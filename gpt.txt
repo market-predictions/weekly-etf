@@ -1,0 +1,18 @@
+Open these files:
+
+masterprompt:
+https://raw.githubusercontent.com/market-predictions/daily-fx/main/daily_outputs/latest/masterprompt.md
+
+ranking json:
+https://raw.githubusercontent.com/market-predictions/daily-fx/main/daily_outputs/latest/today_prediction_ranking.json
+
+ranking csv:
+https://raw.githubusercontent.com/market-predictions/daily-fx/main/daily_outputs/latest/today_prediction_ranking.csv
+
+summary:
+https://raw.githubusercontent.com/market-predictions/daily-fx/main/daily_outputs/latest/today_prediction_summary.txt
+
+integrity:
+https://raw.githubusercontent.com/market-predictions/daily-fx/main/daily_outputs/latest/prediction_integrity_report.json
+
+Read the contents of https://raw.githubusercontent.com/market-predictions/daily-fx/main/daily_outputs/latest/masterprompt.md and apply the masterprompt to the other opened files.

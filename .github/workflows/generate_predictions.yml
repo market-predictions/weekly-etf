@@ -1,0 +1,56 @@
+name: Generate predictions
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "5 6 * * *"
+    - cron: "30 12 * * *"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Run generator
+        env:
+          TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}
+        run: |
+          python prediction.py
+
+      - name: Show latest outputs
+        run: |
+          echo "daily_outputs/latest:"
+          ls -lah daily_outputs/latest || true
+
+      - name: Upload latest prediction files
+        uses: actions/upload-artifact@v4
+        with:
+          name: today-predictions-files
+          path: daily_outputs/latest/
+          if-no-files-found: error
+
+      - name: Commit latest outputs to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add daily_outputs/latest/
+          git diff --cached --quiet || git commit -m "Update latest prediction files"
+          git push

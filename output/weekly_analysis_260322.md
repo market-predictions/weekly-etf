@@ -1,0 +1,537 @@
+# Weekly Report Review 2026-03-22
+
+> *This report is for informational and educational purposes only; please see the disclaimer at the end.*
+
+## 1. ✅ Executive summary
+- **Primary regime:** Policy Transition / Mixed Regime
+- **Secondary cross-current:** Late-Cycle Inflationary
+- **Geopolitical regime:** Acute disruption risk
+- **What changed this week:** The portfolio is inherited from `weekly_analysis_260321.md`. The major change since that report is not the macro core but the geopolitical overlay: the Hormuz and wider Iran conflict escalated further over the weekend, Iraq declared force majeure on some oilfields tied to export disruption, and European gas stress intensified. That reinforces yesterday’s gold / defense / energy tilt rather than reversing it.
+- **Overall portfolio judgment:** The portfolio remains correctly aligned with a slowing-growth, still-sticky-inflation backdrop that is now being amplified by an energy and logistics shock. The right posture is still a defensive-offensive barbell: quality equity core, gold, defense, energy, inflation-linked ballast, and short-duration liquidity.
+- **Main takeaway:** **Stay with the barbell; do not rotate back into broad beta yet.**
+
+## 2. 📌 Portfolio action snapshot
+
+### ➕ Add
+- GLD
+- ITA
+- IXC
+
+### ✅ Hold
+- QUAL
+- TIP
+- SHY
+
+### ⚠️ Hold but replaceable
+- XLI
+- XLU
+
+### ➖ Reduce
+- None
+
+### ❌ Close
+- None
+
+### 🔁 Best replacements to fund
+- No forced replacement this week
+- If funding is needed, first sources are XLU and then XLI
+
+### Top 3 actions this week
+1. Keep adding on strength or pullbacks in GLD, ITA, and IXC.
+2. Keep QUAL as the core equity anchor.
+3. Keep XLU and XLI on a short leash as replaceable sleeves.
+
+### Top 3 risks this week
+1. Fast Gulf de-escalation removes part of the energy and gold premium.
+2. A growth rebound plus cleaner disinflation would weaken the defensive barbell.
+3. Overconcentration in U.S. exposures limits upside participation elsewhere.
+
+## 3. 🧭 Regime dashboard
+### Macro regime
+- Growth: slowing
+- Inflation: sticky / easing only slowly
+- Central banks: restrictive / on hold
+- Real rates: mildly restrictive
+- Credit: mixed, not dislocated
+- USD: firm-bias backdrop
+- Commodities: inflationary pressure
+- Equity leadership: quality / defense / real assets favored
+- Bond market signal: mixed, with renewed inflation risk from energy
+- **Primary regime:** Policy Transition / Mixed Regime
+- Secondary cross-current: Late-Cycle Inflationary
+
+### Geopolitical regime
+- **Regime classification:** Acute disruption risk
+- Driver 1: Strait of Hormuz disruption and wider regional escalation
+- Driver 2: attacks on Middle East oil and gas infrastructure
+- Driver 3: temporary U.S. import duty / trade friction
+- Overall portfolio implication: overweight energy, gold, defense, quality, and liquidity; underweight broad EM beta, small caps, and pure long-duration disinflation trades.
+
+## 4. 🚀 Structural Opportunity Radar
+
+| Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
+|---|---|---|---|---:|---:|---|---|---|
+| Defense innovation | ITA | PPA | Persistent rearmament, backlog, and security spending | 5 | 5 | Actionable now | Continued order visibility and leadership without a sharp de-escalation break | 3–12 months |
+| AI power / grid buildout | PAVE | IFRA | Data-centre electricity and grid capex are accelerating | 5 | 3 | Scale in slowly | Grid bottlenecks and utility capex must keep broadening into listed beneficiaries | 1–5 years |
+| Robotics / automation | ROBO | BOTZ | Factory automation and labor substitution remain strong secular drivers | 4 | 3 | Watchlist | Broader industrial and software order momentum must stay firm | 1–5 years |
+| Advanced nuclear / uranium | URA | URNM | Policy support and fuel-cycle rebuilding are improving | 4 | 2 | Watchlist | Deployment milestones and supply-chain clarity must improve | 2–7 years |
+| AI cooling / thermal management | No clean ETF yet | GRID | Power-density and cooling demand keep rising with AI buildout | 4 | 3 | Too early | Cleaner public-market vehicles or broader listed monetization are needed | 1–5 years |
+
+Actionable now is still defense innovation. AI power / grid buildout is moving toward investable scale but still belongs in the staged bucket rather than the core portfolio today. Robotics and advanced nuclear remain structurally attractive, but their near-term timing is weaker than gold, defense, and energy in the current macro-geopolitical setup.
+
+### Best structural opportunities not yet actionable
+1. AI cooling / thermal management
+2. Advanced nuclear / uranium
+3. Robotics / automation
+
+## 5. 📅 Key risks / invalidators
+- **Macro invalidators:** faster-than-expected disinflation, cleaner growth reacceleration, or a strong payroll rebound.
+- **Market-based invalidators:** cyclical breadth reasserts itself, long duration materially outperforms inflation hedges, or energy leadership breaks down.
+- **Geopolitical invalidators:** rapid de-escalation, reopening of Hormuz, or normalization of energy infrastructure.
+- **Second-order invalidators:** no pass-through from energy to inflation expectations, or no domestic industrial benefit from trade friction.
+- **Portfolio construction risks:** U.S. concentration, reduced participation in a risk-on rally, and overlap between ITA and XLI.
+
+## 6. 🧭 Bottom line
+- what should be exited first: nothing yet
+- what deserves additional capital first: GLD, ITA, IXC
+- what is acceptable but replaceable: XLU and XLI
+- **Single best portfolio upgrade this week:** Keep the inaugural allocation centered on quality + gold + defense + energy rather than rotating toward broad passive beta.
+
+## 7. 🗺️ Asset allocation map
+
+| Bucket | Stance | Reason |
+|---|---|---|
+| US equities | Overweight | Better quality mix and policy insulation than most regions |
+| Europe equities | Underweight | More exposed to energy/LNG shock spillovers |
+| EM equities | Avoid for now | Vulnerable to stronger USD, energy shock, and trade friction |
+| Japan equities | Neutral | Better governance, but still energy-import exposed |
+| large cap | Overweight | Balance-sheet quality matters in mixed growth |
+| small cap | Underweight | Financing sensitivity and lower resilience |
+| growth | Neutral | Quality growth okay; speculative duration growth less attractive |
+| value | Neutral | Energy/defense support helps, but broad value is not a clean regime winner |
+| quality | Overweight | Best fit for slowing growth + inflation uncertainty |
+| defensives | Overweight | Growth softening still matters |
+| cyclicals | Neutral | Selective only |
+| long duration government bonds | Underweight | Energy shock keeps inflation risk alive |
+| intermediate duration bonds | Neutral | Some hedge value, but not top conviction |
+| inflation hedges | Overweight | Energy and shipping risks still live |
+| gold | Overweight | Haven + inflation hedge |
+| energy | Overweight | Direct beneficiary of supply shock |
+| industrials / defense | Overweight | Defense budgets and reshoring effects |
+| broad commodities | Neutral | Positive, but less precise than energy/gold |
+| USD-sensitive assets | Underweight | Dollar and rates backdrop remains a headwind |
+| non-USD assets | Neutral | Selective only |
+
+## 8. 🔍 Second-order effects map
+
+| Driver | First-order effect | Second-order effect | Likely beneficiaries | Likely losers | ETF implication | Timing | Confidence |
+|---|---|---|---|---|---|---|---|
+| Hormuz disruption | Oil/LNG/shipping shock | Higher inflation expectations, tighter supply, margin pressure, policy caution | Energy, gold, defense | Transport, import-dependent cyclicals, EM beta | Overweight IXC, GLD, ITA | Immediate to 3 months | High |
+| Slower U.S. growth | Softer demand and weaker hiring | Quality/defensive premium, more fragile cyclicals, lower tolerance for leverage | QUAL, XLU, SHY | Small caps, weak balance-sheet beta | Overweight QUAL, keep ballast sleeves | 1–12 months | Medium |
+| Temporary import duty | Higher import costs / trade friction | Supply-chain relocation, domestic industrial support, imported-margin pressure | XLI, selective U.S. industry | Broad EM and import-sensitive sectors | Hold XLI, avoid broad EM beta | 3–12 months | Medium |
+| Fed on hold with inflation risk | No immediate policy relief | Opportunity cost for long duration, stronger case for short duration and inflation buffers | SHY, TIP, gold | Pure long-duration bets | Prefer SHY/TIP over aggressive duration | 1–6 months | Medium |
+
+## 9. 📊 Current position review
+
+### QUAL — iShares MSCI USA Quality Factor ETF
+**Scorecard**
+| Factor | Score | Weighted Contribution |
+|---|---:|---:|
+| Macro Fit | 4 | 0.80 |
+| Geopolitical Fit | 3 | 0.30 |
+| Second-Order Fit | 4 | 0.40 |
+| Trend Quality | 4 | 0.60 |
+| Relative Strength vs Alternatives | 4 | 0.60 |
+| Downside Asymmetry | 4 | 0.40 |
+| Opportunity-Cost Efficiency | 4 | 0.40 |
+| Diversification Value | 3 | 0.30 |
+| **Total Score** |  | **3.80** |
+
+**Assessment**
+- Thesis status: intact
+- Best reason to own: quality remains the best broad equity core in this regime
+- Key risk: a full risk-on rotation into cyclicals could temporarily outrun it
+- Upgrade trigger: cleaner disinflation without a new energy spike
+- Downgrade trigger: broad equity breadth collapse
+- Default score-based action: Hold
+- **Final action:** Hold
+- Override reason if any: none
+- Conviction tier: Tier 2
+
+### ITA — iShares U.S. Aerospace & Defense ETF
+**Scorecard**
+| Factor | Score | Weighted Contribution |
+|---|---:|---:|
+| Macro Fit | 4 | 0.80 |
+| Geopolitical Fit | 5 | 0.50 |
+| Second-Order Fit | 5 | 0.50 |
+| Trend Quality | 5 | 0.75 |
+| Relative Strength vs Alternatives | 5 | 0.75 |
+| Downside Asymmetry | 3 | 0.30 |
+| Opportunity-Cost Efficiency | 5 | 0.50 |
+| Diversification Value | 4 | 0.40 |
+| **Total Score** |  | **4.50** |
+
+**Assessment**
+- Thesis status: very strong
+- Best reason to own: direct beneficiary of elevated conflict risk and defense demand
+- Key risk: de-escalation or valuation compression after strong gains
+- Upgrade trigger: continued leadership and fresh order visibility
+- Downgrade trigger: fast de-escalation plus leadership rollover
+- Default score-based action: Add
+- **Final action:** Add
+- Override reason if any: none
+- Conviction tier: Tier 1
+
+### GLD — SPDR Gold Shares
+**Scorecard**
+| Factor | Score | Weighted Contribution |
+|---|---:|---:|
+| Macro Fit | 4 | 0.80 |
+| Geopolitical Fit | 5 | 0.50 |
+| Second-Order Fit | 5 | 0.50 |
+| Trend Quality | 5 | 0.75 |
+| Relative Strength vs Alternatives | 5 | 0.75 |
+| Downside Asymmetry | 4 | 0.40 |
+| Opportunity-Cost Efficiency | 5 | 0.50 |
+| Diversification Value | 5 | 0.50 |
+| **Total Score** |  | **4.70** |
+
+**Assessment**
+- Thesis status: very strong
+- Best reason to own: best blend of haven demand and inflation-tail protection
+- Key risk: real-yield rebound if crisis premium fades
+- Upgrade trigger: persistent stress or a softer real-rate path
+- Downgrade trigger: clear de-escalation and rising real yields
+- Default score-based action: Add
+- **Final action:** Add
+- Override reason if any: none
+- Conviction tier: Tier 1
+
+### IXC — iShares Global Energy ETF
+**Scorecard**
+| Factor | Score | Weighted Contribution |
+|---|---:|---:|
+| Macro Fit | 4 | 0.80 |
+| Geopolitical Fit | 5 | 0.50 |
+| Second-Order Fit | 5 | 0.50 |
+| Trend Quality | 4 | 0.60 |
+| Relative Strength vs Alternatives | 5 | 0.75 |
+| Downside Asymmetry | 3 | 0.30 |
+| Opportunity-Cost Efficiency | 5 | 0.50 |
+| Diversification Value | 4 | 0.40 |
+| **Total Score** |  | **4.35** |
+
+**Assessment**
+- Thesis status: strong
+- Best reason to own: cleanest direct expression of the current supply-shock regime
+- Key risk: sharp reversal if the Gulf risk premium collapses
+- Upgrade trigger: persistent export/logistics disruption and sustained oil leadership
+- Downgrade trigger: rapid restoration of Gulf flows
+- Default score-based action: Add
+- **Final action:** Add
+- Override reason if any: none
+- Conviction tier: Tier 1
+
+### XLI — Industrial Select Sector SPDR Fund
+**Scorecard**
+| Factor | Score | Weighted Contribution |
+|---|---:|---:|
+| Macro Fit | 3 | 0.60 |
+| Geopolitical Fit | 4 | 0.40 |
+| Second-Order Fit | 4 | 0.40 |
+| Trend Quality | 4 | 0.60 |
+| Relative Strength vs Alternatives | 3 | 0.45 |
+| Downside Asymmetry | 3 | 0.30 |
+| Opportunity-Cost Efficiency | 3 | 0.30 |
+| Diversification Value | 3 | 0.30 |
+| **Total Score** |  | **3.35** |
+
+**Assessment**
+- Thesis status: intact but selective
+- Best reason to own: captures reshoring / defense-adjacent second-order effects
+- Key risk: more economically sensitive than QUAL
+- Upgrade trigger: cleaner domestic capex momentum
+- Downgrade trigger: deeper growth scare
+- Default score-based action: Reduce
+- **Final action:** Hold
+- Override reason if any: fills a real domestic industrial role in the book
+- Conviction tier: Tier 3
+
+### XLU — Utilities Select Sector SPDR Fund
+**Scorecard**
+| Factor | Score | Weighted Contribution |
+|---|---:|---:|
+| Macro Fit | 4 | 0.80 |
+| Geopolitical Fit | 3 | 0.30 |
+| Second-Order Fit | 4 | 0.40 |
+| Trend Quality | 3 | 0.45 |
+| Relative Strength vs Alternatives | 2 | 0.30 |
+| Downside Asymmetry | 4 | 0.40 |
+| Opportunity-Cost Efficiency | 2 | 0.20 |
+| Diversification Value | 4 | 0.40 |
+| **Total Score** |  | **3.25** |
+
+**Assessment**
+- Thesis status: intact but low-conviction
+- Best reason to own: defensive ballast if growth keeps softening
+- Key risk: opportunity cost if stronger replacements emerge
+- Upgrade trigger: weaker labor / lower yields
+- Downgrade trigger: clear reacceleration and cyclical breadth expansion
+- Default score-based action: Reduce
+- **Final action:** Hold
+- Override reason if any: retained as ballast despite middling score
+- Conviction tier: Tier 3
+
+### TIP — iShares TIPS Bond ETF
+**Scorecard**
+| Factor | Score | Weighted Contribution |
+|---|---:|---:|
+| Macro Fit | 4 | 0.80 |
+| Geopolitical Fit | 4 | 0.40 |
+| Second-Order Fit | 4 | 0.40 |
+| Trend Quality | 3 | 0.45 |
+| Relative Strength vs Alternatives | 3 | 0.45 |
+| Downside Asymmetry | 4 | 0.40 |
+| Opportunity-Cost Efficiency | 3 | 0.30 |
+| Diversification Value | 4 | 0.40 |
+| **Total Score** |  | **3.60** |
+
+**Assessment**
+- Thesis status: intact
+- Best reason to own: cleaner inflation buffer than nominal duration
+- Key risk: less upside than gold if stress intensifies
+- Upgrade trigger: higher breakevens and persistent pass-through
+- Downgrade trigger: rapid oil normalization and disinflation
+- Default score-based action: Hold
+- **Final action:** Hold
+- Override reason if any: none
+- Conviction tier: Tier 2
+
+### SHY — iShares 1-3 Year Treasury Bond ETF
+**Scorecard**
+| Factor | Score | Weighted Contribution |
+|---|---:|---:|
+| Macro Fit | 4 | 0.80 |
+| Geopolitical Fit | 3 | 0.30 |
+| Second-Order Fit | 4 | 0.40 |
+| Trend Quality | 3 | 0.45 |
+| Relative Strength vs Alternatives | 3 | 0.45 |
+| Downside Asymmetry | 5 | 0.50 |
+| Opportunity-Cost Efficiency | 3 | 0.30 |
+| Diversification Value | 4 | 0.40 |
+| **Total Score** |  | **3.60** |
+
+**Assessment**
+- Thesis status: intact
+- Best reason to own: preserves liquidity and optionality while policy risk is live
+- Key risk: not a return engine
+- Upgrade trigger: more cross-asset volatility or better future entry opportunities
+- Downgrade trigger: cleaner risk-on regime with less inflation shock risk
+- Default score-based action: Hold
+- **Final action:** Hold
+- Override reason if any: none
+- Conviction tier: Tier 2
+
+## 10. ➕ Best new opportunities
+
+### A. Macro-derived opportunities
+
+### [Rank #1] GLD — SPDR Gold Shares
+[Open full TradingView chart](https://www.tradingview.com/chart/?symbol=AMEX%3AGLD)
+
+**Prospective score**
+- Macro Fit: 4
+- Geopolitical Fit: 5
+- Second-Order Fit: 5
+- Trend Quality: 5
+- Relative Strength vs Alternatives: 5
+- Downside Asymmetry: 4
+- Opportunity-Cost Efficiency: 5
+- Diversification Value: 5
+- Total Score: 4.70
+
+**Theme**  
+Large, liquid gold exposure as a haven and inflation hedge.
+
+**Why it fits now**  
+Slowing growth plus renewed energy-driven inflation risk and acute geopolitical stress is exactly the backdrop where gold can diversify both equity and rate uncertainty.
+
+**Why this beats current alternatives**
+It provides cleaner portfolio insurance than broad defensives and cleaner inflation protection than nominal duration.
+
+**Technical analysis**
+- Trend status: strong medium-term uptrend
+- Support: around the mid-460s
+- Resistance: around the prior highs near 510
+- Momentum: strong
+- Breakout / breakdown level: sustained break above the recent high confirms continuation; a break back under the mid-450s weakens the setup
+- Preferred entry style: starter now or add on pullback
+- TA vs macro fit: confirms macro
+
+**Second-order opportunity / threat map**
+- Driver: energy shock and policy uncertainty
+- Transmission path: oil/shipping stress → inflation expectations → haven demand
+- Opportunity created: portfolio hedge with positive trend support
+- Threat created: reversal if real yields rise and crisis premium fades
+
+| 3 arguments pro | 3 arguments contra |
+|---|---|
+| Haven demand remains supported by the current energy and conflict shock. | Fast de-escalation could remove part of the crisis premium. |
+| Gold is a cleaner diversifier than broad equity beta in this regime. | Rising real yields can cap upside even if inflation stays sticky. |
+| Trend structure remains stronger than most alternative hedges. | A hard risk-on rotation could create relative underperformance. |
+
+**Why now rather than later**  
+Because the hedge value matters now, not only after the shock passes.
+
+**Replacement logic**
+- better than: broad passive beta and pure long-duration risk in this regime
+- score difference: materially stronger than XLU and XLI in the current setup
+- implementation note: **core position**
+
+### [Rank #2] ITA — iShares U.S. Aerospace & Defense ETF
+[Open full TradingView chart](https://www.tradingview.com/chart/?symbol=AMEX%3AITA)
+
+**Prospective score**
+- Macro Fit: 4
+- Geopolitical Fit: 5
+- Second-Order Fit: 5
+- Trend Quality: 5
+- Relative Strength vs Alternatives: 5
+- Downside Asymmetry: 3
+- Opportunity-Cost Efficiency: 5
+- Diversification Value: 4
+- Total Score: 4.50
+
+**Theme**  
+Pure-play U.S. defense and aerospace exposure benefiting from elevated conflict risk and spending durability.
+
+**Why it fits now**  
+Defense is one of the clearest listed equity expressions of the current geopolitical regime and has clearer direct support than generic industrials.
+
+**Why this beats current alternatives**
+It is a purer geopolitical and backlog-backed exposure than XLI.
+
+**Technical analysis**
+- Trend status: strong uptrend and leadership
+- Support: low-to-mid 230s
+- Resistance: recent highs in the mid-240s to near 250
+- Momentum: strong
+- Breakout / breakdown level: break above highs confirms continuation; failure back below recent support cools the setup
+- Preferred entry style: starter on pullback or breakout add
+- TA vs macro fit: strongly confirms macro
+
+**Second-order opportunity / threat map**
+- Driver: conflict persistence and defense production support
+- Transmission path: war risk → defense spending / order visibility → leadership premium
+- Opportunity created: direct exposure to rearmament
+- Threat created: de-escalation or valuation compression after strong performance
+
+| 3 arguments pro | 3 arguments contra |
+|---|---|
+| Defense spending and backlog visibility remain strong. | A fast de-escalation could compress the geopolitical premium. |
+| Defense is a purer expression of current conflict risk than broad industrial beta. | Valuations are less forgiving after strong performance. |
+| The trend remains one of the clearest leadership trends in the equity book. | If leadership rolls over, the technical case weakens quickly. |
+
+**Why now rather than later**  
+Because leadership is already visible; waiting risks worse entry levels if the trend persists.
+
+**Replacement logic**
+- better than: XLI and broad industrial beta
+- score difference: stronger than XLI by more than 1 point in the current model
+- implementation note: **core / high-conviction satellite**
+
+### [Rank #3] IXC — iShares Global Energy ETF
+[Open full TradingView chart](https://www.tradingview.com/chart/?symbol=AMEX%3AIXC)
+
+**Prospective score**
+- Macro Fit: 4
+- Geopolitical Fit: 5
+- Second-Order Fit: 5
+- Trend Quality: 4
+- Relative Strength vs Alternatives: 5
+- Downside Asymmetry: 3
+- Opportunity-Cost Efficiency: 5
+- Diversification Value: 4
+- Total Score: 4.35
+
+**Theme**  
+Global energy equity exposure as the cleanest listed expression of the present supply shock.
+
+**Why it fits now**  
+The current conflict is directly disrupting oil and LNG flows, and IXC is one of the most direct ETF ways to express that.
+
+**Why this beats current alternatives**
+It is a more precise inflation and supply-shock hedge than broad commodities or generic value.
+
+**Technical analysis**
+- Trend status: strong medium-term uptrend
+- Support: upper-40s to low-50s area
+- Resistance: recent highs just above 50 into the low-50s
+- Momentum: strong but more reversal-prone than GLD
+- Breakout / breakdown level: clean break above recent highs confirms continuation; break back below support weakens the setup
+- Preferred entry style: tactical starter or breakout add
+- TA vs macro fit: confirms macro
+
+**Second-order opportunity / threat map**
+- Driver: Hormuz disruption and regional infrastructure damage
+- Transmission path: supply shock → higher energy prices → better producer margins / energy leadership
+- Opportunity created: direct participation in the supply-shock winners
+- Threat created: fast political resolution or reserve releases reducing the premium
+
+| 3 arguments pro | 3 arguments contra |
+|---|---|
+| Energy is the cleanest direct expression of the current supply shock. | Energy is also the most vulnerable to a sudden de-escalation. |
+| The sector remains one of the strongest inflation buffers in the book. | Energy equities are more cyclical and more volatile than gold or quality. |
+| Trend support remains stronger than in most generic cyclical alternatives. | If the shock proves brief, upside can fade quickly. |
+
+**Why now rather than later**  
+Because the ETF is most useful while the supply shock is unresolved and inflation pass-through risk remains live.
+
+**Replacement logic**
+- better than: broad commodities and weak cyclical beta
+- score difference: materially stronger than XLU and modestly stronger than XLI
+- implementation note: **satellite / tactical starter**
+
+### B. Structural opportunities
+No structural-only theme is promoted into the portfolio this week. Defense innovation is already captured through ITA in the macro-derived sleeve. AI power / grid buildout is closest, but still belongs in **Scale in slowly** rather than in the core weekly action list.
+
+## 11. 🔁 Portfolio rotation plan
+### ❌ Close
+- None
+
+### ➖ Reduce
+- None
+
+### ✅ Hold
+- QUAL
+- TIP
+- SHY
+- XLI
+- XLU
+
+### ➕ Add
+- GLD
+- ITA
+- IXC
+
+### 🔁 Replace
+- No forced replacement this week
+- If structural confirmation improves, first funding sources are XLU then XLI
+
+## 12. 📋 Final action table
+
+| Ticker | ETF | Existing/New | Weight Now | Suggested Action | Conviction Tier | Total Score | Portfolio Role | Better Alternative Exists? | Short Reason |
+|---|---|---|---:|---|---|---:|---|---|---|
+| QUAL | iShares MSCI USA Quality Factor ETF | Existing | 20 | Hold | Tier 2 | 3.80 | Core equity anchor | No | Best broad quality core |
+| ITA | iShares U.S. Aerospace & Defense ETF | Existing | 15 | Add | Tier 1 | 4.50 | Geopolitical winner | No | Strongest defense leadership |
+| GLD | SPDR Gold Shares | Existing | 15 | Add | Tier 1 | 4.70 | Haven hedge | No | Best hedge in current regime |
+| IXC | iShares Global Energy ETF | Existing | 12 | Add | Tier 1 | 4.35 | Supply-shock hedge | No | Clean energy shock expression |
+| XLI | Industrial Select Sector SPDR Fund | Existing | 10 | Hold | Tier 3 | 3.35 | Domestic industrial sleeve | Yes | Useful but more replaceable |
+| XLU | Utilities Select Sector SPDR Fund | Existing | 8 | Hold | Tier 3 | 3.25 | Defensive ballast | Yes | Acceptable but low-conviction |
+| TIP | iShares TIPS Bond ETF | Existing | 10 | Hold | Tier 2 | 3.60 | Inflation ballast | No | Better than nominal duration now |
+| SHY | iShares 1-3 Year Treasury Bond ETF | Existing | 10 | Hold | Tier 2 | 3.60 | Liquidity sleeve | No | Preserves optionality |
+
+## 13. Disclaimer
+
+This report is provided for informational and educational purposes only. It is not investment, legal, tax, or financial advice, and it is not a recommendation to buy, sell, or hold any security. It does not take into account the specific investment objectives, financial situation, or particular needs of any recipient. Views are general in nature, may change without notice, and may not be suitable for every investor. Investing involves risk, including possible loss of principal.

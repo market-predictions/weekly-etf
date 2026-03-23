@@ -1,0 +1,62 @@
+name: Send weekly ETF report
+
+on:
+  push:
+    paths:
+      - "output/weekly_analysis_*.md"
+      - "send_report.py"
+      - ".github/workflows/send-weekly-report.yml"
+  workflow_dispatch:
+
+jobs:
+  send-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system packages for PDF rendering
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2 \
+            libpango-1.0-0 \
+            libgdk-pixbuf-2.0-0 \
+            libffi-dev \
+            shared-mime-info \
+            fonts-liberation \
+            fonts-dejavu-core \
+            fonts-lato
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install matplotlib mistune weasyprint
+
+
+      - name: Validate HTML/PDF render before send
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import send_report as sr
+          output_dir = Path("output")
+          latest = sr.latest_report_file(output_dir)
+          sr.generate_delivery_assets(output_dir, latest)
+          print(f"RENDER_OK | report={latest.name}")
+          PY
+
+      - name: Send email
+        env:
+          MRKT_RPRTS_SMTP_HOST: ${{ secrets.MRKT_RPRTS_SMTP_HOST }}
+          MRKT_RPRTS_SMTP_PORT: ${{ secrets.MRKT_RPRTS_SMTP_PORT }}
+          MRKT_RPRTS_SMTP_USER: ${{ secrets.MRKT_RPRTS_SMTP_USER }}
+          MRKT_RPRTS_SMTP_PASS: ${{ secrets.MRKT_RPRTS_SMTP_PASS }}
+          MRKT_RPRTS_MAIL_FROM: ${{ secrets.MRKT_RPRTS_MAIL_FROM }}
+          MRKT_RPRTS_MAIL_TO: ${{ secrets.MRKT_RPRTS_MAIL_TO }}
+        run: python send_report.py
