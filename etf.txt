@@ -353,7 +353,7 @@ You must make explicit portfolio judgments.
 I may provide the portfolio using the structure below.
 
 If I do not explicitly provide a new portfolio in the current chat, you must automatically use the most recent stored report in:
-- repository: `market-predictions/daily-fx`
+- repository: `market-predictions/daily-etf`
 - folder: `output/`
 
 ## Most recent report rule
@@ -1044,7 +1044,7 @@ This report is provided for informational and educational purposes only. It is n
 # 11. DUAL OUTPUT + GITHUB WRITE REQUIREMENT
 
 Present the full report in chat and also write the same report as a Markdown file to:
-- repository: `market-predictions/daily-fx`
+- repository: `market-predictions/daily-etf`
 - folder: `output/`
 
 ## Full-chat-publication rule
@@ -1113,7 +1113,7 @@ After those three steps, you must provide a short delivery receipt that explicit
 
 # 12. PRIOR REPORT LOOKUP RULE
 
-Before starting the current analysis, look in `output/` within `market-predictions/daily-fx` for the most recent available report matching:
+Before starting the current analysis, look in `output/` within `market-predictions/daily-etf` for the most recent available report matching:
 - `weekly_analysis_YYMMDD.md`
 - `weekly_analysis_YYMMDD_NN.md`
 
