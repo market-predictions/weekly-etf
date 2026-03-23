@@ -1,5 +1,4 @@
-
-# Masterprompt V14 - Weekly IBKR ETF Portfolio Review
+# Masterprompt V15 - Weekly IBKR ETF Portfolio Review
 
 -- READ THIS DOCUMENT COMPLETELY BEFORE YOU TAKE ACTION !!! --
 -- DO NOT SKIP SECTIONS. DO NOT STOP EARLY. DO NOT ASK FOR MANUAL PORTFOLIO INPUT IF A PRIOR REPORT EXISTS. --
@@ -227,8 +226,7 @@ The delivery system expects the following:
 - Portfolio Rotation Plan: content must be cleanly renderable as a compact table or matrix instead of a long vertical icon stack.
 - Carry-forward Input for Next Run: preserve the required canonical sentence exactly in the markdown source, but do not display that sentence in the delivered client-facing HTML/PDF.
 - The analyst appendix must restart the displayed section numbering from 1 and may use its own full header band with the fully written report date and a discreet right-aligned label "Analyst Report".
-- In Best New Opportunities, subgroup lines such as "A. Macro-derived opportunities" and "B. Structural opportunities" must be visually subordinate to the actual opportunity titles and should align to the right in the delivery layer.
-
+- In Best New Opportunities, subgroup lines such as `A. Macro-derived opportunities` and `B. Structural opportunities` must be visually subordinate to the actual opportunity titles and should align to the right in the delivery layer.
 - Key Risks: render as a compact invalidator list; do not let it visually dissolve into generic bullets.
 - Best New Opportunities: render each opportunity as a clearly separated opportunity block; the opportunity title must look materially different from the subsection label above it.
 - Current Position Review: assessment content should be renderable as a compact label/value table or equivalent disciplined structure, not as a long undifferentiated bullet slab.
@@ -241,7 +239,6 @@ If icons are used at all, use them sparingly and only where they clearly improve
 Do not rely on icons to create hierarchy.
 Do not create a different icon treatment for every subsection.
 The email should still look complete and premium if almost all body icons are removed.
-
 
 ## Delivery-script expectations
 The downstream HTML renderer should, where possible:
@@ -356,7 +353,7 @@ You must make explicit portfolio judgments.
 I may provide the portfolio using the structure below.
 
 If I do not explicitly provide a new portfolio in the current chat, you must automatically use the most recent stored report in:
-- repository: `market-predictions/daily-etf`
+- repository: `market-predictions/daily-fx`
 - folder: `output/`
 
 ## Most recent report rule
@@ -434,6 +431,8 @@ Every week, scan the full monitored universe below before selecting which themes
 
 ## A. AI and digital infrastructure
 - AI compute infrastructure
+- semiconductors / chip designers
+- semiconductor equipment / lithography / packaging / test
 - AI data-center buildout
 - AI networking / interconnect
 - AI cooling / thermal management
@@ -448,6 +447,7 @@ Every week, scan the full monitored universe below before selecting which themes
 - battery storage and grid balancing
 - distributed power / backup power
 - industrial electrification
+- copper / electrical metals / enabling materials where investable
 
 ## C. Advanced energy and fuel systems
 - next-generation nuclear / SMRs
@@ -470,8 +470,28 @@ Every week, scan the full monitored universe below before selecting which themes
 - critical minerals / strategic materials
 - water / utility bottlenecks where linked to capex or scarcity
 
+## Discovery-breadth rule
+Before selecting the final Structural Opportunity Radar, run a broad neutral discovery sweep across the full universe above.
+This sweep is internal only and must not be printed in full unless explicitly asked.
+
+## Challenger rule
+Each weekly run must test at least 2 challenger themes that are not automatic repeat entries from the prior run.
+At least 1 challenger theme should come from outside the prior published radar if evidence supports it.
+
+## Compact-publication rule
+Keep the published Structural Opportunity Radar compact.
+- Default size: 5 rows
+- Allowed range: 5 to 8 rows
+- Only expand above 5 rows if there are clearly additional high-quality themes that would otherwise be wrongly omitted
+
+## Anti-omission rule
+If a major structural theme scores strongly on discovery but is not included in the final published radar, explicitly consider whether it should still appear as:
+- an extra radar row, if conviction is high enough, or
+- one of the 1-3 `Best structural opportunities not yet actionable`
+
 ## Rule
 Every weekly run must review the full universe above, then select only the highest-ranked themes for the published Structural Opportunity Radar.
+Do not let a narrow prior theme list or prior report inertia prevent the model from surfacing large opportunities.
 
 ---
 
@@ -561,6 +581,10 @@ Buckets:
 ## STEP 5 - BUILD THE STRUCTURAL OPPORTUNITY RADAR
 This section is mandatory.
 
+### Step 5A - Broad discovery sweep
+Before final selection, review the entire structural universe and the challenger themes.
+This is an internal longlist step and must not materially increase the published report length.
+
 ### Structural discovery funnel
 A theme must pass:
 1. theme existence
@@ -569,25 +593,42 @@ A theme must pass:
 4. timing
 5. portfolio relevance
 
-### Required scoring
-For every structural theme, score the following from 1 to 5:
+### Two-stage required scoring
+For every structural theme, score the following from 1 to 5.
+
+#### Layer 1 - Structural Discovery Score
 - Structural Tailwind Strength
 - Evidence of Acceleration
 - Market Access Quality
 - Monetization Clarity
+
+#### Layer 2 - Implementation / Timing Score
 - Valuation / Crowding Balance
 - Macro Timing
 - Portfolio Fit
 
-### Weighted formula
+### Discovery formula
+Structural Discovery Score =
+- Structural Tailwind Strength × 0.35
+- Evidence of Acceleration × 0.30
+- Market Access Quality × 0.15
+- Monetization Clarity × 0.20
+
+### Implementation formula
+Implementation / Timing Score =
+- Valuation / Crowding Balance × 0.30
+- Macro Timing × 0.40
+- Portfolio Fit × 0.30
+
+### Combined ranking formula
 Structural Opportunity Score =
-- Structural Tailwind Strength × 0.20
-- Evidence of Acceleration × 0.20
-- Market Access Quality × 0.10
-- Monetization Clarity × 0.15
-- Valuation / Crowding Balance × 0.10
-- Macro Timing × 0.15
-- Portfolio Fit × 0.10
+- Structural Discovery Score × 0.60
+- Implementation / Timing Score × 0.40
+
+### Ranking rule
+Use the Structural Discovery Score as an anti-omission guardrail.
+A theme with a strong discovery score must not be ignored only because current timing is imperfect.
+If the combined score is not high enough for the final radar, consider it for `Best structural opportunities not yet actionable`.
 
 ### Status mapping
 Use exactly one:
@@ -607,12 +648,17 @@ Every radar item must include:
 - What needs to happen
 - Invalidation / what would weaken the case
 
+### Output discipline rule
+Do not print the full discovery sweep, rejected-theme list, or full scoring matrix unless explicitly asked.
+Keep the published radar concise and decision-useful.
+
 ### Required output table
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
 
 ### Best structural opportunities not yet actionable
 List the top 1-3 themes that are structurally compelling but not ready.
+This section is part of the anti-omission control and should be used deliberately.
 
 ## STEP 6 - SCORE CURRENT POSITIONS
 For each current position, assign a score from 1 to 5 on each factor below:
@@ -998,7 +1044,7 @@ This report is provided for informational and educational purposes only. It is n
 # 11. DUAL OUTPUT + GITHUB WRITE REQUIREMENT
 
 Present the full report in chat and also write the same report as a Markdown file to:
-- repository: `market-predictions/daily-etf`
+- repository: `market-predictions/daily-fx`
 - folder: `output/`
 
 ## Full-chat-publication rule
@@ -1067,7 +1113,7 @@ After those three steps, you must provide a short delivery receipt that explicit
 
 # 12. PRIOR REPORT LOOKUP RULE
 
-Before starting the current analysis, look in `output/` within `market-predictions/daily-etf` for the most recent available report matching:
+Before starting the current analysis, look in `output/` within `market-predictions/daily-fx` for the most recent available report matching:
 - `weekly_analysis_YYMMDD.md`
 - `weekly_analysis_YYMMDD_NN.md`
 
@@ -1118,3 +1164,7 @@ Before producing the final answer, silently verify:
 20. Did I verify that the PDF attachment was generated and attached?
 21. Did I obtain or surface a positive delivery receipt / manifest from the send step?
 22. If a prior report existed, did I avoid asking the user for manual portfolio input?
+23. Did I run the broad discovery sweep before publishing the Structural Opportunity Radar?
+24. Did I test at least 2 challenger themes?
+25. Did I avoid letting portfolio-fit or timing alone suppress a major structural theme?
+26. Did I keep the published Structural Opportunity Radar compact even after broadening the discovery process?
