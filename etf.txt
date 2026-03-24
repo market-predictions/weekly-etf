@@ -386,7 +386,8 @@ The tracked portfolio must follow these rules:
 - Base capital: EUR 100,000
 - Holdings are tracked in native ticker currency
 - Total portfolio NAV is tracked in EUR
-- Use the market close EUR/USD snapshot for USD-to-EUR conversion
+- Use the same-day market close EUR/USD snapshot where available
+- If a same-day close snapshot is not cleanly verifiable, use the latest official reference EUR/USD rate from the Market Data + FX Valuation Protocol
 - Assume whole shares only
 - Residual unallocated capital remains as cash
 - Assume all recommendations are implemented
@@ -424,6 +425,79 @@ The tracked portfolio must follow these rules:
 - Risk concerns:
 
 ---
+
+# 6A. MARKET DATA + FX VALUATION PROTOCOL
+
+This section is mandatory.
+
+The purpose of this section is to make ETF closing-price retrieval and EUR valuation operationally deterministic.
+
+## Primary rule
+Do not block the full valuation update only because a single unified source for all holdings is unavailable.
+A complete end-of-day valuation may use per-ticker verified closes from multiple reputable sources, as long as the source used for each ticker is explicitly deterministic and the pricing timestamp is close-compatible.
+
+## Allowed pricing source hierarchy for ETF closes
+For each ETF holding, use this source priority:
+
+1. official exchange or primary market close
+2. issuer or fund provider page if it clearly shows the latest market price or NAV-relevant trading price
+3. major market data source with latest official close
+4. reputable financial media market quote page
+5. prior verified close from the latest stored report only if no fresh close can be verified
+
+## Allowed FX source hierarchy for USD-to-EUR conversion
+Use this priority for USD-to-EUR conversion:
+
+1. same-day market close EUR/USD snapshot from a reputable FX, central-bank, or market-data source
+2. latest official ECB or equivalent reference rate if same-day close is not yet reliably available
+3. prior verified EUR/USD from the latest stored report only if no fresh FX reference can be verified
+
+## Time-of-day rule
+A same-day ETF close may be used once the U.S. regular session has ended.
+Use regular-session close, not after-hours.
+Do not wait for a single perfect source if regular-session close data is already available per ticker from reputable sources.
+
+## Per-ticker valuation rule
+You must attempt to retrieve a fresh close for every held ETF separately.
+Do not require that all holdings come from one single source.
+Per-ticker verified closes are allowed.
+
+## Incomplete-set rule
+If at least 75% of holdings by count OR at least 85% of invested portfolio weight has a fresh verifiable close:
+- update those holdings to the fresh close
+- carry forward only the holdings that could not be freshly verified
+- clearly state which tickers were carried forward
+- still update total NAV and equity curve
+
+If less than that threshold is met:
+- carry forward the full prior verified portfolio valuation
+- explicitly say that the mark-to-market was not updated because the fresh close-set was too incomplete
+
+## Currency-conversion rule
+If all ETF closes are fresh but same-day EUR/USD is not cleanly available:
+- use the latest official reference EUR/USD rate from the allowed FX hierarchy
+- do not block ETF valuation solely because one exact market-close FX print is unavailable
+
+## Staleness labeling rule
+For every run, classify each holding price as one of:
+- Fresh close
+- Fresh source, non-primary fallback
+- Carried forward
+
+This labeling is internal unless explicitly requested, but it must control the valuation logic.
+
+## Deterministic valuation rule
+The valuation process must prefer a partial but explicitly labeled fresh mark-to-market over a full carry-forward, as long as the Incomplete-set rule is satisfied.
+
+## Mandatory reporting note
+If any holdings were carried forward because fresh closes were unavailable, state this briefly in:
+- Executive Summary (`What changed this week`)
+- Equity Curve and Portfolio Development (`Notes`)
+- Position Changes Executed This Run or Current Portfolio Holdings and Cash
+
+## Anti-freeze rule
+Do not leave the equity curve unchanged merely because one or two holdings or the exact same-day FX close could not be perfectly verified.
+Use the fallback hierarchy and incomplete-set rule to keep the tracked portfolio moving whenever enough of the portfolio can be marked reliably.
 
 # 7. FIXED STRUCTURAL THEME UNIVERSE
 
@@ -759,6 +833,9 @@ Translate the final actions into an implemented model portfolio using these rule
 - Track holdings in native currency
 - Convert total portfolio value to EUR using the market close EUR/USD snapshot
 - Keep residual as cash
+- Apply the Market Data + FX Valuation Protocol for all ETF closes and FX conversion
+- Do not require a single-source all-holdings close set if per-ticker verified closes are available
+- If the Incomplete-set rule is satisfied, update the portfolio using fresh closes where available and carry forward only the unresolved holdings
 
 ## STEP 12 - BUILD THE EQUITY-CURVE SUMMARY
 This step is mandatory.
@@ -1168,3 +1245,7 @@ Before producing the final answer, silently verify:
 24. Did I test at least 2 challenger themes?
 25. Did I avoid letting portfolio-fit or timing alone suppress a major structural theme?
 26. Did I keep the published Structural Opportunity Radar compact even after broadening the discovery process?
+27. Did I attempt per-ticker ETF close retrieval rather than requiring a single-source full close set?
+28. If some closes were missing, did I apply the Incomplete-set rule correctly?
+29. If same-day EUR/USD was unavailable, did I use the allowed FX fallback instead of freezing NAV?
+30. If the equity curve remained unchanged, was that because the incomplete-set threshold truly failed?
