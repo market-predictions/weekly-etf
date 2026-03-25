@@ -1,9 +1,10 @@
-name: Send weekly ETF report
+
+name: Send weekly ETF Pro report
 
 on:
   push:
     paths:
-      - "output/weekly_analysis_*.md"
+      - "output/weekly_analysis_pro_*.md"
       - "send_report.py"
       - ".github/workflows/send-weekly-report.yml"
   workflow_dispatch:
@@ -39,20 +40,23 @@ jobs:
           python -m pip install --upgrade pip
           pip install matplotlib mistune weasyprint
 
-
       - name: Validate HTML/PDF render before send
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
         run: |
           python - <<'PY'
           from pathlib import Path
           import send_report as sr
           output_dir = Path("output")
-          latest = sr.latest_report_file(output_dir)
-          sr.generate_delivery_assets(output_dir, latest)
-          print(f"RENDER_OK | report={latest.name}")
+          latest = sr.latest_report_file(output_dir, mode="pro")
+          sr.generate_delivery_assets(output_dir, latest, mode="pro")
+          print(f"RENDER_OK | mode=pro | report={latest.name}")
           PY
 
       - name: Send email
         env:
+          MRKT_RPRTS_REPORT_MODE: pro
+          MRKT_RPRTS_SUBJECT_PREFIX: Weekly ETF Pro Review
           MRKT_RPRTS_SMTP_HOST: ${{ secrets.MRKT_RPRTS_SMTP_HOST }}
           MRKT_RPRTS_SMTP_PORT: ${{ secrets.MRKT_RPRTS_SMTP_PORT }}
           MRKT_RPRTS_SMTP_USER: ${{ secrets.MRKT_RPRTS_SMTP_USER }}
