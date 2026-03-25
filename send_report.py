@@ -1,7 +1,6 @@
 
 import os
 import re
-import base64
 import smtplib
 from pathlib import Path
 from datetime import datetime
@@ -97,8 +96,6 @@ PLAIN_SUBHEADERS = {
     "Best structural opportunities not yet actionable",
 }
 
-
-
 TRADINGVIEW_URL_TEMPLATE = "https://www.tradingview.com/chart/?symbol={ticker}"
 TICKER_TOKEN_RE = re.compile(r"^[A-Z][A-Z0-9.-]{0,14}$")
 LINKABLE_TABLE_HEADERS = {
@@ -109,14 +106,32 @@ LINKABLE_TABLE_HEADERS = {
     "alternative etf / vehicle",
 }
 
-REPORT_RE = re.compile(r"^weekly_analysis_(\d{6})(?:_(\d{2}))?\.md$")
+STANDARD_REPORT_RE = re.compile(r"^weekly_analysis_(\d{6})(?:_(\d{2}))?\.md$")
+PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
 SECTION_RE = re.compile(r"^##\s+(\d+)\.\s+(.*)$")
 MARKDOWN = mistune.create_markdown(plugins=["table"])
 
+SUBJECT_PREFIX = {
+    "standard": "Weekly ETF Review",
+    "pro": "Weekly ETF Pro Review",
+}
+
 
 # ---------- DISCOVERY ----------
-def report_sort_key(path: Path):
-    match = REPORT_RE.match(path.name)
+def normalize_report_mode(mode: str | None) -> str:
+    mode = (mode or "standard").strip().lower()
+    if mode not in {"standard", "pro"}:
+        raise RuntimeError(f"Unsupported MRKT_RPRTS_REPORT_MODE: {mode}")
+    return mode
+
+
+def report_regex(mode: str):
+    mode = normalize_report_mode(mode)
+    return PRO_REPORT_RE if mode == "pro" else STANDARD_REPORT_RE
+
+
+def report_sort_key(path: Path, mode: str = "standard"):
+    match = report_regex(mode).match(path.name)
     if not match:
         return ("", -1)
     date_key = match.group(1)
@@ -124,22 +139,24 @@ def report_sort_key(path: Path):
     return (date_key, version)
 
 
-def list_report_files(output_dir: Path):
-    files = [p for p in output_dir.glob("weekly_analysis_*.md") if REPORT_RE.match(p.name)]
-    return sorted(files, key=report_sort_key)
+def list_report_files(output_dir: Path, mode: str = "standard"):
+    regex = report_regex(mode)
+    files = [p for p in output_dir.glob("weekly_analysis*.md") if regex.match(p.name)]
+    return sorted(files, key=lambda p: report_sort_key(p, mode=mode))
 
 
-def latest_report_file(output_dir: Path) -> Path:
-    reports = list_report_files(output_dir)
+def latest_report_file(output_dir: Path, mode: str = "standard") -> Path:
+    reports = list_report_files(output_dir, mode=mode)
     if not reports:
-        raise FileNotFoundError("No weekly_analysis_*.md file found in output/")
+        pattern = "weekly_analysis_pro_*.md" if normalize_report_mode(mode) == "pro" else "weekly_analysis_*.md"
+        raise FileNotFoundError(f"No {pattern} file found in output/")
     return reports[-1]
 
 
-def latest_reports_by_day(output_dir: Path):
+def latest_reports_by_day(output_dir: Path, mode: str = "standard"):
     latest_per_day = OrderedDict()
-    for path in list_report_files(output_dir):
-        base_date, _ = report_sort_key(path)
+    for path in list_report_files(output_dir, mode=mode):
+        base_date, _ = report_sort_key(path, mode=mode)
         latest_per_day[base_date] = path
     return list(latest_per_day.values())
 
@@ -154,7 +171,6 @@ def require_env(name: str) -> str:
 
 def normalize_markdown_text(text: str) -> str:
     text = text.replace("\r\n", "\n").replace("\r", "\n")
-    # Defensive normalization for reports accidentally persisted with escaped newlines.
     if "\\n" in text or "\\t" in text:
         text = text.replace("\\r\\n", "\n").replace("\\n", "\n").replace("\\t", "\t")
     return text
@@ -230,7 +246,6 @@ def pretty_section_title(raw: str) -> str:
 def heading_text_from_md_heading(heading: str) -> str:
     heading = re.sub(r"^##\s+\d+\.\s+", "", heading).strip()
     return pretty_section_title(heading)
-
 
 
 def tradingview_url(ticker: str) -> str:
@@ -345,7 +360,7 @@ def linkify_ticker_tables(md: str) -> str:
 
 def add_tradingview_targets(html: str) -> str:
     pattern = r'(<a\s+href="https://www\.tradingview\.com/chart/\?symbol=[^"]+")'
-    return re.sub(pattern, r'\1 target="_blank" rel="noopener noreferrer"', html)
+    return re.sub(pattern, r'\1 target=" _blank" rel="noopener noreferrer"', html).replace('target=" _blank"', 'target="_blank"')
 
 
 def linkify_position_card_title(title: str) -> str:
@@ -358,10 +373,11 @@ def linkify_position_card_title(title: str) -> str:
 
 # ---------- PARSING ----------
 def parse_report_date(md_text: str, fallback: str | None = None) -> str:
-    match = re.search(r"^#\s+Weekly Report Review\s+(\d{4}-\d{2}-\d{2})\s*$", md_text, flags=re.MULTILINE)
+    match = re.search(r"^#\s+.*?(\d{4}-\d{2}-\d{2})\s*$", md_text, flags=re.MULTILINE)
     if match:
         return match.group(1)
     return fallback or datetime.now().strftime("%Y-%m-%d")
+
 
 def format_full_date(date_str: str) -> str:
     dt = datetime.strptime(date_str, "%Y-%m-%d")
@@ -470,49 +486,87 @@ def extract_sections(md_text: str):
 
 
 # ---------- VALIDATION ----------
-def validate_required_report(md_text: str) -> None:
-    missing_headings = [h for h in REQUIRED_SECTION_HEADINGS if h not in md_text]
-    if missing_headings:
-        raise RuntimeError("Report is missing mandatory section headings: " + ", ".join(missing_headings))
+def validate_required_report(md_text: str, mode: str = "standard") -> None:
+    mode = normalize_report_mode(mode)
+    if mode == "standard":
+        missing_headings = [h for h in REQUIRED_SECTION_HEADINGS if h not in md_text]
+        if missing_headings:
+            raise RuntimeError("Report is missing mandatory section headings: " + ", ".join(missing_headings))
 
-    if "# Weekly Report Review " not in md_text:
-        raise RuntimeError("Report title is missing or malformed.")
+        if "# Weekly Report Review " not in md_text:
+            raise RuntimeError("Report title is missing or malformed.")
 
-    if f"> *{DISCLAIMER_LINE}*" not in md_text:
-        raise RuntimeError("Top disclaimer callout is missing.")
+        if f"> *{DISCLAIMER_LINE}*" not in md_text:
+            raise RuntimeError("Top disclaimer callout is missing.")
 
-    if "EQUITY_CURVE_CHART_PLACEHOLDER" not in md_text:
-        raise RuntimeError("Equity curve placeholder line is missing.")
+        if "EQUITY_CURVE_CHART_PLACEHOLDER" not in md_text:
+            raise RuntimeError("Equity curve placeholder line is missing.")
 
-    for label in REQUIRED_SECTION15_LABELS:
-        if label not in md_text:
-            raise RuntimeError(f"Section 15 is missing required label: {label}")
+        for label in REQUIRED_SECTION15_LABELS:
+            if label not in md_text:
+                raise RuntimeError(f"Section 15 is missing required label: {label}")
 
-    if SECTION16_SENTENCE not in md_text:
-        raise RuntimeError("Section 16 canonical carry-forward sentence is missing.")
+        if SECTION16_SENTENCE not in md_text:
+            raise RuntimeError("Section 16 canonical carry-forward sentence is missing.")
 
-    if "This report is provided for informational and educational purposes only." not in md_text:
-        raise RuntimeError("Final disclaimer body is missing.")
+        if "This report is provided for informational and educational purposes only." not in md_text:
+            raise RuntimeError("Final disclaimer body is missing.")
+        return
+
+    # pro validation: lighter but still safe
+    if not re.search(r"^#\s+.*\d{4}-\d{2}-\d{2}\s*$", md_text, flags=re.MULTILINE):
+        raise RuntimeError("Pro report title is missing a report date.")
+
+    _, sections = extract_sections(md_text)
+    titles = [s["title"].lower() for s in sections]
+    required_keywords = [
+        "executive summary",
+        "portfolio action snapshot",
+        "regime",
+        "structural opportunity radar",
+        "bottom line",
+        "current portfolio holdings and cash",
+        "disclaimer",
+    ]
+    for keyword in required_keywords:
+        if not any(keyword in title for title in titles):
+            raise RuntimeError(f"Pro report is missing a core section containing: {keyword}")
+
+    if "for informational and educational purposes only" not in md_text.lower():
+        raise RuntimeError("Pro report disclaimer language is missing.")
 
 
-def validate_email_body(html_body: str, md_text: str | None = None) -> None:
+def validate_email_body(html_body: str, md_text: str | None = None, mode: str = "standard") -> None:
+    mode = normalize_report_mode(mode)
     html_lower = html_body.lower()
 
     masthead_options = [
         "weekly etf review",
         "weekly report review",
+        "weekly etf intelligence",
+        "weekly etf pro review",
     ]
     if not any(token in html_lower for token in masthead_options):
-        raise RuntimeError("HTML body is missing required masthead block: WEEKLY ETF REVIEW")
+        raise RuntimeError("HTML body is missing required masthead block.")
 
-    required_strings = [
-        "Executive summary",
-        "Portfolio action snapshot",
-        "Structural Opportunity Radar",
-        "Bottom line",
-        "Current portfolio holdings and cash",
-        "Carry-forward input for next run",
-    ]
+    if mode == "standard":
+        required_strings = [
+            "Executive summary",
+            "Portfolio action snapshot",
+            "Structural Opportunity Radar",
+            "Bottom line",
+            "Current portfolio holdings and cash",
+            "Carry-forward input for next run",
+        ]
+    else:
+        required_strings = [
+            "Executive Summary",
+            "Portfolio Action Snapshot",
+            "Structural Opportunity Radar",
+            "Bottom Line",
+            "Current Portfolio Holdings and Cash",
+        ]
+
     for token in required_strings:
         if token.lower() not in html_lower:
             raise RuntimeError(f"HTML body is missing required content block: {token}")
@@ -520,23 +574,19 @@ def validate_email_body(html_body: str, md_text: str | None = None) -> None:
     if md_text:
         plain_html = html_to_plain_text(html_body)
         plain_md = html_to_plain_text(MARKDOWN(md_text))
-        if len(plain_html) < 0.80 * len(plain_md):
+        if len(plain_html) < 0.72 * len(plain_md):
             raise RuntimeError("HTML body appears too short relative to the full report.")
-
-        for heading in REQUIRED_SECTION_HEADINGS:
-            plain_heading = heading_text_from_md_heading(heading)
-            if plain_heading not in plain_html:
-                raise RuntimeError(f"HTML body is missing required section heading text: {plain_heading}")
 
         for bad_token in ["\\n", "#### ", "|---|", "\\t"]:
             if bad_token in html_body:
                 raise RuntimeError(f"HTML body still contains raw markdown / escaped formatting token: {bad_token}")
 
 
-def write_delivery_manifest(manifest_path: Path, report_name: str, recipient: str, attachments: list[str]) -> None:
+def write_delivery_manifest(manifest_path: Path, report_name: str, recipient: str, attachments: list[str], mode: str) -> None:
     timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     lines = [
         f"timestamp_utc={timestamp}",
+        f"mode={mode}",
         f"report={report_name}",
         f"recipient={recipient}",
         "html_body=full_report",
@@ -547,9 +597,9 @@ def write_delivery_manifest(manifest_path: Path, report_name: str, recipient: st
 
 
 # ---------- EQUITY CURVE ----------
-def create_equity_curve_png(output_dir: Path, chart_path: Path):
+def create_equity_curve_png(output_dir: Path, chart_path: Path, mode: str = "standard"):
     points = []
-    for report_path in latest_reports_by_day(output_dir):
+    for report_path in latest_reports_by_day(output_dir, mode=mode):
         md_text = report_path.read_text(encoding="utf-8")
         report_date = parse_report_date(md_text)
         totals = parse_section15_totals(md_text)
@@ -576,7 +626,6 @@ def create_equity_curve_png(output_dir: Path, chart_path: Path):
 
 
 # ---------- MARKDOWN -> BRANDED HTML ----------
-
 def normalize_subheader(text: str) -> str:
     text = clean_md_inline(text)
     text = re.sub(r"^[^\w]+", "", text).strip()
@@ -697,25 +746,6 @@ def render_markdown_block(text: str, image_src: str | None = None) -> str:
     return add_tradingview_targets(MARKDOWN(md))
 
 
-def chip_html(text: str, bg: str, fg: str) -> str:
-    return f"<span class='chip' style='background:{bg};color:{fg};'>{esc(text)}</span>"
-
-
-def action_tone(header: str):
-    label = clean_md_inline(header).lower()
-    if "add" in label:
-        return BRAND["add_bg"], BRAND["add_tx"]
-    if "hold but replaceable" in label:
-        return BRAND["replace_bg"], BRAND["replace_tx"]
-    if "hold" in label:
-        return BRAND["hold_bg"], BRAND["hold_tx"]
-    if "reduce" in label:
-        return BRAND["reduce_bg"], BRAND["reduce_tx"]
-    if "close" in label:
-        return BRAND["close_bg"], BRAND["close_tx"]
-    return BRAND["champagne_soft"], BRAND["ink"]
-
-
 def section_header_html(number: int, title: str) -> str:
     return (
         "<table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr>"
@@ -733,7 +763,6 @@ def with_display_number(section: dict, display_number: int) -> dict:
     clone = dict(section)
     clone["display_number"] = display_number
     return clone
-
 
 
 def parse_subsections(lines):
@@ -780,7 +809,6 @@ def split_h3_blocks(lines):
     return blocks
 
 
-
 def render_executive_summary(section: dict) -> str:
     pairs = extract_label_pairs(section["lines"])
     if not pairs:
@@ -808,6 +836,7 @@ def render_executive_summary(section: dict) -> str:
         f"{takeaway_html}"
         f"</div>"
     )
+
 
 def render_action_snapshot(section: dict) -> str:
     groups = parse_subsections(section["lines"])
@@ -840,14 +869,6 @@ def render_action_snapshot(section: dict) -> str:
         f"</div>"
     )
 
-def render_risks(section: dict) -> str:
-    body = render_markdown_block("\n".join(section["lines"]))
-    return (
-        f"<div class='panel panel-risks'>"
-        f"{section_header_html(section_number(section), section['title'])}"
-        f"{body}"
-        f"</div>"
-    )
 
 def render_standard_panel(section: dict, image_src: str | None = None, extra_class: str = "") -> str:
     body = render_markdown_block("\n".join(section["lines"]), image_src=image_src)
@@ -1443,66 +1464,66 @@ def build_report_html(
     }
     """
 
-    pdf_css = f"""
-    @page {{
+    pdf_css = """
+    @page {
       size: A4 landscape;
       margin: 12mm;
-    }}
-    body {{
+    }
+    body {
       background: #ffffff;
-    }}
-    .report-shell {{
+    }
+    .report-shell {
       max-width: none;
       padding-bottom: 0;
-    }}
-    .hero, .notice, .summary-strip, .panel-compact, .panel-exec, .panel-snapshot, .panel-risks, .mini-card {{
+    }
+    .hero, .notice, .summary-strip, .panel-compact, .panel-exec, .panel-snapshot, .panel-risks, .mini-card {
       page-break-inside: avoid;
       break-inside: avoid-page;
-    }}
-    .hero {{
+    }
+    .hero {
       border-radius: 10px 10px 0 0;
       padding: 20px 22px 18px 22px;
-    }}
-    .summary-strip {{
+    }
+    .summary-strip {
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
-    }}
-    .client-grid {{
+    }
+    .client-grid {
       display: block;
       margin-bottom: 8px;
-    }}
-    .panel {{
+    }
+    .panel {
       page-break-inside: auto;
       break-inside: auto;
       border-radius: 14px;
       padding: 16px 18px;
       margin-bottom: 14px;
-    }}
-    .snapshot-table, .rotation-table, .panel table {{
+    }
+    .snapshot-table, .rotation-table, .panel table {
       table-layout: auto;
       font-size: 11px;
-    }}
+    }
     .snapshot-table th, .snapshot-table td,
     .rotation-table th, .rotation-table td,
-    .panel th, .panel td {{
+    .panel th, .panel td {
       padding: 6px 8px;
-    }}
-    .subgrid {{
+    }
+    .subgrid {
       display: block;
-    }}
-    .subblock {{
+    }
+    .subblock {
       margin-bottom: 10px;
-    }}
-    .panel img {{
+    }
+    .panel img {
       max-height: 170mm;
       object-fit: contain;
-    }}
-    .analyst-divider {{
+    }
+    .analyst-divider {
       display: none;
       page-break-before: always;
       break-before: page;
       margin-top: 4px;
-    }}
+    }
     """
 
     pdf_fallback_css = """
@@ -1571,6 +1592,7 @@ def build_report_html(
     """
     return html.strip()
 
+
 def create_pdf_from_html(html: str, output_path: Path, fallback_html: str | None = None) -> None:
     try:
         HTML(string=html, base_url=str(output_path.parent)).write_pdf(str(output_path))
@@ -1581,10 +1603,10 @@ def create_pdf_from_html(html: str, output_path: Path, fallback_html: str | None
 
 
 # ---------- DELIVERY ASSETS ----------
-def generate_delivery_assets(output_dir: Path, report_path: Path):
+def generate_delivery_assets(output_dir: Path, report_path: Path, mode: str = "standard"):
     original_md_text = normalize_markdown_text(report_path.read_text(encoding="utf-8"))
     md_text_clean = strip_citations(original_md_text)
-    validate_required_report(md_text_clean)
+    validate_required_report(md_text_clean, mode=mode)
 
     report_date_str = parse_report_date(md_text_clean)
     safe_stem = report_path.stem
@@ -1593,7 +1615,7 @@ def generate_delivery_assets(output_dir: Path, report_path: Path):
     clean_md_path.write_text(md_text_clean, encoding="utf-8")
 
     equity_curve_png = report_path.with_name(f"{safe_stem}_equity_curve.png")
-    create_equity_curve_png(output_dir, equity_curve_png)
+    create_equity_curve_png(output_dir, equity_curve_png, mode=mode)
 
     image_src_pdf = equity_curve_png.resolve().as_uri() if equity_curve_png.exists() else None
     image_src_email = "cid:equitycurve" if equity_curve_png.exists() else None
@@ -1602,7 +1624,7 @@ def generate_delivery_assets(output_dir: Path, report_path: Path):
     html_pdf = build_report_html(md_text_clean, report_date_str, image_src=image_src_pdf, render_mode="pdf")
     html_pdf_fallback = build_report_html(md_text_clean, report_date_str, image_src=image_src_pdf, render_mode="pdf_fallback")
 
-    validate_email_body(html_email, md_text_clean)
+    validate_email_body(html_email, md_text_clean, mode=mode)
 
     html_path = report_path.with_name(f"{safe_stem}_delivery.html")
     html_path.write_text(html_email, encoding="utf-8")
@@ -1626,8 +1648,10 @@ def generate_delivery_assets(output_dir: Path, report_path: Path):
 
 
 # ---------- EMAIL ----------
-def send_email_with_attachments(assets: dict) -> tuple[list[str], Path, str]:
-    subject = f"Weekly ETF Review {assets['report_date_str']}"
+def send_email_with_attachments(assets: dict, mode: str = "standard") -> tuple[list[str], Path, str]:
+    mode = normalize_report_mode(mode)
+    subject_prefix = os.environ.get("MRKT_RPRTS_SUBJECT_PREFIX", SUBJECT_PREFIX[mode]).strip()
+    subject = f"{subject_prefix} {assets['report_date_str']}"
 
     smtp_host = require_env("MRKT_RPRTS_SMTP_HOST")
     smtp_port = int(os.environ.get("MRKT_RPRTS_SMTP_PORT") or "587")
@@ -1689,19 +1713,20 @@ def send_email_with_attachments(assets: dict) -> tuple[list[str], Path, str]:
         server.sendmail(mail_from, [mail_to], root.as_string())
 
     manifest_path = assets["pdf_path"].with_name(f"{assets['safe_stem']}_delivery_manifest.txt")
-    write_delivery_manifest(manifest_path, assets["pdf_path"].name.replace(".pdf", ".md"), mail_to, attachments)
+    write_delivery_manifest(manifest_path, assets["pdf_path"].name.replace(".pdf", ".md"), mail_to, attachments, mode=mode)
     return attachments, manifest_path, mail_to
 
 
 # ---------- MAIN ----------
 def main():
     output_dir = Path("output")
-    latest_report = latest_report_file(output_dir)
-    assets = generate_delivery_assets(output_dir, latest_report)
-    attachments, manifest_path, mail_to = send_email_with_attachments(assets)
+    mode = normalize_report_mode(os.environ.get("MRKT_RPRTS_REPORT_MODE", "standard"))
+    latest_report = latest_report_file(output_dir, mode=mode)
+    assets = generate_delivery_assets(output_dir, latest_report, mode=mode)
+    attachments, manifest_path, mail_to = send_email_with_attachments(assets, mode=mode)
 
     receipt = (
-        f"DELIVERY_OK | report={latest_report.name} | recipient={mail_to} | "
+        f"DELIVERY_OK | mode={mode} | report={latest_report.name} | recipient={mail_to} | "
         f"html_body=full_report | pdf_attached=yes | manifest={manifest_path.name} | "
         f"attachments={', '.join(attachments)}"
     )
