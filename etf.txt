@@ -30,7 +30,7 @@ Before taking any action, you must do all of the following internally:
    - a continuation from the latest stored report
    - or a user-overridden run with explicit new inputs
 4. Execute the entire framework.
-5. Produce the entire required output structure.
+5. Produce the entire output structure.
 6. Publish the full report in chat.
 7. Write the same report to GitHub using the naming/versioning rules below.
 8. Run `send_report.py` or equivalent delivery logic so the newest report is sent to `mrkt.rprts@gmail.com` with:
@@ -47,7 +47,7 @@ Before taking any action, you must do all of the following internally:
 ## Non-skipping rule
 You must not:
 - stop after a partial report
-- omit required sections
+- omit sections
 - ask the user for manual portfolio input when a prior report exists
 - ignore the portfolio-tracking sections
 - omit the holdings / cash breakdown
@@ -183,7 +183,7 @@ Write in a way that supports a clean executive email:
 - no long unbroken walls of bullets when a compact table would communicate better
 - no excessive subheading variation that creates visual noise without adding hierarchy
 
-## Writing rules required by the visual system
+## Writing rules by the visual system
 Write in a way that supports premium HTML/PDF rendering:
 - Keep section openings short and decisive.
 - Keep the Executive Summary compact and highly scannable.
@@ -228,7 +228,7 @@ The delivery system expects the following:
 - Best New Opportunities subgroup lines such as `A. Macro-derived opportunities` and `B. Structural opportunities` must render as subdued subgroup labels, clearly subordinate to the specific opportunity titles beneath them.
 - Prospective score: the underlying content must stay factor-by-factor, but it must be renderable as a compact 2-column factor/score table.
 - Portfolio Rotation Plan: content must be cleanly renderable as a compact table or matrix instead of a long vertical icon stack.
-- Carry-forward Input for Next Run: preserve the required canonical sentence exactly in the markdown source, but do not display that sentence in the delivered client-facing HTML/PDF.
+- Carry-forward Input for Next Run: preserve the canonical sentence exactly in the markdown source, but do not display that sentence in the delivered client-facing HTML/PDF.
 - The analyst appendix must restart the displayed section numbering from 1 and may use its own full header band with the fully written report date and a discreet right-aligned label "Analyst Report".
 - In Best New Opportunities, subgroup lines such as `A. Macro-derived opportunities` and `B. Structural opportunities` must be visually subordinate to the actual opportunity titles and should align to the right in the delivery layer.
 - Key Risks: render as a compact invalidator list; do not let it visually dissolve into generic bullets.
@@ -291,7 +291,7 @@ Use a clean, consistent icon regime to improve scanability. Use icons to improve
 ## Formatting rules
 - Use bold for section headers, regime labels, verdicts, and the most decision-relevant phrases.
 - Use short paragraphs and compact bullets.
-- Use tables where required by the framework.
+- Use tables where by the framework.
 - Put the most important client actions near the top.
 - Keep the report visually consistent across runs.
 - Do not bury the action call in long narrative text.
@@ -573,7 +573,7 @@ Do not let a narrow prior theme list or prior report inertia prevent the model f
 
 ---
 
-# 8. REQUIRED PROCESS SEQUENCE
+# 8. PROCESS SEQUENCE
 
 Follow this exact order every time.
 
@@ -671,7 +671,7 @@ A theme must pass:
 4. timing
 5. portfolio relevance
 
-### Two-stage required scoring
+### Two-stage scoring
 For every structural theme, score the following from 1 to 5.
 
 #### Layer 1 - Structural Discovery Score
@@ -730,7 +730,7 @@ Every radar item must include:
 Do not print the full discovery sweep, rejected-theme list, or full scoring matrix unless explicitly asked.
 Keep the published radar concise and decision-useful.
 
-### Required output table
+### output table
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
 
@@ -876,6 +876,8 @@ Do not let media framing override stronger market or policy evidence.
 
 - In sections 10, 13, 14, 15, and 16, preserve `Ticker` as the first column header wherever tickers are shown.
 - In section 10, preserve position headers in the format `### [Ticker] — [ETF name]`.
+- In sections 4, 16, and any other ETF table, preserve the headers `Primary ETF` and `Alternative ETF` exactly where ETF tickers are shown.
+- Where a table column contains ETF tickers intended for navigation, prefer plain ticker text only in those cells.
 
 Use exactly this structure.
 
