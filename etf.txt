@@ -196,6 +196,10 @@ Write in a way that supports premium HTML/PDF rendering:
 - Prefer concise paragraphs over long narrative blocks.
 - Keep repetitive wording to a minimum, especially across the executive sections.
 - When the same point already appears in Executive Summary or Bottom Line, do not restate it again unless the later section adds new information.
+- Keep ETF tickers as plain ticker text in headings, action lists, and tables; the delivery layer may automatically decorate those tickers as clickable TradingView links in HTML/PDF output.
+- Preserve the first column label exactly as `Ticker` in ticker-based tables so the delivery layer can auto-link those cells reliably.
+- In headings for single-position sections, keep the format `### TICKER — ETF name` so the delivery layer can auto-link the ticker consistently.
+
 
 ## Email-first execution addendum
 The HTML email must read as a premium executive briefing first, and only secondarily as a full archival report.
@@ -869,6 +873,9 @@ Do not let media framing override stronger market or policy evidence.
 ---
 
 # 10. REQUIRED OUTPUT STRUCTURE
+
+- In sections 10, 13, 14, 15, and 16, preserve `Ticker` as the first column header wherever tickers are shown.
+- In section 10, preserve position headers in the format `### [Ticker] — [ETF name]`.
 
 Use exactly this structure.
 
