@@ -1,0 +1,97 @@
+name: Send weekly ETF Pro split-test report
+
+on:
+  push:
+    paths:
+      - "output_split_test/weekly_analysis_pro_*.md"
+      - "send_report.py"
+      - ".github/workflows/send-weekly-report-split-test.yml"
+  workflow_dispatch:
+
+jobs:
+  send-report-split-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system packages for PDF rendering
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2 \
+            libpango-1.0-0 \
+            libgdk-pixbuf-2.0-0 \
+            libffi-dev \
+            shared-mime-info \
+            fonts-liberation \
+            fonts-dejavu-core \
+            fonts-lato
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install matplotlib mistune weasyprint
+
+      - name: Stage latest split-test report into runtime output folder
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import shutil
+          import send_report as sr
+
+          split_dir = Path("output_split_test")
+          runtime_dir = Path("output")
+          latest = sr.latest_report_file(split_dir, mode="pro")
+          staged_name = latest.name.replace(".md", "_splittest.md")
+          staged_path = runtime_dir / staged_name
+          shutil.copy2(latest, staged_path)
+          Path(".split_test_report_path").write_text(str(staged_path), encoding="utf-8")
+          print(f"STAGED_SPLIT_TEST | source={latest} | staged={staged_path}")
+          PY
+
+      - name: Validate HTML/PDF render before send
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import send_report as sr
+
+          staged_path = Path(Path('.split_test_report_path').read_text(encoding='utf-8').strip())
+          output_dir = Path("output")
+          sr.generate_delivery_assets(output_dir, staged_path, mode="pro")
+          print(f"RENDER_OK | mode=pro | report={staged_path.name} | split_test=yes")
+          PY
+
+      - name: Send split-test email
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+          MRKT_RPRTS_SUBJECT_PREFIX: Weekly ETF Pro Review [SPLIT TEST]
+          MRKT_RPRTS_SMTP_HOST: ${{ secrets.MRKT_RPRTS_SMTP_HOST }}
+          MRKT_RPRTS_SMTP_PORT: ${{ secrets.MRKT_RPRTS_SMTP_PORT }}
+          MRKT_RPRTS_SMTP_USER: ${{ secrets.MRKT_RPRTS_SMTP_USER }}
+          MRKT_RPRTS_SMTP_PASS: ${{ secrets.MRKT_RPRTS_SMTP_PASS }}
+          MRKT_RPRTS_MAIL_FROM: ${{ secrets.MRKT_RPRTS_MAIL_FROM }}
+          MRKT_RPRTS_MAIL_TO: ${{ secrets.MRKT_RPRTS_MAIL_TO }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import send_report as sr
+
+          staged_path = Path(Path('.split_test_report_path').read_text(encoding='utf-8').strip())
+          output_dir = Path("output")
+          assets = sr.generate_delivery_assets(output_dir, staged_path, mode="pro")
+          attachments, manifest_path, mail_to = sr.send_email_with_attachments(assets, mode="pro")
+          print(
+              f"DELIVERY_OK | mode=pro | report={staged_path.name} | recipient={mail_to} | "
+              f"html_body=full_report | pdf_attached=yes | manifest={manifest_path.name} | "
+              f"attachments={', '.join(attachments)} | split_test=yes"
+          )
+          PY
