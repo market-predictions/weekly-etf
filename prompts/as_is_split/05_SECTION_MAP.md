@@ -1,0 +1,35 @@
+# ETF As-Is Split — Section Map
+
+## Original source
+- `etf.txt`
+
+## Mapping
+### `04_OPERATIONAL_RUNBOOK.md`
+- document title and opening operating notes
+- Section 0. PRE-FLIGHT EXECUTION RULE
+- Section 11. DUAL OUTPUT + GITHUB WRITE REQUIREMENT
+- Section 13. FINAL CONSISTENCY CHECK BEFORE ANSWERING
+
+### `03_OUTPUT_CONTRACT.md`
+- Section 2. CLIENT-GRADE PRESENTATION STANDARD
+- Section 2A. VISUAL DELIVERY CONTRACT FOR HTML + PDF
+- Section 3. READABILITY + ICON REGIME
+- Section 10. REQUIRED OUTPUT STRUCTURE
+
+### `02_INPUT_STATE_CONTRACT.md`
+- Section 6. INPUT RESOLUTION + STANDARDIZED INPUT TEMPLATE
+- Section 6A. MARKET DATA + FX VALUATION PROTOCOL
+- Section 6B. MANDATORY PRE-ANALYSIS PRICING PASS
+- Section 12. PRIOR REPORT LOOKUP RULE
+
+### `01_DECISION_FRAMEWORK.md`
+- Section 1. PRIMARY OPERATING PRINCIPLE
+- Section 4. ROLE AND MANDATE
+- Section 5. PORTFOLIO PHILOSOPHY
+- Section 7. FIXED STRUCTURAL THEME UNIVERSE
+- Section 8. PROCESS SEQUENCE
+- Section 9. SOURCE DISCIPLINE
+
+## Rule
+This mapping is organizational only.
+It does not change the existing logic, thresholds, workflow, or presentation contract.
