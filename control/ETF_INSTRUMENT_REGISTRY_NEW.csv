@@ -1,0 +1,7 @@
+ticker,fund_name,issuer,currency,source_rule_class,onboarding_state,preferred_primary_source,preferred_secondary_source,active_flag,notes
+SPY,SPDR S&P 500 ETF Trust,State Street,USD,issuer_first,active_tracked,issuer_page,public_marketdata,1,Seeded from current tracked portfolio
+SMH,VanEck Semiconductor ETF,VanEck,USD,issuer_first,active_tracked,issuer_page,public_marketdata,1,Seeded from current tracked portfolio
+PPA,Invesco Aerospace & Defense ETF,Invesco,USD,quorum_required,active_tracked,public_marketdata,public_fallback,1,Use two-source public confirmation until a stronger free issuer-close route is proven stable
+PAVE,Global X U.S. Infrastructure Development ETF,Global X,USD,issuer_first,active_tracked,issuer_page,public_marketdata,1,Seeded from current tracked portfolio
+URNM,Sprott Uranium Miners ETF,Sprott,USD,issuer_first,active_tracked,issuer_page,public_marketdata,1,Seeded from current tracked portfolio
+GLD,SPDR Gold Shares,State Street,USD,issuer_first,active_tracked,issuer_page,public_marketdata,1,Seeded from current tracked portfolio
