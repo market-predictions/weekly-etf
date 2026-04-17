@@ -7,26 +7,21 @@
 
 ---
 
-## Phase 1 — establish the working environment
+## Phase 1 — keep the working environment disciplined
 
-### 1. Use the lean bootstrap upload model
+### 1. Keep using the lean bootstrap upload model
 - Owner: `[USER]`
 - Primary upload:
   - `control/PROJECT_BOOTSTRAP.md`
 - Action:
-  - upload only the bootstrap file as the default stable project context
-  - do **not** upload changing repo files as standard project context unless there is a specific task-driven need
-- Why:
-  - the ChatGPT Project should stay lean
-  - GitHub should remain the live source of truth for prompts, scripts, workflows, outputs, and control docs
-  - this reduces drift between project memory and repo reality
+  - keep the project context lean
+  - continue reading changing repo files live from GitHub
 - Done when:
-  - the project contains the bootstrap file
-  - future sessions read the live repo files from GitHub instead of relying on stale uploaded copies
+  - future sessions do not depend on stale uploaded repo files
 
-### 2. Keep using the control layer at the start of each ETF session
+### 2. Keep using the control-layer start sequence
 - Owner: `[JOINT]`
-- Action: every meaningful ETF architecture, debugging, prompt, state, workflow, split-test, or delivery session starts with:
+- Action: every meaningful ETF architecture, debugging, prompt, state, workflow, or delivery session starts with:
   1. `control/SYSTEM_INDEX.md`
   2. `control/CURRENT_STATE.md`
   3. `control/NEXT_ACTIONS.md`
@@ -35,96 +30,61 @@
 
 ---
 
-## Phase 2 — complete the control-layer refresh
+## Phase 2 — validate the direct production architecture change
 
-### 3. Overwrite the older control files with the prepared update pack
+### 3. Run the next live ETF review from the updated production prompt
 - Owner: `[ASSISTANT]`
-- Source folder: `control/update_pack/`
-- Target files:
-  - `control/SYSTEM_INDEX.md`
-  - `control/CURRENT_STATE.md`
-  - `control/NEXT_ACTIONS.md`
-  - `control/DECISION_LOG.md`
-  - `control/CHATGPT_PROJECT_INSTRUCTIONS.md`
-- Why: the split scaffold is now live, so the older control files should reflect the current architecture instead of the pre-split state.
-- Done when: the live control files match the prepared update-pack versions.
+- Source files:
+  - `etf.txt`
+  - `etf-pro.txt`
+- Action:
+  - use the updated production files directly
+  - confirm the report still feels compact, premium, and decision-useful
+  - confirm newly surfaced categories can appear without bloating the report
+- Done when: a live production run shows the new discovery model working inside the existing executive format.
 
-### 4. Keep the four-layer model explicit
+### 4. Confirm compact publication discipline
 - Owner: `[ASSISTANT]`
-- Action: preserve and reinforce the separation between:
-  1. decision framework
-  2. input/state contract
-  3. output contract
-  4. operational runbook
-- Why: this is the core architectural improvement and must not collapse back into a monolith.
-- Done when: future changes and reviews are consistently framed against these four layers.
+- Action:
+  - confirm the Structural Opportunity Radar remains compact
+  - confirm the report still publishes only the best-ranked 5-8 lanes
+  - confirm “strong but not yet actionable” ideas remain selective rather than padded
+- Done when: broader discovery does not degrade executive selectivity.
+
+### 5. Check lane continuity behavior in real output
+- Owner: `[ASSISTANT]`
+- Action:
+  - confirm retained lanes, new entrants, dropped lanes, and near-miss challengers are handled cleanly
+  - confirm radar change language reads naturally in the premium layer
+  - confirm the report explains changes without exposing internal process machinery
+- Done when: the report feels fresher and broader without feeling unstable.
 
 ---
 
-## Phase 3 — validate the as-is ETF split architecture safely
+## Phase 3 — review rendering and delivery against the new prompt behavior
 
-### 5. Keep the split test strictly non-destructive
-- Owner: `[JOINT]`
-- Action:
-  - keep `etf.txt` unchanged as the production prompt
-  - use `prompts/as_is_split/` only for comparison runs
-  - keep split outputs in `output_split_test/`
-- Done when: the split architecture can be evaluated without changing production behavior.
-
-### 6. Use the split runtime as the comparison entrypoint
+### 6. Review `send_report.py` against the updated architecture
 - Owner: `[ASSISTANT]`
-- Source file: `prompts/as_is_split/ETF_RUNTIME_SPLIT.txt`
-- Action:
-  - use the split runtime as the entrypoint for split tests
-  - preserve the exact read order defined there
-  - treat `05_SECTION_MAP.md` as reference only, not as runtime authority
-- Done when: split runs are reproducible and faithful to production logic.
-
-### 7. Compare split outputs against production outputs
-- Owner: `[ASSISTANT]`
-- Action:
-  - compare methodology preservation
-  - compare pricing-pass behavior
-  - compare scoring integrity
-  - compare portfolio treatment
-  - compare executive presentation quality
-  - compare delivery-readiness
-- Done when: the split architecture is validated as truly “as-is” in practical output quality, not just in wording.
-
-### 8. Confirm ETF executive look & feel preservation explicitly
-- Owner: `[ASSISTANT]`
-- Action:
-  - review split outputs against recent production ETF outputs
-  - confirm hierarchy, spacing, compact-table behavior, appendix separation, and premium feel remain intact
-- Done when: the split architecture is shown not to degrade the ETF design standard.
-
----
-
-## Phase 4 — tighten boundaries without changing behavior
-
-### 9. Review `send_report.py` against the new architecture
-- Owner: `[ASSISTANT]`
-- Action: identify which responsibilities belong in the script and which should stop living in the prompt.
+- Action: identify whether any rendering or delivery assumptions need tightening after the prompt changes.
 - Focus areas:
-  - manifest/receipt logic
-  - HTML/PDF rendering
-  - equity-curve handling
-  - stale-report detection
-  - portfolio-valuation refresh logic
-  - split-test output handling
+  - radar table width and row-count behavior
+  - HTML/PDF compactness with variable lane composition
+  - placement and treatment of continuity language
+  - appendix cleanliness
+  - manifest/receipt behavior
 
-### 10. Review the GitHub Actions workflows
+### 7. Confirm workflow behavior remains operational only
 - Owner: `[ASSISTANT]`
 - Action:
-  - confirm production workflow responsibilities stay limited to orchestration, secrets, execution, and delivery
-  - confirm split-test workflow remains comparison-only and does not silently replace production
-- Done when: workflow logic is clearly operational, not decision-making.
+  - confirm `.github/workflows/send-weekly-report.yml` still acts as orchestration rather than decision logic
+  - confirm the direct production-prompt update did not create hidden workflow assumptions
+- Done when: workflow logic remains operational, not thematic or editorial.
 
 ---
 
-## Phase 5 — move ETF toward explicit implementation state
+## Phase 4 — move ETF toward explicit implementation state
 
-### 11. Design explicit ETF state files
+### 8. Design explicit ETF state files
 - Owner: `[ASSISTANT]`
 - Planned files:
   - `output/etf_portfolio_state.json`
@@ -137,28 +97,49 @@
   - define deterministic conflict resolution when report intent and implementation facts differ
 - Done when: ETF can rely less on prior report parsing for implementation facts.
 
-### 12. Validate stale-data handling
+### 9. Validate stale-data handling under the broader discovery model
 - Owner: `[ASSISTANT]`
 - Action: review handling of:
   - stale ETF quote data
   - stale EUR/USD conversion data
   - stale portfolio values
   - stale report artifacts
-  - stale split-test artifacts
+  - stale watchlist / lane continuity memory
 - Done when: stale inputs cannot silently flatten, distort, or misstate the portfolio or report.
+
+---
+
+## Phase 5 — reduce monolith risk later without weakening production
+
+### 10. Keep the four-layer model explicit in future changes
+- Owner: `[ASSISTANT]`
+- Action: preserve the distinction between:
+  1. decision framework
+  2. input/state contract
+  3. output contract
+  4. operational runbook
+- Done when: future changes do not collapse everything back into a single opaque blob.
+
+### 11. Reduce monolith risk only where it is safe
+- Owner: `[JOINT]`
+- Action:
+  - tighten boundaries gradually
+  - keep production reliability intact
+  - preserve the ETF executive look & feel while doing so
+- Done when: clarity improves without destabilizing the live workflow.
 
 ---
 
 ## Suggested immediate next move
 
 The best next move after this update is:
-1. overwrite the older control files from `control/update_pack/`
-2. run one ETF split comparison through `prompts/as_is_split/ETF_RUNTIME_SPLIT.txt`
-3. compare the result against a current production `etf.txt` + `etf-pro.txt` run
-4. only after output validation, continue boundary tightening in production-adjacent files
+1. run the next live ETF review directly from the updated production files
+2. inspect whether the report surfaces broader categories while staying compact
+3. review `send_report.py` only if the live output reveals formatting or continuity issues
+4. continue with explicit state-file design after that
 
 ---
 
 ## Current checkpoint
 
-**Architecture transition in progress — split runtime exists, production prompt remains protected, split-test workflow exists, and the remaining task is to merge the prepared control update pack into the live control files and validate output parity.**
+**Direct production architecture update complete in GitHub — the next task is live validation of broader internal discovery with compact executive publication, not another split-style comparison cycle.**
