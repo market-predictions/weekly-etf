@@ -1,0 +1,78 @@
+Generate and publish a **fresh** latest ETF pro review for `market-predictions/daily-etf`.
+
+Follow the ETF Review OS bootstrap discipline exactly:
+
+1. Read from GitHub in this order:
+   * `control/SYSTEM_INDEX.md`
+   * `control/CURRENT_STATE.md`
+   * `control/NEXT_ACTIONS.md`
+2. Then read only the minimum relevant execution files:
+   * `etf.txt`
+   * `etf-pro.txt`
+   * `send_report.py`
+   * `.github/workflows/send-weekly-report.yml`
+   * the latest relevant file in `output/`
+
+## Task
+
+* Produce the full latest ETF pro review.
+* Publish the full report in chat.
+* Write the new report to GitHub under the next correct production filename:
+  `output/weekly_analysis_pro_YYMMDD.md`
+  or, if needed, the next versioned file:
+  `output/weekly_analysis_pro_YYMMDD_NN.md`
+* Trigger the production workflow by writing that file.
+
+## Core execution rule
+
+Use the **live production prompt files in GitHub as the source of truth**.
+That means:
+- use the updated `etf.txt` directly
+- use the updated `etf-pro.txt` directly
+- do **not** reintroduce the older small fixed structural-lane gate
+- do use the live production model of:
+  - open internal discovery
+  - dynamic candidate-lane construction
+  - compact executive publication of only the best-ranked lanes
+  - continuity memory for retained, new, dropped, and near-miss lanes
+
+## Fresh pricing requirements
+
+* Do a real pre-analysis pricing pass first.
+* Use the latest available **completed U.S. regular-session close**. If today’s session is not closed yet, use the latest completed close instead.
+* Use **free public sources only**.
+* Reprice holdings **per ticker**.
+* Do not freeze the whole portfolio at the prior NAV because one or two tickers are difficult.
+* If fresh coverage is sufficient, update the covered holdings and carry forward only unresolved holdings.
+* If fresh coverage is too weak for a genuinely fresh report, stop and tell me exactly which tickers block fresh publication instead of publishing a stale flat report.
+* Do not fabricate same-day closes.
+* Do not leave the portfolio at 100000 unless the arithmetic truly supports it.
+* Section 15 holdings, cash, and total portfolio value must reconcile exactly.
+* The latest row in section 7 must exactly equal `Total portfolio value (EUR)` from section 15.
+* The equity curve must be based on the current report’s section 7 values, not a conflicting hidden source.
+
+## Report-quality requirements
+
+* Preserve the ETF executive look and feel.
+* Keep the published Structural Opportunity Radar compact and decision-useful.
+* Let broader internal discovery improve selection breadth without turning the report into a long discovery dump.
+* If the radar changes, explain that cleanly and briefly in premium subscriber language.
+* If the radar is unchanged, make clear why the same top lanes still deserve attention now.
+* Preserve compact, executive continuity handling in section 16.
+
+## Operational rules
+
+* Use whole shares only.
+* Keep residual as cash.
+* Do not claim email delivery succeeded unless you have a real positive receipt/manifest from the delivery layer.
+* If render, PDF, manifest, or send fails, report the exact failure instead of claiming completion.
+
+## Return at the end
+
+1. the full report
+2. the GitHub output path
+3. the report filename
+4. whether the workflow was triggered
+5. whether render succeeded
+6. whether email send succeeded
+7. the exact failure message if any step failed
