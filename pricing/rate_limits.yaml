@@ -1,0 +1,24 @@
+twelve_data:
+  daily_limit: 800
+  reserve_daily: 200
+  minute_credits: 8
+  local_min_seconds_between_calls: 8
+
+fmp:
+  daily_limit: 250
+  reserve_daily: 100
+  local_min_seconds_between_calls: 2
+
+alpha_vantage:
+  daily_limit: 25
+  reserve_daily: 10
+  local_min_seconds_between_calls: 15
+
+website_fallback:
+  local_min_seconds_between_calls: 3
+
+policy:
+  max_holdings_retries_per_symbol: 1
+  max_challenger_retries_per_symbol: 0
+  max_challengers_to_price: 6
+  max_alternatives_to_price: 8
