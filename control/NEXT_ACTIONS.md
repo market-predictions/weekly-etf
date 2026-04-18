@@ -41,7 +41,8 @@
   - use the updated production files directly
   - confirm the report still feels compact, premium, and decision-useful
   - confirm newly surfaced categories can appear without bloating the report
-- Done when: a live production run shows the new discovery model working inside the existing executive format.
+  - confirm a matching pricing audit is consumed correctly when available
+- Done when: a live production run shows the new discovery model and pricing-audit consumption working inside the existing executive format.
 
 ### 4. Confirm compact publication discipline
 - Owner: `[ASSISTANT]`
@@ -85,13 +86,14 @@
 
 ## Phase 4 — move ETF toward explicit implementation state
 
-### 8. Extend the pricing subsystem beyond the starter layer
+### 8. Validate the expanded pricing subsystem in real runs
 - Owner: `[ASSISTANT]`
 - Action:
-  - add issuer-page handlers for held ETFs where useful
-  - add Yahoo fallback parsing only if still needed after API coverage testing
-  - extend holding snapshots and audit richness
-  - prepare shortlist pricing for alternatives and challengers
+  - validate issuer-page handlers in real runtime output
+  - determine whether Yahoo fallback remains necessary after API coverage testing
+  - confirm richer holding snapshots are written correctly
+  - confirm shortlist pricing for alternatives and challengers behaves within free-tier limits
+  - confirm prompt consumption of matching pricing audits is clean and non-stale
 - Done when: the pricing subsystem can support real report pricing authority rather than just a dry-run audit.
 
 ### 9. Design explicit ETF state files
@@ -105,7 +107,7 @@
   - define authority boundaries for each file
   - define how they interact with the report text
   - define deterministic conflict resolution when report intent and implementation facts differ
-- Done when: ETF can rely less on prior report parsing for implementation facts.
+- Done when: ETF can rely less on prior report parsing and prompt-layer logic for implementation facts.
 
 ### 10. Validate stale-data handling under the broader discovery model
 - Owner: `[ASSISTANT]`
@@ -113,6 +115,7 @@
   - stale ETF quote data
   - stale EUR/USD conversion data
   - stale portfolio values
+  - stale pricing audits
   - stale report artifacts
   - stale watchlist / lane continuity memory
 - Done when: stale inputs cannot silently flatten, distort, or misstate the portfolio or report.
@@ -143,13 +146,13 @@
 ## Suggested immediate next move
 
 The best next move after this update is:
-1. keep the production send workflow reserved for actual report-output pushes
-2. extend the starter pricing subsystem so it can support real holdings repricing
-3. then run the next live ETF review directly from the updated production files
-4. continue with explicit state-file design after that
+1. validate the matching pricing-audit consumption path in a real ETF production run
+2. review render/delivery behavior against the updated prompt
+3. continue with explicit state-file design after that
+4. keep extending the pricing subsystem only where real runtime gaps still remain
 
 ---
 
 ## Current checkpoint
 
-**Direct production architecture update is live in GitHub, the starter pricing subsystem is now on `main`, workflow safety has been tightened so code changes do not send subscriber email, and the next task is to extend pricing/state authority until fresh report valuation can rely on explicit audited inputs rather than ad hoc retrieval alone.**
+**Direct production architecture update is live in GitHub, the pricing subsystem now supports audits, richer holding snapshots, and quota-aware shortlist pricing on `main`, workflow safety has been tightened so code changes do not send subscriber email, and the next task is to validate live pricing-audit consumption before moving deeper into explicit ETF state authority.**

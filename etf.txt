@@ -28,7 +28,7 @@ Before taking any action, do all of the following in order:
    - an inaugural build
    - a continuation from the latest stored report
    - or a user-overridden run with explicit new inputs
-4. Complete the **Mandatory Pre-Analysis Pricing Pass** before macro analysis, portfolio scoring, GitHub write, or email delivery.
+4. Complete the **Mandatory Pre-Analysis Pricing Pass** before macro analysis, portfolio scoring, GitHub write, or email delivery. If a same-run matching pricing audit already exists and is valid, use that audit instead of redoing the whole pricing pass manually.
 5. Run the full discovery and ranking process only after the pricing pass has produced a valuation decision.
 6. Produce the full report using the required structure.
 7. Publish the full report in chat.
@@ -271,6 +271,27 @@ This section is mandatory.
 After the U.S. regular session has ended, actively attempt a fresh same-day valuation update.
 Carry-forward is fallback, not baseline.
 
+## Machine-readable audit preference
+If a pricing audit exists in `output/pricing/` for the requested close date, read it first and treat it as the preferred operational pricing input for this run.
+
+Use the latest matching audit to resolve, where available:
+- holdings freshness labels
+- unresolved holdings
+- source tiers used
+- FX basis used
+- holdings coverage by count
+- invested-weight coverage
+- carry-forward versus update decision
+
+Only rerun or redo the pricing pass manually if the audit is:
+- missing
+- for the wrong close date
+- internally inconsistent
+- too incomplete for the current run
+- or clearly stale relative to the requested close date
+
+A prior pricing audit is preferred over ad hoc repeated retrieval for the same run date, but it must not be treated as current if it does not match the requested close date.
+
 ## Allowed ETF close hierarchy
 Per holding, use:
 1. official exchange or primary market close
@@ -315,24 +336,26 @@ Do not leave the equity curve unchanged merely because one or two holdings or th
 # 6B. MANDATORY PRE-ANALYSIS PRICING PASS
 
 Before any macro analysis, lane ranking, position scoring, GitHub write, or email delivery:
-1. Retrieve a fresh close for each held ETF individually
-2. Retrieve the USD/EUR conversion basis using the FX hierarchy
-3. Build the internal pricing coverage table
-4. Label each holding as:
+1. Resolve whether a matching pricing audit already exists in `output/pricing/` for the requested close date.
+2. If a valid matching audit exists, use it as the authoritative operational summary of the pricing pass for this run.
+3. If no valid matching audit exists, retrieve a fresh close for each held ETF individually.
+4. Retrieve the USD/EUR conversion basis using the FX hierarchy.
+5. Build or confirm the internal pricing coverage table.
+6. Label each holding as:
    - Fresh close
    - Fresh fallback source
    - Carried forward
-5. Compute:
+7. Compute:
    - holdings coverage by count
    - invested-weight coverage
-6. Apply the Incomplete-set rule immediately
-7. Recalculate:
+8. Apply the Incomplete-set rule immediately.
+9. Recalculate:
    - total NAV
    - market values
    - weights
    - cash %
    - since-inception return
-8. Only after repricing may the report-writing step begin
+10. Only after repricing may the report-writing step begin.
 
 Do not carry forward the whole portfolio merely because one or two holdings are unresolved if the threshold is otherwise satisfied.
 
@@ -476,7 +499,7 @@ The report should explain lane change elegantly, but not become a process log.
 Follow this order every time.
 
 ## STEP 0 — Mandatory Pre-Analysis Pricing Pass
-Run Section 6B in full.
+Run Section 6B in full, using the latest valid matching pricing audit if available.
 
 ## STEP 1 — Classify the macro regime
 Classify the current 3–12 month macro regime using:
@@ -962,17 +985,18 @@ Silently verify:
 1. Did I read the full prompt before acting?
 2. Did I use the fixed regime labels?
 3. Did I apply the pricing pass before macro analysis and delivery?
-4. Did I include the second-order effects map?
-5. Did I include the Structural Opportunity Radar?
-6. Did I use open discovery before constructing the published radar?
-7. Did I construct and rank candidate lanes before publication?
-8. Did I force challenger lanes?
-9. Did I avoid using a fixed structural lane list as the front-end gate?
-10. Did I keep the published radar compact?
-11. Did I include positions, holdings, cash, and continuity?
-12. Did I track portfolio value in EUR?
-13. Did I produce both chat output and GitHub output?
-14. Did I run the email-delivery step to `mrkt.rprts@gmail.com`?
-15. Did I obtain or surface a positive delivery receipt / manifest?
-16. Did I avoid asking the user for manual input if a prior report existed?
-17. Did I preserve executive readability and report discipline?
+4. Did I use the latest valid matching pricing audit when one was available?
+5. Did I include the second-order effects map?
+6. Did I include the Structural Opportunity Radar?
+7. Did I use open discovery before constructing the published radar?
+8. Did I construct and rank candidate lanes before publication?
+9. Did I force challenger lanes?
+10. Did I avoid using a fixed structural lane list as the front-end gate?
+11. Did I keep the published radar compact?
+12. Did I include positions, holdings, cash, and continuity?
+13. Did I track portfolio value in EUR?
+14. Did I produce both chat output and GitHub output?
+15. Did I run the email-delivery step to `mrkt.rprts@gmail.com`?
+16. Did I obtain or surface a positive delivery receipt / manifest?
+17. Did I avoid asking the user for manual input if a prior report existed?
+18. Did I preserve executive readability and report discipline?

@@ -34,12 +34,16 @@ A first implementation slice of an explicit ETF pricing subsystem is now merged 
 - FX resolver
 - pricing-pass CLI entrypoint
 - pricing audit output folder scaffold
+- richer holding snapshots in the pricing audit
+- quota-aware shortlist pricing for holdings, radar names, alternatives, and challengers
 
 A follow-up repair pass has also now aligned the pricing models, cache helpers, and close resolver after merge-conflict drift.
 
 Workflow safety has also been tightened:
 - the production send workflow now triggers only on production ETF report output pushes
 - a separate validation workflow now handles pricing, prompt, and runtime code changes without sending email
+
+The production prompt can now explicitly consume the latest valid matching pricing audit when one exists, instead of always relying on repeated ad hoc retrieval for the same run date.
 
 This moves ETF toward explicit implementation state rather than relying only on ad hoc retrieval inside the prompt, while reducing the risk of duplicate subscriber emails from non-report code changes.
 
@@ -54,6 +58,7 @@ This moves ETF toward explicit implementation state rather than relying only on 
 - The premium editorial layer still protects a calm, selective, subscriber-facing tone.
 - A quota-aware pricing subsystem starter now exists on `main` and can evolve into the explicit state/input layer.
 - Validation and sending are now separated more cleanly at the workflow layer.
+- The prompt can now consume a matching pricing audit as an operational input layer when available.
 
 ## Current weaknesses
 
@@ -68,7 +73,7 @@ The production system still relies on `etf.txt` as a large combined prompt mixin
 - completion logic
 
 ### 2. Explicit ETF state files still do not yet exist in production
-ETF still relies mainly on prior report parsing and the pricing-pass logic inside `etf.txt` on main.
+ETF still relies mainly on prior report parsing plus the pricing subsystem and pricing-audit logic.
 Planned future state files remain:
 - `output/etf_portfolio_state.json`
 - `output/etf_trade_ledger.csv`
@@ -83,13 +88,12 @@ The prompt now supports broader internal discovery and stronger lane continuity 
 - compact HTML/PDF behavior
 - appendix cleanliness
 
-### 4. The pricing subsystem is only a starter slice so far
+### 4. The pricing subsystem is still evolving
 Still pending:
-- issuer-page handlers
-- Yahoo fallback parser
-- richer holding snapshots and valuation-state outputs
-- direct prompt consumption of the pricing audit
-- explicit shortlist pricing for challengers and alternatives
+- hardening issuer-page handlers through runtime validation
+- evaluating whether Yahoo fallback remains necessary after API coverage testing
+- explicit valuation-state outputs
+- fuller prompt/report consumption of audit-derived state beyond pricing only
 
 ### 5. Live production monitoring is still needed
 The updated architecture should now be validated through normal live production runs to confirm:
@@ -98,6 +102,7 @@ The updated architecture should now be validated through normal live production 
 - no rendering regressions
 - better surfacing of previously omitted categories
 - stable pricing-pass behavior under free-tier rate limits
+- clean use of matching pricing audits without stale carry-over
 
 ## Target architecture
 
@@ -112,6 +117,7 @@ The updated architecture should now be validated through normal live production 
 - The production prompt now uses open discovery + dynamic lane ranking + compact publication.
 - The split scaffold remains available as a reference and optional architecture workbench, not as a required gate for this change.
 - ETF is moving toward an explicit pricing/state layer in `pricing/` plus machine-readable audit output in `output/pricing/`.
+- The production prompt can now consume the latest valid matching pricing audit as the preferred operational pricing summary for the same run date.
 
 ### Delivery side
 - Delivery remains in `send_report.py` plus GitHub Actions.
@@ -136,7 +142,7 @@ Still required:
 
 ### Priority C — move ETF toward explicit implementation state
 Still required:
-- extend the pricing subsystem beyond the starter layer
+- validate the pricing subsystem in real runs
 - add explicit ETF state files
 - make valuation authority less dependent on report parsing
 - tighten deterministic conflict resolution between report intent and implementation facts
@@ -170,8 +176,8 @@ For any future ETF architecture session:
 - review and improve scripts/workflows
 - strengthen pricing/state authority rules
 - harden continuity logic and executive presentation behavior
-- extend the starter pricing subsystem
+- extend the pricing subsystem
 
 ## Current status label
 
-**Production prompt updated for open discovery + dynamic lane ranking, compact executive publication preserved; a starter pricing subsystem is now merged on `main`, workflow safety has been tightened so non-report code changes do not send subscriber email, and the next step is to extend the explicit pricing/state layer toward real production valuation authority.**
+**Production prompt updated for open discovery + dynamic lane ranking, compact executive publication preserved; the pricing subsystem now supports audits, richer holding snapshots, and quota-aware shortlist pricing on `main`; workflow safety has been tightened so non-report code changes do not send subscriber email; and the next step is to validate live pricing-audit consumption and continue moving toward explicit ETF state authority.**

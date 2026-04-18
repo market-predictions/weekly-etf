@@ -183,3 +183,17 @@ The production send workflow must not be triggered by pricing, prompt, script, o
 
 ### Reason
 This prevents accidental duplicate subscriber emails when implementation code changes are merged into `main` and keeps the workflow layer operational rather than editorial.
+
+---
+
+## 2026-04-18 — Let the production prompt consume a matching pricing audit when available
+### Decision
+The production ETF prompt should explicitly read and use the latest valid matching pricing audit from `output/pricing/` when one exists for the requested close date.
+
+### Chosen architecture
+- `etf.txt` prefers a same-date matching pricing audit as the operational summary of the pricing pass
+- ad hoc repeated retrieval is still allowed if the audit is missing, stale, inconsistent, or too incomplete
+- pricing-audit use is limited to the operational pricing layer and does not silently overrule date freshness requirements
+
+### Reason
+This reduces repeated manual retrieval for the same run date, aligns the prompt with the new pricing subsystem, and moves ETF closer to a clean input/state contract without yet requiring full explicit state-file adoption.
