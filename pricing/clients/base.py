@@ -11,5 +11,11 @@ def http_get_json(url: str, timeout: int = 20) -> dict:
         return json.loads(resp.read().decode("utf-8"))
 
 
+def http_get_text(url: str, timeout: int = 20) -> str:
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return resp.read().decode("utf-8", errors="replace")
+
+
 def q(params: dict) -> str:
     return urllib.parse.urlencode(params)
