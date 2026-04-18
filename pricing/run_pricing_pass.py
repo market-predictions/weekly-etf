@@ -35,12 +35,23 @@ def requested_close_from_today(today: date) -> str:
     return d.isoformat()
 
 
-def parse_section15_holdings(md_text: str) -> list[str]:
+def _to_float(text: str) -> float | None:
+    text = text.replace(",", "").replace("%", "").strip()
+    if not text:
+        return None
+    try:
+        return float(text)
+    except ValueError:
+        return None
+
+
+def parse_section15_holdings(md_text: str) -> tuple[list[str], dict[str, float]]:
     section_start = md_text.find("## 15.")
     if section_start == -1:
-        return []
+        return [], {}
     section = md_text[section_start:]
-    tickers = []
+    tickers: list[str] = []
+    weights: dict[str, float] = {}
     in_table = False
     for line in section.splitlines():
         if line.startswith("| Ticker |"):
@@ -52,12 +63,15 @@ def parse_section15_holdings(md_text: str) -> list[str]:
             if "---" in line:
                 continue
             parts = [p.strip() for p in line.strip().strip("|").split("|")]
-            if not parts:
+            if len(parts) < 7:
                 continue
             ticker = parts[0].upper()
+            weight = _to_float(parts[6])
             if ticker and ticker != "CASH":
                 tickers.append(ticker)
-    return tickers
+                if weight is not None:
+                    weights[ticker] = weight
+    return tickers, weights
 
 
 def main() -> None:
@@ -74,7 +88,7 @@ def main() -> None:
     output_dir = Path(args.output_dir)
     latest = latest_report_file(output_dir)
     md_text = latest.read_text(encoding="utf-8")
-    holdings = parse_section15_holdings(md_text)
+    holdings, weights = parse_section15_holdings(md_text)
     if not holdings:
         raise RuntimeError("Could not parse current holdings from section 15.")
 
@@ -84,12 +98,14 @@ def main() -> None:
     results = []
     fresh_count = 0
     unresolved = []
+    fresh_weight = 0.0
 
     for item in shortlist:
         result = resolver.resolve(PriceRequest(symbol=item.symbol, requested_close_date=requested_close_date, kind=item.kind))
         results.append(result)
         if result.status == "fresh_close":
             fresh_count += 1
+            fresh_weight += weights.get(item.symbol.upper(), 0.0)
         if result.status == "unresolved":
             unresolved.append(item.symbol)
 
@@ -97,14 +113,20 @@ def main() -> None:
 
     holdings_count = len(shortlist)
     coverage_count_pct = round((fresh_count / holdings_count) * 100.0, 2) if holdings_count else 0.0
-    decision = "full_update" if coverage_count_pct >= 75.0 else "blocked_or_partial"
+    invested_weight_coverage_pct = round(fresh_weight, 2)
+
+    if coverage_count_pct >= 75.0 or invested_weight_coverage_pct >= 85.0:
+        decision = "update_covered_holdings_carry_unresolved"
+    else:
+        decision = "blocked_or_partial"
+
     pass_result = PricingPassResult(
         run_date=run_date,
         requested_close_date=requested_close_date,
         holdings_count=holdings_count,
         fresh_holdings_count=fresh_count,
         coverage_count_pct=coverage_count_pct,
-        invested_weight_coverage_pct=0.0,
+        invested_weight_coverage_pct=invested_weight_coverage_pct,
         decision=decision,
         unresolved_tickers=unresolved,
         fx_basis=fx,
@@ -112,7 +134,10 @@ def main() -> None:
     )
 
     audit_path = write_price_audit(args.pricing_dir, pass_result)
-    print(f"PRICING_PASS_{'OK' if fresh_count else 'PARTIAL'} | requested_close={requested_close_date} | holdings={holdings_count} | fresh={fresh_count} | audit={audit_path}")
+    print(
+        f"PRICING_PASS_{'OK' if fresh_count else 'PARTIAL'} | requested_close={requested_close_date} | "
+        f"holdings={holdings_count} | fresh={fresh_count} | weight_coverage={invested_weight_coverage_pct:.2f} | audit={audit_path}"
+    )
 
 
 if __name__ == "__main__":
