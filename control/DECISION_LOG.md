@@ -154,3 +154,32 @@ This architecture change is promoted directly into the production prompt and con
 - `control/CURRENT_STATE.md`
 - `control/NEXT_ACTIONS.md`
 - `control/DECISION_LOG.md`
+
+---
+
+## 2026-04-18 — Add starter pricing subsystem on main
+### Decision
+ETF now has a starter explicit pricing subsystem on `main` rather than leaving pricing entirely as ad hoc retrieval inside the prompt.
+
+### Added structure
+- `pricing/`
+- `output/pricing/`
+- pricing clients for Twelve Data, FMP, and Alpha Vantage
+- quota-aware cache and budget manager
+- pricing pass CLI and audit writer
+
+### Reason
+This creates the first machine-readable implementation layer for fresh ETF closes and moves ETF toward explicit input/state authority.
+
+---
+
+## 2026-04-18 — Separate runtime validation from subscriber email send
+### Decision
+The production send workflow must not be triggered by pricing, prompt, script, or workflow code changes.
+
+### Chosen architecture
+- `.github/workflows/send-weekly-report.yml` is reserved for actual production report-output pushes and manual dispatch
+- `.github/workflows/validate-etf-runtime.yml` handles pricing, prompt, runtime, and render validation without sending email
+
+### Reason
+This prevents accidental duplicate subscriber emails when implementation code changes are merged into `main` and keeps the workflow layer operational rather than editorial.
