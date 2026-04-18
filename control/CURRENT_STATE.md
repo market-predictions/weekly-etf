@@ -10,12 +10,13 @@ This repository is now a production-style weekly ETF review system with:
 - a premium editorial layer in `etf-pro.txt`
 - a delivery/rendering script in `send_report.py`
 - a production GitHub Actions workflow for execution and email delivery
+- a non-email validation workflow for runtime and pricing changes
 - archived outputs in `output/`
 - a control layer in `control/`
 - an as-is split scaffold in `prompts/as_is_split/`
 - a split-test workflow in `.github/workflows/send-weekly-report-split-test.yml`
 - a split-test output folder in `output_split_test/`
-- a starter pricing subsystem in `pricing/` on the implementation branch for quota-aware ETF close retrieval and audit output
+- a starter pricing subsystem in `pricing/` on `main` for quota-aware ETF close retrieval and audit output
 
 ## What changed in this step
 
@@ -25,7 +26,7 @@ The production ETF prompt has now been updated directly to move from a small fix
 - compact executive publication of the best-ranked lanes
 - stronger continuity memory for retained, new, dropped, and near-miss lanes
 
-A first implementation slice of an explicit ETF pricing subsystem has also now been added on the implementation branch. This includes:
+A first implementation slice of an explicit ETF pricing subsystem is now merged into `main`. This includes:
 - source registry and rate-limit config
 - cache and budget manager
 - symbol-driven close resolver
@@ -33,9 +34,14 @@ A first implementation slice of an explicit ETF pricing subsystem has also now b
 - FX resolver
 - pricing-pass CLI entrypoint
 - pricing audit output folder scaffold
-- workflow dry-run wiring before render/send
 
-This moves ETF toward explicit implementation state rather than relying only on ad hoc retrieval inside the prompt.
+A follow-up repair pass has also now aligned the pricing models, cache helpers, and close resolver after merge-conflict drift.
+
+Workflow safety has also been tightened:
+- the production send workflow now triggers only on production ETF report output pushes
+- a separate validation workflow now handles pricing, prompt, and runtime code changes without sending email
+
+This moves ETF toward explicit implementation state rather than relying only on ad hoc retrieval inside the prompt, while reducing the risk of duplicate subscriber emails from non-report code changes.
 
 ## Current strengths
 
@@ -46,7 +52,8 @@ This moves ETF toward explicit implementation state rather than relying only on 
 - The control layer exists and now reflects the direct-production architecture choice.
 - The production prompt now has a broader thematic discovery model with a compact publication filter.
 - The premium editorial layer still protects a calm, selective, subscriber-facing tone.
-- A quota-aware pricing subsystem starter now exists and can evolve into the explicit state/input layer.
+- A quota-aware pricing subsystem starter now exists on `main` and can evolve into the explicit state/input layer.
+- Validation and sending are now separated more cleanly at the workflow layer.
 
 ## Current weaknesses
 
@@ -80,9 +87,9 @@ The prompt now supports broader internal discovery and stronger lane continuity 
 Still pending:
 - issuer-page handlers
 - Yahoo fallback parser
-- invested-weight coverage calculation
+- richer holding snapshots and valuation-state outputs
 - direct prompt consumption of the pricing audit
-- production merge to `main`
+- explicit shortlist pricing for challengers and alternatives
 
 ### 5. Live production monitoring is still needed
 The updated architecture should now be validated through normal live production runs to confirm:
@@ -110,7 +117,8 @@ The updated architecture should now be validated through normal live production 
 - Delivery remains in `send_report.py` plus GitHub Actions.
 - `etf-pro.txt` remains the premium editorial compression layer.
 - The ETF executive look & feel remains the non-negotiable presentation reference for the report family.
-- The production workflow on the implementation branch now runs a pricing dry run before render/send and is limited to `main` pushes.
+- Production email send is now gated to actual production report output pushes.
+- Runtime and pricing code changes are now validated separately without sending email.
 
 ## Immediate priorities
 
@@ -128,12 +136,12 @@ Still required:
 
 ### Priority C — move ETF toward explicit implementation state
 Still required:
-- merge and extend the pricing subsystem
+- extend the pricing subsystem beyond the starter layer
 - add explicit ETF state files
 - make valuation authority less dependent on report parsing
 - tighten deterministic conflict resolution between report intent and implementation facts
 
-### Priority D — reduce production monolith risk later
+### Priority D — reduce monolith risk later without weakening production
 Still required:
 - keep the four-layer architecture explicit in future changes
 - gradually move boundary logic out of the monolith where safe
@@ -166,4 +174,4 @@ For any future ETF architecture session:
 
 ## Current status label
 
-**Production prompt updated for open discovery + dynamic lane ranking, with compact executive publication preserved; a starter pricing subsystem and workflow dry-run wiring now exist on the implementation branch, and the next step is to harden and merge that explicit state layer into production.**
+**Production prompt updated for open discovery + dynamic lane ranking, compact executive publication preserved; a starter pricing subsystem is now merged on `main`, workflow safety has been tightened so non-report code changes do not send subscriber email, and the next step is to extend the explicit pricing/state layer toward real production valuation authority.**
