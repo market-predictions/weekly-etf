@@ -197,3 +197,36 @@ The production ETF prompt should explicitly read and use the latest valid matchi
 
 ### Reason
 This reduces repeated manual retrieval for the same run date, aligns the prompt with the new pricing subsystem, and moves ETF closer to a clean input/state contract without yet requiring full explicit state-file adoption.
+
+---
+
+## 2026-04-21 — Make breadth assessment explicit through a lane artifact and visible omitted-lane proof
+### Decision
+Broader discovery should no longer remain only a prompt intention. ETF should now treat breadth as an explicit production requirement with a matching machine-readable lane artifact and a compact visible omitted-lane block in the report.
+
+### Chosen architecture
+- **Mandatory breadth assessment universe** across major investable buckets each run
+- **Matching machine-readable lane artifact** in `output/lane_reviews/`
+- **Compact omitted-lane proof** in the published report through a `Notable lanes assessed but not promoted this week` block
+- **Premium editorial preservation** of omitted but relevant challengers instead of smoothing them away
+- **Helper validator** in `validate_lane_breadth.py` to harden the architecture ahead of final send-path wiring
+
+### Reason
+The prior open-discovery patch improved the conceptual architecture, but broad discovery could still disappear from visible output. This decision makes breadth auditable, visible, and eventually enforceable before send.
+
+### Files updated
+- `etf.txt`
+- `etf-pro.txt`
+- `output/lane_reviews/.gitkeep`
+- `output/lane_reviews/README.md`
+- `validate_lane_breadth.py`
+- `control/CURRENT_STATE.md`
+- `control/NEXT_ACTIONS.md`
+- `control/DECISION_LOG.md`
+
+### Remaining follow-through
+The final step is still to wire the breadth validator directly into:
+- `send_report.py`
+- `.github/workflows/send-weekly-report.yml`
+
+so that non-compliant production reports fail before subscriber delivery.
