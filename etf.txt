@@ -1,4 +1,4 @@
-# Masterprompt V17 — Weekly IBKR ETF Portfolio Review
+# Masterprompt V18 — Weekly IBKR ETF Portfolio Review
 
 -- READ THIS DOCUMENT COMPLETELY BEFORE YOU TAKE ACTION --
 -- DO NOT SKIP SECTIONS. DO NOT ASK FOR MANUAL PORTFOLIO INPUT IF A PRIOR REPORT EXISTS. --
@@ -29,10 +29,10 @@ Before taking any action, do all of the following in order:
    - a continuation from the latest stored report
    - or a user-overridden run with explicit new inputs
 4. Complete the **Mandatory Pre-Analysis Pricing Pass** before macro analysis, portfolio scoring, GitHub write, or email delivery. If a same-run matching pricing audit already exists and is valid, use that audit instead of redoing the whole pricing pass manually.
-5. Run the full discovery and ranking process only after the pricing pass has produced a valuation decision.
+5. Run the full breadth assessment, lane ranking, and lane artifact write only after the pricing pass has produced a valuation decision.
 6. Produce the full report using the required structure.
 7. Publish the full report in chat.
-8. Write the same report to GitHub using the naming/versioning rules below.
+8. Write the same report and matching lane artifact to GitHub using the naming/versioning rules below.
 9. Run `send_report.py` or equivalent delivery logic so the newest report is sent to `mrkt.rprts@gmail.com` with:
    - the full report as HTML email body
    - the report attached as PDF
@@ -41,7 +41,7 @@ Before taking any action, do all of the following in order:
    - HTML body sent
    - PDF attached
    - manifest written
-11. Only consider the workflow complete after chat publication, GitHub write, and email dispatch have all succeeded.
+11. Only consider the workflow complete after chat publication, GitHub write, lane artifact write, and email dispatch have all succeeded.
 
 ## Non-skipping rule
 You must not:
@@ -53,13 +53,14 @@ You must not:
 - omit the equity-curve section
 - omit publication of the full report in chat
 - omit the GitHub write step
+- omit the matching lane artifact write step
 - omit the email delivery step
 - claim completion before all mandatory steps succeed
 - skip the pricing pass because a prior report already exists
 - use prior report prices as if they were current prices when fresh retrieval is still feasible
 
 ## Fail-loud rule
-If any mandatory delivery step fails — chat publication, GitHub write, HTML rendering, PDF generation, manifest creation, or email dispatch — treat the workflow as failed, say so explicitly, and do not describe the job as complete.
+If any mandatory delivery step fails — chat publication, GitHub write, lane artifact write, HTML rendering, PDF generation, manifest creation, or email dispatch — treat the workflow as failed, say so explicitly, and do not describe the job as complete.
 
 ---
 
@@ -387,12 +388,38 @@ Each run must scan across broad investable domains, including where relevant:
 - regional industrialization / reshoring / country-level capex winners
 - real assets / infrastructure materials / engineering beneficiaries
 
-This list is a **broad discovery taxonomy**, not a publication checklist.
+This list is a broad discovery taxonomy, not a publication checklist.
 The system may surface categories outside these labels if clearly investable and relevant.
 
+## 7A. Mandatory breadth assessment universe
+
+This is not a fixed publication list.
+It is a fixed assessment universe.
+
+Every run must explicitly assess at minimum the following breadth buckets before final lane ranking:
+- ai_digital_infrastructure
+- defense_resilience
+- grid_power_electrification
+- uranium_nuclear
+- agriculture_food_security
+- water
+- china
+- india_regional_industrialization
+- biotech_healthcare_innovation
+- fintech_financial_infrastructure
+- robotics_automation
+- critical_minerals_materials
+
+A bucket may be represented by one or more assessed lanes.
+A bucket does not need to appear in the final live radar every week.
+But it must be explicitly assessed and recorded in the matching lane artifact for the run.
+
 ## Candidate-lane construction
-After the discovery sweep, construct 8–15 candidate lanes.
+After the breadth assessment sweep, construct 10–15 candidate lanes for final ranking.
 A lane is an investable basket or category that represents a coherent macro, geopolitical, structural, or second-order opportunity.
+
+At least 8 distinct breadth buckets from the mandatory breadth assessment universe must be represented in the final candidate set.
+If fewer than 8 breadth buckets are represented in the final candidate set, the run is incomplete and must not proceed to publication.
 
 Examples of lanes:
 - AI compute infrastructure
@@ -420,25 +447,35 @@ Every candidate lane must be tagged internally into a persistent taxonomy for:
 The taxonomy is a back-end memory layer, not a front-end gate.
 
 ## Mandatory challenger rule
-Each weekly run must include at least 3 challenger lanes that were not all published in the prior run.
-At least 1 challenger lane should come from outside the prior published radar if evidence supports it.
+Each weekly run must include at least 4 challenger lanes that are not all published in the prior run.
+At least:
+- 2 challengers must come from outside the prior published live radar
+- 2 challengers should come from outside the currently held portfolio themes when feasible
+- 1 challenger should come from a bucket that has been underrepresented in recent publications if evidence supports it
+
+Challengers are not filler.
+They are visible proof that broader discovery was actually performed.
 
 ## Internal-only candidate-lane table
 Before publication, build an internal table containing at minimum:
 - Lane
 - Taxonomy tag
+- Bucket
 - Primary ETF / vehicle
 - Alternative ETF / vehicle
 - Structural Strength score
+- Persistence score
 - Macro Alignment score
 - Second-Order Relevance score
 - Implementation Quality score
 - Valuation / Crowding score
 - Timing Confirmation score
 - Portfolio Differentiation score
-- 3–12 month Persistence score
 - Prior-run status
 - Publish? Yes/No
+- Challenger? Yes/No
+- Rejection reason
+- What would change
 
 Do not print the full candidate table unless explicitly asked.
 Use it to drive the ranking and publication decision.
@@ -471,16 +508,60 @@ Lane Score =
 
 You may adjust interpretation at the margin, but keep the framework stable.
 
+## Mandatory lane assessment artifact
+Before final publication, write a machine-readable lane assessment artifact to GitHub alongside the report.
+
+Path:
+- `output/lane_reviews/etf_lane_assessment_YYMMDD.json`
+- or if the report is versioned:
+- `output/lane_reviews/etf_lane_assessment_YYMMDD_NN.json`
+
+The artifact must match the production report date and version exactly.
+
+The artifact must contain:
+- report_date
+- report_filename
+- prior_report_filename
+- required_breadth_buckets
+- assessed_lanes
+
+Each assessed lane must include at minimum:
+- lane_name
+- taxonomy_tag
+- bucket
+- primary_etf
+- alternative_etf
+- structural_strength
+- persistence
+- implementation_quality
+- macro_alignment
+- second_order_relevance
+- timing_confirmation
+- valuation_crowding
+- portfolio_differentiation
+- total_score
+- prior_run_status
+- promoted_to_live_radar
+- challenger
+- rejection_reason
+- what_would_change
+
+If this artifact is not written, the run is incomplete and must not proceed to publication or delivery.
+
 ## Publication rule
 The published Structural Opportunity Radar should usually contain:
 - 5 lanes by default
 - allowed range: 5 to 8 lanes
 
 Only publish the highest-ranked lanes.
-Compression happens **after** discovery, not before it.
+Compression happens after discovery, not before it.
 
 ## Anti-omission rule
 Also publish 1 to 3 `Best structural opportunities not yet actionable` if strong structural candidates score well on structural strength but do not yet justify full inclusion in the live radar.
+
+Also publish 3 to 5 `Notable lanes assessed but not promoted this week`.
+At least 2 entries in that block should come from breadth buckets not represented in the live radar.
+This block is the visible proof that breadth was assessed without bloating the live radar.
 
 ## Freshness + continuity rule
 Each run must evaluate:
@@ -545,9 +626,7 @@ For each relevant development, trace:
 6. timing bucket: immediate / 1–3 months / 3–12 months
 7. confidence: high / medium / low
 
-Use a table:
-| Driver | First-order effect | Second-order effect | Likely beneficiaries | Likely losers | ETF implication | Timing | Confidence |
-|---|---|---|---|---|---|---|---|
+Use a table.
 
 ## STEP 4 — Derive the asset allocation map
 For each bucket, assign exactly one of:
@@ -578,16 +657,19 @@ Buckets:
 - USD-sensitive assets
 - non-USD assets
 
-## STEP 5 — Run open discovery and rank dynamic lanes
+## STEP 5 — Run breadth assessment, rank dynamic lanes, and write the lane artifact
 This step is mandatory.
 
-1. Run the broad discovery sweep
-2. Construct 8–15 candidate lanes
-3. Force at least 3 challenger lanes
-4. Score all candidate lanes
-5. Rank them
-6. Publish the best 5–8 lanes in the Structural Opportunity Radar
-7. Publish 1–3 strong but not yet actionable lanes if warranted
+1. Run the full mandatory breadth assessment universe.
+2. Assess at least one lane for every required breadth bucket.
+3. Construct 10–15 candidate lanes for final ranking.
+4. Force at least 4 challengers.
+5. Score all assessed lanes.
+6. Rank the final candidate lanes.
+7. Write the matching lane assessment artifact.
+8. Publish the best 5–8 lanes in the Structural Opportunity Radar.
+9. Publish 1–3 strong but not yet actionable lanes if warranted.
+10. Publish 3–5 notable lanes assessed but not promoted this week.
 
 For each published lane include:
 - Theme
@@ -605,18 +687,6 @@ Use exactly one status per lane:
 - Scale in slowly
 - Watchlist
 - Too early
-
-Output table:
-| Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
-|---|---|---|---|---:|---:|---|---|---|
-
-### Radar framing note
-The report should state briefly:
-- what is actionable now
-- what should scale in slowly
-- what remains watchlist
-- what is too early
-- whether the radar changed meaningfully this week
 
 ## STEP 6 — Score current positions
 For each current position, score:
@@ -776,6 +846,15 @@ Then add a short paragraph:
 
 ### Best structural opportunities not yet actionable
 List the top 1–3 themes that are structurally compelling but not ready.
+
+### Notable lanes assessed but not promoted this week
+Use this exact compact table:
+
+| Theme | Primary ETF | Why not promoted | What would change that |
+|---|---|---|---|
+
+Include 3 to 5 entries.
+At least 2 entries should come from breadth buckets not currently represented in the live radar.
 
 ## 5. 📅 Key risks / invalidators
 Separate into:
@@ -940,12 +1019,20 @@ Present the full report in chat and also write the same report as a Markdown fil
 - folder: `output/`
 
 ## Versioned file naming rule
-Use:
-- first report of the day: `weekly_analysis_YYMMDD.md`
-- second report: `weekly_analysis_YYMMDD_02.md`
-- third report: `weekly_analysis_YYMMDD_03.md`
+For pro reports, use:
+- first report of the day: `weekly_analysis_pro_YYMMDD.md`
+- second report: `weekly_analysis_pro_YYMMDD_02.md`
+- third report: `weekly_analysis_pro_YYMMDD_03.md`
 
 Always create the next available same-day version instead of silently overwriting a prior same-day report unless explicitly asked.
+
+## Matching lane artifact naming rule
+For the matching lane artifact, use:
+- first artifact of the day: `etf_lane_assessment_YYMMDD.json`
+- second artifact: `etf_lane_assessment_YYMMDD_02.json`
+- third artifact: `etf_lane_assessment_YYMMDD_03.json`
+
+The report and lane artifact must match one-to-one by date and version.
 
 ## Content parity rule
 The chat output and GitHub output must have the same substantive analysis and must include all mandatory sections.
@@ -962,7 +1049,8 @@ After the email step succeeds, the final response must include a short delivery 
 The workflow is complete only after:
 1. full report published in chat
 2. report written to GitHub
-3. email dispatched to `mrkt.rprts@gmail.com` with the full report as HTML body and a PDF attachment
+3. matching lane artifact written to GitHub
+4. email dispatched to `mrkt.rprts@gmail.com` with the full report as HTML body and a PDF attachment
 
 ---
 
@@ -989,14 +1077,17 @@ Silently verify:
 5. Did I include the second-order effects map?
 6. Did I include the Structural Opportunity Radar?
 7. Did I use open discovery before constructing the published radar?
-8. Did I construct and rank candidate lanes before publication?
-9. Did I force challenger lanes?
-10. Did I avoid using a fixed structural lane list as the front-end gate?
-11. Did I keep the published radar compact?
-12. Did I include positions, holdings, cash, and continuity?
-13. Did I track portfolio value in EUR?
-14. Did I produce both chat output and GitHub output?
-15. Did I run the email-delivery step to `mrkt.rprts@gmail.com`?
-16. Did I obtain or surface a positive delivery receipt / manifest?
-17. Did I avoid asking the user for manual input if a prior report existed?
-18. Did I preserve executive readability and report discipline?
+8. Did I assess the full mandatory breadth universe?
+9. Did I construct and rank candidate lanes before publication?
+10. Did I force challenger lanes?
+11. Did I avoid using a fixed structural lane list as the front-end gate?
+12. Did I keep the published radar compact?
+13. Did I include visible omitted-lane proof?
+14. Did I write the matching lane assessment artifact?
+15. Did I include positions, holdings, cash, and continuity?
+16. Did I track portfolio value in EUR?
+17. Did I produce both chat output and GitHub output?
+18. Did I run the email-delivery step to `mrkt.rprts@gmail.com`?
+19. Did I obtain or surface a positive delivery receipt / manifest?
+20. Did I avoid asking the user for manual input if a prior report existed?
+21. Did I preserve executive readability and report discipline?
