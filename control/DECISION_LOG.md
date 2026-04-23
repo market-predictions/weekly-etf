@@ -230,3 +230,30 @@ The final step is still to wire the breadth validator directly into:
 - `.github/workflows/send-weekly-report.yml`
 
 so that non-compliant production reports fail before subscriber delivery.
+
+---
+
+## 2026-04-23 — Adopt English-canonical plus Dutch-companion bilingual delivery pattern
+### Decision
+ETF bilingual publication should use one canonical English pro report and one Dutch companion report derived from that completed English report.
+
+### Chosen architecture
+- **English pro report** remains the canonical production report for the run
+- **Dutch pro companion** is a faithful language render, not a second research pass
+- **One lane artifact** remains tied to the English canonical report only
+- **Paired filenames** are used for English and Dutch outputs by matching date and version
+- **One workflow run** may now validate, render, and send both language versions when a matching Dutch companion exists
+- **Two separate emails and two PDFs** are sent when the bilingual pair exists
+
+### Reason
+This preserves analytical determinism while allowing premium bilingual distribution with minimal drift risk.
+
+### Files updated
+- `etf-pro.txt`
+- `etf-pro-nl.txt`
+- `send_report.py`
+- `.github/workflows/send-weekly-report.yml`
+- `control/BILINGUAL_OUTPUT_RULES.md`
+- `control/NL_TERMINOLOGY.md`
+- `control/SYSTEM_INDEX.md`
+- `control/DECISION_LOG.md`
