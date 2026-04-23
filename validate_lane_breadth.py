@@ -73,11 +73,19 @@ def validate_report_breadth_proof(md_text: str, report_path: Path) -> None:
         )
 
 
+def latest_canonical_english_pro_report(output_dir: Path) -> Path:
+    reports = sorted(
+        path
+        for path in output_dir.glob("weekly_analysis_pro_*.md")
+        if "_nl_" not in path.name
+    )
+    if not reports:
+        raise RuntimeError("No canonical English ETF pro reports found in output/.")
+    return reports[-1]
+
+
 if __name__ == "__main__":
     output_dir = Path("output")
-    reports = sorted(output_dir.glob("weekly_analysis_pro_*.md"))
-    if not reports:
-        raise RuntimeError("No ETF pro reports found in output/.")
-    latest = reports[-1]
+    latest = latest_canonical_english_pro_report(output_dir)
     validate_report_breadth_proof(latest.read_text(encoding="utf-8"), latest)
     print(f"BREADTH_OK | report={latest.name}")
