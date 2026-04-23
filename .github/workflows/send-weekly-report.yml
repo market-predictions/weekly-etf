@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "output/weekly_analysis_pro_*.md"
+      - "output/weekly_analysis_pro_nl_*.md"
   workflow_dispatch:
 
 jobs:
@@ -53,6 +54,23 @@ jobs:
         run: |
           python validate_lane_breadth.py
 
+      - name: Validate English/Dutch paired report set if present
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import send_report as sr
+
+          output_dir = Path("output")
+          latest = sr.latest_report_file(output_dir, mode="pro")
+          if sr.has_matching_dutch_report(latest):
+              sr.validate_bilingual_pair(latest)
+              print(f"BILINGUAL_PAIR_OK | en={latest.name} | nl={sr.matching_dutch_report_path(latest).name}")
+          else:
+              print(f"BILINGUAL_PAIR_SKIPPED | en={latest.name} | reason=no_matching_dutch_companion")
+          PY
+
       - name: Validate HTML/PDF render before send
         env:
           MRKT_RPRTS_REPORT_MODE: pro
@@ -62,18 +80,23 @@ jobs:
           import send_report as sr
           output_dir = Path("output")
           latest = sr.latest_report_file(output_dir, mode="pro")
-          sr.generate_delivery_assets(output_dir, latest, mode="pro")
-          print(f"RENDER_OK | mode=pro | report={latest.name}")
+          bundle = sr.generate_delivery_assets_for_run(output_dir, latest, mode="pro")
+          if bundle.get("bilingual"):
+              print(f"RENDER_OK | mode=pro_bilingual | report_en={bundle['en']['report_path'].name} | report_nl={bundle['nl']['report_path'].name}")
+          else:
+              print(f"RENDER_OK | mode=pro | report={bundle['en']['report_path'].name}")
           PY
 
       - name: Send email
         env:
           MRKT_RPRTS_REPORT_MODE: pro
           MRKT_RPRTS_SUBJECT_PREFIX: Weekly ETF Pro Review
+          MRKT_RPRTS_SUBJECT_PREFIX_NL: Weekly ETF Pro Review | Nederlands
           MRKT_RPRTS_SMTP_HOST: ${{ secrets.MRKT_RPRTS_SMTP_HOST }}
           MRKT_RPRTS_SMTP_PORT: ${{ secrets.MRKT_RPRTS_SMTP_PORT }}
           MRKT_RPRTS_SMTP_USER: ${{ secrets.MRKT_RPRTS_SMTP_USER }}
           MRKT_RPRTS_SMTP_PASS: ${{ secrets.MRKT_RPRTS_SMTP_PASS }}
           MRKT_RPRTS_MAIL_FROM: ${{ secrets.MRKT_RPRTS_MAIL_FROM }}
           MRKT_RPRTS_MAIL_TO: ${{ secrets.MRKT_RPRTS_MAIL_TO }}
+          MRKT_RPRTS_MAIL_TO_NL: ${{ secrets.MRKT_RPRTS_MAIL_TO_NL }}
         run: python send_report.py
