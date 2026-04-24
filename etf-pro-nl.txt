@@ -46,6 +46,21 @@ The report title may remain in English:
 Section headings may be translated into Dutch.
 Ticker formatting must remain exact.
 
+## 2A. Renderer compatibility rule
+
+Some labels are operationally sensitive for downstream rendering.
+Where compatibility matters, preserve the exact English labels even in the Dutch companion.
+
+For **Section 2 / Portfolio Action Snapshot**, keep these bucket labels exactly as written:
+- Add
+- Hold
+- Hold but replaceable
+- Reduce
+- Close
+
+Do not translate those five bucket labels into Dutch inside the markdown source.
+The surrounding prose may still be Dutch.
+
 # 3. Dutch premium tone rule
 
 Write in:
@@ -66,14 +81,15 @@ Avoid:
 Prefer natural Dutch equivalents where that improves quality.
 
 Examples:
-- sleeve -> bouwsteen
+- sleeve -> positie, allocatie, rol, or bouwsteen depending on context
+- resilience sleeve -> beschermende positie or weerbaarheidspositie
 - lane -> thema or kansenspoor depending on context
 - carry-forward -> doorgeschoven waardering
-- funded switch -> gefinancierde wissel
+- funded switch -> rotatie or portefeuillerotatie
 - resilience -> weerbaarheid or veerkracht depending on context
 - actionable now -> nu inzetbaar or nu kansrijk for implementation
 - scale in slowly -> rustig opbouwen
-- watchlist -> watchlist or observatielijst; choose one style consistently
+- watchlist -> watchlist; use consistently
 - too early -> te vroeg
 - pullback -> terugval
 - breadth -> breedte
@@ -81,6 +97,10 @@ Examples:
 - holdings -> posities or holdings depending on table context
 - ballast -> ballast
 - core beta -> kernblootstelling brede markt
+
+Avoid specifically:
+- weerbaarheidsbouwstenen
+- gefinancierde wissel
 
 Do not force Dutch where the English term is clearly industry-standard and cleaner for subscribers.
 
@@ -94,6 +114,7 @@ Preserve all ticker cells exactly.
 Where useful:
 - translate explanatory headers into Dutch
 - preserve technical headers if changing them would reduce rendering reliability
+- keep operationally sensitive labels in English when needed for compatibility
 
 # 6. Clickable ticker preservation rule
 
@@ -112,6 +133,24 @@ If the English report contains a data note or valuation caveat, preserve it fait
 Do not soften it.
 Do not hide it.
 
+## 8A. Second-order effects discipline rule
+
+Section 9 must remain a genuine second-order effects map.
+Only include real market, macro, policy, geopolitical, sector, earnings, cost, or positioning drivers with causal investment implications.
+
+Do not place operational reporting items in Section 9, including:
+- pricing pass notes
+- verification pass notes
+- carry-forward removal notes
+- workflow or rendering notes
+- data pipeline notes
+- report-construction notes
+
+Operational pricing or verification language belongs instead in:
+- the data note
+- the valuation note near Section 7 or Section 15
+- short execution-context wording elsewhere if needed
+
 # 9. Final self-check
 
 Before producing the Dutch companion, silently verify:
@@ -121,7 +160,9 @@ Before producing the Dutch companion, silently verify:
 4. Did I preserve table row order?
 5. Did I avoid changing any conclusion or ranking?
 6. Did I replace awkward English wording with natural Dutch where appropriate?
-7. Would a Dutch subscriber experience this as a premium report rather than a literal translation?
+7. Did I keep Section 2 bucket labels in English for render compatibility?
+8. Did I keep operational pricing-pass language out of Section 9?
+9. Would a Dutch subscriber experience this as a premium report rather than a literal translation?
 
 # 10. Output goal
 
