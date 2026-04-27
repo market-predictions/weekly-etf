@@ -19,19 +19,22 @@ This repository is now a production-style weekly ETF review system with:
 - a starter pricing subsystem in `pricing/` on `main` for quota-aware ETF close retrieval and audit output
 - a new lane-assessment artifact folder in `output/lane_reviews/`
 - a new helper validator script in `validate_lane_breadth.py`
-- a first **lab-only ETF optimization layer** using explicit lab inputs and PyPortfolioOpt
+- a first **lab-only ETF optimization layer** using PyPortfolioOpt
+- a new **lab-only yfinance auto-fetch layer** that can populate longer ETF history for the optimizer before each lab run
 
 ## What changed in this step
 
-The ETF repository now also contains a first **optimization workbench** that is intentionally separate from the production report flow.
+The ETF repository now also contains an **auto-populating optimization workbench** that is intentionally separate from the production report flow.
 
 The key additions are:
 - a lab-only optimizer script in `tools/generate_pyportfolioopt_optimization_lab.py`
+- a lab-only price fetch script in `tools/fetch_etf_optimizer_prices_yfinance.py`
 - a manual GitHub Actions workflow in `.github/workflows/lab-pyportfolioopt-optimization.yml`
+- an active yfinance fetch config in `lab_inputs/etf_optimizer_fetch_config.json`
 - explicit lab input templates in `lab_inputs/`
 - a lab-only optimization explainer in `docs/ETF_OPTIMIZATION_LAB.md`
 
-This means ETF now has the first low-risk optimization layer for research and QA, while the production Weekly ETF Review remains protected.
+This means ETF now has a low-risk optimization layer for research and QA that can auto-fetch a longer ETF history in the runner workspace, while the production Weekly ETF Review remains protected.
 
 ## Current strengths
 
@@ -48,6 +51,7 @@ This means ETF now has the first low-risk optimization layer for research and QA
 - Validation and sending are now separated more cleanly at the workflow layer.
 - The prompt can now consume a matching pricing audit as an operational input layer when available.
 - A first lab-only optimization layer now exists without forcing optimizer outputs into production methodology.
+- The ETF optimization lab no longer depends only on a hand-maintained starter CSV; it can now auto-populate longer ETF history with yfinance in the lab workflow.
 
 ## Current weaknesses
 
@@ -90,13 +94,14 @@ Still pending:
 - explicit valuation-state outputs
 - fuller prompt/report consumption of audit-derived state beyond pricing only
 
-### 5. The optimization layer is still manual and lab-only
+### 5. The optimization layer is still lab-only and still not production-authoritative
 The new optimizer currently depends on:
-- explicit lab input prices in `lab_inputs/etf_optimizer_prices.csv`
+- yfinance-fetched or manually supplied ETF lab prices in `lab_inputs/etf_optimizer_prices.csv`
+- active fetch settings in `lab_inputs/etf_optimizer_fetch_config.json`
 - optional lab constraints in `lab_inputs/etf_optimizer_constraints.json`
 - optional lab views in `lab_inputs/etf_optimizer_views.json`
 
-This is the correct first step, but it is not yet integrated with an authoritative production ETF state layer.
+This is the correct next step, but it is still not integrated with an authoritative production ETF state layer.
 
 ### 6. Live production monitoring is still needed
 The updated architecture should now be validated through normal live production runs to confirm:
@@ -124,6 +129,7 @@ The updated architecture should now be validated through normal live production 
 - ETF is moving toward an explicit pricing/state layer in `pricing/` plus machine-readable audit output in `output/pricing/`.
 - ETF is also moving toward a machine-readable lane-assessment layer in `output/lane_reviews/`.
 - ETF now also has a lab-only optimization layer that can evolve later into a richer state-aware research stack once explicit ETF state files exist.
+- ETF now also has a lab-only yfinance fetch layer that can auto-populate longer ETF history for optimizer runs while keeping production pricing authority separate.
 
 ### Delivery side
 - Delivery remains in `send_report.py` plus GitHub Actions.
@@ -162,8 +168,8 @@ Still required:
 
 ### Priority E — validate whether the optimization lab is useful enough to keep extending
 Still required:
-- populate a real lab input universe
-- run the manual optimizer workflow once
+- use the new yfinance auto-fetch path to generate a real longer ETF history
+- run the manual optimizer workflow again on fetched history
 - inspect whether optimizer outputs add insight without weakening breadth discipline
 - decide whether the next extension should be a Riskfolio-Lib comparison layer or whether the optimizer should stay a thin QA tool only
 
@@ -182,7 +188,7 @@ For any future ETF architecture session:
 - add and manage repository secrets in GitHub UI
 - review live report quality as subscriber/end-user
 - review and merge implementation PRs when appropriate
-- populate the ETF optimization lab input universe when optimization testing is desired
+- review or edit the ETF optimizer fetch config when optimization testing is desired
 
 ### Can be done by assistant
 - refine the production prompt
@@ -194,7 +200,8 @@ For any future ETF architecture session:
 - extend the pricing subsystem
 - extend lane breadth enforcement and validation
 - extend the ETF optimization lab
+- extend the ETF optimizer fetch layer
 
 ## Current status label
 
-**The ETF production prompt and premium editorial layer now require a mandatory breadth assessment universe, a matching machine-readable lane artifact, and compact visibility for omitted-but-assessed lanes; scaffold files and a helper validator now exist in GitHub; and ETF also now includes a first lab-only PyPortfolioOpt optimization layer using explicit lab inputs, while the next production-critical step remains wiring breadth validation directly into `send_report.py` and the production send workflow so the delivery path can fail before send when breadth proof is missing.**
+**The ETF production prompt and premium editorial layer now require a mandatory breadth assessment universe, a matching machine-readable lane artifact, and compact visibility for omitted-but-assessed lanes; scaffold files and a helper validator now exist in GitHub; ETF also now includes a first lab-only PyPortfolioOpt optimization layer; and that lab can now auto-fetch longer ETF history with yfinance before optimization runs, while the next production-critical step remains wiring breadth validation directly into `send_report.py` and the production send workflow so the delivery path can fail before send when breadth proof is missing.**
