@@ -36,15 +36,16 @@ jobs:
           MRKT_RPRTS_REPORT_MODE: pro
         run: |
           python tools/write_etf_minimum_state.py --output-dir output --mode pro
+          python tools/write_etf_trade_ledger.py --output-dir output
 
       - name: Commit refreshed ETF state files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add output/etf_portfolio_state.json output/etf_valuation_history.csv
+          git add output/etf_portfolio_state.json output/etf_valuation_history.csv output/etf_trade_ledger.csv
           if git diff --cached --quiet; then
             echo "No ETF state changes to commit."
           else
-            git commit -m "refresh ETF minimum state from latest pro report"
+            git commit -m "refresh ETF minimum state and trade ledger from latest pro report"
             git push
           fi
