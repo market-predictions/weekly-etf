@@ -92,6 +92,7 @@ jobs:
           MRKT_RPRTS_REPORT_MODE: pro
         run: |
           python tools/write_etf_minimum_state.py --output-dir output --mode pro --check-only
+          python tools/write_etf_trade_ledger.py --output-dir output --check-only
 
       - name: Send email
         env:
