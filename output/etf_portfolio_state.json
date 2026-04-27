@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "portfolio_mode": "client_long_only_thematic",
+  "base_currency": "EUR",
+  "valuation_source": "Latest Weekly ETF Pro report section 15 holdings table and section 7 equity curve",
+  "pricing_audit_file": null,
+  "inception_date": "2026-03-28",
+  "starting_capital_eur": 100000.0,
+  "cash_eur": 5403.21,
+  "invested_market_value_eur": 97897.05,
+  "nav_eur": 103300.26,
+  "peak_nav_eur": 103300.26,
+  "max_drawdown_pct": -0.4582,
+  "positions": [
+    {
+      "ticker": "SPY",
+      "shares": 41.0,
+      "current_price_local": 711.21,
+      "currency": "USD",
+      "market_value_local": 29159.61,
+      "market_value_eur": 24852.65,
+      "current_weight_pct": 24.06
+    },
+    {
+      "ticker": "SMH",
+      "shares": 51.0,
+      "current_price_local": 476.83,
+      "currency": "USD",
+      "market_value_local": 24318.33,
+      "market_value_eur": 20726.44,
+      "current_weight_pct": 20.06
+    },
+    {
+      "ticker": "PPA",
+      "shares": 110.0,
+      "current_price_local": 176.29,
+      "currency": "USD",
+      "market_value_local": 19391.9,
+      "market_value_eur": 16527.66,
+      "current_weight_pct": 16.0
+    },
+    {
+      "ticker": "PAVE",
+      "shares": 311.0,
+      "current_price_local": 55.13,
+      "currency": "USD",
+      "market_value_local": 17145.43,
+      "market_value_eur": 14613.0,
+      "current_weight_pct": 14.15
+    },
+    {
+      "ticker": "URNM",
+      "shares": 171.0,
+      "current_price_local": 71.49,
+      "currency": "USD",
+      "market_value_local": 12224.79,
+      "market_value_eur": 10419.15,
+      "current_weight_pct": 10.09
+    },
+    {
+      "ticker": "GLD",
+      "shares": 29.0,
+      "current_price_local": 435.26,
+      "currency": "USD",
+      "market_value_local": 12622.54,
+      "market_value_eur": 10758.15,
+      "current_weight_pct": 10.41
+    }
+  ],
+  "last_report": {
+    "date": "2026-04-22",
+    "source_report": "weekly_analysis_pro_260422.md",
+    "position_count": 6
+  },
+  "last_valuation": {
+    "date": "2026-04-22",
+    "nav_eur": 103300.26,
+    "invested_market_value_eur": 97897.05,
+    "cash_eur": 5403.21,
+    "since_inception_return_pct": 3.3,
+    "daily_return_pct": 1.0742,
+    "drawdown_pct": 0.0,
+    "eurusd_used": 1.1733,
+    "equity_curve_state": "New high",
+    "valuation_notes": "Five of six held ETFs were freshly verified to the completed 22 April 2026 U.S. close. PPA was carried forward from the prior confirmed mark because a fresh same-day public close could not be verified with sufficient confidence at publication. EUR conversion uses the latest confirmed ECB reference rate available for 22 April 2026."
+  }
+}
