@@ -1,0 +1,8 @@
+{
+  "tickers": ["SPY", "SMH", "PPA", "PAVE", "URNM", "GLD"],
+  "period": "1y",
+  "interval": "1d",
+  "auto_adjust": false,
+  "prefer_adjusted_close": true,
+  "threads": true
+}
