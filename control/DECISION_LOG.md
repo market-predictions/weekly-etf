@@ -281,3 +281,23 @@ The optimization bucket in the systematic-trading reference repo remained one of
 - optimizer runs depend on explicit lab inputs rather than silently inferred production state
 - the optimization layer does not send email and does not override the ETF decision framework
 - the next likely extension, if useful, is a Riskfolio-Lib comparison layer for richer constrained-risk research. Riskfolio-Lib’s current docs describe support for hierarchical clustering portfolios and a wide range of risk measures and constraints, which is why it remains the strongest second candidate after PyPortfolioOpt. citeturn539570search0turn539570search5
+
+---
+
+## 2026-04-27 — Use yfinance as the first auto-fetch history source for the ETF optimization lab
+### Decision
+The ETF optimization lab should auto-populate its long daily ETF history with **yfinance** before each manual optimizer run.
+
+### Chosen architecture
+- `tools/fetch_etf_optimizer_prices_yfinance.py`
+- `lab_inputs/etf_optimizer_fetch_config.json`
+- updated `.github/workflows/lab-pyportfolioopt-optimization.yml` to fetch first, optimize second
+
+### Reason
+The systematic-trading reference repo highlighted free and partly free market-data options, and the cleanest first ETF history source for this lab is yfinance directly. The current yfinance API docs show `yfinance.download` supports multiple tickers, daily intervals, `period` or `start/end`, and returns market data in one call. OpenBB’s ETF historical docs also show ETF history can be requested with `provider='yfinance'`, which confirms that yfinance-backed ETF history is a reasonable first source for this lab layer. citeturn449898search2turn449898search1turn691774search0
+
+### Consequence
+- the ETF lab no longer depends only on a hand-maintained starter CSV
+- the optimizer can now run on a longer fetched ETF history with the same manual workflow entrypoint
+- yfinance remains a **lab-only** history source here and does not become the production pricing authority automatically
+- if the fetched-history path proves useful, a later option is to compare or replace it with an OpenBB wrapper using the same underlying provider. citeturn691774search0turn691774search2
