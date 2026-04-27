@@ -261,8 +261,8 @@ def write_markdown_summary(path: Path, summary: OptimizationSummary, results_df:
         "",
         f"## Top weights — {summary.best_strategy_by_sharpe}",
         "",
-        "| Ticker | Weight |
-|---|---:|",
+        "| Ticker | Weight |",
+        "|---|---:|",
     ])
     for _, row in top_weights.iterrows():
         lines.append(f"| {row['ticker']} | {row['weight']:.4f} |")
@@ -337,7 +337,8 @@ def main() -> None:
     summary_md_export = artifact_dir / "etf_optimizer_summary.md"
     manifest_export = artifact_dir / "etf_optimizer_manifest.json"
 
-    prices.reset_index().rename(columns={prices.reset_index().columns[0]: "date"}).to_csv(cleaned_prices_export, index=False)
+    cleaned_prices = prices.reset_index().rename(columns={prices.index.name or "index": "date"})
+    cleaned_prices.to_csv(cleaned_prices_export, index=False)
     results_df.to_csv(results_export, index=False)
     weights_df.to_csv(weights_export, index=False)
     summary_export.write_text(json.dumps(asdict(summary), indent=2) + "\n", encoding="utf-8")
