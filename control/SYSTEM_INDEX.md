@@ -21,10 +21,11 @@ Read these only after the control files and only when relevant to the task.
 - `send_report.py` — delivery/rendering script for HTML email, PDF generation, bilingual companion delivery, attachments, and manifest logic.
 - `.github/workflows/send-weekly-report.yml` — production GitHub Actions workflow.
 - `.github/workflows/send-weekly-report-split-test.yml` — split-test workflow for evaluation runs from `output_split_test/`.
-- `.github/workflows/refresh-etf-state-from-report.yml` — repo-native state refresh workflow that writes and commits the minimum ETF state files.
+- `.github/workflows/refresh-etf-state-from-report.yml` — repo-native state refresh workflow that writes and commits the ETF explicit state files.
 - `output/` — archived production ETF report outputs and related artifacts.
-- `output/etf_portfolio_state.json` — current minimum machine-readable ETF portfolio state.
-- `output/etf_valuation_history.csv` — current minimum machine-readable ETF valuation history.
+- `output/etf_portfolio_state.json` — current machine-readable ETF portfolio state.
+- `output/etf_valuation_history.csv` — current machine-readable ETF valuation history.
+- `output/etf_trade_ledger.csv` — current machine-readable ETF trade/change ledger.
 - `output_split_test/` — archived split-test ETF outputs used for comparison, not as production truth.
 - `daily_outputs/latest/` — latest generated supporting outputs.
 - `mt5_output/latest/` — latest supporting outputs when applicable.
@@ -42,8 +43,9 @@ These files exist only to support lab-safe research and QA:
 - `lab_inputs/etf_optimizer_views_template.json`
 
 ### State-model-specific execution files
-These files support the minimum ETF state layer:
+These files support the ETF explicit state layer:
 - `tools/write_etf_minimum_state.py`
+- `tools/write_etf_trade_ledger.py`
 - `docs/ETF_MINIMUM_STATE_MODEL.md`
 
 ## Canonical control files
@@ -76,12 +78,13 @@ Primary files today:
 ### 2. Input/state contract
 Where authoritative facts come from, in what order, and how conflicts are resolved.
 
-Today ETF now has a first explicit minimum state layer, but the state still originates from the canonical English pro report rather than a fully independent implementation engine. Over time ETF should move from report-derived explicit state toward more independent implementation-state ownership.
+Today ETF now has an explicit state layer, but the state still originates from the canonical English pro report rather than a fully independent implementation engine. Over time ETF should move from report-derived explicit state toward more independent implementation-state ownership.
 
 Primary files today:
 - `etf.txt`
 - `output/etf_portfolio_state.json`
 - `output/etf_valuation_history.csv`
+- `output/etf_trade_ledger.csv`
 - `docs/ETF_MINIMUM_STATE_MODEL.md`
 - `prompts/as_is_split/02_INPUT_STATE_CONTRACT.md` for split evaluation
 
@@ -126,7 +129,7 @@ Recommended execution file priority by task:
 - Dutch premium companion delivery layer → `etf-pro-nl.txt`
 - bilingual delivery / rendering / email / PDF → `send_report.py`
 - workflow / secrets / scheduling → `.github/workflows/send-weekly-report.yml`
-- ETF state derivation and persistence → `tools/write_etf_minimum_state.py` and `.github/workflows/refresh-etf-state-from-report.yml`
+- ETF state derivation and persistence → `tools/write_etf_minimum_state.py`, `tools/write_etf_trade_ledger.py`, and `.github/workflows/refresh-etf-state-from-report.yml`
 - split-architecture evaluation → `prompts/as_is_split/ETF_RUNTIME_SPLIT.txt`
 - split-test delivery comparison → `.github/workflows/send-weekly-report-split-test.yml`
 - historical continuity or latest live artifact → latest file in `output/`
@@ -157,7 +160,7 @@ The target architecture for ETF is:
 - **GitHub Actions + scripts** as the real execution and delivery layer
 - **Split prompt scaffold** as a safe evaluation layer while production remains protected
 - **English canonical report + Dutch companion render** as the bilingual publication model when requested
-- **Minimum explicit ETF state layer** as the first bridge toward FX-style implementation authority
+- **Explicit ETF state layer** as the bridge toward FX-style implementation authority
 - **Lab optimization layer** as a safe research surface before any optimizer logic is ever considered for production
 - **Auto-fetch ETF history in the lab layer** using yfinance before optimization runs, while keeping production pricing authority separate
 - **Optional Custom GPT** only as architect/reviewer, not as the main runtime container
