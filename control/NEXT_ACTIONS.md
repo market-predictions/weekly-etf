@@ -140,24 +140,23 @@
 
 ---
 
-## Phase 5 — add and validate the ETF optimization lab
+## Phase 5 — run and judge the ETF optimization lab with auto-fetched history
 
-### 13. Prepare a real ETF optimization lab universe
+### 13. Review the ETF optimizer fetch config
 - Owner: `[USER]`
 - Action:
-  - copy `lab_inputs/etf_optimizer_prices_template.csv` to `lab_inputs/etf_optimizer_prices.csv`
-  - replace the sample prices with a real ETF price-history universe
-  - optionally add `lab_inputs/etf_optimizer_constraints.json`
-  - optionally add `lab_inputs/etf_optimizer_views.json`
-- Done when: the ETF optimization lab has a real input universe rather than the template file.
+  - inspect `lab_inputs/etf_optimizer_fetch_config.json`
+  - adjust the ETF ticker universe, period, or date range if desired
+- Done when: the fetch config reflects the ETF lab universe you want to test.
 
 ### 14. Run the manual PyPortfolioOpt optimization workflow
 - Owner: `[JOINT]`
 - Action:
   - use `.github/workflows/lab-pyportfolioopt-optimization.yml` manually
+  - let the workflow auto-fetch ETF history with yfinance first
   - inspect the generated artifact bundle from `lab_outputs/optimization/`
   - compare max Sharpe, min volatility, HRP, and optional Black-Litterman outputs
-- Done when: the first ETF optimization lab run completes successfully and produces interpretable artifacts.
+- Done when: the ETF optimization lab run completes successfully on a real fetched daily history and produces interpretable artifacts.
 
 ### 15. Judge whether the optimizer adds decision value or just model noise
 - Owner: `[ASSISTANT]`
@@ -194,9 +193,9 @@
 ## Suggested immediate next move
 
 The best next move after this update is:
-1. populate a real ETF lab input universe in `lab_inputs/etf_optimizer_prices.csv`
+1. review the ETF fetch config in `lab_inputs/etf_optimizer_fetch_config.json`
 2. run the manual PyPortfolioOpt optimization workflow once
-3. inspect the artifact bundle for concentration, diversification, and plausibility
+3. inspect the fetched-price history and optimization artifact bundle for concentration, diversification, and plausibility
 4. decide whether the optimizer is useful enough to keep extending
 5. only after that, return to production-critical send-path hardening work or extend the optimizer with a Riskfolio-Lib comparison layer
 
@@ -204,4 +203,4 @@ The best next move after this update is:
 
 ## Current checkpoint
 
-**The ETF repo still has a production-critical breadth-enforcement hardening task outstanding, and it now also includes a first manual PyPortfolioOpt optimization lab that is intentionally separated from the production ETF review flow and uses an explicit lab input contract.**
+**The ETF repo still has a production-critical breadth-enforcement hardening task outstanding, and it now includes a first manual PyPortfolioOpt optimization lab that can auto-fetch longer ETF history with yfinance before optimization runs, while remaining intentionally separate from the production ETF review flow.**
