@@ -325,3 +325,27 @@ FX already showed the value of machine-readable implementation state for continu
 - state persistence is handled by a dedicated repo-native refresh workflow rather than a riskier commit-from-send step
 - the next state extensions should be `output/etf_trade_ledger.csv` and `output/etf_recommendation_scorecard.csv`
 - ETF remains behind FX in state maturity, but the authority model is now moving in the same direction for uniformity
+
+---
+
+## 2026-04-27 — Enrich ETF portfolio state and add the first ETF trade ledger
+### Decision
+ETF should now take the next maturity step toward the FX operating model by enriching current portfolio state with explicit action/target/continuity metadata and by adding a real trade/change-memory file.
+
+### Chosen architecture
+- `tools/write_etf_minimum_state.py` now derives richer position metadata from Sections 13, 14, and 16 in addition to Sections 7 and 15
+- `tools/write_etf_trade_ledger.py`
+- `output/etf_trade_ledger.csv`
+- updated `.github/workflows/refresh-etf-state-from-report.yml`
+- updated `.github/workflows/send-weekly-report.yml`
+- updated `docs/ETF_MINIMUM_STATE_MODEL.md`
+
+### Reason
+The minimum ETF pair was a good first bridge, but it still left ETF behind FX on explicit change-memory and position metadata. ETF is still more report-derived than FX, so the safest next step is not to invent a full independent execution engine, but to extract more of the already explicit canonical-report truth into machine-readable state. Section 13 already contains target weight, suggested action, conviction, score, and role; Section 14 already contains explicit executed-change rows; Section 16 already contains continuity details such as average entry, thesis, and role. Using those sections brings ETF materially closer to FX-style state maturity without pretending ETF already has more authority than it really does.
+
+### Consequence
+- ETF current positions now carry richer explicit metadata in `output/etf_portfolio_state.json`
+- ETF now has a first machine-readable `output/etf_trade_ledger.csv`
+- the send path now validates both enriched state derivation and trade-ledger derivation before delivery
+- the next ETF state target is `output/etf_recommendation_scorecard.csv`
+- ETF has moved materially closer to the architectural maturity level of `weekly-fx`, while still staying honest about its report-derived nature
