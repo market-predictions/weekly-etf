@@ -1,0 +1,50 @@
+name: Refresh ETF state from latest pro report
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "output/weekly_analysis_pro_*.md"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-etf-state:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install matplotlib mistune weasyprint pyyaml
+
+      - name: Write ETF minimum state files
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python tools/write_etf_minimum_state.py --output-dir output --mode pro
+
+      - name: Commit refreshed ETF state files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/etf_portfolio_state.json output/etf_valuation_history.csv
+          if git diff --cached --quiet; then
+            echo "No ETF state changes to commit."
+          else
+            git commit -m "refresh ETF minimum state from latest pro report"
+            git push
+          fi
