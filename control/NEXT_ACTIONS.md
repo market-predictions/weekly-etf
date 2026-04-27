@@ -92,34 +92,34 @@
 
 ---
 
-## Phase 4 — stabilize and extend the ETF minimum state model
+## Phase 4 — stabilize and extend the ETF explicit state layer
 
-### 9. Validate the new ETF minimum state refresh over live runs
+### 9. Validate the ETF enriched state refresh over live runs
 - Owner: `[JOINT]`
 - Action:
   - let `.github/workflows/refresh-etf-state-from-report.yml` run on the next canonical English pro report push
-  - confirm `output/etf_portfolio_state.json` and `output/etf_valuation_history.csv` refresh and commit correctly
-  - confirm the pre-send derivation check passes in `.github/workflows/send-weekly-report.yml`
-- Done when: ETF minimum state refresh is stable and repeatable.
+  - confirm `output/etf_portfolio_state.json`, `output/etf_valuation_history.csv`, and `output/etf_trade_ledger.csv` refresh and commit correctly
+  - confirm the pre-send derivation checks pass in `.github/workflows/send-weekly-report.yml`
+- Done when: ETF explicit state refresh is stable and repeatable.
 
 ### 10. Confirm ETF state/report alignment
 - Owner: `[ASSISTANT]`
 - Action:
   - compare the latest canonical English pro report with `output/etf_portfolio_state.json`
   - compare the latest Section 7 table with `output/etf_valuation_history.csv`
+  - compare the latest Section 14 table with `output/etf_trade_ledger.csv`
   - confirm the statefiles reflect the latest pro report deterministically
 - Done when: state authority is explicit and visibly aligned with the canonical report.
 
-### 11. Add the next ETF state files
+### 11. Add the next ETF state file
 - Owner: `[ASSISTANT]`
-- Planned files:
-  - `output/etf_trade_ledger.csv`
+- Planned file:
   - `output/etf_recommendation_scorecard.csv`
 - Action:
-  - define their minimum schemas
-  - add repo-native writers for them
-  - keep them aligned with the minimum ETF state model already introduced
-- Done when: ETF has the next layer of explicit implementation memory beyond portfolio snapshot and valuation history.
+  - define its minimum schema
+  - add a repo-native writer for it
+  - keep it aligned with the current ETF explicit state layer
+- Done when: ETF has the next layer of explicit recommendation memory beyond portfolio snapshot, valuation history, and trade ledger.
 
 ### 12. Move ETF state beyond report-derived explicit state over time
 - Owner: `[ASSISTANT]`
@@ -141,6 +141,7 @@
   - stale lane artifacts
   - stale watchlist / lane continuity memory
   - stale ETF state files
+  - stale ETF trade-ledger rows
 - Done when: stale inputs cannot silently flatten, distort, or misstate the portfolio or report.
 
 ---
@@ -199,12 +200,12 @@
 
 The best next move after this update is:
 1. let the next canonical English ETF pro report push run both the send workflow and the ETF state-refresh workflow
-2. confirm `output/etf_portfolio_state.json` and `output/etf_valuation_history.csv` refresh cleanly on `main`
-3. only after that, add `output/etf_trade_ledger.csv` and `output/etf_recommendation_scorecard.csv`
+2. confirm `output/etf_portfolio_state.json`, `output/etf_valuation_history.csv`, and `output/etf_trade_ledger.csv` refresh cleanly on `main`
+3. only after that, add `output/etf_recommendation_scorecard.csv`
 4. then return to optimizer-comparison or deeper send-path hardening work
 
 ---
 
 ## Current checkpoint
 
-**The ETF repo now has a first explicit minimum state layer, a repo-native state refresh workflow, and a pre-send derivation check; the next ETF state step is to stabilize that new minimum model across live runs and then extend it with trade-ledger and recommendation-scorecard files.**
+**The ETF repo now has an enriched explicit state layer, a repo-native state refresh workflow, and pre-send derivation checks for both portfolio state and trade ledger; the next ETF state step is to stabilize that richer state model across live runs and then extend it with a recommendation scorecard.**
