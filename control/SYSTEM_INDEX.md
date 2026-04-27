@@ -29,9 +29,11 @@ Read these only after the control files and only when relevant to the task.
 ### Lab-specific execution files
 These files exist only to support lab-safe research and QA:
 - `tools/generate_pyportfolioopt_optimization_lab.py`
+- `tools/fetch_etf_optimizer_prices_yfinance.py`
 - `.github/workflows/lab-pyportfolioopt-optimization.yml`
 - `docs/ETF_OPTIMIZATION_LAB.md`
 - `lab_inputs/README.md`
+- `lab_inputs/etf_optimizer_fetch_config.json`
 - `lab_inputs/etf_optimizer_prices_template.csv`
 - `lab_inputs/etf_optimizer_constraints_template.json`
 - `lab_inputs/etf_optimizer_views_template.json`
@@ -116,7 +118,7 @@ Recommended execution file priority by task:
 - split-test delivery comparison → `.github/workflows/send-weekly-report-split-test.yml`
 - historical continuity or latest live artifact → latest file in `output/`
 - split-output comparison → latest file in `output_split_test/`
-- lab optimization work → `tools/generate_pyportfolioopt_optimization_lab.py` and `docs/ETF_OPTIMIZATION_LAB.md`
+- ETF optimization lab → `tools/fetch_etf_optimizer_prices_yfinance.py`, `tools/generate_pyportfolioopt_optimization_lab.py`, and `docs/ETF_OPTIMIZATION_LAB.md`
 
 ## Session close rule
 At the end of any meaningful architecture or implementation session:
@@ -143,4 +145,5 @@ The target architecture for ETF is:
 - **Split prompt scaffold** as a safe evaluation layer while production remains protected
 - **English canonical report + Dutch companion render** as the bilingual publication model when requested
 - **Lab optimization layer** as a safe research surface before any optimizer logic is ever considered for production
+- **Auto-fetch ETF history in the lab layer** using yfinance before optimization runs, while keeping production pricing authority separate
 - **Optional Custom GPT** only as architect/reviewer, not as the main runtime container
