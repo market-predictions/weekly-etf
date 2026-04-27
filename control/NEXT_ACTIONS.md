@@ -21,7 +21,7 @@
 
 ### 2. Keep using the control-layer start sequence
 - Owner: `[JOINT]`
-- Action: every meaningful ETF architecture, debugging, prompt, state, workflow, or delivery session starts with:
+- Action: every meaningful ETF architecture, debugging, prompt, state, workflow, delivery, or lab-optimization session starts with:
   1. `control/SYSTEM_INDEX.md`
   2. `control/CURRENT_STATE.md`
   3. `control/NEXT_ACTIONS.md`
@@ -140,9 +140,39 @@
 
 ---
 
-## Phase 5 — reduce monolith risk later without weakening production
+## Phase 5 — add and validate the ETF optimization lab
 
-### 13. Keep the four-layer model explicit in future changes
+### 13. Prepare a real ETF optimization lab universe
+- Owner: `[USER]`
+- Action:
+  - copy `lab_inputs/etf_optimizer_prices_template.csv` to `lab_inputs/etf_optimizer_prices.csv`
+  - replace the sample prices with a real ETF price-history universe
+  - optionally add `lab_inputs/etf_optimizer_constraints.json`
+  - optionally add `lab_inputs/etf_optimizer_views.json`
+- Done when: the ETF optimization lab has a real input universe rather than the template file.
+
+### 14. Run the manual PyPortfolioOpt optimization workflow
+- Owner: `[JOINT]`
+- Action:
+  - use `.github/workflows/lab-pyportfolioopt-optimization.yml` manually
+  - inspect the generated artifact bundle from `lab_outputs/optimization/`
+  - compare max Sharpe, min volatility, HRP, and optional Black-Litterman outputs
+- Done when: the first ETF optimization lab run completes successfully and produces interpretable artifacts.
+
+### 15. Judge whether the optimizer adds decision value or just model noise
+- Owner: `[ASSISTANT]`
+- Action:
+  - compare optimizer outputs against ETF breadth discipline and regime logic
+  - check whether optimized allocations are sensible or merely concentrated
+  - decide whether the optimizer is useful as an internal QA layer
+  - decide whether the next extension should be a Riskfolio-Lib comparison layer
+- Done when: the optimizer’s role is clear before any further extension.
+
+---
+
+## Phase 6 — reduce monolith risk later without weakening production
+
+### 16. Keep the four-layer model explicit in future changes
 - Owner: `[ASSISTANT]`
 - Action: preserve the distinction between:
   1. decision framework
@@ -151,7 +181,7 @@
   4. operational runbook
 - Done when: future changes do not collapse everything back into a single opaque blob.
 
-### 14. Reduce monolith risk only where it is safe
+### 17. Reduce monolith risk only where it is safe
 - Owner: `[JOINT]`
 - Action:
   - tighten boundaries gradually
@@ -164,14 +194,14 @@
 ## Suggested immediate next move
 
 The best next move after this update is:
-1. run a fresh ETF production report with the updated prompt
-2. confirm the matching lane artifact is written correctly
-3. finish wiring breadth validation into `send_report.py`
-4. finish wiring breadth validation into `.github/workflows/send-weekly-report.yml`
-5. validate output quality across several consecutive live runs
+1. populate a real ETF lab input universe in `lab_inputs/etf_optimizer_prices.csv`
+2. run the manual PyPortfolioOpt optimization workflow once
+3. inspect the artifact bundle for concentration, diversification, and plausibility
+4. decide whether the optimizer is useful enough to keep extending
+5. only after that, return to production-critical send-path hardening work or extend the optimizer with a Riskfolio-Lib comparison layer
 
 ---
 
 ## Current checkpoint
 
-**The ETF production prompt and premium editorial layer now require a mandatory breadth universe, a matching machine-readable lane artifact, and compact omitted-lane visibility; scaffold files and a helper validator now exist in GitHub; and the next task is to wire that breadth validation directly into the delivery script and production send workflow so non-compliant reports fail before send.**
+**The ETF repo still has a production-critical breadth-enforcement hardening task outstanding, and it now also includes a first manual PyPortfolioOpt optimization lab that is intentionally separated from the production ETF review flow and uses an explicit lab input contract.**
