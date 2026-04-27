@@ -301,3 +301,27 @@ The systematic-trading reference repo highlighted free and partly free market-da
 - the optimizer can now run on a longer fetched ETF history with the same manual workflow entrypoint
 - yfinance remains a **lab-only** history source here and does not become the production pricing authority automatically
 - if the fetched-history path proves useful, a later option is to compare or replace it with an OpenBB wrapper using the same underlying provider. citeturn691774search0turn691774search2
+
+---
+
+## 2026-04-27 — Introduce a minimum explicit ETF state model aligned to FX direction
+### Decision
+ETF should now have a first **minimum explicit production state layer** instead of relying only on prior-report parsing and prompt continuity.
+
+### Chosen architecture
+- `tools/write_etf_minimum_state.py`
+- `.github/workflows/refresh-etf-state-from-report.yml`
+- `output/etf_portfolio_state.json`
+- `output/etf_valuation_history.csv`
+- `docs/ETF_MINIMUM_STATE_MODEL.md`
+- a pre-send derivation check in `.github/workflows/send-weekly-report.yml`
+
+### Reason
+FX already showed the value of machine-readable implementation state for continuity, validation, and downstream tooling. ETF is not ready to mirror the full FX state stack yet, but it is ready for the minimum pair of files that establishes current portfolio state and valuation history explicitly. The right first step is to derive these from the canonical English pro report, specifically Section 15 for holdings/totals and Section 7 for valuation history, while keeping the design compatible with later extensions such as trade ledger and recommendation scorecard.
+
+### Consequence
+- ETF now has a minimum machine-readable state layer on `main`
+- the production send path now validates that the latest pro report can be converted into that minimum state model before delivery
+- state persistence is handled by a dedicated repo-native refresh workflow rather than a riskier commit-from-send step
+- the next state extensions should be `output/etf_trade_ledger.csv` and `output/etf_recommendation_scorecard.csv`
+- ETF remains behind FX in state maturity, but the authority model is now moving in the same direction for uniformity
