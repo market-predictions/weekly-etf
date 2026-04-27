@@ -4,11 +4,46 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 from pathlib import Path
 
 import send_report as sr
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "1.1"
+
+SECTION13_ALIASES = {
+    "ticker": "ticker",
+    "existing/new": "existing_new",
+    "weight inherited": "weight_inherited_pct",
+    "target weight": "target_weight_pct",
+    "suggested action": "suggested_action",
+    "conviction tier": "conviction_tier",
+    "total score": "total_score",
+    "portfolio role": "portfolio_role",
+    "better alternative exists?": "better_alternative_exists",
+    "short reason": "short_reason",
+}
+
+SECTION14_ALIASES = {
+    "ticker": "ticker",
+    "previous weight %": "previous_weight_pct",
+    "new weight %": "new_weight_pct",
+    "weight change %": "weight_change_pct",
+    "shares delta": "shares_delta",
+    "action executed": "action_executed",
+    "funding source / note": "funding_source_note",
+}
+
+SECTION16_ALIASES = {
+    "ticker": "ticker",
+    "direction": "direction",
+    "weight %": "continuity_weight_pct",
+    "avg entry": "avg_entry_local",
+    "current price": "continuity_current_price_local",
+    "p/l %": "pnl_pct",
+    "original thesis": "original_thesis",
+    "role": "continuity_role",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -25,6 +60,30 @@ def safe_float(value):
     if isinstance(value, (int, float)):
         return float(value)
     return sr._to_float(str(value))
+
+
+def normalize_header(text: str) -> str:
+    cleaned = sr.clean_md_inline(text or "").strip().lower()
+    cleaned = cleaned.replace("–", "-").replace("—", "-")
+    cleaned = re.sub(r"\s+", " ", cleaned)
+    return cleaned
+
+
+def parse_first_table(lines: list[str], alias_map: dict[str, str]) -> list[dict]:
+    block = sr._first_markdown_table(lines)
+    if not block:
+        return []
+    rows = sr.parse_markdown_table(block)
+    if len(rows) < 2:
+        return []
+    headers = [alias_map.get(normalize_header(h), normalize_header(h)) for h in rows[0]]
+    parsed: list[dict] = []
+    for raw_row in rows[1:]:
+        row = {}
+        for idx, header in enumerate(headers):
+            row[header] = sr.clean_md_inline(raw_row[idx]) if idx < len(raw_row) else ""
+        parsed.append(row)
+    return parsed
 
 
 def extract_section7_metadata(md_text: str) -> dict:
@@ -65,6 +124,64 @@ def parse_section7_rows(md_text: str) -> list[dict]:
         if report_date and nav is not None:
             parsed.append({"date": report_date, "nav_eur": nav, "comment": comment})
     return parsed
+
+
+def parse_section13_map(md_text: str) -> dict[str, dict]:
+    rows = parse_first_table(sr.extract_section_by_number(md_text, 13), SECTION13_ALIASES)
+    out: dict[str, dict] = {}
+    for row in rows:
+        ticker = row.get("ticker", "").upper()
+        if not ticker:
+            continue
+        out[ticker] = {
+            "existing_new": row.get("existing_new") or None,
+            "weight_inherited_pct": safe_float(row.get("weight_inherited_pct")),
+            "target_weight_pct": safe_float(row.get("target_weight_pct")),
+            "suggested_action": row.get("suggested_action") or None,
+            "conviction_tier": row.get("conviction_tier") or None,
+            "total_score": safe_float(row.get("total_score")),
+            "portfolio_role": row.get("portfolio_role") or None,
+            "better_alternative_exists": row.get("better_alternative_exists") or None,
+            "short_reason": row.get("short_reason") or None,
+        }
+    return out
+
+
+def parse_section14_map(md_text: str) -> dict[str, dict]:
+    rows = parse_first_table(sr.extract_section_by_number(md_text, 14), SECTION14_ALIASES)
+    out: dict[str, dict] = {}
+    for row in rows:
+        ticker = row.get("ticker", "").upper()
+        if not ticker or ticker == "CASH":
+            continue
+        out[ticker] = {
+            "previous_weight_pct": safe_float(row.get("previous_weight_pct")),
+            "new_weight_pct": safe_float(row.get("new_weight_pct")),
+            "weight_change_pct": safe_float(row.get("weight_change_pct")),
+            "shares_delta_this_run": safe_float(row.get("shares_delta")),
+            "action_executed_this_run": row.get("action_executed") or None,
+            "funding_source_note": row.get("funding_source_note") or None,
+        }
+    return out
+
+
+def parse_section16_map(md_text: str) -> dict[str, dict]:
+    rows = parse_first_table(sr.extract_section_by_number(md_text, 16), SECTION16_ALIASES)
+    out: dict[str, dict] = {}
+    for row in rows:
+        ticker = row.get("ticker", "").upper()
+        if not ticker:
+            continue
+        out[ticker] = {
+            "direction": row.get("direction") or None,
+            "continuity_weight_pct": safe_float(row.get("continuity_weight_pct")),
+            "avg_entry_local": safe_float(row.get("avg_entry_local")),
+            "continuity_current_price_local": safe_float(row.get("continuity_current_price_local")),
+            "pnl_pct": safe_float(row.get("pnl_pct")),
+            "original_thesis": row.get("original_thesis") or None,
+            "continuity_role": row.get("continuity_role") or None,
+        }
+    return out
 
 
 def dedupe_history(rows: list[dict]) -> list[dict]:
@@ -110,11 +227,17 @@ def enrich_history(rows: list[dict], latest_totals: dict, report_name: str, euru
 
 
 def parse_positions(md_text: str) -> list[dict]:
+    section13 = parse_section13_map(md_text)
+    section14 = parse_section14_map(md_text)
+    section16 = parse_section16_map(md_text)
     positions = []
     for row in sr.parse_section15_holdings_rows_generic(md_text):
         ticker = sr.clean_md_inline(row.get("ticker", "")).upper()
         if not ticker or ticker == "CASH":
             continue
+        s13 = section13.get(ticker, {})
+        s14 = section14.get(ticker, {})
+        s16 = section16.get(ticker, {})
         positions.append(
             {
                 "ticker": ticker,
@@ -124,6 +247,25 @@ def parse_positions(md_text: str) -> list[dict]:
                 "market_value_local": safe_float(row.get("market value (local)")),
                 "market_value_eur": safe_float(row.get("market value (eur)")),
                 "current_weight_pct": safe_float(row.get("weight %")),
+                "existing_new": s13.get("existing_new"),
+                "weight_inherited_pct": s13.get("weight_inherited_pct"),
+                "target_weight_pct": s13.get("target_weight_pct"),
+                "suggested_action": s13.get("suggested_action"),
+                "conviction_tier": s13.get("conviction_tier"),
+                "total_score": s13.get("total_score"),
+                "portfolio_role": s13.get("portfolio_role") or s16.get("continuity_role"),
+                "better_alternative_exists": s13.get("better_alternative_exists"),
+                "short_reason": s13.get("short_reason"),
+                "direction": s16.get("direction"),
+                "avg_entry_local": s16.get("avg_entry_local"),
+                "continuity_current_price_local": s16.get("continuity_current_price_local"),
+                "pnl_pct": s16.get("pnl_pct"),
+                "original_thesis": s16.get("original_thesis"),
+                "previous_weight_pct": s14.get("previous_weight_pct"),
+                "weight_change_pct": s14.get("weight_change_pct"),
+                "shares_delta_this_run": s14.get("shares_delta_this_run"),
+                "action_executed_this_run": s14.get("action_executed_this_run"),
+                "funding_source_note": s14.get("funding_source_note"),
             }
         )
     return positions
@@ -159,8 +301,10 @@ def build_portfolio_state(md_text: str, report_path: Path, output_dir: Path) -> 
         "schema_version": SCHEMA_VERSION,
         "portfolio_mode": "client_long_only_thematic",
         "base_currency": "EUR",
-        "valuation_source": "Latest Weekly ETF Pro report section 15 holdings table and section 7 equity curve",
+        "valuation_source": "Latest Weekly ETF Pro report sections 7, 13, 14, 15, and 16",
         "pricing_audit_file": pricing_audit_file,
+        "trade_ledger_file": "etf_trade_ledger.csv",
+        "recommendation_scorecard_file": None,
         "inception_date": history_rows[0]["date"],
         "starting_capital_eur": round(totals.get("Starting capital (EUR)", section7_meta.get("starting_capital_eur") or 0.0), 2),
         "cash_eur": round(totals.get("Cash (EUR)", 0.0), 2),
