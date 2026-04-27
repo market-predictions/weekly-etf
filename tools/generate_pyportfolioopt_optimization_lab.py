@@ -27,6 +27,9 @@ import pandas as pd
 from pypfopt import EfficientFrontier, HRPOpt, black_litterman, expected_returns, risk_models
 
 
+MIN_OBSERVATIONS = 7
+
+
 @dataclass
 class StrategyResult:
     strategy: str
@@ -114,8 +117,10 @@ def load_prices(path: Path) -> pd.DataFrame:
 
     if df.shape[1] < 2:
         raise RuntimeError("Need at least 2 ETF columns with usable price history")
-    if df.shape[0] < 20:
-        raise RuntimeError("Need at least 20 price observations for the ETF optimization lab")
+    if df.shape[0] < MIN_OBSERVATIONS:
+        raise RuntimeError(
+            f"Need at least {MIN_OBSERVATIONS} price observations for the ETF optimization lab; current file is intended as a starter report-derived history, not a single-snapshot input."
+        )
 
     return df.astype(float)
 
