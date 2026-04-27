@@ -24,7 +24,11 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from pypfopt import EfficientFrontier, HRPOpt, black_litterman, expected_returns, risk_models
+from pypfopt.black_litterman import BlackLittermanModel
+from pypfopt.efficient_frontier import EfficientFrontier
+from pypfopt.expected_returns import mean_historical_return, returns_from_prices
+from pypfopt.hierarchical_portfolio import HRPOpt
+from pypfopt.risk_models import sample_cov
 
 
 MIN_OBSERVATIONS = 7
@@ -189,7 +193,7 @@ def run_min_vol(mu: pd.Series, cov: pd.DataFrame, bounds: list[tuple[float, floa
 
 
 def run_hrp(prices: pd.DataFrame, mu: pd.Series, cov: pd.DataFrame) -> tuple[StrategyResult, pd.Series]:
-    returns = expected_returns.returns_from_prices(prices).dropna(how="all")
+    returns = returns_from_prices(prices).dropna(how="all")
     hrp = HRPOpt(returns=returns)
     weights = clean_weight_series(hrp.optimize(), list(mu.index))
     return strategy_row("hierarchical_risk_parity", weights, mu, cov)
@@ -212,7 +216,7 @@ def run_black_litterman_if_configured(
     else:
         prior_returns = prior_returns.fillna(mu)
 
-    bl = black_litterman.BlackLittermanModel(
+    bl = BlackLittermanModel(
         cov,
         pi=prior_returns,
         absolute_views=absolute_views,
@@ -294,8 +298,8 @@ def main() -> None:
     views_cfg = load_json_if_exists(views_path)
 
     tickers = list(prices.columns)
-    mu = expected_returns.mean_historical_return(prices)
-    cov = risk_models.sample_cov(prices)
+    mu = mean_historical_return(prices)
+    cov = sample_cov(prices)
     bounds = build_weight_bounds(tickers, constraints)
 
     results: list[StrategyResult] = []
