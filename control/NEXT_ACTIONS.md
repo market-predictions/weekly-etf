@@ -92,41 +92,45 @@
 
 ---
 
-## Phase 4 — move ETF toward explicit implementation state
+## Phase 4 — stabilize and extend the ETF minimum state model
 
-### 9. Validate the expanded pricing subsystem in real runs
+### 9. Validate the new ETF minimum state refresh over live runs
+- Owner: `[JOINT]`
+- Action:
+  - let `.github/workflows/refresh-etf-state-from-report.yml` run on the next canonical English pro report push
+  - confirm `output/etf_portfolio_state.json` and `output/etf_valuation_history.csv` refresh and commit correctly
+  - confirm the pre-send derivation check passes in `.github/workflows/send-weekly-report.yml`
+- Done when: ETF minimum state refresh is stable and repeatable.
+
+### 10. Confirm ETF state/report alignment
 - Owner: `[ASSISTANT]`
 - Action:
-  - validate issuer-page handlers in real runtime output
-  - determine whether Yahoo fallback remains necessary after API coverage testing
-  - confirm richer holding snapshots are written correctly
-  - confirm shortlist pricing for alternatives and challengers behaves within free-tier limits
-  - confirm prompt consumption of matching pricing audits is clean and non-stale
-- Done when: the pricing subsystem can support real report pricing authority rather than just a dry-run audit.
+  - compare the latest canonical English pro report with `output/etf_portfolio_state.json`
+  - compare the latest Section 7 table with `output/etf_valuation_history.csv`
+  - confirm the statefiles reflect the latest pro report deterministically
+- Done when: state authority is explicit and visibly aligned with the canonical report.
 
-### 10. Validate lane artifact quality in real runs
-- Owner: `[ASSISTANT]`
-- Action:
-  - confirm all required breadth buckets appear in each matching lane artifact
-  - confirm challengers are present in sufficient number
-  - confirm report/artifact date and version match one-to-one
-  - confirm omitted-lane explanations are concise and decision-useful
-- Done when: lane breadth becomes auditable rather than impressionistic.
-
-### 11. Design explicit ETF state files
+### 11. Add the next ETF state files
 - Owner: `[ASSISTANT]`
 - Planned files:
-  - `output/etf_portfolio_state.json`
   - `output/etf_trade_ledger.csv`
-  - `output/etf_valuation_history.csv`
   - `output/etf_recommendation_scorecard.csv`
 - Action:
-  - define authority boundaries for each file
-  - define how they interact with the report text
-  - define deterministic conflict resolution when report intent and implementation facts differ
-- Done when: ETF can rely less on prior report parsing and prompt-layer logic for implementation facts.
+  - define their minimum schemas
+  - add repo-native writers for them
+  - keep them aligned with the minimum ETF state model already introduced
+- Done when: ETF has the next layer of explicit implementation memory beyond portfolio snapshot and valuation history.
 
-### 12. Validate stale-data handling under the broader discovery model
+### 12. Move ETF state beyond report-derived explicit state over time
+- Owner: `[ASSISTANT]`
+- Action:
+  - validate the pricing subsystem in real runs
+  - add more valuation authority from machine-readable pricing outputs
+  - reduce dependence on report-derived state where it is safe to do so
+  - tighten deterministic conflict resolution between report intent and implementation facts
+- Done when: ETF explicit state is less dependent on the rendered report itself.
+
+### 13. Validate stale-data handling under the broader discovery model
 - Owner: `[ASSISTANT]`
 - Action: review handling of:
   - stale ETF quote data
@@ -136,20 +140,21 @@
   - stale report artifacts
   - stale lane artifacts
   - stale watchlist / lane continuity memory
+  - stale ETF state files
 - Done when: stale inputs cannot silently flatten, distort, or misstate the portfolio or report.
 
 ---
 
 ## Phase 5 — run and judge the ETF optimization lab with auto-fetched history
 
-### 13. Review the ETF optimizer fetch config
+### 14. Review the ETF optimizer fetch config
 - Owner: `[USER]`
 - Action:
   - inspect `lab_inputs/etf_optimizer_fetch_config.json`
   - adjust the ETF ticker universe, period, or date range if desired
 - Done when: the fetch config reflects the ETF lab universe you want to test.
 
-### 14. Run the manual PyPortfolioOpt optimization workflow
+### 15. Run the manual PyPortfolioOpt optimization workflow
 - Owner: `[JOINT]`
 - Action:
   - use `.github/workflows/lab-pyportfolioopt-optimization.yml` manually
@@ -158,7 +163,7 @@
   - compare max Sharpe, min volatility, HRP, and optional Black-Litterman outputs
 - Done when: the ETF optimization lab run completes successfully on a real fetched daily history and produces interpretable artifacts.
 
-### 15. Judge whether the optimizer adds decision value or just model noise
+### 16. Judge whether the optimizer adds decision value or just model noise
 - Owner: `[ASSISTANT]`
 - Action:
   - compare optimizer outputs against ETF breadth discipline and regime logic
@@ -171,7 +176,7 @@
 
 ## Phase 6 — reduce monolith risk later without weakening production
 
-### 16. Keep the four-layer model explicit in future changes
+### 17. Keep the four-layer model explicit in future changes
 - Owner: `[ASSISTANT]`
 - Action: preserve the distinction between:
   1. decision framework
@@ -180,7 +185,7 @@
   4. operational runbook
 - Done when: future changes do not collapse everything back into a single opaque blob.
 
-### 17. Reduce monolith risk only where it is safe
+### 18. Reduce monolith risk only where it is safe
 - Owner: `[JOINT]`
 - Action:
   - tighten boundaries gradually
@@ -193,14 +198,13 @@
 ## Suggested immediate next move
 
 The best next move after this update is:
-1. review the ETF fetch config in `lab_inputs/etf_optimizer_fetch_config.json`
-2. run the manual PyPortfolioOpt optimization workflow once
-3. inspect the fetched-price history and optimization artifact bundle for concentration, diversification, and plausibility
-4. decide whether the optimizer is useful enough to keep extending
-5. only after that, return to production-critical send-path hardening work or extend the optimizer with a Riskfolio-Lib comparison layer
+1. let the next canonical English ETF pro report push run both the send workflow and the ETF state-refresh workflow
+2. confirm `output/etf_portfolio_state.json` and `output/etf_valuation_history.csv` refresh cleanly on `main`
+3. only after that, add `output/etf_trade_ledger.csv` and `output/etf_recommendation_scorecard.csv`
+4. then return to optimizer-comparison or deeper send-path hardening work
 
 ---
 
 ## Current checkpoint
 
-**The ETF repo still has a production-critical breadth-enforcement hardening task outstanding, and it now includes a first manual PyPortfolioOpt optimization lab that can auto-fetch longer ETF history with yfinance before optimization runs, while remaining intentionally separate from the production ETF review flow.**
+**The ETF repo now has a first explicit minimum state layer, a repo-native state refresh workflow, and a pre-send derivation check; the next ETF state step is to stabilize that new minimum model across live runs and then extend it with trade-ledger and recommendation-scorecard files.**
