@@ -1,0 +1,13 @@
+{
+  "absolute_views": {
+    "XLK": 0.12,
+    "URA": 0.10
+  },
+  "prior_returns": {
+    "XLK": 0.09,
+    "XLI": 0.07,
+    "URA": 0.08,
+    "CGW": 0.06,
+    "IBB": 0.07
+  }
+}
