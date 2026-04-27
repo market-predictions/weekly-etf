@@ -1,7 +1,7 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-04-21
+2026-04-27
 
 ## What this repository currently is
 
@@ -19,26 +19,19 @@ This repository is now a production-style weekly ETF review system with:
 - a starter pricing subsystem in `pricing/` on `main` for quota-aware ETF close retrieval and audit output
 - a new lane-assessment artifact folder in `output/lane_reviews/`
 - a new helper validator script in `validate_lane_breadth.py`
+- a first **lab-only ETF optimization layer** using explicit lab inputs and PyPortfolioOpt
 
 ## What changed in this step
 
-The production ETF prompt has now been updated again to turn breadth from a soft discovery preference into an explicit production requirement. The key changes are:
-- a mandatory breadth assessment universe across major investable buckets
-- a requirement to assess those buckets every run before final ranking
-- a matching machine-readable lane artifact for each production report
-- a requirement to surface compact proof of omitted-but-assessed lanes in the final report
-- corrected pro production filename rules in `etf.txt`
+The ETF repository now also contains a first **optimization workbench** that is intentionally separate from the production report flow.
 
-The premium editorial layer has also been tightened so it no longer compresses away omitted but relevant challengers. It now explicitly preserves compact proof that important breadth buckets were assessed even when they were not promoted into the live radar.
+The key additions are:
+- a lab-only optimizer script in `tools/generate_pyportfolioopt_optimization_lab.py`
+- a manual GitHub Actions workflow in `.github/workflows/lab-pyportfolioopt-optimization.yml`
+- explicit lab input templates in `lab_inputs/`
+- a lab-only optimization explainer in `docs/ETF_OPTIMIZATION_LAB.md`
 
-The repository now also contains:
-- `output/lane_reviews/.gitkeep`
-- `output/lane_reviews/README.md`
-- `validate_lane_breadth.py`
-
-This means the breadth fix is now partially implemented as both:
-- production prompt/output-contract logic
-- explicit artifact scaffolding and helper validation code
+This means ETF now has the first low-risk optimization layer for research and QA, while the production Weekly ETF Review remains protected.
 
 ## Current strengths
 
@@ -54,6 +47,7 @@ This means the breadth fix is now partially implemented as both:
 - A quota-aware pricing subsystem starter now exists on `main` and can evolve into the explicit state/input layer.
 - Validation and sending are now separated more cleanly at the workflow layer.
 - The prompt can now consume a matching pricing audit as an operational input layer when available.
+- A first lab-only optimization layer now exists without forcing optimizer outputs into production methodology.
 
 ## Current weaknesses
 
@@ -96,7 +90,15 @@ Still pending:
 - explicit valuation-state outputs
 - fuller prompt/report consumption of audit-derived state beyond pricing only
 
-### 5. Live production monitoring is still needed
+### 5. The optimization layer is still manual and lab-only
+The new optimizer currently depends on:
+- explicit lab input prices in `lab_inputs/etf_optimizer_prices.csv`
+- optional lab constraints in `lab_inputs/etf_optimizer_constraints.json`
+- optional lab views in `lab_inputs/etf_optimizer_views.json`
+
+This is the correct first step, but it is not yet integrated with an authoritative production ETF state layer.
+
+### 6. Live production monitoring is still needed
 The updated architecture should now be validated through normal live production runs to confirm:
 - no radar bloat
 - no drift in executive tone
@@ -121,6 +123,7 @@ The updated architecture should now be validated through normal live production 
 - The split scaffold remains available as a reference and optional architecture workbench, not as a required gate for this change.
 - ETF is moving toward an explicit pricing/state layer in `pricing/` plus machine-readable audit output in `output/pricing/`.
 - ETF is also moving toward a machine-readable lane-assessment layer in `output/lane_reviews/`.
+- ETF now also has a lab-only optimization layer that can evolve later into a richer state-aware research stack once explicit ETF state files exist.
 
 ### Delivery side
 - Delivery remains in `send_report.py` plus GitHub Actions.
@@ -157,6 +160,13 @@ Still required:
 - gradually move boundary logic out of the monolith where safe
 - preserve production reliability and executive presentation quality while doing so
 
+### Priority E — validate whether the optimization lab is useful enough to keep extending
+Still required:
+- populate a real lab input universe
+- run the manual optimizer workflow once
+- inspect whether optimizer outputs add insight without weakening breadth discipline
+- decide whether the next extension should be a Riskfolio-Lib comparison layer or whether the optimizer should stay a thin QA tool only
+
 ## Recommended session start sequence
 
 For any future ETF architecture session:
@@ -172,6 +182,7 @@ For any future ETF architecture session:
 - add and manage repository secrets in GitHub UI
 - review live report quality as subscriber/end-user
 - review and merge implementation PRs when appropriate
+- populate the ETF optimization lab input universe when optimization testing is desired
 
 ### Can be done by assistant
 - refine the production prompt
@@ -182,7 +193,8 @@ For any future ETF architecture session:
 - harden continuity logic and executive presentation behavior
 - extend the pricing subsystem
 - extend lane breadth enforcement and validation
+- extend the ETF optimization lab
 
 ## Current status label
 
-**The ETF production prompt and premium editorial layer now require a mandatory breadth assessment universe, a matching machine-readable lane artifact, and compact visibility for omitted-but-assessed lanes; scaffold files and a helper validator now exist in GitHub; and the next step is to wire that breadth validation directly into `send_report.py` and the production send workflow so the delivery path can fail before send when breadth proof is missing.**
+**The ETF production prompt and premium editorial layer now require a mandatory breadth assessment universe, a matching machine-readable lane artifact, and compact visibility for omitted-but-assessed lanes; scaffold files and a helper validator now exist in GitHub; and ETF also now includes a first lab-only PyPortfolioOpt optimization layer using explicit lab inputs, while the next production-critical step remains wiring breadth validation directly into `send_report.py` and the production send workflow so the delivery path can fail before send when breadth proof is missing.**
