@@ -1,11 +1,12 @@
 # ETF Review OS — System Index
 
-This file is the **first entry point** for any serious work on the `daily-etf` system.
+This file is the **first entry point** for any serious work on the `weekly-etf` system.
 
 ## Purpose
 This repository now contains both:
 1. **Execution files** — the files that produce and deliver the report.
 2. **Control files** — the files that explain how the system is organized, what is authoritative, and what should happen next.
+3. **Lab-only research files** — the files that test diagnostics or optimization ideas without changing the production ETF review flow.
 
 Use this file first so you do not start in the wrong place or collapse strategy, state, output, and delivery back into one monolith.
 
@@ -24,6 +25,16 @@ Read these only after the control files and only when relevant to the task.
 - `output_split_test/` — archived split-test ETF outputs used for comparison, not as production truth.
 - `daily_outputs/latest/` — latest generated supporting outputs.
 - `mt5_output/latest/` — latest supporting outputs when applicable.
+
+### Lab-specific execution files
+These files exist only to support lab-safe research and QA:
+- `tools/generate_pyportfolioopt_optimization_lab.py`
+- `.github/workflows/lab-pyportfolioopt-optimization.yml`
+- `docs/ETF_OPTIMIZATION_LAB.md`
+- `lab_inputs/README.md`
+- `lab_inputs/etf_optimizer_prices_template.csv`
+- `lab_inputs/etf_optimizer_constraints_template.json`
+- `lab_inputs/etf_optimizer_views_template.json`
 
 ## Canonical control files
 These are the control-layer files for future sessions.
@@ -88,7 +99,7 @@ Primary files today:
 - `.github/workflows/send-weekly-report-split-test.yml`
 
 ## Session start rule
-For architecture work, debugging, prompt changes, or flow redesign, start in this order:
+For architecture work, debugging, prompt changes, flow redesign, or lab optimization work, start in this order:
 
 1. `control/SYSTEM_INDEX.md`
 2. `control/CURRENT_STATE.md`
@@ -105,6 +116,7 @@ Recommended execution file priority by task:
 - split-test delivery comparison → `.github/workflows/send-weekly-report-split-test.yml`
 - historical continuity or latest live artifact → latest file in `output/`
 - split-output comparison → latest file in `output_split_test/`
+- lab optimization work → `tools/generate_pyportfolioopt_optimization_lab.py` and `docs/ETF_OPTIMIZATION_LAB.md`
 
 ## Session close rule
 At the end of any meaningful architecture or implementation session:
@@ -120,6 +132,7 @@ At the end of any meaningful architecture or implementation session:
 - Do not claim delivery succeeded without a real receipt or manifest.
 - Do not treat prior report prices as current prices when a fresh pricing pass is feasible.
 - Do not let the Dutch companion become a second independent research pass.
+- Do not treat lab optimizer output as production truth without explicit review.
 
 ## Current direction of travel
 The target architecture for ETF is:
@@ -129,4 +142,5 @@ The target architecture for ETF is:
 - **GitHub Actions + scripts** as the real execution and delivery layer
 - **Split prompt scaffold** as a safe evaluation layer while production remains protected
 - **English canonical report + Dutch companion render** as the bilingual publication model when requested
+- **Lab optimization layer** as a safe research surface before any optimizer logic is ever considered for production
 - **Optional Custom GPT** only as architect/reviewer, not as the main runtime container
