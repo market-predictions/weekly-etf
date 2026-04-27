@@ -1,0 +1,1 @@
+trade_id,trade_date,source_report,ticker,action,shares_delta,previous_weight_pct,new_weight_pct,weight_change_pct,target_weight_pct,conviction_tier,portfolio_role,funding_source_note
