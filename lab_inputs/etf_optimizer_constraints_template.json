@@ -1,0 +1,9 @@
+{
+  "default_min_weight": 0.0,
+  "default_max_weight": 0.35,
+  "exclude_tickers": [],
+  "per_ticker_bounds": {
+    "XLK": {"min": 0.0, "max": 0.30},
+    "URA": {"min": 0.0, "max": 0.20}
+  }
+}
