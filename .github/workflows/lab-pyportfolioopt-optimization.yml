@@ -1,0 +1,37 @@
+name: Lab PyPortfolioOpt ETF optimization
+
+on:
+  workflow_dispatch:
+
+jobs:
+  pyportfolioopt-optimization:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas pyportfolioopt
+
+      - name: Generate ETF optimization lab artifacts
+        run: |
+          python tools/generate_pyportfolioopt_optimization_lab.py \
+            --prices-csv lab_inputs/etf_optimizer_prices.csv \
+            --constraints-json lab_inputs/etf_optimizer_constraints.json \
+            --views-json lab_inputs/etf_optimizer_views.json \
+            --artifact-dir lab_outputs/optimization
+
+      - name: Upload optimization artifact bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-etf-optimization-lab
+          path: lab_outputs/optimization
+          if-no-files-found: error
