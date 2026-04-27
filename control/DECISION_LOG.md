@@ -257,3 +257,27 @@ This preserves analytical determinism while allowing premium bilingual distribut
 - `control/NL_TERMINOLOGY.md`
 - `control/SYSTEM_INDEX.md`
 - `control/DECISION_LOG.md`
+
+---
+
+## 2026-04-27 — Add first lab-only ETF optimization layer with PyPortfolioOpt
+### Decision
+ETF now includes a first **lab-only optimization workbench** using PyPortfolioOpt and an explicit lab input contract.
+
+### Chosen architecture
+- `tools/generate_pyportfolioopt_optimization_lab.py`
+- `.github/workflows/lab-pyportfolioopt-optimization.yml`
+- `docs/ETF_OPTIMIZATION_LAB.md`
+- `lab_inputs/README.md`
+- `lab_inputs/etf_optimizer_prices_template.csv`
+- `lab_inputs/etf_optimizer_constraints_template.json`
+- `lab_inputs/etf_optimizer_views_template.json`
+
+### Reason
+The optimization bucket in the systematic-trading reference repo remained one of the most relevant unharvested areas for Weekly Reviews, especially for ETF and later Index. A low-risk first step is to add a separate optimization lab rather than trying to force optimizer output into the production review flow immediately. PyPortfolioOpt’s current documentation and repository describe support for classical efficient frontier optimization, Black-Litterman allocation, and hierarchical risk parity, which makes it a strong first tool for this lab layer. citeturn539570search1turn539570search2turn539570search3
+
+### Consequence
+- ETF now has a manual, artifact-only optimizer layer
+- optimizer runs depend on explicit lab inputs rather than silently inferred production state
+- the optimization layer does not send email and does not override the ETF decision framework
+- the next likely extension, if useful, is a Riskfolio-Lib comparison layer for richer constrained-risk research. Riskfolio-Lib’s current docs describe support for hierarchical clustering portfolios and a wide range of risk measures and constraints, which is why it remains the strongest second candidate after PyPortfolioOpt. citeturn539570search0turn539570search5
