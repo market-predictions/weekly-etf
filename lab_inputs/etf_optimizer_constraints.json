@@ -1,2 +1,10 @@
 {
-  "default
+  "default_min_weight": 0.0,
+  "default_max_weight": 0.30,
+  "exclude_tickers": [],
+  "per_ticker_bounds": {
+    "GLD": {"min": 0.00, "max": 0.20},
+    "URNM": {"min": 0.00, "max": 0.15},
+    "PPA": {"min": 0.00, "max": 0.25}
+  }
+}
