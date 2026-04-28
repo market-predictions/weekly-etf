@@ -40,7 +40,7 @@
       "weight_change_pct": -0.14,
       "shares_delta_this_run": 0.0,
       "action_executed_this_run": "None",
-      "funding_source_note": "Fresh 24 April repricing"
+      "funding_source_note": "Carried forward on latest verified valuation basis"
     },
     {
       "ticker": "SMH",
@@ -68,7 +68,7 @@
       "weight_change_pct": 1.15,
       "shares_delta_this_run": 0.0,
       "action_executed_this_run": "None",
-      "funding_source_note": "Fresh 24 April repricing"
+      "funding_source_note": "Carried forward on latest verified valuation basis"
     },
     {
       "ticker": "PPA",
@@ -96,7 +96,7 @@
       "weight_change_pct": -0.18,
       "shares_delta_this_run": 0.0,
       "action_executed_this_run": "None",
-      "funding_source_note": "Carried forward on unresolved same-day public close verification"
+      "funding_source_note": "Carried forward on latest verified valuation basis"
     },
     {
       "ticker": "PAVE",
@@ -124,7 +124,7 @@
       "weight_change_pct": 0.11,
       "shares_delta_this_run": 0.0,
       "action_executed_this_run": "None",
-      "funding_source_note": "Fresh 24 April repricing"
+      "funding_source_note": "Carried forward on latest verified valuation basis"
     },
     {
       "ticker": "URNM",
@@ -152,7 +152,7 @@
       "weight_change_pct": -0.73,
       "shares_delta_this_run": 0.0,
       "action_executed_this_run": "None",
-      "funding_source_note": "Fresh 24 April repricing"
+      "funding_source_note": "Carried forward on latest verified valuation basis"
     },
     {
       "ticker": "GLD",
@@ -180,24 +180,24 @@
       "weight_change_pct": -0.16,
       "shares_delta_this_run": 0.0,
       "action_executed_this_run": "None",
-      "funding_source_note": "Fresh 24 April repricing"
+      "funding_source_note": "Carried forward on latest verified valuation basis"
     }
   ],
   "last_report": {
-    "date": "2026-04-27",
-    "source_report": "weekly_analysis_pro_260427_04.md",
+    "date": "2026-04-28",
+    "source_report": "weekly_analysis_pro_260428.md",
     "position_count": 6
   },
   "last_valuation": {
-    "date": "2026-04-27",
+    "date": "2026-04-28",
     "nav_eur": 104477.54,
     "invested_market_value_eur": 99074.33,
     "cash_eur": 5403.21,
     "since_inception_return_pct": 4.48,
-    "daily_return_pct": 1.1397,
+    "daily_return_pct": 0.0,
     "drawdown_pct": 0.0,
     "eurusd_used": 1.1712,
     "equity_curve_state": "New high",
-    "valuation_notes": "Five of six held ETFs were freshly verified to the completed 24 April 2026 U.S. close. PPA was carried forward from the prior confirmed mark because a fresh same-day public close could not be independently verified with sufficient confidence at publication. EUR conversion uses the latest confirmed ECB reference rate available for 24 April 2026."
+    "valuation_notes": "The latest verified portfolio valuation remains the completed 24 April 2026 close-set from the prior canonical run. No matching pricing audit exists for 2026-04-28; public coverage verified inside this run was too incomplete to justify a fresh full mark-to-market without fabricating closes."
   }
 }
