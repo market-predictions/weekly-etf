@@ -65,6 +65,7 @@ def fetch_close(symbol: str, requested_close_date: str) -> PriceResult:
                 error="Yahoo chart endpoint returned no valid close values.",
             )
 
+        pairs.sort(key=lambda item: item[0])
         for returned_date, price in pairs:
             if returned_date == requested_close_date:
                 return PriceResult(
@@ -80,7 +81,12 @@ def fetch_close(symbol: str, requested_close_date: str) -> PriceResult:
                     confidence="medium",
                 )
 
-        returned_date, price = pairs[0]
+        prior_pairs = [(dt, price) for dt, price in pairs if dt <= requested_close_date]
+        if prior_pairs:
+            returned_date, price = prior_pairs[-1]
+        else:
+            returned_date, price = pairs[-1]
+
         return PriceResult(
             symbol=symbol,
             requested_close_date=requested_close_date,
@@ -91,7 +97,7 @@ def fetch_close(symbol: str, requested_close_date: str) -> PriceResult:
             source_detail="query1_chart_v8",
             field_used="close",
             status="fresh_fallback_source",
-            confidence="low",
+            confidence="medium",
         )
     except Exception as exc:
         return PriceResult(
