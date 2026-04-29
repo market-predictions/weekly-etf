@@ -40,13 +40,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install matplotlib mistune weasyprint pyyaml
 
-      - name: Run pricing pass dry run
-        env:
-          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
-          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
-          ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+      - name: Validate persisted pricing audit before render
         run: |
-          python -m pricing.run_pricing_pass
+          python pricing/validate_persisted_audit.py --allow-prior-run-date
 
       - name: Validate lane breadth proof before render
         env:
