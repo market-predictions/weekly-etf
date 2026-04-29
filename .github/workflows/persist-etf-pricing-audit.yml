@@ -11,8 +11,7 @@ on:
     branches:
       - main
     paths:
-      - "output/weekly_analysis_pro_*.md"
-      - "output/lane_reviews/etf_lane_assessment_*.json"
+      - "control/run_queue/etf_pricing_request_*.md"
       - "pricing/**"
       - ".github/workflows/persist-etf-pricing-audit.yml"
 
