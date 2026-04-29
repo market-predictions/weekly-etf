@@ -42,7 +42,7 @@ jobs:
 
       - name: Validate persisted pricing audit before render
         run: |
-          python pricing/validate_persisted_audit.py --allow-prior-run-date
+          python pricing/validate_persisted_audit.py
 
       - name: Validate lane breadth proof before render
         env:
