@@ -6,7 +6,7 @@ from .budget_manager import BudgetManager
 from .cache import load_daily_cache, save_daily_cache, cache_get, cache_put
 from .models import PriceRequest, PriceResult
 from .symbol_resolver import SymbolResolver
-from .clients import twelve_data, fmp, alpha_vantage
+from .clients import twelve_data, fmp, alpha_vantage, yahoo_history, issuer_override
 
 
 class CloseResolver:
@@ -17,21 +17,23 @@ class CloseResolver:
         self.cache = load_daily_cache(run_date)
 
     def _fetch_from_source(self, source: str, req: PriceRequest) -> PriceResult:
+        if source == "issuer_override":
+            handler = self.symbol_resolver.get_issuer_handler(req.symbol)
+            return issuer_override.fetch_close(req.symbol, req.requested_close_date, handler)
         if source == "twelve_data":
             return twelve_data.fetch_close(req.symbol, req.requested_close_date)
         if source == "fmp":
             return fmp.fetch_close(req.symbol, req.requested_close_date)
         if source == "alpha_vantage":
             return alpha_vantage.fetch_close(req.symbol, req.requested_close_date)
-        return PriceResult(req.symbol, req.requested_close_date, None, None, None, source, None, None, "unresolved", "low", error="Source not yet implemented in starter branch")
+        if source == "yahoo_history":
+            return yahoo_history.fetch_close(req.symbol, req.requested_close_date)
+        return PriceResult(req.symbol, req.requested_close_date, None, None, None, source, None, None, "unresolved", "low", error="Unknown source")
 
     def resolve(self, req: PriceRequest) -> PriceResult:
         source_order = self.symbol_resolver.get_source_order(req.symbol, req.kind)
 
         for source in source_order:
-            if source not in {"twelve_data", "fmp", "alpha_vantage"}:
-                continue
-
             cached = cache_get(self.cache, req.symbol, req.requested_close_date, source)
             if cached:
                 return PriceResult(**cached)
