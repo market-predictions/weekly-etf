@@ -23,6 +23,16 @@ from .fx_resolver import resolve_fx
 from .audit_writer import write_price_audit
 
 REPORT_RE = re.compile(r"weekly_analysis(?:_pro)?_(\d{6})(?:_(\d{2}))?\.md$")
+VALID_SYMBOL_RE = re.compile(r"^[A-Z][A-Z0-9./_-]{0,14}$")
+INVALID_SYMBOL_WORDS = {
+    "NO",
+    "NONE",
+    "N/A",
+    "NA",
+    "CASH",
+    "GEEN",
+    "NIETS",
+}
 
 
 def latest_report_file(output_dir: Path) -> Path:
@@ -58,7 +68,14 @@ def _to_float(text: str) -> float | None:
 
 def _clean_symbol(text: str) -> str:
     text = text.strip().upper()
-    return re.sub(r"[^A-Z0-9./_-]", "", text)
+    text = re.sub(r"[^A-Z0-9./_-]", "", text)
+    if text in INVALID_SYMBOL_WORDS:
+        return ""
+    if not VALID_SYMBOL_RE.match(text):
+        return ""
+    if not any(ch.isalpha() for ch in text):
+        return ""
+    return text
 
 
 def parse_section15_holdings(md_text: str) -> tuple[list[HoldingSnapshot], dict[str, float]]:
@@ -81,8 +98,8 @@ def parse_section15_holdings(md_text: str) -> tuple[list[HoldingSnapshot], dict[
             parts = [p.strip() for p in line.strip().strip("|").split("|")]
             if len(parts) < 7:
                 continue
-            ticker = parts[0].upper()
-            if ticker == "CASH" or not ticker:
+            ticker = _clean_symbol(parts[0])
+            if not ticker:
                 continue
             shares = _to_float(parts[1])
             previous_price_local = _to_float(parts[2])
@@ -151,8 +168,9 @@ def parse_section2_replacements(md_text: str) -> list[str]:
         if stripped.startswith("###"):
             break
         if stripped.startswith("-"):
-            symbol = _clean_symbol(stripped.lstrip("- "))
-            if symbol and symbol != "NONE":
+            candidate = stripped.lstrip("- ").strip()
+            symbol = _clean_symbol(candidate)
+            if symbol:
                 replacements.append(symbol)
     return replacements
 
@@ -208,7 +226,7 @@ def main() -> None:
         result = resolver.resolve(PriceRequest(symbol=item.symbol, requested_close_date=requested_close_date, kind=item.kind))
         results.append(result)
         if item.kind == "holding":
-            if result.status == "fresh_close":
+            if result.status in {"fresh_close", "fresh_fallback_source"}:
                 fresh_count += 1
                 fresh_weight += weights.get(item.symbol.upper(), 0.0)
             elif result.status == "carried_forward" or result.carried_forward:
