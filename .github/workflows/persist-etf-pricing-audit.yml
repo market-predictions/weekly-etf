@@ -60,7 +60,7 @@ jobs:
 
       - name: Commit pricing audit if changed
         run: |
-          if git diff --quiet -- output/pricing; then
+          if [ -z "$(git status --porcelain -- output/pricing)" ]; then
             echo "PRICING_AUDIT_UNCHANGED | no commit needed"
             exit 0
           fi
