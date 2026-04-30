@@ -1,0 +1,480 @@
+{
+  "carried_forward_holdings_count": 0,
+  "coverage_count_pct": 100.0,
+  "decision": "update_covered_holdings_carry_unresolved",
+  "fresh_holdings_count": 6,
+  "fx_basis": {
+    "error": null,
+    "metadata": {
+      "primary_error": "Missing TWELVE_DATA_API_KEY",
+      "primary_source": "twelve_data"
+    },
+    "pair": "EUR/USD",
+    "rate": 1.1702,
+    "requested_date": "2026-04-30",
+    "returned_date": "2026-04-30",
+    "source": "ecb_reference",
+    "status": "fresh_close"
+  },
+  "holdings": [
+    {
+      "currency": "USD",
+      "previous_market_value_eur": 24922.93,
+      "previous_market_value_local": 29174.78,
+      "previous_price_local": 711.58,
+      "previous_weight_pct": 24.47,
+      "shares": 41.0,
+      "ticker": "SPY"
+    },
+    {
+      "currency": "USD",
+      "previous_market_value_eur": 21765.4,
+      "previous_market_value_local": 25478.58,
+      "previous_price_local": 499.58,
+      "previous_weight_pct": 21.37,
+      "shares": 51.0,
+      "ticker": "SMH"
+    },
+    {
+      "currency": "USD",
+      "previous_market_value_eur": 15366.73,
+      "previous_market_value_local": 17988.3,
+      "previous_price_local": 163.53,
+      "previous_weight_pct": 15.09,
+      "shares": 110.0,
+      "ticker": "PPA"
+    },
+    {
+      "currency": "USD",
+      "previous_market_value_eur": 14646.7,
+      "previous_market_value_local": 17145.43,
+      "previous_price_local": 55.13,
+      "previous_weight_pct": 14.38,
+      "shares": 311.0,
+      "ticker": "PAVE"
+    },
+    {
+      "currency": "USD",
+      "previous_market_value_eur": 9408.94,
+      "previous_market_value_local": 11014.11,
+      "previous_price_local": 64.41,
+      "previous_weight_pct": 9.24,
+      "shares": 171.0,
+      "ticker": "URNM"
+    },
+    {
+      "currency": "USD",
+      "previous_market_value_eur": 10340.76,
+      "previous_market_value_local": 12104.89,
+      "previous_price_local": 417.41,
+      "previous_weight_pct": 10.15,
+      "shares": 29.0,
+      "ticker": "GLD"
+    }
+  ],
+  "holdings_count": 6,
+  "invested_weight_coverage_pct": 94.7,
+  "price_results": [
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "ssga_gld"
+      },
+      "price": 423.6600036621094,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:ssga_gld",
+      "status": "fresh_close",
+      "symbol": "GLD"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "globalx_pave"
+      },
+      "price": 56.790000915527344,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:globalx_pave",
+      "status": "fresh_close",
+      "symbol": "PAVE"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "invesco_ppa"
+      },
+      "price": 167.4499969482422,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:invesco_ppa",
+      "status": "fresh_close",
+      "symbol": "PPA"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "vaneck_smh"
+      },
+      "price": 506.7200012207031,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:vaneck_smh",
+      "status": "fresh_close",
+      "symbol": "SMH"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "ssga_spy"
+      },
+      "price": 718.6599731445312,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:ssga_spy",
+      "status": "fresh_close",
+      "symbol": "SPY"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "sprott_urnm"
+      },
+      "price": 68.55000305175781,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:sprott_urnm",
+      "status": "fresh_close",
+      "symbol": "URNM"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {},
+      "price": 83.8499984741211,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "fresh_close",
+      "symbol": "MOO"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {},
+      "price": 190.99000549316406,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "fresh_close",
+      "symbol": "GRID"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {},
+      "price": 218.55999755859375,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "fresh_close",
+      "symbol": "ITA"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {},
+      "price": 461.44000244140625,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "fresh_close",
+      "symbol": "SOXX"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {},
+      "price": 56.41999816894531,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "fresh_close",
+      "symbol": "URA"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {},
+      "price": 45.86000061035156,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "fresh_close",
+      "symbol": "VEGI"
+    }
+  ],
+  "prices": [
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "ssga_gld"
+      },
+      "price": 423.6600036621094,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:ssga_gld",
+      "status": "fresh_close",
+      "symbol": "GLD"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "globalx_pave"
+      },
+      "price": 56.790000915527344,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:globalx_pave",
+      "status": "fresh_close",
+      "symbol": "PAVE"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "invesco_ppa"
+      },
+      "price": 167.4499969482422,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:invesco_ppa",
+      "status": "fresh_close",
+      "symbol": "PPA"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "vaneck_smh"
+      },
+      "price": 506.7200012207031,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:vaneck_smh",
+      "status": "fresh_close",
+      "symbol": "SMH"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "ssga_spy"
+      },
+      "price": 718.6599731445312,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:ssga_spy",
+      "status": "fresh_close",
+      "symbol": "SPY"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "sprott_urnm"
+      },
+      "price": 68.55000305175781,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:sprott_urnm",
+      "status": "fresh_close",
+      "symbol": "URNM"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {},
+      "price": 83.8499984741211,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "fresh_close",
+      "symbol": "MOO"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {},
+      "price": 190.99000549316406,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "fresh_close",
+      "symbol": "GRID"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {},
+      "price": 218.55999755859375,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "fresh_close",
+      "symbol": "ITA"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {},
+      "price": 461.44000244140625,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "fresh_close",
+      "symbol": "SOXX"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {},
+      "price": 56.41999816894531,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "fresh_close",
+      "symbol": "URA"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {},
+      "price": 45.86000061035156,
+      "requested_close_date": "2026-04-30",
+      "returned_close_date": "2026-04-30",
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "fresh_close",
+      "symbol": "VEGI"
+    }
+  ],
+  "requested_close_date": "2026-04-30",
+  "run_date": "2026-04-30",
+  "unresolved_tickers": []
+}
