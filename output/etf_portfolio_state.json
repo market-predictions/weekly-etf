@@ -23,7 +23,7 @@
       "market_value_eur": 24922.93,
       "current_weight_pct": 24.47,
       "existing_new": "Existing",
-      "weight_inherited_pct": 23.92,
+      "weight_inherited_pct": 24.47,
       "target_weight_pct": 24.47,
       "suggested_action": "Hold",
       "conviction_tier": "Tier 2",
@@ -36,11 +36,11 @@
       "continuity_current_price_local": 711.58,
       "pnl_pct": 5.21,
       "original_thesis": "Core U.S. large-cap exposure",
-      "previous_weight_pct": 23.92,
-      "weight_change_pct": 0.55,
+      "previous_weight_pct": 24.47,
+      "weight_change_pct": 0.0,
       "shares_delta_this_run": 0.0,
       "action_executed_this_run": "None",
-      "funding_source_note": "Fresh 2026-04-29 pricing audit"
+      "funding_source_note": "Same persisted 2026-04-29 pricing audit"
     },
     {
       "ticker": "SMH",
@@ -51,7 +51,7 @@
       "market_value_eur": 21765.4,
       "current_weight_pct": 21.37,
       "existing_new": "Existing",
-      "weight_inherited_pct": 21.21,
+      "weight_inherited_pct": 21.37,
       "target_weight_pct": 21.37,
       "suggested_action": "Hold",
       "conviction_tier": "Tier 1",
@@ -64,11 +64,11 @@
       "continuity_current_price_local": 499.58,
       "pnl_pct": 22.94,
       "original_thesis": "AI compute / semiconductor leadership",
-      "previous_weight_pct": 21.21,
-      "weight_change_pct": 0.16,
+      "previous_weight_pct": 21.37,
+      "weight_change_pct": 0.0,
       "shares_delta_this_run": 0.0,
       "action_executed_this_run": "None",
-      "funding_source_note": "Fresh 2026-04-29 pricing audit"
+      "funding_source_note": "Same persisted 2026-04-29 pricing audit"
     },
     {
       "ticker": "PPA",
@@ -79,7 +79,7 @@
       "market_value_eur": 15366.73,
       "current_weight_pct": 15.09,
       "existing_new": "Existing",
-      "weight_inherited_pct": 15.82,
+      "weight_inherited_pct": 15.09,
       "target_weight_pct": 15.09,
       "suggested_action": "Hold",
       "conviction_tier": "Tier 1",
@@ -92,11 +92,11 @@
       "continuity_current_price_local": 163.53,
       "pnl_pct": -8.12,
       "original_thesis": "Defense and sovereign resilience",
-      "previous_weight_pct": 15.82,
-      "weight_change_pct": -0.73,
+      "previous_weight_pct": 15.09,
+      "weight_change_pct": 0.0,
       "shares_delta_this_run": 0.0,
       "action_executed_this_run": "None",
-      "funding_source_note": "Fresh 2026-04-29 pricing audit"
+      "funding_source_note": "Same persisted 2026-04-29 pricing audit"
     },
     {
       "ticker": "PAVE",
@@ -107,7 +107,7 @@
       "market_value_eur": 14646.7,
       "current_weight_pct": 14.38,
       "existing_new": "Existing",
-      "weight_inherited_pct": 14.26,
+      "weight_inherited_pct": 14.38,
       "target_weight_pct": 14.38,
       "suggested_action": "Hold",
       "conviction_tier": "Tier 2",
@@ -120,11 +120,11 @@
       "continuity_current_price_local": 55.13,
       "pnl_pct": 6.06,
       "original_thesis": "Grid and infrastructure capex",
-      "previous_weight_pct": 14.26,
-      "weight_change_pct": 0.12,
+      "previous_weight_pct": 14.38,
+      "weight_change_pct": 0.0,
       "shares_delta_this_run": 0.0,
       "action_executed_this_run": "None",
-      "funding_source_note": "Fresh 2026-04-29 pricing audit"
+      "funding_source_note": "Same persisted 2026-04-29 pricing audit"
     },
     {
       "ticker": "URNM",
@@ -135,7 +135,7 @@
       "market_value_eur": 9408.94,
       "current_weight_pct": 9.24,
       "existing_new": "Existing",
-      "weight_inherited_pct": 9.36,
+      "weight_inherited_pct": 9.24,
       "target_weight_pct": 9.24,
       "suggested_action": "Hold",
       "conviction_tier": "Tier 2",
@@ -148,11 +148,11 @@
       "continuity_current_price_local": 64.41,
       "pnl_pct": -4.58,
       "original_thesis": "Nuclear and uranium cycle exposure",
-      "previous_weight_pct": 9.36,
-      "weight_change_pct": -0.12,
+      "previous_weight_pct": 9.24,
+      "weight_change_pct": 0.0,
       "shares_delta_this_run": 0.0,
       "action_executed_this_run": "None",
-      "funding_source_note": "Fresh 2026-04-29 pricing audit"
+      "funding_source_note": "Same persisted 2026-04-29 pricing audit"
     },
     {
       "ticker": "GLD",
@@ -163,7 +163,7 @@
       "market_value_eur": 10340.76,
       "current_weight_pct": 10.15,
       "existing_new": "Existing",
-      "weight_inherited_pct": 10.25,
+      "weight_inherited_pct": 10.15,
       "target_weight_pct": 10.15,
       "suggested_action": "Hold",
       "conviction_tier": "Tier 2",
@@ -176,16 +176,16 @@
       "continuity_current_price_local": 417.41,
       "pnl_pct": -12.35,
       "original_thesis": "Hard-asset geopolitical and inflation hedge",
-      "previous_weight_pct": 10.25,
-      "weight_change_pct": -0.1,
+      "previous_weight_pct": 10.15,
+      "weight_change_pct": 0.0,
       "shares_delta_this_run": 0.0,
       "action_executed_this_run": "None",
-      "funding_source_note": "Fresh 2026-04-29 pricing audit"
+      "funding_source_note": "Same persisted 2026-04-29 pricing audit"
     }
   ],
   "last_report": {
     "date": "2026-04-29",
-    "source_report": "weekly_analysis_pro_260429_02.md",
+    "source_report": "weekly_analysis_pro_260429_03.md",
     "position_count": 6
   },
   "last_valuation": {
