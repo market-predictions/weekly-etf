@@ -1,0 +1,40 @@
+{
+  "run_date": "2026-05-04",
+  "requested_close_date": "2026-05-04",
+  "holdings_count": 6,
+  "fresh_holdings_count": 5,
+  "carried_forward_holdings_count": 1,
+  "coverage_count_pct": 83.33,
+  "invested_weight_coverage_pct": 89.85,
+  "decision": "update_covered_holdings_carry_unresolved",
+  "unresolved_tickers": ["GLD"],
+  "fx_basis": {
+    "pair": "EUR/USD",
+    "rate": 1.1693,
+    "requested_date": "2026-05-04",
+    "returned_date": "2026-05-04",
+    "source": "public_market_snapshot_investing_com",
+    "status": "fresh_fallback_source",
+    "error": null,
+    "metadata": {
+      "basis": "public EUR/USD market snapshot recovered during pricing pass"
+    }
+  },
+  "prices": [
+    {"symbol": "SPY", "status": "fresh_close", "source": "public_market_recovery", "source_detail": "investing_com:nl:spdr-s-p-500-historical-data", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-04", "price": 718.07, "currency": "USD", "confidence": "medium", "carried_forward": false, "field_used": "close_or_near_close_public_quote", "error": null},
+    {"symbol": "SMH", "status": "fresh_close", "source": "public_market_recovery", "source_detail": "investing_com:nl:holdrs-merrill-lynch-semiconductor-historical-data", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-04", "price": 507.87, "currency": "USD", "confidence": "medium", "carried_forward": false, "field_used": "close_or_near_close_public_quote", "error": null},
+    {"symbol": "PPA", "status": "fresh_fallback_source", "source": "public_market_recovery", "source_detail": "investing_com:au:powershares-aerospace---defense-current-quote", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-04", "price": 156.12, "currency": "USD", "confidence": "low", "carried_forward": false, "field_used": "same_day_public_quote", "error": null},
+    {"symbol": "PAVE", "status": "fresh_close", "source": "public_market_recovery", "source_detail": "investing_com:es:global-x-us-infrastructure-dev-current-quote", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-04", "price": 56.27, "currency": "USD", "confidence": "medium", "carried_forward": false, "field_used": "close_or_near_close_public_quote", "error": null},
+    {"symbol": "URNM", "status": "fresh_fallback_source", "source": "public_market_recovery", "source_detail": "investing_com:id:north-shore-global-uranium-mining-current-quote", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-04", "price": 67.69, "currency": "USD", "confidence": "medium", "carried_forward": false, "field_used": "same_day_public_quote", "error": null},
+    {"symbol": "GLD", "status": "carried_forward", "source": "prior_verified_report_mark", "source_detail": "carried_forward:weekly_analysis_pro_260429_04.md", "requested_close_date": "2026-05-04", "returned_close_date": "2026-04-29", "price": 417.41, "currency": "USD", "confidence": "low", "carried_forward": true, "field_used": "prior_verified_close", "error": "2026-05-04 regular-session close not recovered with sufficient confidence"}
+  ],
+  "price_results": [],
+  "holdings": [
+    {"ticker": "SPY", "shares": 41, "previous_price_local": 711.58, "currency": "USD", "previous_market_value_local": 29174.78, "previous_market_value_eur": 24922.93, "previous_weight_pct": 24.47},
+    {"ticker": "SMH", "shares": 51, "previous_price_local": 499.58, "currency": "USD", "previous_market_value_local": 25478.58, "previous_market_value_eur": 21765.40, "previous_weight_pct": 21.37},
+    {"ticker": "PPA", "shares": 110, "previous_price_local": 163.53, "currency": "USD", "previous_market_value_local": 17988.30, "previous_market_value_eur": 15366.73, "previous_weight_pct": 15.09},
+    {"ticker": "PAVE", "shares": 311, "previous_price_local": 55.13, "currency": "USD", "previous_market_value_local": 17145.43, "previous_market_value_eur": 14646.70, "previous_weight_pct": 14.38},
+    {"ticker": "URNM", "shares": 171, "previous_price_local": 64.41, "currency": "USD", "previous_market_value_local": 11014.11, "previous_market_value_eur": 9408.94, "previous_weight_pct": 9.24},
+    {"ticker": "GLD", "shares": 29, "previous_price_local": 417.41, "currency": "USD", "previous_market_value_local": 12104.89, "previous_market_value_eur": 10340.76, "previous_weight_pct": 10.15}
+  ]
+}
