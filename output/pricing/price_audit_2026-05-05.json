@@ -1,0 +1,36 @@
+{
+  "run_date": "2026-05-05",
+  "requested_close_date": "2026-05-04",
+  "holdings_count": 6,
+  "fresh_holdings_count": 5,
+  "carried_forward_holdings_count": 1,
+  "coverage_count_pct": 83.33,
+  "invested_weight_coverage_pct": 89.87,
+  "decision": "update_covered_holdings_carry_unresolved",
+  "unresolved_tickers": ["GLD"],
+  "fx_basis": {
+    "pair": "EUR/USD",
+    "rate": 1.1693,
+    "requested_date": "2026-05-04",
+    "returned_date": "2026-05-04",
+    "source": "public_market_snapshot_investing_com",
+    "status": "fresh_fallback_source",
+    "error": null
+  },
+  "prices": [
+    {"symbol": "SPY", "status": "fresh_close", "source": "investing_com", "source_detail": "nl:spdr-s-p-500-historical-data", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-04", "price": 718.07, "currency": "USD", "confidence": "high", "carried_forward": false, "error": null},
+    {"symbol": "SMH", "status": "fresh_close", "source": "investing_com", "source_detail": "nl:holdrs-merrill-lynch-semiconductor-historical-data", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-04", "price": 507.87, "currency": "USD", "confidence": "high", "carried_forward": false, "error": null},
+    {"symbol": "PPA", "status": "fresh_fallback_source", "source": "investing_com_nl_and_finviz_crosscheck", "source_detail": "PPA 2026-05-04 quote/range with prior close 165.58; same-day recovered quote 164.77", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-04", "price": 164.77, "currency": "USD", "confidence": "medium", "carried_forward": false, "error": null},
+    {"symbol": "PAVE", "status": "fresh_fallback_source", "source": "persisted_prior_recovery_audit", "source_detail": "PAVE retained from 2026-05-04 pricing recovery audit", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-04", "price": 56.27, "currency": "USD", "confidence": "medium", "carried_forward": false, "error": null},
+    {"symbol": "URNM", "status": "fresh_fallback_source", "source": "persisted_prior_recovery_audit", "source_detail": "URNM retained from 2026-05-04 pricing recovery audit", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-04", "price": 67.69, "currency": "USD", "confidence": "medium", "carried_forward": false, "error": null},
+    {"symbol": "GLD", "status": "carried_forward_latest_verified_close", "source": "investing_com", "source_detail": "latest verified GLD close 2026-05-01; 2026-05-04 close not recovered with sufficient confidence", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-01", "price": 423.18, "currency": "USD", "confidence": "medium", "carried_forward": true, "error": "2026-05-04 regular-session close not recovered with sufficient confidence"}
+  ],
+  "holdings": [
+    {"ticker": "SPY", "shares": 41, "previous_price_local": 718.07, "currency": "USD", "previous_weight_pct": 24.53},
+    {"ticker": "SMH", "shares": 51, "previous_price_local": 507.87, "currency": "USD", "previous_weight_pct": 21.58},
+    {"ticker": "PPA", "shares": 110, "previous_price_local": 156.12, "currency": "USD", "previous_weight_pct": 14.31},
+    {"ticker": "PAVE", "shares": 311, "previous_price_local": 56.27, "currency": "USD", "previous_weight_pct": 14.58},
+    {"ticker": "URNM", "shares": 171, "previous_price_local": 67.69, "currency": "USD", "previous_weight_pct": 9.64},
+    {"ticker": "GLD", "shares": 29, "previous_price_local": 417.41, "currency": "USD", "previous_weight_pct": 10.09}
+  ]
+}
