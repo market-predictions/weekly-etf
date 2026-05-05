@@ -32,6 +32,7 @@ For every current holding, assess:
 6. Hedge validity test where relevant
 7. Cash policy test
 8. Action-clock / inertia test
+9. Replacement pricing and duel evidence
 
 ## Fresh cash test
 
@@ -71,11 +72,14 @@ A position must be compared directly with a named alternative when any of these 
 - it is down more than 10% from average entry
 - it has underperformed the portfolio for two consecutive runs
 - an alternative ETF is named in the Structural Opportunity Radar or Final Action Table
+- a ticker is named under `Best replacements to fund`
 
 Minimum duel fields:
 
 | Test | Current holding | Alternative | Winner |
 |---|---:|---:|---|
+| Latest verified close date | | | |
+| Latest verified close price | | | |
 | 1-month relative strength | | | |
 | 3-month relative strength | | | |
 | Liquidity / spread | | | |
@@ -85,6 +89,27 @@ Minimum duel fields:
 | Final verdict | | | |
 
 If data is incomplete, say so and treat the duel as unresolved, not as permission for indefinite Hold.
+
+## Replacement pricing and duel evidence
+
+The report may mention a challenger as a **replacement candidate** only if it has at least a visible pricing and comparison status.
+
+Rules:
+- `Best replacements to fund` must not imply a fundable replacement unless the challenger has a latest verified close, close date, and comparison status.
+- If the challenger has no verified close, the correct status is `Not fundable yet — pricing missing`.
+- If the challenger has a verified close but no relative-strength comparison, the correct status is `Priced but duel incomplete`.
+- If the challenger has verified close data and a completed duel, the correct status may be `Fundable replacement candidate`.
+- A same-report switch from current holding to challenger requires current holding and challenger to share the same close-date basis or a clearly disclosed exception.
+- Named alternatives in `Best replacements to fund`, `Final Action Table`, and Section 16 must be included in the pricing shortlist when ticker symbols are parseable.
+
+Required compact report block when replacements are mentioned:
+
+### Replacement pricing and duel status
+
+| Current holding | Challenger | Current close | Challenger close | Close-date basis | Duel status | Decision implication |
+|---|---|---:|---:|---|---|---|
+
+This block may be compact, but it must exist when the report names fundable challengers.
 
 ## Factor-overlap test
 
@@ -161,8 +186,12 @@ Rules:
 | Cash >3% and an Actionable now lane exists | Deploy or explain reserve |
 | Single factor exposure >40% | Explicit concentration warning |
 | No non-U.S. exposure | Explicit U.S. exceptionalism statement |
+| Replacement challenger named without verified close | Mark not fundable yet or remove from fundable language |
 
 ## Required report integration
+
+### Section 2 — Portfolio Action Snapshot
+If `Best replacements to fund` mentions challengers, include or immediately follow it with `Replacement pricing and duel status`.
 
 ### Section 6 — Bottom Line
 Mention the single most important discipline issue if one exists:
@@ -171,6 +200,7 @@ Mention the single most important discipline issue if one exists:
 - hedge validity
 - replaceable holding
 - loss-making holding requiring re-underwriting
+- unpriced or incompletely priced replacement duel
 
 ### Section 10 — Current Position Review
 Add, where practical:
@@ -180,6 +210,7 @@ Add, where practical:
 - Implementation score
 - Best alternative
 - Required next action
+- Replacement duel status where a challenger is named
 
 ### Section 13 — Final Action Table
 If the fixed table cannot be extended without rendering risk, encode discipline in `Short Reason` and ensure the machine-readable scorecard stores the full fields.
@@ -192,6 +223,7 @@ Carry forward:
 - hedge review status
 - factor concentration note
 - cash policy note
+- replacement duel status
 
 ## Machine-readable state requirement
 
@@ -211,5 +243,7 @@ This scorecard is the explicit memory layer for:
 - hedge validity
 - required next action
 - override reason
+- replacement close status
+- replacement duel status
 
 The scorecard is report-derived for now, but it is the bridge toward independent implementation-state authority.

@@ -58,6 +58,12 @@ jobs:
         run: |
           python validate_lane_breadth.py
 
+      - name: Validate replacement duel pricing proof before render
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python validate_replacement_duels.py
+
       - name: Validate English/Dutch paired report set if present
         env:
           MRKT_RPRTS_REPORT_MODE: pro

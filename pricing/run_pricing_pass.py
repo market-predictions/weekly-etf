@@ -32,6 +32,13 @@ INVALID_SYMBOL_WORDS = {
     "CASH",
     "GEEN",
     "NIETS",
+    "NOT",
+    "YET",
+    "AND",
+    "OR",
+    "THE",
+    "VS",
+    "VERSUS",
 }
 
 
@@ -76,6 +83,21 @@ def _clean_symbol(text: str) -> str:
     if not any(ch.isalpha() for ch in text):
         return ""
     return text
+
+
+def _symbols_from_text(text: str) -> list[str]:
+    """Extract likely ETF tickers from narrative replacement lines.
+
+    This intentionally ignores long uppercase words and common non-ticker words so
+    lines such as `PPA versus ITA`, `GLD versus GSG / BIL / cash`, and
+    `SPY versus QQQ / QUAL / IEFA` become priceable challenger inputs.
+    """
+    symbols: list[str] = []
+    for raw in re.findall(r"\b[A-Z][A-Z0-9./_-]{1,9}\b", text.upper()):
+        symbol = _clean_symbol(raw)
+        if symbol and symbol not in symbols:
+            symbols.append(symbol)
+    return symbols
 
 
 def parse_section15_holdings(md_text: str) -> tuple[list[HoldingSnapshot], dict[str, float]]:
@@ -161,18 +183,39 @@ def parse_section2_replacements(md_text: str) -> list[str]:
         return []
     section = md_text[section_start:]
     replacements: list[str] = []
-    for line in section.splitlines()[1:10]:
+    for line in section.splitlines()[1:25]:
         stripped = line.strip()
         if not stripped:
             continue
-        if stripped.startswith("###"):
+        if stripped.startswith("###") or stripped.startswith("## "):
             break
         if stripped.startswith("-"):
-            candidate = stripped.lstrip("- ").strip()
-            symbol = _clean_symbol(candidate)
-            if symbol:
-                replacements.append(symbol)
+            for symbol in _symbols_from_text(stripped):
+                if symbol not in replacements:
+                    replacements.append(symbol)
     return replacements
+
+
+def parse_replacement_duel_table(md_text: str) -> list[str]:
+    """Parse symbols from the optional Replacement pricing and duel status table."""
+    section_start = md_text.find("### Replacement pricing and duel status")
+    if section_start == -1:
+        return []
+    section = md_text[section_start:]
+    symbols: list[str] = []
+    for line in section.splitlines()[1:40]:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("###") or stripped.startswith("## "):
+            break
+        if stripped.startswith("|") and "---" not in stripped and "Current holding" not in stripped:
+            parts = [p.strip() for p in stripped.strip("|").split("|")]
+            for cell in parts[:2]:
+                for symbol in _symbols_from_text(cell):
+                    if symbol not in symbols:
+                        symbols.append(symbol)
+    return symbols
 
 
 def load_policy(rate_limit_file: str) -> dict:
@@ -200,7 +243,7 @@ def main() -> None:
 
     holding_symbols = [h.ticker for h in holding_snapshots]
     radar_primaries, radar_alternatives, watchlist_challengers = parse_section16_watchlist(md_text)
-    replacement_candidates = parse_section2_replacements(md_text)
+    replacement_candidates = parse_section2_replacements(md_text) + parse_replacement_duel_table(md_text)
     policy = load_policy(args.rate_limit_file)
     max_alternatives = int(policy.get("max_alternatives_to_price", 8))
     max_challengers = int(policy.get("max_challengers_to_price", 6))
