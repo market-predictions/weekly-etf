@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 REQUIRED_BREADTH_BUCKETS = {
@@ -17,6 +18,8 @@ REQUIRED_BREADTH_BUCKETS = {
     "robotics_automation",
     "critical_minerals_materials",
 }
+
+CANONICAL_ENGLISH_REPORT_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 
 
 def matching_lane_artifact_path(report_path: Path) -> Path:
@@ -77,7 +80,7 @@ def latest_canonical_english_pro_report(output_dir: Path) -> Path:
     reports = sorted(
         path
         for path in output_dir.glob("weekly_analysis_pro_*.md")
-        if "_nl_" not in path.name
+        if CANONICAL_ENGLISH_REPORT_RE.match(path.name)
     )
     if not reports:
         raise RuntimeError("No canonical English ETF pro reports found in output/.")
