@@ -1,0 +1,29 @@
+{
+  "run_date": "2026-05-05",
+  "requested_close_date": "2026-05-04",
+  "holdings_count": 6,
+  "fresh_holdings_count": 3,
+  "fresh_or_latest_verified_holdings_count": 6,
+  "carried_forward_holdings_count": 3,
+  "coverage_count_pct": 100.0,
+  "fresh_same_day_count_pct": 50.0,
+  "decision": "update_verified_holdings_carry_latest_verified_for_unresolved_same_day",
+  "unresolved_same_day_tickers": ["PPA", "URNM", "GLD"],
+  "fx_basis": {
+    "pair": "EUR/USD",
+    "rate": 1.1693,
+    "requested_date": "2026-05-04",
+    "returned_date": "2026-05-04",
+    "source": "public_market_snapshot_investing_com",
+    "status": "fresh_fallback_source",
+    "error": null
+  },
+  "prices": [
+    {"symbol": "SPY", "status": "fresh_close", "source": "investing_com", "source_detail": "SPY historical table shows 2026-05-04 close 718.07", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-04", "price": 718.07, "currency": "USD", "confidence": "high", "carried_forward": false, "error": null},
+    {"symbol": "SMH", "status": "fresh_close", "source": "investing_com", "source_detail": "SMH same-day market close/realtime snapshot recovered as 506.70", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-04", "price": 506.70, "currency": "USD", "confidence": "medium", "carried_forward": false, "error": null},
+    {"symbol": "PPA", "status": "latest_verified_close", "source": "investing_com", "source_detail": "latest verified close in recovered table is 2026-05-01 close 165.58; 2026-05-04 close not shown", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-01", "price": 165.58, "currency": "USD", "confidence": "medium", "carried_forward": true, "error": "2026-05-04 regular-session close not recovered with sufficient confidence"},
+    {"symbol": "PAVE", "status": "fresh_fallback_source", "source": "persisted_prior_recovery_audit", "source_detail": "PAVE retained from 2026-05-04 pricing recovery audit", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-04", "price": 56.27, "currency": "USD", "confidence": "medium", "carried_forward": false, "error": null},
+    {"symbol": "URNM", "status": "latest_verified_close", "source": "investing_com", "source_detail": "latest verified close in recovered table is 2026-05-01 close 67.13; 2026-05-04 close not shown", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-01", "price": 67.13, "currency": "USD", "confidence": "medium", "carried_forward": true, "error": "2026-05-04 regular-session close not recovered with sufficient confidence"},
+    {"symbol": "GLD", "status": "latest_verified_close", "source": "woonsocketcall_marketdata", "source_detail": "latest verified close is 2026-05-01 close 423.18; 2026-05-04 close not recovered", "requested_close_date": "2026-05-04", "returned_close_date": "2026-05-01", "price": 423.18, "currency": "USD", "confidence": "medium", "carried_forward": true, "error": "2026-05-04 regular-session close not recovered with sufficient confidence"}
+  ]
+}
