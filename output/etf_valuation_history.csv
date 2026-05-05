@@ -1,14 +1,8 @@
 date,nav_eur,cash_eur,invested_market_value_eur,daily_return_pct,since_inception_return_pct,drawdown_pct,eurusd_used,comment,source_report
-2026-03-28,100000.0,,,0.0,0.0,0.0,,Inaugural model portfolio established,weekly_analysis_pro_260504.md
-2026-03-30,100000.0,,,0.0,0.0,0.0,,Positioning maintained on prior confirmed valuation basis,weekly_analysis_pro_260504.md
-2026-04-01,99541.83,,,-0.4582,-0.4582,-0.4582,,Mixed-source repricing applied,weekly_analysis_pro_260504.md
-2026-04-16,100671.75,,,1.1351,0.6717,0.0,,Fresh per-ticker repricing using the latest completed 15 April close set,weekly_analysis_pro_260504.md
-2026-04-17,100830.55,,,0.1577,0.8306,0.0,,Fresh six-of-six repricing using the latest completed 16 April close set,weekly_analysis_pro_260504.md
-2026-04-18,102179.56,,,1.3379,2.1796,0.0,,Fresh five-of-six repricing using the latest completed 17 April close set; URNM carried forward,weekly_analysis_pro_260504.md
-2026-04-20,102026.08,,,-0.1502,2.0261,-0.1502,,Fresh six-of-six repricing using the completed 20 April close set,weekly_analysis_pro_260504.md
-2026-04-21,102202.44,,,0.1729,2.2024,0.0,,Fresh five-of-six verification using the completed 20 April close set; PAVE carried forward,weekly_analysis_pro_260504.md
-2026-04-22,103300.26,,,1.0742,3.3003,0.0,,Fresh five-of-six repricing using the completed 22 April close set; PPA carried forward,weekly_analysis_pro_260504.md
-2026-04-24,104477.54,,,1.1397,4.4775,0.0,,Fresh five-of-six repricing using the completed 24 April close set; PPA carried forward,weekly_analysis_pro_260504.md
-2026-04-28,104477.54,,,0.0,4.4775,0.0,,Valuation carried forward because fresh current close coverage was too incomplete,weekly_analysis_pro_260504.md
-2026-04-29,101854.68,,,-2.5105,1.8547,-2.5105,,Fresh six-of-six repricing using persisted 2026-04-29 pricing audit,weekly_analysis_pro_260504.md
-2026-05-04,102636.85,5403.21,97233.64,0.7679,2.6369,-1.7618,1.1693,Fresh five-of-six pricing recovery; GLD carried forward on latest verified portfolio mark,weekly_analysis_pro_260504.md
+2026-03-28,100000.0,,,0.0,0.0,0.0,,Inaugural model portfolio established,weekly_analysis_pro_260505.md
+2026-04-16,100671.75,,,0.6717,0.6717,0.0,,Fresh per-ticker repricing using latest completed close set,weekly_analysis_pro_260505.md
+2026-04-20,102026.08,,,1.3453,2.0261,0.0,,Fresh six-of-six repricing using completed 20 April close set,weekly_analysis_pro_260505.md
+2026-04-24,104477.54,,,2.4028,4.4775,0.0,,Fresh five-of-six repricing; PPA carried forward,weekly_analysis_pro_260505.md
+2026-04-29,101854.68,,,-2.5105,1.8547,-2.5105,,Fresh six-of-six repricing using persisted 2026-04-29 audit,weekly_analysis_pro_260505.md
+2026-05-04,102636.85,,,0.7679,2.6369,-1.7618,,Fresh five-of-six pricing recovery; GLD carried forward,weekly_analysis_pro_260505.md
+2026-05-05,103536.96,1936.52,101600.44,0.877,3.537,-0.9003,1.1693,Latest 4 May close basis; +8 SMH executed from cash,weekly_analysis_pro_260505.md
