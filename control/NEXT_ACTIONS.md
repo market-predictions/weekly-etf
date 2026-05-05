@@ -9,203 +9,135 @@
 
 ## Phase 1 — keep the working environment disciplined
 
-### 1. Keep using the lean bootstrap upload model
-- Owner: `[USER]`
-- Primary upload:
-  - `control/PROJECT_BOOTSTRAP.md`
-- Action:
-  - keep the project context lean
-  - continue reading changing repo files live from GitHub
-- Done when:
-  - future sessions do not depend on stale uploaded repo files
-
-### 2. Keep using the control-layer start sequence
+### 1. Keep using the control-layer start sequence
 - Owner: `[JOINT]`
 - Action: every meaningful ETF architecture, debugging, prompt, state, workflow, delivery, or lab-optimization session starts with:
   1. `control/SYSTEM_INDEX.md`
   2. `control/CURRENT_STATE.md`
   3. `control/NEXT_ACTIONS.md`
   4. only then the minimum relevant execution file(s)
-- Done when: sessions no longer need to rediscover how the system is organized.
+- Done when: sessions no longer rediscover the architecture.
+
+### 2. Keep GitHub as source of truth
+- Owner: `[JOINT]`
+- Action: read changing repo files live from GitHub and do not rely on stale uploaded copies.
+- Done when: prompt, state, workflow, and output changes are all traceable in GitHub.
 
 ---
 
-## Phase 2 — validate the breadth-enforcement architecture in live ETF runs
+## Phase 2 — validate capital discipline in the next live ETF report
 
-### 3. Run the next live ETF review from the updated production prompt
+### 3. Apply the capital re-underwriting layer in the next report
 - Owner: `[ASSISTANT]`
 - Source files:
   - `etf.txt`
-  - `etf-pro.txt`
+  - `control/CAPITAL_REUNDERWRITING_RULES.md`
+  - latest `output/etf_recommendation_scorecard.csv`
 - Action:
-  - use the updated production files directly
-  - confirm the report still feels compact, premium, and decision-useful
-  - confirm omitted sectors now show up as promoted lanes or compact challengers
-  - confirm a matching pricing audit is consumed correctly when available
-  - confirm a matching lane artifact is written correctly
-- Done when: a live production run shows the broader discovery model, omitted-lane visibility, and matching lane artifact working inside the existing executive format.
+  - run the fresh cash test for every current holding
+  - split thesis validity from implementation quality
+  - force alternative duels for replaceable or weak holdings
+  - flag factor overlap and cash policy explicitly
+  - test hedge validity for GLD or any hedge sleeve
+- Done when: the next report clearly explains why Hold is still justified or why action is required.
 
-### 4. Confirm compact publication discipline
+### 4. Force the specific current weak-point reviews
+- Owner: `[ASSISTANT]`
+- Action: in the next report explicitly review:
+  - SPY overlap versus SMH
+  - PPA versus ITA
+  - PAVE versus GRID
+  - GLD hedge validity and pricing confidence
+  - cash reserve versus actionable SMH / URNM lanes
+- Done when: no weak or replaceable holding remains vague.
+
+### 5. Validate scorecard derivation over a live report
 - Owner: `[ASSISTANT]`
 - Action:
-  - confirm the Structural Opportunity Radar remains compact
-  - confirm the report still publishes only the best-ranked 5-8 lanes
-  - confirm omitted-lane proof does not bloat the report
-  - confirm “strong but not yet actionable” ideas remain selective rather than padded
-- Done when: broader discovery does not degrade executive selectivity.
-
-### 5. Check lane continuity and omitted-lane behavior in real output
-- Owner: `[ASSISTANT]`
-- Action:
-  - confirm retained lanes, new entrants, dropped lanes, and near-miss challengers are handled cleanly
-  - confirm omitted but relevant lanes are surfaced naturally in premium language
-  - confirm the report explains changes without exposing internal process machinery
-- Done when: the report feels fresher and broader without feeling unstable.
+  - confirm `tools/write_etf_recommendation_scorecard.py --check-only` passes before send
+  - confirm `output/etf_recommendation_scorecard.csv` refreshes after canonical English report push
+  - inspect whether discipline flags are useful and not noisy
+- Done when: the recommendation scorecard is stable across a live run.
 
 ---
 
-## Phase 3 — finish wiring breadth enforcement into the send path
+## Phase 3 — continue send-path hardening
 
-### 6. Wire `validate_lane_breadth.py` into `send_report.py`
+### 6. Confirm production workflow trigger behavior
+- Owner: `[JOINT]`
+- Action:
+  - confirm GitHub Actions actually triggers on canonical report pushes
+  - confirm logs produce visible render/send/manifest evidence
+  - avoid claiming delivery success without a real receipt
+- Done when: delivery status can be verified reliably.
+
+### 7. Wire breadth validation deeper into `send_report.py`
 - Owner: `[ASSISTANT]`
 - Action:
-  - import or replicate the lane breadth validation logic inside `send_report.py`
-  - fail before render/send if the report lacks omitted-lane proof or a matching lane artifact
-  - confirm the check only applies where operationally appropriate
-- Done when: the delivery script itself can block non-compliant production reports before email send.
-
-### 7. Wire breadth validation into `.github/workflows/send-weekly-report.yml`
-- Owner: `[ASSISTANT]`
-- Action:
-  - add a distinct pre-render breadth validation step
-  - make the workflow fail before render/send if breadth proof is missing
-  - surface a clear `BREADTH_OK` or equivalent log line when successful
-- Done when: breadth is enforced operationally before subscriber delivery.
+  - import or replicate lane breadth validation inside `send_report.py`
+  - fail before render/send if matching lane artifact or omitted-lane proof is missing
+- Done when: delivery script itself blocks non-compliant reports.
 
 ### 8. Keep workflow behavior operational only
 - Owner: `[ASSISTANT]`
 - Action:
-  - keep `.github/workflows/send-weekly-report.yml` limited to actual production report send events
-  - keep code, pricing, prompt, and render checks in non-email validation workflows
-  - confirm no non-report code change can silently resend the latest subscriber email
-- Done when: workflow logic remains operational, not thematic or editorial, and email sending is gated to real report publication only.
+  - production send workflow should be for production report-output pushes and manual dispatch only
+  - code changes should not silently resend subscriber emails
+- Done when: workflow logic remains operational, not editorial.
 
 ---
 
-## Phase 4 — stabilize and extend the ETF explicit state layer
+## Phase 4 — improve explicit ETF state quality
 
-### 9. Validate the ETF enriched state refresh over live runs
-- Owner: `[JOINT]`
-- Action:
-  - let `.github/workflows/refresh-etf-state-from-report.yml` run on the next canonical English pro report push
-  - confirm `output/etf_portfolio_state.json`, `output/etf_valuation_history.csv`, and `output/etf_trade_ledger.csv` refresh and commit correctly
-  - confirm the pre-send derivation checks pass in `.github/workflows/send-weekly-report.yml`
-- Done when: ETF explicit state refresh is stable and repeatable.
-
-### 10. Confirm ETF state/report alignment
+### 9. Improve recommendation scorecard quality
 - Owner: `[ASSISTANT]`
 - Action:
-  - compare the latest canonical English pro report with `output/etf_portfolio_state.json`
-  - compare the latest Section 7 table with `output/etf_valuation_history.csv`
-  - compare the latest Section 14 table with `output/etf_trade_ledger.csv`
-  - confirm the statefiles reflect the latest pro report deterministically
-- Done when: state authority is explicit and visibly aligned with the canonical report.
+  - add real 1-month and 3-month relative-strength values when reliable price history is available
+  - improve best-alternative scoring
+  - improve cash classification extraction
+  - improve consecutive-week replaceable history
+- Done when: scorecard becomes less heuristic and more data-backed.
 
-### 11. Add the next ETF state file
-- Owner: `[ASSISTANT]`
-- Planned file:
-  - `output/etf_recommendation_scorecard.csv`
-- Action:
-  - define its minimum schema
-  - add a repo-native writer for it
-  - keep it aligned with the current ETF explicit state layer
-- Done when: ETF has the next layer of explicit recommendation memory beyond portfolio snapshot, valuation history, and trade ledger.
-
-### 12. Move ETF state beyond report-derived explicit state over time
+### 10. Move ETF state beyond report-derived state over time
 - Owner: `[ASSISTANT]`
 - Action:
   - validate the pricing subsystem in real runs
   - add more valuation authority from machine-readable pricing outputs
-  - reduce dependence on report-derived state where it is safe to do so
-  - tighten deterministic conflict resolution between report intent and implementation facts
-- Done when: ETF explicit state is less dependent on the rendered report itself.
+  - reduce dependence on report-derived state where safe
+- Done when: ETF explicit state is less dependent on rendered report parsing.
 
-### 13. Validate stale-data handling under the broader discovery model
+### 11. Validate stale-data handling under the broader discovery model
 - Owner: `[ASSISTANT]`
-- Action: review handling of:
-  - stale ETF quote data
-  - stale EUR/USD conversion data
-  - stale portfolio values
-  - stale pricing audits
-  - stale report artifacts
-  - stale lane artifacts
-  - stale watchlist / lane continuity memory
-  - stale ETF state files
-  - stale ETF trade-ledger rows
-- Done when: stale inputs cannot silently flatten, distort, or misstate the portfolio or report.
+- Action: review handling of stale:
+  - ETF quotes
+  - EUR/USD conversion
+  - portfolio values
+  - pricing audits
+  - report artifacts
+  - lane artifacts
+  - recommendation scorecard rows
+  - trade-ledger rows
+- Done when: stale inputs cannot silently flatten, distort, or misstate the report.
 
 ---
 
-## Phase 5 — run and judge the ETF optimization lab with auto-fetched history
+## Phase 5 — keep optimization lab separate
 
-### 14. Review the ETF optimizer fetch config
+### 12. Review ETF optimizer fetch config
 - Owner: `[USER]`
-- Action:
-  - inspect `lab_inputs/etf_optimizer_fetch_config.json`
-  - adjust the ETF ticker universe, period, or date range if desired
-- Done when: the fetch config reflects the ETF lab universe you want to test.
+- Action: inspect `lab_inputs/etf_optimizer_fetch_config.json` if optimization testing is desired.
+- Done when: the lab universe reflects the intended ETF test set.
 
-### 15. Run the manual PyPortfolioOpt optimization workflow
+### 13. Run and judge the PyPortfolioOpt lab only after production state is stable
 - Owner: `[JOINT]`
 - Action:
-  - use `.github/workflows/lab-pyportfolioopt-optimization.yml` manually
-  - let the workflow auto-fetch ETF history with yfinance first
-  - inspect the generated artifact bundle from `lab_outputs/optimization/`
-  - compare max Sharpe, min volatility, HRP, and optional Black-Litterman outputs
-- Done when: the ETF optimization lab run completes successfully on a real fetched daily history and produces interpretable artifacts.
-
-### 16. Judge whether the optimizer adds decision value or just model noise
-- Owner: `[ASSISTANT]`
-- Action:
-  - compare optimizer outputs against ETF breadth discipline and regime logic
-  - check whether optimized allocations are sensible or merely concentrated
-  - decide whether the optimizer is useful as an internal QA layer
-  - decide whether the next extension should be a Riskfolio-Lib comparison layer
-- Done when: the optimizer’s role is clear before any further extension.
-
----
-
-## Phase 6 — reduce monolith risk later without weakening production
-
-### 17. Keep the four-layer model explicit in future changes
-- Owner: `[ASSISTANT]`
-- Action: preserve the distinction between:
-  1. decision framework
-  2. input/state contract
-  3. output contract
-  4. operational runbook
-- Done when: future changes do not collapse everything back into a single opaque blob.
-
-### 18. Reduce monolith risk only where it is safe
-- Owner: `[JOINT]`
-- Action:
-  - tighten boundaries gradually
-  - keep production reliability intact
-  - preserve the ETF executive look & feel while doing so
-- Done when: clarity improves without destabilizing the live workflow.
-
----
-
-## Suggested immediate next move
-
-The best next move after this update is:
-1. let the next canonical English ETF pro report push run both the send workflow and the ETF state-refresh workflow
-2. confirm `output/etf_portfolio_state.json`, `output/etf_valuation_history.csv`, and `output/etf_trade_ledger.csv` refresh cleanly on `main`
-3. only after that, add `output/etf_recommendation_scorecard.csv`
-4. then return to optimizer-comparison or deeper send-path hardening work
+  - run `.github/workflows/lab-pyportfolioopt-optimization.yml` manually
+  - compare outputs against the ETF decision framework
+  - keep optimizer results as QA/research, not production authority
+- Done when: optimizer usefulness is clear.
 
 ---
 
 ## Current checkpoint
 
-**The ETF repo now has an enriched explicit state layer, a repo-native state refresh workflow, and pre-send derivation checks for both portfolio state and trade ledger; the next ETF state step is to stabilize that richer state model across live runs and then extend it with a recommendation scorecard.**
+**The next state step is no longer to add `output/etf_recommendation_scorecard.csv`; it now exists. The next priority is to validate it during the next live report and use it to force clear decisions on SPY, PPA, PAVE, GLD, and cash policy.**

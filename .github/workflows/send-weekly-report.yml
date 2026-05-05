@@ -91,12 +91,13 @@ jobs:
               print(f"RENDER_OK | mode=pro | report={bundle['en']['report_path'].name}")
           PY
 
-      - name: Validate ETF minimum state derivation before send
+      - name: Validate ETF explicit state derivation before send
         env:
           MRKT_RPRTS_REPORT_MODE: pro
         run: |
           python tools/write_etf_minimum_state.py --output-dir output --mode pro --check-only
           python tools/write_etf_trade_ledger.py --output-dir output --check-only
+          python tools/write_etf_recommendation_scorecard.py --output-dir output --mode pro --check-only
 
       - name: Send email
         env:
