@@ -48,6 +48,14 @@ jobs:
         run: |
           python -m pricing.run_pricing_pass
 
+      - name: Discover and score ETF opportunity lanes
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python -m runtime.discover_etf_lanes \
+            --config config/etf_discovery_universe.yml \
+            --portfolio-state output/etf_portfolio_state.json
+
       - name: Build runtime ETF state and reports
         env:
           MRKT_RPRTS_REPORT_MODE: pro
