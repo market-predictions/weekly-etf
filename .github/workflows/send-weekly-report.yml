@@ -40,7 +40,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install matplotlib mistune weasyprint pyyaml
 
-      - name: Run persistent ETF pricing pass before validation
+      - name: Run persistent ETF pricing pass
         env:
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
           FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
@@ -48,16 +48,16 @@ jobs:
         run: |
           python -m pricing.run_pricing_pass
 
-      - name: Validate persisted pricing audit before render
-        run: |
-          python pricing/validate_persisted_audit.py
-
       - name: Build runtime ETF state and reports
         env:
           MRKT_RPRTS_REPORT_MODE: pro
         run: |
           python -m runtime.build_etf_report_state
           python -m runtime.render_etf_report_from_state --output-dir output
+
+      - name: Validate persisted pricing audit after runtime render
+        run: |
+          python pricing/validate_persisted_audit.py
 
       - name: Validate lane breadth proof before render
         env:
