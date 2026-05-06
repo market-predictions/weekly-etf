@@ -24,6 +24,17 @@ def f2(value: Any) -> str:
         return ""
 
 
+def f4(value: Any) -> str:
+    try:
+        return f"{float(value):.4f}"
+    except (TypeError, ValueError):
+        return ""
+
+
+def eurusd_used(state: dict[str, Any]) -> str:
+    return f4((state.get("fx_basis") or {}).get("rate")) or "0.0000"
+
+
 def position_rows(state: dict[str, Any]) -> list[dict[str, Any]]:
     return list(state.get("positions", []))
 
@@ -229,6 +240,7 @@ def render_en(state: dict[str, Any]) -> str:
     inv = invested_eur(state)
     cash = cash_eur(state)
     holdings = ", ".join(str(p.get("ticker")) for p in position_rows(state))
+    eurusd = eurusd_used(state)
     return f"""# Weekly ETF Pro Review {report_date}
 
 > *This report is for informational and educational purposes only; please see the disclaimer at the end.*
@@ -329,7 +341,7 @@ def render_en(state: dict[str, Any]) -> str:
 - Current portfolio value (EUR): {nav:.2f}
 - Since inception return (%): {(nav / 100000.0 - 1.0) * 100.0:.2f}
 - Equity-curve state: Runtime-derived
-- EUR/USD used: see pricing audit
+- EUR/USD used: {eurusd}
 - Notes: Section 7 and Section 15 are rendered from the same normalized runtime state.
 
 {section7_table(state)}
@@ -395,7 +407,7 @@ def render_en(state: dict[str, Any]) -> str:
 - Cash (EUR): {cash:.2f}
 - Total portfolio value (EUR): {nav:.2f}
 - Since inception return (%): {(nav / 100000.0 - 1.0) * 100.0:.2f}
-- EUR/USD used: see pricing audit
+- EUR/USD used: {eurusd}
 
 {section15_table(state)}
 
