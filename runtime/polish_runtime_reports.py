@@ -28,8 +28,12 @@ def replace_between(text: str, start_heading: str, end_heading: str, replacement
 
 def polish_english(text: str) -> str:
     text = text.replace(
+        "- **Secondary cross-current:** Runtime-derived report generation is active. Pricing, lane discovery, portfolio state and recommendation discipline are separate inputs.",
+        "- **Secondary cross-current:** The production process is now state-led: pricing, portfolio holdings, lane discovery and recommendation discipline are independently validated before delivery."
+    )
+    text = text.replace(
         "- **Secondary cross-current:** Runtime-derived report generation is active. Pricing, lane assessment, portfolio state and recommendation discipline are separate inputs.",
-        "- **Secondary cross-current:** The production process is now state-led: pricing, portfolio holdings, lane breadth and recommendation discipline are independently validated before delivery."
+        "- **Secondary cross-current:** The production process is now state-led: pricing, portfolio holdings, lane discovery and recommendation discipline are independently validated before delivery."
     )
     text = text.replace(
         "- **What changed this week:** This report is rendered from normalized runtime state rather than manually patched markdown. Replacement challengers are shown only with pricing and duel status.",
@@ -89,30 +93,16 @@ def polish_english(text: str) -> str:
 """
     )
 
-    text = replace_between(
-        text,
-        "## 10. Current Position Review",
-        "## 11. Best New Opportunities",
-        """
-The position review now separates three questions that used to blur together: is the thesis still valid, is the ETF still the right vehicle, and would fresh cash buy this today at the current weight?
-
-| Ticker | Score | Action | Conviction | Key point |
-|---|---:|---|---|---|
-| SPY | 3.53 | Hold under review | Tier 2 | Useful core beta, but overlap with SMH limits its diversification value. |
-| SMH | 4.28 | Hold / preferred add candidate | Tier 1 | Best earned position; only add if the 25% max-position rule leaves room. |
-| PPA | 3.45 | Hold under review | Tier 3 | Defense thesis remains valid, but ITA must be compared before new capital. |
-| PAVE | 3.68 | Hold under review | Tier 2 | Infrastructure thesis remains attractive, but GRID is the clean challenger. |
-| URNM | 3.70 | Hold | Tier 2 | Strategic nuclear exposure is still valid, but it is not the first use of fresh cash. |
-| GLD | 3.00 | Hold under review | Tier 3 | Hedge role is not automatic after drawdown; ballast behavior must be proven. |
-"""
-    )
+    # Section 10 is intentionally left intact. It is now generated from enriched
+    # runtime position state plus the recommendation scorecard. Do not replace it
+    # with a static table here.
     return text
 
 
 def polish_dutch(text: str) -> str:
     text = polish_english(text)
     replacements = {
-        "The production process is now state-led: pricing, portfolio holdings, lane breadth and recommendation discipline are independently validated before delivery.": "Het productieproces is nu state-led: pricing, portefeuilleposities, lane-breedte en aanbevelingsdiscipline worden onafhankelijk gevalideerd vóór verzending.",
+        "The production process is now state-led: pricing, portfolio holdings, lane discovery and recommendation discipline are independently validated before delivery.": "Het productieproces is nu state-led: pricing, portefeuilleposities, lane-discovery en aanbevelingsdiscipline worden onafhankelijk gevalideerd vóór verzending.",
         "The report now separates presentation from state authority. Replacement candidates are no longer treated as fundable ideas unless their closing-price basis and duel status are visible.": "Het rapport scheidt nu presentatie van state-authority. Vervangingskandidaten worden niet meer als financierbare ideeën gepresenteerd zonder zichtbare sluitkoersbasis en duel-status.",
         "Keep the current portfolio intact for now, but treat SPY, PPA, PAVE and GLD as active review items rather than passive holds.": "Behoud de huidige portefeuille voorlopig, maar behandel SPY, PPA, PAVE en GLD als actieve reviewposities in plaats van passieve holds.",
         "SMH remains the earned leader, but fresh capital and replacement decisions must now pass a stricter close-based evidence test.": "SMH blijft de verdiende leider, maar nieuw kapitaal en vervangingsbesluiten moeten nu door een strengere sluitkoers-gebaseerde bewijscheck.",
@@ -128,13 +118,7 @@ def polish_dutch(text: str) -> str:
         "PPA must prove itself against ITA, PAVE must prove itself against GRID, and GLD must prove that it still behaves like useful ballast.": "PPA moet zich bewijzen tegenover ITA, PAVE tegenover GRID, en GLD moet bewijzen dat het nog steeds nuttige ballast is.",
         "Action bias": "Actiebias",
         "No replacement is fundable yet. The right next move is evidence gathering, not forced churn.": "Nog geen vervanger is financierbaar. De juiste volgende stap is bewijs verzamelen, niet geforceerd wisselen.",
-        "The position review now separates three questions that used to blur together: is the thesis still valid, is the ETF still the right vehicle, and would fresh cash buy this today at the current weight?": "De positiereview scheidt nu drie vragen die eerder door elkaar liepen: is de thesis nog geldig, is de ETF nog het juiste instrument, en zou vers kapitaal dit vandaag nog kopen op dit gewicht?",
-        "Useful core beta, but overlap with SMH limits its diversification value.": "Nuttige core beta, maar overlap met SMH beperkt de spreidingswaarde.",
-        "Best earned position; only add if the 25% max-position rule leaves room.": "Best verdiende positie; alleen toevoegen als de 25%-positielimiet ruimte laat.",
-        "Defense thesis remains valid, but ITA must be compared before new capital.": "Defensietheorie blijft geldig, maar ITA moet vergeleken worden vóór nieuw kapitaal.",
-        "Infrastructure thesis remains attractive, but GRID is the clean challenger.": "Infrastructuurthema blijft aantrekkelijk, maar GRID is de duidelijke challenger.",
-        "Strategic nuclear exposure is still valid, but it is not the first use of fresh cash.": "Strategische nucleaire exposure blijft geldig, maar is niet de eerste inzet van vers kapitaal.",
-        "Hedge role is not automatic after drawdown; ballast behavior must be proven.": "Hedgerol is na drawdown niet automatisch; ballastgedrag moet bewezen worden.",
+        "The position review separates three questions: is the thesis still valid, is the ETF still the right vehicle, and would fresh cash buy this today at the current weight?": "De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het juiste instrument, en zou vers kapitaal dit vandaag nog kopen op het huidige gewicht?",
         "Reconciled to Section 15": "Aangesloten op Section 15",
         "No exit clears the evidence threshold today": "Geen exit haalt vandaag de bewijsdrempel",
         "No fresh add is authorized without confirming position-size headroom": "Geen fresh add zonder bevestigde ruimte binnen de positielimiet",

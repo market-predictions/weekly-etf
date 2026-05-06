@@ -58,6 +58,151 @@ def _fx_rate(pricing_audit: dict[str, Any]) -> float | None:
         return None
 
 
+def _ticker(value: Any) -> str:
+    return str(value or "").strip().upper()
+
+
+def _to_float(value: Any) -> float | None:
+    if value is None or value == "":
+        return None
+    try:
+        return float(str(value).replace(",", "").replace("%", ""))
+    except (TypeError, ValueError):
+        return None
+
+
+def _index_by_ticker(rows: list[dict[str, Any]], ticker_key: str = "ticker") -> dict[str, dict[str, Any]]:
+    indexed: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        ticker = _ticker(row.get(ticker_key))
+        if ticker:
+            indexed[ticker] = row
+    return indexed
+
+
+def _semantic_defaults(ticker: str) -> dict[str, Any]:
+    defaults = {
+        "SPY": {
+            "suggested_action": "Hold under review",
+            "conviction_tier": "Tier 2",
+            "portfolio_role": "Core beta",
+            "better_alternative_exists": "Yes",
+            "short_reason": "Useful core beta, but overlap with SMH limits diversification value.",
+            "required_next_action": "Review overlap versus SMH and compare with QUAL / IEFA.",
+            "fresh_cash_test": "Smaller / under review",
+        },
+        "SMH": {
+            "suggested_action": "Hold / preferred add candidate",
+            "conviction_tier": "Tier 1",
+            "portfolio_role": "Growth engine",
+            "better_alternative_exists": "No",
+            "short_reason": "Best earned position; add only if the 25% max-position rule leaves room.",
+            "required_next_action": "Respect max-position discipline before any fresh add.",
+            "fresh_cash_test": "Yes, but size-limited",
+        },
+        "PPA": {
+            "suggested_action": "Hold under review",
+            "conviction_tier": "Tier 3",
+            "portfolio_role": "Resilience",
+            "better_alternative_exists": "Yes",
+            "short_reason": "Defense thesis remains valid, but ITA must be compared before new capital.",
+            "required_next_action": "Complete PPA-versus-ITA replacement duel.",
+            "fresh_cash_test": "No / reduce unless duel improves",
+        },
+        "PAVE": {
+            "suggested_action": "Hold under review",
+            "conviction_tier": "Tier 2",
+            "portfolio_role": "Real-asset capex",
+            "better_alternative_exists": "Yes",
+            "short_reason": "Infrastructure thesis remains attractive, but GRID is the clean challenger.",
+            "required_next_action": "Complete PAVE-versus-GRID implementation duel.",
+            "fresh_cash_test": "Smaller / under review",
+        },
+        "URNM": {
+            "suggested_action": "Hold",
+            "conviction_tier": "Tier 2",
+            "portfolio_role": "Strategic energy",
+            "better_alternative_exists": "No",
+            "short_reason": "Strategic nuclear exposure remains valid, but it is not the first use of fresh cash.",
+            "required_next_action": "Hold unless relative strength confirms add status.",
+            "fresh_cash_test": "Hold / wait for confirmation",
+        },
+        "GLD": {
+            "suggested_action": "Hold under review",
+            "conviction_tier": "Tier 3",
+            "portfolio_role": "Hedge ballast",
+            "better_alternative_exists": "Yes",
+            "short_reason": "Hedge role is not automatic after drawdown; ballast behavior must be proven.",
+            "required_next_action": "Run hedge-validity test versus GSG / BIL.",
+            "fresh_cash_test": "No / hedge review",
+        },
+    }
+    return defaults.get(ticker, {})
+
+
+def enrich_positions(
+    pricing_holdings: list[dict[str, Any]],
+    portfolio_state: dict[str, Any],
+    recommendation_scorecard: list[dict[str, str]],
+) -> list[dict[str, Any]]:
+    """Create current runtime positions with pricing + semantic decision fields.
+
+    Pricing audit holdings are the valuation authority for Section 7/15, but
+    portfolio state and recommendation scorecard are the decision-context
+    authorities for Section 10/12/13/16. This merge prevents the report from
+    rendering analytically empty rows when the pricing audit only contains
+    numeric holding snapshots.
+    """
+    state_by_ticker = _index_by_ticker(portfolio_state.get("positions", []) or [])
+    score_by_ticker = _index_by_ticker(recommendation_scorecard)
+
+    enriched: list[dict[str, Any]] = []
+    for holding in pricing_holdings:
+        ticker = _ticker(holding.get("ticker"))
+        if not ticker:
+            continue
+        merged: dict[str, Any] = {}
+        merged.update(_semantic_defaults(ticker))
+        merged.update(state_by_ticker.get(ticker, {}))
+        merged.update(score_by_ticker.get(ticker, {}))
+        merged.update(holding)
+        merged["ticker"] = ticker
+
+        # Normalize key pricing aliases expected by renderers.
+        merged["current_price_local"] = _to_float(holding.get("previous_price_local")) or _to_float(merged.get("current_price_local"))
+        merged["market_value_local"] = _to_float(holding.get("previous_market_value_local")) or _to_float(merged.get("market_value_local"))
+        merged["market_value_eur"] = _to_float(holding.get("previous_market_value_eur")) or _to_float(merged.get("market_value_eur"))
+        merged["current_weight_pct"] = _to_float(holding.get("previous_weight_pct")) or _to_float(merged.get("current_weight_pct"))
+        merged["continuity_current_price_local"] = merged.get("current_price_local")
+
+        # Keep Section 15 compatibility names as valuation authority.
+        merged["previous_price_local"] = merged.get("current_price_local")
+        merged["previous_market_value_local"] = merged.get("market_value_local")
+        merged["previous_market_value_eur"] = merged.get("market_value_eur")
+        merged["previous_weight_pct"] = _to_float(merged.get("current_weight_pct")) or _to_float(merged.get("previous_weight_pct"))
+
+        # Convert common numeric scorecard strings back to floats where useful.
+        for key in (
+            "shares",
+            "total_score",
+            "thesis_score",
+            "implementation_score",
+            "pnl_pct",
+            "avg_entry_local",
+            "shares_delta_this_run",
+            "weight_change_pct",
+            "target_weight_pct",
+            "weight_inherited_pct",
+        ):
+            numeric = _to_float(merged.get(key))
+            if numeric is not None:
+                merged[key] = numeric
+
+        enriched.append(merged)
+
+    return enriched
+
+
 def build_runtime_state() -> dict[str, Any]:
     sources = discover_sources()
 
@@ -66,7 +211,8 @@ def build_runtime_state() -> dict[str, Any]:
     lane_assessment = load_json(sources.lane_assessment)
     recommendation_scorecard = load_scorecard(sources.recommendation_scorecard)
 
-    holdings = pricing_audit.get("holdings", [])
+    pricing_holdings = pricing_audit.get("holdings", [])
+    holdings = enrich_positions(pricing_holdings, portfolio_state, recommendation_scorecard)
     prices = pricing_audit.get("prices", [])
     fx_basis = pricing_audit.get("fx_basis") or {}
 
@@ -133,6 +279,7 @@ def build_runtime_state() -> dict[str, Any]:
             "pricing_audit_valid": bool(pricing_audit.get("holdings")),
             "lane_assessment_present": bool(lane_assessment.get("assessed_lanes")),
             "scorecard_present": len(recommendation_scorecard) > 0,
+            "positions_enriched": any(p.get("short_reason") for p in holdings),
             "fx_rate_present": _fx_rate(pricing_audit) is not None,
         },
     }

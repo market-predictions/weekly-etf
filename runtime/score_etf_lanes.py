@@ -90,6 +90,26 @@ def adjusted_lane_score(lane: dict[str, Any], context: LaneContext) -> float:
     return round(base + gap_bonus + price_bonus + novelty_bonus, 2)
 
 
+def _rejection_reason(lane: dict[str, Any]) -> str:
+    timing = _num(lane.get("timing_confirmation"), 0.0)
+    macro = _num(lane.get("macro_alignment"), 0.0)
+    impl = _num(lane.get("implementation_quality"), 0.0)
+    primary_status = str(lane.get("primary_price_status", ""))
+    evidence = str(lane.get("evidence_summary", "")).strip()
+
+    if "not_in_current_pricing_audit" in primary_status:
+        return "Structurally relevant, but not priced in the current audit; keep as discovery candidate, not fundable replacement."
+    if timing <= 2:
+        return "Structural case is credible, but timing confirmation still trails higher-ranked lanes."
+    if macro <= 2:
+        return "Macro alignment is not yet strong enough to displace funded exposures."
+    if impl <= 2:
+        return "Implementation quality or ETF vehicle confidence is not strong enough yet."
+    if evidence:
+        return "Scored below promoted lanes despite valid thesis; needs stronger relative timing or portfolio-fit evidence."
+    return "Scored below the live radar cutoff versus stronger funded and challenger lanes."
+
+
 def score_lane(lane: dict[str, Any], context: LaneContext) -> dict[str, Any]:
     primary = str(lane.get("primary_etf", "")).upper()
     alt = str(lane.get("alternative_etf", "")).upper()
@@ -123,7 +143,6 @@ def score_lane(lane: dict[str, Any], context: LaneContext) -> dict[str, Any]:
 
 
 def select_promoted_lanes(scored: list[dict[str, Any]], required_buckets: list[str]) -> list[dict[str, Any]]:
-    # Start with top lane per required bucket to preserve breadth, then fill by score.
     selected: list[dict[str, Any]] = []
     seen_ids: set[str] = set()
 
@@ -146,7 +165,6 @@ def select_promoted_lanes(scored: list[dict[str, Any]], required_buckets: list[s
         if len(selected) >= 6:
             break
 
-    # Keep the radar compact but valid: 5-8 promoted lanes.
     return selected[:8]
 
 
@@ -160,8 +178,6 @@ def apply_promotion_flags(scored: list[dict[str, Any]], promoted: list[dict[str,
         if is_promoted:
             lane["rejection_reason"] = ""
         else:
-            lane.setdefault("rejection_reason", "Scored below the live radar cutoff this run.")
-            if not lane.get("rejection_reason"):
-                lane["rejection_reason"] = "Scored below the live radar cutoff this run."
+            lane["rejection_reason"] = _rejection_reason(lane)
         output.append(lane)
     return output

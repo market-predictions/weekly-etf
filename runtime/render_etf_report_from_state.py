@@ -31,6 +31,18 @@ def f4(value: Any) -> str:
         return ""
 
 
+def text(value: Any, fallback: str = "") -> str:
+    raw = str(value or "").strip()
+    return raw if raw else fallback
+
+
+def short_text(value: Any, fallback: str = "", max_len: int = 140) -> str:
+    raw = text(value, fallback)
+    if len(raw) <= max_len:
+        return raw
+    return raw[: max_len - 1].rstrip() + "…"
+
+
 def eurusd_used(state: dict[str, Any]) -> str:
     return f4((state.get("fx_basis") or {}).get("rate")) or "0.0000"
 
@@ -120,10 +132,12 @@ def radar_table(state: dict[str, Any]) -> str:
     ]
     for lane in promoted_lanes(state):
         status = "Actionable now" if float(lane.get("total_score") or 0) >= 4.5 else "Watchlist / under review"
+        why_it_matters = short_text(lane.get("evidence_summary"), lane.get("why_now") or "Structural lane retained by discovery scoring.")
+        needs = short_text(lane.get("why_now") or lane.get("what_would_change"), "Needs stronger pricing, timing or relative-strength confirmation.")
         lines.append(
             f"| {lane.get('lane_name')} | {lane.get('primary_etf')} | {lane.get('alternative_etf')} | "
-            f"{lane.get('what_would_change', '')} | {lane.get('structural_strength', '')} | {lane.get('macro_alignment', '')} | "
-            f"{status} | {lane.get('what_would_change', '')} | 3-12 months |"
+            f"{why_it_matters} | {lane.get('structural_strength', '')} | {lane.get('macro_alignment', '')} | "
+            f"{status} | {needs} | 3-12 months |"
         )
     return "\n".join(lines)
 
@@ -134,9 +148,16 @@ def omitted_table(state: dict[str, Any]) -> str:
         "|---|---|---|---|",
     ]
     for lane in omitted_lanes(state):
+        rejection = short_text(
+            lane.get("rejection_reason"),
+            "Scored below the live radar cutoff versus stronger funded and challenger lanes.",
+        )
+        needs = short_text(
+            lane.get("why_now") or lane.get("what_would_change") or lane.get("freshness_note"),
+            "Needs better timing, pricing confirmation or portfolio-fit evidence.",
+        )
         lines.append(
-            f"| {lane.get('lane_name')} | {lane.get('primary_etf')} | "
-            f"{lane.get('rejection_reason') or 'Not superior to funded exposures this run.'} | {lane.get('what_would_change', '')} |"
+            f"| {lane.get('lane_name')} | {lane.get('primary_etf')} | {rejection} | {needs} |"
         )
     return "\n".join(lines)
 
@@ -173,13 +194,15 @@ def section7_table(state: dict[str, Any]) -> str:
 
 def current_position_table(state: dict[str, Any]) -> str:
     lines = [
-        "| Ticker | Score | Action | Conviction | Key point |",
-        "|---|---:|---|---|---|",
+        "| Ticker | Score | Action | Conviction | Fresh-cash test | Key point | Required next action |",
+        "|---|---:|---|---|---|---|---|",
     ]
     for p in position_rows(state):
         lines.append(
             f"| {p.get('ticker')} | {f2(p.get('total_score'))} | {p.get('suggested_action', 'Hold')} | "
-            f"{p.get('conviction_tier', '')} | {p.get('short_reason', '')} |"
+            f"{p.get('conviction_tier', '')} | {p.get('fresh_cash_test', '')} | "
+            f"{short_text(p.get('short_reason'), 'No material change this run.')} | "
+            f"{short_text(p.get('required_next_action'), 'Hold and reassess next run.')} |"
         )
     return "\n".join(lines)
 
@@ -193,7 +216,7 @@ def final_action_table(state: dict[str, Any]) -> str:
     for p in position_rows(state):
         ticker = str(p.get("ticker", "")).upper()
         lines.append(
-            f"| {ticker} | {ETF_NAMES.get(ticker, ticker)} | {p.get('existing_new', 'Existing')} | {f2(p.get('previous_weight_pct'))} | {f2(w.get(ticker))} | "
+            f"| {ticker} | {ETF_NAMES.get(ticker, ticker)} | {p.get('existing_new', 'Existing')} | {f2(p.get('weight_inherited_pct') or p.get('previous_weight_pct'))} | {f2(p.get('target_weight_pct') or w.get(ticker))} | "
             f"{p.get('suggested_action', 'Hold')} | {p.get('conviction_tier', '')} | {f2(p.get('total_score'))} | {p.get('portfolio_role', '')} | "
             f"{p.get('better_alternative_exists', 'No')} | {p.get('short_reason', '')} |"
         )
@@ -234,12 +257,53 @@ def continuity_table(state: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def action_tickers(state: dict[str, Any], predicate) -> str:
+    tickers = [str(p.get("ticker")) for p in position_rows(state) if predicate(str(p.get("suggested_action", "")), p)]
+    return ", ".join(tickers) if tickers else "None"
+
+
+def rotation_plan_table(state: dict[str, Any]) -> str:
+    close = action_tickers(state, lambda action, p: "close" in action.lower() or "sell" in action.lower())
+    reduce = action_tickers(state, lambda action, p: "reduce" in action.lower())
+    hold = action_tickers(state, lambda action, p: "hold" in action.lower())
+    add = action_tickers(state, lambda action, p: "add" in action.lower() or "buy" in str(p.get("action_executed_this_run", "")).lower())
+    replace = action_tickers(state, lambda action, p: str(p.get("better_alternative_exists", "")).lower() == "yes" and "review" in action.lower())
+    return "\n".join(
+        [
+            "| Close | Reduce | Hold | Add | Replace |",
+            "|---|---|---|---|---|",
+            f"| {close} | {reduce} | {hold} | {add} | {replace} |",
+        ]
+    )
+
+
+def best_opportunities_text(state: dict[str, Any]) -> str:
+    promoted = promoted_lanes(state)
+    challenger_lines = []
+    for lane in promoted:
+        if lane.get("challenger") is True and len(challenger_lines) < 3:
+            challenger_lines.append(
+                f"- {lane.get('primary_etf')} / {lane.get('alternative_etf')}: {short_text(lane.get('evidence_summary'), lane.get('why_now'), 180)}"
+            )
+    if not challenger_lines:
+        challenger_lines.append("- No challenger is fundable without completed pricing and relative-strength duel evidence.")
+    return "\n".join(
+        [
+            "- SMH remains the leading funded growth exposure, subject to the max-position rule.",
+            *challenger_lines,
+            "- Replacement candidates remain evidence-gated: pricing basis and duel status must be visible before funding.",
+        ]
+    )
+
+
 def render_en(state: dict[str, Any]) -> str:
     report_date = state.get("report_date") or "unknown"
     nav = total_nav(state)
     inv = invested_eur(state)
     cash = cash_eur(state)
     holdings = ", ".join(str(p.get("ticker")) for p in position_rows(state))
+    add_candidates = action_tickers(state, lambda action, p: "add" in action.lower() or "buy" in str(p.get("action_executed_this_run", "")).lower())
+    hold_review = action_tickers(state, lambda action, p: "review" in action.lower() or str(p.get("better_alternative_exists", "")).lower() == "yes")
     eurusd = eurusd_used(state)
     return f"""# Weekly ETF Pro Review {report_date}
 
@@ -248,22 +312,22 @@ def render_en(state: dict[str, Any]) -> str:
 ## 1. Executive Summary
 
 - **Primary regime:** Policy Transition / Mixed Regime
-- **Secondary cross-current:** Runtime-derived report generation is active. Pricing, lane assessment, portfolio state and recommendation discipline are separate inputs.
+- **Secondary cross-current:** Runtime-derived report generation is active. Pricing, lane discovery, portfolio state and recommendation discipline are separate inputs.
 - **Geopolitical regime:** Elevated but localized
-- **What changed this week:** This report is rendered from normalized runtime state rather than manually patched markdown. Replacement challengers are shown only with pricing and duel status.
-- **Overall portfolio judgment:** Maintain the implemented book while keeping SPY, PPA, PAVE and GLD under explicit discipline review.
-- **Main takeaway:** **Use SMH as the highest-conviction funded leader, but do not let replacement candidates become fundable without close-based duel evidence.**
+- **What changed this week:** The Structural Opportunity Radar is now rebuilt from discovery metadata instead of static memory, and current positions are enriched from portfolio state plus recommendation discipline.
+- **Overall portfolio judgment:** Keep the current portfolio intact for now, but treat SPY, PPA, PAVE and GLD as active review items rather than passive holds.
+- **Main takeaway:** **SMH remains the earned leader, but fresh capital and replacement decisions must now pass a stricter close-based evidence test.**
 
 ## 2. Portfolio Action Snapshot
 
 ### Add
-- None from this renderer unless the runtime state already records an executed Add.
+- {add_candidates if add_candidates != 'None' else 'None executed this run. SMH remains the first candidate for additional capital only if the 25% position-size rule leaves room.'}
 
 ### Hold
 - {holdings}
 
 ### Hold but replaceable
-- SPY, PPA, PAVE, GLD remain under explicit review.
+- {hold_review} remain under explicit review.
 
 ### Reduce
 - None.
@@ -272,7 +336,7 @@ def render_en(state: dict[str, Any]) -> str:
 - None.
 
 ### Best replacements to fund
-- No replacement is fundable until the pricing and relative-strength duel is complete.
+- No challenger is promoted to a fundable replacement yet. Each named replacement must first clear the same close-date pricing basis and relative-strength duel.
 
 ### Replacement pricing and duel status
 
@@ -374,23 +438,17 @@ def render_en(state: dict[str, Any]) -> str:
 
 ## 10. Current Position Review
 
+The position review separates three questions: is the thesis still valid, is the ETF still the right vehicle, and would fresh cash buy this today at the current weight?
+
 {current_position_table(state)}
 
 ## 11. Best New Opportunities
 
-- SMH remains the leading funded growth exposure, subject to the max-position rule.
-- IEFA / EFA remain diversification challengers if U.S. concentration rises further.
-- GRID, ITA, GSG, BIL and QUAL remain challengers but are not fundable without completed close-based duels.
+{best_opportunities_text(state)}
 
 ## 12. Portfolio Rotation Plan
 
-| Bucket | Tickers | Plan |
-|---|---|---|
-| Close | None | No exits required by runtime state |
-| Reduce | None | No trims required by runtime state |
-| Hold | {holdings} | Maintain current share counts unless trade ledger changes |
-| Add | None | No runtime-generated add |
-| Replace | None | Replacement duels incomplete |
+{rotation_plan_table(state)}
 
 ## 13. Final Action Table
 
@@ -468,6 +526,7 @@ def render_nl(state: dict[str, Any]) -> str:
         "Main takeaway": "Belangrijkste conclusie",
         "Replacement pricing and duel status": "Replacement pricing and duel status",
         "Current Portfolio Holdings and Cash": "Current Portfolio Holdings and Cash",
+        "The position review separates three questions: is the thesis still valid, is the ETF still the right vehicle, and would fresh cash buy this today at the current weight?": "De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het juiste instrument, en zou vers kapitaal dit vandaag nog kopen op het huidige gewicht?",
         "This section is the canonical default input for the next run unless the user explicitly overrides it.": "Deze sectie is de canonieke standaardinput voor de volgende run tenzij de gebruiker expliciet iets anders opgeeft.",
         "This report is provided for informational and educational purposes only.": "Dit rapport wordt uitsluitend verstrekt voor informatieve en educatieve doeleinden.",
         "It is not investment, legal, tax, or financial advice": "Het is geen beleggingsadvies, juridisch advies, fiscaal advies of financieel advies",
