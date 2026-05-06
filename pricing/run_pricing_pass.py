@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from datetime import date, timedelta
 from pathlib import Path
@@ -63,8 +64,12 @@ def requested_close_from_today(today: date) -> str:
     return d.isoformat()
 
 
-def _to_float(text: str) -> float | None:
-    text = text.replace(",", "").replace("%", "").strip()
+def _to_float(text: str | int | float | None) -> float | None:
+    if text is None:
+        return None
+    if isinstance(text, (int, float)):
+        return float(text)
+    text = str(text).replace(",", "").replace("%", "").strip()
     if not text or text == "-":
         return None
     try:
@@ -98,6 +103,47 @@ def _symbols_from_text(text: str) -> list[str]:
         if symbol and symbol not in symbols:
             symbols.append(symbol)
     return symbols
+
+
+def parse_portfolio_state_holdings(state_path: Path) -> tuple[list[HoldingSnapshot], dict[str, float]]:
+    """Load current holdings from explicit ETF portfolio state.
+
+    This is the primary holdings authority for pricing. Markdown Section 15 is
+    retained only as a backward-compatible fallback.
+    """
+    if not state_path.exists():
+        return [], {}
+
+    payload = json.loads(state_path.read_text(encoding="utf-8"))
+    positions = payload.get("positions") or []
+    holdings: list[HoldingSnapshot] = []
+    weights: dict[str, float] = {}
+
+    for position in positions:
+        ticker = _clean_symbol(str(position.get("ticker") or ""))
+        if not ticker or ticker == "CASH":
+            continue
+        shares = _to_float(position.get("shares"))
+        previous_price_local = _to_float(position.get("current_price_local"))
+        currency = str(position.get("currency") or "USD")
+        previous_market_value_local = _to_float(position.get("market_value_local"))
+        previous_market_value_eur = _to_float(position.get("market_value_eur"))
+        previous_weight_pct = _to_float(position.get("current_weight_pct"))
+
+        snapshot = HoldingSnapshot(
+            ticker=ticker,
+            shares=0.0 if shares is None else shares,
+            previous_price_local=previous_price_local,
+            currency=currency,
+            previous_market_value_local=previous_market_value_local,
+            previous_market_value_eur=previous_market_value_eur,
+            previous_weight_pct=previous_weight_pct,
+        )
+        holdings.append(snapshot)
+        if previous_weight_pct is not None:
+            weights[ticker] = previous_weight_pct
+
+    return holdings, weights
 
 
 def parse_section15_holdings(md_text: str) -> tuple[list[HoldingSnapshot], dict[str, float]]:
@@ -222,11 +268,20 @@ def load_policy(rate_limit_file: str) -> dict:
     return yaml.safe_load(Path(rate_limit_file).read_text(encoding="utf-8")).get("policy", {})
 
 
+def load_latest_report_text(output_dir: Path) -> str:
+    try:
+        latest = latest_report_file(output_dir)
+        return latest.read_text(encoding="utf-8")
+    except RuntimeError:
+        return ""
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--requested-close-date", default=None)
     parser.add_argument("--output-dir", default="output")
     parser.add_argument("--pricing-dir", default="output/pricing")
+    parser.add_argument("--portfolio-state", default="output/etf_portfolio_state.json")
     parser.add_argument("--rate-limit-file", default="pricing/rate_limits.yaml")
     args = parser.parse_args()
 
@@ -235,11 +290,15 @@ def main() -> None:
     run_date = today.isoformat()
 
     output_dir = Path(args.output_dir)
-    latest = latest_report_file(output_dir)
-    md_text = latest.read_text(encoding="utf-8")
-    holding_snapshots, weights = parse_section15_holdings(md_text)
+    md_text = load_latest_report_text(output_dir)
+
+    holding_snapshots, weights = parse_portfolio_state_holdings(Path(args.portfolio_state))
+    holdings_source = "portfolio_state"
     if not holding_snapshots:
-        raise RuntimeError("Could not parse current holdings from section 15.")
+        holding_snapshots, weights = parse_section15_holdings(md_text)
+        holdings_source = "markdown_section15_fallback"
+    if not holding_snapshots:
+        raise RuntimeError("Could not load current holdings from output/etf_portfolio_state.json or fallback Section 15.")
 
     holding_symbols = [h.ticker for h in holding_snapshots]
     radar_primaries, radar_alternatives, watchlist_challengers = parse_section16_watchlist(md_text)
@@ -307,7 +366,8 @@ def main() -> None:
     audit_path = write_price_audit(args.pricing_dir, pass_result)
     print(
         f"PRICING_PASS_{'OK' if fresh_count else 'PARTIAL'} | requested_close={requested_close_date} | "
-        f"holdings={holdings_count} | shortlist={len(shortlist)} | fresh={fresh_count} | carried={carried_forward_count} | "
+        f"holdings={holdings_count} | holdings_source={holdings_source} | shortlist={len(shortlist)} | "
+        f"fresh={fresh_count} | carried={carried_forward_count} | "
         f"weight_coverage={invested_weight_coverage_pct:.2f} | audit={audit_path}"
     )
 
