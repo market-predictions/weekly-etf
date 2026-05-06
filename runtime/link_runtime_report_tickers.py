@@ -14,11 +14,20 @@ TICKERS = {
     "QUAL", "GSG", "BIL", "MOO", "FIW", "INDA", "XBI", "FINX",
 }
 
-SECTION_BOUNDS = [
-    ("## 2. Portfolio Action Snapshot", "## 3. Regime Dashboard"),
-    ("## 4A. Short Opportunity Radar", "## 5. Key Risks / Invalidators"),
-    ("## 9. Second-Order Effects Map", "## 10. Current Position Review"),
+# Section 2 is intentionally excluded here. Its special action-snapshot
+# renderer already links comma-separated pure ticker rows correctly. Generic
+# markdown linkification breaks that renderer and exposes [TICKER](url) text.
+SECTION_TEXT_BOUNDS = [
     ("## 11. Best New Opportunities", "## 12. Portfolio Rotation Plan"),
+]
+
+SECTION_TABLE_BOUNDS = [
+    ("## 4A. Short Opportunity Radar", "## 5. Key Risks / Invalidators", {"candidate etf"}),
+    (
+        "## 9. Second-Order Effects Map",
+        "## 10. Current Position Review",
+        {"first-order effect", "second-order effect", "likely beneficiaries", "likely losers", "etf implication"},
+    ),
 ]
 
 
@@ -37,6 +46,24 @@ def md_link(ticker: str) -> str:
     return f"[{ticker}]({tv_url(ticker)})"
 
 
+def is_table_line(line: str) -> bool:
+    stripped = line.strip()
+    return stripped.startswith("|") and stripped.endswith("|") and "|" in stripped[1:-1]
+
+
+def is_separator_line(line: str) -> bool:
+    if not is_table_line(line):
+        return False
+    cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+    return all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells)
+
+
+def cell_text(cell: str) -> str:
+    cell = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", cell)
+    cell = cell.replace("**", "").replace("`", "")
+    return re.sub(r"\s+", " ", cell).strip()
+
+
 def _is_inside_existing_link(text: str, start: int, end: int) -> bool:
     prefix = text[max(0, start - 120):start]
     suffix = text[end:min(len(text), end + 120)]
@@ -48,7 +75,9 @@ def _is_inside_existing_link(text: str, start: int, end: int) -> bool:
 
 
 def linkify_segment(segment: str) -> str:
-    ticker_pattern = re.compile(r"(?<![A-Za-z0-9_\]/])\b(" + "|".join(sorted(TICKERS, key=len, reverse=True)) + r")\b(?![A-Za-z0-9_\]])")
+    ticker_pattern = re.compile(
+        r"(?<![A-Za-z0-9_\]/])\b(" + "|".join(sorted(TICKERS, key=len, reverse=True)) + r")\b(?![A-Za-z0-9_\]])"
+    )
     result: list[str] = []
     last = 0
     for match in ticker_pattern.finditer(segment):
@@ -63,8 +92,8 @@ def linkify_segment(segment: str) -> str:
     return "".join(result)
 
 
-def linkify_sections(text: str) -> str:
-    for start_heading, end_heading in SECTION_BOUNDS:
+def linkify_text_sections(text: str) -> str:
+    for start_heading, end_heading in SECTION_TEXT_BOUNDS:
         start = text.find(start_heading)
         if start == -1:
             continue
@@ -77,6 +106,71 @@ def linkify_sections(text: str) -> str:
     return text
 
 
+def split_table_row(row: str) -> list[str]:
+    return row.strip().strip("|").split("|")
+
+
+def join_table_row(cells: list[str]) -> str:
+    return "|" + "|".join(cells) + "|"
+
+
+def linkify_table_block(block: list[str], allowed_headers: set[str]) -> list[str]:
+    if len(block) < 3:
+        return block
+    headers = [cell_text(cell).lower() for cell in split_table_row(block[0])]
+    linkable_indexes = [idx for idx, header in enumerate(headers) if header in allowed_headers]
+    if not linkable_indexes:
+        return block
+
+    out = [block[0], block[1]]
+    for row in block[2:]:
+        cells = split_table_row(row)
+        for idx in linkable_indexes:
+            if idx < len(cells):
+                cells[idx] = linkify_segment(cells[idx])
+        out.append(join_table_row(cells))
+    return out
+
+
+def linkify_tables_in_section(section: str, allowed_headers: set[str]) -> str:
+    lines = section.splitlines()
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        if i + 1 < len(lines) and is_table_line(lines[i]) and is_separator_line(lines[i + 1]):
+            j = i + 2
+            block = [lines[i], lines[i + 1]]
+            while j < len(lines) and is_table_line(lines[j]):
+                block.append(lines[j])
+                j += 1
+            out.extend(linkify_table_block(block, allowed_headers))
+            i = j
+            continue
+        out.append(lines[i])
+        i += 1
+    return "\n".join(out)
+
+
+def linkify_table_sections(text: str) -> str:
+    for start_heading, end_heading, allowed_headers in SECTION_TABLE_BOUNDS:
+        start = text.find(start_heading)
+        if start == -1:
+            continue
+        body_start = start + len(start_heading)
+        end = text.find(end_heading, body_start)
+        if end == -1:
+            continue
+        body = text[body_start:end]
+        text = text[:body_start] + linkify_tables_in_section(body, allowed_headers) + text[end:]
+    return text
+
+
+def linkify_report(text: str) -> str:
+    text = linkify_text_sections(text)
+    text = linkify_table_sections(text)
+    return text
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", default="output")
@@ -85,7 +179,7 @@ def main() -> None:
     output_dir = Path(args.output_dir)
     for pattern in (EN_RE, NL_RE):
         report_path = latest_report(output_dir, pattern)
-        report_path.write_text(linkify_sections(report_path.read_text(encoding="utf-8")), encoding="utf-8")
+        report_path.write_text(linkify_report(report_path.read_text(encoding="utf-8")), encoding="utf-8")
         print(f"ETF_LINKIFY_OK | report={report_path.name}")
 
 
