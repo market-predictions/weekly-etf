@@ -1,0 +1,167 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any
+
+LANE_WEIGHTS = {
+    "structural_strength": 0.18,
+    "persistence": 0.12,
+    "implementation_quality": 0.12,
+    "macro_alignment": 0.18,
+    "second_order_relevance": 0.12,
+    "timing_confirmation": 0.12,
+    "valuation_crowding": 0.08,
+    "portfolio_differentiation": 0.08,
+}
+
+
+@dataclass(frozen=True)
+class LaneContext:
+    held_tickers: set[str]
+    prior_promoted_tickers: set[str]
+    price_status_by_symbol: dict[str, str]
+    priced_symbols: set[str]
+    portfolio_gap_themes: dict[str, int]
+
+
+def _num(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def weighted_lane_score(lane: dict[str, Any]) -> float:
+    score = 0.0
+    for key, weight in LANE_WEIGHTS.items():
+        score += _num(lane.get(key), 0.0) * weight
+    return round(score, 2)
+
+
+def portfolio_gap_score(lane: dict[str, Any], context: LaneContext) -> int:
+    taxonomy = str(lane.get("taxonomy_tag", ""))
+    bucket = str(lane.get("bucket", ""))
+    primary = str(lane.get("primary_etf", "")).upper()
+    alt = str(lane.get("alternative_etf", "")).upper()
+
+    if primary in context.held_tickers or alt in context.held_tickers:
+        return 1
+    return int(context.portfolio_gap_themes.get(taxonomy, context.portfolio_gap_themes.get(bucket, 2)))
+
+
+def pricing_confidence(symbol: str, context: LaneContext) -> str:
+    symbol = symbol.upper()
+    status = context.price_status_by_symbol.get(symbol)
+    if status in {"fresh_close", "fresh_fallback_source"}:
+        return "fresh_priced"
+    if symbol in context.priced_symbols:
+        return "latest_verified_or_challenger_priced"
+    return "not_priced_in_current_audit"
+
+
+def novelty_status(lane: dict[str, Any], context: LaneContext) -> str:
+    configured = lane.get("novelty_status")
+    primary = str(lane.get("primary_etf", "")).upper()
+    alt = str(lane.get("alternative_etf", "")).upper()
+    if primary in context.prior_promoted_tickers or alt in context.prior_promoted_tickers:
+        if configured and str(configured).startswith("retained"):
+            return str(configured)
+        return "retained_memory"
+    return str(configured or "new_or_rotating_challenger")
+
+
+def is_challenger(lane: dict[str, Any], context: LaneContext) -> bool:
+    primary = str(lane.get("primary_etf", "")).upper()
+    alt = str(lane.get("alternative_etf", "")).upper()
+    novelty = novelty_status(lane, context)
+    return (
+        primary not in context.held_tickers
+        and alt not in context.held_tickers
+    ) or "challenger" in novelty or "near_miss" in novelty
+
+
+def adjusted_lane_score(lane: dict[str, Any], context: LaneContext) -> float:
+    base = weighted_lane_score(lane)
+    gap_bonus = min(portfolio_gap_score(lane, context), 5) * 0.03
+    primary_conf = pricing_confidence(str(lane.get("primary_etf", "")), context)
+    price_bonus = 0.05 if primary_conf == "fresh_priced" else 0.02 if primary_conf == "latest_verified_or_challenger_priced" else -0.03
+    novelty = novelty_status(lane, context)
+    novelty_bonus = 0.04 if novelty in {"new_or_rotating_challenger", "rotating_challenger"} else 0.0
+    return round(base + gap_bonus + price_bonus + novelty_bonus, 2)
+
+
+def score_lane(lane: dict[str, Any], context: LaneContext) -> dict[str, Any]:
+    primary = str(lane.get("primary_etf", "")).upper()
+    alt = str(lane.get("alternative_etf", "")).upper()
+    total_score = adjusted_lane_score(lane, context)
+    primary_status = context.price_status_by_symbol.get(primary, "not_in_current_pricing_audit")
+    alt_status = context.price_status_by_symbol.get(alt, "not_in_current_pricing_audit") if alt else "not_applicable"
+    gap = portfolio_gap_score(lane, context)
+    challenger = is_challenger(lane, context)
+    novelty = novelty_status(lane, context)
+
+    output = dict(lane)
+    output.update(
+        {
+            "primary_etf": primary,
+            "alternative_etf": alt,
+            "total_score": total_score,
+            "prior_run_status": novelty,
+            "challenger": challenger,
+            "portfolio_gap_score": gap,
+            "pricing_confidence": pricing_confidence(primary, context),
+            "primary_price_status": primary_status,
+            "alternative_price_status": alt_status,
+            "freshness_note": (
+                "Primary ETF was priced in the current audit."
+                if primary in context.priced_symbols
+                else "Primary ETF was assessed structurally but not priced in the current audit."
+            ),
+        }
+    )
+    return output
+
+
+def select_promoted_lanes(scored: list[dict[str, Any]], required_buckets: list[str]) -> list[dict[str, Any]]:
+    # Start with top lane per required bucket to preserve breadth, then fill by score.
+    selected: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+
+    for bucket in required_buckets:
+        bucket_lanes = [lane for lane in scored if lane.get("bucket") == bucket]
+        if not bucket_lanes:
+            continue
+        top = sorted(bucket_lanes, key=lambda x: float(x.get("total_score", 0.0)), reverse=True)[0]
+        lane_id = str(top.get("taxonomy_tag"))
+        if lane_id not in seen_ids and len(selected) < 5:
+            selected.append(top)
+            seen_ids.add(lane_id)
+
+    for lane in sorted(scored, key=lambda x: float(x.get("total_score", 0.0)), reverse=True):
+        lane_id = str(lane.get("taxonomy_tag"))
+        if lane_id in seen_ids:
+            continue
+        selected.append(lane)
+        seen_ids.add(lane_id)
+        if len(selected) >= 6:
+            break
+
+    # Keep the radar compact but valid: 5-8 promoted lanes.
+    return selected[:8]
+
+
+def apply_promotion_flags(scored: list[dict[str, Any]], promoted: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    promoted_tags = {lane.get("taxonomy_tag") for lane in promoted}
+    output: list[dict[str, Any]] = []
+    for lane in scored:
+        lane = dict(lane)
+        is_promoted = lane.get("taxonomy_tag") in promoted_tags
+        lane["promoted_to_live_radar"] = bool(is_promoted)
+        if is_promoted:
+            lane["rejection_reason"] = ""
+        else:
+            lane.setdefault("rejection_reason", "Scored below the live radar cutoff this run.")
+            if not lane.get("rejection_reason"):
+                lane["rejection_reason"] = "Scored below the live radar cutoff this run."
+        output.append(lane)
+    return output
