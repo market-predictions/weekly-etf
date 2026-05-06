@@ -1,0 +1,35 @@
+{
+  "run_date": "2026-05-06",
+  "requested_close_date": "2026-05-05",
+  "holdings_count": 6,
+  "fresh_holdings_count": 2,
+  "carried_forward_holdings_count": 4,
+  "coverage_count_pct": 33.33,
+  "invested_weight_coverage_pct": 50.00,
+  "decision": "blocked_or_partial",
+  "unresolved_tickers": ["PPA", "PAVE", "URNM", "GLD"],
+  "fx_basis": {"pair": "EUR/USD", "rate": 1.1693, "requested_date": "2026-05-05", "returned_date": "2026-05-05", "source": "ValutaFX / Investing.com cross-check", "status": "fresh_fallback_source", "error": null},
+  "prices": [
+    {"symbol": "SPY", "status": "latest_verified_close", "source": "Investing.com", "source_detail": "latest verified close available from recovered table: 2026-05-04", "requested_close_date": "2026-05-05", "returned_close_date": "2026-05-04", "price": 718.07, "currency": "USD", "confidence": "medium", "carried_forward": true, "error": "2026-05-05 close not recovered with sufficient confidence"},
+    {"symbol": "SMH", "status": "fresh_close", "source": "TECHi historical table", "source_detail": "2026-05-05 close recovered", "requested_close_date": "2026-05-05", "returned_close_date": "2026-05-05", "price": 522.69, "currency": "USD", "confidence": "medium", "carried_forward": false, "error": null},
+    {"symbol": "PPA", "status": "latest_verified_close", "source": "prior verified audit", "source_detail": "latest verified close retained", "requested_close_date": "2026-05-05", "returned_close_date": "2026-05-01", "price": 165.58, "currency": "USD", "confidence": "medium", "carried_forward": true, "error": "2026-05-05 close not recovered with sufficient confidence"},
+    {"symbol": "PAVE", "status": "latest_verified_close", "source": "prior verified audit", "source_detail": "latest verified close retained", "requested_close_date": "2026-05-05", "returned_close_date": "2026-05-04", "price": 56.27, "currency": "USD", "confidence": "medium", "carried_forward": true, "error": "2026-05-05 close not recovered with sufficient confidence"},
+    {"symbol": "URNM", "status": "latest_verified_close", "source": "prior verified audit", "source_detail": "latest verified close retained", "requested_close_date": "2026-05-05", "returned_close_date": "2026-05-01", "price": 67.13, "currency": "USD", "confidence": "medium", "carried_forward": true, "error": "2026-05-05 close not recovered with sufficient confidence"},
+    {"symbol": "GLD", "status": "latest_verified_close", "source": "FinancialContent", "source_detail": "2026-05-04 close recovered; 2026-05-05 table last trade shown but historical close not available", "requested_close_date": "2026-05-05", "returned_close_date": "2026-05-04", "price": 414.71, "currency": "USD", "confidence": "medium", "carried_forward": true, "error": "2026-05-05 close not recovered with sufficient confidence"},
+    {"symbol": "ITA", "status": "latest_verified_close", "source": "prior public recovery", "source_detail": "challenger latest verified close", "requested_close_date": "2026-05-05", "returned_close_date": "2026-04-30", "price": 218.73, "currency": "USD", "confidence": "low", "carried_forward": true, "error": null},
+    {"symbol": "GRID", "status": "priced_but_duel_incomplete", "source": "public quote recovery", "source_detail": "challenger latest verified close", "requested_close_date": "2026-05-05", "returned_close_date": "2026-05-04", "price": 78.11, "currency": "USD", "confidence": "low", "carried_forward": true, "error": null},
+    {"symbol": "GSG", "status": "priced_but_duel_incomplete", "source": "public quote recovery", "source_detail": "challenger latest verified close", "requested_close_date": "2026-05-05", "returned_close_date": "2026-05-04", "price": 21.74, "currency": "USD", "confidence": "low", "carried_forward": true, "error": null},
+    {"symbol": "BIL", "status": "priced_but_duel_incomplete", "source": "public quote recovery", "source_detail": "challenger latest verified close", "requested_close_date": "2026-05-05", "returned_close_date": "2026-05-04", "price": 91.62, "currency": "USD", "confidence": "low", "carried_forward": true, "error": null},
+    {"symbol": "QUAL", "status": "priced_but_duel_incomplete", "source": "public quote recovery", "source_detail": "challenger latest verified close", "requested_close_date": "2026-05-05", "returned_close_date": "2026-05-04", "price": 192.55, "currency": "USD", "confidence": "low", "carried_forward": true, "error": null},
+    {"symbol": "IEFA", "status": "priced_but_duel_incomplete", "source": "public quote recovery", "source_detail": "challenger latest verified close", "requested_close_date": "2026-05-05", "returned_close_date": "2026-05-04", "price": 84.13, "currency": "USD", "confidence": "low", "carried_forward": true, "error": null}
+  ],
+  "holdings": [
+    {"ticker": "SPY", "shares": 41, "previous_price_local": 718.07, "currency": "USD", "previous_market_value_local": 29440.87, "previous_market_value_eur": 25178.20, "previous_weight_pct": 24.18},
+    {"ticker": "SMH", "shares": 58, "previous_price_local": 522.69, "currency": "USD", "previous_market_value_local": 30316.02, "previous_market_value_eur": 25926.64, "previous_weight_pct": 24.90},
+    {"ticker": "PPA", "shares": 110, "previous_price_local": 165.58, "currency": "USD", "previous_market_value_local": 18213.80, "previous_market_value_eur": 15576.67, "previous_weight_pct": 14.96},
+    {"ticker": "PAVE", "shares": 311, "previous_price_local": 56.27, "currency": "USD", "previous_market_value_local": 17499.97, "previous_market_value_eur": 14966.19, "previous_weight_pct": 14.37},
+    {"ticker": "URNM", "shares": 171, "previous_price_local": 67.13, "currency": "USD", "previous_market_value_local": 11479.23, "previous_market_value_eur": 9817.18, "previous_weight_pct": 9.43},
+    {"ticker": "GLD", "shares": 29, "previous_price_local": 414.71, "currency": "USD", "previous_market_value_local": 12026.59, "previous_market_value_eur": 10285.29, "previous_weight_pct": 9.88}
+  ],
+  "price_results": []
+}
