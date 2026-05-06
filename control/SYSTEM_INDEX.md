@@ -21,7 +21,7 @@ Always distinguish:
 
 ## Session start rule
 
-For ETF architecture, debugging, prompt, workflow, state, pricing, or delivery work, read in this order:
+For ETF architecture, debugging, prompt, workflow, state, pricing, discovery, or delivery work, read in this order:
 
 1. `control/SYSTEM_INDEX.md`
 2. `control/CURRENT_STATE.md`
@@ -32,9 +32,15 @@ For ETF architecture, debugging, prompt, workflow, state, pricing, or delivery w
 
 - `etf.txt` — production masterprompt for the Weekly ETF Review.
 - `control/CAPITAL_REUNDERWRITING_RULES.md` — authoritative decision-framework addendum for fresh-cash tests, action clocks, hedge checks, factor-overlap checks, cash policy, and recommendation discipline.
+- `control/LANE_DISCOVERY_CONTRACT.md` — authoritative discovery contract for broad ETF lane scanning and novelty/challenger rules.
 - `control/ETF_RUNTIME_STATE_CONTRACT.md` — runtime input/state authority contract.
+- `config/etf_discovery_universe.yml` — broad investable ETF lane universe used by discovery.
+- `runtime/discover_etf_lanes.py` — lane discovery runtime that writes the matching lane artifact.
+- `runtime/score_etf_lanes.py` — deterministic lane scoring and promotion logic.
 - `runtime/build_etf_report_state.py` — deterministic runtime state builder.
 - `runtime/render_etf_report_from_state.py` — runtime-driven English/Dutch markdown renderer.
+- `runtime/polish_runtime_reports.py` — post-render editorial polish layer.
+- `runtime/link_runtime_report_tickers.py` — context-aware ticker linkification layer.
 - `etf-pro.txt` — premium English editorial delivery layer.
 - `etf-pro-nl.txt` — Dutch companion delivery layer derived from the completed English report.
 - `send_report.py` — HTML/PDF/email delivery logic and manifest handling.
@@ -50,7 +56,7 @@ For ETF architecture, debugging, prompt, workflow, state, pricing, or delivery w
 - `output/etf_trade_ledger.csv` — machine-readable executed-change ledger.
 - `output/etf_recommendation_scorecard.csv` — machine-readable recommendation discipline and capital re-underwriting memory.
 - `output/pricing/` — persisted pricing audits.
-- `output/lane_reviews/` — machine-readable lane assessment artifacts.
+- `output/lane_reviews/` — machine-readable lane assessment artifacts created by the lane discovery engine.
 - `output/runtime/` — normalized runtime state artifacts.
 
 ## State-model scripts
@@ -78,6 +84,7 @@ Lab outputs are never production truth unless explicitly promoted through a revi
 - Do not claim email delivery without a receipt or manifest.
 - Do not let `Hold but replaceable` become indefinite inertia; apply `control/CAPITAL_REUNDERWRITING_RULES.md`.
 - Do not use markdown as the primary pricing or holdings database once runtime state is available.
+- Do not treat the Structural Opportunity Radar as a static memory list; run the lane discovery engine before runtime state build.
 
 ## Current direction of travel
 
@@ -87,6 +94,6 @@ ETF is moving toward:
 - ChatGPT Project as workbench
 - explicit pricing/state artifacts
 - runtime-derived English canonical report plus Dutch companion
-- lane assessment artifacts for breadth discipline
+- lane discovery artifacts for breadth, novelty, and challenger discipline
 - recommendation scorecard artifacts for capital discipline
 - lab-only optimization as a QA/research surface, not a production allocator
