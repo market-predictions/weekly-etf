@@ -1,0 +1,474 @@
+required_breadth_buckets:
+  - ai_digital_infrastructure
+  - defense_resilience
+  - grid_power_electrification
+  - uranium_nuclear
+  - agriculture_food_security
+  - water
+  - china
+  - india_regional_industrialization
+  - biotech_healthcare_innovation
+  - fintech_financial_infrastructure
+  - robotics_automation
+  - critical_minerals_materials
+
+portfolio_gap_themes:
+  non_us_developed_equities: 5
+  broad_commodities: 4
+  cash_like_ballast: 4
+  water: 3
+  agriculture_food_security: 3
+  healthcare_innovation: 3
+  cyber_security: 3
+  europe_defense_industry: 3
+
+lanes:
+  - lane_name: AI compute infrastructure
+    taxonomy_tag: ai_compute_infrastructure
+    bucket: ai_digital_infrastructure
+    primary_etf: SMH
+    alternative_etf: SOXX
+    discovery_source: retained_memory_plus_pricing_scan
+    novelty_status: retained
+    evidence_summary: Semiconductor and AI capex remains the cleanest funded structural growth lane.
+    why_now: AI infrastructure leadership remains persistent, but position-size discipline matters.
+    structural_strength: 5
+    persistence: 5
+    implementation_quality: 5
+    macro_alignment: 5
+    second_order_relevance: 5
+    timing_confirmation: 5
+    valuation_crowding: 3
+    portfolio_differentiation: 3
+
+  - lane_name: Cybersecurity resilience
+    taxonomy_tag: cyber_security
+    bucket: ai_digital_infrastructure
+    primary_etf: CIBR
+    alternative_etf: BUG
+    discovery_source: portfolio_gap_challenger
+    novelty_status: rotating_challenger
+    evidence_summary: Cyber spend is linked to AI, cloud, data-center and geopolitical resilience.
+    why_now: Offers digital-infrastructure exposure with less direct semiconductor cyclicality.
+    structural_strength: 4
+    persistence: 5
+    implementation_quality: 4
+    macro_alignment: 4
+    second_order_relevance: 4
+    timing_confirmation: 3
+    valuation_crowding: 3
+    portfolio_differentiation: 5
+
+  - lane_name: Defense innovation / sovereign resilience
+    taxonomy_tag: defense_resilience
+    bucket: defense_resilience
+    primary_etf: PPA
+    alternative_etf: ITA
+    discovery_source: retained_memory_plus_replacement_duel
+    novelty_status: retained_under_review
+    evidence_summary: Defense spending remains structurally durable, but vehicle selection must be proven.
+    why_now: The lane remains relevant, but PPA must justify itself versus ITA.
+    structural_strength: 5
+    persistence: 5
+    implementation_quality: 3
+    macro_alignment: 3
+    second_order_relevance: 4
+    timing_confirmation: 3
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Europe defense and security rearmament
+    taxonomy_tag: europe_defense_industry
+    bucket: defense_resilience
+    primary_etf: DFEN
+    alternative_etf: NATO
+    discovery_source: geopolitical_challenger
+    novelty_status: new_or_rotating_challenger
+    evidence_summary: European rearmament is a structurally distinct defense impulse from broad U.S. aerospace exposure.
+    why_now: If European fiscal defense commitments accelerate, regional exposure could diversify PPA/ITA.
+    structural_strength: 4
+    persistence: 4
+    implementation_quality: 2
+    macro_alignment: 3
+    second_order_relevance: 4
+    timing_confirmation: 2
+    valuation_crowding: 2
+    portfolio_differentiation: 5
+
+  - lane_name: Grid buildout / electrification
+    taxonomy_tag: grid_power
+    bucket: grid_power_electrification
+    primary_etf: PAVE
+    alternative_etf: GRID
+    discovery_source: retained_memory_plus_replacement_duel
+    novelty_status: retained_under_review
+    evidence_summary: Power demand, grid bottlenecks and reshoring capex support infrastructure spend.
+    why_now: PAVE remains useful, but GRID is the cleaner thematic challenger.
+    structural_strength: 5
+    persistence: 5
+    implementation_quality: 4
+    macro_alignment: 4
+    second_order_relevance: 4
+    timing_confirmation: 4
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Power infrastructure and utilities capex
+    taxonomy_tag: power_utilities_capex
+    bucket: grid_power_electrification
+    primary_etf: XLU
+    alternative_etf: VPU
+    discovery_source: macro_challenger
+    novelty_status: rotating_challenger
+    evidence_summary: AI data-center power demand can also support regulated utilities and transmission spend.
+    why_now: Offers a more defensive grid-adjacent expression if cyclicals weaken.
+    structural_strength: 3
+    persistence: 4
+    implementation_quality: 5
+    macro_alignment: 3
+    second_order_relevance: 4
+    timing_confirmation: 3
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Uranium / nuclear fuel cycle
+    taxonomy_tag: uranium_nuclear
+    bucket: uranium_nuclear
+    primary_etf: URNM
+    alternative_etf: URA
+    discovery_source: retained_memory_plus_structural_scan
+    novelty_status: retained
+    evidence_summary: Nuclear fuel security remains a structural energy-security lane.
+    why_now: Long-cycle thesis remains valid, but timing is less urgent than semis or grid.
+    structural_strength: 4
+    persistence: 4
+    implementation_quality: 4
+    macro_alignment: 4
+    second_order_relevance: 4
+    timing_confirmation: 3
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Nuclear utilities and clean baseload
+    taxonomy_tag: nuclear_utilities
+    bucket: uranium_nuclear
+    primary_etf: NLR
+    alternative_etf: NUCL
+    discovery_source: thematic_challenger
+    novelty_status: rotating_challenger
+    evidence_summary: Baseload scarcity and AI power demand can broaden nuclear exposure beyond miners.
+    why_now: Can diversify URNM if fuel-cycle volatility is too high.
+    structural_strength: 4
+    persistence: 4
+    implementation_quality: 3
+    macro_alignment: 3
+    second_order_relevance: 4
+    timing_confirmation: 2
+    valuation_crowding: 3
+    portfolio_differentiation: 5
+
+  - lane_name: Food security / agriculture inputs
+    taxonomy_tag: agri_food_security
+    bucket: agriculture_food_security
+    primary_etf: MOO
+    alternative_etf: VEGI
+    discovery_source: breadth_challenger
+    novelty_status: near_miss
+    evidence_summary: Agriculture inputs and food security remain structurally relevant but timing is not yet superior.
+    why_now: Becomes more relevant if energy, fertilizer or crop stress rises.
+    structural_strength: 4
+    persistence: 4
+    implementation_quality: 3
+    macro_alignment: 3
+    second_order_relevance: 4
+    timing_confirmation: 3
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Agricultural commodities
+    taxonomy_tag: agriculture_commodities
+    bucket: agriculture_food_security
+    primary_etf: DBA
+    alternative_etf: CORN
+    discovery_source: commodity_challenger
+    novelty_status: rotating_challenger
+    evidence_summary: Direct crop exposure can hedge food inflation differently than agribusiness equities.
+    why_now: Useful only if commodity stress becomes visible.
+    structural_strength: 3
+    persistence: 3
+    implementation_quality: 3
+    macro_alignment: 3
+    second_order_relevance: 4
+    timing_confirmation: 2
+    valuation_crowding: 3
+    portfolio_differentiation: 5
+
+  - lane_name: Water infrastructure / treatment
+    taxonomy_tag: water_infrastructure
+    bucket: water
+    primary_etf: FIW
+    alternative_etf: PHO
+    discovery_source: breadth_challenger
+    novelty_status: near_miss
+    evidence_summary: Water scarcity and treatment capex remain durable, but near-term leadership is modest.
+    why_now: Moves up if relative strength improves versus PAVE/GRID.
+    structural_strength: 4
+    persistence: 5
+    implementation_quality: 4
+    macro_alignment: 3
+    second_order_relevance: 3
+    timing_confirmation: 2
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Water utilities / defensive infrastructure
+    taxonomy_tag: water_utilities
+    bucket: water
+    primary_etf: PHO
+    alternative_etf: CGW
+    discovery_source: defensive_challenger
+    novelty_status: rotating_challenger
+    evidence_summary: Water utilities provide a defensive variant of infrastructure exposure.
+    why_now: More useful if equity beta weakens and defensive infrastructure improves.
+    structural_strength: 4
+    persistence: 5
+    implementation_quality: 3
+    macro_alignment: 2
+    second_order_relevance: 3
+    timing_confirmation: 2
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: China platform / policy reset
+    taxonomy_tag: china_policy_recovery
+    bucket: china
+    primary_etf: KWEB
+    alternative_etf: MCHI
+    discovery_source: breadth_challenger
+    novelty_status: near_miss
+    evidence_summary: China beta remains cheap but policy and earnings confirmation are not sufficient.
+    why_now: Needs durable policy support and stronger earnings momentum.
+    structural_strength: 3
+    persistence: 3
+    implementation_quality: 3
+    macro_alignment: 2
+    second_order_relevance: 3
+    timing_confirmation: 2
+    valuation_crowding: 3
+    portfolio_differentiation: 5
+
+  - lane_name: China hard-asset demand recovery
+    taxonomy_tag: china_materials_recovery
+    bucket: china
+    primary_etf: MCHI
+    alternative_etf: FXI
+    discovery_source: macro_challenger
+    novelty_status: rotating_challenger
+    evidence_summary: China recovery would transmit through materials, EM and industrial commodity demand.
+    why_now: Still needs policy confirmation and USD relief.
+    structural_strength: 3
+    persistence: 3
+    implementation_quality: 4
+    macro_alignment: 2
+    second_order_relevance: 4
+    timing_confirmation: 2
+    valuation_crowding: 3
+    portfolio_differentiation: 5
+
+  - lane_name: India industrialization / capex
+    taxonomy_tag: india_industrialization
+    bucket: india_regional_industrialization
+    primary_etf: INDA
+    alternative_etf: EPI
+    discovery_source: breadth_challenger
+    novelty_status: near_miss
+    evidence_summary: India capex remains a regional structural growth lane with diversification value.
+    why_now: Needs better entry levels or stronger relative momentum.
+    structural_strength: 4
+    persistence: 4
+    implementation_quality: 4
+    macro_alignment: 3
+    second_order_relevance: 3
+    timing_confirmation: 3
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Non-U.S. developed market diversification
+    taxonomy_tag: non_us_developed_equities
+    bucket: india_regional_industrialization
+    primary_etf: IEFA
+    alternative_etf: EFA
+    discovery_source: portfolio_gap_challenger
+    novelty_status: retained_challenger
+    evidence_summary: Zero non-U.S. equity exposure is an implicit U.S.-exceptionalism bet.
+    why_now: Becomes fundable if U.S. factor concentration rises or non-U.S. breadth improves.
+    structural_strength: 3
+    persistence: 3
+    implementation_quality: 5
+    macro_alignment: 3
+    second_order_relevance: 3
+    timing_confirmation: 3
+    valuation_crowding: 4
+    portfolio_differentiation: 5
+
+  - lane_name: Biotech innovation / therapeutic platforms
+    taxonomy_tag: biotech_innovation
+    bucket: biotech_healthcare_innovation
+    primary_etf: XBI
+    alternative_etf: IBB
+    discovery_source: breadth_challenger
+    novelty_status: near_miss
+    evidence_summary: Biotech remains a long-duration innovation lane but needs risk appetite.
+    why_now: Can become attractive if breadth improves and rates ease.
+    structural_strength: 4
+    persistence: 4
+    implementation_quality: 4
+    macro_alignment: 3
+    second_order_relevance: 3
+    timing_confirmation: 2
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Healthcare quality and defensive growth
+    taxonomy_tag: healthcare_quality
+    bucket: biotech_healthcare_innovation
+    primary_etf: XLV
+    alternative_etf: VHT
+    discovery_source: defensive_challenger
+    novelty_status: rotating_challenger
+    evidence_summary: Healthcare quality can provide defensive growth without speculative biotech beta.
+    why_now: More useful if broad equity leadership narrows further.
+    structural_strength: 3
+    persistence: 4
+    implementation_quality: 5
+    macro_alignment: 3
+    second_order_relevance: 3
+    timing_confirmation: 3
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Fintech / payments rails
+    taxonomy_tag: fintech_infrastructure
+    bucket: fintech_financial_infrastructure
+    primary_etf: FINX
+    alternative_etf: ARKF
+    discovery_source: breadth_challenger
+    novelty_status: near_miss
+    evidence_summary: Payments infrastructure remains structurally relevant but lower urgency.
+    why_now: Needs transaction-growth leadership and better price action.
+    structural_strength: 3
+    persistence: 4
+    implementation_quality: 3
+    macro_alignment: 3
+    second_order_relevance: 3
+    timing_confirmation: 2
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Financial infrastructure and market plumbing
+    taxonomy_tag: financial_market_plumbing
+    bucket: fintech_financial_infrastructure
+    primary_etf: KCE
+    alternative_etf: IAI
+    discovery_source: structural_challenger
+    novelty_status: rotating_challenger
+    evidence_summary: Exchanges, brokers and market infrastructure benefit from volatility and capital-market activity.
+    why_now: Useful diversifier if financial infrastructure earnings broaden.
+    structural_strength: 3
+    persistence: 4
+    implementation_quality: 3
+    macro_alignment: 3
+    second_order_relevance: 4
+    timing_confirmation: 3
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Robotics / automation
+    taxonomy_tag: robotics_automation
+    bucket: robotics_automation
+    primary_etf: BOTZ
+    alternative_etf: ROBO
+    discovery_source: breadth_challenger
+    novelty_status: near_miss
+    evidence_summary: Automation is a structural productivity lane but overlaps partly with AI hardware.
+    why_now: Needs industrial capex breadth and ETF momentum.
+    structural_strength: 4
+    persistence: 4
+    implementation_quality: 3
+    macro_alignment: 3
+    second_order_relevance: 3
+    timing_confirmation: 2
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Industrial automation and factory software
+    taxonomy_tag: factory_automation
+    bucket: robotics_automation
+    primary_etf: ROBO
+    alternative_etf: IRBO
+    discovery_source: industrial_challenger
+    novelty_status: rotating_challenger
+    evidence_summary: Automation capex can broaden beyond semiconductors into industrial productivity.
+    why_now: Needs clearer industrial order momentum.
+    structural_strength: 4
+    persistence: 4
+    implementation_quality: 3
+    macro_alignment: 3
+    second_order_relevance: 3
+    timing_confirmation: 2
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Critical minerals / copper / refining
+    taxonomy_tag: critical_minerals
+    bucket: critical_minerals_materials
+    primary_etf: REMX
+    alternative_etf: PICK
+    discovery_source: breadth_challenger
+    novelty_status: near_miss
+    evidence_summary: Critical mineral supply chains matter for electrification, defense and grid capex.
+    why_now: Needs supply-chain policy plus price momentum.
+    structural_strength: 4
+    persistence: 4
+    implementation_quality: 3
+    macro_alignment: 3
+    second_order_relevance: 4
+    timing_confirmation: 2
+    valuation_crowding: 3
+    portfolio_differentiation: 4
+
+  - lane_name: Copper and electrification materials
+    taxonomy_tag: copper_electrification
+    bucket: critical_minerals_materials
+    primary_etf: COPX
+    alternative_etf: PICK
+    discovery_source: commodity_challenger
+    novelty_status: rotating_challenger
+    evidence_summary: Copper transmits grid, AI power and electrification demand into commodity equities.
+    why_now: Becomes more fundable if copper momentum and China demand confirm.
+    structural_strength: 4
+    persistence: 4
+    implementation_quality: 3
+    macro_alignment: 3
+    second_order_relevance: 5
+    timing_confirmation: 3
+    valuation_crowding: 3
+    portfolio_differentiation: 5
+
+  - lane_name: Broad commodity inflation hedge
+    taxonomy_tag: broad_commodities
+    bucket: critical_minerals_materials
+    primary_etf: GSG
+    alternative_etf: DBC
+    discovery_source: portfolio_gap_challenger
+    novelty_status: rotating_challenger
+    evidence_summary: Broad commodities may hedge inflation better than single-metal or single-gold exposure.
+    why_now: Useful only if commodity breadth confirms.
+    structural_strength: 3
+    persistence: 3
+    implementation_quality: 4
+    macro_alignment: 3
+    second_order_relevance: 4
+    timing_confirmation: 3
+    valuation_crowding: 3
+    portfolio_differentiation: 5
