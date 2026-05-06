@@ -54,6 +54,7 @@ jobs:
         run: |
           python -m runtime.build_etf_report_state
           python -m runtime.render_etf_report_from_state --output-dir output
+          python -m runtime.polish_runtime_reports --output-dir output
 
       - name: Validate persisted pricing audit after runtime render
         run: |
