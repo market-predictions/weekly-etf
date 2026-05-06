@@ -52,6 +52,13 @@ jobs:
         run: |
           python pricing/validate_persisted_audit.py
 
+      - name: Build runtime ETF state and reports
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python -m runtime.build_etf_report_state
+          python -m runtime.render_etf_report_from_state --output-dir output
+
       - name: Validate lane breadth proof before render
         env:
           MRKT_RPRTS_REPORT_MODE: pro

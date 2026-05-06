@@ -32,6 +32,9 @@ For ETF architecture, debugging, prompt, workflow, state, pricing, or delivery w
 
 - `etf.txt` — production masterprompt for the Weekly ETF Review.
 - `control/CAPITAL_REUNDERWRITING_RULES.md` — authoritative decision-framework addendum for fresh-cash tests, action clocks, hedge checks, factor-overlap checks, cash policy, and recommendation discipline.
+- `control/ETF_RUNTIME_STATE_CONTRACT.md` — runtime input/state authority contract.
+- `runtime/build_etf_report_state.py` — deterministic runtime state builder.
+- `runtime/render_etf_report_from_state.py` — runtime-driven English/Dutch markdown renderer.
 - `etf-pro.txt` — premium English editorial delivery layer.
 - `etf-pro-nl.txt` — Dutch companion delivery layer derived from the completed English report.
 - `send_report.py` — HTML/PDF/email delivery logic and manifest handling.
@@ -48,6 +51,7 @@ For ETF architecture, debugging, prompt, workflow, state, pricing, or delivery w
 - `output/etf_recommendation_scorecard.csv` — machine-readable recommendation discipline and capital re-underwriting memory.
 - `output/pricing/` — persisted pricing audits.
 - `output/lane_reviews/` — machine-readable lane assessment artifacts.
+- `output/runtime/` — normalized runtime state artifacts.
 
 ## State-model scripts
 
@@ -73,6 +77,7 @@ Lab outputs are never production truth unless explicitly promoted through a revi
 - Do not let the Dutch companion become an independent research pass.
 - Do not claim email delivery without a receipt or manifest.
 - Do not let `Hold but replaceable` become indefinite inertia; apply `control/CAPITAL_REUNDERWRITING_RULES.md`.
+- Do not use markdown as the primary pricing or holdings database once runtime state is available.
 
 ## Current direction of travel
 
@@ -81,7 +86,7 @@ ETF is moving toward:
 - GitHub as external source of truth
 - ChatGPT Project as workbench
 - explicit pricing/state artifacts
-- English canonical report plus Dutch companion
+- runtime-derived English canonical report plus Dutch companion
 - lane assessment artifacts for breadth discipline
 - recommendation scorecard artifacts for capital discipline
 - lab-only optimization as a QA/research surface, not a production allocator
