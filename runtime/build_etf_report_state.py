@@ -49,6 +49,15 @@ def discover_sources() -> RuntimeSources:
     )
 
 
+def _fx_rate(pricing_audit: dict[str, Any]) -> float | None:
+    fx_basis = pricing_audit.get("fx_basis") or {}
+    raw = fx_basis.get("rate")
+    try:
+        return None if raw is None else float(raw)
+    except (TypeError, ValueError):
+        return None
+
+
 def build_runtime_state() -> dict[str, Any]:
     sources = discover_sources()
 
@@ -59,6 +68,7 @@ def build_runtime_state() -> dict[str, Any]:
 
     holdings = pricing_audit.get("holdings", [])
     prices = pricing_audit.get("prices", [])
+    fx_basis = pricing_audit.get("fx_basis") or {}
 
     duel_candidates = []
     challenger_map = {
@@ -106,6 +116,14 @@ def build_runtime_state() -> dict[str, Any]:
             "total_portfolio_value_eur": round(total_portfolio_value_eur, 2),
             "base_currency": "EUR",
         },
+        "fx_basis": {
+            "pair": fx_basis.get("pair", "EUR/USD"),
+            "rate": _fx_rate(pricing_audit),
+            "requested_date": fx_basis.get("requested_date"),
+            "returned_date": fx_basis.get("returned_date"),
+            "source": fx_basis.get("source"),
+            "status": fx_basis.get("status"),
+        },
         "positions": holdings,
         "pricing": prices,
         "lane_assessment": lane_assessment,
@@ -115,6 +133,7 @@ def build_runtime_state() -> dict[str, Any]:
             "pricing_audit_valid": bool(pricing_audit.get("holdings")),
             "lane_assessment_present": bool(lane_assessment.get("assessed_lanes")),
             "scorecard_present": len(recommendation_scorecard) > 0,
+            "fx_rate_present": _fx_rate(pricing_audit) is not None,
         },
     }
 
