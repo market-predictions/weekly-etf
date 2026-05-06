@@ -19,6 +19,18 @@ REQUIRED_BREADTH_BUCKETS = {
     "critical_minerals_materials",
 }
 
+DISCOVERY_REQUIRED_FIELDS = {
+    "discovery_source",
+    "novelty_status",
+    "portfolio_gap_score",
+    "pricing_confidence",
+    "primary_price_status",
+    "alternative_price_status",
+    "evidence_summary",
+    "why_now",
+    "freshness_note",
+}
+
 CANONICAL_ENGLISH_REPORT_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 
 
@@ -49,6 +61,11 @@ def validate_report_breadth_proof(md_text: str, report_path: Path) -> None:
             f"Breadth artifact mismatch: artifact report_filename={data.get('report_filename')} but report is {report_path.name}."
         )
 
+    if not data.get("discovery_engine_version"):
+        raise RuntimeError("Breadth artifact missing discovery_engine_version; lane discovery engine did not run.")
+    if not data.get("discovery_inputs"):
+        raise RuntimeError("Breadth artifact missing discovery_inputs; discovery provenance is unavailable.")
+
     lanes = data.get("assessed_lanes", [])
     if len(lanes) < len(REQUIRED_BREADTH_BUCKETS):
         raise RuntimeError(
@@ -63,10 +80,27 @@ def validate_report_breadth_proof(md_text: str, report_path: Path) -> None:
             + ", ".join(sorted(missing_buckets))
         )
 
+    for lane in lanes:
+        missing_fields = [field for field in DISCOVERY_REQUIRED_FIELDS if field not in lane]
+        if missing_fields:
+            raise RuntimeError(
+                f"Breadth artifact lane {lane.get('lane_name')} missing discovery fields: "
+                + ", ".join(sorted(missing_fields))
+            )
+
     challengers = [lane for lane in lanes if lane.get("challenger") is True]
     if len(challengers) < 4:
         raise RuntimeError(
             f"Breadth artifact incomplete: expected at least 4 challengers, found {len(challengers)}."
+        )
+
+    non_memory_challengers = [
+        lane for lane in challengers
+        if str(lane.get("novelty_status", "")).lower() not in {"retained", "retained_memory", "retained_under_review"}
+    ]
+    if len(non_memory_challengers) < 2:
+        raise RuntimeError(
+            f"Discovery artifact too static: expected at least 2 non-memory challengers, found {len(non_memory_challengers)}."
         )
 
     promoted = [lane for lane in lanes if lane.get("promoted_to_live_radar") is True]
