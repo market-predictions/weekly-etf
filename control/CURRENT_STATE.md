@@ -1,7 +1,7 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-05-05
+2026-05-06
 
 ## What this repository currently is
 
@@ -9,10 +9,17 @@ This repository is a production-style weekly ETF review system with:
 
 - `etf.txt` as the production masterprompt
 - `control/CAPITAL_REUNDERWRITING_RULES.md` as the decision-framework addendum for model discipline
+- `control/LANE_DISCOVERY_CONTRACT.md` as the discovery-layer contract
+- `control/ETF_RUNTIME_STATE_CONTRACT.md` as the runtime state contract
+- `config/etf_discovery_universe.yml` as the broad investable lane universe
+- `runtime/discover_etf_lanes.py` and `runtime/score_etf_lanes.py` as the lane discovery/scoring engine
+- `runtime/build_etf_report_state.py` as the deterministic runtime state builder
+- `runtime/render_etf_report_from_state.py` as the English/Dutch runtime renderer
+- `runtime/polish_runtime_reports.py` as the editorial polish layer
+- `runtime/link_runtime_report_tickers.py` as the context-aware ticker link layer
 - `etf-pro.txt` and `etf-pro-nl.txt` as premium English/Dutch delivery layers
 - `send_report.py` as the delivery/rendering script
 - `.github/workflows/send-weekly-report.yml` as the production send workflow
-- `.github/workflows/refresh-etf-state-from-report.yml` as the explicit state refresh workflow
 - a pricing subsystem in `pricing/`
 - archived reports in `output/`
 - pricing audits in `output/pricing/`
@@ -22,106 +29,78 @@ This repository is a production-style weekly ETF review system with:
   - `output/etf_valuation_history.csv`
   - `output/etf_trade_ledger.csv`
   - `output/etf_recommendation_scorecard.csv`
-- state derivation scripts:
-  - `tools/write_etf_minimum_state.py`
-  - `tools/write_etf_trade_ledger.py`
-  - `tools/write_etf_recommendation_scorecard.py`
-- a lab-only optimization layer using PyPortfolioOpt and yfinance history fetches
 
 ## What changed in this step
 
-This update implements the **capital discipline / re-underwriting upgrade** requested after the first-principles review of the portfolio.
+This update implements the first production lane discovery engine.
 
 The key additions are:
 
-- a new authoritative control addendum: `control/CAPITAL_REUNDERWRITING_RULES.md`
-- a new machine-readable recommendation memory file: `output/etf_recommendation_scorecard.csv`
-- a new writer: `tools/write_etf_recommendation_scorecard.py`
-- send-path validation that the latest report can derive the recommendation scorecard before email delivery
-- state-refresh workflow support so the scorecard is refreshed and committed with the other ETF state files
-- updated control docs that make the capital re-underwriting layer explicit
-
-The model-discipline upgrade adds these concepts to the ETF Review OS:
-
-- fresh cash test
-- thesis versus implementation split
-- direct alternative duel for replaceable or weak holdings
-- factor-overlap test
-- hedge validity test
-- cash policy test
-- action-clock / inertia test
-- deterministic re-underwriting triggers
+- `control/LANE_DISCOVERY_CONTRACT.md`
+- `config/etf_discovery_universe.yml`
+- `runtime/discover_etf_lanes.py`
+- `runtime/score_etf_lanes.py`
+- workflow step: `Discover and score ETF opportunity lanes`
+- stricter `validate_lane_breadth.py` discovery metadata validation
 
 ## Why this matters
 
-The latest portfolio critique identified a real process risk: a position could be called `Hold but replaceable`, weakening, or difficult to reprice, while still remaining unchanged for repeated runs.
+The Structural Opportunity Radar had become structurally valid but too static. It proved that required buckets were present, but did not prove that a broad discovery process had run.
 
-That is not enough for a premium allocation model.
+The new discovery layer moves the radar from:
 
-This upgrade makes `Hold` harder to hide behind:
+- memory + fixed taxonomy + manually retained lane artifact
 
-- weak holdings must be re-underwritten
-- replaceable holdings must carry a timer and best alternative
-- hedges must prove hedge usefulness
-- factor overlap must be visible
-- cash must be explained as a deliberate choice
-- the recommendation scorecard preserves this discipline across runs
+toward:
+
+- broad ETF universe + pricing context + portfolio gaps + novelty/challenger scoring + machine-readable lane artifact
 
 ## Current strengths
 
-- Strong executive look and feel in the ETF report family.
-- English canonical + Dutch companion delivery model exists.
-- Pricing audit layer exists and is used operationally.
-- Lane breadth artifact layer exists.
-- Explicit ETF state files now cover portfolio state, valuation history, trade ledger, and recommendation discipline.
-- Send workflow validates pricing, lane breadth, bilingual pairing, renderability, ETF state derivation, trade ledger derivation, and recommendation scorecard derivation before delivery.
-- State refresh workflow can now commit the recommendation scorecard alongside the other state files.
+- Runtime pipeline has successfully delivered bilingual reports.
+- Pricing pass and validation run before render/send.
+- Lane discovery now runs before runtime state build.
+- Lane artifact now includes discovery provenance and novelty metadata.
+- Breadth validation now checks discovery metadata, not just static bucket coverage.
+- Portfolio/radar reporting no longer needs manually patched markdown to pass.
 
 ## Current weaknesses
 
-### 1. `etf.txt` remains a production monolith
-The production masterprompt still mixes decision framework, state rules, output rules, and runbook rules.
+### 1. Discovery is still config-driven, not fully market-history-driven
+The discovery universe is now broad, but the first engine still uses configured priors and latest pricing availability. It does not yet compute true 1-month and 3-month relative strength rankings from historical ETF prices.
 
-The capital discipline logic is now represented in a separate control addendum instead of fully decomposing the monolith.
+### 2. ETF universe is broader but still curated
+`config/etf_discovery_universe.yml` is the first broad universe. It needs periodic expansion and review.
 
-### 2. Recommendation scorecard is still report-derived
-The scorecard currently derives from the canonical English report. It is a major improvement for state memory, but it is not yet an independent implementation engine.
+### 3. Challenger pricing coverage is limited by the current pricing pass
+The discovery engine can score and rotate challengers, but not every challenger has fresh same-day pricing unless the pricing pass includes it.
 
-### 3. Alternative duel scoring is not yet fully data-backed
-The scorecard stores best alternative and required next action, but true 1-month / 3-month relative strength comparison still needs better machine-readable market history.
-
-### 4. Factor exposure is rule-derived, not holdings-lookthrough-derived
-The factor overlap flags are useful and deterministic, but still approximate. A future layer could add underlying ETF holdings/factor lookthrough if needed.
-
-### 5. Delivery trigger behavior still needs validation
-Recent delivery attempts showed that GitHub Actions visibility and triggering may not always be obvious through the connector. Production email success must still be verified from real workflow logs or manifests.
+### 4. Fundamental evidence is encoded, not fetched live
+The first engine stores evidence summaries and why-now fields, but does not yet fetch current macro/fundamental news or official data automatically.
 
 ## Immediate priorities
 
-### Priority A — validate scorecard derivation on the next live report
+### Priority A — run one live workflow after lane discovery merge
 Confirm that:
-- `tools/write_etf_recommendation_scorecard.py --check-only` passes before send
-- `output/etf_recommendation_scorecard.csv` refreshes after report publication
-- flagged holdings are sensible and not noisy
+- lane discovery writes a matching artifact
+- runtime state uses the newly written artifact
+- breadth validation passes with discovery metadata
+- report is delivered
 
-### Priority B — use the next ETF report to force decisions on weak/replaceable holdings
-The next report should explicitly apply the new discipline to:
-- SPY factor overlap versus SMH
-- PPA re-underwriting versus ITA
-- PAVE replaceability versus GRID
-- GLD hedge validity and pricing confidence
-- cash policy versus actionable SMH / URNM lanes
+### Priority B — inspect radar freshness after the first discovery-driven run
+Check whether promoted and omitted lanes change versus prior reports and whether the added challengers are useful, not filler.
 
-### Priority C — improve scorecard quality over time
-Future enhancements:
-- add real relative-strength alternative duel values
-- add better cash classification extraction
-- add more robust factor exposure model
-- add explicit history of consecutive replaceable weeks across reports
+### Priority C — add historical ETF relative-strength layer
+Future enhancement:
+- compute 1-month and 3-month returns
+- compute trend quality
+- compute volatility/drawdown filters
+- feed those values into `runtime/score_etf_lanes.py`
 
-### Priority D — keep the four-layer architecture explicit
-Do not collapse the new rules back into a prompt-only narrative. The addendum is decision framework; the scorecard is input/state contract; the report remains output contract; workflows remain runbook.
+### Priority D — expand challenger pricing coverage
+Future enhancement:
+- pricing pass should price top discovery challengers after lane discovery or use a two-pass workflow.
 
 ## Current status label
 
-**ETF now has a capital re-underwriting discipline layer and a recommendation scorecard state file. The next live run should validate that weak or replaceable positions can no longer hide behind vague Hold language without a named next action, alternative comparison, or override reason.**
+**ETF now has a deterministic lane discovery engine. The next live run should prove whether the Structural Opportunity Radar is no longer just static memory, while acknowledging that full market-history and live fundamental discovery remain future maturity steps.**

@@ -11,7 +11,7 @@
 
 ### 1. Keep using the control-layer start sequence
 - Owner: `[JOINT]`
-- Action: every meaningful ETF architecture, debugging, prompt, state, workflow, delivery, or lab-optimization session starts with:
+- Action: every meaningful ETF architecture, debugging, prompt, state, workflow, delivery, discovery, or lab-optimization session starts with:
   1. `control/SYSTEM_INDEX.md`
   2. `control/CURRENT_STATE.md`
   3. `control/NEXT_ACTIONS.md`
@@ -25,12 +25,69 @@
 
 ---
 
-## Phase 2 — validate capital discipline in the next live ETF report
+## Phase 2 — validate lane discovery in the next live ETF report
 
-### 3. Apply the capital re-underwriting layer in the next report
+### 3. Run and inspect the first discovery-driven report
+- Owner: `[JOINT]`
+- Action:
+  - run `Send weekly ETF Pro report` manually
+  - confirm `Discover and score ETF opportunity lanes` passes
+  - confirm the matching lane artifact includes `discovery_engine_version`
+  - confirm the report uses the newly written lane artifact
+- Done when: workflow succeeds and both EN/NL reports are received.
+
+### 4. Inspect whether radar freshness improved
+- Owner: `[JOINT]`
+- Action:
+  - compare Structural Opportunity Radar with the prior report
+  - check whether omitted-but-assessed lanes include useful rotating challengers
+  - confirm the radar no longer looks like a static list of previously suggested themes
+- Done when: the radar contains a believable mix of retained leaders, portfolio-gap challengers, and rotating discovery lanes.
+
+### 5. Expand and curate the discovery universe
+- Owner: `[ASSISTANT]`
+- Source file:
+  - `config/etf_discovery_universe.yml`
+- Action:
+  - add additional sectors, factor ETFs, region ETFs, commodity ETFs, and defensive exposures
+  - keep each lane investable, differentiated, and scored
+- Done when: the universe is broad enough to surface new candidates without becoming noisy.
+
+---
+
+## Phase 3 — improve discovery intelligence
+
+### 6. Add historical relative-strength scoring
+- Owner: `[ASSISTANT]`
+- Action:
+  - add 1-month and 3-month ETF return calculations
+  - add trend quality
+  - add volatility/drawdown filters
+  - feed values into `runtime/score_etf_lanes.py`
+- Done when: lane ranking is less dependent on configured priors and more market-data backed.
+
+### 7. Expand challenger pricing coverage
+- Owner: `[ASSISTANT]`
+- Action:
+  - adapt pricing to include top discovery challengers
+  - or split the workflow into discovery pre-scan and pricing pass two-pass mode
+- Done when: top challenger lanes have close-based pricing evidence before final scoring.
+
+### 8. Add better macro/fundamental freshness inputs
+- Owner: `[ASSISTANT]`
+- Action:
+  - add machine-readable macro/regime input file
+  - add policy/geopolitical catalyst tags
+  - add current official or market-based freshness notes where possible
+- Done when: discovery is no longer only config-driven.
+
+---
+
+## Phase 4 — continue capital discipline
+
+### 9. Apply the capital re-underwriting layer in every report
 - Owner: `[ASSISTANT]`
 - Source files:
-  - `etf.txt`
   - `control/CAPITAL_REUNDERWRITING_RULES.md`
   - latest `output/etf_recommendation_scorecard.csv`
 - Action:
@@ -39,9 +96,9 @@
   - force alternative duels for replaceable or weak holdings
   - flag factor overlap and cash policy explicitly
   - test hedge validity for GLD or any hedge sleeve
-- Done when: the next report clearly explains why Hold is still justified or why action is required.
+- Done when: the report clearly explains why Hold is still justified or why action is required.
 
-### 4. Force the specific current weak-point reviews
+### 10. Force the specific current weak-point reviews
 - Owner: `[ASSISTANT]`
 - Action: in the next report explicitly review:
   - SPY overlap versus SMH
@@ -51,34 +108,19 @@
   - cash reserve versus actionable SMH / URNM lanes
 - Done when: no weak or replaceable holding remains vague.
 
-### 5. Validate scorecard derivation over a live report
-- Owner: `[ASSISTANT]`
-- Action:
-  - confirm `tools/write_etf_recommendation_scorecard.py --check-only` passes before send
-  - confirm `output/etf_recommendation_scorecard.csv` refreshes after canonical English report push
-  - inspect whether discipline flags are useful and not noisy
-- Done when: the recommendation scorecard is stable across a live run.
-
 ---
 
-## Phase 3 — continue send-path hardening
+## Phase 5 — keep send-path hardening
 
-### 6. Confirm production workflow trigger behavior
+### 11. Confirm production workflow trigger behavior
 - Owner: `[JOINT]`
 - Action:
-  - confirm GitHub Actions actually triggers on canonical report pushes
+  - confirm GitHub Actions actually triggers on canonical report pushes and manual dispatch
   - confirm logs produce visible render/send/manifest evidence
   - avoid claiming delivery success without a real receipt
 - Done when: delivery status can be verified reliably.
 
-### 7. Wire breadth validation deeper into `send_report.py`
-- Owner: `[ASSISTANT]`
-- Action:
-  - import or replicate lane breadth validation inside `send_report.py`
-  - fail before render/send if matching lane artifact or omitted-lane proof is missing
-- Done when: delivery script itself blocks non-compliant reports.
-
-### 8. Keep workflow behavior operational only
+### 12. Keep workflow behavior operational only
 - Owner: `[ASSISTANT]`
 - Action:
   - production send workflow should be for production report-output pushes and manual dispatch only
@@ -87,57 +129,6 @@
 
 ---
 
-## Phase 4 — improve explicit ETF state quality
-
-### 9. Improve recommendation scorecard quality
-- Owner: `[ASSISTANT]`
-- Action:
-  - add real 1-month and 3-month relative-strength values when reliable price history is available
-  - improve best-alternative scoring
-  - improve cash classification extraction
-  - improve consecutive-week replaceable history
-- Done when: scorecard becomes less heuristic and more data-backed.
-
-### 10. Move ETF state beyond report-derived state over time
-- Owner: `[ASSISTANT]`
-- Action:
-  - validate the pricing subsystem in real runs
-  - add more valuation authority from machine-readable pricing outputs
-  - reduce dependence on report-derived state where safe
-- Done when: ETF explicit state is less dependent on rendered report parsing.
-
-### 11. Validate stale-data handling under the broader discovery model
-- Owner: `[ASSISTANT]`
-- Action: review handling of stale:
-  - ETF quotes
-  - EUR/USD conversion
-  - portfolio values
-  - pricing audits
-  - report artifacts
-  - lane artifacts
-  - recommendation scorecard rows
-  - trade-ledger rows
-- Done when: stale inputs cannot silently flatten, distort, or misstate the report.
-
----
-
-## Phase 5 — keep optimization lab separate
-
-### 12. Review ETF optimizer fetch config
-- Owner: `[USER]`
-- Action: inspect `lab_inputs/etf_optimizer_fetch_config.json` if optimization testing is desired.
-- Done when: the lab universe reflects the intended ETF test set.
-
-### 13. Run and judge the PyPortfolioOpt lab only after production state is stable
-- Owner: `[JOINT]`
-- Action:
-  - run `.github/workflows/lab-pyportfolioopt-optimization.yml` manually
-  - compare outputs against the ETF decision framework
-  - keep optimizer results as QA/research, not production authority
-- Done when: optimizer usefulness is clear.
-
----
-
 ## Current checkpoint
 
-**The next state step is no longer to add `output/etf_recommendation_scorecard.csv`; it now exists. The next priority is to validate it during the next live report and use it to force clear decisions on SPY, PPA, PAVE, GLD, and cash policy.**
+**The next priority is to validate the new lane discovery engine in a live workflow run, then inspect whether the Structural Opportunity Radar has become genuinely broader and less static.**
