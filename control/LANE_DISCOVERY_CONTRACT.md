@@ -4,21 +4,21 @@
 
 This contract defines the discovery layer that sits before runtime state build and report rendering.
 
-The Structural Opportunity Radar must not be a static prompt memory or a small manually curated watchlist. It must be produced from a broad ETF universe, scored lanes, current portfolio gaps, novelty/challenger rules, and historical relative-strength evidence when available.
+The Structural Opportunity Radar must not be a static prompt memory or a small manually curated watchlist. It must be produced from a broad ETF universe, scored lanes, current portfolio gaps, novelty/challenger rules, historical relative-strength evidence, and targeted challenger pricing where available.
 
 ## Four-layer placement
 
 1. **Decision framework** — open discovery, score lanes, promote only the best.
-2. **Input/state contract** — `config/etf_discovery_universe.yml`, latest pricing audit, historical relative-strength metrics, latest portfolio state, prior lane artifacts.
+2. **Input/state contract** — `config/etf_discovery_universe.yml`, latest pricing audit, historical relative-strength metrics, targeted challenger pricing, latest portfolio state, prior lane artifacts.
 3. **Output contract** — `output/lane_reviews/etf_lane_assessment_YYMMDD.json` with machine-readable evidence fields.
-4. **Operational runbook** — workflow runs historical relative-strength fetch after pricing pass and before lane discovery.
+4. **Operational runbook** — workflow runs historical relative-strength fetch, first-pass discovery, targeted challenger pricing, and final discovery before runtime state build.
 
 ## Discovery authority order
 
 Lane discovery uses these inputs:
 
 1. `config/etf_discovery_universe.yml` — broad investable ETF universe and lane metadata
-2. latest `output/pricing/price_audit_*.json` — close data availability and pricing confidence
+2. latest `output/pricing/price_audit_*.json` — holding closes, close data availability, pricing confidence, and top-challenger pricing after augmentation
 3. `output/market_history/etf_relative_strength.json` — 1m/3m returns, trend quality, drawdown, volatility, and relative strength versus SPY when available
 4. `output/etf_portfolio_state.json` — current holdings and portfolio gaps
 5. latest prior `output/lane_reviews/etf_lane_assessment_*.json` — continuity, retained lanes, prior promotions
@@ -34,8 +34,27 @@ Each run must:
 - include at least two challengers outside the prior live radar where available
 - include at least two challengers outside current held portfolio themes where available
 - use historical relative-strength metrics when available
+- use targeted challenger pricing where available
 - promote 5 to 8 highest-ranked lanes to the live radar
 - publish omitted-but-assessed lanes as proof of breadth without bloating the client report
+
+## Two-pass challenger pricing rule
+
+The production workflow should use this sequence:
+
+```text
+pricing pass for current holdings and known report inputs
+→ historical relative-strength fetch
+→ first-pass lane discovery
+→ targeted pricing for top discovery challengers
+→ final lane discovery using the augmented pricing audit
+→ runtime state build
+→ render/polish/linkify
+→ validation
+→ PDF/email delivery
+```
+
+Targeted challenger pricing is not allowed to weaken the existing holdings pricing gate. If challenger pricing fails, the report may still proceed as long as holdings pricing coverage remains valid; failed challengers must remain non-fundable or under review.
 
 ## Lane scoring fields
 
@@ -89,33 +108,25 @@ Historical relative-strength fields should include when available:
 It is not a replacement for the editorial report.
 It is not a signal to automatically trade every promoted lane.
 It is not allowed to fabricate price history or claim fresh evidence when the market-history fetch does not support it.
+It is not allowed to treat a priced challenger as automatically superior; it only makes a fairer comparison possible.
 
 ## Current limitation
 
-The first historical relative-strength layer uses yfinance daily history as a pragmatic public-source history layer. This makes lane scoring more market-data backed, but it is still not a full institutional data pipeline.
+The historical relative-strength layer uses yfinance daily history as a pragmatic public-source history layer. Targeted challenger pricing extends the persisted pricing audit but is still constrained by available public sources and API rate limits.
 
 Remaining limitations:
 
 - no explicit liquidity screen yet
 - no full sector/factor benchmark normalization yet
-- no two-pass challenger pricing yet
 - no live fundamental/news ingestion yet
+- challenger pricing is targeted, not full-universe pricing
 
 ## Next maturity step
 
-Add two-pass challenger pricing:
-
-```text
-first pass: broad lane discovery
-→ identify top challengers
-→ second pricing pass for top challengers
-→ final scoring
-→ report render
-```
-
-Then add:
+Add:
 
 - liquidity filters
 - relative strength versus current holdings
 - sector/factor benchmark normalization
 - macro/fundamental freshness inputs
+- a separate discovery/pricing manifest for challenger augmentation
