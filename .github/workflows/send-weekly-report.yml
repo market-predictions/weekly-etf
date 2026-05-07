@@ -82,6 +82,9 @@ jobs:
             --config config/etf_discovery_universe.yml \
             --portfolio-state output/etf_portfolio_state.json \
             --relative-strength output/market_history/etf_relative_strength.json
+          python -m runtime.augment_lane_artifact_with_quality_filters \
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --macro-context config/etf_macro_fundamental_context.yml
 
       - name: Build runtime ETF state and reports
         env:
@@ -89,6 +92,7 @@ jobs:
         run: |
           python -m runtime.build_etf_report_state
           python -m runtime.render_etf_report_from_state --output-dir output
+          python -m runtime.fix_report_output_contract --output-dir output
           python -m runtime.polish_runtime_reports --output-dir output
           python -m runtime.link_runtime_report_tickers --output-dir output
 

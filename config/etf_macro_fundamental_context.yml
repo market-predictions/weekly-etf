@@ -1,0 +1,59 @@
+as_of: 2026-05-07
+source_type: curated_runtime_context
+regime:
+  primary: Policy Transition / Mixed Regime
+  geopolitical: Elevated but localized
+  growth: Stable but selective
+  inflation: Easing trend but vulnerable to energy and shipping shocks
+  central_banks: Neutral / restrictive
+  real_rates: Restrictive
+  credit: Stable enough to avoid recession signal
+  usd: Rangebound to slightly firm
+  commodities: Mixed
+  equity_leadership: Narrow but persistent AI / semiconductor leadership
+  bond_market_signal: Mixed
+bucket_adjustments:
+  ai_digital_infrastructure:
+    score_adjustment: 0.12
+    freshness_note: AI infrastructure remains supported by capex and leadership persistence, but position-size discipline matters.
+  defense_resilience:
+    score_adjustment: 0.02
+    freshness_note: Defense spending remains structurally durable, but vehicle selection still needs proof.
+  grid_power_electrification:
+    score_adjustment: 0.08
+    freshness_note: Power demand, grid bottlenecks and reshoring capex remain supportive.
+  uranium_nuclear:
+    score_adjustment: 0.02
+    freshness_note: Nuclear security remains strategic, but timing is less urgent than AI power and grid lanes.
+  agriculture_food_security:
+    score_adjustment: 0.00
+    freshness_note: Food security remains relevant, but needs visible commodity stress or pricing confirmation.
+  water:
+    score_adjustment: 0.00
+    freshness_note: Water remains structurally attractive but needs better market confirmation.
+  china:
+    score_adjustment: -0.06
+    freshness_note: China exposure still needs durable policy and earnings confirmation.
+  india_regional_industrialization:
+    score_adjustment: 0.02
+    freshness_note: India remains a portfolio-gap candidate, but entry and relative momentum matter.
+  biotech_healthcare_innovation:
+    score_adjustment: 0.00
+    freshness_note: Healthcare and biotech are useful diversifiers, but risk appetite and rates still matter.
+  fintech_financial_infrastructure:
+    score_adjustment: 0.00
+    freshness_note: Financial infrastructure needs stronger transaction-growth leadership before promotion.
+  robotics_automation:
+    score_adjustment: 0.00
+    freshness_note: Automation remains structural but overlaps with AI hardware and needs industrial breadth.
+  critical_minerals_materials:
+    score_adjustment: 0.03
+    freshness_note: Copper and critical minerals are linked to grid, AI power and electrification, but need commodity momentum.
+liquidity_policy:
+  min_avg_dollar_volume_promote: 5000000
+  preferred_avg_dollar_volume: 20000000
+  max_illiquid_penalty: -0.45
+replacement_duel_policy:
+  require_direct_holding_rs: true
+  direct_rs_lookback: 3m
+  promote_requires_pricing_or_rs_edge: true
