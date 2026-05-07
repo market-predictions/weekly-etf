@@ -5,14 +5,16 @@
 
 ## What this repository currently is
 
-This repository is now a stable runtime-driven production-style weekly ETF review system with:
+This repository is now a validated runtime-driven production-style weekly ETF review system with:
 
 - `etf.txt` as the production masterprompt
 - `control/CAPITAL_REUNDERWRITING_RULES.md` as the decision-framework addendum for model discipline
 - `control/LANE_DISCOVERY_CONTRACT.md` as the discovery-layer contract
 - `control/ETF_RUNTIME_STATE_CONTRACT.md` as the runtime state contract
 - `config/etf_discovery_universe.yml` as the broad investable lane universe
+- `runtime/fetch_etf_relative_strength.py` as the historical relative-strength input layer
 - `runtime/discover_etf_lanes.py` and `runtime/score_etf_lanes.py` as the lane discovery/scoring engine
+- `pricing/augment_challenger_pricing.py` as the targeted second-pass challenger pricing layer
 - `runtime/build_etf_report_state.py` as the deterministic runtime state builder
 - `runtime/render_etf_report_from_state.py` as the English/Dutch runtime renderer
 - `runtime/polish_runtime_reports.py` as the editorial polish layer
@@ -23,6 +25,7 @@ This repository is now a stable runtime-driven production-style weekly ETF revie
 - a pricing subsystem in `pricing/`
 - archived reports in `output/`
 - pricing audits in `output/pricing/`
+- relative-strength metrics in `output/market_history/`
 - lane artifacts in `output/lane_reviews/`
 - explicit ETF state files:
   - `output/etf_portfolio_state.json`
@@ -32,11 +35,14 @@ This repository is now a stable runtime-driven production-style weekly ETF revie
 
 ## Stable production baseline
 
-The current baseline is now:
+The current proven baseline is now:
 
 ```text
 pricing audit
-→ lane discovery
+→ historical relative strength
+→ first-pass lane discovery
+→ targeted challenger pricing
+→ final lane discovery
 → runtime state
 → EN/NL report render
 → polish/linkify
@@ -44,23 +50,25 @@ pricing audit
 → PDF/email delivery
 ```
 
-This path has produced received bilingual reports and should be treated as the stable baseline before further renderer changes.
+This path has produced a green workflow run and received bilingual reports. Treat this as the current production baseline before further changes.
 
 ## What changed recently
 
 ### Runtime production path stabilized
 
-The repo no longer depends on manually patched markdown as the hidden production source. The workflow now builds reports from state artifacts and validates them before delivery.
+The repo no longer depends on manually patched markdown as the hidden production source. The workflow builds reports from state artifacts and validates them before delivery.
 
-### Lane discovery engine implemented
+### Lane discovery engine implemented and upgraded
 
 The Structural Opportunity Radar now comes from:
 
 - `config/etf_discovery_universe.yml`
 - latest pricing audit
+- historical relative-strength metrics
 - portfolio state
 - prior lane artifact
 - novelty/challenger scoring
+- targeted challenger pricing where available
 
 instead of only static memory.
 
@@ -80,8 +88,11 @@ so the radar, omitted lanes, Section 10, Section 12, and Final Action Table are 
 
 - Runtime pipeline has successfully delivered bilingual reports.
 - Pricing pass and validation run before render/send.
-- Lane discovery runs before runtime state build.
-- Lane artifact includes discovery provenance and novelty metadata.
+- Historical relative-strength fetch runs before discovery.
+- First-pass discovery identifies top challengers.
+- Targeted challenger pricing augments the pricing audit.
+- Final discovery uses the augmented pricing audit.
+- Lane artifact includes discovery provenance, novelty metadata, and market-strength fields.
 - Breadth validation checks discovery metadata, not just static bucket coverage.
 - Portfolio/radar reporting no longer needs manually patched markdown to pass.
 - Section 7 and Section 15 are reconciled from the same runtime state.
@@ -90,42 +101,42 @@ so the radar, omitted lanes, Section 10, Section 12, and Final Action Table are 
 
 ## Current weaknesses
 
-### 1. Discovery is still config-driven, not fully market-history-driven
-The discovery universe is now broad, but the first engine still uses configured priors and latest pricing availability. It does not yet compute true 1-month and 3-month relative strength rankings from historical ETF prices.
-
-### 2. ETF universe is broader but still curated
+### 1. ETF universe is broader but still curated
 `config/etf_discovery_universe.yml` is the first broad universe. It needs periodic expansion and review.
 
-### 3. Challenger pricing coverage is limited by the current pricing pass
-The discovery engine can score and rotate challengers, but not every challenger has fresh same-day pricing unless the pricing pass includes it.
-
-### 4. Fundamental evidence is encoded, not fetched live
+### 2. Fundamental evidence is encoded, not fetched live
 The first engine stores evidence summaries and why-now fields, but does not yet fetch current macro/fundamental news or official data automatically.
+
+### 3. Relative strength is broad but not yet fully institutional
+The relative-strength layer uses pragmatic public yfinance history. It does not yet include liquidity filters, factor/sector benchmark normalization, or relative strength versus every current holding.
+
+### 4. Challenger pricing is targeted, not full-universe pricing
+Targeted challenger pricing improves comparison quality, but it intentionally does not price the whole ETF universe to protect runtime and API limits.
 
 ## Immediate priorities
 
-### Priority A — add historical ETF relative-strength layer
+### Priority A — inspect the latest received report after two-pass challenger pricing
+Check whether:
+
+- replacement challenger pricing is visible and sensible
+- final radar ranking changed logically after challenger pricing
+- omitted lanes have useful rejection reasons
+- no report formatting regression occurred
+
+### Priority B — add liquidity and tradability filters
 Next enhancement:
 
-- compute 1-month and 3-month returns
-- compute trend quality
-- compute drawdown/volatility filters
-- compute relative strength versus SPY
-- compute relative strength versus current holdings where possible
-- feed those values into `runtime/score_etf_lanes.py`
+- average dollar volume filter
+- ETF AUM / spread proxy if available
+- avoid promoting technically attractive but illiquid ETFs
 
-### Priority B — implement two-pass challenger pricing
+### Priority C — add relative strength versus current holdings
 Future enhancement:
 
-```text
-first pass: broad lane discovery
-→ identify top challengers
-→ second pricing pass for top challengers
-→ final scoring
-→ report render
-```
+- compare challengers directly versus SPY, SMH, PPA, PAVE, URNM, and GLD where relevant
+- use this in replacement-duel scoring
 
-### Priority C — expand macro/fundamental freshness inputs
+### Priority D — expand macro/fundamental freshness inputs
 Future enhancement:
 
 - machine-readable macro/regime input file
@@ -134,4 +145,4 @@ Future enhancement:
 
 ## Current status label
 
-**ETF now has a stable runtime-driven bilingual production baseline. The next engineering phase is historical relative-strength scoring, followed by two-pass challenger pricing.**
+**ETF now has a validated runtime-driven bilingual production baseline with historical relative-strength scoring and two-pass challenger pricing. The next engineering phase is liquidity/tradability filtering and richer macro/fundamental freshness inputs.**
