@@ -57,7 +57,24 @@ jobs:
             --period 6mo \
             --output-json output/market_history/etf_relative_strength.json
 
-      - name: Discover and score ETF opportunity lanes
+      - name: First-pass ETF lane discovery
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python -m runtime.discover_etf_lanes \
+            --config config/etf_discovery_universe.yml \
+            --portfolio-state output/etf_portfolio_state.json \
+            --relative-strength output/market_history/etf_relative_strength.json
+
+      - name: Price top discovery challengers
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+          ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+        run: |
+          python -m pricing.augment_challenger_pricing --max-symbols 12
+
+      - name: Final ETF lane discovery after challenger pricing
         env:
           MRKT_RPRTS_REPORT_MODE: pro
         run: |
