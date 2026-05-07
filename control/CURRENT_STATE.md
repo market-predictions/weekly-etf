@@ -1,11 +1,11 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-05-06
+2026-05-07
 
 ## What this repository currently is
 
-This repository is a production-style weekly ETF review system with:
+This repository is now a stable runtime-driven production-style weekly ETF review system with:
 
 - `etf.txt` as the production masterprompt
 - `control/CAPITAL_REUNDERWRITING_RULES.md` as the decision-framework addendum for model discipline
@@ -30,39 +30,63 @@ This repository is a production-style weekly ETF review system with:
   - `output/etf_trade_ledger.csv`
   - `output/etf_recommendation_scorecard.csv`
 
-## What changed in this step
+## Stable production baseline
 
-This update implements the first production lane discovery engine.
+The current baseline is now:
 
-The key additions are:
+```text
+pricing audit
+→ lane discovery
+→ runtime state
+→ EN/NL report render
+→ polish/linkify
+→ validation
+→ PDF/email delivery
+```
 
-- `control/LANE_DISCOVERY_CONTRACT.md`
+This path has produced received bilingual reports and should be treated as the stable baseline before further renderer changes.
+
+## What changed recently
+
+### Runtime production path stabilized
+
+The repo no longer depends on manually patched markdown as the hidden production source. The workflow now builds reports from state artifacts and validates them before delivery.
+
+### Lane discovery engine implemented
+
+The Structural Opportunity Radar now comes from:
+
 - `config/etf_discovery_universe.yml`
-- `runtime/discover_etf_lanes.py`
-- `runtime/score_etf_lanes.py`
-- workflow step: `Discover and score ETF opportunity lanes`
-- stricter `validate_lane_breadth.py` discovery metadata validation
+- latest pricing audit
+- portfolio state
+- prior lane artifact
+- novelty/challenger scoring
 
-## Why this matters
+instead of only static memory.
 
-The Structural Opportunity Radar had become structurally valid but too static. It proved that required buckets were present, but did not prove that a broad discovery process had run.
+### Report renderer caught up with discovery metadata
 
-The new discovery layer moves the radar from:
+The runtime renderer now uses:
 
-- memory + fixed taxonomy + manually retained lane artifact
+- `evidence_summary`
+- `why_now`
+- richer rejection reasons
+- enriched current-position metadata
+- recommendation scorecard fields
 
-toward:
-
-- broad ETF universe + pricing context + portfolio gaps + novelty/challenger scoring + machine-readable lane artifact
+so the radar, omitted lanes, Section 10, Section 12, and Final Action Table are no longer analytically thin.
 
 ## Current strengths
 
 - Runtime pipeline has successfully delivered bilingual reports.
 - Pricing pass and validation run before render/send.
-- Lane discovery now runs before runtime state build.
-- Lane artifact now includes discovery provenance and novelty metadata.
-- Breadth validation now checks discovery metadata, not just static bucket coverage.
+- Lane discovery runs before runtime state build.
+- Lane artifact includes discovery provenance and novelty metadata.
+- Breadth validation checks discovery metadata, not just static bucket coverage.
 - Portfolio/radar reporting no longer needs manually patched markdown to pass.
+- Section 7 and Section 15 are reconciled from the same runtime state.
+- Dutch report is derived from the English runtime state and preserves numeric parity.
+- Current-position review is enriched from portfolio state and recommendation scorecard.
 
 ## Current weaknesses
 
@@ -80,27 +104,34 @@ The first engine stores evidence summaries and why-now fields, but does not yet 
 
 ## Immediate priorities
 
-### Priority A — run one live workflow after lane discovery merge
-Confirm that:
-- lane discovery writes a matching artifact
-- runtime state uses the newly written artifact
-- breadth validation passes with discovery metadata
-- report is delivered
+### Priority A — add historical ETF relative-strength layer
+Next enhancement:
 
-### Priority B — inspect radar freshness after the first discovery-driven run
-Check whether promoted and omitted lanes change versus prior reports and whether the added challengers are useful, not filler.
-
-### Priority C — add historical ETF relative-strength layer
-Future enhancement:
 - compute 1-month and 3-month returns
 - compute trend quality
-- compute volatility/drawdown filters
+- compute drawdown/volatility filters
+- compute relative strength versus SPY
+- compute relative strength versus current holdings where possible
 - feed those values into `runtime/score_etf_lanes.py`
 
-### Priority D — expand challenger pricing coverage
+### Priority B — implement two-pass challenger pricing
 Future enhancement:
-- pricing pass should price top discovery challengers after lane discovery or use a two-pass workflow.
+
+```text
+first pass: broad lane discovery
+→ identify top challengers
+→ second pricing pass for top challengers
+→ final scoring
+→ report render
+```
+
+### Priority C — expand macro/fundamental freshness inputs
+Future enhancement:
+
+- machine-readable macro/regime input file
+- policy/geopolitical catalyst tags
+- official or market-based freshness notes
 
 ## Current status label
 
-**ETF now has a deterministic lane discovery engine. The next live run should prove whether the Structural Opportunity Radar is no longer just static memory, while acknowledging that full market-history and live fundamental discovery remain future maturity steps.**
+**ETF now has a stable runtime-driven bilingual production baseline. The next engineering phase is historical relative-strength scoring, followed by two-pass challenger pricing.**
