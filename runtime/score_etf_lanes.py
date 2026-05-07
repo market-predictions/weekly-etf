@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 LANE_WEIGHTS = {
-    "structural_strength": 0.18,
-    "persistence": 0.12,
-    "implementation_quality": 0.12,
-    "macro_alignment": 0.18,
-    "second_order_relevance": 0.12,
-    "timing_confirmation": 0.12,
-    "valuation_crowding": 0.08,
-    "portfolio_differentiation": 0.08,
+    "structural_strength": 0.16,
+    "persistence": 0.10,
+    "implementation_quality": 0.11,
+    "macro_alignment": 0.15,
+    "second_order_relevance": 0.10,
+    "timing_confirmation": 0.10,
+    "valuation_crowding": 0.07,
+    "portfolio_differentiation": 0.07,
 }
 
 
@@ -22,10 +22,13 @@ class LaneContext:
     price_status_by_symbol: dict[str, str]
     priced_symbols: set[str]
     portfolio_gap_themes: dict[str, int]
+    relative_strength_metrics: dict[str, dict[str, Any]] = field(default_factory=dict)
 
 
 def _num(value: Any, default: float = 0.0) -> float:
     try:
+        if value is None or value == "":
+            return default
         return float(value)
     except (TypeError, ValueError):
         return default
@@ -36,6 +39,39 @@ def weighted_lane_score(lane: dict[str, Any]) -> float:
     for key, weight in LANE_WEIGHTS.items():
         score += _num(lane.get(key), 0.0) * weight
     return round(score, 2)
+
+
+def rs_metrics(symbol: str, context: LaneContext) -> dict[str, Any]:
+    return dict(context.relative_strength_metrics.get(symbol.upper(), {}) or {})
+
+
+def rs_score(symbol: str, context: LaneContext) -> float:
+    metrics = rs_metrics(symbol, context)
+    if not metrics:
+        return 0.0
+    r1 = _num(metrics.get("return_1m_pct"), 0.0)
+    r3 = _num(metrics.get("return_3m_pct"), 0.0)
+    trend = _num(metrics.get("trend_quality"), 0.0)
+    rs1 = _num(metrics.get("rs_vs_spy_1m_pct"), 0.0)
+    rs3 = _num(metrics.get("rs_vs_spy_3m_pct"), 0.0)
+    dd = _num(metrics.get("max_drawdown_3m_pct"), 0.0)
+    vol = _num(metrics.get("volatility_3m_pct"), 0.0)
+
+    score = 0.0
+    score += max(min(r1 / 10.0, 1.0), -1.0) * 0.35
+    score += max(min(r3 / 20.0, 1.0), -1.0) * 0.45
+    score += (trend / 5.0) * 0.55
+    score += max(min(rs1 / 8.0, 1.0), -1.0) * 0.25
+    score += max(min(rs3 / 12.0, 1.0), -1.0) * 0.30
+    if dd < -18:
+        score -= 0.20
+    elif dd > -8:
+        score += 0.08
+    if vol > 35:
+        score -= 0.12
+    elif 0 < vol < 20:
+        score += 0.05
+    return round(max(min(score, 1.25), -0.75), 2)
 
 
 def portfolio_gap_score(lane: dict[str, Any], context: LaneContext) -> int:
@@ -81,13 +117,18 @@ def is_challenger(lane: dict[str, Any], context: LaneContext) -> bool:
 
 
 def adjusted_lane_score(lane: dict[str, Any], context: LaneContext) -> float:
+    primary = str(lane.get("primary_etf", "")).upper()
+    alt = str(lane.get("alternative_etf", "")).upper()
     base = weighted_lane_score(lane)
     gap_bonus = min(portfolio_gap_score(lane, context), 5) * 0.03
-    primary_conf = pricing_confidence(str(lane.get("primary_etf", "")), context)
+    primary_conf = pricing_confidence(primary, context)
     price_bonus = 0.05 if primary_conf == "fresh_priced" else 0.02 if primary_conf == "latest_verified_or_challenger_priced" else -0.03
     novelty = novelty_status(lane, context)
     novelty_bonus = 0.04 if novelty in {"new_or_rotating_challenger", "rotating_challenger"} else 0.0
-    return round(base + gap_bonus + price_bonus + novelty_bonus, 2)
+    primary_rs = rs_score(primary, context)
+    alt_rs = rs_score(alt, context) if alt else 0.0
+    market_bonus = max(primary_rs, alt_rs * 0.65)
+    return round(base + gap_bonus + price_bonus + novelty_bonus + market_bonus, 2)
 
 
 def _rejection_reason(lane: dict[str, Any]) -> str:
@@ -95,19 +136,37 @@ def _rejection_reason(lane: dict[str, Any]) -> str:
     macro = _num(lane.get("macro_alignment"), 0.0)
     impl = _num(lane.get("implementation_quality"), 0.0)
     primary_status = str(lane.get("primary_price_status", ""))
-    evidence = str(lane.get("evidence_summary", "")).strip()
+    r1 = lane.get("return_1m_pct")
+    r3 = lane.get("return_3m_pct")
+    rs3 = lane.get("rs_vs_spy_3m_pct")
 
-    if "not_in_current_pricing_audit" in primary_status:
-        return "Structurally relevant, but not priced in the current audit; keep as discovery candidate, not fundable replacement."
+    if "not_in_current_pricing_audit" in primary_status and r1 is None:
+        return "Structurally relevant, but neither current audit pricing nor historical momentum was available; keep as discovery candidate, not fundable replacement."
+    if r3 is not None and float(r3) < 0:
+        return "Structural case is credible, but 3-month price momentum is still negative."
+    if rs3 is not None and float(rs3) < 0:
+        return "Not promoted because it still trails SPY on 3-month relative strength."
     if timing <= 2:
         return "Structural case is credible, but timing confirmation still trails higher-ranked lanes."
     if macro <= 2:
         return "Macro alignment is not yet strong enough to displace funded exposures."
     if impl <= 2:
         return "Implementation quality or ETF vehicle confidence is not strong enough yet."
-    if evidence:
-        return "Scored below promoted lanes despite valid thesis; needs stronger relative timing or portfolio-fit evidence."
-    return "Scored below the live radar cutoff versus stronger funded and challenger lanes."
+    return "Scored below promoted lanes despite valid thesis; needs stronger relative timing or portfolio-fit evidence."
+
+
+def _rs_fields(primary: str, context: LaneContext) -> dict[str, Any]:
+    metrics = rs_metrics(primary, context)
+    return {
+        "return_1m_pct": metrics.get("return_1m_pct"),
+        "return_3m_pct": metrics.get("return_3m_pct"),
+        "trend_quality": metrics.get("trend_quality"),
+        "max_drawdown_3m_pct": metrics.get("max_drawdown_3m_pct"),
+        "volatility_3m_pct": metrics.get("volatility_3m_pct"),
+        "rs_vs_spy_1m_pct": metrics.get("rs_vs_spy_1m_pct"),
+        "rs_vs_spy_3m_pct": metrics.get("rs_vs_spy_3m_pct"),
+        "relative_strength_score": rs_score(primary, context),
+    }
 
 
 def score_lane(lane: dict[str, Any], context: LaneContext) -> dict[str, Any]:
@@ -119,6 +178,7 @@ def score_lane(lane: dict[str, Any], context: LaneContext) -> dict[str, Any]:
     gap = portfolio_gap_score(lane, context)
     challenger = is_challenger(lane, context)
     novelty = novelty_status(lane, context)
+    rs = _rs_fields(primary, context)
 
     output = dict(lane)
     output.update(
@@ -133,12 +193,13 @@ def score_lane(lane: dict[str, Any], context: LaneContext) -> dict[str, Any]:
             "primary_price_status": primary_status,
             "alternative_price_status": alt_status,
             "freshness_note": (
-                "Primary ETF was priced in the current audit."
-                if primary in context.priced_symbols
-                else "Primary ETF was assessed structurally but not priced in the current audit."
+                "Historical relative strength was available and included in scoring."
+                if rs.get("return_1m_pct") is not None or rs.get("return_3m_pct") is not None
+                else "Primary ETF was assessed structurally but historical momentum was unavailable."
             ),
         }
     )
+    output.update(rs)
     return output
 
 

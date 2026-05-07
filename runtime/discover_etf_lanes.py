@@ -18,6 +18,7 @@ from runtime.score_etf_lanes import (
 
 PRICING_DIR = Path("output/pricing")
 LANE_DIR = Path("output/lane_reviews")
+RS_PATH = Path("output/market_history/etf_relative_strength.json")
 REPORT_RE = re.compile(r"weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
 
 
@@ -102,6 +103,13 @@ def prior_promoted_tickers(prior: dict[str, Any] | None) -> set[str]:
     return out
 
 
+def relative_strength_metrics(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    payload = load_json(path)
+    return dict(payload.get("metrics", {}) or {})
+
+
 def validate_discovery_payload(payload: dict[str, Any]) -> None:
     required_buckets = set(payload.get("required_breadth_buckets", []))
     lanes = payload.get("assessed_lanes", [])
@@ -119,7 +127,12 @@ def validate_discovery_payload(payload: dict[str, Any]) -> None:
         raise RuntimeError(f"Lane discovery promoted invalid number of lanes: {len(promoted)}")
 
 
-def build_lane_artifact(config_path: Path, portfolio_state_path: Path, pricing_audit_path: Path) -> tuple[dict[str, Any], Path]:
+def build_lane_artifact(
+    config_path: Path,
+    portfolio_state_path: Path,
+    pricing_audit_path: Path,
+    relative_strength_path: Path = RS_PATH,
+) -> tuple[dict[str, Any], Path]:
     config = load_yaml(config_path)
     pricing_audit = load_json(pricing_audit_path)
     report_date = report_date_from_pricing(pricing_audit)
@@ -128,12 +141,14 @@ def build_lane_artifact(config_path: Path, portfolio_state_path: Path, pricing_a
     prior = prior_lane_artifact(suffix)
 
     status_by_symbol, priced_symbols = pricing_context(pricing_audit)
+    rs_metrics = relative_strength_metrics(relative_strength_path)
     context = LaneContext(
         held_tickers=held_tickers_from_portfolio_state(portfolio_state_path),
         prior_promoted_tickers=prior_promoted_tickers(prior),
         price_status_by_symbol=status_by_symbol,
         priced_symbols=priced_symbols,
         portfolio_gap_themes=dict(config.get("portfolio_gap_themes", {}) or {}),
+        relative_strength_metrics=rs_metrics,
     )
 
     lanes = [score_lane(lane, context) for lane in config.get("lanes", [])]
@@ -145,11 +160,12 @@ def build_lane_artifact(config_path: Path, portfolio_state_path: Path, pricing_a
         "report_date": report_date,
         "report_filename": report_filename,
         "prior_report_filename": (prior or {}).get("report_filename"),
-        "discovery_engine_version": "lane_discovery_v1",
+        "discovery_engine_version": "lane_discovery_v2_relative_strength",
         "discovery_inputs": {
             "config": str(config_path),
             "portfolio_state": str(portfolio_state_path),
             "pricing_audit": str(pricing_audit_path),
+            "relative_strength": str(relative_strength_path) if relative_strength_path.exists() else None,
             "prior_lane_artifact": "latest_available" if prior else None,
         },
         "required_breadth_buckets": list(config.get("required_breadth_buckets", [])),
@@ -168,16 +184,23 @@ def main() -> None:
     parser.add_argument("--config", default="config/etf_discovery_universe.yml")
     parser.add_argument("--portfolio-state", default="output/etf_portfolio_state.json")
     parser.add_argument("--pricing-audit", default=None)
+    parser.add_argument("--relative-strength", default=str(RS_PATH))
     args = parser.parse_args()
 
     pricing_audit_path = Path(args.pricing_audit) if args.pricing_audit else latest_file(PRICING_DIR, "price_audit_*.json")
-    payload, out_path = build_lane_artifact(Path(args.config), Path(args.portfolio_state), pricing_audit_path)
+    payload, out_path = build_lane_artifact(
+        Path(args.config),
+        Path(args.portfolio_state),
+        pricing_audit_path,
+        Path(args.relative_strength),
+    )
     promoted = [lane for lane in payload["assessed_lanes"] if lane.get("promoted_to_live_radar")]
     challengers = [lane for lane in payload["assessed_lanes"] if lane.get("challenger")]
+    rs_used = bool(payload.get("discovery_inputs", {}).get("relative_strength"))
     print(
         "ETF_LANE_DISCOVERY_OK | "
         f"report={payload['report_filename']} | lanes={len(payload['assessed_lanes'])} | "
-        f"promoted={len(promoted)} | challengers={len(challengers)} | artifact={out_path}"
+        f"promoted={len(promoted)} | challengers={len(challengers)} | rs_used={rs_used} | artifact={out_path}"
     )
 
 
