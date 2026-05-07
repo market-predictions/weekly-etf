@@ -29,24 +29,35 @@ def discovery_tickers(config: dict[str, Any]) -> list[str]:
     return sorted(tickers)
 
 
-def extract_close_frame(raw: pd.DataFrame, tickers: list[str]) -> pd.DataFrame:
+def extract_field_frame(raw: pd.DataFrame, tickers: list[str], field_candidates: list[str]) -> pd.DataFrame:
     if raw is None or raw.empty:
         raise RuntimeError("yfinance returned no data for relative-strength fetch")
     if isinstance(raw.columns, pd.MultiIndex):
-        field = "Adj Close" if "Adj Close" in raw.columns.get_level_values(0) else "Close"
+        field = next((candidate for candidate in field_candidates if candidate in raw.columns.get_level_values(0)), None)
+        if field is None:
+            return pd.DataFrame()
         data = raw[field].copy()
     else:
         data = raw.copy()
-        if "Adj Close" in data.columns:
-            data = data[["Adj Close"]]
-        elif "Close" in data.columns:
-            data = data[["Close"]]
+        field = next((candidate for candidate in field_candidates if candidate in data.columns), None)
+        if field is None:
+            return pd.DataFrame()
+        data = data[[field]]
         if len(tickers) == 1:
             data.columns = tickers
     data = data[[c for c in data.columns if str(c).upper() in set(tickers)]].copy()
     data.columns = [str(c).upper() for c in data.columns]
     data = data.sort_index().dropna(how="all").ffill()
     return data
+
+
+def extract_close_frame(raw: pd.DataFrame, tickers: list[str]) -> pd.DataFrame:
+    return extract_field_frame(raw, tickers, ["Adj Close", "Close"])
+
+
+def extract_volume_frame(raw: pd.DataFrame, tickers: list[str]) -> pd.DataFrame:
+    data = extract_field_frame(raw, tickers, ["Volume"])
+    return data.fillna(0) if not data.empty else data
 
 
 def last_valid(series: pd.Series) -> float | None:
@@ -81,7 +92,8 @@ def trend_quality(series: pd.Series) -> float | None:
         score += 1.5
     if last > ma50:
         score += 1.0
-    slope = (ma20 / float(clean.iloc[-40:-20].mean()) - 1.0) if len(clean) >= 40 and float(clean.iloc[-40:-20].mean()) else 0.0
+    prior = float(clean.iloc[-40:-20].mean()) if len(clean) >= 40 else 0.0
+    slope = (ma20 / prior - 1.0) if prior else 0.0
     if slope > 0:
         score += 1.0
     return round(min(score, 5.0), 2)
@@ -104,7 +116,28 @@ def vol_3m(series: pd.Series) -> float | None:
     return round(float(returns.std()) * (252 ** 0.5) * 100.0, 2)
 
 
-def build_metrics(prices: pd.DataFrame) -> dict[str, Any]:
+def avg_volume(series: pd.Series, days: int = 63) -> float | None:
+    clean = pd.to_numeric(series, errors="coerce").dropna().iloc[-days:]
+    if clean.empty:
+        return None
+    return round(float(clean.mean()), 2)
+
+
+def liquidity_score(avg_dollar_volume_3m: float | None) -> float | None:
+    if avg_dollar_volume_3m is None:
+        return None
+    if avg_dollar_volume_3m >= 50_000_000:
+        return 5.0
+    if avg_dollar_volume_3m >= 20_000_000:
+        return 4.0
+    if avg_dollar_volume_3m >= 5_000_000:
+        return 3.0
+    if avg_dollar_volume_3m >= 1_000_000:
+        return 2.0
+    return 1.0
+
+
+def build_metrics(prices: pd.DataFrame, volumes: pd.DataFrame) -> dict[str, Any]:
     spy_ret_1m = ret_over_days(prices["SPY"], 21) if "SPY" in prices.columns else None
     spy_ret_3m = ret_over_days(prices["SPY"], 63) if "SPY" in prices.columns else None
     metrics: dict[str, Any] = {}
@@ -112,8 +145,12 @@ def build_metrics(prices: pd.DataFrame) -> dict[str, Any]:
         s = prices[ticker]
         r1 = ret_over_days(s, 21)
         r3 = ret_over_days(s, 63)
+        last = last_valid(s)
+        volume_3m = avg_volume(volumes[ticker], 63) if ticker in volumes.columns else None
+        dollar_volume_3m = round(volume_3m * last, 2) if volume_3m is not None and last is not None else None
+        liq_score = liquidity_score(dollar_volume_3m)
         metrics[ticker] = {
-            "last_price": last_valid(s),
+            "last_price": last,
             "return_1m_pct": r1,
             "return_3m_pct": r3,
             "trend_quality": trend_quality(s),
@@ -121,6 +158,10 @@ def build_metrics(prices: pd.DataFrame) -> dict[str, Any]:
             "volatility_3m_pct": vol_3m(s),
             "rs_vs_spy_1m_pct": round(r1 - spy_ret_1m, 2) if r1 is not None and spy_ret_1m is not None else None,
             "rs_vs_spy_3m_pct": round(r3 - spy_ret_3m, 2) if r3 is not None and spy_ret_3m is not None else None,
+            "avg_volume_3m": volume_3m,
+            "avg_dollar_volume_3m": dollar_volume_3m,
+            "liquidity_score": liq_score,
+            "tradability_status": "pass" if liq_score is not None and liq_score >= 3 else "watch" if liq_score is not None and liq_score >= 2 else "fail_or_unknown",
         }
     return metrics
 
@@ -144,7 +185,8 @@ def main() -> None:
         progress=False,
     )
     prices = extract_close_frame(raw, tickers)
-    metrics = build_metrics(prices)
+    volumes = extract_volume_frame(raw, tickers)
+    metrics = build_metrics(prices, volumes)
 
     out_path = Path(args.output_json)
     out_path.parent.mkdir(parents=True, exist_ok=True)
