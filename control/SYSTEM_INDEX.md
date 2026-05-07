@@ -17,7 +17,7 @@ Always distinguish:
 1. **Decision framework** — what the ETF review is trying to decide.
 2. **Input/state contract** — where authoritative facts come from and how conflicts are resolved.
 3. **Output contract** — how the final English/Dutch reports must be structured and rendered.
-4. **Operational runbook** — how GitHub Actions and scripts execute validation, rendering, state refresh, and delivery.
+4. **Operational runbook** — how GitHub Actions and scripts execute validation, rendering, state refresh, discovery, pricing, and delivery.
 
 ## Session start rule
 
@@ -32,11 +32,13 @@ For ETF architecture, debugging, prompt, workflow, state, pricing, discovery, or
 
 - `etf.txt` — production masterprompt for the Weekly ETF Review.
 - `control/CAPITAL_REUNDERWRITING_RULES.md` — authoritative decision-framework addendum for fresh-cash tests, action clocks, hedge checks, factor-overlap checks, cash policy, and recommendation discipline.
-- `control/LANE_DISCOVERY_CONTRACT.md` — authoritative discovery contract for broad ETF lane scanning and novelty/challenger rules.
+- `control/LANE_DISCOVERY_CONTRACT.md` — authoritative discovery contract for broad ETF lane scanning, historical relative strength, and two-pass challenger pricing.
 - `control/ETF_RUNTIME_STATE_CONTRACT.md` — runtime input/state authority contract.
 - `config/etf_discovery_universe.yml` — broad investable ETF lane universe used by discovery.
+- `runtime/fetch_etf_relative_strength.py` — historical relative-strength fetcher for discovery scoring.
 - `runtime/discover_etf_lanes.py` — lane discovery runtime that writes the matching lane artifact.
 - `runtime/score_etf_lanes.py` — deterministic lane scoring and promotion logic.
+- `pricing/augment_challenger_pricing.py` — targeted second-pass challenger pricing augmenter.
 - `runtime/build_etf_report_state.py` — deterministic runtime state builder.
 - `runtime/render_etf_report_from_state.py` — runtime-driven English/Dutch markdown renderer.
 - `runtime/polish_runtime_reports.py` — post-render editorial polish layer.
@@ -56,6 +58,7 @@ For ETF architecture, debugging, prompt, workflow, state, pricing, discovery, or
 - `output/etf_trade_ledger.csv` — machine-readable executed-change ledger.
 - `output/etf_recommendation_scorecard.csv` — machine-readable recommendation discipline and capital re-underwriting memory.
 - `output/pricing/` — persisted pricing audits.
+- `output/market_history/etf_relative_strength.json` — historical market-strength metrics used by discovery scoring when available.
 - `output/lane_reviews/` — machine-readable lane assessment artifacts created by the lane discovery engine.
 - `output/runtime/` — normalized runtime state artifacts.
 
@@ -85,6 +88,7 @@ Lab outputs are never production truth unless explicitly promoted through a revi
 - Do not let `Hold but replaceable` become indefinite inertia; apply `control/CAPITAL_REUNDERWRITING_RULES.md`.
 - Do not use markdown as the primary pricing or holdings database once runtime state is available.
 - Do not treat the Structural Opportunity Radar as a static memory list; run the lane discovery engine before runtime state build.
+- Do not treat priced challengers as automatically fundable; challenger pricing only enables fairer comparison.
 
 ## Current direction of travel
 
@@ -94,6 +98,6 @@ ETF is moving toward:
 - ChatGPT Project as workbench
 - explicit pricing/state artifacts
 - runtime-derived English canonical report plus Dutch companion
-- lane discovery artifacts for breadth, novelty, and challenger discipline
+- lane discovery artifacts for breadth, novelty, market strength, and challenger discipline
 - recommendation scorecard artifacts for capital discipline
 - lab-only optimization as a QA/research surface, not a production allocator
