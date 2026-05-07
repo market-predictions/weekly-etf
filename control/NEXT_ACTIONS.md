@@ -7,7 +7,7 @@
 
 ---
 
-## Phase 1 — protect the stable runtime baseline
+## Phase 1 — protect the validated runtime baseline
 
 ### 1. Keep using the control-layer start sequence
 - Owner: `[JOINT]`
@@ -18,12 +18,15 @@
   4. only then the minimum relevant execution file(s)
 - Done when: sessions no longer rediscover the architecture.
 
-### 2. Treat the current runtime path as the production baseline
+### 2. Treat the current two-pass runtime path as the production baseline
 - Owner: `[JOINT]`
 - Current baseline:
   ```text
   pricing audit
-  → lane discovery
+  → historical relative strength
+  → first-pass lane discovery
+  → targeted challenger pricing
+  → final lane discovery
   → runtime state
   → EN/NL report render
   → polish/linkify
@@ -43,30 +46,40 @@
 
 ---
 
-## Phase 2 — improve discovery intelligence
+## Phase 2 — inspect latest report quality
 
-### 4. Add historical relative-strength scoring
+### 4. Inspect latest received two-pass report
+- Owner: `[JOINT]`
+- Action:
+  - check whether replacement challenger pricing is visible and sensible
+  - check whether final radar ranking changed logically after challenger pricing
+  - check whether omitted lanes have useful rejection reasons
+  - check whether Section 2, 4A, 9, 10, 12, 13 and 15 still render cleanly
+- Done when: no visible report regression remains.
+
+---
+
+## Phase 3 — improve discovery intelligence further
+
+### 5. Add liquidity and tradability filters
 - Owner: `[ASSISTANT]`
 - Action:
-  - add 1-month and 3-month ETF return calculations
-  - add trend quality
-  - add volatility/drawdown filters
-  - add relative strength versus SPY
-  - add relative strength versus current holdings where possible
-  - feed values into `runtime/score_etf_lanes.py`
-- Done when: lane ranking is less dependent on configured priors and more market-data backed.
+  - add average dollar volume where available
+  - add ETF liquidity/tradability score
+  - penalize or block illiquid ETFs from live radar promotion
+- Done when: technically attractive but illiquid ETFs are not promoted without an explicit override.
 
-### 5. Expand challenger pricing coverage with a two-pass flow
+### 6. Add relative strength versus current holdings
 - Owner: `[ASSISTANT]`
 - Action:
-  - first pass: broad lane discovery
-  - identify top challengers
-  - second pricing pass for top challengers
-  - final scoring
-  - report render
-- Done when: top challenger lanes have close-based pricing evidence before final scoring.
+  - compare SPY challengers versus SPY
+  - compare PPA challengers versus PPA
+  - compare PAVE challengers versus PAVE
+  - compare GLD challengers versus GLD
+  - use the result in replacement-duel scoring
+- Done when: replacement candidates are compared against the actual holding they would replace, not only versus SPY.
 
-### 6. Expand and curate the discovery universe
+### 7. Expand and curate the discovery universe
 - Owner: `[ASSISTANT]`
 - Source file:
   - `config/etf_discovery_universe.yml`
@@ -75,7 +88,7 @@
   - keep each lane investable, differentiated, and scored
 - Done when: the universe is broad enough to surface new candidates without becoming noisy.
 
-### 7. Add better macro/fundamental freshness inputs
+### 8. Add better macro/fundamental freshness inputs
 - Owner: `[ASSISTANT]`
 - Action:
   - add machine-readable macro/regime input file
@@ -85,9 +98,9 @@
 
 ---
 
-## Phase 3 — continue capital discipline
+## Phase 4 — continue capital discipline
 
-### 8. Apply the capital re-underwriting layer in every report
+### 9. Apply the capital re-underwriting layer in every report
 - Owner: `[ASSISTANT]`
 - Source files:
   - `control/CAPITAL_REUNDERWRITING_RULES.md`
@@ -100,7 +113,7 @@
   - test hedge validity for GLD or any hedge sleeve
 - Done when: the report clearly explains why Hold is still justified or why action is required.
 
-### 9. Force the specific current weak-point reviews
+### 10. Force the specific current weak-point reviews
 - Owner: `[ASSISTANT]`
 - Action: in the next report explicitly review:
   - SPY overlap versus SMH
@@ -114,4 +127,4 @@
 
 ## Current checkpoint
 
-**The runtime-driven bilingual production baseline is stable. The next priority is historical relative-strength scoring, then two-pass challenger pricing.**
+**The runtime-driven bilingual production baseline with historical relative-strength scoring and two-pass challenger pricing is validated. The next priority is report inspection, then liquidity/tradability filtering and direct replacement-duel relative strength.**
