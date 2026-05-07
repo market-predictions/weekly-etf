@@ -135,3 +135,30 @@ The new discipline layer forces the model to ask whether each holding would be b
 - Weak or replaceable holdings now need a named next action, alternative comparison, or explicit override.
 - The next live ETF report should force clear review of SPY, PPA, PAVE, GLD, and cash policy.
 - ETF state now includes portfolio state, valuation history, trade ledger, lane artifacts, pricing audits, and recommendation discipline memory.
+
+---
+
+## 2026-05-07 — Lock runtime-driven bilingual production baseline
+### Decision
+ETF now treats the runtime-driven pipeline as the stable production baseline.
+
+### Chosen architecture
+```text
+pricing audit
+→ lane discovery
+→ runtime state
+→ EN/NL report render
+→ polish/linkify
+→ validation
+→ PDF/email delivery
+```
+
+### Reason
+This path has produced received bilingual reports and resolves the prior architecture problem where markdown reports acted as hidden state, pricing source, continuity memory, and delivery artifact all at once.
+
+### Consequence
+- Markdown reports are presentation output, not primary state authority.
+- Future changes should preserve the runtime flow and avoid manual markdown patching.
+- Renderer changes should be limited to concrete output defects or validated improvements.
+- The next discovery-maturity phase is historical relative-strength scoring.
+- The next pricing-maturity phase is two-pass challenger pricing.
