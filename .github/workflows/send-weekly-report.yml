@@ -38,7 +38,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install matplotlib mistune weasyprint pyyaml
+          pip install matplotlib mistune weasyprint pyyaml pandas yfinance
 
       - name: Run persistent ETF pricing pass
         env:
@@ -48,13 +48,23 @@ jobs:
         run: |
           python -m pricing.run_pricing_pass
 
+      - name: Fetch ETF historical relative strength
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python -m runtime.fetch_etf_relative_strength \
+            --config config/etf_discovery_universe.yml \
+            --period 6mo \
+            --output-json output/market_history/etf_relative_strength.json
+
       - name: Discover and score ETF opportunity lanes
         env:
           MRKT_RPRTS_REPORT_MODE: pro
         run: |
           python -m runtime.discover_etf_lanes \
             --config config/etf_discovery_universe.yml \
-            --portfolio-state output/etf_portfolio_state.json
+            --portfolio-state output/etf_portfolio_state.json \
+            --relative-strength output/market_history/etf_relative_strength.json
 
       - name: Build runtime ETF state and reports
         env:
