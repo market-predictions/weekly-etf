@@ -162,3 +162,37 @@ This path has produced received bilingual reports and resolves the prior archite
 - Renderer changes should be limited to concrete output defects or validated improvements.
 - The next discovery-maturity phase is historical relative-strength scoring.
 - The next pricing-maturity phase is two-pass challenger pricing.
+
+---
+
+## 2026-05-07 — Validate historical relative-strength and two-pass challenger pricing baseline
+### Decision
+ETF now treats historical relative-strength scoring and two-pass challenger pricing as part of the validated production baseline.
+
+### Chosen architecture
+```text
+pricing audit
+→ historical relative strength
+→ first-pass lane discovery
+→ targeted challenger pricing
+→ final lane discovery
+→ runtime state
+→ EN/NL report render
+→ polish/linkify
+→ validation
+→ PDF/email delivery
+```
+
+### Reason
+The workflow successfully passed after adding:
+
+- `runtime/fetch_etf_relative_strength.py`
+- historical 1m/3m return, trend, drawdown, volatility and relative-strength inputs
+- `pricing/augment_challenger_pricing.py`
+- targeted challenger pricing between first-pass and final discovery
+
+### Consequence
+- The Structural Opportunity Radar is now less dependent on configured priors.
+- Top discovery challengers can receive targeted pricing before final scoring.
+- Priced challengers are not automatically fundable; they only enable a fairer comparison.
+- The next maturity steps are liquidity/tradability filtering, relative strength versus current holdings, and macro/fundamental freshness inputs.
