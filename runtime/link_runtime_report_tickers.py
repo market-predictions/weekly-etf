@@ -29,7 +29,6 @@ SECTION_TABLE_BOUNDS = [
         "## 10. Current Position Review",
         {"first-order effect", "second-order effect", "likely beneficiaries", "likely losers", "etf implication"},
     ),
-    ("## 10. Current Position Review", "## 11. Best New Opportunities", {"ticker"}),
 ]
 
 
@@ -108,27 +107,6 @@ def linkify_text_sections(text: str) -> str:
     return text
 
 
-def linkify_action_snapshot_ticker_bullets(text: str) -> str:
-    start_heading = "## 2. Portfolio Action Snapshot"
-    end_heading = "## 3. Regime Dashboard"
-    start = text.find(start_heading)
-    if start == -1:
-        return text
-    body_start = start + len(start_heading)
-    end = text.find(end_heading, body_start)
-    if end == -1:
-        return text
-    body = text[body_start:end]
-    out = []
-    pure_ticker_bullet = re.compile(r"^(\s*-\s+)([A-Z][A-Z0-9.-]{0,14})(\s*)$")
-    for line in body.splitlines():
-        m = pure_ticker_bullet.match(line)
-        if m and m.group(2) in TICKERS:
-            line = f"{m.group(1)}{md_link(m.group(2))}{m.group(3)}"
-        out.append(line)
-    return text[:body_start] + "\n".join(out) + text[end:]
-
-
 def split_table_row(row: str) -> list[str]:
     return row.strip().strip("|").split("|")
 
@@ -189,8 +167,9 @@ def linkify_table_sections(text: str) -> str:
 
 
 def linkify_report(text: str) -> str:
+    # Section 2 is deliberately not markdown-linkified. The branded action
+    # snapshot renderer converts pure ticker values to TradingView anchors.
     text = linkify_text_sections(text)
-    text = linkify_action_snapshot_ticker_bullets(text)
     text = linkify_table_sections(text)
     return text
 
