@@ -1,7 +1,7 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-05-07
+2026-05-08
 
 ## What this repository currently is
 
@@ -16,11 +16,13 @@ This repository is now a validated runtime-driven production-style weekly ETF re
 - `runtime/discover_etf_lanes.py` and `runtime/score_etf_lanes.py` as the lane discovery/scoring engine
 - `pricing/augment_challenger_pricing.py` as the targeted second-pass challenger pricing layer
 - `runtime/build_etf_report_state.py` as the deterministic runtime state builder
-- `runtime/render_etf_report_from_state.py` as the English/Dutch runtime renderer
+- `runtime/render_etf_report_from_state.py` as the English/Dutch runtime markdown renderer
 - `runtime/polish_runtime_reports.py` as the editorial polish layer
-- `runtime/link_runtime_report_tickers.py` as the context-aware ticker link layer
-- `etf-pro.txt` and `etf-pro-nl.txt` as premium English/Dutch delivery layers
-- `send_report.py` as the delivery/rendering script
+- `runtime/link_runtime_report_tickers.py` as the context-aware markdown ticker link layer
+- `runtime/delivery_html_overrides.py` as the delivery-layer HTML authority for strict branded sections
+- `tools/validate_etf_delivery_html_contract.py` as the dynamic delivery HTML regression validator
+- `send_report_runtime_html.py` as the production delivery entrypoint that applies runtime-state HTML overrides
+- `send_report.py` as the base delivery/rendering script
 - `.github/workflows/send-weekly-report.yml` as the production send workflow
 - a pricing subsystem in `pricing/`
 - archived reports in `output/`
@@ -44,13 +46,25 @@ pricing audit
 → targeted challenger pricing
 → final lane discovery
 → runtime state
-→ EN/NL report render
+→ EN/NL markdown render
 → polish/linkify
-→ validation
+→ delivery HTML overrides
+→ delivery HTML contract validation
 → PDF/email delivery
 ```
 
-This path has produced a green workflow run and received bilingual reports. Treat this as the current production baseline before further changes.
+This path has solved the recurring report-render defect where Section 2 ticker links and Current Position Review layout could not be made reliable through markdown post-processing.
+
+## Stable render decision
+
+Strict branded sections are now delivery-render responsibilities, not markdown-polish responsibilities.
+
+Specifically:
+
+- Portfolio Action Snapshot is rendered from runtime state as delivery HTML.
+- Current Position Review is rendered from runtime state as delivery HTML.
+- The delivery HTML validator dynamically reads current holdings from runtime state.
+- The validator checks real TradingView anchors and a real Current Position Review HTML table before email send.
 
 ## What changed recently
 
@@ -72,17 +86,9 @@ The Structural Opportunity Radar now comes from:
 
 instead of only static memory.
 
-### Report renderer caught up with discovery metadata
+### Delivery HTML layer added for strict sections
 
-The runtime renderer now uses:
-
-- `evidence_summary`
-- `why_now`
-- richer rejection reasons
-- enriched current-position metadata
-- recommendation scorecard fields
-
-so the radar, omitted lanes, Section 10, Section 12, and Final Action Table are no longer analytically thin.
+The recurring Section 2 and Current Position Review rendering issues were resolved by moving those sections into the delivery HTML layer. The validator now fails the workflow before email send if those sections lose anchors or table structure.
 
 ## Current strengths
 
@@ -93,11 +99,10 @@ so the radar, omitted lanes, Section 10, Section 12, and Final Action Table are 
 - Targeted challenger pricing augments the pricing audit.
 - Final discovery uses the augmented pricing audit.
 - Lane artifact includes discovery provenance, novelty metadata, and market-strength fields.
-- Breadth validation checks discovery metadata, not just static bucket coverage.
-- Portfolio/radar reporting no longer needs manually patched markdown to pass.
+- Delivery HTML overrides protect strict branded sections.
+- Delivery HTML validator checks the rendered output contract before email send.
 - Section 7 and Section 15 are reconciled from the same runtime state.
 - Dutch report is derived from the English runtime state and preserves numeric parity.
-- Current-position review is enriched from portfolio state and recommendation scorecard.
 
 ## Current weaknesses
 
@@ -108,35 +113,28 @@ so the radar, omitted lanes, Section 10, Section 12, and Final Action Table are 
 The first engine stores evidence summaries and why-now fields, but does not yet fetch current macro/fundamental news or official data automatically.
 
 ### 3. Relative strength is broad but not yet fully institutional
-The relative-strength layer uses pragmatic public yfinance history. It does not yet include liquidity filters, factor/sector benchmark normalization, or relative strength versus every current holding.
+The relative-strength layer uses pragmatic public yfinance history. It includes early liquidity/tradability metrics, but does not yet include full factor/sector benchmark normalization or complete direct replacement-duel scoring.
 
 ### 4. Challenger pricing is targeted, not full-universe pricing
 Targeted challenger pricing improves comparison quality, but it intentionally does not price the whole ETF universe to protect runtime and API limits.
 
 ## Immediate priorities
 
-### Priority A — inspect the latest received report after two-pass challenger pricing
-Check whether:
+### Priority A — final confirmation run
+Run one fresh production workflow to confirm:
 
-- replacement challenger pricing is visible and sensible
-- final radar ranking changed logically after challenger pricing
-- omitted lanes have useful rejection reasons
-- no report formatting regression occurred
+- delivery HTML validator passes
+- PDF/email render still succeeds
+- received PDF keeps Section 2 links and Current Position Review table intact
 
-### Priority B — add liquidity and tradability filters
+### Priority B — add direct challenger-vs-current-holding scoring
 Next enhancement:
 
-- average dollar volume filter
-- ETF AUM / spread proxy if available
-- avoid promoting technically attractive but illiquid ETFs
+- map challenger lanes to the holding they may replace
+- compute direct 1m and 3m relative strength versus that holding
+- feed direct replacement edge into lane scoring and replacement-duel notes
 
-### Priority C — add relative strength versus current holdings
-Future enhancement:
-
-- compare challengers directly versus SPY, SMH, PPA, PAVE, URNM, and GLD where relevant
-- use this in replacement-duel scoring
-
-### Priority D — expand macro/fundamental freshness inputs
+### Priority C — expand macro/fundamental freshness inputs
 Future enhancement:
 
 - machine-readable macro/regime input file
@@ -145,4 +143,4 @@ Future enhancement:
 
 ## Current status label
 
-**ETF now has a validated runtime-driven bilingual production baseline with historical relative-strength scoring and two-pass challenger pricing. The next engineering phase is liquidity/tradability filtering and richer macro/fundamental freshness inputs.**
+**ETF now has a validated runtime-driven bilingual production baseline with historical relative-strength scoring, two-pass challenger pricing, and delivery HTML validation for strict branded sections. The next engineering phase is direct challenger-vs-current-holding scoring.**
