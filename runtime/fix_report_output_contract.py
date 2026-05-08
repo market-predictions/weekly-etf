@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from runtime.build_etf_report_state import build_runtime_state
-from runtime.render_etf_report_from_state import f2, position_rows
+from runtime.render_etf_report_from_state import f2, position_rows, replacement_duel_table
 
 EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
@@ -60,36 +60,70 @@ def is_replace(p: dict[str, Any]) -> bool:
     return better == "yes" or "review" in action or "replace" in action
 
 
+def is_reduce(p: dict[str, Any]) -> bool:
+    return "reduce" in clean_action(p.get("suggested_action")).lower()
+
+
+def is_close(p: dict[str, Any]) -> bool:
+    action = clean_action(p.get("suggested_action")).lower()
+    return "close" in action or "sell" in action
+
+
 def tickers(items: list[dict[str, Any]]) -> str:
     values = [str(p.get("ticker", "")).upper() for p in items if p.get("ticker")]
     return ", ".join(values) if values else "None"
 
 
-def current_position_cards(state: dict[str, Any]) -> str:
-    """Renderer-safe current-position block.
+def ticker_bullets(items: list[dict[str, Any]]) -> str:
+    values = [str(p.get("ticker", "")).upper() for p in items if p.get("ticker")]
+    if not values:
+        return "- None"
+    return "\n".join(f"- {ticker}" for ticker in values)
 
-    The PDF renderer's current-position template gives strong visual treatment to
-    `###` titles. In the previous output, only the ticker heading survived into
-    the PDF. Therefore the essential decision data is now embedded directly in
-    each heading, with the paragraph kept as a secondary fallback.
-    """
-    parts = [
-        "The position review separates thesis quality, ETF implementation quality and the fresh-cash test. Existing holdings are not treated as automatic default holds."
+
+def action_snapshot_section(state: dict[str, Any]) -> str:
+    positions = position_rows(state)
+    add = [p for p in positions if is_add(p)]
+    hold = [p for p in positions if is_hold(p) or is_add(p)]
+    replace = [p for p in positions if is_replace(p)]
+    reduce = [p for p in positions if is_reduce(p)]
+    close = [p for p in positions if is_close(p)]
+    return "\n".join([
+        "### Add",
+        ticker_bullets(add),
+        "",
+        "### Hold",
+        ticker_bullets(hold),
+        "",
+        "### Hold but replaceable",
+        f"- {tickers(replace)} remain under explicit review." if replace else "- None.",
+        "",
+        "### Reduce",
+        ticker_bullets(reduce),
+        "",
+        "### Close",
+        ticker_bullets(close),
+        "",
+        "### Best replacements to fund",
+        "- No challenger is promoted to a fundable replacement yet. Each named replacement must first clear the same close-date pricing basis and relative-strength duel.",
+        "",
+        "### Replacement pricing and duel status",
+        "",
+        replacement_duel_table(state),
+    ])
+
+
+def current_position_table(state: dict[str, Any]) -> str:
+    rows = [
+        "| Ticker | Action | Score | Fresh cash | Role | Required next action |",
+        "|---|---|---:|---|---|---|",
     ]
     for p in position_rows(state):
-        ticker = str(p.get("ticker", "")).upper()
-        score = f2(p.get("total_score")) or "n/a"
-        action = clean_action(p.get("suggested_action"))
-        fresh_cash = clean_action(p.get("fresh_cash_test"))
-        role = clean_action(p.get("portfolio_role"))
-        key_point = compact(p.get("short_reason"), 96)
-        next_action = compact(p.get("required_next_action"), 96)
-        parts.extend([
-            f"### {ticker} — {action} — Score {score} — Fresh cash: {fresh_cash}",
-            f"Role: {role}. Key point: {key_point}. Next action: {next_action}.",
-            "",
-        ])
-    return "\n".join(parts).strip()
+        rows.append(
+            f"| {str(p.get('ticker', '')).upper()} | {clean_action(p.get('suggested_action'))} | {f2(p.get('total_score')) or 'n/a'} | "
+            f"{clean_action(p.get('fresh_cash_test'))} | {compact(p.get('portfolio_role'), 42)} | {compact(p.get('required_next_action'), 90)} |"
+        )
+    return "\n".join(rows)
 
 
 def rotation_plan_sections(state: dict[str, Any]) -> str:
@@ -97,13 +131,30 @@ def rotation_plan_sections(state: dict[str, Any]) -> str:
     add = [p for p in positions if is_add(p)]
     hold = [p for p in positions if is_hold(p)]
     replace = [p for p in positions if is_replace(p)]
-    reduce = [p for p in positions if "reduce" in clean_action(p.get("suggested_action")).lower()]
-    close = [p for p in positions if "close" in clean_action(p.get("suggested_action")).lower() or "sell" in clean_action(p.get("suggested_action")).lower()]
+    reduce = [p for p in positions if is_reduce(p)]
+    close = [p for p in positions if is_close(p)]
     return "\n".join([
         "| Close | Reduce | Hold | Add | Replace |",
         "|---|---|---|---|---|",
         f"| {tickers(close)} | {tickers(reduce)} | {tickers(hold)} | {tickers(add)} | {tickers(replace)} |",
     ])
+
+
+def best_new_opportunities(state: dict[str, Any]) -> str:
+    lines = ["- SMH remains the leading funded growth exposure, subject to the max-position rule."]
+    promoted = state.get("lane_assessment", {}).get("assessed_lanes", [])
+    count = 0
+    for lane in promoted:
+        if lane.get("promoted_to_live_radar") is True and lane.get("challenger") is True and count < 3:
+            primary = clean_action(lane.get("primary_etf"))
+            alt = clean_action(lane.get("alternative_etf"))
+            summary = compact(lane.get("evidence_summary") or lane.get("why_now"), 150)
+            lines.append(f"- {primary} / {alt}: {summary}")
+            count += 1
+    if count == 0:
+        lines.append("- No challenger is fundable without completed pricing and relative-strength duel evidence.")
+    lines.append("- Replacement candidates remain evidence-gated: pricing basis and duel status must be visible before funding.")
+    return "\n".join(lines)
 
 
 def trim_omitted_lanes_table(text: str, max_rows: int = 5) -> str:
@@ -141,9 +192,21 @@ def patch_report(path: Path, state: dict[str, Any]) -> None:
     text = path.read_text(encoding="utf-8")
     text = replace_between(
         text,
+        "## 2. Portfolio Action Snapshot",
+        "## 3. Regime Dashboard",
+        action_snapshot_section(state),
+    )
+    text = replace_between(
+        text,
         "## 10. Current Position Review",
         "## 11. Best New Opportunities",
-        current_position_cards(state),
+        current_position_table(state),
+    )
+    text = replace_between(
+        text,
+        "## 11. Best New Opportunities",
+        "## 12. Portfolio Rotation Plan",
+        best_new_opportunities(state),
     )
     text = replace_between(
         text,
