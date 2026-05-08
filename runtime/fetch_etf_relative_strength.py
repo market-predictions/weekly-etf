@@ -10,22 +10,46 @@ import yaml
 import yfinance as yf
 
 OUTPUT_DIR = Path("output/market_history")
+DEFAULT_MACRO_CONTEXT = Path("config/etf_macro_fundamental_context.yml")
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
-    return yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not path.exists():
+        return {}
+    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
 
 
-def discovery_tickers(config: dict[str, Any]) -> list[str]:
+def _split_tickers(raw: Any) -> list[str]:
+    values: list[str] = []
+    for ticker in str(raw or "").upper().replace("/", " ").replace(",", " ").split():
+        ticker = ticker.strip()
+        if ticker and ticker != "CASH" and ticker not in values:
+            values.append(ticker)
+    return values
+
+
+def replacement_target_tickers(macro_context: dict[str, Any]) -> list[str]:
+    tickers: set[str] = set()
+    target_map = ((macro_context.get("replacement_duel_policy") or {}).get("target_map") or {})
+    for holding, payload in target_map.items():
+        tickers.update(_split_tickers(holding))
+        if isinstance(payload, dict):
+            challengers = payload.get("challengers", []) or []
+        else:
+            challengers = payload or []
+        for challenger in challengers:
+            tickers.update(_split_tickers(challenger))
+    return sorted(tickers)
+
+
+def discovery_tickers(config: dict[str, Any], macro_context: dict[str, Any] | None = None) -> list[str]:
     tickers: set[str] = {"SPY"}
     for lane in config.get("lanes", []) or []:
         for key in ("primary_etf", "alternative_etf"):
-            raw = str(lane.get(key, "")).strip().upper()
-            if not raw:
-                continue
-            for ticker in raw.replace("/", " ").replace(",", " ").split():
-                if ticker and ticker != "CASH":
-                    tickers.add(ticker)
+            for ticker in _split_tickers(lane.get(key)):
+                tickers.add(ticker)
+    if macro_context:
+        tickers.update(replacement_target_tickers(macro_context))
     return sorted(tickers)
 
 
@@ -169,12 +193,15 @@ def build_metrics(prices: pd.DataFrame, volumes: pd.DataFrame) -> dict[str, Any]
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="config/etf_discovery_universe.yml")
+    parser.add_argument("--macro-context", default=str(DEFAULT_MACRO_CONTEXT))
     parser.add_argument("--period", default="6mo")
     parser.add_argument("--output-json", default="output/market_history/etf_relative_strength.json")
     args = parser.parse_args()
 
     config = load_yaml(Path(args.config))
-    tickers = discovery_tickers(config)
+    macro_context = load_yaml(Path(args.macro_context))
+    target_map_tickers = replacement_target_tickers(macro_context)
+    tickers = discovery_tickers(config, macro_context)
     raw = yf.download(
         tickers=tickers,
         period=args.period,
@@ -193,12 +220,20 @@ def main() -> None:
     payload = {
         "source": "yfinance",
         "period": args.period,
+        "config": args.config,
+        "macro_context": args.macro_context,
+        "replacement_target_map_tickers": target_map_tickers,
         "tickers_requested": tickers,
         "tickers_returned": sorted(metrics.keys()),
+        "missing_replacement_target_map_tickers": sorted([ticker for ticker in target_map_tickers if ticker not in metrics]),
         "metrics": metrics,
     }
     out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    print(f"ETF_RELATIVE_STRENGTH_OK | requested={len(tickers)} | returned={len(metrics)} | output={out_path}")
+    print(
+        "ETF_RELATIVE_STRENGTH_OK | "
+        f"requested={len(tickers)} | returned={len(metrics)} | "
+        f"target_map_tickers={len(target_map_tickers)} | output={out_path}"
+    )
 
 
 if __name__ == "__main__":
