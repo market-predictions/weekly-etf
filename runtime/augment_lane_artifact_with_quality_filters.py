@@ -11,7 +11,7 @@ LANE_DIR = Path("output/lane_reviews")
 RS_PATH = Path("output/market_history/etf_relative_strength.json")
 MACRO_PATH = Path("config/etf_macro_fundamental_context.yml")
 
-REPLACEMENT_MAP = {
+DEFAULT_REPLACEMENT_MAP = {
     "SPY": ["QUAL", "IEFA"],
     "PPA": ["ITA"],
     "PAVE": ["GRID"],
@@ -49,10 +49,32 @@ def metric(symbol: str, metrics: dict[str, Any], key: str) -> Any:
     return (metrics.get(symbol.upper(), {}) or {}).get(key)
 
 
+def replacement_target_map(macro: dict[str, Any]) -> dict[str, list[str]]:
+    policy = macro.get("replacement_duel_policy", {}) or {}
+    target_map = policy.get("target_map", {}) or {}
+    if not target_map:
+        return DEFAULT_REPLACEMENT_MAP
+    out: dict[str, list[str]] = {}
+    for holding, payload in target_map.items():
+        if isinstance(payload, dict):
+            challengers = payload.get("challengers", []) or []
+        else:
+            challengers = payload or []
+        out[str(holding).upper()] = [str(item).upper() for item in challengers]
+    return out
+
+
+def target_map_reason(macro: dict[str, Any], holding: str) -> str:
+    policy = macro.get("replacement_duel_policy", {}) or {}
+    payload = (policy.get("target_map", {}) or {}).get(holding, {}) or {}
+    if isinstance(payload, dict):
+        return str(payload.get("reason", ""))
+    return ""
+
+
 def liquidity_adjustment(symbol: str, metrics: dict[str, Any], policy: dict[str, Any]) -> tuple[float, str]:
     avg_dv = metric(symbol, metrics, "avg_dollar_volume_3m")
     liq_score = metric(symbol, metrics, "liquidity_score")
-    status = metric(symbol, metrics, "tradability_status") or "unknown"
     if avg_dv is None or liq_score is None:
         return -0.10, "Liquidity unknown; promoted only if other evidence is strong."
     min_promote = fnum(policy.get("min_avg_dollar_volume_promote"), 5_000_000)
@@ -64,18 +86,64 @@ def liquidity_adjustment(symbol: str, metrics: dict[str, Any], policy: dict[str,
     return -0.35, "Liquidity/tradability below preferred promotion threshold."
 
 
-def direct_holding_rs(symbol: str, metrics: dict[str, Any]) -> dict[str, Any]:
+def _return_edge(symbol: str, holding: str, metrics: dict[str, Any], key: str) -> float | None:
+    symbol_return = metric(symbol, metrics, key)
+    holding_return = metric(holding, metrics, key)
+    if symbol_return is None or holding_return is None:
+        return None
+    return round(fnum(symbol_return) - fnum(holding_return), 2)
+
+
+def direct_holding_rs(symbol: str, metrics: dict[str, Any], macro: dict[str, Any]) -> dict[str, Any]:
     symbol = symbol.upper()
     out: dict[str, Any] = {}
-    symbol_r3 = metric(symbol, metrics, "return_3m_pct")
-    for holding, challengers in REPLACEMENT_MAP.items():
-        if symbol in challengers:
-            holding_r3 = metric(holding, metrics, "return_3m_pct")
-            if symbol_r3 is not None and holding_r3 is not None:
-                out["direct_rs_vs_holding"] = holding
-                out["direct_rs_vs_holding_3m_pct"] = round(fnum(symbol_r3) - fnum(holding_r3), 2)
-                return out
+    for holding, challengers in replacement_target_map(macro).items():
+        if symbol not in challengers:
+            continue
+        edge_1m = _return_edge(symbol, holding, metrics, "return_1m_pct")
+        edge_3m = _return_edge(symbol, holding, metrics, "return_3m_pct")
+        if edge_1m is None and edge_3m is None:
+            return out
+        out["direct_rs_vs_holding"] = holding
+        out["direct_rs_vs_holding_1m_pct"] = edge_1m
+        out["direct_rs_vs_holding_3m_pct"] = edge_3m
+        out["direct_rs_vs_holding_reason"] = target_map_reason(macro, holding)
+        return out
     return out
+
+
+def direct_rs_adjustment(direct: dict[str, Any], macro: dict[str, Any]) -> float:
+    policy = macro.get("replacement_duel_policy", {}) or {}
+    max_bonus = fnum(policy.get("direct_edge_max_bonus"), 0.25)
+    max_penalty = fnum(policy.get("direct_edge_max_penalty"), -0.25)
+    edge_1m = direct.get("direct_rs_vs_holding_1m_pct")
+    edge_3m = direct.get("direct_rs_vs_holding_3m_pct")
+    if edge_1m is None and edge_3m is None:
+        return 0.0
+    weighted = 0.0
+    weight_total = 0.0
+    if edge_1m is not None:
+        weighted += fnum(edge_1m) * 0.35
+        weight_total += 0.35
+    if edge_3m is not None:
+        weighted += fnum(edge_3m) * 0.65
+        weight_total += 0.65
+    edge = weighted / weight_total if weight_total else 0.0
+    return round(max(min(edge / 20.0, max_bonus), max_penalty), 2)
+
+
+def direct_rs_note(direct: dict[str, Any]) -> str:
+    holding = direct.get("direct_rs_vs_holding")
+    if not holding:
+        return "No direct replacement-duel target mapped."
+    e1 = direct.get("direct_rs_vs_holding_1m_pct")
+    e3 = direct.get("direct_rs_vs_holding_3m_pct")
+    edge_parts = []
+    if e1 is not None:
+        edge_parts.append(f"1m {e1}%")
+    if e3 is not None:
+        edge_parts.append(f"3m {e3}%")
+    return f"Direct replacement duel versus {holding}: {'; '.join(edge_parts) if edge_parts else 'insufficient history'}."
 
 
 def augment_lane(lane: dict[str, Any], metrics: dict[str, Any], macro: dict[str, Any]) -> dict[str, Any]:
@@ -87,11 +155,8 @@ def augment_lane(lane: dict[str, Any], metrics: dict[str, Any], macro: dict[str,
 
     liq_adj, liq_note = liquidity_adjustment(primary, metrics, liquidity_policy)
     macro_adj = fnum(bucket_context.get("score_adjustment"), 0.0)
-    direct = direct_holding_rs(primary, metrics)
-    direct_adj = 0.0
-    if direct.get("direct_rs_vs_holding_3m_pct") is not None:
-        edge = fnum(direct.get("direct_rs_vs_holding_3m_pct"))
-        direct_adj = max(min(edge / 20.0, 0.20), -0.20)
+    direct = direct_holding_rs(primary, metrics, macro)
+    direct_adj = direct_rs_adjustment(direct, macro)
 
     lane["avg_dollar_volume_3m"] = metric(primary, metrics, "avg_dollar_volume_3m")
     lane["liquidity_score"] = metric(primary, metrics, "liquidity_score")
@@ -99,14 +164,16 @@ def augment_lane(lane: dict[str, Any], metrics: dict[str, Any], macro: dict[str,
     lane["liquidity_note"] = liq_note
     lane["macro_freshness_note"] = bucket_context.get("freshness_note", "No specific macro freshness override.")
     lane.update(direct)
+    lane["direct_rs_adjustment"] = direct_adj
+    lane["direct_rs_note"] = direct_rs_note(direct)
     lane["quality_filter_adjustment"] = round(liq_adj + macro_adj + direct_adj, 2)
     lane["total_score"] = round(fnum(lane.get("total_score")) + lane["quality_filter_adjustment"], 2)
 
     if lane["tradability_status"] == "fail_or_unknown" and lane.get("promoted_to_live_radar") is True:
         lane["rejection_reason"] = "Blocked from live radar because liquidity/tradability evidence is too weak."
         lane["promoted_to_live_radar"] = False
-    elif lane.get("rejection_reason") and lane.get("direct_rs_vs_holding_3m_pct") is not None:
-        lane["rejection_reason"] = f"{lane['rejection_reason']} Direct 3m RS versus {lane.get('direct_rs_vs_holding')} is {lane.get('direct_rs_vs_holding_3m_pct')}%."
+    elif lane.get("rejection_reason") and lane.get("direct_rs_vs_holding"):
+        lane["rejection_reason"] = f"{lane['rejection_reason']} {lane['direct_rs_note']}"
     return lane
 
 
@@ -148,7 +215,7 @@ def main() -> None:
     metrics = rs_payload.get("metrics", {}) or {}
     macro = load_yaml(Path(args.macro_context))
 
-    artifact["discovery_engine_version"] = str(artifact.get("discovery_engine_version", "lane_discovery")) + "+quality_filters_v1"
+    artifact["discovery_engine_version"] = str(artifact.get("discovery_engine_version", "lane_discovery")) + "+direct_replacement_rs_v1"
     artifact.setdefault("discovery_inputs", {})["quality_filter_macro_context"] = str(args.macro_context)
     artifact.setdefault("quality_filter_summary", {})["enabled"] = True
     lanes = [augment_lane(lane, metrics, macro) for lane in artifact.get("assessed_lanes", [])]
@@ -156,6 +223,7 @@ def main() -> None:
     artifact["quality_filter_summary"]["promoted_count"] = sum(1 for lane in artifact["assessed_lanes"] if lane.get("promoted_to_live_radar"))
     artifact["quality_filter_summary"]["liquidity_checked"] = True
     artifact["quality_filter_summary"]["direct_holding_rs_checked"] = True
+    artifact["quality_filter_summary"]["direct_holding_rs_version"] = "v1_1m_3m_weighted"
     lane_path.write_text(json.dumps(artifact, indent=2), encoding="utf-8")
     print(f"ETF_LANE_QUALITY_FILTERS_OK | artifact={lane_path} | promoted={artifact['quality_filter_summary']['promoted_count']}")
 
