@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from runtime.build_etf_report_state import build_runtime_state
+from runtime.replacement_duel_v2 import replacement_duel_v2_markdown
 
 ETF_NAMES = {
     "SPY": "SPDR S&P 500 ETF Trust",
@@ -91,38 +92,7 @@ def report_suffix(report_date: str) -> str:
 
 
 def replacement_duel_table(state: dict[str, Any]) -> str:
-    prices = price_by_symbol(state)
-    current = {str(p.get("ticker", "")).upper(): p for p in position_rows(state)}
-    duel_map = {
-        "PPA": ["ITA"],
-        "PAVE": ["GRID"],
-        "GLD": ["GSG", "BIL"],
-        "SPY": ["QUAL", "IEFA"],
-    }
-    lines = [
-        "| Current holding | Challenger | Current close | Challenger close | Close-date basis | Duel status | Decision implication |",
-        "|---|---|---:|---:|---|---|---|",
-    ]
-    for holding, challengers in duel_map.items():
-        current_close = f2(current.get(holding, {}).get("previous_price_local"))
-        challenger_close_parts = []
-        close_basis_parts = []
-        any_priced = False
-        for challenger in challengers:
-            p = prices.get(challenger)
-            if p:
-                any_priced = True
-                challenger_close_parts.append(f"{challenger} {f2(p.get('price'))}")
-                close_basis_parts.append(str(p.get("returned_close_date") or "latest verified"))
-            else:
-                challenger_close_parts.append(f"{challenger} n/a")
-                close_basis_parts.append("missing")
-        status = "priced but duel incomplete" if any_priced else "not fundable — pricing missing"
-        lines.append(
-            f"| {holding} | {' / '.join(challengers)} | {current_close} | {'; '.join(challenger_close_parts)} | "
-            f"{' / '.join(close_basis_parts)} | {status} | Do not fund replacement until same-basis relative-strength duel is complete |"
-        )
-    return "\n".join(lines)
+    return replacement_duel_v2_markdown(state)
 
 
 def radar_table(state: dict[str, Any]) -> str:
@@ -338,9 +308,9 @@ def render_en(state: dict[str, Any]) -> str:
 ### Best replacements to fund
 - No challenger is promoted to a fundable replacement yet. Each named replacement must first clear the same close-date pricing basis and relative-strength duel.
 
-### Replacement pricing and duel status
+### Replacement Duel Table v2
 
-{replacement_duel_table(state)}
+{replacement_duel_v2_markdown(state)}
 
 ## 3. Regime Dashboard
 
@@ -446,6 +416,10 @@ The position review separates three questions: is the thesis still valid, is the
 
 {best_opportunities_text(state)}
 
+### Replacement Duel Table v2
+
+{replacement_duel_v2_markdown(state)}
+
 ## 12. Portfolio Rotation Plan
 
 {rotation_plan_table(state)}
@@ -524,7 +498,7 @@ def render_nl(state: dict[str, Any]) -> str:
         "What changed this week": "Wat is er deze week veranderd",
         "Overall portfolio judgment": "Algemeen portefeuilleoordeel",
         "Main takeaway": "Belangrijkste conclusie",
-        "Replacement pricing and duel status": "Replacement pricing and duel status",
+        "Replacement Duel Table v2": "Replacement Duel Table v2",
         "Current Portfolio Holdings and Cash": "Current Portfolio Holdings and Cash",
         "The position review separates three questions: is the thesis still valid, is the ETF still the right vehicle, and would fresh cash buy this today at the current weight?": "De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het juiste instrument, en zou vers kapitaal dit vandaag nog kopen op het huidige gewicht?",
         "This section is the canonical default input for the next run unless the user explicitly overrides it.": "Deze sectie is de canonieke standaardinput voor de volgende run tenzij de gebruiker expliciet iets anders opgeeft.",
