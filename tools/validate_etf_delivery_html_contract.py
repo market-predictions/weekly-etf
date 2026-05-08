@@ -13,6 +13,7 @@ if str(REPO_ROOT) not in sys.path:
 import send_report as report_module
 from runtime.build_etf_report_state import build_runtime_state
 from runtime.delivery_html_overrides import build_report_html_with_state
+from runtime.render_etf_report_from_state import position_rows
 
 report_module.build_report_html = build_report_html_with_state(
     report_module.build_report_html,
@@ -26,8 +27,41 @@ def _ticker(value: Any) -> str:
     return str(value or "").strip().upper()
 
 
-def _current_holdings_from_state() -> list[str]:
-    state = build_runtime_state()
+def _clean(value: Any) -> str:
+    return str(value or "").strip().lower()
+
+
+def _is_add(p: dict[str, Any]) -> bool:
+    action = _clean(p.get("suggested_action"))
+    executed = _clean(p.get("action_executed_this_run"))
+    shares_delta = float(p.get("shares_delta_this_run") or 0.0)
+    return "add" in action or "buy" in executed or shares_delta > 0
+
+
+def _is_hold(p: dict[str, Any]) -> bool:
+    return "hold" in _clean(p.get("suggested_action")) and not _is_add(p)
+
+
+def _is_replace(p: dict[str, Any]) -> bool:
+    action = _clean(p.get("suggested_action"))
+    better = _clean(p.get("better_alternative_exists"))
+    return better == "yes" or "review" in action or "replace" in action
+
+
+def _is_reduce(p: dict[str, Any]) -> bool:
+    return "reduce" in _clean(p.get("suggested_action"))
+
+
+def _is_close(p: dict[str, Any]) -> bool:
+    action = _clean(p.get("suggested_action"))
+    return "close" in action or "sell" in action
+
+
+def _state() -> dict[str, Any]:
+    return build_runtime_state()
+
+
+def _current_holdings_from_state(state: dict[str, Any]) -> list[str]:
     tickers: list[str] = []
     for position in state.get("positions", []) or []:
         ticker = _ticker(position.get("ticker"))
@@ -36,6 +70,17 @@ def _current_holdings_from_state() -> list[str]:
     if not tickers:
         raise RuntimeError("Delivery HTML contract validation failed: no current holdings found in runtime state.")
     return tickers
+
+
+def _classified_state_tickers(state: dict[str, Any]) -> dict[str, list[str]]:
+    positions = position_rows(state)
+    return {
+        "add": [_ticker(p.get("ticker")) for p in positions if _is_add(p)],
+        "hold": [_ticker(p.get("ticker")) for p in positions if _is_hold(p) or _is_add(p)],
+        "replace": [_ticker(p.get("ticker")) for p in positions if _is_replace(p)],
+        "reduce": [_ticker(p.get("ticker")) for p in positions if _is_reduce(p)],
+        "close": [_ticker(p.get("ticker")) for p in positions if _is_close(p)],
+    }
 
 
 def _latest_reports(output_dir: Path) -> list[Path]:
@@ -132,14 +177,48 @@ def _validate_position_review(html: str, report_name: str, holdings: list[str]) 
         )
 
 
+def _validate_rotation_plan(html: str, report_name: str, classified: dict[str, list[str]]) -> None:
+    panel = _section_panel(html, "Portfolio Rotation Plan")
+    required_bits = [
+        "rotation-plan-table",
+        ">Close<",
+        ">Reduce<",
+        ">Hold<",
+        ">Add<",
+        ">Replace<",
+    ]
+    missing_bits = [bit for bit in required_bits if bit not in panel]
+    if missing_bits:
+        raise RuntimeError(
+            f"Delivery HTML contract validation failed for {report_name}: Portfolio Rotation Plan missing required HTML bits: {', '.join(missing_bits)}"
+        )
+
+    if all(not values for values in classified.values()):
+        return
+    if re.search(r"<td>\s*None\s*</td>\s*<td>\s*None\s*</td>\s*<td>\s*None\s*</td>\s*<td>\s*None\s*</td>\s*<td>\s*None\s*</td>", panel, flags=re.IGNORECASE):
+        raise RuntimeError(
+            f"Delivery HTML contract validation failed for {report_name}: Portfolio Rotation Plan shows all None despite state actions."
+        )
+
+    for bucket, tickers in classified.items():
+        for ticker in tickers:
+            if ticker and not _anchor_for_ticker_exists(panel, ticker):
+                raise RuntimeError(
+                    f"Delivery HTML contract validation failed for {report_name}: Portfolio Rotation Plan missing {bucket} anchor for {ticker}."
+                )
+
+
 def validate(output_dir: Path) -> None:
-    holdings = _current_holdings_from_state()
+    state = _state()
+    holdings = _current_holdings_from_state(state)
+    classified = _classified_state_tickers(state)
     reports = _latest_reports(output_dir)
     for report_path in reports:
         html = _render_delivery_html(report_path)
         _validate_no_raw_markdown_links(html, report_path.name)
         _validate_action_snapshot(html, report_path.name, holdings)
         _validate_position_review(html, report_path.name, holdings)
+        _validate_rotation_plan(html, report_path.name, classified)
         print(f"ETF_DELIVERY_HTML_CONTRACT_OK | report={report_path.name} | dynamic_holdings={','.join(holdings)}")
 
 
