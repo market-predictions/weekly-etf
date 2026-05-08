@@ -68,23 +68,29 @@ def _section_header(base: Any, number: int, title: str) -> str:
         return f"<h2>{escape(title)}</h2>"
 
 
-def _action_snapshot_html(base: Any, state: dict[str, Any]) -> str:
+def _classified_positions(state: dict[str, Any]) -> dict[str, list[str]]:
     positions = position_rows(state)
-    add = [str(p.get("ticker", "")).upper() for p in positions if _is_add(p)]
-    hold = [str(p.get("ticker", "")).upper() for p in positions if _is_hold(p) or _is_add(p)]
-    replace = [str(p.get("ticker", "")).upper() for p in positions if _is_replace(p)]
-    reduce = [str(p.get("ticker", "")).upper() for p in positions if _is_reduce(p)]
-    close = [str(p.get("ticker", "")).upper() for p in positions if _is_close(p)]
+    return {
+        "add": [str(p.get("ticker", "")).upper() for p in positions if _is_add(p)],
+        "hold": [str(p.get("ticker", "")).upper() for p in positions if _is_hold(p) or _is_add(p)],
+        "replace": [str(p.get("ticker", "")).upper() for p in positions if _is_replace(p)],
+        "reduce": [str(p.get("ticker", "")).upper() for p in positions if _is_reduce(p)],
+        "close": [str(p.get("ticker", "")).upper() for p in positions if _is_close(p)],
+    }
+
+
+def _action_snapshot_html(base: Any, state: dict[str, Any]) -> str:
+    classified = _classified_positions(state)
 
     return "".join([
         "<div class='panel panel-action-snapshot'>",
         _section_header(base, 2, "Portfolio Action Snapshot"),
         "<table class='action-table'><thead><tr><th>Recommendation</th><th>Tickers / notes</th></tr></thead><tbody>",
-        f"<tr><th>Add</th><td>{_ticker_join(base, add)}</td></tr>",
-        f"<tr><th>Hold</th><td>{_ticker_join(base, hold)}</td></tr>",
-        f"<tr><th>Hold but replaceable</th><td>{_ticker_join(base, replace)} remain under explicit review.</td></tr>",
-        f"<tr><th>Reduce</th><td>{_ticker_join(base, reduce)}</td></tr>",
-        f"<tr><th>Close</th><td>{_ticker_join(base, close)}</td></tr>",
+        f"<tr><th>Add</th><td>{_ticker_join(base, classified['add'])}</td></tr>",
+        f"<tr><th>Hold</th><td>{_ticker_join(base, classified['hold'])}</td></tr>",
+        f"<tr><th>Hold but replaceable</th><td>{_ticker_join(base, classified['replace'])} remain under explicit review.</td></tr>",
+        f"<tr><th>Reduce</th><td>{_ticker_join(base, classified['reduce'])}</td></tr>",
+        f"<tr><th>Close</th><td>{_ticker_join(base, classified['close'])}</td></tr>",
         "</tbody></table>",
         "<div class='note-box'><h4>Best replacements to fund</h4>",
         "<ul><li>No challenger is promoted to a fundable replacement yet. Each named replacement must first clear the same close-date pricing basis and relative-strength duel.</li></ul>",
@@ -115,6 +121,24 @@ def _position_review_html(base: Any, state: dict[str, Any]) -> str:
         "<tbody>",
         "".join(rows),
         "</tbody></table></div>",
+    ])
+
+
+def _rotation_plan_html(base: Any, state: dict[str, Any]) -> str:
+    classified = _classified_positions(state)
+    return "".join([
+        "<div class='panel panel-rotation-plan'>",
+        _section_header(base, 5, "Portfolio Rotation Plan"),
+        "<table class='data-table rotation-plan-table'>",
+        "<thead><tr><th>Close</th><th>Reduce</th><th>Hold</th><th>Add</th><th>Replace</th></tr></thead>",
+        "<tbody><tr>",
+        f"<td>{_ticker_join(base, classified['close'])}</td>",
+        f"<td>{_ticker_join(base, classified['reduce'])}</td>",
+        f"<td>{_ticker_join(base, classified['hold'])}</td>",
+        f"<td>{_ticker_join(base, classified['add'])}</td>",
+        f"<td>{_ticker_join(base, classified['replace'])}</td>",
+        "</tr></tbody></table>",
+        "</div>",
     ])
 
 
@@ -156,6 +180,7 @@ def apply_etf_delivery_html_overrides(html: str, base: Any, md_text: str) -> str
 
     html = _replace_panel_by_title(html, "Portfolio Action Snapshot", _action_snapshot_html(base, state))
     html = _replace_panel_by_title(html, "Current Position Review", _position_review_html(base, state))
+    html = _replace_panel_by_title(html, "Portfolio Rotation Plan", _rotation_plan_html(base, state))
     return html
 
 
