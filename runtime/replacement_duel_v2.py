@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import json
 from html import escape
+from pathlib import Path
 from typing import Any
+
+import yaml
 
 DEFAULT_TARGET_MAP: dict[str, list[str]] = {
     "SPY": ["QUAL", "IEFA", "EFA", "IWM"],
@@ -11,6 +15,11 @@ DEFAULT_TARGET_MAP: dict[str, list[str]] = {
     "URNM": ["URA", "NLR", "NUCL"],
     "SMH": ["SOXX", "IRBO", "BOTZ", "ROBO"],
 }
+
+STRATEGIC_HOLDING_ORDER = ["SPY", "PPA", "PAVE", "GLD", "URNM", "SMH"]
+STRATEGIC_HOLDING_RANK = {ticker: idx for idx, ticker in enumerate(STRATEGIC_HOLDING_ORDER)}
+DEFAULT_MACRO_CONTEXT = Path("config/etf_macro_fundamental_context.yml")
+DEFAULT_RS_PATH = Path("output/market_history/etf_relative_strength.json")
 
 
 def _ticker(value: Any) -> str:
@@ -33,6 +42,41 @@ def _edge_text(value: Any) -> str:
     return f"{sign}{value_f:.2f}%"
 
 
+def _load_yaml(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def _load_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _target_map() -> dict[str, list[str]]:
+    macro = _load_yaml(DEFAULT_MACRO_CONTEXT)
+    target_map = ((macro.get("replacement_duel_policy") or {}).get("target_map") or {})
+    if not target_map:
+        return DEFAULT_TARGET_MAP
+    out: dict[str, list[str]] = {}
+    for holding, payload in target_map.items():
+        holding_ticker = _ticker(holding)
+        if isinstance(payload, dict):
+            challengers = payload.get("challengers", []) or []
+        else:
+            challengers = payload or []
+        out[holding_ticker] = [_ticker(challenger) for challenger in challengers if _ticker(challenger)]
+    return out
+
+
+def _rs_metrics(state: dict[str, Any]) -> dict[str, Any]:
+    embedded = state.get("market_history", {}).get("metrics") if isinstance(state.get("market_history"), dict) else None
+    if embedded:
+        return embedded
+    return (_load_json(DEFAULT_RS_PATH).get("metrics") or {})
+
+
 def _index_prices(state: dict[str, Any]) -> dict[str, dict[str, Any]]:
     out: dict[str, dict[str, Any]] = {}
     for item in state.get("pricing", []) or []:
@@ -42,62 +86,15 @@ def _index_prices(state: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return out
 
 
-def _lane_rows(state: dict[str, Any]) -> list[dict[str, Any]]:
-    prices = _index_prices(state)
-    lanes = state.get("lane_assessment", {}).get("assessed_lanes", []) or []
-    rows: list[dict[str, Any]] = []
-    seen: set[tuple[str, str]] = set()
-
-    for lane in lanes:
-        holding = _ticker(lane.get("direct_rs_vs_holding"))
-        challenger = _ticker(lane.get("primary_etf"))
-        if not holding or not challenger or holding == challenger:
-            continue
-        key = (holding, challenger)
-        if key in seen:
-            continue
-        seen.add(key)
-        price = prices.get(challenger) or {}
-        rows.append(
-            {
-                "current_holding": holding,
-                "challenger": challenger,
-                "edge_1m_pct": lane.get("direct_rs_vs_holding_1m_pct"),
-                "edge_3m_pct": lane.get("direct_rs_vs_holding_3m_pct"),
-                "pricing_status": _pricing_status(challenger, price),
-                "decision": _decision(price, lane.get("direct_rs_vs_holding_1m_pct"), lane.get("direct_rs_vs_holding_3m_pct")),
-                "source": "lane_artifact_direct_rs",
-            }
-        )
-    return rows
-
-
-def _fallback_rows(state: dict[str, Any], existing_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    prices = _index_prices(state)
-    holdings = {_ticker(p.get("ticker")) for p in state.get("positions", []) or []}
-    existing = {(_ticker(row.get("current_holding")), _ticker(row.get("challenger"))) for row in existing_rows}
-    rows: list[dict[str, Any]] = []
-
-    for holding, challengers in DEFAULT_TARGET_MAP.items():
-        if holding not in holdings:
-            continue
-        for challenger in challengers:
-            key = (holding, challenger)
-            if key in existing:
-                continue
-            price = prices.get(challenger) or {}
-            rows.append(
-                {
-                    "current_holding": holding,
-                    "challenger": challenger,
-                    "edge_1m_pct": None,
-                    "edge_3m_pct": None,
-                    "pricing_status": _pricing_status(challenger, price),
-                    "decision": "Mapped challenger; direct relative-strength evidence not yet available.",
-                    "source": "fallback_target_map",
-                }
-            )
-    return rows
+def _return_edge(metrics: dict[str, Any], challenger: str, holding: str, key: str) -> float | None:
+    challenger_return = (metrics.get(challenger) or {}).get(key)
+    holding_return = (metrics.get(holding) or {}).get(key)
+    try:
+        if challenger_return is None or holding_return is None:
+            return None
+        return round(float(challenger_return) - float(holding_return), 2)
+    except (TypeError, ValueError):
+        return None
 
 
 def _pricing_status(challenger: str, price: dict[str, Any]) -> str:
@@ -129,19 +126,79 @@ def _decision(price: dict[str, Any], edge_1m: Any, edge_3m: Any) -> str:
     return "Current holding still leads; no replacement."
 
 
-def replacement_duel_v2_rows(state: dict[str, Any], limit: int = 12) -> list[dict[str, Any]]:
-    rows = _lane_rows(state)
-    rows.extend(_fallback_rows(state, rows))
+def _strategic_rows(state: dict[str, Any]) -> list[dict[str, Any]]:
+    prices = _index_prices(state)
+    metrics = _rs_metrics(state)
+    holdings = {_ticker(p.get("ticker")) for p in state.get("positions", []) or []}
+    rows: list[dict[str, Any]] = []
+    for holding, challengers in _target_map().items():
+        if holding not in holdings:
+            continue
+        for challenger in challengers:
+            price = prices.get(challenger) or {}
+            edge_1m = _return_edge(metrics, challenger, holding, "return_1m_pct")
+            edge_3m = _return_edge(metrics, challenger, holding, "return_3m_pct")
+            rows.append(
+                {
+                    "current_holding": holding,
+                    "challenger": challenger,
+                    "edge_1m_pct": edge_1m,
+                    "edge_3m_pct": edge_3m,
+                    "pricing_status": _pricing_status(challenger, price),
+                    "decision": _decision(price, edge_1m, edge_3m),
+                    "source": "strategic_target_map",
+                }
+            )
+    return rows
 
-    def sort_key(row: dict[str, Any]) -> tuple[int, float, str, str]:
-        has_direct = 0 if row.get("source") == "lane_artifact_direct_rs" else 1
-        try:
-            edge = float(row.get("edge_3m_pct"))
-        except (TypeError, ValueError):
-            edge = -999.0
-        return (has_direct, -edge, str(row.get("current_holding")), str(row.get("challenger")))
 
-    return sorted(rows, key=sort_key)[:limit]
+def _lane_rows(state: dict[str, Any], existing: set[tuple[str, str]]) -> list[dict[str, Any]]:
+    prices = _index_prices(state)
+    lanes = state.get("lane_assessment", {}).get("assessed_lanes", []) or []
+    rows: list[dict[str, Any]] = []
+    for lane in lanes:
+        holding = _ticker(lane.get("direct_rs_vs_holding"))
+        challenger = _ticker(lane.get("primary_etf"))
+        if not holding or not challenger or holding == challenger:
+            continue
+        key = (holding, challenger)
+        if key in existing:
+            continue
+        existing.add(key)
+        price = prices.get(challenger) or {}
+        edge_1m = lane.get("direct_rs_vs_holding_1m_pct")
+        edge_3m = lane.get("direct_rs_vs_holding_3m_pct")
+        rows.append(
+            {
+                "current_holding": holding,
+                "challenger": challenger,
+                "edge_1m_pct": edge_1m,
+                "edge_3m_pct": edge_3m,
+                "pricing_status": _pricing_status(challenger, price),
+                "decision": _decision(price, edge_1m, edge_3m),
+                "source": "lane_artifact_direct_rs",
+            }
+        )
+    return rows
+
+
+def _row_rank(row: dict[str, Any]) -> tuple[int, int, int, float, str]:
+    source_rank = 0 if row.get("source") == "strategic_target_map" else 1
+    holding = _ticker(row.get("current_holding"))
+    holding_rank = STRATEGIC_HOLDING_RANK.get(holding, 99)
+    try:
+        edge = float(row.get("edge_3m_pct"))
+    except (TypeError, ValueError):
+        edge = -999.0
+    missing_edge_rank = 1 if edge == -999.0 else 0
+    return (source_rank, holding_rank, missing_edge_rank, -edge, _ticker(row.get("challenger")))
+
+
+def replacement_duel_v2_rows(state: dict[str, Any], limit: int = 16) -> list[dict[str, Any]]:
+    rows = _strategic_rows(state)
+    existing = {(_ticker(row.get("current_holding")), _ticker(row.get("challenger"))) for row in rows}
+    rows.extend(_lane_rows(state, existing))
+    return sorted(rows, key=_row_rank)[:limit]
 
 
 def replacement_duel_v2_markdown(state: dict[str, Any]) -> str:
