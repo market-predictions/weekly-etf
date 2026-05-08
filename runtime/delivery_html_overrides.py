@@ -6,6 +6,44 @@ from typing import Any, Callable
 from runtime.build_etf_report_state import build_runtime_state
 from runtime.render_etf_report_from_state import f2, position_rows
 
+PRINT_TABLE_PAGINATION_CSS = """
+<style id="etf-table-pagination-guard">
+  @media print {
+    table {
+      page-break-inside: auto;
+      break-inside: auto;
+      border-collapse: collapse;
+    }
+
+    thead {
+      display: table-header-group;
+    }
+
+    tfoot {
+      display: table-footer-group;
+    }
+
+    tr,
+    th,
+    td {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .panel table tr,
+    .panel table th,
+    .panel table td,
+    .data-table tr,
+    .action-table tr,
+    .rotation-plan-table tr,
+    .position-review-table tr {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+  }
+</style>
+"""
+
 
 def _clean(value: Any) -> str:
     return str(value or "").strip() or "None"
@@ -172,16 +210,24 @@ def _replace_panel_by_title(html: str, title: str, replacement: str) -> str:
     return html[:start] + replacement + html[end:]
 
 
+def _inject_print_table_pagination_css(html: str) -> str:
+    if "etf-table-pagination-guard" in html:
+        return html
+    if "</head>" in html:
+        return html.replace("</head>", PRINT_TABLE_PAGINATION_CSS + "\n</head>", 1)
+    return PRINT_TABLE_PAGINATION_CSS + html
+
+
 def apply_etf_delivery_html_overrides(html: str, base: Any, md_text: str) -> str:
     try:
         state = build_runtime_state()
     except Exception:
-        return html
+        return _inject_print_table_pagination_css(html)
 
     html = _replace_panel_by_title(html, "Portfolio Action Snapshot", _action_snapshot_html(base, state))
     html = _replace_panel_by_title(html, "Current Position Review", _position_review_html(base, state))
     html = _replace_panel_by_title(html, "Portfolio Rotation Plan", _rotation_plan_html(base, state))
-    return html
+    return _inject_print_table_pagination_css(html)
 
 
 def build_report_html_with_state(base_build_report_html: Callable[..., str], base: Any) -> Callable[..., str]:
