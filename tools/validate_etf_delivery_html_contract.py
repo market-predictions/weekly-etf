@@ -5,8 +5,14 @@ import re
 from pathlib import Path
 from typing import Any
 
-import send_report_runtime_html as srh
+import send_report as report_module
 from runtime.build_etf_report_state import build_runtime_state
+from runtime.delivery_html_overrides import build_report_html_with_state
+
+report_module.build_report_html = build_report_html_with_state(
+    report_module.build_report_html,
+    report_module._base,
+)
 
 RAW_MARKDOWN_LINK_RE = re.compile(r"\[[A-Z][A-Z0-9.-]{0,14}\]\(https?://[^\)]+\)")
 
@@ -28,11 +34,10 @@ def _current_holdings_from_state() -> list[str]:
 
 
 def _latest_reports(output_dir: Path) -> list[Path]:
-    sr = srh.report_module
-    latest_en = sr.latest_report_file(output_dir, mode="pro")
+    latest_en = report_module.latest_report_file(output_dir, mode="pro")
     reports = [latest_en]
-    if sr.has_matching_dutch_report(latest_en):
-        reports.append(sr.matching_dutch_report_path(latest_en))
+    if report_module.has_matching_dutch_report(latest_en):
+        reports.append(report_module.matching_dutch_report_path(latest_en))
     return reports
 
 
@@ -45,9 +50,8 @@ def _report_date_from_filename(path: Path) -> str:
 
 
 def _render_delivery_html(report_path: Path) -> str:
-    sr = srh.report_module
     md_text = report_path.read_text(encoding="utf-8")
-    return sr.build_report_html(
+    return report_module.build_report_html(
         md_text,
         _report_date_from_filename(report_path),
         image_src=None,
