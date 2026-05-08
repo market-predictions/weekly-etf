@@ -7,7 +7,7 @@
 
 ---
 
-## Phase 1 — protect the validated runtime baseline
+## Phase 1 — protect the validated runtime and delivery baseline
 
 ### 1. Keep using the control-layer start sequence
 - Owner: `[JOINT]`
@@ -18,7 +18,7 @@
   4. only then the minimum relevant execution file(s)
 - Done when: sessions no longer rediscover the architecture.
 
-### 2. Treat the current two-pass runtime path as the production baseline
+### 2. Treat the current runtime + delivery HTML path as the production baseline
 - Owner: `[JOINT]`
 - Current baseline:
   ```text
@@ -28,13 +28,14 @@
   → targeted challenger pricing
   → final lane discovery
   → runtime state
-  → EN/NL report render
+  → EN/NL markdown render
   → polish/linkify
-  → validation
+  → delivery HTML overrides
+  → delivery HTML contract validation
   → PDF/email delivery
   ```
-- Action: do not keep changing the renderer unless there is a concrete output defect or validated improvement.
-- Done when: future changes preserve the runtime architecture rather than reintroducing manual markdown patching.
+- Action: do not repair strict branded sections through markdown post-processing.
+- Done when: Section 2 and Current Position Review stay governed by delivery HTML overrides and validator checks.
 
 ### 3. Keep workflow behavior operational only
 - Owner: `[ASSISTANT]`
@@ -46,40 +47,32 @@
 
 ---
 
-## Phase 2 — inspect latest report quality
+## Phase 2 — final confirmation run
 
-### 4. Inspect latest received two-pass report
-- Owner: `[JOINT]`
+### 4. Run one fresh production confirmation workflow
+- Owner: `[USER]` or `[ASSISTANT]` if workflow dispatch is available through tools
 - Action:
-  - check whether replacement challenger pricing is visible and sensible
-  - check whether final radar ranking changed logically after challenger pricing
-  - check whether omitted lanes have useful rejection reasons
-  - check whether Section 2, 4A, 9, 10, 12, 13 and 15 still render cleanly
-- Done when: no visible report regression remains.
+  - run `Send weekly ETF Pro report`
+  - confirm `Validate ETF delivery HTML contract` passes
+  - confirm email/PDF delivery succeeds
+  - inspect received PDF for Section 2 links and Current Position Review table
+- Done when: the report is received and the delivery HTML validator has passed.
 
 ---
 
-## Phase 3 — improve discovery intelligence further
+## Phase 3 — improve portfolio decision quality
 
-### 5. Add liquidity and tradability filters
+### 5. Add direct challenger-vs-current-holding scoring
 - Owner: `[ASSISTANT]`
 - Action:
-  - add average dollar volume where available
-  - add ETF liquidity/tradability score
-  - penalize or block illiquid ETFs from live radar promotion
-- Done when: technically attractive but illiquid ETFs are not promoted without an explicit override.
-
-### 6. Add relative strength versus current holdings
-- Owner: `[ASSISTANT]`
-- Action:
-  - compare SPY challengers versus SPY
-  - compare PPA challengers versus PPA
-  - compare PAVE challengers versus PAVE
-  - compare GLD challengers versus GLD
-  - use the result in replacement-duel scoring
+  - map challenger lanes to likely funded holdings they could replace
+  - compare challenger 1m and 3m returns directly versus the target holding
+  - add direct replacement edge to lane scoring
+  - add direct duel fields to lane artifacts
+  - surface the direct edge in replacement-duel notes
 - Done when: replacement candidates are compared against the actual holding they would replace, not only versus SPY.
 
-### 7. Expand and curate the discovery universe
+### 6. Expand and curate the discovery universe
 - Owner: `[ASSISTANT]`
 - Source file:
   - `config/etf_discovery_universe.yml`
@@ -88,7 +81,7 @@
   - keep each lane investable, differentiated, and scored
 - Done when: the universe is broad enough to surface new candidates without becoming noisy.
 
-### 8. Add better macro/fundamental freshness inputs
+### 7. Add better macro/fundamental freshness inputs
 - Owner: `[ASSISTANT]`
 - Action:
   - add machine-readable macro/regime input file
@@ -100,7 +93,7 @@
 
 ## Phase 4 — continue capital discipline
 
-### 9. Apply the capital re-underwriting layer in every report
+### 8. Apply the capital re-underwriting layer in every report
 - Owner: `[ASSISTANT]`
 - Source files:
   - `control/CAPITAL_REUNDERWRITING_RULES.md`
@@ -113,7 +106,7 @@
   - test hedge validity for GLD or any hedge sleeve
 - Done when: the report clearly explains why Hold is still justified or why action is required.
 
-### 10. Force the specific current weak-point reviews
+### 9. Force the specific current weak-point reviews
 - Owner: `[ASSISTANT]`
 - Action: in the next report explicitly review:
   - SPY overlap versus SMH
@@ -127,4 +120,4 @@
 
 ## Current checkpoint
 
-**The runtime-driven bilingual production baseline with historical relative-strength scoring and two-pass challenger pricing is validated. The next priority is report inspection, then liquidity/tradability filtering and direct replacement-duel relative strength.**
+**The runtime-driven bilingual production baseline now includes delivery HTML overrides and a dynamic delivery HTML validator. The next priority is one final confirmation run, then direct challenger-vs-current-holding scoring.**

@@ -43,9 +43,12 @@ For ETF architecture, debugging, prompt, workflow, state, pricing, discovery, or
 - `runtime/render_etf_report_from_state.py` — runtime-driven English/Dutch markdown renderer.
 - `runtime/polish_runtime_reports.py` — post-render editorial polish layer.
 - `runtime/link_runtime_report_tickers.py` — context-aware ticker linkification layer.
+- `runtime/delivery_html_overrides.py` — delivery-layer HTML overrides for branded sections that require strict layout/clickable behavior.
+- `tools/validate_etf_delivery_html_contract.py` — dynamic render-regression validator for delivery HTML.
+- `send_report.py` — base HTML/PDF/email delivery logic and manifest handling.
+- `send_report_runtime_html.py` — delivery entrypoint that applies runtime-state HTML overrides before PDF/email output.
 - `etf-pro.txt` — premium English editorial delivery layer.
 - `etf-pro-nl.txt` — Dutch companion delivery layer derived from the completed English report.
-- `send_report.py` — HTML/PDF/email delivery logic and manifest handling.
 - `.github/workflows/send-weekly-report.yml` — production send workflow.
 - `.github/workflows/refresh-etf-state-from-report.yml` — explicit state refresh workflow.
 - `.github/workflows/send-weekly-report-split-test.yml` — split-test delivery comparison workflow.
@@ -89,6 +92,7 @@ Lab outputs are never production truth unless explicitly promoted through a revi
 - Do not use markdown as the primary pricing or holdings database once runtime state is available.
 - Do not treat the Structural Opportunity Radar as a static memory list; run the lane discovery engine before runtime state build.
 - Do not treat priced challengers as automatically fundable; challenger pricing only enables fairer comparison.
+- Do not repair branded sections that require strict layout/clickable behavior through markdown post-processing; render them from runtime state at the delivery HTML layer and protect them with the delivery HTML validator.
 
 ## Current direction of travel
 
@@ -98,6 +102,7 @@ ETF is moving toward:
 - ChatGPT Project as workbench
 - explicit pricing/state artifacts
 - runtime-derived English canonical report plus Dutch companion
+- delivery HTML as the authority for branded strict-layout sections
 - lane discovery artifacts for breadth, novelty, market strength, and challenger discipline
 - recommendation scorecard artifacts for capital discipline
 - lab-only optimization as a QA/research surface, not a production allocator

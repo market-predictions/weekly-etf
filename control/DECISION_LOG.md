@@ -196,3 +196,35 @@ The workflow successfully passed after adding:
 - Top discovery challengers can receive targeted pricing before final scoring.
 - Priced challengers are not automatically fundable; they only enable a fairer comparison.
 - The next maturity steps are liquidity/tradability filtering, relative strength versus current holdings, and macro/fundamental freshness inputs.
+
+---
+
+## 2026-05-08 — Move strict branded sections to delivery HTML and validate rendered contract
+### Decision
+Sections with strict layout or clickable behavior are delivery-HTML responsibilities, not markdown-polish responsibilities.
+
+### Chosen architecture
+```text
+runtime state
+→ EN/NL markdown render
+→ polish/linkify
+→ delivery HTML overrides for strict sections
+→ dynamic delivery HTML contract validator
+→ PDF/email delivery
+```
+
+### Scope
+This applies specifically to:
+
+- Portfolio Action Snapshot
+- Current Position Review
+
+### Reason
+Repeated markdown-level fixes could not reliably guarantee clickable ticker formatting or a stable Current Position Review table because the branded PDF renderer uses special panel logic. The stable solution is to render these strict sections directly from runtime state at the delivery HTML layer.
+
+### Consequence
+- `runtime/delivery_html_overrides.py` owns the final HTML for strict branded sections.
+- `send_report_runtime_html.py` is the workflow delivery entrypoint.
+- `tools/validate_etf_delivery_html_contract.py` dynamically reads holdings from runtime state and validates rendered delivery HTML before email send.
+- The validator checks for real TradingView anchors, prevents raw markdown links, and ensures Current Position Review is a real HTML table.
+- Future PDF layout defects in these sections should be fixed in the delivery HTML layer, not by more markdown post-processing.
