@@ -208,6 +208,28 @@ def _validate_rotation_plan(html: str, report_name: str, classified: dict[str, l
                 )
 
 
+def _validate_replacement_duel_v2(html: str, report_name: str) -> None:
+    panel = _section_panel(html, "Replacement Duel Table v2")
+    required_bits = [
+        "replacement-duel-v2-table",
+        ">Current holding<",
+        ">Challenger<",
+        ">1m edge<",
+        ">3m edge<",
+        ">Pricing status<",
+        ">Decision<",
+    ]
+    missing_bits = [bit for bit in required_bits if bit not in panel]
+    if missing_bits:
+        raise RuntimeError(
+            f"Delivery HTML contract validation failed for {report_name}: Replacement Duel Table v2 missing required HTML bits: {', '.join(missing_bits)}"
+        )
+    if "direct RS duel incomplete" not in panel and "Challenger improving" not in panel and "Replacement trigger" not in panel and "Current holding still leads" not in panel and "Mapped challenger" not in panel:
+        raise RuntimeError(
+            f"Delivery HTML contract validation failed for {report_name}: Replacement Duel Table v2 has no decision text."
+        )
+
+
 def validate(output_dir: Path) -> None:
     state = _state()
     holdings = _current_holdings_from_state(state)
@@ -219,6 +241,7 @@ def validate(output_dir: Path) -> None:
         _validate_action_snapshot(html, report_path.name, holdings)
         _validate_position_review(html, report_path.name, holdings)
         _validate_rotation_plan(html, report_path.name, classified)
+        _validate_replacement_duel_v2(html, report_path.name)
         print(f"ETF_DELIVERY_HTML_CONTRACT_OK | report={report_path.name} | dynamic_holdings={','.join(holdings)}")
 
 
