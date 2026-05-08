@@ -12,11 +12,12 @@ TICKERS = {
     "SOXX", "ITA", "GRID", "URA", "IEFA", "EFA",
     "IWM", "KWEB", "TLT", "ICLN",
     "QUAL", "GSG", "BIL", "MOO", "FIW", "INDA", "XBI", "FINX",
+    "CIBR", "BUG", "REMX", "PICK", "XLU", "VPU", "NLR", "NUCL",
+    "DBA", "CORN", "PHO", "CGW", "MCHI", "FXI", "EPI", "IBB",
+    "XLV", "VHT", "KCE", "IAI", "BOTZ", "ROBO", "IRBO", "COPX",
+    "DBC", "DFEN", "NATO",
 }
 
-# Section 2 is intentionally excluded here. Its special action-snapshot
-# renderer already links comma-separated pure ticker rows correctly. Generic
-# markdown linkification breaks that renderer and exposes [TICKER](url) text.
 SECTION_TEXT_BOUNDS = [
     ("## 11. Best New Opportunities", "## 12. Portfolio Rotation Plan"),
 ]
@@ -28,6 +29,7 @@ SECTION_TABLE_BOUNDS = [
         "## 10. Current Position Review",
         {"first-order effect", "second-order effect", "likely beneficiaries", "likely losers", "etf implication"},
     ),
+    ("## 10. Current Position Review", "## 11. Best New Opportunities", {"ticker"}),
 ]
 
 
@@ -106,6 +108,27 @@ def linkify_text_sections(text: str) -> str:
     return text
 
 
+def linkify_action_snapshot_ticker_bullets(text: str) -> str:
+    start_heading = "## 2. Portfolio Action Snapshot"
+    end_heading = "## 3. Regime Dashboard"
+    start = text.find(start_heading)
+    if start == -1:
+        return text
+    body_start = start + len(start_heading)
+    end = text.find(end_heading, body_start)
+    if end == -1:
+        return text
+    body = text[body_start:end]
+    out = []
+    pure_ticker_bullet = re.compile(r"^(\s*-\s+)([A-Z][A-Z0-9.-]{0,14})(\s*)$")
+    for line in body.splitlines():
+        m = pure_ticker_bullet.match(line)
+        if m and m.group(2) in TICKERS:
+            line = f"{m.group(1)}{md_link(m.group(2))}{m.group(3)}"
+        out.append(line)
+    return text[:body_start] + "\n".join(out) + text[end:]
+
+
 def split_table_row(row: str) -> list[str]:
     return row.strip().strip("|").split("|")
 
@@ -167,6 +190,7 @@ def linkify_table_sections(text: str) -> str:
 
 def linkify_report(text: str) -> str:
     text = linkify_text_sections(text)
+    text = linkify_action_snapshot_ticker_bullets(text)
     text = linkify_table_sections(text)
     return text
 
