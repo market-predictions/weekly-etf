@@ -5,6 +5,7 @@ from typing import Any, Callable
 
 from runtime.build_etf_report_state import build_runtime_state
 from runtime.render_etf_report_from_state import f2, position_rows
+from runtime.replacement_duel_v2 import replacement_duel_v2_html
 
 PRINT_TABLE_PAGINATION_CSS = """
 <style id="etf-table-pagination-guard">
@@ -36,7 +37,8 @@ PRINT_TABLE_PAGINATION_CSS = """
     .data-table tr,
     .action-table tr,
     .rotation-plan-table tr,
-    .position-review-table tr {
+    .position-review-table tr,
+    .replacement-duel-v2-table tr {
       page-break-inside: avoid;
       break-inside: avoid;
     }
@@ -180,6 +182,15 @@ def _rotation_plan_html(base: Any, state: dict[str, Any]) -> str:
     ])
 
 
+def _replacement_duel_v2_panel(base: Any, state: dict[str, Any]) -> str:
+    return "".join([
+        "<div class='panel panel-replacement-duel-v2'>",
+        _section_header(base, 11, "Replacement Duel Table v2"),
+        replacement_duel_v2_html(state, base),
+        "</div>",
+    ])
+
+
 def _replace_panel_by_title(html: str, title: str, replacement: str) -> str:
     marker_options = [
         f"<span class='section-label'>{escape(title)}</span>",
@@ -210,6 +221,24 @@ def _replace_panel_by_title(html: str, title: str, replacement: str) -> str:
     return html[:start] + replacement + html[end:]
 
 
+def _append_replacement_duel_v2_after_best_opportunities(html: str, base: Any, state: dict[str, Any]) -> str:
+    if "replacement-duel-v2-table" in html:
+        return html
+    marker = "Best New Opportunities"
+    idx = html.find(marker)
+    if idx == -1:
+        return html
+    next_candidates = []
+    for token in ("<div class='panel", '<div class="panel'):
+        pos = html.find(token, idx + len(marker))
+        if pos != -1:
+            next_candidates.append(pos)
+    insert_at = min(next_candidates) if next_candidates else html.find("</body>", idx)
+    if insert_at == -1:
+        insert_at = len(html)
+    return html[:insert_at] + _replacement_duel_v2_panel(base, state) + html[insert_at:]
+
+
 def _inject_print_table_pagination_css(html: str) -> str:
     if "etf-table-pagination-guard" in html:
         return html
@@ -227,6 +256,7 @@ def apply_etf_delivery_html_overrides(html: str, base: Any, md_text: str) -> str
     html = _replace_panel_by_title(html, "Portfolio Action Snapshot", _action_snapshot_html(base, state))
     html = _replace_panel_by_title(html, "Current Position Review", _position_review_html(base, state))
     html = _replace_panel_by_title(html, "Portfolio Rotation Plan", _rotation_plan_html(base, state))
+    html = _append_replacement_duel_v2_after_best_opportunities(html, base, state)
     return _inject_print_table_pagination_css(html)
 
 
