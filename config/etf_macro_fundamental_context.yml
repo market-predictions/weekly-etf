@@ -57,3 +57,24 @@ replacement_duel_policy:
   require_direct_holding_rs: true
   direct_rs_lookback: 3m
   promote_requires_pricing_or_rs_edge: true
+  direct_edge_max_bonus: 0.25
+  direct_edge_max_penalty: -0.25
+  target_map:
+    SPY:
+      challengers: [QUAL, IEFA, EFA, IWM]
+      reason: Core beta can be challenged by quality, non-U.S. developed equity, or smaller-cap beta only if direct relative strength clears.
+    PPA:
+      challengers: [ITA, DFEN, NATO]
+      reason: Defense exposure should be challenged by cleaner implementation vehicles when relative strength improves.
+    PAVE:
+      challengers: [GRID, XLU, VPU]
+      reason: Infrastructure exposure can be challenged by grid/power beneficiaries if they show stronger direct momentum.
+    GLD:
+      challengers: [GSG, DBC, BIL]
+      reason: Hedge sleeve can be challenged by broader commodities or cash-like ballast if gold implementation keeps underperforming.
+    URNM:
+      challengers: [URA, NLR, NUCL]
+      reason: Uranium/nuclear exposure can be challenged by broader nuclear or uranium implementation vehicles.
+    SMH:
+      challengers: [SOXX, IRBO, BOTZ, ROBO]
+      reason: Semiconductor leadership can be challenged only by cleaner or broader AI implementation if direct strength is compelling.
