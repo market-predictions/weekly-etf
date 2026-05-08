@@ -135,10 +135,10 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import send_report as sr
+          import send_report_patched as sr
           output_dir = Path("output")
-          latest = sr.latest_report_file(output_dir, mode="pro")
-          bundle = sr.generate_delivery_assets_for_run(output_dir, latest, mode="pro")
+          latest = sr._sr.latest_report_file(output_dir, mode="pro")
+          bundle = sr._sr.generate_delivery_assets_for_run(output_dir, latest, mode="pro")
           if bundle.get("bilingual"):
               print(f"RENDER_OK | mode=pro_bilingual | report_en={bundle['en']['report_path'].name} | report_nl={bundle['nl']['report_path'].name}")
           else:
@@ -165,4 +165,4 @@ jobs:
           MRKT_RPRTS_MAIL_FROM: ${{ secrets.MRKT_RPRTS_MAIL_FROM }}
           MRKT_RPRTS_MAIL_TO: ${{ secrets.MRKT_RPRTS_MAIL_TO }}
           MRKT_RPRTS_MAIL_TO_NL: ${{ secrets.MRKT_RPRTS_MAIL_TO_NL }}
-        run: python send_report.py
+        run: python send_report_patched.py
