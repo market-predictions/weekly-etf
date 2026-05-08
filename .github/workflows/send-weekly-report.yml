@@ -146,6 +146,12 @@ jobs:
               print(f"RENDER_OK | mode=pro | report={bundle['en']['report_path'].name}")
           PY
 
+      - name: Validate ETF delivery HTML contract
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python tools/validate_etf_delivery_html_contract.py --output-dir output
+
       - name: Validate ETF explicit state derivation before send
         env:
           MRKT_RPRTS_REPORT_MODE: pro
