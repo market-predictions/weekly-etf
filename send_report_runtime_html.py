@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 from typing import Any
@@ -20,8 +21,24 @@ def _canonical_report_key(path: Path, mode: str) -> tuple[str, int] | None:
     return match.group(1), int(match.group(2) or "1")
 
 
+def _explicit_report_path(mode: str) -> Path | None:
+    raw = os.environ.get("MRKT_RPRTS_EXPLICIT_REPORT_PATH", "").strip()
+    if not raw:
+        return None
+    path = Path(raw)
+    if not path.exists():
+        raise RuntimeError(f"Explicit report path does not exist: {path}")
+    if _canonical_report_key(path, report_module.normalize_report_mode(mode)) is None:
+        raise RuntimeError(f"Explicit report path is not a canonical {mode} report: {path}")
+    return path
+
+
 def _latest_canonical_report_file(output_dir: Path, mode: str = "standard") -> Path:
     normalized_mode = report_module.normalize_report_mode(mode)
+    explicit = _explicit_report_path(normalized_mode)
+    if explicit is not None:
+        return explicit
+
     candidates: list[tuple[str, int, Path]] = []
     for path in output_dir.glob("weekly_analysis*.md"):
         key = _canonical_report_key(path, normalized_mode)
@@ -35,6 +52,10 @@ def _latest_canonical_report_file(output_dir: Path, mode: str = "standard") -> P
 
 def _latest_canonical_reports_by_day(output_dir: Path, mode: str = "standard") -> list[Path]:
     normalized_mode = report_module.normalize_report_mode(mode)
+    explicit = _explicit_report_path(normalized_mode)
+    if explicit is not None:
+        return [explicit]
+
     by_day: dict[str, tuple[int, Path]] = {}
     for path in output_dir.glob("weekly_analysis*.md"):
         key = _canonical_report_key(path, normalized_mode)
