@@ -1,6 +1,6 @@
 # Weekly ETF Pro Review 2026-05-09
 
-> *This trigger scaffold is intentionally minimal. The production GitHub Actions workflow must rebuild the final English and Dutch reports from runtime state after fresh pricing, relative-strength fetch, lane discovery, challenger pricing, state build, polish, linkification, validation, rendering, and delivery checks.*
+> *Fresh runtime rerun trigger after validator fixes. The production GitHub Actions workflow must rebuild the final English and Dutch reports from runtime state after fresh pricing, relative-strength fetch, lane discovery, challenger pricing, state build, polish, linkification, validation, rendering, and delivery checks.*
 
 ## 1. Executive Summary
 - Primary regime: runtime rebuild required.
