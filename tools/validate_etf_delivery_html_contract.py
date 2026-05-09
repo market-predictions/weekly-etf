@@ -21,6 +21,26 @@ report_module.build_report_html = build_report_html_with_state(
 )
 
 RAW_MARKDOWN_LINK_RE = re.compile(r"\[[A-Z][A-Z0-9.-]{0,14}\]\(https?://[^\)]+\)")
+PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
+
+
+def _canonical_report_key(path: Path) -> tuple[str, int] | None:
+    match = PRO_REPORT_RE.match(path.name)
+    if not match:
+        return None
+    return match.group(1), int(match.group(2) or "1")
+
+
+def _latest_canonical_english_report(output_dir: Path) -> Path:
+    candidates: list[tuple[str, int, Path]] = []
+    for path in output_dir.glob("weekly_analysis_pro_*.md"):
+        key = _canonical_report_key(path)
+        if key is not None:
+            candidates.append((key[0], key[1], path))
+    if not candidates:
+        raise RuntimeError(f"No canonical English ETF pro reports found in {output_dir}.")
+    candidates.sort(key=lambda item: (item[0], item[1]))
+    return candidates[-1][2]
 
 
 def _ticker(value: Any) -> str:
@@ -84,7 +104,7 @@ def _classified_state_tickers(state: dict[str, Any]) -> dict[str, list[str]]:
 
 
 def _latest_reports(output_dir: Path) -> list[Path]:
-    latest_en = report_module.latest_report_file(output_dir, mode="pro")
+    latest_en = _latest_canonical_english_report(output_dir)
     reports = [latest_en]
     if report_module.has_matching_dutch_report(latest_en):
         reports.append(report_module.matching_dutch_report_path(latest_en))
