@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -89,6 +90,28 @@ def omitted_lanes(state: dict[str, Any]) -> list[dict[str, Any]]:
 
 def report_suffix(report_date: str) -> str:
     return report_date.replace("-", "")[2:]
+
+
+def next_report_paths(output_dir: Path, suffix: str) -> tuple[Path, Path]:
+    """Return matched EN/NL paths for the next same-day version.
+
+    The renderer must not overwrite the unversioned file when same-day versioned
+    reports already exist, because the delivery selector intentionally chooses the
+    highest same-day version. This keeps the newly rendered report and the report
+    selected for delivery aligned.
+    """
+    pattern = re.compile(rf"^weekly_analysis_pro_{re.escape(suffix)}(?:_(\d{{2}}))?\.md$")
+    existing_versions: list[int] = []
+    for path in output_dir.glob(f"weekly_analysis_pro_{suffix}*.md"):
+        match = pattern.match(path.name)
+        if not match:
+            continue
+        existing_versions.append(int(match.group(1) or "1"))
+    next_version = (max(existing_versions) + 1) if existing_versions else 1
+    version_suffix = "" if next_version == 1 else f"_{next_version:02d}"
+    en_path = output_dir / f"weekly_analysis_pro_{suffix}{version_suffix}.md"
+    nl_path = output_dir / f"weekly_analysis_pro_nl_{suffix}{version_suffix}.md"
+    return en_path, nl_path
 
 
 def replacement_duel_table(state: dict[str, Any]) -> str:
@@ -513,8 +536,7 @@ def render_nl(state: dict[str, Any]) -> str:
 def write_reports(state: dict[str, Any], output_dir: Path) -> tuple[Path, Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
     suffix = report_suffix(str(state.get("report_date")))
-    en_path = output_dir / f"weekly_analysis_pro_{suffix}.md"
-    nl_path = output_dir / f"weekly_analysis_pro_nl_{suffix}.md"
+    en_path, nl_path = next_report_paths(output_dir, suffix)
     en_path.write_text(render_en(state), encoding="utf-8")
     nl_path.write_text(render_nl(state), encoding="utf-8")
     return en_path, nl_path
