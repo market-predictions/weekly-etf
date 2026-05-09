@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import re
 from pathlib import Path
 
@@ -33,6 +34,16 @@ SECTION_TABLE_BOUNDS = [
 
 
 def latest_report(output_dir: Path, pattern: re.Pattern[str]) -> Path:
+    for env_name in ("MRKT_RPRTS_EXPLICIT_REPORT_PATH", "MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL"):
+        raw = os.environ.get(env_name, "").strip()
+        if not raw:
+            continue
+        path = Path(raw)
+        if pattern.match(path.name):
+            if not path.exists():
+                raise RuntimeError(f"Explicit report path from {env_name} does not exist: {path}")
+            return path
+
     reports = sorted(path for path in output_dir.glob("weekly_analysis_pro*.md") if pattern.match(path.name))
     if not reports:
         raise RuntimeError(f"No matching report found in {output_dir} for {pattern.pattern}")
