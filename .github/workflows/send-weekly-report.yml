@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - "control/run_queue/weekly_etf_report_request_*.md"
       - "output/weekly_analysis_pro_*.md"
       - "output/weekly_analysis_pro_nl_*.md"
   workflow_dispatch:
