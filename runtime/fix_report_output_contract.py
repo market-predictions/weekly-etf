@@ -35,6 +35,13 @@ def clean_action(value: Any) -> str:
     return str(value or "").strip() or "None"
 
 
+def clean_optional(value: Any) -> str:
+    raw = str(value or "").strip()
+    if raw.lower() in {"none", "nan", "null", "n/a", "-"}:
+        return ""
+    return raw
+
+
 def compact(value: Any, max_len: int = 105) -> str:
     raw = clean_action(value)
     if len(raw) <= max_len:
@@ -149,16 +156,27 @@ def rotation_plan_sections(state: dict[str, Any]) -> str:
     ])
 
 
+def lane_label(lane: dict[str, Any]) -> str:
+    primary = clean_optional(lane.get("primary_etf"))
+    alternative = clean_optional(lane.get("alternative_etf"))
+    if primary and alternative:
+        return f"{primary} / {alternative}"
+    if primary:
+        return primary
+    if alternative:
+        return alternative
+    return clean_optional(lane.get("lane_name")) or "Unnamed challenger lane"
+
+
 def best_new_opportunities(state: dict[str, Any]) -> str:
     lines = ["- SMH remains the leading funded growth exposure, subject to the max-position rule."]
     promoted = state.get("lane_assessment", {}).get("assessed_lanes", [])
     count = 0
     for lane in promoted:
         if lane.get("promoted_to_live_radar") is True and lane.get("challenger") is True and count < 3:
-            primary = clean_action(lane.get("primary_etf"))
-            alt = clean_action(lane.get("alternative_etf"))
+            label = lane_label(lane)
             summary = compact(lane.get("evidence_summary") or lane.get("why_now"), 150)
-            lines.append(f"- {primary} / {alt}: {summary}")
+            lines.append(f"- {label}: {summary}")
             count += 1
     if count == 0:
         lines.append("- No challenger is fundable without completed pricing and relative-strength duel evidence.")
