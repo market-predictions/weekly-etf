@@ -1,0 +1,7 @@
+# Production trigger for fresh Weekly ETF Pro Review
+
+requested_at_utc: 2026-05-09T10:14:00Z
+mode: trigger-only
+purpose: Trigger fresh runtime ETF production workflow after latest same-day lane breadth artifact validator fix.
+
+This file is intentionally not a canonical report filename and is ignored by report discovery regex.
