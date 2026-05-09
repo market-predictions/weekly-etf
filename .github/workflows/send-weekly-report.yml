@@ -109,6 +109,8 @@ jobs:
             echo "Runtime renderer did not emit a valid Dutch report path." >&2
             exit 1
           fi
+          export MRKT_RPRTS_EXPLICIT_REPORT_PATH="$en_path"
+          export MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL="$nl_path"
           echo "MRKT_RPRTS_EXPLICIT_REPORT_PATH=$en_path" >> "$GITHUB_ENV"
           echo "MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL=$nl_path" >> "$GITHUB_ENV"
           echo "RUNTIME_REPORT_PATHS_OK | en=$en_path | nl=$nl_path"
