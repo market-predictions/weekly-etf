@@ -40,11 +40,55 @@ def load_scorecard(path: Path) -> list[dict[str, str]]:
     return rows
 
 
+def _clean_symbol(value: Any) -> str:
+    raw = str(value or "").strip().upper()
+    if raw in {"", "NONE", "NAN", "NULL", "N/A", "-"}:
+        return ""
+    return raw
+
+
+def _lane_artifact_has_etf_contract(payload: dict[str, Any]) -> bool:
+    lanes = payload.get("assessed_lanes", []) or []
+    if not lanes:
+        return False
+    for lane in lanes:
+        if not _clean_symbol(lane.get("primary_etf")):
+            return False
+    return True
+
+
+def latest_lane_file(directory: Path, pattern: str) -> Path:
+    """Return the newest lane artifact that satisfies the runtime ETF contract.
+
+    Legacy runtime-breadth artifacts in output/lane_reviews contained lane names
+    but no primary_etf / alternative_etf fields. They sort newer than the close
+    date artifact and caused reports to render Primary ETF = None. The runtime
+    state builder must never use those artifacts as portfolio-discovery truth.
+    """
+    files = sorted(directory.glob(pattern), reverse=True)
+    if not files:
+        raise RuntimeError(f"No files found for {pattern} in {directory}")
+    rejected: list[str] = []
+    for path in files:
+        try:
+            payload = load_json(path)
+        except Exception:
+            rejected.append(path.name)
+            continue
+        if _lane_artifact_has_etf_contract(payload):
+            return path
+        rejected.append(path.name)
+    raise RuntimeError(
+        "No ETF lane artifact satisfies the runtime ETF contract; rejected: "
+        + ", ".join(rejected)
+    )
+
+
 def discover_sources() -> RuntimeSources:
     return RuntimeSources(
         portfolio_state=Path("output/etf_portfolio_state.json"),
         pricing_audit=latest_file(PRICING_DIR, "price_audit_*.json"),
-        lane_assessment=latest_file(LANE_DIR, "etf_lane_assessment_*.json"),
+        lane_assessment=latest_lane_file(LANE_DIR, "etf_lane_assessment_*.json"),
         recommendation_scorecard=Path("output/etf_recommendation_scorecard.csv"),
     )
 
@@ -273,6 +317,8 @@ def build_runtime_state() -> dict[str, Any]:
         "validation_flags": {
             "pricing_audit_valid": bool(pricing_audit.get("holdings")),
             "lane_assessment_present": bool(lane_assessment.get("assessed_lanes")),
+            "lane_assessment_source": str(sources.lane_assessment),
+            "lane_assessment_has_primary_etfs": _lane_artifact_has_etf_contract(lane_assessment),
             "scorecard_present": len(recommendation_scorecard) > 0,
             "positions_enriched": any(p.get("short_reason") for p in holdings),
             "fx_rate_present": _fx_rate(pricing_audit) is not None,
@@ -292,7 +338,7 @@ def main() -> None:
     out_path.write_text(json.dumps(runtime_state, indent=2), encoding="utf-8")
 
     print(
-        f"ETF_RUNTIME_STATE_OK | report_date={runtime_state.get('report_date')} | output={out_path}"
+        f"ETF_RUNTIME_STATE_OK | report_date={runtime_state.get('report_date')} | output={out_path} | lane_source={runtime_state.get('source_files', {}).get('lane_assessment')}"
     )
 
 
