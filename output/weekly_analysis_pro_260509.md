@@ -36,7 +36,7 @@
 ## 10. Current Position Review
 - Placeholder for runtime replacement.
 
-## 11. Best New ETF Opportunities
+## 11. Best New Opportunities
 - Placeholder for runtime replacement.
 
 ## 12. Portfolio Rotation Plan
