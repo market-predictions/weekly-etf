@@ -25,6 +25,7 @@ FORBIDDEN_CONTENT_TOKENS = [
     "runtime rebuild required",
     "Pending classification",
     "None / None:",
+    "Replacement Duel Table v2",
 ]
 STRICT_TITLES = [
     "Portfolio Action Snapshot",
@@ -38,7 +39,7 @@ STRICT_TITLES = [
     "Final Action Table",
     "Current Portfolio Holdings and Cash",
     "Continuity Input for Next Run",
-    "Replacement Duel Table v2",
+    "Replacement Duel Table",
 ]
 
 
@@ -135,7 +136,7 @@ def _validate_no_forbidden_content(html: str, report_name: str) -> None:
     lower = html.lower()
     for token in FORBIDDEN_CONTENT_TOKENS:
         if token.lower() in lower:
-            raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: forbidden placeholder token found: {token!r}")
+            raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: forbidden token found: {token!r}")
     match = RAW_MARKDOWN_LINK_RE.search(html)
     if match:
         raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: raw markdown link found: {match.group(0)}")
@@ -162,6 +163,10 @@ def _validate_strict_tables_and_anchors(html: str, report_name: str, holdings: l
     missing_classes = [klass for klass in required_classes if klass not in html]
     if missing_classes:
         raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: missing strict delivery table classes: {', '.join(missing_classes)}")
+    required_headers = ["Current close", "Challenger close", "Pricing basis", "Required trigger"]
+    missing_headers = [header for header in required_headers if header not in html]
+    if missing_headers:
+        raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: Replacement Duel Table missing headers: {', '.join(missing_headers)}")
     for ticker in holdings:
         if not _anchor_for_ticker_exists(html, ticker):
             raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: missing TradingView anchor for current holding {ticker}.")
