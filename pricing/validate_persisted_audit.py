@@ -34,17 +34,20 @@ def parse_report_date(report_path: Path) -> str:
     return match.group(1)
 
 
-def load_audits(pricing_dir: Path) -> list[tuple[str, Path, dict[str, Any]]]:
-    audits: list[tuple[str, Path, dict[str, Any]]] = []
+def load_audits(pricing_dir: Path) -> list[tuple[str, str, Path, dict[str, Any]]]:
+    audits: list[tuple[str, str, Path, dict[str, Any]]] = []
     for path in sorted(pricing_dir.glob("price_audit_*.json")):
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError as exc:
             raise RuntimeError(f"Invalid pricing audit JSON: {path}") from exc
         run_date = str(payload.get("run_date") or "")
+        requested_close_date = str(payload.get("requested_close_date") or "")
         if not run_date:
             raise RuntimeError(f"Pricing audit is missing run_date: {path}")
-        audits.append((run_date, path, payload))
+        if not requested_close_date:
+            raise RuntimeError(f"Pricing audit is missing requested_close_date: {path}")
+        audits.append((run_date, requested_close_date, path, payload))
     return audits
 
 
@@ -88,11 +91,48 @@ def iso_date(value: str, field: str, path: Path) -> datetime:
         raise RuntimeError(f"Pricing audit {path} has invalid {field}: {value}") from exc
 
 
+def _select_audit(
+    audits: list[tuple[str, str, Path, dict[str, Any]]],
+    report_date: str,
+    allow_prior_run_date: bool,
+) -> tuple[Path, dict[str, Any]]:
+    # Primary contract: the report date represents the market close date under review.
+    # The pricing pass may run later, so match requested_close_date before run_date.
+    close_matches = [(path, payload) for _run_date, requested_close, path, payload in audits if requested_close == report_date]
+    if close_matches:
+        return close_matches[-1]
+
+    # Backward compatibility for older audits where run_date and close date were the same concept.
+    run_matches = [(path, payload) for run_date, _requested_close, path, payload in audits if run_date == report_date]
+    if run_matches:
+        return run_matches[-1]
+
+    if allow_prior_run_date:
+        report_dt = datetime.strptime(report_date, "%Y-%m-%d")
+        prior = []
+        for run_date, requested_close, path, payload in audits:
+            close_dt = iso_date(requested_close, "requested_close_date", path)
+            run_dt = iso_date(run_date, "run_date", path)
+            if close_dt <= report_dt:
+                prior.append((close_dt, run_dt, path, payload))
+        if not prior:
+            raise RuntimeError(f"No persisted pricing audit on or before report close date {report_date}.")
+        prior.sort(key=lambda item: (item[0], item[1]))
+        _, _, audit_path, payload = prior[-1]
+        return audit_path, payload
+
+    available = ", ".join(f"{path.name}(run={run}, close={close})" for run, close, path, _ in audits) or "none"
+    raise RuntimeError(
+        f"No persisted pricing audit with requested_close_date={report_date} for report close date {report_date}. "
+        f"Available audits: {available}"
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Validate that a persisted ETF pricing audit exists before render/send.")
     parser.add_argument("--output-dir", default="output")
     parser.add_argument("--pricing-dir", default="output/pricing")
-    parser.add_argument("--allow-prior-run-date", action="store_true", help="Allow the latest prior audit if no same-report-date audit exists.")
+    parser.add_argument("--allow-prior-run-date", action="store_true", help="Allow the latest prior audit if no same-report-close audit exists.")
     args = parser.parse_args()
 
     output_dir = Path(args.output_dir)
@@ -107,26 +147,7 @@ def main() -> None:
             "Run the persistent ETF pricing workflow before writing or sending the report."
         )
 
-    exact_matches = [(path, payload) for run_date, path, payload in audits if run_date == report_date]
-    if exact_matches:
-        audit_path, payload = exact_matches[-1]
-    elif args.allow_prior_run_date:
-        report_dt = datetime.strptime(report_date, "%Y-%m-%d")
-        prior = []
-        for run_date, path, payload in audits:
-            run_dt = iso_date(run_date, "run_date", path)
-            if run_dt <= report_dt:
-                prior.append((run_dt, path, payload))
-        if not prior:
-            raise RuntimeError(f"No persisted pricing audit on or before report date {report_date}.")
-        prior.sort(key=lambda item: item[0])
-        _, audit_path, payload = prior[-1]
-    else:
-        available = ", ".join(path.name for _, path, _ in audits) or "none"
-        raise RuntimeError(
-            f"No persisted pricing audit with run_date={report_date} for report {report_path.name}. "
-            f"Available audits: {available}"
-        )
+    audit_path, payload = _select_audit(audits, report_date, args.allow_prior_run_date)
 
     validate_payload(audit_path, payload)
     requested_close = str(payload.get("requested_close_date"))
@@ -141,7 +162,7 @@ def main() -> None:
     print(
         "PRICING_AUDIT_OK | "
         f"report={report_path.name} | audit={audit_path.name} | run_date={run_date} | "
-        f"requested_close={requested_close} | decision={payload.get('decision')} | "
+        f"requested_close={requested_close} | report_close={report_date} | decision={payload.get('decision')} | "
         f"fresh_holdings={payload.get('fresh_holdings_count')}/{payload.get('holdings_count')} | "
         f"coverage_count_pct={payload.get('coverage_count_pct')} | "
         f"invested_weight_coverage_pct={payload.get('invested_weight_coverage_pct')}"
