@@ -6,8 +6,6 @@ on:
       - main
     paths:
       - "control/run_queue/weekly_etf_report_request_*.md"
-      - "output/weekly_analysis_pro_*.md"
-      - "output/weekly_analysis_pro_nl_*.md"
   workflow_dispatch:
 
 jobs:
@@ -99,10 +97,30 @@ jobs:
           MRKT_RPRTS_REPORT_MODE: pro
         run: |
           python -m runtime.build_etf_report_state
-          python -m runtime.render_etf_report_from_state --output-dir output
+          render_log="$(python -m runtime.render_etf_report_from_state --output-dir output)"
+          echo "$render_log"
+          en_path="$(printf '%s\n' "$render_log" | sed -n 's/^ETF_RUNTIME_RENDER_OK | en=\([^|]*\) | nl=.*/\1/p' | xargs)"
+          nl_path="$(printf '%s\n' "$render_log" | sed -n 's/^ETF_RUNTIME_RENDER_OK | en=[^|]* | nl=\([^|]*\).*/\1/p' | xargs)"
+          if [ -z "$en_path" ] || [ ! -f "$en_path" ]; then
+            echo "Runtime renderer did not emit a valid English report path." >&2
+            exit 1
+          fi
+          if [ -z "$nl_path" ] || [ ! -f "$nl_path" ]; then
+            echo "Runtime renderer did not emit a valid Dutch report path." >&2
+            exit 1
+          fi
+          echo "MRKT_RPRTS_EXPLICIT_REPORT_PATH=$en_path" >> "$GITHUB_ENV"
+          echo "MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL=$nl_path" >> "$GITHUB_ENV"
+          echo "RUNTIME_REPORT_PATHS_OK | en=$en_path | nl=$nl_path"
           python -m runtime.polish_runtime_reports --output-dir output
           python -m runtime.fix_report_output_contract --output-dir output
           python -m runtime.link_runtime_report_tickers --output-dir output
+
+      - name: Validate ETF report content contract
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python tools/validate_etf_report_content_contract.py --output-dir output
 
       - name: Validate persisted pricing audit after runtime render
         run: |
@@ -126,7 +144,8 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import send_report as sr
+          import send_report_runtime_html as srh
+          sr = srh.report_module
 
           output_dir = Path("output")
           latest = sr.latest_report_file(output_dir, mode="pro")
