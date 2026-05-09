@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from html import unescape
 from pathlib import Path
 from typing import Any
 
@@ -49,6 +50,10 @@ def _ticker(value: Any) -> str:
 
 def _clean(value: Any) -> str:
     return str(value or "").strip().lower()
+
+
+def _strip_html(value: str) -> str:
+    return unescape(re.sub(r"<[^>]+>", " ", value)).strip()
 
 
 def _is_add(p: dict[str, Any]) -> bool:
@@ -244,9 +249,25 @@ def _validate_replacement_duel_v2(html: str, report_name: str) -> None:
         raise RuntimeError(
             f"Delivery HTML contract validation failed for {report_name}: Replacement Duel Table v2 missing required HTML bits: {', '.join(missing_bits)}"
         )
-    if "direct RS duel incomplete" not in panel and "Challenger improving" not in panel and "Replacement trigger" not in panel and "Current holding still leads" not in panel and "Mapped challenger" not in panel:
+
+    row_matches = re.findall(r"<tr>(.*?)</tr>", panel, flags=re.IGNORECASE | re.DOTALL)
+    data_rows = [row for row in row_matches if "<td" in row.lower()]
+    if not data_rows:
         raise RuntimeError(
-            f"Delivery HTML contract validation failed for {report_name}: Replacement Duel Table v2 has no decision text."
+            f"Delivery HTML contract validation failed for {report_name}: Replacement Duel Table v2 has no data rows."
+        )
+
+    filled_decisions = 0
+    for row in data_rows:
+        cells = re.findall(r"<td[^>]*>(.*?)</td>", row, flags=re.IGNORECASE | re.DOTALL)
+        if len(cells) < 6:
+            continue
+        decision_text = _strip_html(cells[5])
+        if decision_text and decision_text.lower() not in {"none", "n/a", "-"}:
+            filled_decisions += 1
+    if filled_decisions == 0:
+        raise RuntimeError(
+            f"Delivery HTML contract validation failed for {report_name}: Replacement Duel Table v2 has no filled decision cells."
         )
 
 
