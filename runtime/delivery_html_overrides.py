@@ -182,10 +182,10 @@ def _rotation_plan_html(base: Any, state: dict[str, Any]) -> str:
     ])
 
 
-def _replacement_duel_v2_panel(base: Any, state: dict[str, Any]) -> str:
+def _replacement_duel_panel(base: Any, state: dict[str, Any]) -> str:
     return "".join([
-        "<div class='panel panel-replacement-duel-v2'>",
-        _section_header(base, 11, "Replacement Duel Table v2"),
+        "<div class='panel panel-replacement-duel'>",
+        _section_header(base, 11, "Replacement Duel Table"),
         replacement_duel_v2_html(state, base),
         "</div>",
     ])
@@ -221,9 +221,9 @@ def _replace_panel_by_title(html: str, title: str, replacement: str) -> str:
     return html[:start] + replacement + html[end:]
 
 
-def _append_replacement_duel_v2_after_best_opportunities(html: str, base: Any, state: dict[str, Any]) -> str:
+def _append_replacement_duel_after_best_opportunities(html: str, base: Any, state: dict[str, Any]) -> str:
     if "replacement-duel-v2-table" in html:
-        return html
+        return html.replace("Replacement Duel Table v2", "Replacement Duel Table")
     marker = "Best New Opportunities"
     idx = html.find(marker)
     if idx == -1:
@@ -236,7 +236,7 @@ def _append_replacement_duel_v2_after_best_opportunities(html: str, base: Any, s
     insert_at = min(next_candidates) if next_candidates else html.find("</body>", idx)
     if insert_at == -1:
         insert_at = len(html)
-    return html[:insert_at] + _replacement_duel_v2_panel(base, state) + html[insert_at:]
+    return html[:insert_at] + _replacement_duel_panel(base, state) + html[insert_at:]
 
 
 def _inject_print_table_pagination_css(html: str) -> str:
@@ -256,7 +256,8 @@ def apply_etf_delivery_html_overrides(html: str, base: Any, md_text: str) -> str
     html = _replace_panel_by_title(html, "Portfolio Action Snapshot", _action_snapshot_html(base, state))
     html = _replace_panel_by_title(html, "Current Position Review", _position_review_html(base, state))
     html = _replace_panel_by_title(html, "Portfolio Rotation Plan", _rotation_plan_html(base, state))
-    html = _append_replacement_duel_v2_after_best_opportunities(html, base, state)
+    html = _append_replacement_duel_after_best_opportunities(html, base, state)
+    html = html.replace("Replacement Duel Table v2", "Replacement Duel Table")
     return _inject_print_table_pagination_css(html)
 
 
