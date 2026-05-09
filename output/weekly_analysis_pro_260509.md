@@ -10,7 +10,7 @@
 ## 2. Portfolio Action Snapshot
 - Placeholder for runtime replacement.
 
-## 3. Global Regime Dashboard
+## 3. Regime Dashboard
 - Placeholder for runtime replacement.
 
 ## 4. Structural Opportunity Radar
