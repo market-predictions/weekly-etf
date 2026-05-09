@@ -16,6 +16,14 @@
 ## 4. Structural Opportunity Radar
 - Placeholder for runtime replacement.
 
+### Notable lanes assessed but not promoted this week
+- Europe broad equities
+- India equities
+- Greater China equities
+- Commodity-sensitive equity lanes
+- Defensive minimum-volatility lanes
+- Clean-energy rebound lanes
+
 ## 5. Key Risks / Invalidators
 - Placeholder for runtime replacement.
 
