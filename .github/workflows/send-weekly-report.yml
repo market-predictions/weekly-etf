@@ -80,6 +80,12 @@ jobs:
         run: |
           python -m pricing.augment_challenger_pricing --max-symbols 24
 
+      - name: Validate replacement duel pricing contract
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python tools/validate_replacement_duel_pricing_contract.py
+
       - name: Final ETF lane discovery after challenger pricing
         env:
           MRKT_RPRTS_REPORT_MODE: pro
