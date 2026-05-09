@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import sys
 from html import unescape
@@ -23,6 +24,24 @@ report_module.build_report_html = build_report_html_with_state(
 
 RAW_MARKDOWN_LINK_RE = re.compile(r"\[[A-Z][A-Z0-9.-]{0,14}\]\(https?://[^\)]+\)")
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
+FORBIDDEN_CONTENT_TOKENS = [
+    "Placeholder for runtime replacement",
+    "runtime rebuild required",
+    "Pending classification",
+    "None / None:",
+]
+
+CLIENT_CONTENT_SECTIONS = {
+    "Regime Dashboard": ["Macro regime", "Primary regime", "Geopolitical regime"],
+    "Structural Opportunity Radar": ["Theme", "Primary ETF", "Why it matters"],
+    "Key Risks / Invalidators": ["SPY", "GLD", "PPA"],
+    "Equity Curve and Portfolio Development": ["Current portfolio value", "Portfolio value"],
+    "Asset Allocation Map": ["Bucket", "Stance", "Reason"],
+    "Second-Order Effects Map": ["Driver", "First-order effect", "ETF implication"],
+    "Final Action Table": ["Ticker", "Suggested Action", "Total Score"],
+    "Current Portfolio Holdings and Cash": ["Total portfolio value", "Market value", "Weight"],
+    "Continuity Input for Next Run": ["Portfolio table", "Watchlist", "Recommendation discipline"],
+}
 
 
 def _canonical_report_key(path: Path) -> tuple[str, int] | None:
@@ -32,7 +51,23 @@ def _canonical_report_key(path: Path) -> tuple[str, int] | None:
     return match.group(1), int(match.group(2) or "1")
 
 
+def _explicit_report_path() -> Path | None:
+    raw = os.environ.get("MRKT_RPRTS_EXPLICIT_REPORT_PATH", "").strip()
+    if not raw:
+        return None
+    path = Path(raw)
+    if not path.exists():
+        raise RuntimeError(f"Explicit report path does not exist: {path}")
+    if _canonical_report_key(path) is None:
+        raise RuntimeError(f"Explicit report path is not a canonical English ETF pro report: {path}")
+    return path
+
+
 def _latest_canonical_english_report(output_dir: Path) -> Path:
+    explicit = _explicit_report_path()
+    if explicit is not None:
+        return explicit
+
     candidates: list[tuple[str, int, Path]] = []
     for path in output_dir.glob("weekly_analysis_pro_*.md"):
         key = _canonical_report_key(path)
@@ -168,6 +203,30 @@ def _validate_no_raw_markdown_links(html: str, report_name: str) -> None:
         )
 
 
+def _validate_no_placeholder_content(html: str, report_name: str) -> None:
+    lower = html.lower()
+    for token in FORBIDDEN_CONTENT_TOKENS:
+        if token.lower() in lower:
+            raise RuntimeError(
+                f"Delivery HTML contract validation failed for {report_name}: forbidden placeholder token found: {token!r}"
+            )
+
+
+def _validate_client_content_sections(html: str, report_name: str) -> None:
+    for title, required_terms in CLIENT_CONTENT_SECTIONS.items():
+        panel = _section_panel(html, title)
+        plain = _strip_html(panel).lower()
+        if len(plain) < 120:
+            raise RuntimeError(
+                f"Delivery HTML contract validation failed for {report_name}: {title} is too thin after rendering."
+            )
+        missing = [term for term in required_terms if term.lower() not in plain]
+        if missing:
+            raise RuntimeError(
+                f"Delivery HTML contract validation failed for {report_name}: {title} missing client-facing content markers: {', '.join(missing)}"
+            )
+
+
 def _validate_action_snapshot(html: str, report_name: str, holdings: list[str]) -> None:
     panel = _section_panel(html, "Portfolio Action Snapshot")
     if "action-table" not in panel:
@@ -278,7 +337,9 @@ def validate(output_dir: Path) -> None:
     reports = _latest_reports(output_dir)
     for report_path in reports:
         html = _render_delivery_html(report_path)
+        _validate_no_placeholder_content(html, report_path.name)
         _validate_no_raw_markdown_links(html, report_path.name)
+        _validate_client_content_sections(html, report_path.name)
         _validate_action_snapshot(html, report_path.name, holdings)
         _validate_position_review(html, report_path.name, holdings)
         _validate_rotation_plan(html, report_path.name, classified)
