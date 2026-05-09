@@ -40,29 +40,38 @@
 ### 3. Keep workflow behavior operational only
 - Owner: `[ASSISTANT]`
 - Action:
-  - production send workflow should be for production report-output pushes and manual dispatch only
+  - production send workflow should be for production report-output pushes, manual dispatch, or safe run-queue requests only
   - code changes should not silently resend subscriber emails
   - do not claim delivery success without a real receipt or manifest
 - Done when: delivery status remains verifiable.
 
 ---
 
-## Phase 2 — final confirmation run
+## Phase 2 — ChatGPT-triggerable report generation
 
-### 4. Run one fresh production confirmation workflow
-- Owner: `[USER]` or `[ASSISTANT]` if workflow dispatch is available through tools
+### 4. Use safe report request queue for ChatGPT-initiated fresh reports
+- Owner: `[ASSISTANT]`
+- Action: when the user asks ChatGPT to generate a fresh Weekly ETF Review, create a request file under:
+  ```text
+  control/run_queue/weekly_etf_report_request_YYYYMMDD_HHMMSS.md
+  ```
+- Do not create trigger files under `output/`.
+- Done when: the send workflow is triggered by the run-queue request path and no placeholder report files are introduced.
+
+### 5. Run one fresh production confirmation workflow
+- Owner: `[USER]` or `[ASSISTANT]` if GitHub write permission is approved
 - Action:
-  - run `Send weekly ETF Pro report`
+  - create a run-queue request file or use manual workflow dispatch
   - confirm `Validate ETF delivery HTML contract` passes
   - confirm email/PDF delivery succeeds
-  - inspect received PDF for Section 2 links and Current Position Review table
-- Done when: the report is received and the delivery HTML validator has passed.
+  - inspect received PDF for Section 2 links, Current Position Review table, Portfolio Rotation Plan, radar pagination, and Replacement Duel Table v2
+- Done when: the report is received and all validation steps pass.
 
 ---
 
 ## Phase 3 — improve portfolio decision quality
 
-### 5. Add direct challenger-vs-current-holding scoring
+### 6. Continue direct challenger-vs-current-holding scoring
 - Owner: `[ASSISTANT]`
 - Action:
   - map challenger lanes to likely funded holdings they could replace
@@ -72,7 +81,7 @@
   - surface the direct edge in replacement-duel notes
 - Done when: replacement candidates are compared against the actual holding they would replace, not only versus SPY.
 
-### 6. Expand and curate the discovery universe
+### 7. Expand and curate the discovery universe
 - Owner: `[ASSISTANT]`
 - Source file:
   - `config/etf_discovery_universe.yml`
@@ -81,7 +90,7 @@
   - keep each lane investable, differentiated, and scored
 - Done when: the universe is broad enough to surface new candidates without becoming noisy.
 
-### 7. Add better macro/fundamental freshness inputs
+### 8. Add better macro/fundamental freshness inputs
 - Owner: `[ASSISTANT]`
 - Action:
   - add machine-readable macro/regime input file
@@ -93,7 +102,7 @@
 
 ## Phase 4 — continue capital discipline
 
-### 8. Apply the capital re-underwriting layer in every report
+### 9. Apply the capital re-underwriting layer in every report
 - Owner: `[ASSISTANT]`
 - Source files:
   - `control/CAPITAL_REUNDERWRITING_RULES.md`
@@ -106,7 +115,7 @@
   - test hedge validity for GLD or any hedge sleeve
 - Done when: the report clearly explains why Hold is still justified or why action is required.
 
-### 9. Force the specific current weak-point reviews
+### 10. Force the specific current weak-point reviews
 - Owner: `[ASSISTANT]`
 - Action: in the next report explicitly review:
   - SPY overlap versus SMH
@@ -120,4 +129,4 @@
 
 ## Current checkpoint
 
-**The runtime-driven bilingual production baseline now includes delivery HTML overrides and a dynamic delivery HTML validator. The next priority is one final confirmation run, then direct challenger-vs-current-holding scoring.**
+**The runtime-driven bilingual production baseline now includes delivery HTML overrides, a dynamic delivery HTML validator, direct replacement-duel logic, and a safe ChatGPT-triggerable report request queue under `control/run_queue/`.**
