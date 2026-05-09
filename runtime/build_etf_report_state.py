@@ -145,14 +145,6 @@ def enrich_positions(
     portfolio_state: dict[str, Any],
     recommendation_scorecard: list[dict[str, str]],
 ) -> list[dict[str, Any]]:
-    """Create current runtime positions with pricing + semantic decision fields.
-
-    Pricing audit holdings are the valuation authority for Section 7/15, but
-    portfolio state and recommendation scorecard are the decision-context
-    authorities for Section 10/12/13/16. This merge prevents the report from
-    rendering analytically empty rows when the pricing audit only contains
-    numeric holding snapshots.
-    """
     state_by_ticker = _index_by_ticker(portfolio_state.get("positions", []) or [])
     score_by_ticker = _index_by_ticker(recommendation_scorecard)
 
@@ -168,20 +160,17 @@ def enrich_positions(
         merged.update(holding)
         merged["ticker"] = ticker
 
-        # Normalize key pricing aliases expected by renderers.
         merged["current_price_local"] = _to_float(holding.get("previous_price_local")) or _to_float(merged.get("current_price_local"))
         merged["market_value_local"] = _to_float(holding.get("previous_market_value_local")) or _to_float(merged.get("market_value_local"))
         merged["market_value_eur"] = _to_float(holding.get("previous_market_value_eur")) or _to_float(merged.get("market_value_eur"))
         merged["current_weight_pct"] = _to_float(holding.get("previous_weight_pct")) or _to_float(merged.get("current_weight_pct"))
         merged["continuity_current_price_local"] = merged.get("current_price_local")
 
-        # Keep Section 15 compatibility names as valuation authority.
         merged["previous_price_local"] = merged.get("current_price_local")
         merged["previous_market_value_local"] = merged.get("market_value_local")
         merged["previous_market_value_eur"] = merged.get("market_value_eur")
         merged["previous_weight_pct"] = _to_float(merged.get("current_weight_pct")) or _to_float(merged.get("previous_weight_pct"))
 
-        # Convert common numeric scorecard strings back to floats where useful.
         for key in (
             "shares",
             "total_score",
@@ -247,9 +236,15 @@ def build_runtime_state() -> dict[str, Any]:
         for h in holdings
     ) + float(portfolio_state.get("cash_eur", 0.0) or 0.0)
 
+    resolved_report_date = (
+        lane_assessment.get("report_date")
+        or pricing_audit.get("requested_close_date")
+        or datetime.utcnow().strftime("%Y-%m-%d")
+    )
+
     runtime_state = {
         "generated_at_utc": datetime.utcnow().isoformat() + "Z",
-        "report_date": lane_assessment.get("report_date"),
+        "report_date": resolved_report_date,
         "requested_close_date": pricing_audit.get("requested_close_date"),
         "source_files": {
             "portfolio_state": str(sources.portfolio_state),
@@ -291,7 +286,7 @@ def main() -> None:
     runtime_state = build_runtime_state()
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
 
-    report_date = runtime_state.get("report_date", "unknown").replace("-", "")
+    report_date = str(runtime_state.get("report_date") or "unknown").replace("-", "")
     out_path = RUNTIME_DIR / f"etf_report_state_{report_date}.json"
 
     out_path.write_text(json.dumps(runtime_state, indent=2), encoding="utf-8")
