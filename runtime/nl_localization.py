@@ -82,7 +82,7 @@ TABLE_LABELS = {
     "EUR/USD used": "EUR/USD gebruikt",
     "Date": "Datum",
     "Comment": "Toelichting",
-    "Shares": "Aantal",
+    "Shares": "Aantal aandelen",
     "Price (local)": "Prijs (lokaal)",
     "Currency": "Valuta",
     "Market value (local)": "Marktwaarde (lokaal)",
