@@ -4,7 +4,7 @@ import re
 from typing import Any
 
 DUTCH_DISCLAIMER = (
-    "Dit rapport is uitsluitend bedoeld voor informatieve en educatieve doeleinden. "
+    "Dit rapport wordt uitsluitend verstrekt voor informatieve en educatieve doeleinden. "
     "Het is geen beleggingsadvies, juridisch advies, fiscaal advies of financieel advies, "
     "en vormt geen aanbeveling om effecten te kopen, te verkopen of aan te houden. "
     "Het rapport houdt geen rekening met individuele beleggingsdoelen, financiële situatie "
