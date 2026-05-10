@@ -28,19 +28,31 @@ FORBIDDEN_CONTENT_TOKENS = [
     "None / None:",
     "Replacement Duel Table v2",
 ]
-STRICT_TITLES = [
-    "Portfolio Action Snapshot",
-    "Regime Dashboard",
-    "Structural Opportunity Radar",
-    "Key Risks / Invalidators",
-    "Equity Curve and Portfolio Development",
-    "Asset Allocation Map",
-    "Second-Order Effects Map",
-    "Current Position Review",
-    "Final Action Table",
-    "Current Portfolio Holdings and Cash",
-    "Continuity Input for Next Run",
-    "Replacement Duel Table",
+FORBIDDEN_REPLACEMENT_DUEL_HEADERS = ["Current close", "Challenger close"]
+
+STRICT_TITLE_GROUPS = [
+    ["Portfolio Action Snapshot", "Portefeuille-acties"],
+    ["Regime Dashboard"],
+    ["Structural Opportunity Radar"],
+    ["Key Risks / Invalidators"],
+    ["Equity Curve and Portfolio Development"],
+    ["Asset Allocation Map"],
+    ["Second-Order Effects Map"],
+    ["Current Position Review", "Review huidige posities"],
+    ["Final Action Table"],
+    ["Current Portfolio Holdings and Cash"],
+    ["Continuity Input for Next Run"],
+    ["Replacement Duel Table", "Vervangingsanalyse"],
+]
+
+REPLACEMENT_DUEL_REQUIRED_HEADER_GROUPS = [
+    ["Current holding", "Huidige positie"],
+    ["Challenger", "Alternatief"],
+    ["1m edge", "1m relatieve sterkte"],
+    ["3m edge", "3m relatieve sterkte"],
+    ["Pricing basis", "Prijsbasis"],
+    ["Decision", "Beoordeling"],
+    ["Required trigger", "Benodigde bevestiging"],
 ]
 
 
@@ -124,12 +136,21 @@ def _anchor_for_ticker_exists(html: str, ticker: str) -> bool:
     return bool(re.search(rf"<a\b[^>]*href=[\"'][^\"']*tradingview\.com/chart/\?symbol={ticker_re}[^\"']*[\"'][^>]*>\s*{ticker_re}\s*</a>", html, flags=re.IGNORECASE))
 
 
-def _section_between_titles(html: str, start_title: str, end_titles: list[str]) -> str:
-    start = html.find(start_title)
+def _find_any(html: str, options: list[str], start: int = 0) -> tuple[int, str | None]:
+    candidates = [(html.find(option, start), option) for option in options]
+    candidates = [(idx, option) for idx, option in candidates if idx != -1]
+    return min(candidates, key=lambda item: item[0]) if candidates else (-1, None)
+
+
+def _section_between_title_groups(html: str, start_titles: list[str], end_title_groups: list[list[str]]) -> str:
+    start, found = _find_any(html, start_titles)
     if start == -1:
-        raise RuntimeError(f"Delivery HTML contract validation failed: missing section title: {start_title}")
-    candidates = [html.find(title, start + len(start_title)) for title in end_titles]
-    candidates = [idx for idx in candidates if idx != -1]
+        raise RuntimeError(f"Delivery HTML contract validation failed: missing section title from: {start_titles}")
+    candidates: list[int] = []
+    for group in end_title_groups:
+        idx, _ = _find_any(html, group, start + len(found or ""))
+        if idx != -1:
+            candidates.append(idx)
     end = min(candidates) if candidates else len(html)
     return html[start:end]
 
@@ -146,13 +167,17 @@ def _validate_no_forbidden_content(html: str, report_name: str) -> None:
 
 def _validate_required_titles(html: str, report_name: str) -> None:
     plain = _strip_html(html)
-    missing = [title for title in STRICT_TITLES if title not in plain]
+    missing = [" / ".join(group) for group in STRICT_TITLE_GROUPS if not any(title in plain for title in group)]
     if missing:
         raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: missing rendered section titles: {', '.join(missing)}")
 
 
 def _validate_structural_radar(html: str, report_name: str) -> None:
-    section = _section_between_titles(html, "Structural Opportunity Radar", ["Short Opportunity Radar", "Key Risks / Invalidators"])
+    section = _section_between_title_groups(
+        html,
+        ["Structural Opportunity Radar"],
+        [["Short Opportunity Radar"], ["Key Risks / Invalidators"]],
+    )
     plain = _strip_html(section).lower()
     if len(plain) < 240:
         raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: Structural Opportunity Radar is too thin after rendering.")
@@ -160,15 +185,30 @@ def _validate_structural_radar(html: str, report_name: str) -> None:
         raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: Structural Opportunity Radar still contains placeholder text.")
 
 
+def _replacement_duel_section(html: str) -> str:
+    return _section_between_title_groups(
+        html,
+        ["Replacement Duel Table", "Vervangingsanalyse"],
+        [["Portfolio Rotation Plan"], ["Rotatieplan portefeuille"], ["Final Action Table"]],
+    )
+
+
 def _validate_strict_tables_and_anchors(html: str, report_name: str, holdings: list[str]) -> None:
     required_classes = ["action-table", "position-review-table", "rotation-plan-table", "replacement-duel-v2-table"]
     missing_classes = [klass for klass in required_classes if klass not in html]
     if missing_classes:
         raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: missing strict delivery table classes: {', '.join(missing_classes)}")
-    required_headers = ["Current close", "Challenger close", "Pricing basis", "Required trigger"]
-    missing_headers = [header for header in required_headers if header not in html]
+
+    duel = _replacement_duel_section(html)
+    plain_duel = _strip_html(duel)
+    forbidden_headers = [header for header in FORBIDDEN_REPLACEMENT_DUEL_HEADERS if header in plain_duel]
+    if forbidden_headers:
+        raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: removed Replacement Duel columns still rendered: {', '.join(forbidden_headers)}")
+
+    missing_headers = [" / ".join(group) for group in REPLACEMENT_DUEL_REQUIRED_HEADER_GROUPS if not any(header in plain_duel for header in group)]
     if missing_headers:
         raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: Replacement Duel Table missing headers: {', '.join(missing_headers)}")
+
     for ticker in holdings:
         if not _anchor_for_ticker_exists(html, ticker):
             raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: missing TradingView anchor for current holding {ticker}.")
