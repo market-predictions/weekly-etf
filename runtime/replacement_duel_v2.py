@@ -7,6 +7,8 @@ from typing import Any
 
 import yaml
 
+from runtime.nl_localization import localized_pricing_basis, localize_decision, localize_trigger
+
 DEFAULT_TARGET_MAP: dict[str, list[str]] = {
     "SPY": ["QUAL", "IEFA", "EFA", "IWM"],
     "PPA": ["ITA", "DFEN", "NATO"],
@@ -16,9 +18,6 @@ DEFAULT_TARGET_MAP: dict[str, list[str]] = {
     "SMH": ["SOXX", "IRBO", "BOTZ", "ROBO"],
 }
 
-# Priority pairs are the decision-grade duel rows. These must have both current
-# and challenger closes before delivery. Lower-priority exploratory challengers
-# may remain visible, but cannot be treated as fundable without prices.
 PRIORITY_DUEL_PAIRS: set[tuple[str, str]] = {
     ("SPY", "QUAL"),
     ("SPY", "IEFA"),
@@ -155,9 +154,9 @@ def _return_edge(metrics: dict[str, Any], challenger: str, holding: str, key: st
 def _pricing_basis(current_close: dict[str, Any], challenger_close: dict[str, Any]) -> str:
     current_date = current_close.get("returned_close_date") or "missing current close"
     challenger_date = challenger_close.get("returned_close_date") or "missing challenger close"
-    current_source = current_close.get("source") or "state"
-    challenger_source = challenger_close.get("source") or "pricing audit"
-    return f"Current {current_date} via {current_source}; challenger {challenger_date} via {challenger_source}."
+    if current_date and challenger_date and current_date == challenger_date:
+        return f"Current and challenger closes validated on {current_date}."
+    return f"Current validated on {current_date}; challenger validated on {challenger_date}."
 
 
 def _pricing_complete(current_close: dict[str, Any], challenger_close: dict[str, Any]) -> bool:
@@ -208,7 +207,7 @@ def _row_payload(
     current_close = _holding_close(state, holding)
     challenger_close = _price_close(prices.get(challenger) or {})
     complete = _pricing_complete(current_close, challenger_close)
-    return {
+    row = {
         "current_holding": holding,
         "current_close": current_close.get("price"),
         "current_close_currency": current_close.get("currency", "USD"),
@@ -219,13 +218,14 @@ def _row_payload(
         "challenger_close_date": challenger_close.get("returned_close_date"),
         "edge_1m_pct": edge_1m,
         "edge_3m_pct": edge_3m,
-        "pricing_basis": _pricing_basis(current_close, challenger_close),
         "pricing_complete": complete,
         "is_priority_duel": (holding, challenger) in PRIORITY_DUEL_PAIRS,
         "decision": _decision(complete, edge_1m, edge_3m),
         "required_trigger": _required_trigger(complete, edge_1m, edge_3m),
         "source": source,
     }
+    row["pricing_basis"] = _pricing_basis(current_close, challenger_close)
+    return row
 
 
 def _strategic_rows(state: dict[str, Any]) -> list[dict[str, Any]]:
@@ -285,16 +285,22 @@ def replacement_duel_v2_rows(state: dict[str, Any], limit: int = 16) -> list[dic
     return sorted(rows, key=_row_rank)[:limit]
 
 
-def replacement_duel_v2_markdown(state: dict[str, Any]) -> str:
-    lines = [
-        "| Current holding | Challenger | 1m edge | 3m edge | Pricing basis | Decision | Required trigger |",
-        "|---|---|---:|---:|---|---|---|",
-    ]
+def replacement_duel_v2_markdown(state: dict[str, Any], language: str = "en") -> str:
+    if language == "nl":
+        lines = [
+            "| Huidige positie | Alternatief | 1m relatieve sterkte | 3m relatieve sterkte | Prijsbasis | Beoordeling | Benodigde bevestiging |",
+            "|---|---|---:|---:|---|---|---|",
+        ]
+    else:
+        lines = [
+            "| Current holding | Challenger | 1m edge | 3m edge | Pricing basis | Decision | Required trigger |",
+            "|---|---|---:|---:|---|---|---|",
+        ]
     for row in replacement_duel_v2_rows(state):
         lines.append(
             f"| {row['current_holding']} | {row['challenger']} | "
             f"{_edge_text(row.get('edge_1m_pct'))} | {_edge_text(row.get('edge_3m_pct'))} | "
-            f"{row['pricing_basis']} | {row['decision']} | {row['required_trigger']} |"
+            f"{localized_pricing_basis(row, language)} | {localize_decision(row['decision'], language)} | {localize_trigger(row['required_trigger'], language)} |"
         )
     return "\n".join(lines)
 
@@ -321,9 +327,9 @@ def replacement_duel_v2_html(state: dict[str, Any], base: Any, language: str = "
             f"<td>{anchor(str(row['challenger']))}</td>"
             f"<td class='num'>{escape(_edge_text(row.get('edge_1m_pct')))}</td>"
             f"<td class='num'>{escape(_edge_text(row.get('edge_3m_pct')))}</td>"
-            f"<td>{escape(str(row['pricing_basis']))}</td>"
-            f"<td>{escape(str(row['decision']))}</td>"
-            f"<td>{escape(str(row['required_trigger']))}</td>"
+            f"<td>{escape(localized_pricing_basis(row, language))}</td>"
+            f"<td>{escape(localize_decision(row['decision'], language))}</td>"
+            f"<td>{escape(localize_trigger(row['required_trigger'], language))}</td>"
             "</tr>"
         )
     return "".join(
