@@ -289,10 +289,10 @@ def validate_nl_email_body(html_body: str, md_text: str) -> None:
         raise RuntimeError("Dutch HTML body is missing required masthead block.")
 
     required_groups = [
-        ["executive summary", "samenvatting"],
-        ["portfolio action snapshot", "portefeuille", "actie"],
-        ["structural opportunity radar"],
-        ["current portfolio holdings and cash", "huidige portefeuille", "holdings en cash"],
+        ["executive summary", "samenvatting", "kernsamenvatting"],
+        ["portfolio action snapshot", "portefeuille", "actie", "portefeuille-acties"],
+        ["structural opportunity radar", "structurele kansenradar"],
+        ["current portfolio holdings and cash", "huidige portefeuille", "holdings en cash", "huidige posities en cash"],
     ]
     for group in required_groups:
         if not any(token in html_lower for token in group):
