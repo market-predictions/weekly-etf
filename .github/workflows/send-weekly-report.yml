@@ -57,6 +57,12 @@ jobs:
             --period 6mo \
             --output-json output/market_history/etf_relative_strength.json
 
+      - name: Build macro policy research pack
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python -m runtime.build_macro_policy_pack
+
       - name: Validate replacement duel RS coverage
         env:
           MRKT_RPRTS_REPORT_MODE: pro
@@ -70,7 +76,8 @@ jobs:
           python -m runtime.discover_etf_lanes \
             --config config/etf_discovery_universe.yml \
             --portfolio-state output/etf_portfolio_state.json \
-            --relative-strength output/market_history/etf_relative_strength.json
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --macro-policy-pack output/macro/latest.json
 
       - name: Price replacement-duel and discovery challengers
         env:
@@ -93,7 +100,8 @@ jobs:
           python -m runtime.discover_etf_lanes \
             --config config/etf_discovery_universe.yml \
             --portfolio-state output/etf_portfolio_state.json \
-            --relative-strength output/market_history/etf_relative_strength.json
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --macro-policy-pack output/macro/latest.json
           python -m runtime.augment_lane_artifact_with_quality_filters \
             --relative-strength output/market_history/etf_relative_strength.json \
             --macro-context config/etf_macro_fundamental_context.yml
