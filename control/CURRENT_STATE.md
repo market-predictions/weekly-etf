@@ -1,7 +1,7 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-05-08
+2026-05-10
 
 ## What this repository currently is
 
@@ -17,12 +17,15 @@ This repository is now a validated runtime-driven production-style weekly ETF re
 - `pricing/augment_challenger_pricing.py` as the targeted second-pass challenger pricing layer
 - `runtime/build_etf_report_state.py` as the deterministic runtime state builder
 - `runtime/render_etf_report_from_state.py` as the English/Dutch runtime markdown renderer
+- `runtime/nl_localization.py` as the Dutch language-contract module
+- `runtime/apply_nl_localization.py` as the Dutch companion localization pass
+- `tools/validate_etf_dutch_language_quality.py` as the Dutch markdown quality gate
 - `runtime/polish_runtime_reports.py` as the editorial polish layer
 - `runtime/link_runtime_report_tickers.py` as the context-aware markdown ticker link layer
 - `runtime/delivery_html_overrides.py` as the delivery-layer HTML authority for strict branded sections
-- `tools/validate_etf_delivery_html_contract.py` as the dynamic delivery HTML regression validator
+- `tools/validate_etf_delivery_html_contract.py` as the dynamic bilingual delivery HTML regression validator
 - `send_report_runtime_html.py` as the production delivery entrypoint that applies runtime-state HTML overrides
-- `send_report.py` as the base delivery/rendering script
+- `send_report.py` as the base delivery/rendering script and bilingual parity validator
 - `.github/workflows/send-weekly-report.yml` as the production send workflow
 - a pricing subsystem in `pricing/`
 - archived reports in `output/`
@@ -48,12 +51,15 @@ pricing audit
 → runtime state
 → EN/NL markdown render
 → polish/linkify
+→ Dutch localization contract pass
+→ Dutch language quality validation
+→ bilingual numeric parity validation
 → delivery HTML overrides
-→ delivery HTML contract validation
+→ bilingual delivery HTML contract validation
 → PDF/email delivery
 ```
 
-This path has solved the recurring report-render defect where Section 2 ticker links and Current Position Review layout could not be made reliable through markdown post-processing.
+This path has solved the recurring report-render defects where Section 2 ticker links, Current Position Review layout, Replacement Duel Table layout, Dutch terminology quality, and bilingual numeric parity could not be made reliable through markdown post-processing alone.
 
 ## Stable render decision
 
@@ -63,8 +69,24 @@ Specifically:
 
 - Portfolio Action Snapshot is rendered from runtime state as delivery HTML.
 - Current Position Review is rendered from runtime state as delivery HTML.
+- Replacement Duel Table / Vervangingsanalyse is rendered from runtime state as delivery HTML.
 - The delivery HTML validator dynamically reads current holdings from runtime state.
-- The validator checks real TradingView anchors and a real Current Position Review HTML table before email send.
+- The validator checks real TradingView anchors and real HTML tables before email send.
+- Dutch localized strict-section aliases are accepted by the delivery HTML contract.
+
+## Stable bilingual decision
+
+The Dutch report is a companion language render of the English canonical report, not a separate research pass.
+
+Specifically:
+
+- English remains the canonical analytical report.
+- Dutch uses the same runtime state, prices, portfolio totals, holdings, equity-curve values, and recommendation logic.
+- `runtime/nl_localization.py` is the central Dutch language-contract source for labels, status phrases, decision strings, trigger phrases, disclaimer text, and allowed English financial terms.
+- `runtime/apply_nl_localization.py` applies the Dutch language contract to the markdown companion.
+- `tools/validate_etf_dutch_language_quality.py` blocks hard English client-facing leaks and internal source labels.
+- `send_report.py` validates bilingual numeric parity before render/send.
+- `tools/validate_etf_delivery_html_contract.py` validates both English and Dutch rendered delivery HTML.
 
 ## What changed recently
 
@@ -90,6 +112,12 @@ instead of only static memory.
 
 The recurring Section 2 and Current Position Review rendering issues were resolved by moving those sections into the delivery HTML layer. The validator now fails the workflow before email send if those sections lose anchors or table structure.
 
+### Dutch companion localization production-tested
+
+A fresh production run successfully generated and delivered English and Dutch reports after adding the Dutch language-contract layer, Dutch quality gate, bilingual numeric parity fixes, and Dutch aliases for delivery HTML validators.
+
+The important lesson from this debugging cycle is that bilingual localization must be handled as a contract across render, markdown validation, delivery HTML validation, and send-time parity checks. One-off phrase fixes are fragile.
+
 ## Current strengths
 
 - Runtime pipeline has successfully delivered bilingual reports.
@@ -103,6 +131,8 @@ The recurring Section 2 and Current Position Review rendering issues were resolv
 - Delivery HTML validator checks the rendered output contract before email send.
 - Section 7 and Section 15 are reconciled from the same runtime state.
 - Dutch report is derived from the English runtime state and preserves numeric parity.
+- Dutch localization now has a dedicated language-contract module and quality gate.
+- Dutch strict-section delivery aliases are validated after render.
 
 ## Current weaknesses
 
@@ -118,17 +148,20 @@ The relative-strength layer uses pragmatic public yfinance history. It includes 
 ### 4. Challenger pricing is targeted, not full-universe pricing
 Targeted challenger pricing improves comparison quality, but it intentionally does not price the whole ETF universe to protect runtime and API limits.
 
+### 5. Bilingual aliases are still distributed across several files
+Dutch labels and aliases now work in production, but the alias definitions are still duplicated across `runtime/nl_localization.py`, `runtime/apply_nl_localization.py`, `send_report.py`, and `tools/validate_etf_delivery_html_contract.py`. This should be consolidated to reduce future validator drift.
+
 ## Immediate priorities
 
-### Priority A — final confirmation run
-Run one fresh production workflow to confirm:
+### Priority A — consolidate bilingual alias handling
+Next engineering cleanup:
 
-- delivery HTML validator passes
-- PDF/email render still succeeds
-- received PDF keeps Section 2 links and Current Position Review table intact
+- keep Dutch terminology and aliases in one source of truth
+- reuse that source from markdown localization, send-time parity checks, Dutch quality validation, and delivery HTML validation
+- avoid future one-error-at-a-time phrase fixes
 
 ### Priority B — add direct challenger-vs-current-holding scoring
-Next enhancement:
+Next model enhancement:
 
 - map challenger lanes to the holding they may replace
 - compute direct 1m and 3m relative strength versus that holding
@@ -143,4 +176,4 @@ Future enhancement:
 
 ## Current status label
 
-**ETF now has a validated runtime-driven bilingual production baseline with historical relative-strength scoring, two-pass challenger pricing, and delivery HTML validation for strict branded sections. The next engineering phase is direct challenger-vs-current-holding scoring.**
+**ETF now has a production-tested runtime-driven bilingual baseline with historical relative-strength scoring, two-pass challenger pricing, Dutch language-contract validation, bilingual numeric parity, delivery HTML validation for strict branded sections, and confirmed English/Dutch email delivery. The next engineering cleanup is consolidating bilingual alias handling; the next model phase remains direct challenger-vs-current-holding scoring.**
