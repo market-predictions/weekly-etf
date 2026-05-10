@@ -23,6 +23,7 @@ class LaneContext:
     priced_symbols: set[str]
     portfolio_gap_themes: dict[str, int]
     relative_strength_metrics: dict[str, dict[str, Any]] = field(default_factory=dict)
+    macro_policy_pack: dict[str, Any] = field(default_factory=dict)
 
 
 def _num(value: Any, default: float = 0.0) -> float:
@@ -116,7 +117,28 @@ def is_challenger(lane: dict[str, Any], context: LaneContext) -> bool:
     ) or "challenger" in novelty or "near_miss" in novelty
 
 
-def adjusted_lane_score(lane: dict[str, Any], context: LaneContext) -> float:
+def macro_adjustment(lane: dict[str, Any], context: LaneContext) -> tuple[float, str]:
+    pack = dict(context.macro_policy_pack or {})
+    adjustments = dict(pack.get("lane_adjustments", {}) or {})
+
+    candidates = [
+        str(lane.get("lane_name") or ""),
+        str(lane.get("taxonomy_tag") or ""),
+        str(lane.get("bucket") or ""),
+    ]
+
+    for key in candidates:
+        if key in adjustments:
+            payload = adjustments[key]
+            return (
+                max(min(_num(payload.get("score_adjustment"), 0.0), 0.20), -0.20),
+                str(payload.get("reason") or "Macro-policy adjustment applied."),
+            )
+
+    return 0.0, ""
+
+
+def adjusted_lane_score(lane: dict[str, Any], context: LaneContext) -> tuple[float, float, str]:
     primary = str(lane.get("primary_etf", "")).upper()
     alt = str(lane.get("alternative_etf", "")).upper()
     base = weighted_lane_score(lane)
@@ -128,7 +150,9 @@ def adjusted_lane_score(lane: dict[str, Any], context: LaneContext) -> float:
     primary_rs = rs_score(primary, context)
     alt_rs = rs_score(alt, context) if alt else 0.0
     market_bonus = max(primary_rs, alt_rs * 0.65)
-    return round(base + gap_bonus + price_bonus + novelty_bonus + market_bonus, 2)
+    macro_bonus, macro_reason = macro_adjustment(lane, context)
+    total = round(base + gap_bonus + price_bonus + novelty_bonus + market_bonus + macro_bonus, 2)
+    return total, macro_bonus, macro_reason
 
 
 def _rejection_reason(lane: dict[str, Any]) -> str:
@@ -172,7 +196,7 @@ def _rs_fields(primary: str, context: LaneContext) -> dict[str, Any]:
 def score_lane(lane: dict[str, Any], context: LaneContext) -> dict[str, Any]:
     primary = str(lane.get("primary_etf", "")).upper()
     alt = str(lane.get("alternative_etf", "")).upper()
-    total_score = adjusted_lane_score(lane, context)
+    total_score, macro_bonus, macro_reason = adjusted_lane_score(lane, context)
     primary_status = context.price_status_by_symbol.get(primary, "not_in_current_pricing_audit")
     alt_status = context.price_status_by_symbol.get(alt, "not_in_current_pricing_audit") if alt else "not_applicable"
     gap = portfolio_gap_score(lane, context)
@@ -192,6 +216,8 @@ def score_lane(lane: dict[str, Any], context: LaneContext) -> dict[str, Any]:
             "pricing_confidence": pricing_confidence(primary, context),
             "primary_price_status": primary_status,
             "alternative_price_status": alt_status,
+            "macro_policy_adjustment": macro_bonus,
+            "macro_policy_reason": macro_reason,
             "freshness_note": (
                 "Historical relative strength was available and included in scoring."
                 if rs.get("return_1m_pct") is not None or rs.get("return_3m_pct") is not None
