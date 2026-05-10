@@ -79,7 +79,7 @@ TABLE_LABELS = {
     "Invested market value": "Belegde marktwaarde",
     "Total portfolio value": "Totale portefeuillewaarde",
     "Since inception return": "Rendement sinds start",
-    "EUR/USD used": "Gebruikte EUR/USD",
+    "EUR/USD used": "EUR/USD gebruikt",
     "Date": "Datum",
     "Comment": "Toelichting",
     "Shares": "Aantal",
