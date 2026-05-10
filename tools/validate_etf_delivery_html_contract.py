@@ -14,6 +14,7 @@ if str(REPO_ROOT) not in sys.path:
 
 import send_report as report_module
 from runtime.build_etf_report_state import build_runtime_state
+from runtime.client_facing_sanitizer import sanitize_client_facing_html
 from runtime.delivery_html_overrides import build_report_html_with_state
 
 report_module.build_report_html = build_report_html_with_state(report_module.build_report_html, report_module._base)
@@ -95,7 +96,8 @@ def _report_date_from_filename(path: Path) -> str:
 
 def _render_delivery_html(report_path: Path) -> str:
     md_text = report_path.read_text(encoding="utf-8")
-    return report_module.build_report_html(md_text, _report_date_from_filename(report_path), image_src=None, render_mode="email")
+    html = report_module.build_report_html(md_text, _report_date_from_filename(report_path), image_src=None, render_mode="email")
+    return sanitize_client_facing_html(html)
 
 
 def _strip_html(value: str) -> str:
