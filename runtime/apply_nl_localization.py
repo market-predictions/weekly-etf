@@ -11,6 +11,7 @@ NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 
 SECTION_TITLE_REPLACEMENTS = {
     "## 1. Executive Summary": "## 1. Kernsamenvatting",
+    "## 2. Portfolio Action Snapshot": "## 2. Portefeuille-acties",
     "## 3. Regime Dashboard": "## 3. Regime-dashboard",
     "## 4. Structural Opportunity Radar": "## 4. Structurele kansenradar",
     "## 5. Key Risks / Invalidators": "## 5. Belangrijkste risico’s / invalidaties",
@@ -26,9 +27,14 @@ SECTION_TITLE_REPLACEMENTS = {
     "## 15. Current Portfolio Holdings and Cash": "## 15. Huidige posities en cash",
     "## 16. Continuity Input for Next Run": "## 16. Input voor de volgende run",
     "## 17. Disclaimer": "## 17. Disclaimer",
+    "### Replacement Duel Table v2": "### Vervangingsanalyse",
+    "### Replacement Duel Table": "### Vervangingsanalyse",
 }
 
 CLIENT_PHRASES = {
+    "Portfolio Action Snapshot": "Portefeuille-acties",
+    "Replacement Duel Table v2": "Vervangingsanalyse",
+    "Replacement Duel Table": "Vervangingsanalyse",
     "Risk appetite is supportive, but fresh adds still need position-size room and pricing confirmation.": "De risicobereidheid blijft ondersteunend, maar extra allocaties vragen nog ruimte binnen de positielimiet en prijsbevestiging.",
     "Growth and infrastructure lanes can be considered if they do not worsen concentration.": "Groei- en infrastructuurthema’s kunnen worden overwogen zolang ze de concentratie niet vergroten.",
     "Defensive hedges should be reviewed for opportunity cost.": "Defensieve hedgeposities moeten worden getoetst op opportuniteitskosten.",
