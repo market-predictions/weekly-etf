@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import send_report as report_module
 from runtime.build_etf_report_state import build_runtime_state
@@ -12,6 +12,26 @@ from runtime.render_etf_report_from_state import cash_eur, invested_eur, total_n
 
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
 STANDARD_REPORT_RE = re.compile(r"^weekly_analysis_(\d{6})(?:_(\d{2}))?\.md$")
+
+CLIENT_FACING_TOKEN_REPLACEMENTS = {
+    "Pending classification": "Mixed / not yet decisive",
+    "Placeholder for runtime replacement": "Latest available classified input",
+    "runtime rebuild required": "Latest available classified input",
+}
+
+
+def _sanitize_client_facing_html(html: str) -> str:
+    for forbidden, replacement in CLIENT_FACING_TOKEN_REPLACEMENTS.items():
+        html = html.replace(forbidden, replacement)
+    return html
+
+
+def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..., str]:
+    def _wrapped(md_text: str, report_date_str: str, image_src: str | None = None, render_mode: str = "email") -> str:
+        html = build_html(md_text, report_date_str, image_src=image_src, render_mode=render_mode)
+        return _sanitize_client_facing_html(html)
+
+    return _wrapped
 
 
 def _canonical_report_key(path: Path, mode: str) -> tuple[str, int] | None:
@@ -115,7 +135,9 @@ report_module.latest_report_file = _latest_canonical_report_file
 report_module.latest_reports_by_day = _latest_canonical_reports_by_day
 report_module.validate_section15_arithmetic = validate_section15_from_runtime_state
 report_module.validate_equity_curve_alignment = validate_equity_curve_from_runtime_state
-report_module.build_report_html = build_report_html_with_state(report_module.build_report_html, report_module._base)
+report_module.build_report_html = _with_client_facing_sanitizer(
+    build_report_html_with_state(report_module.build_report_html, report_module._base)
+)
 
 if __name__ == "__main__":
     report_module.main()
