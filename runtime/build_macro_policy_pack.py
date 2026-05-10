@@ -8,6 +8,8 @@ from typing import Any
 
 import yaml
 
+from runtime.regime_memory import update_regime_memory
+
 PRICING_DIR = Path("output/pricing")
 MACRO_DIR = Path("output/macro")
 RS_PATH = Path("output/market_history/etf_relative_strength.json")
@@ -164,7 +166,7 @@ def policy_catalysts(metrics: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def lane_adjustments(regime: str, metrics: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    adjustments: dict[str, dict[str, Any]] = {
+    return {
         "AI compute infrastructure": {
             "score_adjustment": 0.16 if regime in {"Risk-on narrow leadership", "Risk-on growth"} else 0.08,
             "reason": "Regime and price leadership still support AI compute exposure, but concentration discipline applies.",
@@ -194,7 +196,6 @@ def lane_adjustments(regime: str, metrics: dict[str, Any]) -> dict[str, dict[str
             "reason": "Current regime does not yet confirm broad small-cap risk appetite.",
         },
     }
-    return adjustments
 
 
 def portfolio_implications(regime: str) -> list[str]:
@@ -273,6 +274,7 @@ def build_pack(pricing_audit_path: Path, relative_strength_path: Path, macro_con
             "style_rule": "Transfer only decision-relevant macro information. Do not dump the full research pack into the report.",
         },
     }
+    pack["regime_memory"] = update_regime_memory(pack)
     return pack
 
 
@@ -295,9 +297,11 @@ def main() -> None:
     out_path.write_text(json.dumps(pack, indent=2, sort_keys=True), encoding="utf-8")
     latest_path.write_text(json.dumps(pack, indent=2, sort_keys=True), encoding="utf-8")
 
+    memory = pack.get("regime_memory", {})
     print(
         "ETF_MACRO_POLICY_PACK_OK | "
-        f"report_date={pack.get('report_date')} | regime={pack.get('regime', {}).get('current')} | output={out_path}"
+        f"report_date={pack.get('report_date')} | regime={pack.get('regime', {}).get('current')} | "
+        f"transition={memory.get('transition_state')} | weeks={memory.get('weeks_in_regime')} | output={out_path}"
     )
 
 
