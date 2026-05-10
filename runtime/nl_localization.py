@@ -140,6 +140,13 @@ DECISION_TRANSLATIONS = {
     "Challenger improving; keep duel active.": "Alternatief verbetert; vervangingsanalyse actief houden.",
     "Early 1m improvement only; wait for 3m confirmation.": "Alleen vroege 1-maands verbetering; wacht op 3-maands bevestiging.",
     "Current holding still leads; no replacement.": "Huidige positie blijft sterker; geen vervanging.",
+    # Some markdown render paths can strip the trailing period; keep both forms.
+    "Not fundable — close proof incomplete": "Niet geschikt voor allocatie — sluitkoersbewijs is onvolledig",
+    "Priced, but direct RS duel incomplete": "Geprijsd, maar de directe relatieve-sterkteanalyse is onvolledig",
+    "Replacement trigger watch — challenger leading over 3m": "Vervangingssignaal op watchlist — alternatief leidt over 3 maanden",
+    "Challenger improving; keep duel active": "Alternatief verbetert; vervangingsanalyse actief houden",
+    "Early 1m improvement only; wait for 3m confirmation": "Alleen vroege 1-maands verbetering; wacht op 3-maands bevestiging",
+    "Current holding still leads; no replacement": "Huidige positie blijft sterker; geen vervanging",
 }
 
 TRIGGER_TRANSLATIONS = {
@@ -148,6 +155,12 @@ TRIGGER_TRANSLATIONS = {
     "Needs repeat 3m edge and capital source.": "Vereist herhaalde 3-maands voorsprong en duidelijke financieringsbron.",
     "Needs 3m confirmation.": "Vereist 3-maands bevestiging.",
     "Needs sustained relative outperformance.": "Vereist aanhoudende relatieve outperformance.",
+    # Some markdown render paths can strip the trailing period; keep both forms.
+    "Resolve both close prices before decision": "Los beide slotkoersen op vóór een besluit",
+    "Confirm thesis fit, liquidity and funding source": "Bevestig thesisfit, liquiditeit en financieringsbron",
+    "Needs repeat 3m edge and capital source": "Vereist herhaalde 3-maands voorsprong en duidelijke financieringsbron",
+    "Needs 3m confirmation": "Vereist 3-maands bevestiging",
+    "Needs sustained relative outperformance": "Vereist aanhoudende relatieve outperformance",
 }
 
 FORBIDDEN_NL_STRINGS = [
@@ -213,7 +226,13 @@ def localize_text(value: Any, language: str = "nl") -> str:
     text = str(value or "")
     if language != "nl":
         return text
-    for src, dst in {**PHRASE_REPLACEMENTS, **TABLE_LABELS, **ACTION_REPLACEMENTS}.items():
+    for src, dst in {
+        **PHRASE_REPLACEMENTS,
+        **TABLE_LABELS,
+        **ACTION_REPLACEMENTS,
+        **DECISION_TRANSLATIONS,
+        **TRIGGER_TRANSLATIONS,
+    }.items():
         text = text.replace(src, dst)
     text = re.sub(
         r"This report is provided for informational and educational purposes only\..*?possible loss of principal\.",
