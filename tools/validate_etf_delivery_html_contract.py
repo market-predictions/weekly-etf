@@ -32,16 +32,16 @@ FORBIDDEN_REPLACEMENT_DUEL_HEADERS = ["Current close", "Challenger close"]
 
 STRICT_TITLE_GROUPS = [
     ["Portfolio Action Snapshot", "Portefeuille-acties"],
-    ["Regime Dashboard"],
-    ["Structural Opportunity Radar"],
-    ["Key Risks / Invalidators"],
-    ["Equity Curve and Portfolio Development"],
-    ["Asset Allocation Map"],
-    ["Second-Order Effects Map"],
+    ["Regime Dashboard", "Regime-dashboard"],
+    ["Structural Opportunity Radar", "Structurele kansenradar"],
+    ["Key Risks / Invalidators", "Belangrijkste risico’s / invalidaties"],
+    ["Equity Curve and Portfolio Development", "Portefeuillecurve en portefeuilleontwikkeling"],
+    ["Asset Allocation Map", "Allocatiekaart"],
+    ["Second-Order Effects Map", "Tweede-orde-effectenkaart"],
     ["Current Position Review", "Review huidige posities"],
-    ["Final Action Table"],
-    ["Current Portfolio Holdings and Cash"],
-    ["Continuity Input for Next Run"],
+    ["Final Action Table", "Definitieve actietabel"],
+    ["Current Portfolio Holdings and Cash", "Huidige posities en cash"],
+    ["Continuity Input for Next Run", "Input voor de volgende run"],
     ["Replacement Duel Table", "Vervangingsanalyse"],
 ]
 
@@ -53,6 +53,12 @@ REPLACEMENT_DUEL_REQUIRED_HEADER_GROUPS = [
     ["Pricing basis", "Prijsbasis"],
     ["Decision", "Beoordeling"],
     ["Required trigger", "Benodigde bevestiging"],
+]
+
+STRUCTURAL_RADAR_TITLES = ["Structural Opportunity Radar", "Structurele kansenradar"]
+STRUCTURAL_RADAR_END_TITLE_GROUPS = [
+    ["Short Opportunity Radar"],
+    ["Key Risks / Invalidators", "Belangrijkste risico’s / invalidaties"],
 ]
 
 
@@ -173,11 +179,7 @@ def _validate_required_titles(html: str, report_name: str) -> None:
 
 
 def _validate_structural_radar(html: str, report_name: str) -> None:
-    section = _section_between_title_groups(
-        html,
-        ["Structural Opportunity Radar"],
-        [["Short Opportunity Radar"], ["Key Risks / Invalidators"]],
-    )
+    section = _section_between_title_groups(html, STRUCTURAL_RADAR_TITLES, STRUCTURAL_RADAR_END_TITLE_GROUPS)
     plain = _strip_html(section).lower()
     if len(plain) < 240:
         raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: Structural Opportunity Radar is too thin after rendering.")
@@ -189,7 +191,7 @@ def _replacement_duel_section(html: str) -> str:
     return _section_between_title_groups(
         html,
         ["Replacement Duel Table", "Vervangingsanalyse"],
-        [["Portfolio Rotation Plan"], ["Rotatieplan portefeuille"], ["Final Action Table"]],
+        [["Portfolio Rotation Plan", "Rotatieplan portefeuille"], ["Final Action Table", "Definitieve actietabel"]],
     )
 
 
