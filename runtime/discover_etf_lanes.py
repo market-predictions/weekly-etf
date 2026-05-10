@@ -19,6 +19,7 @@ from runtime.score_etf_lanes import (
 PRICING_DIR = Path("output/pricing")
 LANE_DIR = Path("output/lane_reviews")
 RS_PATH = Path("output/market_history/etf_relative_strength.json")
+MACRO_POLICY_PACK_PATH = Path("output/macro/latest.json")
 REPORT_RE = re.compile(r"weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
 
 
@@ -132,6 +133,7 @@ def build_lane_artifact(
     portfolio_state_path: Path,
     pricing_audit_path: Path,
     relative_strength_path: Path = RS_PATH,
+    macro_policy_pack_path: Path = MACRO_POLICY_PACK_PATH,
 ) -> tuple[dict[str, Any], Path]:
     config = load_yaml(config_path)
     pricing_audit = load_json(pricing_audit_path)
@@ -142,6 +144,8 @@ def build_lane_artifact(
 
     status_by_symbol, priced_symbols = pricing_context(pricing_audit)
     rs_metrics = relative_strength_metrics(relative_strength_path)
+    macro_policy_pack = load_json(macro_policy_pack_path) if macro_policy_pack_path.exists() else {}
+
     context = LaneContext(
         held_tickers=held_tickers_from_portfolio_state(portfolio_state_path),
         prior_promoted_tickers=prior_promoted_tickers(prior),
@@ -149,6 +153,7 @@ def build_lane_artifact(
         priced_symbols=priced_symbols,
         portfolio_gap_themes=dict(config.get("portfolio_gap_themes", {}) or {}),
         relative_strength_metrics=rs_metrics,
+        macro_policy_pack=macro_policy_pack,
     )
 
     lanes = [score_lane(lane, context) for lane in config.get("lanes", [])]
@@ -160,12 +165,14 @@ def build_lane_artifact(
         "report_date": report_date,
         "report_filename": report_filename,
         "prior_report_filename": (prior or {}).get("report_filename"),
-        "discovery_engine_version": "lane_discovery_v2_relative_strength",
+        "discovery_engine_version": "lane_discovery_v3_macro_policy",
+        "macro_regime": (macro_policy_pack.get("regime") or {}).get("current"),
         "discovery_inputs": {
             "config": str(config_path),
             "portfolio_state": str(portfolio_state_path),
             "pricing_audit": str(pricing_audit_path),
             "relative_strength": str(relative_strength_path) if relative_strength_path.exists() else None,
+            "macro_policy_pack": str(macro_policy_pack_path) if macro_policy_pack_path.exists() else None,
             "prior_lane_artifact": "latest_available" if prior else None,
         },
         "required_breadth_buckets": list(config.get("required_breadth_buckets", [])),
@@ -185,6 +192,7 @@ def main() -> None:
     parser.add_argument("--portfolio-state", default="output/etf_portfolio_state.json")
     parser.add_argument("--pricing-audit", default=None)
     parser.add_argument("--relative-strength", default=str(RS_PATH))
+    parser.add_argument("--macro-policy-pack", default=str(MACRO_POLICY_PACK_PATH))
     args = parser.parse_args()
 
     pricing_audit_path = Path(args.pricing_audit) if args.pricing_audit else latest_file(PRICING_DIR, "price_audit_*.json")
@@ -193,13 +201,14 @@ def main() -> None:
         Path(args.portfolio_state),
         pricing_audit_path,
         Path(args.relative_strength),
+        Path(args.macro_policy_pack),
     )
     promoted = [lane for lane in payload["assessed_lanes"] if lane.get("promoted_to_live_radar")]
     challengers = [lane for lane in payload["assessed_lanes"] if lane.get("challenger")]
     rs_used = bool(payload.get("discovery_inputs", {}).get("relative_strength"))
     print(
         "ETF_LANE_DISCOVERY_OK | "
-        f"report={payload['report_filename']} | lanes={len(payload['assessed_lanes'])} | "
+        f"report={payload['report_filename']} | regime={payload.get('macro_regime')} | lanes={len(payload['assessed_lanes'])} | "
         f"promoted={len(promoted)} | challengers={len(challengers)} | rs_used={rs_used} | artifact={out_path}"
     )
 
