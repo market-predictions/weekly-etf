@@ -14,10 +14,13 @@ from runtime.nl_localization import DUTCH_DISCLAIMER, FORBIDDEN_NL_STRINGS, vali
 
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 
+# This validator checks the Dutch markdown companion only. Strict delivery-only
+# panels such as the Replacement Duel Table / Vervangingsanalyse are rendered
+# later from runtime state in the delivery HTML layer and are protected by
+# tools/validate_etf_delivery_html_contract.py.
 REQUIRED_DUTCH_MARKERS = [
     "Kernsamenvatting",
     "Portefeuille-acties",
-    "Vervangingsanalyse",
     "Review huidige posities",
     "Rotatieplan portefeuille",
     "Huidige posities en cash",
