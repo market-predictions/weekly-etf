@@ -10,6 +10,7 @@ from typing import Any
 RUNTIME_DIR = Path("output/runtime")
 PRICING_DIR = Path("output/pricing")
 LANE_DIR = Path("output/lane_reviews")
+MACRO_DIR = Path("output/macro")
 
 
 @dataclass
@@ -18,6 +19,7 @@ class RuntimeSources:
     pricing_audit: Path
     lane_assessment: Path
     recommendation_scorecard: Path
+    macro_policy_pack: Path | None = None
 
 
 def latest_file(directory: Path, pattern: str) -> Path:
@@ -29,6 +31,12 @@ def latest_file(directory: Path, pattern: str) -> Path:
 
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def load_json_if_exists(path: Path | None) -> dict[str, Any]:
+    if path is None or not path.exists():
+        return {}
+    return load_json(path)
 
 
 def load_scorecard(path: Path) -> list[dict[str, str]]:
@@ -58,13 +66,6 @@ def _lane_artifact_has_etf_contract(payload: dict[str, Any]) -> bool:
 
 
 def latest_lane_file(directory: Path, pattern: str) -> Path:
-    """Return the newest lane artifact that satisfies the runtime ETF contract.
-
-    Legacy runtime-breadth artifacts in output/lane_reviews contained lane names
-    but no primary_etf / alternative_etf fields. They sort newer than the close
-    date artifact and caused reports to render Primary ETF = None. The runtime
-    state builder must never use those artifacts as portfolio-discovery truth.
-    """
     files = sorted(directory.glob(pattern), reverse=True)
     if not files:
         raise RuntimeError(f"No files found for {pattern} in {directory}")
@@ -84,12 +85,21 @@ def latest_lane_file(directory: Path, pattern: str) -> Path:
     )
 
 
+def latest_macro_policy_pack() -> Path | None:
+    latest = MACRO_DIR / "latest.json"
+    if latest.exists():
+        return latest
+    files = sorted(MACRO_DIR.glob("etf_macro_policy_pack_*.json")) if MACRO_DIR.exists() else []
+    return files[-1] if files else None
+
+
 def discover_sources() -> RuntimeSources:
     return RuntimeSources(
         portfolio_state=Path("output/etf_portfolio_state.json"),
         pricing_audit=latest_file(PRICING_DIR, "price_audit_*.json"),
         lane_assessment=latest_lane_file(LANE_DIR, "etf_lane_assessment_*.json"),
         recommendation_scorecard=Path("output/etf_recommendation_scorecard.csv"),
+        macro_policy_pack=latest_macro_policy_pack(),
     )
 
 
@@ -243,6 +253,7 @@ def build_runtime_state() -> dict[str, Any]:
     pricing_audit = load_json(sources.pricing_audit)
     lane_assessment = load_json(sources.lane_assessment)
     recommendation_scorecard = load_scorecard(sources.recommendation_scorecard)
+    macro_policy_pack = load_json_if_exists(sources.macro_policy_pack)
 
     pricing_holdings = pricing_audit.get("holdings", [])
     holdings = enrich_positions(pricing_holdings, portfolio_state, recommendation_scorecard)
@@ -295,6 +306,7 @@ def build_runtime_state() -> dict[str, Any]:
             "pricing_audit": str(sources.pricing_audit),
             "lane_assessment": str(sources.lane_assessment),
             "recommendation_scorecard": str(sources.recommendation_scorecard),
+            "macro_policy_pack": str(sources.macro_policy_pack) if sources.macro_policy_pack else None,
         },
         "portfolio": {
             "cash_eur": portfolio_state.get("cash_eur"),
@@ -312,6 +324,7 @@ def build_runtime_state() -> dict[str, Any]:
         "positions": holdings,
         "pricing": prices,
         "lane_assessment": lane_assessment,
+        "macro_policy_pack": macro_policy_pack,
         "recommendation_scorecard": recommendation_scorecard,
         "replacement_duels": duel_candidates,
         "validation_flags": {
@@ -319,6 +332,7 @@ def build_runtime_state() -> dict[str, Any]:
             "lane_assessment_present": bool(lane_assessment.get("assessed_lanes")),
             "lane_assessment_source": str(sources.lane_assessment),
             "lane_assessment_has_primary_etfs": _lane_artifact_has_etf_contract(lane_assessment),
+            "macro_policy_pack_present": bool(macro_policy_pack.get("regime")),
             "scorecard_present": len(recommendation_scorecard) > 0,
             "positions_enriched": any(p.get("short_reason") for p in holdings),
             "fx_rate_present": _fx_rate(pricing_audit) is not None,
@@ -338,7 +352,7 @@ def main() -> None:
     out_path.write_text(json.dumps(runtime_state, indent=2), encoding="utf-8")
 
     print(
-        f"ETF_RUNTIME_STATE_OK | report_date={runtime_state.get('report_date')} | output={out_path} | lane_source={runtime_state.get('source_files', {}).get('lane_assessment')}"
+        f"ETF_RUNTIME_STATE_OK | report_date={runtime_state.get('report_date')} | output={out_path} | lane_source={runtime_state.get('source_files', {}).get('lane_assessment')} | macro_source={runtime_state.get('source_files', {}).get('macro_policy_pack')}"
     )
 
 
