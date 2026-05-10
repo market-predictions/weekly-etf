@@ -42,13 +42,6 @@ def _ticker(value: Any) -> str:
     return str(value or "").strip().upper()
 
 
-def _f2(value: Any) -> str:
-    try:
-        return f"{float(value):.2f}"
-    except (TypeError, ValueError):
-        return "n/a"
-
-
 def _num(value: Any) -> float | None:
     try:
         if value is None or value == "":
@@ -64,14 +57,6 @@ def _edge_text(value: Any) -> str:
         return "n/a"
     sign = "+" if value_f > 0 else ""
     return f"{sign}{value_f:.2f}%"
-
-
-def _close_text(value: Any, currency: Any = "USD") -> str:
-    value_f = _num(value)
-    if value_f is None:
-        return "n/a"
-    ccy = str(currency or "USD").upper()
-    return f"{ccy} {value_f:.2f}"
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
@@ -282,7 +267,7 @@ def _lane_rows(state: dict[str, Any], existing: set[tuple[str, str]]) -> list[di
     return rows
 
 
-def _row_rank(row: dict[str, Any]) -> tuple[int, int, int, float, str]:
+def _row_rank(row: dict[str, Any]) -> tuple[int, int, int, int, float, str]:
     priority_rank = 0 if row.get("is_priority_duel") else 1
     source_rank = 0 if row.get("source") == "strategic_target_map" else 1
     holding = _ticker(row.get("current_holding"))
@@ -302,20 +287,19 @@ def replacement_duel_v2_rows(state: dict[str, Any], limit: int = 16) -> list[dic
 
 def replacement_duel_v2_markdown(state: dict[str, Any]) -> str:
     lines = [
-        "| Current holding | Current close | Challenger | Challenger close | 1m edge | 3m edge | Pricing basis | Decision | Required trigger |",
-        "|---|---:|---|---:|---:|---:|---|---|---|",
+        "| Current holding | Challenger | 1m edge | 3m edge | Pricing basis | Decision | Required trigger |",
+        "|---|---|---:|---:|---|---|---|",
     ]
     for row in replacement_duel_v2_rows(state):
         lines.append(
-            f"| {row['current_holding']} | {_close_text(row.get('current_close'), row.get('current_close_currency'))} | "
-            f"{row['challenger']} | {_close_text(row.get('challenger_close'), row.get('challenger_close_currency'))} | "
+            f"| {row['current_holding']} | {row['challenger']} | "
             f"{_edge_text(row.get('edge_1m_pct'))} | {_edge_text(row.get('edge_3m_pct'))} | "
             f"{row['pricing_basis']} | {row['decision']} | {row['required_trigger']} |"
         )
     return "\n".join(lines)
 
 
-def replacement_duel_v2_html(state: dict[str, Any], base: Any) -> str:
+def replacement_duel_v2_html(state: dict[str, Any], base: Any, language: str = "en") -> str:
     def anchor(ticker: str) -> str:
         try:
             return base.ticker_anchor_html(ticker)
@@ -323,15 +307,18 @@ def replacement_duel_v2_html(state: dict[str, Any], base: Any) -> str:
             url = f"https://www.tradingview.com/chart/?symbol={escape(ticker)}"
             return f'<a href="{url}" target="_blank" rel="noopener noreferrer">{escape(ticker)}</a>'
 
+    labels = {
+        "en": ["Current holding", "Challenger", "1m edge", "3m edge", "Pricing basis", "Decision", "Required trigger"],
+        "nl": ["Huidige positie", "Alternatief", "1m relatieve sterkte", "3m relatieve sterkte", "Prijsbasis", "Beoordeling", "Benodigde bevestiging"],
+    }.get(language, ["Current holding", "Challenger", "1m edge", "3m edge", "Pricing basis", "Decision", "Required trigger"])
+
     body = []
     for row in replacement_duel_v2_rows(state):
         row_class = " priority-duel" if row.get("is_priority_duel") else ""
         body.append(
             f"<tr class='{row_class.strip()}'>"
             f"<td>{anchor(str(row['current_holding']))}</td>"
-            f"<td class='num'>{escape(_close_text(row.get('current_close'), row.get('current_close_currency')))}</td>"
             f"<td>{anchor(str(row['challenger']))}</td>"
-            f"<td class='num'>{escape(_close_text(row.get('challenger_close'), row.get('challenger_close_currency')))}</td>"
             f"<td class='num'>{escape(_edge_text(row.get('edge_1m_pct')))}</td>"
             f"<td class='num'>{escape(_edge_text(row.get('edge_3m_pct')))}</td>"
             f"<td>{escape(str(row['pricing_basis']))}</td>"
@@ -342,7 +329,7 @@ def replacement_duel_v2_html(state: dict[str, Any], base: Any) -> str:
     return "".join(
         [
             "<table class='data-table replacement-duel-v2-table'>",
-            "<thead><tr><th>Current holding</th><th>Current close</th><th>Challenger</th><th>Challenger close</th><th>1m edge</th><th>3m edge</th><th>Pricing basis</th><th>Decision</th><th>Required trigger</th></tr></thead>",
+            "<thead><tr>" + "".join(f"<th>{escape(label)}</th>" for label in labels) + "</tr></thead>",
             "<tbody>",
             "".join(body),
             "</tbody></table>",
