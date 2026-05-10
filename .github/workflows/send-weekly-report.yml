@@ -131,12 +131,19 @@ jobs:
           python -m runtime.polish_runtime_reports --output-dir output
           python -m runtime.fix_report_output_contract --output-dir output
           python -m runtime.link_runtime_report_tickers --output-dir output
+          python -m runtime.apply_nl_localization --output-dir output
 
       - name: Validate ETF report content contract
         env:
           MRKT_RPRTS_REPORT_MODE: pro
         run: |
           python tools/validate_etf_report_content_contract.py --output-dir output
+
+      - name: Validate Dutch language quality contract
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python tools/validate_etf_dutch_language_quality.py --output-dir output
 
       - name: Validate persisted pricing audit after runtime render
         run: |
