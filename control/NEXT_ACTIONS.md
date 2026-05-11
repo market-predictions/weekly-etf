@@ -31,8 +31,10 @@
   → final lane discovery
   → runtime state
   → EN/NL markdown render
+  → full valuation-history Section 7 equity curve
   → polish/linkify
   → Dutch localization contract pass
+  → equity-curve history validation
   → Dutch language quality validation
   → bilingual numeric parity validation
   → delivery HTML overrides
@@ -40,7 +42,7 @@
   → PDF/email delivery
   ```
 - Action: do not repair strict branded sections through markdown post-processing.
-- Done when: Section 2, Current Position Review, Portfolio Rotation Plan, and Vervangingsanalyse stay governed by delivery HTML overrides and validator checks.
+- Done when: Section 2, Current Position Review, Portfolio Rotation Plan, Vervangingsanalyse, and Section 7 equity curve stay governed by runtime/delivery contracts and validator checks.
 
 ### 3. Keep workflow behavior operational only
 - Owner: `[ASSISTANT]`
@@ -51,11 +53,24 @@
   - do not claim delivery success without a real receipt, manifest, or explicit user confirmation of received delivery
 - Done when: delivery status remains verifiable.
 
+### 4. Protect the full valuation-history equity curve
+- Owner: `[ASSISTANT]`
+- Status: done / active regression guard
+- Result:
+  - Section 7 now uses `output/etf_valuation_history.csv` plus current runtime NAV.
+  - The embedded equity-curve chart now shows intermediate valuation dates.
+  - `tools/validate_etf_equity_curve_history.py` is wired into `.github/workflows/send-weekly-report.yml`.
+  - Workflow marker: `ETF_EQUITY_CURVE_HISTORY_OK`.
+- Action going forward:
+  - do not hardcode Section 7 as only start/latest
+  - if valuation history changes, preserve Section 7 ↔ Section 15 reconciliation
+- Done when: every fresh report has at least the historical valuation points plus current NAV and latest Section 7 NAV reconciles with Section 15 total NAV.
+
 ---
 
 ## Phase 2 — ChatGPT-triggerable report generation
 
-### 4. Use safe report request queue for ChatGPT-initiated fresh reports
+### 5. Use safe report request queue for ChatGPT-initiated fresh reports
 - Owner: `[ASSISTANT]`
 - Status: active baseline
 - Action: when the user asks ChatGPT to generate a fresh Weekly ETF Review, create a request file under:
@@ -65,21 +80,22 @@
 - Do not create trigger files under `output/`.
 - Done when: the send workflow is triggered by the run-queue request path and no placeholder report files are introduced.
 
-### 5. Run one fresh production confirmation workflow
+### 6. Run one fresh production confirmation workflow
 - Owner: `[USER]` or `[ASSISTANT]` if GitHub write permission is approved
-- Status: done on 2026-05-10
+- Status: done on 2026-05-10; equity-curve correction reconfirmed on 2026-05-11
 - Result:
   - English and Dutch reports were generated and received.
   - Dutch localization contract passed after validator drift was corrected.
   - Bilingual numeric parity passed.
   - Delivery HTML render and final email delivery succeeded.
+  - Equity curve now renders full valuation history and no longer collapses to start/latest.
 - Follow-up: no additional confirmation run is needed unless the delivery/render path changes.
 
 ---
 
 ## Phase 3 — bilingual quality and validator consolidation
 
-### 6. Consolidate bilingual alias handling
+### 7. Consolidate bilingual alias handling
 - Owner: `[ASSISTANT]`
 - Priority: high engineering cleanup before adding more NL output features
 - Current issue:
@@ -97,7 +113,7 @@
   - preserve English canonical report as analytical source of truth
 - Done when: adding or changing one Dutch section/table label requires one edit, not patches across several validators.
 
-### 7. Keep the Dutch companion premium but selective
+### 8. Keep the Dutch companion premium but selective
 - Owner: `[ASSISTANT]`
 - Action:
   - continue improving Dutch client-facing language through the language-contract layer
@@ -110,7 +126,7 @@
 
 ## Phase 4 — improve portfolio decision quality
 
-### 8. Continue direct challenger-vs-current-holding scoring
+### 9. Continue direct challenger-vs-current-holding scoring
 - Owner: `[ASSISTANT]`
 - Action:
   - map challenger lanes to likely funded holdings they could replace
@@ -120,7 +136,7 @@
   - surface the direct edge in replacement-duel notes
 - Done when: replacement candidates are compared against the actual holding they would replace, not only versus SPY.
 
-### 9. Expand and curate the discovery universe
+### 10. Expand and curate the discovery universe
 - Owner: `[ASSISTANT]`
 - Source file:
   - `config/etf_discovery_universe.yml`
@@ -129,7 +145,7 @@
   - keep each lane investable, differentiated, and scored
 - Done when: the universe is broad enough to surface new candidates without becoming noisy.
 
-### 10. Add better macro/fundamental freshness inputs
+### 11. Add better macro/fundamental freshness inputs
 - Owner: `[ASSISTANT]`
 - Action:
   - add machine-readable macro/regime input file
@@ -141,7 +157,7 @@
 
 ## Phase 5 — continue capital discipline
 
-### 11. Apply the capital re-underwriting layer in every report
+### 12. Apply the capital re-underwriting layer in every report
 - Owner: `[ASSISTANT]`
 - Source files:
   - `control/CAPITAL_REUNDERWRITING_RULES.md`
@@ -154,7 +170,7 @@
   - test hedge validity for GLD or any hedge sleeve
 - Done when: the report clearly explains why Hold is still justified or why action is required.
 
-### 12. Force the specific current weak-point reviews
+### 13. Force the specific current weak-point reviews
 - Owner: `[ASSISTANT]`
 - Action: in the next report explicitly review:
   - SPY overlap versus SMH
@@ -168,4 +184,4 @@
 
 ## Current checkpoint
 
-**The runtime-driven bilingual production baseline now includes delivery HTML overrides, a dynamic bilingual delivery HTML validator, Dutch localization contract validation, bilingual numeric parity, direct replacement-duel logic, and a safe ChatGPT-triggerable report request queue under `control/run_queue/`. The latest confirmation run delivered English and Dutch reports successfully.**
+**The runtime-driven bilingual production baseline now includes delivery HTML overrides, a dynamic bilingual delivery HTML validator, Dutch localization contract validation, bilingual numeric parity, full valuation-history Section 7 equity curve rendering protected by `ETF_EQUITY_CURVE_HISTORY_OK`, direct replacement-duel logic, and a safe ChatGPT-triggerable report request queue under `control/run_queue/`. The latest corrected run delivered English and Dutch reports with the full equity curve successfully.**
