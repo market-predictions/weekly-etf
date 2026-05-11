@@ -1,7 +1,7 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-05-10
+2026-05-11
 
 ## What this repository currently is
 
@@ -20,6 +20,7 @@ This repository is now a validated runtime-driven production-style weekly ETF re
 - `runtime/nl_localization.py` as the Dutch language-contract module
 - `runtime/apply_nl_localization.py` as the Dutch companion localization pass
 - `tools/validate_etf_dutch_language_quality.py` as the Dutch markdown quality gate
+- `tools/validate_etf_equity_curve_history.py` as the equity-curve history regression guard
 - `runtime/polish_runtime_reports.py` as the editorial polish layer
 - `runtime/link_runtime_report_tickers.py` as the context-aware markdown ticker link layer
 - `runtime/delivery_html_overrides.py` as the delivery-layer HTML authority for strict branded sections
@@ -50,8 +51,10 @@ pricing audit
 → final lane discovery
 → runtime state
 → EN/NL markdown render
+→ full valuation-history Section 7 equity curve
 → polish/linkify
 → Dutch localization contract pass
+→ equity-curve history validation
 → Dutch language quality validation
 → bilingual numeric parity validation
 → delivery HTML overrides
@@ -59,7 +62,7 @@ pricing audit
 → PDF/email delivery
 ```
 
-This path has solved the recurring report-render defects where Section 2 ticker links, Current Position Review layout, Replacement Duel Table layout, Dutch terminology quality, and bilingual numeric parity could not be made reliable through markdown post-processing alone.
+This path has solved the recurring report-render defects where Section 2 ticker links, Current Position Review layout, Replacement Duel Table layout, Dutch terminology quality, bilingual numeric parity, and the Section 7 equity curve could not be made reliable through markdown post-processing alone.
 
 ## Stable render decision
 
@@ -73,6 +76,19 @@ Specifically:
 - The delivery HTML validator dynamically reads current holdings from runtime state.
 - The validator checks real TradingView anchors and real HTML tables before email send.
 - Dutch localized strict-section aliases are accepted by the delivery HTML contract.
+
+## Stable equity-curve decision
+
+Section 7 is now a state/history render, not a hardcoded start/latest summary.
+
+Specifically:
+
+- `output/etf_valuation_history.csv` is the source for historical NAV points.
+- `runtime/render_etf_report_from_state.py` appends or replaces the current runtime NAV for the report date.
+- Section 7 renders the full valuation history table.
+- The embedded equity-curve chart is generated from the Section 7 table, so it now shows the intermediate valuation dates.
+- `tools/validate_etf_equity_curve_history.py` protects the contract with the marker `ETF_EQUITY_CURVE_HISTORY_OK`.
+- The validator fails if Section 7 has too few points, has duplicate dates, or if the latest Section 7 NAV does not reconcile with Section 15 total NAV.
 
 ## Stable bilingual decision
 
@@ -118,6 +134,12 @@ A fresh production run successfully generated and delivered English and Dutch re
 
 The important lesson from this debugging cycle is that bilingual localization must be handled as a contract across render, markdown validation, delivery HTML validation, and send-time parity checks. One-off phrase fixes are fragile.
 
+### Equity curve regression fixed and production-tested
+
+A fresh corrected report confirmed that Section 7 now uses the full `output/etf_valuation_history.csv` history plus the current runtime NAV. The embedded equity-curve chart now shows the intermediate valuation dates instead of only the start and latest points.
+
+The workflow is protected by `ETF_EQUITY_CURVE_HISTORY_OK`.
+
 ## Current strengths
 
 - Runtime pipeline has successfully delivered bilingual reports.
@@ -129,7 +151,8 @@ The important lesson from this debugging cycle is that bilingual localization mu
 - Lane artifact includes discovery provenance, novelty metadata, and market-strength fields.
 - Delivery HTML overrides protect strict branded sections.
 - Delivery HTML validator checks the rendered output contract before email send.
-- Section 7 and Section 15 are reconciled from the same runtime state.
+- Section 7 now renders full valuation history from `output/etf_valuation_history.csv` plus current runtime NAV.
+- Section 7 and Section 15 are reconciled from the same runtime state and protected by `ETF_EQUITY_CURVE_HISTORY_OK`.
 - Dutch report is derived from the English runtime state and preserves numeric parity.
 - Dutch localization now has a dedicated language-contract module and quality gate.
 - Dutch strict-section delivery aliases are validated after render.
@@ -176,4 +199,4 @@ Future enhancement:
 
 ## Current status label
 
-**ETF now has a production-tested runtime-driven bilingual baseline with historical relative-strength scoring, two-pass challenger pricing, Dutch language-contract validation, bilingual numeric parity, delivery HTML validation for strict branded sections, and confirmed English/Dutch email delivery. The next engineering cleanup is consolidating bilingual alias handling; the next model phase remains direct challenger-vs-current-holding scoring.**
+**ETF now has a production-tested runtime-driven bilingual baseline with historical relative-strength scoring, two-pass challenger pricing, Dutch language-contract validation, full valuation-history equity curve rendering, bilingual numeric parity, delivery HTML validation for strict branded sections, and confirmed English/Dutch email delivery. The next engineering cleanup is consolidating bilingual alias handling; the next model phase remains direct challenger-vs-current-holding scoring.**
