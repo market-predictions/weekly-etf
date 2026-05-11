@@ -228,3 +228,53 @@ Repeated markdown-level fixes could not reliably guarantee clickable ticker form
 - `tools/validate_etf_delivery_html_contract.py` dynamically reads holdings from runtime state and validates rendered delivery HTML before email send.
 - The validator checks for real TradingView anchors, prevents raw markdown links, and ensures Current Position Review is a real HTML table.
 - Future PDF layout defects in these sections should be fixed in the delivery HTML layer, not by more markdown post-processing.
+
+---
+
+## 2026-05-10 — Treat Dutch localization as a language-contract layer
+### Decision
+The Dutch ETF companion report is governed by a language-contract layer, not by ad-hoc markdown replacements or a separate research pass.
+
+### Chosen architecture
+```text
+runtime state
+→ English canonical report
+→ Dutch companion render
+→ Dutch localization contract pass
+→ Dutch language quality validation
+→ bilingual numeric parity validation
+→ bilingual delivery HTML validation
+→ PDF/email delivery
+```
+
+### Scope
+This applies to:
+
+- Dutch section titles
+- Dutch table labels
+- Dutch decision/status strings
+- Dutch trigger phrases
+- Dutch disclaimer wording
+- allowed English financial terminology
+- internal source labels that must never appear in client-facing Dutch text
+- Dutch aliases used by validators and delivery checks
+
+### Reason
+The production debugging cycle showed that one-failure-at-a-time phrase fixes are fragile. The real issue was validator drift between:
+
+- `runtime/nl_localization.py`
+- `runtime/apply_nl_localization.py`
+- `tools/validate_etf_dutch_language_quality.py`
+- `send_report.py`
+- `tools/validate_etf_delivery_html_contract.py`
+
+Dutch output quality must be handled as an explicit contract across render, markdown validation, send-time parity validation, delivery HTML validation, and final email/PDF delivery.
+
+### Consequence
+- English remains the canonical analytical report.
+- Dutch remains a derived companion, not an independent research pass.
+- Dutch client-facing text should read as premium Dutch, not translated English with system artifacts.
+- Validators must support both English canonical titles and Dutch companion titles.
+- Numeric parity between English and Dutch must remain strict.
+- Strict branded sections remain delivery HTML responsibilities.
+- The next cleanup is to consolidate bilingual aliases so one Dutch label change does not require patches across several validators.
