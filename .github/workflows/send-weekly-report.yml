@@ -133,6 +133,12 @@ jobs:
           python -m runtime.link_runtime_report_tickers --output-dir output
           python -m runtime.apply_nl_localization --output-dir output
 
+      - name: Validate ETF equity curve history contract
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python tools/validate_etf_equity_curve_history.py --output-dir output --min-points 3
+
       - name: Validate ETF report content contract
         env:
           MRKT_RPRTS_REPORT_MODE: pro
