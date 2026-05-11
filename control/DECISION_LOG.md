@@ -278,3 +278,37 @@ Dutch output quality must be handled as an explicit contract across render, mark
 - Numeric parity between English and Dutch must remain strict.
 - Strict branded sections remain delivery HTML responsibilities.
 - The next cleanup is to consolidate bilingual aliases so one Dutch label change does not require patches across several validators.
+
+---
+
+## 2026-05-11 — Render Section 7 equity curve from full valuation history
+### Decision
+Section 7 equity curve rendering must use the full machine-readable valuation history, not a hardcoded start/latest pair.
+
+### Chosen architecture
+```text
+output/etf_valuation_history.csv
+→ runtime/render_etf_report_from_state.py
+→ Section 7 valuation table
+→ embedded equity-curve chart
+→ tools/validate_etf_equity_curve_history.py
+→ ETF_EQUITY_CURVE_HISTORY_OK
+```
+
+### Scope
+This applies to:
+
+- Section 7 table rows
+- embedded equity-curve chart
+- latest NAV reconciliation with Section 15
+- future regression protection before delivery
+
+### Reason
+A production report showed the equity curve with only two dots: the initial start date and the latest report date. The intermediate valuation dates existed in `output/etf_valuation_history.csv`, but the renderer ignored that file and hardcoded only start/latest. Because the chart generator uses Section 7 as its primary source, the chart also collapsed to two points.
+
+### Consequence
+- `runtime/render_etf_report_from_state.py` now reads `output/etf_valuation_history.csv` and adds or replaces the current runtime NAV for the report date.
+- Section 7 now shows the full valuation history plus current NAV.
+- The embedded chart now shows intermediate valuation dates.
+- `tools/validate_etf_equity_curve_history.py` is wired into the send workflow.
+- Fresh delivery fails before email if Section 7 has too few points, duplicate dates, or latest NAV does not reconcile with Section 15 total NAV.
