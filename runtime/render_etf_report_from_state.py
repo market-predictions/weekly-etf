@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import re
 from pathlib import Path
@@ -17,6 +18,8 @@ ETF_NAMES = {
     "URNM": "Sprott Uranium Miners ETF",
     "GLD": "SPDR Gold Shares",
 }
+
+VALUATION_HISTORY_PATH = Path("output/etf_valuation_history.csv")
 
 
 def f2(value: Any) -> str:
@@ -172,17 +175,63 @@ def section15_table(state: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _float_or_none(value: Any) -> float | None:
+    try:
+        if value is None or value == "":
+            return None
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def valuation_history_points(state: dict[str, Any], history_path: Path = VALUATION_HISTORY_PATH) -> list[dict[str, Any]]:
+    """Return full equity-curve history plus the current runtime NAV.
+
+    The report renderer must not collapse the equity curve to only start/latest.
+    Historical NAV points are authoritative from `output/etf_valuation_history.csv`;
+    the current run's NAV is then added or replaces the same date. This keeps the
+    Section 7 table and the embedded chart on the same history contract.
+    """
+    points_by_date: dict[str, dict[str, Any]] = {}
+    if history_path.exists():
+        with history_path.open(newline="", encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                date = str(row.get("date") or "").strip()
+                nav = _float_or_none(row.get("nav_eur"))
+                if not date or nav is None:
+                    continue
+                points_by_date[date] = {
+                    "date": date,
+                    "nav_eur": round(nav, 2),
+                    "comment": str(row.get("comment") or "Historical runtime valuation").strip(),
+                }
+
+    report_date = str(state.get("report_date") or "").strip()
+    if report_date:
+        points_by_date[report_date] = {
+            "date": report_date,
+            "nav_eur": total_nav(state),
+            "comment": "Runtime-derived valuation from pricing audit and explicit portfolio state",
+        }
+
+    return [points_by_date[date] for date in sorted(points_by_date)]
+
+
 def section7_table(state: dict[str, Any]) -> str:
-    report_date = state.get("report_date") or ""
-    nav = total_nav(state)
-    return "\n".join(
-        [
-            "| Date | Portfolio value (EUR) | Comment |",
-            "|---|---:|---|",
-            "| 2026-03-28 | 100000.00 | Inaugural model portfolio established |",
-            f"| {report_date} | {nav:.2f} | Runtime-derived valuation from pricing audit and explicit portfolio state |",
+    lines = [
+        "| Date | Portfolio value (EUR) | Comment |",
+        "|---|---:|---|",
+    ]
+    points = valuation_history_points(state)
+    if not points:
+        points = [
+            {"date": "2026-03-28", "nav_eur": 100000.0, "comment": "Inaugural model portfolio established"},
+            {"date": state.get("report_date") or "", "nav_eur": total_nav(state), "comment": "Runtime-derived valuation from pricing audit and explicit portfolio state"},
         ]
-    )
+    for point in points:
+        lines.append(f"| {point['date']} | {float(point['nav_eur']):.2f} | {point.get('comment', '')} |")
+    return "\n".join(lines)
 
 
 def current_position_table(state: dict[str, Any]) -> str:
@@ -397,9 +446,9 @@ def render_en(state: dict[str, Any]) -> str:
 - Starting capital (EUR): 100000.00
 - Current portfolio value (EUR): {nav:.2f}
 - Since inception return (%): {(nav / 100000.0 - 1.0) * 100.0:.2f}
-- Equity-curve state: Runtime-derived
+- Equity-curve state: Reconciled to Section 15 with full valuation history
 - EUR/USD used: {eurusd}
-- Notes: Section 7 and Section 15 are rendered from the same normalized runtime state.
+- Notes: Section 7 uses `output/etf_valuation_history.csv` plus the current runtime NAV; Section 15 is rendered from the same normalized runtime state.
 
 {section7_table(state)}
 
