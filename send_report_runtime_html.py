@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import re
 from pathlib import Path
 from typing import Any, Callable
@@ -36,11 +35,43 @@ DUTCH_HTML_TOKEN_REPLACEMENTS = {
     "Portfolio value (EUR)": "Portefeuillewaarde (EUR)",
 }
 
+DUTCH_MD_MARKERS = [
+    "kernsamenvatting",
+    "portefeuille-acties",
+    "huidige posities",
+    "beleggersrapport",
+    "wekelijks",
+    "wekelijkse etf-review",
+    "primair regime",
+    "geopolitiek regime",
+    "kernconclusie",
+    "dit rapport wordt uitsluitend verstrekt",
+]
+
+ENGLISH_MD_MARKERS = [
+    "executive summary",
+    "portfolio action snapshot",
+    "current portfolio holdings and cash",
+    "weekly etf review",
+    "investor report",
+    "primary regime",
+    "main takeaway",
+    "this report is for informational",
+]
+
 
 def _looks_dutch(md_text: str) -> bool:
-    lower = md_text.lower()
-    markers = ["kernsamenvatting", "portefeuille-acties", "huidige posities", "disclaimer", "beleggersrapport"]
-    return sum(marker in lower for marker in markers) >= 2 or "weekly_analysis_pro_nl_" in os.environ.get("MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL", "")
+    """Detect Dutch from the markdown itself, never from global env.
+
+    Bilingual runs set both EN and NL report paths in the environment. The old
+    implementation treated every report as Dutch whenever the NL env path was
+    present, which localized the English HTML masthead and broke the English
+    render validator. Keep detection local to the report text.
+    """
+    lower = (md_text or "").lower()
+    dutch_score = sum(marker in lower for marker in DUTCH_MD_MARKERS)
+    english_score = sum(marker in lower for marker in ENGLISH_MD_MARKERS)
+    return dutch_score >= 2 and dutch_score > english_score
 
 
 def _sanitize_client_facing_html(html: str, md_text: str | None = None) -> str:
@@ -68,7 +99,7 @@ def _canonical_report_key(path: Path, mode: str) -> tuple[str, int] | None:
 
 
 def _explicit_report_path(mode: str) -> Path | None:
-    raw = os.environ.get("MRKT_RPRTS_EXPLICIT_REPORT_PATH", "").strip()
+    raw = report_module.os.environ.get("MRKT_RPRTS_EXPLICIT_REPORT_PATH", "").strip()
     if not raw:
         return None
     path = Path(raw)
