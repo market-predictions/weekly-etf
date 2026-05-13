@@ -162,11 +162,13 @@ def liquidity_score(avg_dollar_volume_3m: float | None) -> float | None:
 
 
 def build_metrics(prices: pd.DataFrame, volumes: pd.DataFrame) -> dict[str, Any]:
+    spy_ret_1w = ret_over_days(prices["SPY"], 5) if "SPY" in prices.columns else None
     spy_ret_1m = ret_over_days(prices["SPY"], 21) if "SPY" in prices.columns else None
     spy_ret_3m = ret_over_days(prices["SPY"], 63) if "SPY" in prices.columns else None
     metrics: dict[str, Any] = {}
     for ticker in prices.columns:
         s = prices[ticker]
+        r1w = ret_over_days(s, 5)
         r1 = ret_over_days(s, 21)
         r3 = ret_over_days(s, 63)
         last = last_valid(s)
@@ -175,11 +177,13 @@ def build_metrics(prices: pd.DataFrame, volumes: pd.DataFrame) -> dict[str, Any]
         liq_score = liquidity_score(dollar_volume_3m)
         metrics[ticker] = {
             "last_price": last,
+            "return_1w_pct": r1w,
             "return_1m_pct": r1,
             "return_3m_pct": r3,
             "trend_quality": trend_quality(s),
             "max_drawdown_3m_pct": max_drawdown_3m(s),
             "volatility_3m_pct": vol_3m(s),
+            "rs_vs_spy_1w_pct": round(r1w - spy_ret_1w, 2) if r1w is not None and spy_ret_1w is not None else None,
             "rs_vs_spy_1m_pct": round(r1 - spy_ret_1m, 2) if r1 is not None and spy_ret_1m is not None else None,
             "rs_vs_spy_3m_pct": round(r3 - spy_ret_3m, 2) if r3 is not None and spy_ret_3m is not None else None,
             "avg_volume_3m": volume_3m,
