@@ -14,10 +14,6 @@ from runtime.nl_localization import DUTCH_DISCLAIMER, FORBIDDEN_NL_STRINGS, vali
 
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 
-# This validator checks the Dutch markdown companion only. Strict delivery-only
-# panels such as the Replacement Duel Table / Vervangingsanalyse are rendered
-# later from runtime state in the delivery HTML layer and are protected by
-# tools/validate_etf_delivery_html_contract.py.
 REQUIRED_DUTCH_MARKERS = [
     "Kernsamenvatting",
     "Portefeuille-acties",
@@ -37,16 +33,65 @@ FORBIDDEN_CLIENT_LABELS = [
     "Position Changes Executed This Run",
     "Final Action Table",
     "What changed this week",
+    "WAT VERANDERDE THIS WEEK",
     "Portfolio implication",
     "Current holding still leads",
     "Replacement trigger watch",
     "Needs sustained relative outperformance",
     "Confirm thesis fit",
+    "Investor Report",
+    "Analyst Report",
+    "PRIMARY REGIME",
+    "GEOPOLITICAL REGIME",
+    "MAIN TAKEAWAY",
+    "Theme",
+    "Primary ETF",
+    "Alternative ETF",
+    "Why it matters",
+    "What needs to happen",
+    "Time horizon",
+    "Short theme",
+    "Candidate ETF",
+    "Short thesis",
+    "Invalidation",
+    "Bucket",
+    "Stance",
+    "Reason",
+    "First-order effect",
+    "Second-order effect",
+    "Likely beneficiaries",
+    "Likely losers",
+    "ETF implication",
+    "Current status",
+    "Why I’m considering it",
+    "Why I'm considering it",
+]
+
+FORBIDDEN_DECISION_WORDS = [
+    "Keep ",
+    "Require ",
+    "Force ",
+    "Funding ",
+    "funding ",
+    "fundable",
+    "Existing",
+    "Duel required",
+    "under review",
+    "earned leader",
+    "price proof",
+    "thesisfit",
+    "actiebias",
+    "reviewpositie",
+    "verdiende leider",
+    "prijsbewijs",
+    "vers kapitaal",
 ]
 
 ALLOWED_ENGLISH_PATTERNS = [
     r"\bETF\b",
+    r"\bETFs\b",
     r"\bticker\b",
+    r"\btickers\b",
     r"\bcash\b",
     r"\bhedge\b",
     r"\bdrawdown\b",
@@ -60,6 +105,9 @@ ALLOWED_ENGLISH_PATTERNS = [
     r"\bsemiconductor\b",
     r"\boutperformance\b",
     r"\bwatchlist\b",
+    r"\bUCITS\b",
+    r"\bUSD\b",
+    r"\bEUR\b",
 ]
 
 
@@ -75,23 +123,33 @@ def latest_nl_report(output_dir: Path) -> Path:
     return reports[-1]
 
 
+def _strip_markdown_links(text: str) -> str:
+    return re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", text)
+
+
 def _failures_for_text(text: str) -> list[str]:
     failures: list[str] = []
-    failures.extend(validate_dutch_text(text))
+    plain = _strip_markdown_links(text)
+    failures.extend(validate_dutch_text(plain))
     for marker in REQUIRED_DUTCH_MARKERS:
-        if marker not in text:
+        if marker not in plain:
             failures.append(f"missing Dutch marker: {marker}")
     for label in FORBIDDEN_CLIENT_LABELS:
-        if label in text:
+        if label in plain:
             failures.append(f"forbidden English client label: {label}")
     for token in FORBIDDEN_NL_STRINGS:
-        if token in text and token not in failures:
+        if token in plain:
             failures.append(f"forbidden Dutch report token: {token}")
-    if DUTCH_DISCLAIMER not in text:
+    for token in FORBIDDEN_DECISION_WORDS:
+        if token in plain:
+            failures.append(f"forbidden English/low-quality decision wording: {token.strip()}")
+    if DUTCH_DISCLAIMER not in plain:
         failures.append("Dutch disclaimer does not match contract")
-    if "and it is not a recommendation" in text or "It does not take into account" in text:
+    if "and it is not a recommendation" in plain or "It does not take into account" in plain:
         failures.append("half-English disclaimer remains")
-    return failures
+    if re.search(r"\bbut\b", plain, flags=re.IGNORECASE):
+        failures.append("mixed-language connector remains: but")
+    return sorted(set(failures))
 
 
 def validate_report(path: Path) -> None:
