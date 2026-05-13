@@ -80,6 +80,9 @@ CLIENT_PHRASES = {
 }
 
 ACTION_PHRASES = {
+    "Hold but replaceable": "Aanhouden, maar vervangbaar",
+    "Aanhouden but replaceable": "Aanhouden, maar vervangbaar",
+    "Aanhouden maar replaceable": "Aanhouden, maar vervangbaar",
     "Hold under review": "Aanhouden, onder herbeoordeling",
     "Hold; overlap review versus SMH": "Aanhouden; overlapreview versus SMH",
     "Hold / preferred add candidate": "Aanhouden / voorkeurskandidaat voor uitbreiding",
@@ -99,7 +102,7 @@ ACTION_PHRASES = {
     "Hold; not better than SMH for cash this run": "Aanhouden; deze run niet beter dan SMH voor nieuwe cash",
     "Hold under hedge-validity review": "Aanhouden, onder hedge-validiteitsreview",
     "Residual cash": "Resterende cash",
-    "Force alternative duel; upgrade, reduce, replace, or close": "Forceer vervangingsanalyse; verhoog, verlaag, vervang of sluit",
+    "Force alternative duel; upgrade, reduce, replace, or close": "Vervangingsanalyse vereist; verhoog, verlaag, vervang of sluit",
     "Run hedge validity test and compare with alternatives": "Voer hedge-validiteitstest uit en vergelijk met alternatieven",
 }
 
@@ -116,10 +119,6 @@ CLIENT_LANGUAGE_CLEANUPS = {
     "output/": "",
     "Section 7": "Sectie 7",
     "Section 15": "sectie 15",
-    "Laat de huidige portefeuille voorlopig intact, but treat SPY, PPA, PAVE and GLD as active review items rather than passive holds.": "Laat de huidige portefeuille voorlopig intact, maar behandel SPY, PPA, PAVE en GLD als posities onder actieve herbeoordeling in plaats van passieve aanhoudposities.",
-    "but treat SPY, PPA, PAVE and GLD as active review items rather than passive holds": "maar behandel SPY, PPA, PAVE en GLD als posities onder actieve herbeoordeling in plaats van passieve aanhoudposities",
-    "SMH blijft de best onderbouwde kernpositie, but nieuw kapitaal en vervangingsbeslissingen moeten het regimebeeld, de koersbevestiging en de vervangingsanalyse doorstaan.": "SMH blijft de best onderbouwde kernpositie, maar nieuw kapitaal en vervangingsbeslissingen moeten het regimebeeld, de koersbevestiging en de vervangingsanalyse doorstaan.",
-    "but nieuw kapitaal": "maar nieuw kapitaal",
     "Keep SPY under review": "Houd SPY onder herbeoordeling",
     "Keep [SPY](https://www.tradingview.com/chart/?symbol=SPY) onder herbeoordeling": "Houd [SPY](https://www.tradingview.com/chart/?symbol=SPY) onder herbeoordeling",
     "Keep [SPY]": "Houd [SPY]",
@@ -143,6 +142,26 @@ CLIENT_LANGUAGE_CLEANUPS = {
     "under review": "onder herbeoordeling",
     "Aanhouden under review": "Aanhouden, onder herbeoordeling",
     "Hold onder herbeoordeling": "Aanhouden, onder herbeoordeling",
+}
+
+# These patterns catch partial localization artifacts. They are intentionally
+# broader than the exact phrase map because the markdown renderer, the generic
+# localizer and the linkifier can each change part of a sentence before the
+# final Dutch pass runs.
+PARTIAL_MIXED_EXACT_CLEANUPS = {
+    "Aanhouden but replaceable": "Aanhouden, maar vervangbaar",
+    "Aanhouden maar replaceable": "Aanhouden, maar vervangbaar",
+    "Hold maar vervangbaar": "Aanhouden, maar vervangbaar",
+    "active review items rather than passive holds": "posities onder actieve herbeoordeling in plaats van passieve aanhoudposities",
+    "actieve herbeoordeling in plaats van passieve holds": "actieve herbeoordeling in plaats van passieve aanhoudposities",
+    "posities onder actieve herbeoordeling in plaats van passieve holds": "posities onder actieve herbeoordeling in plaats van passieve aanhoudposities",
+    "passive holds": "passieve aanhoudposities",
+    "fresh capital and replacement decisions": "nieuw kapitaal en vervangingsbeslissingen",
+    "replacement decisions": "vervangingsbeslissingen",
+    "funding challengers": "allocatie naar alternatieven",
+    "before funding": "vóór allocatie",
+    "as posities": "als posities",
+    "as positie": "als positie",
 }
 
 
@@ -192,18 +211,52 @@ def _clean_client_language(text: str) -> str:
     return text
 
 
+def _normalize_ticker_lists(text: str) -> str:
+    return re.sub(
+        r"\b([A-Z]{2,6}(?:,\s*[A-Z]{2,6})+)\s+and\s+([A-Z]{2,6})\b",
+        lambda match: f"{match.group(1)} en {match.group(2)}",
+        text,
+    )
+
+
+def _normalize_partial_mixed_language(text: str) -> str:
+    for src, dst in sorted(PARTIAL_MIXED_EXACT_CLEANUPS.items(), key=lambda item: len(item[0]), reverse=True):
+        text = text.replace(src, dst)
+
+    text = _normalize_ticker_lists(text)
+    text = re.sub(r"\bbut\s+treat\b", "maar behandel", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bbut\b", "maar", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bas\s+(posities|positie|thema’s|themas|kandidaten|alternatieven)\b", r"als \1", text, flags=re.IGNORECASE)
+    text = re.sub(r"\band\s+(vervangingsbeslissingen|koersbevestiging|cash|GLD|PAVE|PPA|SPY|SMH)\b", r"en \1", text, flags=re.IGNORECASE)
+    text = re.sub(r"in plaats van passieve\s*(?:,|\.|$)", "in plaats van passieve aanhoudposities.", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bpassieve\s*,", "passieve aanhoudposities,", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bpassieve\s*\.", "passieve aanhoudposities.", text, flags=re.IGNORECASE)
+    text = re.sub(r"###\s*Aanhouden\s+maar\s+vervangbaar", "### Aanhouden, maar vervangbaar", text, flags=re.IGNORECASE)
+    text = re.sub(r"###\s*Aanhouden\s+but\s+replaceable", "### Aanhouden, maar vervangbaar", text, flags=re.IGNORECASE)
+    text = re.sub(r"###\s*Hold\s+but\s+replaceable", "### Aanhouden, maar vervangbaar", text, flags=re.IGNORECASE)
+    text = text.replace("passieve aanhoudposities.", "passieve aanhoudposities.")
+    return text
+
+
+def _localize_until_stable(text: str, passes: int = 3) -> str:
+    previous = text
+    for _ in range(passes):
+        current = localize_text(previous, language="nl")
+        current = localize_markdown_table_headers(current, language="nl")
+        current = _clean_runtime_artifacts(current)
+        current = _clean_client_language(current)
+        current = _normalize_partial_mixed_language(current)
+        if current == previous:
+            return current
+        previous = current
+    return previous
+
+
 def localize_report(text: str) -> str:
     text = _replace_disclaimer(text)
     text = _localize_section_titles(text)
     text = _localize_phrases(text)
-    text = localize_text(text, language="nl")
-    text = localize_markdown_table_headers(text, language="nl")
-    text = _clean_runtime_artifacts(text)
-    text = _clean_client_language(text)
-    # Run the generic localization one more time after bespoke cleanup so table
-    # fragments introduced by state data are normalized too.
-    text = localize_text(text, language="nl")
-    text = _clean_client_language(text)
+    text = _localize_until_stable(text, passes=4)
     return text
 
 
