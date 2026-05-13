@@ -12,7 +12,7 @@
 ### 1. Keep using the control-layer start sequence
 - Owner: `[JOINT]`
 - Status: active standing rule
-- Action: every meaningful ETF architecture, debugging, prompt, state, workflow, delivery, discovery, or lab-optimization session starts with:
+- Action: every meaningful ETF architecture, debugging, prompt, state, workflow, delivery, discovery, localization, or lab-optimization session starts with:
   1. `control/SYSTEM_INDEX.md`
   2. `control/CURRENT_STATE.md`
   3. `control/NEXT_ACTIONS.md`
@@ -68,9 +68,96 @@
 
 ---
 
-## Phase 2 — ChatGPT-triggerable report generation
+## Phase 2 — Dutch premium report quality roadmap
 
-### 5. Use safe report request queue for ChatGPT-initiated fresh reports
+### 5. Maintain the Dutch quality roadmap
+- Owner: `[ASSISTANT]`
+- Status: started
+- Source files:
+  - `control/NL_REPORT_QUALITY_ROADMAP.md`
+  - `control/NL_REPORT_LANGUAGE_CONTRACT.md`
+  - `control/NL_TERMINOLOGY.md`
+- Action:
+  - keep roadmap phases explicit
+  - do not let one-off Dutch phrase fixes replace the language-contract layer
+- Done when: Dutch report improvements are tracked as an operating roadmap, not ad-hoc fixes.
+
+### 6. Block mixed English/Dutch sentences before next Dutch publication
+- Owner: `[ASSISTANT]`
+- Status: implemented; needs test run
+- Changed files:
+  - `runtime/nl_localization.py`
+  - `tools/validate_etf_dutch_language_quality.py`
+- Action:
+  - validate that mixed sentences such as `Keep SMH...`, `but vers kapitaal...`, `Require replacement duels...`, and `Aanhouden under review` fail before send
+- Done when: the Dutch language quality validator fails any mixed-language decision sentence.
+
+### 7. Translate table headers and enum values through controlled mappings
+- Owner: `[ASSISTANT]`
+- Status: implemented; needs test run
+- Changed files:
+  - `runtime/nl_localization.py`
+  - `runtime/apply_nl_localization.py`
+  - `control/NL_TERMINOLOGY.md`
+- Action:
+  - validate table labels such as Theme, Primary ETF, Why it matters, Existing, Yes, No, None, Hold, Add, Current status, Why I’m considering it
+- Done when: table labels and enum values in the Dutch report are mapped through the Dutch terminology contract.
+
+### 8. Remove internal workflow language from the Dutch client report
+- Owner: `[ASSISTANT]`
+- Status: implemented; needs test run
+- Changed files:
+  - `runtime/nl_localization.py`
+  - `tools/validate_etf_dutch_language_quality.py`
+- Action:
+  - block `Section`, `runtime`, `state-led`, `output/`, `pricing_audit`, `workflow`, `manifest`, `artifact`, and placeholder language where client-facing
+- Done when: operational runbook terms remain in audit/manifest files only.
+
+### 9. Replace low-quality literal translations
+- Owner: `[ASSISTANT]`
+- Status: implemented; needs test run
+- Changed files:
+  - `runtime/nl_localization.py`
+  - `control/NL_TERMINOLOGY.md`
+- Action:
+  - replace `verdiende leider`, `prijsbewijs`, `actiebias`, `thesisfit`, `reviewpositie`, `nuttige ballast`, `vers kapitaal`
+- Done when: executive sections and tables use institutional Dutch such as `best onderbouwde kernpositie`, `koersbevestiging`, `beslissingsrichting`, `aansluiting op de beleggingscase`, and `positie onder actieve herbeoordeling`.
+
+### 10. Make Dutch cover and chart language Dutch
+- Owner: `[ASSISTANT]`
+- Status: implemented; needs render test
+- Changed file:
+  - `send_report_runtime_html.py`
+- Action:
+  - validate Dutch delivery HTML/PDF cover no longer shows Investor Report, Analyst Report, PRIMARY REGIME, GEOPOLITICAL REGIME, MAIN TAKEAWAY
+  - validate chart labels are Dutch where practical
+- Done when: Dutch PDF cover and equity-curve labels read as Dutch client-facing output.
+
+### 11. Native Dutch templates for key sections
+- Owner: `[ASSISTANT]`
+- Status: planned after first test result
+- Target files:
+  - `runtime/render_etf_report_from_state.py`
+  - `runtime/apply_nl_localization.py`
+  - `runtime/nl_localization.py`
+- Action:
+  - render Kernsamenvatting, Conclusie, Portefeuille-acties, Review huidige posities and Vervangingsanalyse from runtime state using Dutch-native templates rather than sentence-by-sentence translation
+- Done when: these sections read as originally written Dutch.
+
+### 12. Human-readable Dutch glossary per section
+- Owner: `[ASSISTANT]`
+- Status: started
+- Source file:
+  - `control/NL_TERMINOLOGY.md`
+- Action:
+  - expand glossary when new sections/tables are added
+- Done when: changing Dutch report wording requires one terminology update plus one code mapping if needed.
+
+---
+
+## Phase 3 — ChatGPT-triggerable report generation
+
+### 13. Use safe report request queue for ChatGPT-initiated fresh reports
 - Owner: `[ASSISTANT]`
 - Status: active baseline
 - Action: when the user asks ChatGPT to generate a fresh Weekly ETF Review, create a request file under:
@@ -80,53 +167,19 @@
 - Do not create trigger files under `output/`.
 - Done when: the send workflow is triggered by the run-queue request path and no placeholder report files are introduced.
 
-### 6. Run one fresh production confirmation workflow
-- Owner: `[USER]` or `[ASSISTANT]` if GitHub write permission is approved
-- Status: done on 2026-05-10; equity-curve correction reconfirmed on 2026-05-11
-- Result:
-  - English and Dutch reports were generated and received.
-  - Dutch localization contract passed after validator drift was corrected.
-  - Bilingual numeric parity passed.
-  - Delivery HTML render and final email delivery succeeded.
-  - Equity curve now renders full valuation history and no longer collapses to start/latest.
-- Follow-up: no additional confirmation run is needed unless the delivery/render path changes.
-
----
-
-## Phase 3 — bilingual quality and validator consolidation
-
-### 7. Consolidate bilingual alias handling
-- Owner: `[ASSISTANT]`
-- Priority: high engineering cleanup before adding more NL output features
-- Current issue:
-  - Dutch labels and aliases currently exist across several files:
-    - `runtime/nl_localization.py`
-    - `runtime/apply_nl_localization.py`
-    - `send_report.py`
-    - `tools/validate_etf_dutch_language_quality.py`
-    - `tools/validate_etf_delivery_html_contract.py`
-  - This caused validator drift and repeated one-failure-at-a-time fixes.
+### 14. Run one Dutch quality confirmation workflow
+- Owner: `[JOINT]`
+- Status: next checkpoint
 - Action:
-  - define one canonical bilingual terminology/alias source
-  - reuse it from markdown localization, Dutch markdown validation, send-time numeric parity, NL HTML body validation, and delivery HTML contract validation
-  - keep allowed English financial terms explicit
-  - preserve English canonical report as analytical source of truth
-- Done when: adding or changing one Dutch section/table label requires one edit, not patches across several validators.
-
-### 8. Keep the Dutch companion premium but selective
-- Owner: `[ASSISTANT]`
-- Action:
-  - continue improving Dutch client-facing language through the language-contract layer
-  - avoid low-grade literal translations
-  - keep accepted financial terms such as ETF, ticker, cash, hedge, drawdown, beta, capex, outperformance, watchlist where they read better
-  - keep numeric parity and report structure identical to English
-- Done when: Dutch reports read as professional Dutch companion reports, not translated English with system artifacts.
+  - trigger a fresh report only after the user agrees to test the Phase 1 Dutch quality changes
+  - inspect validator output and the received PDF
+- Done when: the Dutch report passes automated validators and visual inspection for premium Dutch language quality.
 
 ---
 
 ## Phase 4 — improve portfolio decision quality
 
-### 9. Continue direct challenger-vs-current-holding scoring
+### 15. Continue direct challenger-vs-current-holding scoring
 - Owner: `[ASSISTANT]`
 - Action:
   - map challenger lanes to likely funded holdings they could replace
@@ -136,7 +189,7 @@
   - surface the direct edge in replacement-duel notes
 - Done when: replacement candidates are compared against the actual holding they would replace, not only versus SPY.
 
-### 10. Expand and curate the discovery universe
+### 16. Expand and curate the discovery universe
 - Owner: `[ASSISTANT]`
 - Source file:
   - `config/etf_discovery_universe.yml`
@@ -145,7 +198,7 @@
   - keep each lane investable, differentiated, and scored
 - Done when: the universe is broad enough to surface new candidates without becoming noisy.
 
-### 11. Add better macro/fundamental freshness inputs
+### 17. Add better macro/fundamental freshness inputs
 - Owner: `[ASSISTANT]`
 - Action:
   - add machine-readable macro/regime input file
@@ -155,33 +208,6 @@
 
 ---
 
-## Phase 5 — continue capital discipline
-
-### 12. Apply the capital re-underwriting layer in every report
-- Owner: `[ASSISTANT]`
-- Source files:
-  - `control/CAPITAL_REUNDERWRITING_RULES.md`
-  - latest `output/etf_recommendation_scorecard.csv`
-- Action:
-  - run the fresh cash test for every current holding
-  - split thesis validity from implementation quality
-  - force alternative duels for replaceable or weak holdings
-  - flag factor overlap and cash policy explicitly
-  - test hedge validity for GLD or any hedge sleeve
-- Done when: the report clearly explains why Hold is still justified or why action is required.
-
-### 13. Force the specific current weak-point reviews
-- Owner: `[ASSISTANT]`
-- Action: in the next report explicitly review:
-  - SPY overlap versus SMH
-  - PPA versus ITA
-  - PAVE versus GRID
-  - GLD hedge validity and pricing confidence
-  - cash reserve versus actionable SMH / URNM lanes
-- Done when: no weak or replaceable holding remains vague.
-
----
-
 ## Current checkpoint
 
-**The runtime-driven bilingual production baseline now includes delivery HTML overrides, a dynamic bilingual delivery HTML validator, Dutch localization contract validation, bilingual numeric parity, full valuation-history Section 7 equity curve rendering protected by `ETF_EQUITY_CURVE_HISTORY_OK`, direct replacement-duel logic, and a safe ChatGPT-triggerable report request queue under `control/run_queue/`. The latest corrected run delivered English and Dutch reports with the full equity curve successfully.**
+**Dutch ETF report quality is now on a formal roadmap. Phase 1 contract files and validators have been strengthened to block mixed-language sentences, untranslated table labels, internal workflow language, and low-quality literal translations. The next checkpoint is a controlled fresh bilingual report run to see which remaining Dutch issues are generated by markdown localization versus delivery HTML rendering.**
