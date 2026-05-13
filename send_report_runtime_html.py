@@ -19,6 +19,8 @@ CLIENT_FACING_TOKEN_REPLACEMENTS = {
 }
 
 DUTCH_HTML_TOKEN_REPLACEMENTS = {
+    "WEEKLY ETF PRO REVIEW": "WEKELIJKSE ETF-REVIEW",
+    "Weekly ETF Pro Review": "Wekelijkse ETF-review",
     "WEEKLY ETF REVIEW": "WEKELIJKSE ETF-REVIEW",
     "Weekly ETF Review": "Wekelijkse ETF-review",
     "Investor Report": "Beleggersrapport",
@@ -53,6 +55,7 @@ ENGLISH_MD_MARKERS = [
     "portfolio action snapshot",
     "current portfolio holdings and cash",
     "weekly etf review",
+    "weekly etf pro review",
     "investor report",
     "primary regime",
     "main takeaway",
@@ -89,6 +92,49 @@ def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..
         return _sanitize_client_facing_html(html, md_text=md_text)
 
     return _wrapped
+
+
+def validate_nl_email_body_runtime(html_body: str, md_text: str) -> None:
+    """Dutch delivery validator aligned with Dutch masthead localization.
+
+    The base validator only accepted English masthead text. Once the Dutch
+    delivery cover is localized, that becomes too strict and fails a valid Dutch
+    report. Keep the same length/raw-markdown/content checks, but accept both
+    English and Dutch masthead variants.
+    """
+    html_lower = html_body.lower()
+    masthead_options = [
+        "weekly etf review",
+        "weekly report review",
+        "weekly etf intelligence",
+        "weekly etf pro review",
+        "wekelijkse etf-review",
+        "wekelijkse etf review",
+        "wekelijks etf-review",
+        "wekelijks etf review",
+        "beleggersrapport",
+    ]
+    if not any(token in html_lower for token in masthead_options):
+        raise RuntimeError("Dutch HTML body is missing required masthead block.")
+
+    required_groups = [
+        ["executive summary", "samenvatting", "kernsamenvatting"],
+        ["portfolio action snapshot", "portefeuille", "actie", "portefeuille-acties"],
+        ["structural opportunity radar", "structurele kansenradar"],
+        ["current portfolio holdings and cash", "huidige portefeuille", "holdings en cash", "huidige posities en cash"],
+    ]
+    for group in required_groups:
+        if not any(token in html_lower for token in group):
+            raise RuntimeError(f"Dutch HTML body is missing a required content block from: {group}")
+
+    plain_html = report_module._base.html_to_plain_text(html_body)
+    plain_md = report_module._base.html_to_plain_text(report_module._base.MARKDOWN(md_text))
+    if len(plain_html) < 0.72 * len(plain_md):
+        raise RuntimeError("Dutch HTML body appears too short relative to the full report.")
+
+    for bad_token in ["\\n", "#### ", "|---|", "\\t"]:
+        if bad_token in html_body:
+            raise RuntimeError(f"Dutch HTML body still contains raw markdown / escaped formatting token: {bad_token}")
 
 
 def _canonical_report_key(path: Path, mode: str) -> tuple[str, int] | None:
@@ -192,6 +238,7 @@ report_module.latest_report_file = _latest_canonical_report_file
 report_module.latest_reports_by_day = _latest_canonical_reports_by_day
 report_module.validate_section15_arithmetic = validate_section15_from_runtime_state
 report_module.validate_equity_curve_alignment = validate_equity_curve_from_runtime_state
+report_module.validate_nl_email_body = validate_nl_email_body_runtime
 report_module.build_report_html = _with_client_facing_sanitizer(
     build_report_html_with_state(report_module.build_report_html, report_module._base)
 )
