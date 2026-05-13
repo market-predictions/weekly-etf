@@ -78,6 +78,29 @@ DUTCH_MARKERS = [
 
 NL_SUBJECT_PREFIX_FALLBACK = "Weekly ETF Pro Review | Nederlands"
 
+ENGLISH_MASTHEAD_TOKENS = [
+    "weekly etf review",
+    "weekly report review",
+    "weekly etf intelligence",
+    "weekly etf pro review",
+]
+
+DUTCH_MASTHEAD_TOKENS = [
+    "wekelijkse etf-review",
+    "wekelijkse etf review",
+    "wekelijks etf-review",
+    "wekelijks etf review",
+    "beleggersrapport",
+    "analistenrapport",
+]
+
+NL_REQUIRED_CONTENT_GROUPS = [
+    ["executive summary", "samenvatting", "kernsamenvatting"],
+    ["portfolio action snapshot", "portefeuille", "actie", "portefeuille-acties"],
+    ["structural opportunity radar", "structurele kansenradar"],
+    ["current portfolio holdings and cash", "huidige portefeuille", "holdings en cash", "huidige posities en cash"],
+]
+
 
 def _first_markdown_table(lines: list[str]) -> list[str]:
     i = 0
@@ -277,31 +300,37 @@ def validate_dutch_companion_report(md_text: str) -> None:
         raise RuntimeError("Dutch companion report disclaimer language is missing.")
 
 
+def _html_debug_excerpt(html_body: str, limit: int = 500) -> str:
+    plain = _base.html_to_plain_text(html_body)
+    plain = re.sub(r"\s+", " ", plain).strip()
+    return plain[:limit]
+
+
+def _contains_any(text: str, tokens: list[str]) -> bool:
+    return any(token in text for token in tokens)
+
+
 def validate_nl_email_body(html_body: str, md_text: str) -> None:
     html_lower = html_body.lower()
-    masthead_options = [
-        "weekly etf review",
-        "weekly report review",
-        "weekly etf intelligence",
-        "weekly etf pro review",
-    ]
-    if not any(token in html_lower for token in masthead_options):
-        raise RuntimeError("Dutch HTML body is missing required masthead block.")
+    masthead_options = ENGLISH_MASTHEAD_TOKENS + DUTCH_MASTHEAD_TOKENS
+    if not _contains_any(html_lower, masthead_options):
+        raise RuntimeError(
+            "Dutch HTML body is missing required masthead block. "
+            f"Accepted masthead tokens include: {', '.join(masthead_options)}. "
+            f"HTML excerpt: {_html_debug_excerpt(html_body)}"
+        )
 
-    required_groups = [
-        ["executive summary", "samenvatting", "kernsamenvatting"],
-        ["portfolio action snapshot", "portefeuille", "actie", "portefeuille-acties"],
-        ["structural opportunity radar", "structurele kansenradar"],
-        ["current portfolio holdings and cash", "huidige portefeuille", "holdings en cash", "huidige posities en cash"],
-    ]
-    for group in required_groups:
-        if not any(token in html_lower for token in group):
-            raise RuntimeError(f"Dutch HTML body is missing a required content block from: {group}")
+    for group in NL_REQUIRED_CONTENT_GROUPS:
+        if not _contains_any(html_lower, group):
+            raise RuntimeError(f"Dutch HTML body is missing a required content block from: {group}. HTML excerpt: {_html_debug_excerpt(html_body)}")
 
     plain_html = _base.html_to_plain_text(html_body)
     plain_md = _base.html_to_plain_text(_base.MARKDOWN(md_text))
     if len(plain_html) < 0.72 * len(plain_md):
-        raise RuntimeError("Dutch HTML body appears too short relative to the full report.")
+        raise RuntimeError(
+            "Dutch HTML body appears too short relative to the full report. "
+            f"html_chars={len(plain_html)} md_chars={len(plain_md)}"
+        )
 
     for bad_token in ["\\n", "#### ", "|---|", "\\t"]:
         if bad_token in html_body:
