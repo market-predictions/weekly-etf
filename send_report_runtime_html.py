@@ -19,17 +19,43 @@ CLIENT_FACING_TOKEN_REPLACEMENTS = {
     "runtime rebuild required": "Latest available classified input",
 }
 
+DUTCH_HTML_TOKEN_REPLACEMENTS = {
+    "WEEKLY ETF REVIEW": "WEKELIJKSE ETF-REVIEW",
+    "Weekly ETF Review": "Wekelijkse ETF-review",
+    "Investor Report": "Beleggersrapport",
+    "Investment Report": "Beleggersrapport",
+    "Analyst Report": "Analistenrapport",
+    "PRIMARY REGIME": "PRIMAIR REGIME",
+    "Primary Regime": "Primair regime",
+    "GEOPOLITICAL REGIME": "GEOPOLITIEK REGIME",
+    "Geopolitical Regime": "Geopolitiek regime",
+    "MAIN TAKEAWAY": "KERNCONCLUSIE",
+    "Main Takeaway": "Kernconclusie",
+    "This report is for informational and educational purposes only; please see the disclaimer at the end.": "Dit rapport wordt uitsluitend verstrekt voor informatieve en educatieve doeleinden; zie de disclaimer aan het einde.",
+    "Equity Curve (EUR)": "Portefeuillecurve (EUR)",
+    "Portfolio value (EUR)": "Portefeuillewaarde (EUR)",
+}
 
-def _sanitize_client_facing_html(html: str) -> str:
+
+def _looks_dutch(md_text: str) -> bool:
+    lower = md_text.lower()
+    markers = ["kernsamenvatting", "portefeuille-acties", "huidige posities", "disclaimer", "beleggersrapport"]
+    return sum(marker in lower for marker in markers) >= 2 or "weekly_analysis_pro_nl_" in os.environ.get("MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL", "")
+
+
+def _sanitize_client_facing_html(html: str, md_text: str | None = None) -> str:
     for forbidden, replacement in CLIENT_FACING_TOKEN_REPLACEMENTS.items():
         html = html.replace(forbidden, replacement)
+    if md_text and _looks_dutch(md_text):
+        for src, dst in DUTCH_HTML_TOKEN_REPLACEMENTS.items():
+            html = html.replace(src, dst)
     return html
 
 
 def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..., str]:
     def _wrapped(md_text: str, report_date_str: str, image_src: str | None = None, render_mode: str = "email") -> str:
         html = build_html(md_text, report_date_str, image_src=image_src, render_mode=render_mode)
-        return _sanitize_client_facing_html(html)
+        return _sanitize_client_facing_html(html, md_text=md_text)
 
     return _wrapped
 
