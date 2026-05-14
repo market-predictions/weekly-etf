@@ -38,54 +38,19 @@ CLIENT_PHRASES = {
     "Portfolio Action Snapshot": "Portefeuille-acties",
     "Replacement Duel Table v2": "Vervangingsanalyse",
     "Replacement Duel Table": "Vervangingsanalyse",
-    "Risk appetite is supportive, but fresh adds still need position-size room and pricing confirmation.": "De risicobereidheid blijft ondersteunend, maar extra allocaties vragen nog ruimte binnen de positielimiet en koersbevestiging.",
-    "Growth and infrastructure lanes can be considered if they do not worsen concentration.": "Groei- en infrastructuurthema’s kunnen worden overwogen zolang ze de concentratie niet vergroten.",
-    "Defensive hedges should be reviewed for opportunity cost.": "Defensieve hedgeposities moeten worden getoetst op opportuniteitskosten.",
-    "Semiconductor leadership supports SMH, but SPY overlap must remain explicit.": "Semiconductorleiderschap ondersteunt SMH, maar de overlap met SPY moet expliciet zichtbaar blijven.",
-    "Small-cap and duration signals are not strong enough to justify broad beta expansion.": "Small-cap- en duration-signalen zijn niet sterk genoeg om brede beta-uitbreiding te rechtvaardigen.",
-    "Gold is treated as a hedge review item unless price behavior improves.": "Goud blijft een hedgepositie onder herbeoordeling zolang het prijsbeeld niet verbetert.",
-    "AI infrastructure and semiconductor supply chains": "AI-infrastructuur en semiconductorketens",
-    "Defense and sovereign resilience": "Defensie en strategische weerbaarheid",
-    "Affected lanes": "Geraakte thema’s",
     "Investment Report": "Beleggersrapport",
     "Investor Report": "Beleggersrapport",
     "Analyst Report": "Analistenrapport",
-    "Regime snapshot": "Regimesamenvatting",
-    "What changed": "Wat veranderde",
-    "Portfolio implications": "Portefeuille-implicaties",
-    "Cross-asset confirmation": "Cross-asset bevestiging",
-    "Policy catalysts transferred to the report": "Beleidscatalysatoren in het rapport",
-    "Current regime": "Huidig regime",
-    "Decision rule": "Beslisregel",
-    "Confidence": "Vertrouwen",
     "Starting capital": "Startkapitaal",
     "Invested market value": "Belegde marktwaarde",
     "Total portfolio value": "Totale portefeuillewaarde",
     "Since inception return": "Rendement sinds start",
     "EUR/USD used": "EUR/USD gebruikt",
-    "Equity-curve state": "Status portefeuillecurve",
-    "Notes": "Toelichting",
-    "Portfolio table": "Portefeuilletabel",
-    "Available cash": "Beschikbare cash",
-    "Watchlist / dynamic radar memory": "Volglijst / dynamisch radargeheugen",
-    "Recommendation discipline continuity": "Continuïteit in aanbevelingsdiscipline",
-    "Changes since last review": "Wijzigingen sinds de vorige review",
-    "Constraints": "Randvoorwaarden",
-    "Leverage allowed": "Leverage toegestaan",
-    "Margin usage": "Margegebruik",
-    "Max position size": "Maximale positiegrootte",
-    "Max number of positions": "Maximaal aantal posities",
-    "Drawdown tolerance": "Drawdown-tolerantie",
-    "Income vs growth preference": "Voorkeur inkomen versus groei",
 }
 
 ACTION_PHRASES = {
     "Hold but replaceable": "Aanhouden, maar vervangbaar",
     "Aanhouden but replaceable": "Aanhouden, maar vervangbaar",
-    "Aanhouden maar replaceable": "Aanhouden, maar vervangbaar",
-    "Hold under review": "Aanhouden, onder herbeoordeling",
-    "Hold; overlap review versus SMH": "Aanhouden; overlapreview versus SMH",
-    "Hold / preferred add candidate": "Aanhouden / voorkeurskandidaat voor uitbreiding",
     "Buy": "Kopen",
     "Add": "Toevoegen",
     "Hold": "Aanhouden",
@@ -96,73 +61,35 @@ ACTION_PHRASES = {
     "Yes": "Ja",
     "No": "Nee",
     "None": "Geen",
-    "Funded from cash; stays below 25% max position size": "Gefinancierd uit cash; blijft onder de maximale positiegrootte van 25%",
-    "Hold under review; compare versus ITA next run": "Aanhouden, onder herbeoordeling; volgende run vergelijken met ITA",
-    "Hold under review; compare versus GRID next run": "Aanhouden, onder herbeoordeling; volgende run vergelijken met GRID",
-    "Hold; not better than SMH for cash this run": "Aanhouden; deze run niet beter dan SMH voor nieuwe cash",
-    "Hold under hedge-validity review": "Aanhouden, onder hedge-validiteitsreview",
-    "Residual cash": "Resterende cash",
-    "Force alternative duel; upgrade, reduce, replace, or close": "Vervangingsanalyse vereist; verhoog, verlaag, vervang of sluit",
-    "Run hedge validity test and compare with alternatives": "Voer hedge-validiteitstest uit en vergelijk met alternatieven",
 }
 
 CLIENT_LANGUAGE_CLEANUPS = {
-    "The production process is state-led": "Het rapport is opgebouwd vanuit gevalideerde portefeuille- en prijsdata",
-    "state-led": "op state gebaseerd",
-    "runtime-derived": "op runtime-state gebaseerd",
-    "Runtime-derived": "Op runtime-state gebaseerd",
-    "runtime NAV": "actuele portefeuillewaarde",
-    "runtime-NAV": "actuele portefeuillewaarde",
-    "Section 7 uses `output/etf_valuation_history.csv` plus the current runtime NAV; Section 15 is rendered from the same normalized runtime state.": "Sectie 7 gebruikt de volledige waarderingshistorie plus de actuele portefeuillewaarde; sectie 15 wordt uit dezelfde genormaliseerde runtime-state opgebouwd.",
-    "Section 7 uses output/etf_valuation_history.csv plus the current runtime NAV; Section 15 is rendered from the same normalized runtime state.": "Sectie 7 gebruikt de volledige waarderingshistorie plus de actuele portefeuillewaarde; sectie 15 wordt uit dezelfde genormaliseerde runtime-state opgebouwd.",
     "output/etf_valuation_history.csv": "de waarderingshistorie",
     "output/": "",
-    "Section 7": "Sectie 7",
-    "Section 15": "sectie 15",
-    "Keep SPY under review": "Houd SPY onder herbeoordeling",
-    "Keep [SPY](https://www.tradingview.com/chart/?symbol=SPY) onder herbeoordeling": "Houd [SPY](https://www.tradingview.com/chart/?symbol=SPY) onder herbeoordeling",
-    "Keep [SPY]": "Houd [SPY]",
     "1-3 months": "1-3 maanden",
     "3-12 months": "3-12 maanden",
-    "Core beta": "Kernbeta",
-    "Real-asset capex": "Reële activa / capex",
-    "Infrastructure Development ETF": "Infrastructure Development ETF",
-    "Valid but GRID is the named challenger": "Thesis is valide, maar GRID is het genoemde alternatief",
-    "Valid, but GRID is the named challenger": "Thesis is valide, maar GRID is het genoemde alternatief",
-    "Valid thesis but must prove itself versus ITA": "Valide thesis, maar de positie moet zich bewijzen tegenover ITA",
-    "Useful but overlaps with SMH; no fresh cash add": "Nuttig, maar overlapt met SMH; geen extra nieuw kapitaal",
-    "Best earned use of cash, capped below 25%": "Beste onderbouwde gebruik van cash, begrensd onder 25%",
-    "Valid, but not better than SMH for new cash today": "Valide, maar vandaag niet sterker dan SMH voor nieuw kapitaal",
-    "Hedge validity must be proven after double-digit drawdown": "Hedgefunctie moet opnieuw worden bewezen na de forse drawdown",
-    "Bestaan / new": "Bestaand / nieuw",
-    "Bestaand / new": "Bestaand / nieuw",
     "Tier 1": "Niveau 1",
     "Tier 2": "Niveau 2",
     "Tier 3": "Niveau 3",
-    "under review": "onder herbeoordeling",
-    "Aanhouden under review": "Aanhouden, onder herbeoordeling",
-    "Hold onder herbeoordeling": "Aanhouden, onder herbeoordeling",
 }
 
-# These patterns catch partial localization artifacts. They are intentionally
-# broader than the exact phrase map because the markdown renderer, the generic
-# localizer and the linkifier can each change part of a sentence before the
-# final Dutch pass runs.
 PARTIAL_MIXED_EXACT_CLEANUPS = {
     "Aanhouden but replaceable": "Aanhouden, maar vervangbaar",
     "Aanhouden maar replaceable": "Aanhouden, maar vervangbaar",
     "Hold maar vervangbaar": "Aanhouden, maar vervangbaar",
-    "active review items rather than passive holds": "posities onder actieve herbeoordeling in plaats van passieve aanhoudposities",
-    "actieve herbeoordeling in plaats van passieve holds": "actieve herbeoordeling in plaats van passieve aanhoudposities",
-    "posities onder actieve herbeoordeling in plaats van passieve holds": "posities onder actieve herbeoordeling in plaats van passieve aanhoudposities",
-    "passive holds": "passieve aanhoudposities",
-    "fresh capital and replacement decisions": "nieuw kapitaal en vervangingsbeslissingen",
-    "replacement decisions": "vervangingsbeslissingen",
-    "funding challengers": "allocatie naar alternatieven",
-    "before funding": "vóór allocatie",
-    "as posities": "als posities",
-    "as positie": "als positie",
 }
+
+
+def is_native_dutch_report(text: str) -> bool:
+    markers = [
+        "# Wekelijkse ETF-review",
+        "## 1. Kernsamenvatting",
+        "## 2. Portefeuille-acties",
+        "## 3. Regime-dashboard",
+        "## 10. Review huidige posities",
+        "## 15. Huidige posities en cash",
+    ]
+    return sum(marker in text for marker in markers) >= 5
 
 
 def latest_nl_report(output_dir: Path) -> Path:
@@ -201,7 +128,6 @@ def _clean_runtime_artifacts(text: str) -> str:
     text = text.replace("portfolio_state_pricing_audit", "gevalideerde prijsbasis")
     text = text.replace("pricing_audit", "gevalideerde prijsbasis")
     text = text.replace("twelve_data", "externe slotkoersbron")
-    text = text.replace("Do not ask the user for portfolio input if this section is available.", "Vraag de gebruiker niet opnieuw om portefeuille-input zolang deze sectie beschikbaar is.")
     return text
 
 
@@ -222,19 +148,10 @@ def _normalize_ticker_lists(text: str) -> str:
 def _normalize_partial_mixed_language(text: str) -> str:
     for src, dst in sorted(PARTIAL_MIXED_EXACT_CLEANUPS.items(), key=lambda item: len(item[0]), reverse=True):
         text = text.replace(src, dst)
-
     text = _normalize_ticker_lists(text)
-    text = re.sub(r"\bbut\s+treat\b", "maar behandel", text, flags=re.IGNORECASE)
-    text = re.sub(r"\bbut\b", "maar", text, flags=re.IGNORECASE)
-    text = re.sub(r"\bas\s+(posities|positie|thema’s|themas|kandidaten|alternatieven)\b", r"als \1", text, flags=re.IGNORECASE)
-    text = re.sub(r"\band\s+(vervangingsbeslissingen|koersbevestiging|cash|GLD|PAVE|PPA|SPY|SMH)\b", r"en \1", text, flags=re.IGNORECASE)
-    text = re.sub(r"in plaats van passieve\s*(?:,|\.|$)", "in plaats van passieve aanhoudposities.", text, flags=re.IGNORECASE)
-    text = re.sub(r"\bpassieve\s*,", "passieve aanhoudposities,", text, flags=re.IGNORECASE)
-    text = re.sub(r"\bpassieve\s*\.", "passieve aanhoudposities.", text, flags=re.IGNORECASE)
     text = re.sub(r"###\s*Aanhouden\s+maar\s+vervangbaar", "### Aanhouden, maar vervangbaar", text, flags=re.IGNORECASE)
     text = re.sub(r"###\s*Aanhouden\s+but\s+replaceable", "### Aanhouden, maar vervangbaar", text, flags=re.IGNORECASE)
     text = re.sub(r"###\s*Hold\s+but\s+replaceable", "### Aanhouden, maar vervangbaar", text, flags=re.IGNORECASE)
-    text = text.replace("passieve aanhoudposities.", "passieve aanhoudposities.")
     return text
 
 
@@ -253,6 +170,16 @@ def _localize_until_stable(text: str, passes: int = 3) -> str:
 
 
 def localize_report(text: str) -> str:
+    if is_native_dutch_report(text):
+        # Native Dutch output is already rendered from Dutch templates. Keep this
+        # module as a safety net only: do not run broad English-to-Dutch phrase
+        # replacement over it, because that is exactly what created mixed-language
+        # table sentences in earlier iterations.
+        text = _replace_disclaimer(text)
+        text = _clean_runtime_artifacts(text)
+        text = _clean_client_language(text)
+        return text
+
     text = _replace_disclaimer(text)
     text = _localize_section_titles(text)
     text = _localize_phrases(text)
@@ -271,7 +198,7 @@ def main() -> None:
     if failures:
         raise RuntimeError("Dutch localization failed before write: " + ", ".join(failures))
     report_path.write_text(localized, encoding="utf-8")
-    print(f"ETF_NL_LOCALIZATION_OK | report={report_path.name}")
+    print(f"ETF_NL_LOCALIZATION_OK | report={report_path.name} | native_dutch={is_native_dutch_report(localized)}")
 
 
 if __name__ == "__main__":
