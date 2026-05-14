@@ -10,43 +10,20 @@ from runtime.replacement_duel_v2 import replacement_duel_v2_html
 PRINT_TABLE_PAGINATION_CSS = """
 <style id="etf-table-pagination-guard">
   @media print {
-    table {
-      page-break-inside: auto;
-      break-inside: auto;
-      border-collapse: collapse;
-    }
-
-    thead {
-      display: table-header-group;
-    }
-
-    tfoot {
-      display: table-footer-group;
-    }
-
-    tr,
-    th,
-    td {
-      page-break-inside: avoid;
-      break-inside: avoid;
-    }
-
-    .panel table tr,
-    .panel table th,
-    .panel table td,
-    .data-table tr,
-    .action-table tr,
-    .rotation-plan-table tr,
-    .position-review-table tr,
-    .replacement-duel-v2-table tr {
-      page-break-inside: avoid;
-      break-inside: avoid;
+    table { page-break-inside: auto; break-inside: auto; border-collapse: collapse; }
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    tr, th, td { page-break-inside: avoid; break-inside: avoid; }
+    .panel table tr, .panel table th, .panel table td,
+    .data-table tr, .action-table tr, .rotation-plan-table tr,
+    .position-review-table tr, .replacement-duel-v2-table tr {
+      page-break-inside: avoid; break-inside: avoid;
     }
   }
 </style>
 """
 
-NL_MARKERS = ["belangrijkste conclusie", "wat is er deze week veranderd", "beschikbare cash", "nederlands"]
+NL_MARKERS = ["belangrijkste conclusie", "wat is er deze week veranderd", "beschikbare cash", "kernsamenvatting", "portefeuille-acties"]
 
 LABELS = {
     "en": {
@@ -61,6 +38,7 @@ LABELS = {
         "hold_replaceable": "Hold but replaceable",
         "reduce": "Reduce",
         "close": "Close",
+        "none": "None",
         "replaceable_note": "remain under explicit review.",
         "best_replacements": "Best replacements to fund",
         "best_replacements_note": "No challenger is promoted to a fundable replacement yet. Each named replacement must first clear the same close-date pricing basis and relative-strength duel.",
@@ -84,7 +62,8 @@ LABELS = {
         "hold_replaceable": "Aanhouden, maar vervangbaar",
         "reduce": "Verlagen",
         "close": "Sluiten",
-        "replaceable_note": "blijven expliciet onder review.",
+        "none": "Geen",
+        "replaceable_note": "blijven expliciet onder herbeoordeling.",
         "best_replacements": "Beste alternatieven om te financieren",
         "best_replacements_note": "Nog geen alternatief is sterk genoeg om direct te financieren. Elk genoemd alternatief moet eerst dezelfde prijsbasis en relatieve-sterkteanalyse doorstaan.",
         "ticker": "Ticker",
@@ -97,25 +76,106 @@ LABELS = {
     },
 }
 
+ACTION_NL = {
+    "hold": "Aanhouden",
+    "add": "Toevoegen",
+    "buy": "Kopen",
+    "reduce": "Verlagen",
+    "close": "Sluiten",
+    "sell": "Verkopen",
+    "hold under review": "Aanhouden, onder herbeoordeling",
+}
+FRESH_CASH_NL = {
+    "smaller / under review": "Kleiner / onder herbeoordeling",
+    "smaller": "Kleiner",
+    "reduce": "Verlagen",
+    "hold": "Aanhouden",
+}
+ROLE_NL = {
+    "Core beta": "Kernbeta",
+    "Growth engine": "Groeimotor",
+    "Resilience": "Weerbaarheid",
+    "Real-asset capex": "Reële activa / capex",
+    "Strategic energy": "Strategische energie",
+    "Hedge ballast": "Hedgepositie",
+}
+NEXT_ACTION_NL = {
+    "SPY": "Toets overlap met SMH voordat extra kapitaal wordt toegewezen.",
+    "SMH": "Aanhouden binnen de maximale positiegrootte en opnieuw toetsen op concentratie.",
+    "PPA": "Voer de vervangingsanalyse tegenover ITA opnieuw uit.",
+    "PAVE": "Voer de vervangingsanalyse tegenover GRID opnieuw uit.",
+    "URNM": "Aanhouden en vergelijken met URA/NLR als uraniumbreedte verbetert.",
+    "GLD": "Voer de hedge-validiteitstest opnieuw uit tegenover GSG en BIL.",
+}
+
 
 def _language(md_text: str) -> str:
     lower = md_text.lower()
-    return "nl" if any(marker in lower for marker in NL_MARKERS) or "weekly_analysis_pro_nl" in lower else "en"
+    return "nl" if any(marker in lower for marker in NL_MARKERS) else "en"
 
 
 def _labels(language: str) -> dict[str, str]:
     return LABELS.get(language, LABELS["en"])
 
 
-def _clean(value: Any) -> str:
-    return str(value or "").strip() or "None"
+def _clean(value: Any, language: str = "en") -> str:
+    fallback = LABELS[language].get("none", "None")
+    raw = str(value or "").strip()
+    if not raw or raw.lower() in {"none", "null", "nan"}:
+        return fallback
+    return raw
 
 
-def _compact(value: Any, max_len: int = 90) -> str:
-    raw = _clean(value)
-    if len(raw) <= max_len:
-        return raw
-    return raw[: max_len - 1].rstrip() + "…"
+def _compact(value: Any, max_len: int = 90, language: str = "en") -> str:
+    raw = _clean(value, language)
+    return raw if len(raw) <= max_len else raw[: max_len - 1].rstrip() + "…"
+
+
+def _nl_action(value: Any) -> str:
+    raw = str(value or "").strip()
+    low = raw.lower()
+    if low in ACTION_NL:
+        return ACTION_NL[low]
+    if "add" in low or "buy" in low:
+        return "Toevoegen"
+    if "reduce" in low:
+        return "Verlagen"
+    if "review" in low:
+        return "Aanhouden, onder herbeoordeling"
+    if "hold" in low:
+        return "Aanhouden"
+    if not raw or low == "none":
+        return "Geen"
+    return raw
+
+
+def _nl_fresh_cash(value: Any) -> str:
+    raw = str(value or "").strip()
+    low = raw.lower()
+    return FRESH_CASH_NL.get(low, raw or "Onder herbeoordeling")
+
+
+def _nl_role(value: Any) -> str:
+    raw = str(value or "").strip()
+    return ROLE_NL.get(raw, raw or "Positie")
+
+
+def _display_action(value: Any, language: str) -> str:
+    return _nl_action(value) if language == "nl" else _clean(value, language)
+
+
+def _display_fresh_cash(value: Any, language: str) -> str:
+    return _nl_fresh_cash(value) if language == "nl" else _clean(value, language)
+
+
+def _display_role(value: Any, language: str) -> str:
+    return _nl_role(value) if language == "nl" else _compact(value, 55, language)
+
+
+def _display_next_action(ticker: str, value: Any, language: str) -> str:
+    if language == "nl":
+        return NEXT_ACTION_NL.get(ticker, "Aanhouden en opnieuw toetsen in de volgende run.")
+    return _compact(value, 95, language)
 
 
 def _is_add(p: dict[str, Any]) -> bool:
@@ -126,8 +186,7 @@ def _is_add(p: dict[str, Any]) -> bool:
 
 
 def _is_hold(p: dict[str, Any]) -> bool:
-    action = _clean(p.get("suggested_action")).lower()
-    return "hold" in action and not _is_add(p)
+    return "hold" in _clean(p.get("suggested_action")).lower() and not _is_add(p)
 
 
 def _is_replace(p: dict[str, Any]) -> bool:
@@ -145,10 +204,10 @@ def _is_close(p: dict[str, Any]) -> bool:
     return "close" in action or "sell" in action
 
 
-def _ticker_anchor(base: Any, ticker: str) -> str:
+def _ticker_anchor(base: Any, ticker: str, language: str = "en") -> str:
     ticker = ticker.strip().upper()
     if not ticker or ticker == "NONE":
-        return "None"
+        return _labels(language)["none"]
     try:
         return base.ticker_anchor_html(ticker)
     except Exception:
@@ -156,9 +215,9 @@ def _ticker_anchor(base: Any, ticker: str) -> str:
         return f'<a href="{url}" target="_blank" rel="noopener noreferrer">{escape(ticker)}</a>'
 
 
-def _ticker_join(base: Any, tickers: list[str]) -> str:
+def _ticker_join(base: Any, tickers: list[str], language: str) -> str:
     values = [t.strip().upper() for t in tickers if t and t.strip().upper() != "NONE"]
-    return ", ".join(_ticker_anchor(base, t) for t in values) if values else "None"
+    return ", ".join(_ticker_anchor(base, t, language) for t in values) if values else _labels(language)["none"]
 
 
 def _section_header(base: Any, number: int, title: str) -> str:
@@ -180,23 +239,19 @@ def _classified_positions(state: dict[str, Any]) -> dict[str, list[str]]:
 
 
 def _action_snapshot_html(base: Any, state: dict[str, Any], language: str) -> str:
-    classified = _classified_positions(state)
+    c = _classified_positions(state)
     l = _labels(language)
-
     return "".join([
-        "<div class='panel panel-action-snapshot'>",
-        _section_header(base, 2, l["portfolio_action_snapshot"]),
-        "<table class='action-table'><thead><tr>"
+        "<div class='panel panel-action-snapshot'>", _section_header(base, 2, l["portfolio_action_snapshot"]),
+        "<table class='action-table'><thead><tr>",
         f"<th>{escape(l['recommendation'])}</th><th>{escape(l['tickers_notes'])}</th></tr></thead><tbody>",
-        f"<tr><th>{escape(l['add'])}</th><td>{_ticker_join(base, classified['add'])}</td></tr>",
-        f"<tr><th>{escape(l['hold'])}</th><td>{_ticker_join(base, classified['hold'])}</td></tr>",
-        f"<tr><th>{escape(l['hold_replaceable'])}</th><td>{_ticker_join(base, classified['replace'])} {escape(l['replaceable_note'])}</td></tr>",
-        f"<tr><th>{escape(l['reduce'])}</th><td>{_ticker_join(base, classified['reduce'])}</td></tr>",
-        f"<tr><th>{escape(l['close'])}</th><td>{_ticker_join(base, classified['close'])}</td></tr>",
-        "</tbody></table>",
-        f"<div class='note-box'><h4>{escape(l['best_replacements'])}</h4>",
-        f"<ul><li>{escape(l['best_replacements_note'])}</li></ul>",
-        "</div></div>",
+        f"<tr><th>{escape(l['add'])}</th><td>{_ticker_join(base, c['add'], language)}</td></tr>",
+        f"<tr><th>{escape(l['hold'])}</th><td>{_ticker_join(base, c['hold'], language)}</td></tr>",
+        f"<tr><th>{escape(l['hold_replaceable'])}</th><td>{_ticker_join(base, c['replace'], language)} {escape(l['replaceable_note'])}</td></tr>",
+        f"<tr><th>{escape(l['reduce'])}</th><td>{_ticker_join(base, c['reduce'], language)}</td></tr>",
+        f"<tr><th>{escape(l['close'])}</th><td>{_ticker_join(base, c['close'], language)}</td></tr>",
+        "</tbody></table>", f"<div class='note-box'><h4>{escape(l['best_replacements'])}</h4>",
+        f"<ul><li>{escape(l['best_replacements_note'])}</li></ul>", "</div></div>",
     ])
 
 
@@ -207,66 +262,44 @@ def _position_review_html(base: Any, state: dict[str, Any], language: str) -> st
         ticker = str(p.get("ticker", "")).upper()
         rows.append(
             "<tr>"
-            f"<td>{_ticker_anchor(base, ticker)}</td>"
-            f"<td>{escape(_clean(p.get('suggested_action')))}</td>"
+            f"<td>{_ticker_anchor(base, ticker, language)}</td>"
+            f"<td>{escape(_display_action(p.get('suggested_action'), language))}</td>"
             f"<td class='num'>{escape(f2(p.get('total_score')) or 'n/a')}</td>"
-            f"<td>{escape(_clean(p.get('fresh_cash_test')))}</td>"
-            f"<td>{escape(_compact(p.get('portfolio_role'), 55))}</td>"
-            f"<td>{escape(_compact(p.get('required_next_action'), 95))}</td>"
+            f"<td>{escape(_display_fresh_cash(p.get('fresh_cash_test'), language))}</td>"
+            f"<td>{escape(_display_role(p.get('portfolio_role'), language))}</td>"
+            f"<td>{escape(_display_next_action(ticker, p.get('required_next_action'), language))}</td>"
             "</tr>"
         )
-
     return "".join([
-        "<div class='panel panel-position-review'>",
-        _section_header(base, 3, l["current_position_review"]),
-        "<table class='data-table position-review-table'>",
-        "<thead><tr>"
+        "<div class='panel panel-position-review'>", _section_header(base, 3, l["current_position_review"]),
+        "<table class='data-table position-review-table'><thead><tr>",
         f"<th>{escape(l['ticker'])}</th><th>{escape(l['action'])}</th><th>{escape(l['score'])}</th><th>{escape(l['fresh_cash'])}</th><th>{escape(l['role'])}</th><th>{escape(l['required_next_action'])}</th></tr></thead>",
-        "<tbody>",
-        "".join(rows),
-        "</tbody></table></div>",
+        "<tbody>", "".join(rows), "</tbody></table></div>",
     ])
 
 
 def _rotation_plan_html(base: Any, state: dict[str, Any], language: str) -> str:
-    classified = _classified_positions(state)
+    c = _classified_positions(state)
     l = _labels(language)
     return "".join([
-        "<div class='panel panel-rotation-plan'>",
-        _section_header(base, 5, l["portfolio_rotation_plan"]),
-        "<table class='data-table rotation-plan-table'>",
-        "<thead><tr>"
+        "<div class='panel panel-rotation-plan'>", _section_header(base, 5, l["portfolio_rotation_plan"]),
+        "<table class='data-table rotation-plan-table'><thead><tr>",
         f"<th>{escape(l['close'])}</th><th>{escape(l['reduce'])}</th><th>{escape(l['hold'])}</th><th>{escape(l['add'])}</th><th>{escape(l['replace'])}</th></tr></thead>",
         "<tbody><tr>",
-        f"<td>{_ticker_join(base, classified['close'])}</td>",
-        f"<td>{_ticker_join(base, classified['reduce'])}</td>",
-        f"<td>{_ticker_join(base, classified['hold'])}</td>",
-        f"<td>{_ticker_join(base, classified['add'])}</td>",
-        f"<td>{_ticker_join(base, classified['replace'])}</td>",
-        "</tr></tbody></table>",
-        "</div>",
+        f"<td>{_ticker_join(base, c['close'], language)}</td><td>{_ticker_join(base, c['reduce'], language)}</td><td>{_ticker_join(base, c['hold'], language)}</td><td>{_ticker_join(base, c['add'], language)}</td><td>{_ticker_join(base, c['replace'], language)}</td>",
+        "</tr></tbody></table></div>",
     ])
 
 
 def _replacement_duel_panel(base: Any, state: dict[str, Any], language: str) -> str:
     l = _labels(language)
-    return "".join([
-        "<div class='panel panel-replacement-duel'>",
-        _section_header(base, 11, l["replacement_duel_table"]),
-        replacement_duel_v2_html(state, base, language=language),
-        "</div>",
-    ])
+    return "".join(["<div class='panel panel-replacement-duel'>", _section_header(base, 11, l["replacement_duel_table"]), replacement_duel_v2_html(state, base, language=language), "</div>"])
 
 
 def _replace_panel_by_title(html: str, titles: list[str], replacement: str) -> str:
     label_idx = -1
     for title in titles:
-        marker_options = [
-            f"<span class='section-label'>{escape(title)}</span>",
-            f'<span class="section-label">{escape(title)}</span>',
-            escape(title),
-        ]
-        for marker in marker_options:
+        for marker in (f"<span class='section-label'>{escape(title)}</span>", f'<span class="section-label">{escape(title)}</span>', escape(title)):
             label_idx = html.find(marker)
             if label_idx != -1:
                 break
@@ -274,17 +307,10 @@ def _replace_panel_by_title(html: str, titles: list[str], replacement: str) -> s
             break
     if label_idx == -1:
         return html
-
-    starts = [html.rfind("<div class='panel", 0, label_idx), html.rfind('<div class="panel', 0, label_idx)]
-    start = max(starts)
+    start = max(html.rfind("<div class='panel", 0, label_idx), html.rfind('<div class="panel', 0, label_idx))
     if start == -1:
         return html
-
-    next_candidates = []
-    for token in ("<div class='panel", '<div class="panel'):
-        pos = html.find(token, label_idx + 1)
-        if pos != -1:
-            next_candidates.append(pos)
+    next_candidates = [pos for token in ("<div class='panel", '<div class="panel') if (pos := html.find(token, label_idx + 1)) != -1]
     end = min(next_candidates) if next_candidates else html.find("</body>", label_idx)
     if end == -1:
         end = len(html)
@@ -294,21 +320,16 @@ def _replace_panel_by_title(html: str, titles: list[str], replacement: str) -> s
 def _append_replacement_duel_after_best_opportunities(html: str, base: Any, state: dict[str, Any], language: str) -> str:
     if "replacement-duel-v2-table" in html:
         return html.replace("Replacement Duel Table v2", _labels(language)["replacement_duel_table"])
-    marker_options = ["Best New Opportunities", "Beste nieuwe kansen"]
     idx = -1
     marker_len = 0
-    for marker in marker_options:
+    for marker in ("Best New Opportunities", "Beste nieuwe kansen"):
         idx = html.find(marker)
         if idx != -1:
             marker_len = len(marker)
             break
     if idx == -1:
         return html
-    next_candidates = []
-    for token in ("<div class='panel", '<div class="panel'):
-        pos = html.find(token, idx + marker_len)
-        if pos != -1:
-            next_candidates.append(pos)
+    next_candidates = [pos for token in ("<div class='panel", '<div class="panel') if (pos := html.find(token, idx + marker_len)) != -1]
     insert_at = min(next_candidates) if next_candidates else html.find("</body>", idx)
     if insert_at == -1:
         insert_at = len(html)
@@ -329,7 +350,6 @@ def apply_etf_delivery_html_overrides(html: str, base: Any, md_text: str) -> str
         state = build_runtime_state()
     except Exception:
         return _inject_print_table_pagination_css(html)
-
     html = _replace_panel_by_title(html, ["Portfolio Action Snapshot", "Portefeuille-acties"], _action_snapshot_html(base, state, language))
     html = _replace_panel_by_title(html, ["Current Position Review", "Review huidige posities"], _position_review_html(base, state, language))
     html = _replace_panel_by_title(html, ["Portfolio Rotation Plan", "Rotatieplan portefeuille"], _rotation_plan_html(base, state, language))
@@ -342,5 +362,4 @@ def build_report_html_with_state(base_build_report_html: Callable[..., str], bas
     def _wrapped(md_text: str, report_date_str: str, image_src: str | None = None, render_mode: str = "email") -> str:
         html = base_build_report_html(md_text, report_date_str, image_src=image_src, render_mode=render_mode)
         return apply_etf_delivery_html_overrides(html, base, md_text)
-
     return _wrapped
