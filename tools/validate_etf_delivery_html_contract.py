@@ -14,7 +14,7 @@ if str(REPO_ROOT) not in sys.path:
 
 import send_report as report_module
 from runtime.build_etf_report_state import build_runtime_state
-from runtime.client_facing_sanitizer import sanitize_client_facing_html
+from runtime.client_facing_sanitizer import looks_dutch_markdown, sanitize_client_facing_html, validate_dutch_delivery_language
 from runtime.delivery_html_overrides import build_report_html_with_state
 
 report_module.build_report_html = build_report_html_with_state(report_module.build_report_html, report_module._base)
@@ -115,7 +115,7 @@ def _report_date_from_filename(path: Path) -> str:
 def _render_delivery_html(report_path: Path) -> str:
     md_text = report_path.read_text(encoding="utf-8")
     html = report_module.build_report_html(md_text, _report_date_from_filename(report_path), image_src=None, render_mode="email")
-    return sanitize_client_facing_html(html)
+    return sanitize_client_facing_html(html, md_text=md_text, language="nl" if looks_dutch_markdown(md_text) else "en")
 
 
 def _strip_html(value: str) -> str:
@@ -221,11 +221,14 @@ def validate(output_dir: Path) -> None:
     holdings = _current_holdings_from_state(state)
     reports = _latest_reports(output_dir)
     for report_path in reports:
+        md_text = report_path.read_text(encoding="utf-8")
         html = _render_delivery_html(report_path)
         _validate_no_forbidden_content(html, report_path.name)
         _validate_required_titles(html, report_path.name)
         _validate_structural_radar(html, report_path.name)
         _validate_strict_tables_and_anchors(html, report_path.name, holdings)
+        if looks_dutch_markdown(md_text):
+            validate_dutch_delivery_language(html, report_path.name)
         print(f"ETF_DELIVERY_HTML_CONTRACT_OK | report={report_path.name} | dynamic_holdings={','.join(holdings)}")
 
 
