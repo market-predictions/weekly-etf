@@ -35,6 +35,7 @@ STRATEGIC_HOLDING_ORDER = ["SPY", "PPA", "PAVE", "GLD", "URNM", "SMH"]
 STRATEGIC_HOLDING_RANK = {ticker: idx for idx, ticker in enumerate(STRATEGIC_HOLDING_ORDER)}
 DEFAULT_MACRO_CONTEXT = Path("config/etf_macro_fundamental_context.yml")
 DEFAULT_RS_PATH = Path("output/market_history/etf_relative_strength.json")
+INVESTOR_REPLACEMENT_DUEL_LIMIT = 8
 
 
 def _ticker(value: Any) -> str:
@@ -278,7 +279,14 @@ def _row_rank(row: dict[str, Any]) -> tuple[int, int, int, int, float, str]:
     return (priority_rank, source_rank, holding_rank, missing_edge_rank, -edge_value, _ticker(row.get("challenger")))
 
 
-def replacement_duel_v2_rows(state: dict[str, Any], limit: int = 16) -> list[dict[str, Any]]:
+def replacement_duel_v2_rows(state: dict[str, Any], limit: int = INVESTOR_REPLACEMENT_DUEL_LIMIT) -> list[dict[str, Any]]:
+    """Return the most decision-relevant replacement duels for the client report.
+
+    The full target map can easily become a long analyst audit table. The client
+    report should stay compact and only show the most relevant funding/replacement
+    decisions, while the underlying target map and pricing artifacts remain the
+    machine-readable audit trail.
+    """
     rows = _strategic_rows(state)
     existing = {(_ticker(row.get("current_holding")), _ticker(row.get("challenger"))) for row in rows}
     rows.extend(_lane_rows(state, existing))
