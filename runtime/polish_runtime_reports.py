@@ -29,6 +29,18 @@ def latest_report(output_dir: Path, pattern: re.Pattern[str]) -> Path:
     return reports[-1]
 
 
+def is_native_dutch_report(text: str) -> bool:
+    markers = [
+        "# Wekelijkse ETF-review",
+        "## 1. Kernsamenvatting",
+        "## 2. Portefeuille-acties",
+        "## 3. Regime-dashboard",
+        "## 10. Review huidige posities",
+        "## 15. Huidige posities en cash",
+    ]
+    return sum(marker in text for marker in markers) >= 5
+
+
 def load_macro_pack() -> dict[str, Any]:
     if not MACRO_LATEST.exists():
         return {}
@@ -66,8 +78,7 @@ def _policy_bullets(pack: dict[str, Any], limit: int = 2) -> str:
 def _macro_reason_for_lane(lane_name: Any, pack: dict[str, Any]) -> str:
     lane_name = str(lane_name or "").strip()
     payload = (pack.get("lane_adjustments", {}) or {}).get(lane_name, {})
-    reason = str(payload.get("reason") or "").strip()
-    return reason
+    return str(payload.get("reason") or "").strip()
 
 
 def replace_between(text: str, start_heading: str, end_heading: str, replacement_body: str) -> str:
@@ -213,58 +224,13 @@ def polish_english(text: str) -> str:
 
 
 def polish_dutch(text: str) -> str:
-    text = polish_english(text)
-    replacements = {
-        "The production process is state-led: pricing, portfolio holdings, lane discovery, macro regime and recommendation discipline are independently validated before delivery.": "Het productieproces is state-led: pricing, portefeuilleposities, lane-discovery, macroregime en aanbevelingsdiscipline worden onafhankelijk gevalideerd vóór verzending.",
-        "No challenger is promoted to a fundable replacement yet. Each named replacement must first clear the same close-date pricing basis and relative-strength duel.": "Geen challenger is al gepromoveerd tot financierbare vervanger. Elke genoemde vervanger moet eerst dezelfde sluitkoersbasis en relatieve-sterkte-duel doorstaan.",
-        "Portfolio stance": "Portefeuillehouding",
-        "Best earned exposure": "Best verdiende exposure",
-        "Main discipline issue": "Belangrijkste disciplinepunt",
-        "Weakest implementation questions": "Zwakste implementatievragen",
-        "Action bias": "Actiebias",
-        "Current regime": "Huidig regime",
-        "Confidence": "Vertrouwen",
-        "Decision rule": "Beslisregel",
-        "What changed": "Wat veranderde",
-        "Portfolio implications": "Portefeuille-implicaties",
-        "Cross-asset confirmation": "Cross-asset bevestiging",
-        "Policy catalysts transferred to the report": "Beleidscatalysatoren in het rapport",
-        "Macro supports selection discipline, not broad risk expansion by default.": "Macro ondersteunt selectiediscipline, niet standaard brede risico-uitbreiding.",
-        "Stay invested": "Blijf belegd",
-        "SMH remains the portfolio's strongest contributor and cleanest secular growth expression.": "SMH blijft de sterkste bijdrage in de portefeuille en de zuiverste structurele groeiblootstelling.",
-        "PPA must prove itself against ITA, PAVE must prove itself against GRID, and GLD must prove that it still behaves like useful ballast.": "PPA moet zich bewijzen tegenover ITA, PAVE tegenover GRID, en GLD moet bewijzen dat het nog steeds nuttige ballast is.",
-        "Reconciled to Section 15": "Aangesloten op Section 15",
-        "a validated state-led production path with macro-policy regime input; no portfolio position was added unless shown in Section 14.": "een gevalideerd state-led productiepad met macro-/beleidsregime-input; geen positie is toegevoegd tenzij zichtbaar in Section 14.",
-        "No structural thesis was abandoned; implementation and macro-regime discipline are materially tighter.": "Geen structurele thesis is losgelaten; implementatie- en macroregimediscipline zijn duidelijk aangescherpt.",
-        "Overall portfolio judgment": "Algemeen portefeuilleoordeel",
-        "Main takeaway": "Belangrijkste conclusie",
-        "What changed this week": "Wat is er deze week veranderd",
-        "Available cash": "Beschikbare cash",
-        "Portfolio table": "Portefeuilletabel",
-        "Current Portfolio Holdings and Cash": "Current Portfolio Holdings and Cash",
-        "Current portfolio value": "Huidige portefeuillewaarde",
-        "Runtime-derived valuation from pricing audit and explicit portfolio state": "Doorgeschoven waardering uit pricing-audit en expliciete portefeuillestaat",
-        "Comment": "Opmerking",
-    }
-    for src, dst in replacements.items():
-        text = text.replace(src, dst)
+    if is_native_dutch_report(text):
+        print("ETF_RUNTIME_POLISH_NL_SKIPPED | reason=native_dutch_renderer")
+        return text
 
-    # Tactical bilingual-quality guard: keep the Dutch companion compact, but add
-    # enough Dutch client-facing wording around the runtime-rendered English
-    # section labels so the bilingual validator can distinguish it from the
-    # canonical English report. Numeric tables remain unchanged for parity.
-    if "## 1. Executive Summary\n\n- **Wat is er deze week veranderd:**" not in text:
-        text = text.replace(
-            "## 1. Executive Summary\n\n",
-            "## 1. Executive Summary\n\n"
-            "- **Wat is er deze week veranderd:** De macro-, beleids- en regime-input wordt nu meegenomen in de beoordeling, maar alleen de belangrijkste beslissignalen worden in dit rapport getoond.\n"
-            "- **Belangrijkste conclusie:** De portefeuille blijft belegd, maar nieuwe allocatie vraagt om prijsbewijs, relatieve sterkte en macrosteun.\n\n",
-            1,
-        )
-    text = text.replace("### Available cash", "### Beschikbare cash")
-    text = text.replace("## 15. Current Portfolio Holdings and Cash", "## 15. Current Portfolio Holdings and Cash\n\n### Huidige portefeuille")
-    text = text.replace("### Changes since last review", "### Wijzigingen sinds de vorige review")
-    text = text.replace("### Recommendation discipline continuity", "### Continuïteit in aanbevelingsdiscipline")
+    # Legacy fallback only. Native Dutch reports should not pass through this
+    # English-to-Dutch patch layer because it can reintroduce half-translated
+    # sentences and English section assumptions.
     return text
 
 
