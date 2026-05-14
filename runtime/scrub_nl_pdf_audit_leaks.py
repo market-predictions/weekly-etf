@@ -13,6 +13,13 @@ NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 # This pass catches residual client-visible English fragments that the PDF audit
 # found in rendered Dutch reports. It is intentionally broader and phrase based:
 # if these fragments appear, the Dutch report is not premium-client ready.
+#
+# Important: reports are linkified before this pass. Therefore ticker phrases may
+# appear either as `SMH remains` or `[SMH](https://...) remains`. All ticker-verb
+# cleanup must preserve the markdown link while translating the surrounding
+# client-facing sentence.
+
+TICKER_OR_LINK = r"(?:\[[A-Z]{2,6}\]\([^\)]+\)|(?<![A-Za-z0-9])[A-Z]{2,6}(?![A-Za-z0-9]))"
 
 EXACT_REPLACEMENTS = {
     "Core U.S. large-cap exposure": "Amerikaanse large-cap kernblootstelling",
@@ -27,6 +34,10 @@ EXACT_REPLACEMENTS = {
     "Needs supply-chain": "Vereist steun vanuit de toeleveringsketen",
     "Needs supply-chain policy plus price momentum.": "Vereist steun vanuit toeleveringsketenbeleid en koersmomentum.",
     "SMH remains": "SMH blijft",
+    "GLD remains": "GLD blijft",
+    "SPY remains": "SPY blijft",
+    "PPA remains": "PPA blijft",
+    "PAVE remains": "PAVE blijft",
     "Useful only if": "Alleen nuttig als",
     "Volglijst only": "Alleen volglijst",
     "Watchlist only": "Alleen volglijst",
@@ -34,7 +45,9 @@ EXACT_REPLACEMENTS = {
     "Zero allocation is an explicit U.S. exceptionalism bet.": "Nulallocatie is een expliciete inzet op Amerikaanse uitzonderingskracht.",
     "Investable maar concentration risk is explicit.": "Belegbaar, maar concentratierisico is expliciet aanwezig.",
     "Volglijst only; non-U.S. exposure remains a diversification gap.": "Alleen volglijst; niet-Amerikaanse blootstelling blijft een diversificatiekloof.",
+    "Watchlist only; non-U.S. exposure remains a diversification gap.": "Alleen volglijst; niet-Amerikaanse blootstelling blijft een diversificatiekloof.",
     "SMH remains the cleanest growth expression": "SMH blijft de zuiverste groeiblootstelling",
+    "GLD remains a hedge review, not an unquestioned ballast position.": "GLD blijft een hedgepositie onder herbeoordeling en is geen vanzelfsprekende stabilisator.",
     "Useful only if commodity breadth confirms.": "Alleen nuttig als de breedte in grondstoffen bevestigt.",
     "Useful only if commodity stress becomes visible.": "Alleen nuttig als grondstoffenstress zichtbaar wordt.",
     "Direct replacement duel versus SMH": "Directe vervangingsanalyse tegenover SMH",
@@ -42,7 +55,7 @@ EXACT_REPLACEMENTS = {
     "Direct replacement duel versus GRID": "Directe vervangingsanalyse tegenover GRID",
 }
 
-REGEX_REPLACEMENTS: list[tuple[re.Pattern[str], str]] = [
+REGEX_REPLACEMENTS: list[tuple[re.Pattern[str], str | callable]] = [
     (re.compile(r"\bCore\s+U\.?S\.?\s+large-cap\s+exposure\b", re.I), "Amerikaanse large-cap kernblootstelling"),
     (re.compile(r"\bCyber\s+spend\b", re.I), "cybersecurity-uitgaven"),
     (re.compile(r"\bDirect\s+replacement\s+duel\b", re.I), "directe vervangingsanalyse"),
@@ -51,7 +64,14 @@ REGEX_REPLACEMENTS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"\bHedge\s+ballast\b", re.I), "hedgepositie"),
     (re.compile(r"\bInvestable\s+(?:maar|but)\b", re.I), "Belegbaar, maar"),
     (re.compile(r"\bNeeds\s+supply-chain\b", re.I), "Vereist steun vanuit de toeleveringsketen"),
-    (re.compile(r"\b([A-Z]{2,6})\s+remains\b", re.I), r"\1 blijft"),
+    (re.compile(rf"({TICKER_OR_LINK})\s+remains\s+the\s+cleanest\s+growth\s+expression\b", re.I), r"\1 blijft de zuiverste groeiblootstelling"),
+    (re.compile(rf"({TICKER_OR_LINK})\s+remains\s+the\s+leading\s+funded\s+growth\s+exposure\b", re.I), r"\1 blijft de leidende gefinancierde groeiblootstelling"),
+    (re.compile(rf"({TICKER_OR_LINK})\s+remains\s+a\s+hedge\s+review\b", re.I), r"\1 blijft een hedgepositie onder herbeoordeling"),
+    (re.compile(rf"({TICKER_OR_LINK})\s+remains\s+structurally\s+valid\b", re.I), r"\1 blijft structureel valide"),
+    (re.compile(rf"({TICKER_OR_LINK})\s+remains\b", re.I), r"\1 blijft"),
+    (re.compile(rf"({TICKER_OR_LINK})\s+creates\b", re.I), r"\1 creëert"),
+    (re.compile(rf"({TICKER_OR_LINK})\s+must\s+justify\s+itself\b", re.I), r"\1 moet zich bewijzen"),
+    (re.compile(rf"({TICKER_OR_LINK})\s+must\s+be\s+proven\b", re.I), r"\1 moet worden bewezen"),
     (re.compile(r"\bUseful\s+only\s+if\b", re.I), "Alleen nuttig als"),
     (re.compile(r"\b(?:Volglijst|Watchlist)\s+only\b", re.I), "Alleen volglijst"),
     (re.compile(r"\bZero\s+allocation\b", re.I), "Nulallocatie"),
@@ -69,6 +89,12 @@ FORBIDDEN_AFTER_SCRUB = [
     "Investable but",
     "Needs supply-chain",
     "SMH remains",
+    "GLD remains",
+    "SPY remains",
+    "PPA remains",
+    "PAVE remains",
+    " remains ",
+    "] remains",
     "Useful only if",
     "Volglijst only",
     "Watchlist only",
@@ -90,7 +116,7 @@ def latest_nl_report(output_dir: Path) -> Path:
 
 def scrub_text(text: str) -> str:
     previous = text
-    for _ in range(3):
+    for _ in range(4):
         current = previous
         for source, target in sorted(EXACT_REPLACEMENTS.items(), key=lambda item: len(item[0]), reverse=True):
             current = current.replace(source, target)
