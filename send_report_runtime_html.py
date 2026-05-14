@@ -12,6 +12,40 @@ from runtime.render_etf_report_from_state import cash_eur, invested_eur, total_n
 
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
 STANDARD_REPORT_RE = re.compile(r"^weekly_analysis_(\d{6})(?:_(\d{2}))?\.md$")
+ISO_DATE_RE = re.compile(r"\b(20\d{2})-(\d{2})-(\d{2})\b")
+DUTCH_LONG_DATE_RE = re.compile(
+    r"\b(?:Maandag|Dinsdag|Woensdag|Donderdag|Vrijdag|Zaterdag|Zondag)?\s*"
+    r"(\d{1,2})\s+"
+    r"(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december)\s+"
+    r"(20\d{2})\b",
+    flags=re.IGNORECASE,
+)
+DUTCH_MONTH_NUMBERS = {
+    "januari": "01",
+    "februari": "02",
+    "maart": "03",
+    "april": "04",
+    "mei": "05",
+    "juni": "06",
+    "juli": "07",
+    "augustus": "08",
+    "september": "09",
+    "oktober": "10",
+    "november": "11",
+    "december": "12",
+}
+NATIVE_DUTCH_TITLE_MARKERS = [
+    "# Wekelijkse ETF-review",
+    "# Wekelijkse ETF review",
+]
+NATIVE_DUTCH_SECTION_MARKERS = [
+    "## 1. Kernsamenvatting",
+    "## 2. Portefeuille-acties",
+    "## 3. Regime-dashboard",
+    "## 4. Structurele kansenradar",
+    "## 10. Review huidige posities",
+    "## 15. Huidige posities en cash",
+]
 
 
 def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..., str]:
@@ -20,6 +54,60 @@ def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..
         return sanitize_client_facing_html(html, md_text=md_text, language="nl" if looks_dutch_markdown(md_text) else "en")
 
     return _wrapped
+
+
+def _dutch_long_date_to_iso(match: re.Match[str]) -> str:
+    day, month, year = match.groups()
+    return f"{year}-{DUTCH_MONTH_NUMBERS[month.lower()]}-{int(day):02d}"
+
+
+def parse_report_date_runtime(md_text: str) -> str:
+    """Accept ISO report dates and native Dutch long report dates.
+
+    The base delivery validator was built when the Dutch companion was a patched
+    clone of the English markdown, so it required an ISO date in the H1 title.
+    Native Dutch reports now use a client-facing Dutch date in the title, e.g.
+    `Wekelijkse ETF-review Donderdag 14 mei 2026`. This parser keeps ISO dates
+    for audit tables while accepting the native Dutch H1 format for delivery.
+    """
+    iso = ISO_DATE_RE.search(md_text)
+    if iso:
+        return iso.group(0)
+    dutch = DUTCH_LONG_DATE_RE.search(md_text)
+    if dutch:
+        return _dutch_long_date_to_iso(dutch)
+    return report_module._base.parse_report_date(md_text)
+
+
+def _has_report_title_date(md_text: str) -> bool:
+    for line in md_text.splitlines():
+        if not line.startswith("# "):
+            continue
+        if ISO_DATE_RE.search(line) or DUTCH_LONG_DATE_RE.search(line):
+            return True
+    return False
+
+
+def validate_dutch_companion_report_runtime(md_text: str) -> None:
+    """Validate both legacy patched Dutch and native Dutch companion reports."""
+    if not _has_report_title_date(md_text):
+        raise RuntimeError("Dutch companion report title is missing a report date.")
+
+    for section_number in range(1, 18):
+        if not report_module.extract_section_by_number(md_text, section_number):
+            raise RuntimeError(f"Dutch companion report is missing section {section_number}.")
+
+    lower = md_text.lower()
+    native_score = sum(marker.lower() in lower for marker in NATIVE_DUTCH_SECTION_MARKERS)
+    legacy_score = sum(marker in lower for marker in report_module.DUTCH_MARKERS)
+    if native_score < 4 and legacy_score < 2:
+        raise RuntimeError("Dutch companion report does not appear to contain enough Dutch-language wording.")
+
+    if (
+        "for informational and educational purposes only" not in lower
+        and "uitsluitend verstrekt voor informatieve en educatieve doeleinden" not in lower
+    ):
+        raise RuntimeError("Dutch companion report disclaimer language is missing.")
 
 
 def validate_nl_email_body_runtime(html_body: str, md_text: str) -> None:
@@ -158,6 +246,8 @@ def validate_equity_curve_from_runtime_state(_md_text: str | None = None, tolera
 
 report_module.latest_report_file = _latest_canonical_report_file
 report_module.latest_reports_by_day = _latest_canonical_reports_by_day
+report_module.parse_report_date = parse_report_date_runtime
+report_module.validate_dutch_companion_report = validate_dutch_companion_report_runtime
 report_module.validate_section15_arithmetic = validate_section15_from_runtime_state
 report_module.validate_equity_curve_alignment = validate_equity_curve_from_runtime_state
 report_module.validate_nl_email_body = validate_nl_email_body_runtime
