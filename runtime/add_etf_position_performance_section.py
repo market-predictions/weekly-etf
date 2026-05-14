@@ -8,13 +8,14 @@ from pathlib import Path
 from typing import Any
 
 from runtime.build_etf_report_state import build_runtime_state
+from runtime.render_etf_report_nl_from_state import nl_role, nl_thesis
 
 MARKET_HISTORY_PATH = Path("output/market_history/etf_relative_strength.json")
 EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 
 SECTION_START_RE = re.compile(
-    r"\n## 7A\. (?:ETF Position Performance|ETF-positieperformance)\n.*?(?=\n## 8\. )",
+    r"\n## 7A\. (?:ETF Position Performance|ETF-positieperformance|Rendement huidige ETF-posities)\n.*?(?=\n## 8\. )",
     re.DOTALL,
 )
 
@@ -62,7 +63,7 @@ def _float(value: Any) -> float | None:
 def _fmt_pct(value: Any, signed: bool = True) -> str:
     number = _float(value)
     if number is None:
-        return "n/a"
+        return "n.v.t."
     sign = "+" if signed and number > 0 else ""
     return f"{sign}{number:.2f}%"
 
@@ -70,7 +71,7 @@ def _fmt_pct(value: Any, signed: bool = True) -> str:
 def _fmt_eur(value: Any) -> str:
     number = _float(value)
     if number is None:
-        return "n/a"
+        return "n.v.t."
     sign = "-" if number < 0 else ""
     return f"{sign}{abs(number):,.2f}"
 
@@ -110,17 +111,13 @@ def _position_pl_eur(position: dict[str, Any], state: dict[str, Any]) -> float |
 
 
 def _contribution_pct(pl_eur: float | None, state: dict[str, Any]) -> float | None:
-    starting = _float((state.get("portfolio") or {}).get("starting_capital_eur"))
-    if starting is None:
-        # Current production portfolio starts at EUR 100,000; keep this fallback
-        # local to the presentation layer until the runtime state exposes it.
-        starting = 100000.0
+    starting = _float((state.get("portfolio") or {}).get("starting_capital_eur")) or 100000.0
     if pl_eur is None or not starting:
         return None
     return round(pl_eur / starting * 100.0, 2)
 
 
-def _performance_rows(state: dict[str, Any]) -> list[dict[str, Any]]:
+def _performance_rows(state: dict[str, Any], language: str = "en") -> list[dict[str, Any]]:
     metrics = _load_market_metrics()
     weights = _weight_map(state)
     rows: list[dict[str, Any]] = []
@@ -130,10 +127,16 @@ def _performance_rows(state: dict[str, Any]) -> list[dict[str, Any]]:
             continue
         metric = metrics.get(ticker, {})
         pl_eur = _position_pl_eur(position, state)
+        if language == "nl":
+            sleeve = nl_role(position.get("portfolio_role") or "Position")
+            thesis = nl_thesis(position.get("original_thesis"), ticker)
+        else:
+            sleeve = position.get("portfolio_role") or "Position"
+            thesis = position.get("original_thesis") or ETF_NAMES.get(ticker, ticker)
         rows.append(
             {
-                "portfolio_sleeve": position.get("portfolio_role") or "Position",
-                "investment_thesis": position.get("original_thesis") or ETF_NAMES.get(ticker, ticker),
+                "portfolio_sleeve": sleeve,
+                "investment_thesis": thesis,
                 "ticker": ticker,
                 "weight_pct": weights.get(ticker),
                 "return_1w_pct": metric.get("return_1w_pct"),
@@ -148,12 +151,12 @@ def _performance_rows(state: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def _table(state: dict[str, Any], language: str = "en") -> str:
-    rows = _performance_rows(state)
+    rows = _performance_rows(state, language)
     if language == "nl":
         lines = [
-            "## 7A. ETF-positieperformance",
+            "## 7A. Rendement huidige ETF-posities",
             "",
-            "Performance wordt berekend op de huidige ETF-posities op basis van de meest recente gevalideerde slotkoers-audit en beschikbare markthistorie.",
+            "Rendement wordt berekend op de huidige ETF-posities op basis van de meest recente gevalideerde slotkoers-audit en beschikbare markthistorie.",
             "",
             "| Portefeuillesegment | Beleggingsthese | ETF | Gewicht % | 1w rendement | 1m rendement | 3m rendement | Sinds instap | P/L EUR | Bijdrage % |",
             "|---|---|---|---:|---:|---:|---:|---:|---:|---:|",
@@ -189,7 +192,7 @@ def update_report(path: Path, state: dict[str, Any], language: str) -> None:
     report_text = path.read_text(encoding="utf-8")
     updated = _insert_or_replace(report_text, _table(state, language))
     path.write_text(updated, encoding="utf-8")
-    print(f"ETF_POSITION_PERFORMANCE_SECTION_OK | report={path.name} | language={language} | rows={len(_performance_rows(state))}")
+    print(f"ETF_POSITION_PERFORMANCE_SECTION_OK | report={path.name} | language={language} | rows={len(_performance_rows(state, language))}")
 
 
 def main() -> None:
