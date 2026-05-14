@@ -101,6 +101,10 @@ ENUM_VALUE_MAPPINGS = {
 }
 
 SECTION_TITLE_MAPPINGS = {
+    "Top 3 Actions This Week": "Top 3 acties deze week",
+    "TOP 3 ACTIONS THIS WEEK": "TOP 3 ACTIES DEZE WEEK",
+    "Top 3 Risks This Week": "Top 3 risico’s deze week",
+    "TOP 3 RISKS THIS WEEK": "TOP 3 RISICO’S DEZE WEEK",
     "Notable lanes assessed but not promoted this week": "Opvallende thema’s beoordeeld, maar deze week niet gepromoveerd",
     "Notable lanes assessed maar not promoted this week": "Opvallende thema’s beoordeeld, maar deze week niet gepromoveerd",
     "Neetable lanes assessed but not promoted this week": "Opvallende thema’s beoordeeld, maar deze week niet gepromoveerd",
@@ -109,6 +113,7 @@ SECTION_TITLE_MAPPINGS = {
     "not promoted this week": "deze week niet gepromoveerd",
     "THIS WEEK": "DEZE WEEK",
     "This week": "Deze week",
+    "this week": "deze week",
     "Short Opportunity Radar": "Shortkansenradar",
     "Alternative Duel Table": "Alternatievenanalyse",
     "Replacement Duel Table": "Vervangingsanalyse",
@@ -225,6 +230,29 @@ ANALYST_APPENDIX_MAPPINGS = {
     "Leverage ETFs allowed": "Leveraged ETF’s toegestaan",
 }
 
+TIMEFRAME_MAPPINGS = {
+    "this week's": "van deze week",
+    "this week’s": "van deze week",
+    "this week": "deze week",
+    "This week": "Deze week",
+    "THIS WEEK": "DEZE WEEK",
+    "next week": "volgende week",
+    "Next week": "Volgende week",
+    "NEXT WEEK": "VOLGENDE WEEK",
+    "last week": "vorige week",
+    "Last week": "Vorige week",
+    "LAST WEEK": "VORIGE WEEK",
+    "this run": "deze run",
+    "This run": "Deze run",
+    "THIS RUN": "DEZE RUN",
+    "next run": "volgende run",
+    "Next run": "Volgende run",
+    "NEXT RUN": "VOLGENDE RUN",
+    "last run": "vorige run",
+    "Last run": "Vorige run",
+    "LAST RUN": "VORIGE RUN",
+}
+
 TABLE_SECTION_EXACT_MAPPINGS = {
     **TABLE_HEADER_MAPPINGS,
     **ENUM_VALUE_MAPPINGS,
@@ -235,6 +263,7 @@ TABLE_SECTION_EXACT_MAPPINGS = {
     **ACTION_DECISION_MAPPINGS,
     **VALUATION_HISTORY_MAPPINGS,
     **ANALYST_APPENDIX_MAPPINGS,
+    **TIMEFRAME_MAPPINGS,
 }
 
 TABLE_SECTION_REGEX_MAPPINGS: list[tuple[re.Pattern[str], str]] = [
@@ -253,8 +282,14 @@ TABLE_SECTION_REGEX_MAPPINGS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"\bfundable\b", re.I), "geschikt voor allocatie"),
     (re.compile(r"\bfunding\b", re.I), "allocatie"),
     (re.compile(r"\bnot\s+promoted\s+this\s+week\b", re.I), "deze week niet gepromoveerd"),
+    (re.compile(r"\bthis\s+week(?:'s|’s)?\b", re.I), "deze week"),
+    (re.compile(r"\bnext\s+week\b", re.I), "volgende week"),
+    (re.compile(r"\blast\s+week\b", re.I), "vorige week"),
+    (re.compile(r"\bthis\s+run\b", re.I), "deze run"),
+    (re.compile(r"\bnext\s+run\b", re.I), "volgende run"),
+    (re.compile(r"\blast\s+run\b", re.I), "vorige run"),
     (re.compile(r"\bNeetable\b", re.I), "Opvallende"),
-    (re.compile(r"\bTHIS\s+WEEK\b"), "DEZE WEEK"),
+    (re.compile(r"\bTHIS\s+WEEK\b", re.I), "DEZE WEEK"),
     (re.compile(r"\bconfidence\b", re.I), "vertrouwen"),
     (re.compile(r"\bCapital\s+spending\b", re.I), "Kapitaaluitgaven"),
     (re.compile(r"\bAI\s+compute\s+infrastructure\b", re.I), "AI-rekenkrachtinfrastructuur"),
@@ -262,8 +297,10 @@ TABLE_SECTION_REGEX_MAPPINGS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"\bU\.S\.\s+equities\b", re.I), "Amerikaanse aandelen"),
     (re.compile(r"\bSPY\s+plus\s+SMH\s+creates\b", re.I), "SPY plus SMH creëert"),
     (re.compile(r"\bStructural\s+case\s+is\s+credible\b", re.I), "De structurele case is geloofwaardig"),
+    (re.compile(r"\bcompare\s+versus\s+([A-Z]{2,6})\s+volgende\s+run\b", re.I), r"volgende run vergelijken met \1"),
     (re.compile(r"\bcompare\s+versus\s+([A-Z]{2,6})\s+next\s+run\b", re.I), r"volgende run vergelijken met \1"),
     (re.compile(r"\bunder\s+hedge-validity\s+review\b", re.I), "onder hedge-validiteitsreview"),
+    (re.compile(r"\bnot\s+better\s+than\s+([A-Z]{2,6})\s+for\s+cash\s+deze\s+run\b", re.I), r"deze run niet beter dan \1 voor cash"),
     (re.compile(r"\bnot\s+better\s+than\s+([A-Z]{2,6})\s+for\s+cash\s+this\s+run\b", re.I), r"deze run niet beter dan \1 voor cash"),
     (re.compile(r"\b([A-Z]{2,6})\s+remains\s+([a-z][^.]+)\."), r"\1 blijft \2."),
 ]
@@ -317,6 +354,14 @@ TABLE_SECTION_FORBIDDEN_AFTER_SCRUB = [
     "Neetable",
     "SPY plus SMH creates",
     "THIS WEEK",
+    "This Week",
+    "this week",
+    "NEXT WEEK",
+    "Next Week",
+    "next week",
+    "LAST WEEK",
+    "Last Week",
+    "last week",
     "US equities",
     "confidence",
     "Mixed / not yet decisive",
