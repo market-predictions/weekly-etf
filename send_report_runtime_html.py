@@ -48,6 +48,39 @@ NATIVE_DUTCH_SECTION_MARKERS = [
 ]
 
 
+def _add_aliases(alias_map: dict[str, list[str]], canonical: str, aliases: list[str]) -> None:
+    existing = alias_map.setdefault(canonical, [])
+    for alias in aliases:
+        if alias not in existing:
+            existing.append(alias)
+
+
+def _extend_native_dutch_numeric_aliases() -> None:
+    """Teach legacy parity validators native Dutch table labels.
+
+    The native Dutch renderer intentionally uses client-facing labels such as
+    `Prijs lokaal` and `Marktwaarde EUR`. The legacy bilingual parity checker
+    canonicalizes section-15/section-7 tables through alias maps in send_report.
+    Extend those maps at runtime so the validator verifies numeric parity instead
+    of forcing English-shaped column labels back into the Dutch report.
+    """
+    _add_aliases(report_module.SECTION15_LABEL_ALIASES, "Starting capital (EUR)", ["startkapitaal eur"])
+    _add_aliases(report_module.SECTION15_LABEL_ALIASES, "Invested market value (EUR)", ["belegde marktwaarde eur"])
+    _add_aliases(report_module.SECTION15_LABEL_ALIASES, "Cash (EUR)", ["cash eur"])
+    _add_aliases(report_module.SECTION15_LABEL_ALIASES, "Total portfolio value (EUR)", ["totale portefeuillewaarde eur"])
+    _add_aliases(report_module.SECTION15_LABEL_ALIASES, "Since inception return (%)", ["rendement sinds start"])
+
+    _add_aliases(report_module.SECTION15_HEADER_ALIASES, "ticker", ["etf"])
+    _add_aliases(report_module.SECTION15_HEADER_ALIASES, "shares", ["aantal stukken"])
+    _add_aliases(report_module.SECTION15_HEADER_ALIASES, "price (local)", ["prijs lokaal", "lokale prijs"])
+    _add_aliases(report_module.SECTION15_HEADER_ALIASES, "market value (local)", ["marktwaarde lokaal", "lokale marktwaarde"])
+    _add_aliases(report_module.SECTION15_HEADER_ALIASES, "market value (eur)", ["marktwaarde eur", "marktwaarde in eur"])
+    _add_aliases(report_module.SECTION15_HEADER_ALIASES, "weight %", ["weging %"])
+
+    _add_aliases(report_module.SECTION7_HEADER_ALIASES, "portfolio value (eur)", ["portefeuillewaarde eur", "portefeuillewaarde in eur"])
+    _add_aliases(report_module.SECTION7_HEADER_ALIASES, "comment", ["toelichting"])
+
+
 def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..., str]:
     def _wrapped(md_text: str, report_date_str: str, image_src: str | None = None, render_mode: str = "email") -> str:
         html = build_html(md_text, report_date_str, image_src=image_src, render_mode=render_mode)
@@ -244,6 +277,7 @@ def validate_equity_curve_from_runtime_state(_md_text: str | None = None, tolera
     print(f"RUNTIME_EQUITY_CURVE_OK | latest_nav={nav:.2f}")
 
 
+_extend_native_dutch_numeric_aliases()
 report_module.latest_report_file = _latest_canonical_report_file
 report_module.latest_reports_by_day = _latest_canonical_reports_by_day
 report_module.parse_report_date = parse_report_date_runtime
