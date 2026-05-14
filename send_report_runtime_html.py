@@ -7,6 +7,7 @@ from typing import Any, Callable
 import send_report as report_module
 from runtime.build_etf_report_state import build_runtime_state
 from runtime.delivery_html_overrides import build_report_html_with_state
+from runtime.nl_dates import localize_english_report_dates
 from runtime.render_etf_report_from_state import cash_eur, invested_eur, total_nav
 
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
@@ -32,9 +33,17 @@ DUTCH_HTML_TOKEN_REPLACEMENTS = {
     "Geopolitical Regime": "Geopolitiek regime",
     "MAIN TAKEAWAY": "KERNCONCLUSIE",
     "Main Takeaway": "Kernconclusie",
+    "Risk-on narrow US mega-cap leadership": "Risk-on met smal Amerikaans mega-capleiderschap",
+    "Risk-on narrow U.S. mega-cap leadership": "Risk-on met smal Amerikaans mega-capleiderschap",
+    "Risk-on smal marktleiderschap": "Risk-on met smal marktleiderschap",
+    "confidence": "vertrouwen",
+    "Mixed / not yet decisive": "Gemengd / nog niet doorslaggevend",
+    "Keep the current allocation disciplined.": "Houd de huidige allocatie gedisciplineerd.",
+    "Keep the current allocation": "Houd de huidige allocatie",
     "This report is for informational and educational purposes only; please see the disclaimer at the end.": "Dit rapport wordt uitsluitend verstrekt voor informatieve en educatieve doeleinden; zie de disclaimer aan het einde.",
     "Equity Curve (EUR)": "Portefeuillecurve (EUR)",
     "Portfolio value (EUR)": "Portefeuillewaarde (EUR)",
+    "Date": "Datum",
 }
 
 DUTCH_MD_MARKERS = [
@@ -64,25 +73,24 @@ ENGLISH_MD_MARKERS = [
 
 
 def _looks_dutch(md_text: str) -> bool:
-    """Detect Dutch from the markdown itself, never from global env.
-
-    Bilingual runs set both EN and NL report paths in the environment. The old
-    implementation treated every report as Dutch whenever the NL env path was
-    present, which localized the English HTML masthead and broke the English
-    render validator. Keep detection local to the report text.
-    """
+    """Detect Dutch from the markdown itself, never from global env."""
     lower = (md_text or "").lower()
     dutch_score = sum(marker in lower for marker in DUTCH_MD_MARKERS)
     english_score = sum(marker in lower for marker in ENGLISH_MD_MARKERS)
     return dutch_score >= 2 and dutch_score > english_score
 
 
+def _localize_dutch_delivery_html(html: str) -> str:
+    for src, dst in DUTCH_HTML_TOKEN_REPLACEMENTS.items():
+        html = html.replace(src, dst)
+    return localize_english_report_dates(html)
+
+
 def _sanitize_client_facing_html(html: str, md_text: str | None = None) -> str:
     for forbidden, replacement in CLIENT_FACING_TOKEN_REPLACEMENTS.items():
         html = html.replace(forbidden, replacement)
     if md_text and _looks_dutch(md_text):
-        for src, dst in DUTCH_HTML_TOKEN_REPLACEMENTS.items():
-            html = html.replace(src, dst)
+        html = _localize_dutch_delivery_html(html)
     return html
 
 
@@ -95,13 +103,7 @@ def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..
 
 
 def validate_nl_email_body_runtime(html_body: str, md_text: str) -> None:
-    """Dutch delivery validator aligned with Dutch masthead localization.
-
-    The base validator only accepted English masthead text. Once the Dutch
-    delivery cover is localized, that becomes too strict and fails a valid Dutch
-    report. Keep the same length/raw-markdown/content checks, but accept both
-    English and Dutch masthead variants.
-    """
+    """Dutch delivery validator aligned with Dutch masthead localization."""
     html_lower = html_body.lower()
     masthead_options = [
         "weekly etf review",
