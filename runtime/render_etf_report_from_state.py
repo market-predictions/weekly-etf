@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from runtime.build_etf_report_state import build_runtime_state
+from runtime.render_etf_report_nl_from_state import render_nl_native
 from runtime.replacement_duel_v2 import replacement_duel_v2_markdown
 
 ETF_NAMES = {
@@ -96,13 +97,6 @@ def report_suffix(report_date: str) -> str:
 
 
 def next_report_paths(output_dir: Path, suffix: str) -> tuple[Path, Path]:
-    """Return matched EN/NL paths for the next same-day version.
-
-    The renderer must not overwrite the unversioned file when same-day versioned
-    reports already exist, because the delivery selector intentionally chooses the
-    highest same-day version. This keeps the newly rendered report and the report
-    selected for delivery aligned.
-    """
     pattern = re.compile(rf"^weekly_analysis_pro_{re.escape(suffix)}(?:_(\d{{2}}))?\.md$")
     existing_versions: list[int] = []
     for path in output_dir.glob(f"weekly_analysis_pro_{suffix}*.md"):
@@ -152,9 +146,7 @@ def omitted_table(state: dict[str, Any]) -> str:
             lane.get("why_now") or lane.get("what_would_change") or lane.get("freshness_note"),
             "Needs better timing, pricing confirmation or portfolio-fit evidence.",
         )
-        lines.append(
-            f"| {lane.get('lane_name')} | {lane.get('primary_etf')} | {rejection} | {needs} |"
-        )
+        lines.append(f"| {lane.get('lane_name')} | {lane.get('primary_etf')} | {rejection} | {needs} |")
     return "\n".join(lines)
 
 
@@ -185,13 +177,6 @@ def _float_or_none(value: Any) -> float | None:
 
 
 def valuation_history_points(state: dict[str, Any], history_path: Path = VALUATION_HISTORY_PATH) -> list[dict[str, Any]]:
-    """Return full equity-curve history plus the current runtime NAV.
-
-    The report renderer must not collapse the equity curve to only start/latest.
-    Historical NAV points are authoritative from `output/etf_valuation_history.csv`;
-    the current run's NAV is then added or replaces the same date. This keeps the
-    Section 7 table and the embedded chart on the same history contract.
-    """
     points_by_date: dict[str, dict[str, Any]] = {}
     if history_path.exists():
         with history_path.open(newline="", encoding="utf-8") as handle:
@@ -219,10 +204,7 @@ def valuation_history_points(state: dict[str, Any], history_path: Path = VALUATI
 
 
 def section7_table(state: dict[str, Any]) -> str:
-    lines = [
-        "| Date | Portfolio value (EUR) | Comment |",
-        "|---|---:|---|",
-    ]
+    lines = ["| Date | Portfolio value (EUR) | Comment |", "|---|---:|---|"]
     points = valuation_history_points(state)
     if not points:
         points = [
@@ -310,13 +292,7 @@ def rotation_plan_table(state: dict[str, Any]) -> str:
     hold = action_tickers(state, lambda action, p: "hold" in action.lower())
     add = action_tickers(state, lambda action, p: "add" in action.lower() or "buy" in str(p.get("action_executed_this_run", "")).lower())
     replace = action_tickers(state, lambda action, p: str(p.get("better_alternative_exists", "")).lower() == "yes" and "review" in action.lower())
-    return "\n".join(
-        [
-            "| Close | Reduce | Hold | Add | Replace |",
-            "|---|---|---|---|---|",
-            f"| {close} | {reduce} | {hold} | {add} | {replace} |",
-        ]
-    )
+    return "\n".join(["| Close | Reduce | Hold | Add | Replace |", "|---|---|---|---|---|", f"| {close} | {reduce} | {hold} | {add} | {replace} |"])
 
 
 def best_opportunities_text(state: dict[str, Any]) -> str:
@@ -324,18 +300,10 @@ def best_opportunities_text(state: dict[str, Any]) -> str:
     challenger_lines = []
     for lane in promoted:
         if lane.get("challenger") is True and len(challenger_lines) < 3:
-            challenger_lines.append(
-                f"- {lane.get('primary_etf')} / {lane.get('alternative_etf')}: {short_text(lane.get('evidence_summary'), lane.get('why_now'), 180)}"
-            )
+            challenger_lines.append(f"- {lane.get('primary_etf')} / {lane.get('alternative_etf')}: {short_text(lane.get('evidence_summary'), lane.get('why_now'), 180)}")
     if not challenger_lines:
         challenger_lines.append("- No challenger is fundable without completed pricing and relative-strength duel evidence.")
-    return "\n".join(
-        [
-            "- SMH remains the leading funded growth exposure, subject to the max-position rule.",
-            *challenger_lines,
-            "- Replacement candidates remain evidence-gated: pricing basis and duel status must be visible before funding.",
-        ]
-    )
+    return "\n".join(["- SMH remains the leading funded growth exposure, subject to the max-position rule.", *challenger_lines, "- Replacement candidates remain evidence-gated: pricing basis and duel status must be visible before funding."])
 
 
 def render_en(state: dict[str, Any]) -> str:
@@ -564,22 +532,7 @@ This report is provided for informational and educational purposes only. It is n
 
 
 def render_nl(state: dict[str, Any]) -> str:
-    nl = render_en(state)
-    replacements = {
-        "This report is for informational and educational purposes only; please see the disclaimer at the end.": "Dit rapport is uitsluitend bedoeld voor informatieve en educatieve doeleinden; zie de disclaimer aan het einde.",
-        "What changed this week": "Wat is er deze week veranderd",
-        "Overall portfolio judgment": "Algemeen portefeuilleoordeel",
-        "Main takeaway": "Belangrijkste conclusie",
-        "Replacement Duel Table v2": "Replacement Duel Table v2",
-        "Current Portfolio Holdings and Cash": "Current Portfolio Holdings and Cash",
-        "The position review separates three questions: is the thesis still valid, is the ETF still the right vehicle, and would fresh cash buy this today at the current weight?": "De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het juiste instrument, en zou vers kapitaal dit vandaag nog kopen op het huidige gewicht?",
-        "This section is the canonical default input for the next run unless the user explicitly overrides it.": "Deze sectie is de canonieke standaardinput voor de volgende run tenzij de gebruiker expliciet iets anders opgeeft.",
-        "This report is provided for informational and educational purposes only.": "Dit rapport wordt uitsluitend verstrekt voor informatieve en educatieve doeleinden.",
-        "It is not investment, legal, tax, or financial advice": "Het is geen beleggingsadvies, juridisch advies, fiscaal advies of financieel advies",
-    }
-    for src, dst in replacements.items():
-        nl = nl.replace(src, dst)
-    return nl
+    return render_nl_native(state)
 
 
 def write_reports(state: dict[str, Any], output_dir: Path) -> tuple[Path, Path]:
