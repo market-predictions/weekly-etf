@@ -34,10 +34,6 @@ DUTCH_MONTH_NUMBERS = {
     "november": "11",
     "december": "12",
 }
-NATIVE_DUTCH_TITLE_MARKERS = [
-    "# Wekelijkse ETF-review",
-    "# Wekelijkse ETF review",
-]
 NATIVE_DUTCH_SECTION_MARKERS = [
     "## 1. Kernsamenvatting",
     "## 2. Portefeuille-acties",
@@ -56,14 +52,7 @@ def _add_aliases(alias_map: dict[str, list[str]], canonical: str, aliases: list[
 
 
 def _extend_native_dutch_numeric_aliases() -> None:
-    """Teach legacy parity validators native Dutch table labels.
-
-    The native Dutch renderer intentionally uses client-facing labels such as
-    `Prijs lokaal` and `Marktwaarde EUR`. The legacy bilingual parity checker
-    canonicalizes section-15/section-7 tables through alias maps in send_report.
-    Extend those maps at runtime so the validator verifies numeric parity instead
-    of forcing English-shaped column labels back into the Dutch report.
-    """
+    """Teach legacy parity validators native Dutch table labels."""
     _add_aliases(report_module.SECTION15_LABEL_ALIASES, "Starting capital (EUR)", ["startkapitaal eur"])
     _add_aliases(report_module.SECTION15_LABEL_ALIASES, "Invested market value (EUR)", ["belegde marktwaarde eur"])
     _add_aliases(report_module.SECTION15_LABEL_ALIASES, "Cash (EUR)", ["cash eur"])
@@ -94,15 +83,25 @@ def _dutch_long_date_to_iso(match: re.Match[str]) -> str:
     return f"{year}-{DUTCH_MONTH_NUMBERS[month.lower()]}-{int(day):02d}"
 
 
-def parse_report_date_runtime(md_text: str) -> str:
-    """Accept ISO report dates and native Dutch long report dates.
+def _title_lines(md_text: str) -> list[str]:
+    return [line for line in md_text.splitlines() if line.startswith("# ")]
 
-    The base delivery validator was built when the Dutch companion was a patched
-    clone of the English markdown, so it required an ISO date in the H1 title.
-    Native Dutch reports now use a client-facing Dutch date in the title, e.g.
-    `Wekelijkse ETF-review Donderdag 14 mei 2026`. This parser keeps ISO dates
-    for audit tables while accepting the native Dutch H1 format for delivery.
+
+def parse_report_date_runtime(md_text: str) -> str:
+    """Parse report date from the H1 title first.
+
+    Native Dutch reports contain historical valuation dates in Section 7. A
+    whole-document date search can accidentally pick the inception date
+    (`2026-03-28`) instead of the report title date. The report title is the
+    authority for cover/date delivery; historical tables remain historical data.
     """
+    for line in _title_lines(md_text):
+        dutch = DUTCH_LONG_DATE_RE.search(line)
+        if dutch:
+            return _dutch_long_date_to_iso(dutch)
+        iso = ISO_DATE_RE.search(line)
+        if iso:
+            return iso.group(0)
     iso = ISO_DATE_RE.search(md_text)
     if iso:
         return iso.group(0)
@@ -113,9 +112,7 @@ def parse_report_date_runtime(md_text: str) -> str:
 
 
 def _has_report_title_date(md_text: str) -> bool:
-    for line in md_text.splitlines():
-        if not line.startswith("# "):
-            continue
+    for line in _title_lines(md_text):
         if ISO_DATE_RE.search(line) or DUTCH_LONG_DATE_RE.search(line):
             return True
     return False
