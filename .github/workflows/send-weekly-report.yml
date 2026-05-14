@@ -134,6 +134,7 @@ jobs:
           python -m runtime.add_etf_position_performance_section --output-dir output
           python -m runtime.apply_nl_localization --output-dir output
           python -m runtime.scrub_nl_client_language --output-dir output
+          python -m runtime.localize_nl_report_dates --output-dir output
 
       - name: Validate ETF equity curve history contract
         env:
