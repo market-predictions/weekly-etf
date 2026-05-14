@@ -56,6 +56,7 @@ EXACT_REPLACEMENTS = {
 }
 
 REGEX_REPLACEMENTS: list[tuple[re.Pattern[str], str | callable]] = [
+    # PDF-audit phrases.
     (re.compile(r"\bCore\s+U\.?S\.?\s+large-cap\s+exposure\b", re.I), "Amerikaanse large-cap kernblootstelling"),
     (re.compile(r"\bCyber\s+spend\b", re.I), "cybersecurity-uitgaven"),
     (re.compile(r"\bDirect\s+replacement\s+duel\b", re.I), "directe vervangingsanalyse"),
@@ -64,6 +65,8 @@ REGEX_REPLACEMENTS: list[tuple[re.Pattern[str], str | callable]] = [
     (re.compile(r"\bHedge\s+ballast\b", re.I), "hedgepositie"),
     (re.compile(r"\bInvestable\s+(?:maar|but)\b", re.I), "Belegbaar, maar"),
     (re.compile(r"\bNeeds\s+supply-chain\b", re.I), "Vereist steun vanuit de toeleveringsketen"),
+    # Ticker-or-link grammar. These fire before the broad verb sweep below and
+    # preserve markdown links.
     (re.compile(rf"({TICKER_OR_LINK})\s+remains\s+the\s+cleanest\s+growth\s+expression\b", re.I), r"\1 blijft de zuiverste groeiblootstelling"),
     (re.compile(rf"({TICKER_OR_LINK})\s+remains\s+the\s+leading\s+funded\s+growth\s+exposure\b", re.I), r"\1 blijft de leidende gefinancierde groeiblootstelling"),
     (re.compile(rf"({TICKER_OR_LINK})\s+remains\s+a\s+hedge\s+review\b", re.I), r"\1 blijft een hedgepositie onder herbeoordeling"),
@@ -72,6 +75,25 @@ REGEX_REPLACEMENTS: list[tuple[re.Pattern[str], str | callable]] = [
     (re.compile(rf"({TICKER_OR_LINK})\s+creates\b", re.I), r"\1 creëert"),
     (re.compile(rf"({TICKER_OR_LINK})\s+must\s+justify\s+itself\b", re.I), r"\1 moet zich bewijzen"),
     (re.compile(rf"({TICKER_OR_LINK})\s+must\s+be\s+proven\b", re.I), r"\1 moet worden bewezen"),
+    # Broader artifact-sentence verb sweep. This prevents back-and-forth on the
+    # same family of residual English verbs when the subject is not a ticker or
+    # when linkification changes the token boundary.
+    (re.compile(r"\bremains\b", re.I), "blijft"),
+    (re.compile(r"\bremain\b", re.I), "blijven"),
+    (re.compile(r"\bneeds\b", re.I), "vereist"),
+    (re.compile(r"\bneed\b", re.I), "vereisen"),
+    (re.compile(r"\brequires\b", re.I), "vereist"),
+    (re.compile(r"\brequire\b", re.I), "vereisen"),
+    (re.compile(r"\boffers\b", re.I), "biedt"),
+    (re.compile(r"\boffer\b", re.I), "bieden"),
+    (re.compile(r"\bcreates\b", re.I), "creëert"),
+    (re.compile(r"\bcreate\b", re.I), "creëren"),
+    (re.compile(r"\btrails\b", re.I), "blijft achter bij"),
+    (re.compile(r"\btrail\b", re.I), "blijven achter bij"),
+    (re.compile(r"\bconfirms\b", re.I), "bevestigt"),
+    (re.compile(r"\bconfirm\b", re.I), "bevestigen"),
+    (re.compile(r"\bsupports\b", re.I), "ondersteunt"),
+    (re.compile(r"\bsupport\b", re.I), "ondersteunen"),
     (re.compile(r"\bUseful\s+only\s+if\b", re.I), "Alleen nuttig als"),
     (re.compile(r"\b(?:Volglijst|Watchlist)\s+only\b", re.I), "Alleen volglijst"),
     (re.compile(r"\bZero\s+allocation\b", re.I), "Nulallocatie"),
@@ -95,6 +117,17 @@ FORBIDDEN_AFTER_SCRUB = [
     "PAVE remains",
     " remains ",
     "] remains",
+    " remains.",
+    " remains,",
+    "remains",
+    " remain ",
+    " needs ",
+    " creates ",
+    " offers ",
+    " requires ",
+    " trails ",
+    " confirms ",
+    " supports ",
     "Useful only if",
     "Volglijst only",
     "Watchlist only",
@@ -116,7 +149,7 @@ def latest_nl_report(output_dir: Path) -> Path:
 
 def scrub_text(text: str) -> str:
     previous = text
-    for _ in range(4):
+    for _ in range(6):
         current = previous
         for source, target in sorted(EXACT_REPLACEMENTS.items(), key=lambda item: len(item[0]), reverse=True):
             current = current.replace(source, target)
