@@ -15,13 +15,7 @@ NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 
 
 def latest_report(output_dir: Path, pattern: re.Pattern[str]) -> Path:
-    """Return the report this run just rendered, not merely the latest file by name.
-
-    The workflow exports MRKT_RPRTS_EXPLICIT_REPORT_PATH and
-    MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL immediately after runtime rendering.
-    Without this, same-day reruns can patch an older/newer filename while the
-    content validator correctly checks the explicit runtime output.
-    """
+    """Return the report this run just rendered, not merely the latest file by name."""
     for env_name in ("MRKT_RPRTS_EXPLICIT_REPORT_PATH", "MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL"):
         raw = os.environ.get(env_name, "").strip()
         if not raw:
@@ -36,6 +30,17 @@ def latest_report(output_dir: Path, pattern: re.Pattern[str]) -> Path:
     if not reports:
         raise RuntimeError(f"No matching report found in {output_dir} for {pattern.pattern}")
     return reports[-1]
+
+
+def is_native_dutch_report(text: str) -> bool:
+    markers = [
+        "# Wekelijkse ETF-review",
+        "## 1. Kernsamenvatting",
+        "## 2. Portefeuille-acties",
+        "## 10. Review huidige posities",
+        "## 15. Huidige posities en cash",
+    ]
+    return sum(marker in text for marker in markers) >= 4
 
 
 def replace_between(text: str, start_heading: str, end_heading: str, replacement_body: str) -> str:
@@ -139,9 +144,6 @@ def action_snapshot_section(state: dict[str, Any]) -> str:
 
 
 def current_position_cards(state: dict[str, Any]) -> str:
-    # This section is rendered by a custom card renderer, not by the generic
-    # markdown-table renderer. Keep the essential fields in the H3 title so the
-    # PDF cannot drop the details.
     parts = [
         "The position review separates thesis quality, ETF implementation quality and the fresh-cash test. Existing holdings are not treated as automatic default holds."
     ]
@@ -235,32 +237,16 @@ def trim_omitted_lanes_table(text: str, max_rows: int = 5) -> str:
 
 def patch_report(path: Path, state: dict[str, Any]) -> None:
     text = path.read_text(encoding="utf-8")
-    text = replace_between(
-        text,
-        "## 2. Portfolio Action Snapshot",
-        "## 3. Regime Dashboard",
-        action_snapshot_section(state),
-    )
-    text = replace_between(
-        text,
-        "## 10. Current Position Review",
-        "## 11. Best New Opportunities",
-        current_position_cards(state),
-    )
-    text = replace_between(
-        text,
-        "## 11. Best New Opportunities",
-        "## 12. Portfolio Rotation Plan",
-        best_new_opportunities(state),
-    )
-    text = replace_between(
-        text,
-        "## 12. Portfolio Rotation Plan",
-        "## 13. Final Action Table",
-        rotation_plan_sections(state),
-    )
+    if is_native_dutch_report(text):
+        print(f"ETF_OUTPUT_CONTRACT_FIX_SKIPPED | report={path.name} | reason=native_dutch_renderer")
+        return
+    text = replace_between(text, "## 2. Portfolio Action Snapshot", "## 3. Regime Dashboard", action_snapshot_section(state))
+    text = replace_between(text, "## 10. Current Position Review", "## 11. Best New Opportunities", current_position_cards(state))
+    text = replace_between(text, "## 11. Best New Opportunities", "## 12. Portfolio Rotation Plan", best_new_opportunities(state))
+    text = replace_between(text, "## 12. Portfolio Rotation Plan", "## 13. Final Action Table", rotation_plan_sections(state))
     text = trim_omitted_lanes_table(text)
     path.write_text(text, encoding="utf-8")
+    print(f"ETF_OUTPUT_CONTRACT_FIX_PATCHED | report={path.name}")
 
 
 def main() -> None:
@@ -274,8 +260,8 @@ def main() -> None:
     else:
         state = build_runtime_state()
     output_dir = Path(args.output_dir)
-    for pattern in (EN_RE, NL_RE):
-        patch_report(latest_report(output_dir, pattern), state)
+    patch_report(latest_report(output_dir, EN_RE), state)
+    patch_report(latest_report(output_dir, NL_RE), state)
     print("ETF_OUTPUT_CONTRACT_FIX_OK")
 
 
