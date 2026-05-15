@@ -105,6 +105,33 @@ MINI_CARD_TRIPLE_RE = re.compile(
     r"</div>\s*){3}",
     re.DOTALL,
 )
+HERO_LAYOUT_GUARD_CSS = """
+<style id="etf-hero-layout-guard">
+  .summary-strip .mini-card {
+    overflow: hidden;
+  }
+  .summary-strip .mini-value {
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: auto;
+  }
+  .summary-strip .mini-card:nth-child(3) .mini-value {
+    font-size: 19px;
+    line-height: 1.22;
+  }
+  @media screen and (max-width: 1100px) {
+    .summary-strip .mini-card:nth-child(3) .mini-value {
+      font-size: 18px;
+      line-height: 1.24;
+    }
+  }
+</style>
+"""
+HIDDEN_EXEC_SUMMARY_MARKER = (
+    "<div class='panel panel-exec-suppressed' style='display:none'>"
+    "Executive Summary / Kernsamenvatting"
+    "</div>"
+)
 
 
 def looks_dutch_markdown(md_text: str | None) -> bool:
@@ -197,6 +224,39 @@ def _apply_global_client_token_replacements(html: str) -> str:
     return html
 
 
+def inject_hero_layout_guard(html: str) -> str:
+    if "etf-hero-layout-guard" in html:
+        return html
+    if "</head>" in html:
+        return html.replace("</head>", HERO_LAYOUT_GUARD_CSS + "\n</head>", 1)
+    return HERO_LAYOUT_GUARD_CSS + html
+
+
+def suppress_duplicate_executive_panel(html: str) -> str:
+    """Suppress the duplicated Section 1 panel below the hero cards.
+
+    The hero card strip is now the client-facing executive summary authority.
+    Leaving the old Section 1 panel visible can create a stray large fallback
+    sentence below the cards, making the Kernconclusie appear to escape its
+    frame. Keep a hidden validation marker so body-level sanity checks still see
+    the Executive Summary / Kernsamenvatting concept.
+    """
+    for marker in ("<div class='panel panel-exec'>", '<div class="panel panel-exec">'):
+        start = html.find(marker)
+        if start == -1:
+            continue
+        next_single = html.find("<div class='panel", start + len(marker))
+        next_double = html.find('<div class="panel', start + len(marker))
+        candidates = [idx for idx in (next_single, next_double) if idx != -1]
+        end = min(candidates) if candidates else html.find("<div class=\"report-stack\"", start)
+        if end == -1:
+            end = html.find("</body>", start)
+        if end == -1:
+            end = len(html)
+        return html[:start] + HIDDEN_EXEC_SUMMARY_MARKER + html[end:]
+    return html
+
+
 def sanitize_client_facing_html(html: str, *, md_text: str | None = None, language: str | None = None) -> str:
     """Remove internal/runtime placeholder language from final client-facing HTML."""
     resolved_language = language or ("nl" if looks_dutch_markdown(md_text) else "en")
@@ -210,6 +270,8 @@ def sanitize_client_facing_html(html: str, *, md_text: str | None = None, langua
     # forbidden-token cleanup so a missing section-1 value cannot reintroduce
     # delivery-blocking placeholders such as `Pending classification`.
     html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
+    html = suppress_duplicate_executive_panel(html)
+    html = inject_hero_layout_guard(html)
     html = _apply_global_client_token_replacements(html)
     html = convert_residual_markdown_links(html)
     return html
