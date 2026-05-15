@@ -19,6 +19,7 @@ from runtime.delivery_html_overrides import build_report_html_with_state
 
 report_module.build_report_html = build_report_html_with_state(report_module.build_report_html, report_module._base)
 
+PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2})?\.md$)")
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
 RAW_MARKDOWN_LINK_RE = re.compile(r"\[[A-Z][A-Z0-9.-]{0,14}\]\(https?://[^\)]+\)")
 FORBIDDEN_CONTENT_TOKENS = [
@@ -171,6 +172,20 @@ def _validate_no_forbidden_content(html: str, report_name: str) -> None:
         raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: raw markdown link found: {match.group(0)}")
 
 
+def _validate_no_duplicate_executive_summary(html: str, report_name: str) -> None:
+    visible_html = re.sub(r"<div class=['\"]panel panel-exec-suppressed['\"][^>]*>.*?</div>", "", html, flags=re.DOTALL)
+    if "panel-exec" in visible_html:
+        raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: duplicate executive summary panel still rendered.")
+    plain = _strip_html(visible_html)
+    for phrase in [
+        "SMH remains the earned leader, but fresh capital and replacement decisions must pass regime, pricing and duel-evidence checks.",
+        "SMH blijft de best onderbouwde kernpositie, maar nieuw kapitaal en vervangingsbeslissingen moeten koersbevestiging, relatieve sterkte en steun vanuit het macrobeeld doorstaan.",
+        "Houd de huidige allocatie gedisciplineerd.",
+    ]:
+        if plain.count(phrase) > 1:
+            raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: duplicated executive takeaway phrase: {phrase[:80]}")
+
+
 def _validate_required_titles(html: str, report_name: str) -> None:
     plain = _strip_html(html)
     missing = [" / ".join(group) for group in STRICT_TITLE_GROUPS if not any(title in plain for title in group)]
@@ -224,6 +239,7 @@ def validate(output_dir: Path) -> None:
         md_text = report_path.read_text(encoding="utf-8")
         html = _render_delivery_html(report_path)
         _validate_no_forbidden_content(html, report_path.name)
+        _validate_no_duplicate_executive_summary(html, report_path.name)
         _validate_required_titles(html, report_path.name)
         _validate_structural_radar(html, report_path.name)
         _validate_strict_tables_and_anchors(html, report_path.name, holdings)
