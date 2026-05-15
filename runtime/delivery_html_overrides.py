@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from html import escape
 from typing import Any, Callable
 
@@ -49,6 +50,9 @@ LABELS = {
         "role": "Role",
         "required_next_action": "Required next action",
         "replace": "Replace",
+        "primary_regime": "Primary regime",
+        "geopolitical_regime": "Geopolitical regime",
+        "main_takeaway": "Main takeaway",
     },
     "nl": {
         "portfolio_action_snapshot": "Portefeuille-acties",
@@ -73,6 +77,9 @@ LABELS = {
         "role": "Rol",
         "required_next_action": "Volgende toets",
         "replace": "Vervangen",
+        "primary_regime": "Primair regime",
+        "geopolitical_regime": "Geopolitiek regime",
+        "main_takeaway": "Kernconclusie",
     },
 }
 
@@ -129,6 +136,64 @@ def _clean(value: Any, language: str = "en") -> str:
 def _compact(value: Any, max_len: int = 90, language: str = "en") -> str:
     raw = _clean(value, language)
     return raw if len(raw) <= max_len else raw[: max_len - 1].rstrip() + "…"
+
+
+def _strip_md(value: str) -> str:
+    value = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", value)
+    value = value.replace("**", "").replace("`", "")
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def _section_one_pairs(md_text: str) -> dict[str, str]:
+    pairs: dict[str, str] = {}
+    in_section = False
+    for raw in md_text.splitlines():
+        stripped = raw.strip()
+        if stripped.startswith("## 1."):
+            in_section = True
+            continue
+        if in_section and stripped.startswith("## 2."):
+            break
+        if not in_section or not stripped.startswith("-") or ":" not in stripped:
+            continue
+        key, value = stripped.lstrip("- ").split(":", 1)
+        norm_key = _strip_md(key).lower()
+        pairs[norm_key] = _strip_md(value)
+    return pairs
+
+
+def _summary_values(md_text: str, language: str) -> dict[str, str]:
+    pairs = _section_one_pairs(md_text)
+    if language == "nl":
+        return {
+            "primary": pairs.get("primair regime") or pairs.get("primary regime") or "",
+            "geo": pairs.get("geopolitiek regime") or pairs.get("geopolitical regime") or "",
+            "takeaway": pairs.get("belangrijkste conclusie") or pairs.get("kernconclusie") or pairs.get("main takeaway") or "",
+        }
+    return {
+        "primary": pairs.get("primary regime") or pairs.get("primair regime") or "",
+        "geo": pairs.get("geopolitical regime") or pairs.get("geopolitiek regime") or "",
+        "takeaway": pairs.get("main takeaway") or pairs.get("belangrijkste conclusie") or pairs.get("kernconclusie") or "",
+    }
+
+
+def _hero_cards_html(values: dict[str, str], language: str) -> str:
+    labels = _labels(language)
+    primary = values.get("primary") or ("Pending classification" if language == "en" else "Nog niet geclassificeerd")
+    geo = values.get("geo") or ("Pending classification" if language == "en" else "Nog niet geclassificeerd")
+    takeaway = values.get("takeaway") or ("Keep the current allocation disciplined." if language == "en" else "Houd de huidige allocatie gedisciplineerd.")
+    return (
+        f"<div class='mini-card'><div class='mini-label'>{escape(labels['primary_regime'])}</div><div class='mini-value'>{escape(primary)}</div></div>"
+        f"<div class='mini-card'><div class='mini-label'>{escape(labels['geopolitical_regime'])}</div><div class='mini-value'>{escape(geo)}</div></div>"
+        f"<div class='mini-card'><div class='mini-label'>{escape(labels['main_takeaway'])}</div><div class='mini-value'>{escape(takeaway)}</div></div>"
+    )
+
+
+def _replace_hero_cards(html: str, md_text: str, language: str) -> str:
+    values = _summary_values(md_text, language)
+    replacement = _hero_cards_html(values, language)
+    pattern = re.compile(r"(?:<div class=['\"]mini-card['\"]>.*?</div>\s*){3}", re.DOTALL)
+    return pattern.sub(replacement, html, count=1)
 
 
 def _nl_action(value: Any) -> str:
@@ -350,6 +415,7 @@ def apply_etf_delivery_html_overrides(html: str, base: Any, md_text: str) -> str
         state = build_runtime_state()
     except Exception:
         return _inject_print_table_pagination_css(html)
+    html = _replace_hero_cards(html, md_text, language)
     html = _replace_panel_by_title(html, ["Portfolio Action Snapshot", "Portefeuille-acties"], _action_snapshot_html(base, state, language))
     html = _replace_panel_by_title(html, ["Current Position Review", "Review huidige posities"], _position_review_html(base, state, language))
     html = _replace_panel_by_title(html, ["Portfolio Rotation Plan", "Rotatieplan portefeuille"], _rotation_plan_html(base, state, language))
