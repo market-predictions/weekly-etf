@@ -105,6 +105,14 @@ MINI_CARD_TRIPLE_RE = re.compile(
     r"</div>\s*){3}",
     re.DOTALL,
 )
+PANEL_EXEC_TO_SNAPSHOT_RE = re.compile(
+    r"<div class=['\"]panel panel-exec['\"]>.*?(?=<div class=['\"]panel panel-snapshot['\"]>)",
+    re.DOTALL,
+)
+PANEL_EXEC_TO_NEXT_PANEL_RE = re.compile(
+    r"<div class=['\"]panel panel-exec['\"]>.*?(?=<div class=['\"]panel\s+(?!panel-exec)[^'\"]*['\"]>)",
+    re.DOTALL,
+)
 HERO_LAYOUT_GUARD_CSS = """
 <style id="etf-hero-layout-guard">
   .summary-strip .mini-card {
@@ -118,6 +126,18 @@ HERO_LAYOUT_GUARD_CSS = """
   .summary-strip .mini-card:nth-child(3) .mini-value {
     font-size: 19px;
     line-height: 1.22;
+  }
+  .panel.panel-exec {
+    display: none !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+  .panel.panel-exec * {
+    display: none !important;
   }
   @media screen and (max-width: 1100px) {
     .summary-strip .mini-card:nth-child(3) .mini-value {
@@ -233,27 +253,20 @@ def inject_hero_layout_guard(html: str) -> str:
 
 
 def suppress_duplicate_executive_panel(html: str) -> str:
-    """Suppress the duplicated Section 1 panel below the hero cards.
+    """Remove the duplicate Section 1 HTML panel below the hero cards.
 
-    The hero card strip is now the client-facing executive summary authority.
-    Leaving the old Section 1 panel visible can create a stray large fallback
-    sentence below the cards, making the Kernconclusie appear to escape its
-    frame. Keep a hidden validation marker so body-level sanity checks still see
-    the Executive Summary / Kernsamenvatting concept.
+    The base renderer emits Section 1 twice: once as hero cards and once as a
+    regular `panel-exec` in the client grid. Once the hero cards are populated
+    from markdown, that second panel is duplicate visual content. Use regexes
+    anchored to the next sibling panel so nested divs inside the executive panel
+    cannot truncate the removal.
     """
-    for marker in ("<div class='panel panel-exec'>", '<div class="panel panel-exec">'):
-        start = html.find(marker)
-        if start == -1:
-            continue
-        next_single = html.find("<div class='panel", start + len(marker))
-        next_double = html.find('<div class="panel', start + len(marker))
-        candidates = [idx for idx in (next_single, next_double) if idx != -1]
-        end = min(candidates) if candidates else html.find("<div class=\"report-stack\"", start)
-        if end == -1:
-            end = html.find("</body>", start)
-        if end == -1:
-            end = len(html)
-        return html[:start] + HIDDEN_EXEC_SUMMARY_MARKER + html[end:]
+    updated, count = PANEL_EXEC_TO_SNAPSHOT_RE.subn(HIDDEN_EXEC_SUMMARY_MARKER, html, count=1)
+    if count:
+        return updated
+    updated, count = PANEL_EXEC_TO_NEXT_PANEL_RE.subn(HIDDEN_EXEC_SUMMARY_MARKER, html, count=1)
+    if count:
+        return updated
     return html
 
 
@@ -266,9 +279,8 @@ def sanitize_client_facing_html(html: str, *, md_text: str | None = None, langua
     if resolved_language == "nl":
         html = localize_dutch_delivery_html(html)
     # Re-apply hero cards after generic localization to preserve exact section-1
-    # values and keep the executive summary link-free. Then re-apply global
-    # forbidden-token cleanup so a missing section-1 value cannot reintroduce
-    # delivery-blocking placeholders such as `Pending classification`.
+    # values and keep the executive summary link-free. Then remove the duplicate
+    # Section 1 panel before layout CSS is injected.
     html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
     html = suppress_duplicate_executive_panel(html)
     html = inject_hero_layout_guard(html)
