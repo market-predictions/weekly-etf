@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import re
+from html import escape
+
 from runtime.nl_dates import localize_english_report_dates
 
 CLIENT_FACING_TOKEN_REPLACEMENTS = {
@@ -93,6 +96,8 @@ DUTCH_DELIVERY_FORBIDDEN_TOKENS = [
     "Portfolio value (EUR)",
 ]
 
+RAW_MARKDOWN_LINK_RE = re.compile(r"\[([A-Z][A-Z0-9.-]{0,14})\]\((https?://[^\s\)]+)\)")
+
 
 def looks_dutch_markdown(md_text: str | None) -> bool:
     lower = (md_text or "").lower()
@@ -107,6 +112,25 @@ def localize_dutch_delivery_html(html: str) -> str:
     return localize_english_report_dates(html)
 
 
+def convert_residual_markdown_links(html: str) -> str:
+    """Convert markdown links that survived custom HTML rendering into anchors.
+
+    Report-wide ticker linkification intentionally runs on markdown before the
+    delivery render. Most markdown links are converted by the markdown renderer,
+    but a few strict-layout/custom rendered blocks escape table cell contents and
+    can therefore leave raw `[SMH](https://...)` text inside the final HTML. That
+    is not a report-content problem; it is a final-render contract issue. This
+    safety pass turns any remaining raw markdown link into a real HTML anchor so
+    the PDF/email remains clickable and the delivery validator can stay strict.
+    """
+    def repl(match: re.Match[str]) -> str:
+        label = escape(match.group(1))
+        url = escape(match.group(2), quote=True)
+        return f'<a href="{url}" target="_blank" rel="noopener noreferrer">{label}</a>'
+
+    return RAW_MARKDOWN_LINK_RE.sub(repl, html)
+
+
 def sanitize_client_facing_html(html: str, *, md_text: str | None = None, language: str | None = None) -> str:
     """Remove internal/runtime placeholder language from final client-facing HTML.
 
@@ -116,8 +140,10 @@ def sanitize_client_facing_html(html: str, *, md_text: str | None = None, langua
     """
     for forbidden, replacement in CLIENT_FACING_TOKEN_REPLACEMENTS.items():
         html = html.replace(forbidden, replacement)
+    html = convert_residual_markdown_links(html)
     if language == "nl" or (language is None and looks_dutch_markdown(md_text)):
         html = localize_dutch_delivery_html(html)
+    html = convert_residual_markdown_links(html)
     return html
 
 
