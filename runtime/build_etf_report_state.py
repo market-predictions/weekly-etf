@@ -79,10 +79,7 @@ def latest_lane_file(directory: Path, pattern: str) -> Path:
         if _lane_artifact_has_etf_contract(payload):
             return path
         rejected.append(path.name)
-    raise RuntimeError(
-        "No ETF lane artifact satisfies the runtime ETF contract; rejected: "
-        + ", ".join(rejected)
-    )
+    raise RuntimeError("No ETF lane artifact satisfies the runtime ETF contract; rejected: " + ", ".join(rejected))
 
 
 def latest_macro_policy_pack() -> Path | None:
@@ -134,73 +131,69 @@ def _index_by_ticker(rows: list[dict[str, Any]], ticker_key: str = "ticker") -> 
     return indexed
 
 
+def _index_price_results(pricing_audit: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    indexed: dict[str, dict[str, Any]] = {}
+    for row in pricing_audit.get("price_results", []) or pricing_audit.get("prices", []) or []:
+        symbol = _ticker(row.get("symbol"))
+        if symbol:
+            indexed[symbol] = row
+    return indexed
+
+
 def _semantic_defaults(ticker: str) -> dict[str, Any]:
     defaults = {
-        "SPY": {
-            "suggested_action": "Hold under review",
-            "conviction_tier": "Tier 2",
-            "portfolio_role": "Core beta",
-            "better_alternative_exists": "Yes",
-            "short_reason": "Useful core beta, but overlap with SMH limits diversification value.",
-            "required_next_action": "Review overlap versus SMH and compare with QUAL / IEFA.",
-            "fresh_cash_test": "Smaller / under review",
-        },
-        "SMH": {
-            "suggested_action": "Hold / preferred add candidate",
-            "conviction_tier": "Tier 1",
-            "portfolio_role": "Growth engine",
-            "better_alternative_exists": "No",
-            "short_reason": "Best earned position; add only if the 25% max-position rule leaves room.",
-            "required_next_action": "Respect max-position discipline before any fresh add.",
-            "fresh_cash_test": "Yes, but size-limited",
-        },
-        "PPA": {
-            "suggested_action": "Hold under review",
-            "conviction_tier": "Tier 3",
-            "portfolio_role": "Resilience",
-            "better_alternative_exists": "Yes",
-            "short_reason": "Defense thesis remains valid, but ITA must be compared before new capital.",
-            "required_next_action": "Complete PPA-versus-ITA replacement duel.",
-            "fresh_cash_test": "No / reduce unless duel improves",
-        },
-        "PAVE": {
-            "suggested_action": "Hold under review",
-            "conviction_tier": "Tier 2",
-            "portfolio_role": "Real-asset capex",
-            "better_alternative_exists": "Yes",
-            "short_reason": "Infrastructure thesis remains attractive, but GRID is the clean challenger.",
-            "required_next_action": "Complete PAVE-versus-GRID implementation duel.",
-            "fresh_cash_test": "Smaller / under review",
-        },
-        "URNM": {
-            "suggested_action": "Hold",
-            "conviction_tier": "Tier 2",
-            "portfolio_role": "Strategic energy",
-            "better_alternative_exists": "No",
-            "short_reason": "Strategic nuclear exposure remains valid, but it is not the first use of fresh cash.",
-            "required_next_action": "Hold unless relative strength confirms add status.",
-            "fresh_cash_test": "Hold / wait for confirmation",
-        },
-        "GLD": {
-            "suggested_action": "Hold under review",
-            "conviction_tier": "Tier 3",
-            "portfolio_role": "Hedge ballast",
-            "better_alternative_exists": "Yes",
-            "short_reason": "Hedge role is not automatic after drawdown; ballast behavior must be proven.",
-            "required_next_action": "Run hedge-validity test versus GSG / BIL.",
-            "fresh_cash_test": "No / hedge review",
-        },
+        "SPY": {"suggested_action": "Hold under review", "conviction_tier": "Tier 2", "portfolio_role": "Core beta", "better_alternative_exists": "Yes", "short_reason": "Useful core beta, but overlap with SMH limits diversification value.", "required_next_action": "Review overlap versus SMH and compare with QUAL / IEFA.", "fresh_cash_test": "Smaller / under review"},
+        "SMH": {"suggested_action": "Hold / preferred add candidate", "conviction_tier": "Tier 1", "portfolio_role": "Growth engine", "better_alternative_exists": "No", "short_reason": "Best earned position; add only if the 25% max-position rule leaves room.", "required_next_action": "Respect max-position discipline before any fresh add.", "fresh_cash_test": "Yes, but size-limited"},
+        "PPA": {"suggested_action": "Hold under review", "conviction_tier": "Tier 3", "portfolio_role": "Resilience", "better_alternative_exists": "Yes", "short_reason": "Defense thesis remains valid, but ITA must be compared before new capital.", "required_next_action": "Complete PPA-versus-ITA replacement duel.", "fresh_cash_test": "No / reduce unless duel improves"},
+        "PAVE": {"suggested_action": "Hold under review", "conviction_tier": "Tier 2", "portfolio_role": "Real-asset capex", "better_alternative_exists": "Yes", "short_reason": "Infrastructure thesis remains attractive, but GRID is the clean challenger.", "required_next_action": "Complete PAVE-versus-GRID implementation duel.", "fresh_cash_test": "Smaller / under review"},
+        "URNM": {"suggested_action": "Hold", "conviction_tier": "Tier 2", "portfolio_role": "Strategic energy", "better_alternative_exists": "No", "short_reason": "Strategic nuclear exposure remains valid, but it is not the first use of fresh cash.", "required_next_action": "Hold unless relative strength confirms add status.", "fresh_cash_test": "Hold / wait for confirmation"},
+        "GLD": {"suggested_action": "Hold under review", "conviction_tier": "Tier 3", "portfolio_role": "Hedge ballast", "better_alternative_exists": "Yes", "short_reason": "Hedge role is not automatic after drawdown; ballast behavior must be proven.", "required_next_action": "Run hedge-validity test versus GSG / BIL.", "fresh_cash_test": "No / hedge review"},
     }
     return defaults.get(ticker, {})
 
 
-def enrich_positions(
-    pricing_holdings: list[dict[str, Any]],
-    portfolio_state: dict[str, Any],
-    recommendation_scorecard: list[dict[str, str]],
-) -> list[dict[str, Any]]:
+def _revalue_holding_from_price(holding: dict[str, Any], price_row: dict[str, Any] | None, pricing_audit: dict[str, Any]) -> dict[str, Any]:
+    ticker = _ticker(holding.get("ticker"))
+    if not ticker or not price_row:
+        return holding
+    price = _to_float(price_row.get("price"))
+    if price is None:
+        return holding
+    status = str(price_row.get("status") or "")
+    if status not in {"fresh_close", "fresh_fallback_source"}:
+        return holding
+
+    shares = _to_float(holding.get("shares"))
+    if shares is None:
+        return holding
+    currency = str(price_row.get("currency") or holding.get("currency") or "USD")
+    market_value_local = round(shares * price, 2)
+    fx = _fx_rate(pricing_audit)
+    if currency.upper() == "EUR":
+        market_value_eur = market_value_local
+    elif fx:
+        market_value_eur = round(market_value_local / fx, 2)
+    else:
+        market_value_eur = _to_float(holding.get("previous_market_value_eur"))
+
+    holding = dict(holding)
+    holding["currency"] = currency
+    holding["current_price_local"] = price
+    holding["previous_price_local"] = price
+    holding["market_value_local"] = market_value_local
+    holding["previous_market_value_local"] = market_value_local
+    holding["market_value_eur"] = market_value_eur
+    holding["previous_market_value_eur"] = market_value_eur
+    holding["previous_price_date"] = price_row.get("returned_close_date")
+    holding["pricing_source"] = price_row.get("source")
+    holding["pricing_status"] = price_row.get("status")
+    return holding
+
+
+def enrich_positions(pricing_holdings: list[dict[str, Any]], portfolio_state: dict[str, Any], recommendation_scorecard: list[dict[str, str]], pricing_audit: dict[str, Any]) -> list[dict[str, Any]]:
     state_by_ticker = _index_by_ticker(portfolio_state.get("positions", []) or [])
     score_by_ticker = _index_by_ticker(recommendation_scorecard)
+    price_by_ticker = _index_price_results(pricing_audit)
 
     enriched: list[dict[str, Any]] = []
     for holding in pricing_holdings:
@@ -213,36 +206,28 @@ def enrich_positions(
         merged.update(score_by_ticker.get(ticker, {}))
         merged.update(holding)
         merged["ticker"] = ticker
+        merged = _revalue_holding_from_price(merged, price_by_ticker.get(ticker), pricing_audit)
 
-        merged["current_price_local"] = _to_float(holding.get("previous_price_local")) or _to_float(merged.get("current_price_local"))
-        merged["market_value_local"] = _to_float(holding.get("previous_market_value_local")) or _to_float(merged.get("market_value_local"))
-        merged["market_value_eur"] = _to_float(holding.get("previous_market_value_eur")) or _to_float(merged.get("market_value_eur"))
-        merged["current_weight_pct"] = _to_float(holding.get("previous_weight_pct")) or _to_float(merged.get("current_weight_pct"))
+        merged["current_price_local"] = _to_float(merged.get("current_price_local")) or _to_float(merged.get("previous_price_local"))
+        merged["market_value_local"] = _to_float(merged.get("market_value_local")) or _to_float(merged.get("previous_market_value_local"))
+        merged["market_value_eur"] = _to_float(merged.get("market_value_eur")) or _to_float(merged.get("previous_market_value_eur"))
         merged["continuity_current_price_local"] = merged.get("current_price_local")
-
         merged["previous_price_local"] = merged.get("current_price_local")
         merged["previous_market_value_local"] = merged.get("market_value_local")
         merged["previous_market_value_eur"] = merged.get("market_value_eur")
-        merged["previous_weight_pct"] = _to_float(merged.get("current_weight_pct")) or _to_float(merged.get("previous_weight_pct"))
 
-        for key in (
-            "shares",
-            "total_score",
-            "thesis_score",
-            "implementation_score",
-            "pnl_pct",
-            "avg_entry_local",
-            "shares_delta_this_run",
-            "weight_change_pct",
-            "target_weight_pct",
-            "weight_inherited_pct",
-        ):
+        for key in ("shares", "total_score", "thesis_score", "implementation_score", "pnl_pct", "avg_entry_local", "shares_delta_this_run", "weight_change_pct", "target_weight_pct", "weight_inherited_pct"):
             numeric = _to_float(merged.get(key))
             if numeric is not None:
                 merged[key] = numeric
 
         enriched.append(merged)
 
+    nav_base = sum(float(h.get("previous_market_value_eur", 0.0) or 0.0) for h in enriched) + float(portfolio_state.get("cash_eur", 0.0) or 0.0)
+    if nav_base > 0:
+        for item in enriched:
+            item["previous_weight_pct"] = round(float(item.get("previous_market_value_eur") or 0.0) / nav_base * 100.0, 2)
+            item["current_weight_pct"] = item["previous_weight_pct"]
     return enriched
 
 
@@ -256,104 +241,45 @@ def build_runtime_state() -> dict[str, Any]:
     macro_policy_pack = load_json_if_exists(sources.macro_policy_pack)
 
     pricing_holdings = pricing_audit.get("holdings", [])
-    holdings = enrich_positions(pricing_holdings, portfolio_state, recommendation_scorecard)
+    holdings = enrich_positions(pricing_holdings, portfolio_state, recommendation_scorecard, pricing_audit)
     prices = pricing_audit.get("prices", [])
     fx_basis = pricing_audit.get("fx_basis") or {}
 
     duel_candidates = []
-    challenger_map = {
-        "PPA": ["ITA"],
-        "PAVE": ["GRID"],
-        "GLD": ["GSG", "BIL"],
-        "SPY": ["QUAL", "IEFA"],
-    }
-
+    challenger_map = {"PPA": ["ITA"], "PAVE": ["GRID"], "GLD": ["GSG", "BIL"], "SPY": ["QUAL", "IEFA"]}
     for holding in holdings:
         ticker = holding.get("ticker")
-        challengers = challenger_map.get(ticker, [])
-        for challenger in challengers:
+        for challenger in challenger_map.get(ticker, []):
             challenger_price = next((p for p in prices if p.get("symbol") == challenger), None)
-            duel_candidates.append(
-                {
-                    "current_holding": ticker,
-                    "challenger": challenger,
-                    "challenger_price": challenger_price,
-                    "status": (
-                        "priced_but_duel_incomplete"
-                        if challenger_price
-                        else "not_fundable_pricing_missing"
-                    ),
-                }
-            )
+            duel_candidates.append({"current_holding": ticker, "challenger": challenger, "challenger_price": challenger_price, "status": "priced_but_duel_incomplete" if challenger_price else "not_fundable_pricing_missing"})
 
-    total_portfolio_value_eur = sum(
-        float(h.get("previous_market_value_eur", 0.0) or 0.0)
-        for h in holdings
-    ) + float(portfolio_state.get("cash_eur", 0.0) or 0.0)
+    total_portfolio_value_eur = sum(float(h.get("previous_market_value_eur", 0.0) or 0.0) for h in holdings) + float(portfolio_state.get("cash_eur", 0.0) or 0.0)
+    resolved_report_date = lane_assessment.get("report_date") or pricing_audit.get("requested_close_date") or datetime.utcnow().strftime("%Y-%m-%d")
 
-    resolved_report_date = (
-        lane_assessment.get("report_date")
-        or pricing_audit.get("requested_close_date")
-        or datetime.utcnow().strftime("%Y-%m-%d")
-    )
-
-    runtime_state = {
+    return {
         "generated_at_utc": datetime.utcnow().isoformat() + "Z",
         "report_date": resolved_report_date,
         "requested_close_date": pricing_audit.get("requested_close_date"),
-        "source_files": {
-            "portfolio_state": str(sources.portfolio_state),
-            "pricing_audit": str(sources.pricing_audit),
-            "lane_assessment": str(sources.lane_assessment),
-            "recommendation_scorecard": str(sources.recommendation_scorecard),
-            "macro_policy_pack": str(sources.macro_policy_pack) if sources.macro_policy_pack else None,
-        },
-        "portfolio": {
-            "cash_eur": portfolio_state.get("cash_eur"),
-            "total_portfolio_value_eur": round(total_portfolio_value_eur, 2),
-            "base_currency": "EUR",
-        },
-        "fx_basis": {
-            "pair": fx_basis.get("pair", "EUR/USD"),
-            "rate": _fx_rate(pricing_audit),
-            "requested_date": fx_basis.get("requested_date"),
-            "returned_date": fx_basis.get("returned_date"),
-            "source": fx_basis.get("source"),
-            "status": fx_basis.get("status"),
-        },
+        "source_files": {"portfolio_state": str(sources.portfolio_state), "pricing_audit": str(sources.pricing_audit), "lane_assessment": str(sources.lane_assessment), "recommendation_scorecard": str(sources.recommendation_scorecard), "macro_policy_pack": str(sources.macro_policy_pack) if sources.macro_policy_pack else None},
+        "portfolio": {"cash_eur": portfolio_state.get("cash_eur"), "total_portfolio_value_eur": round(total_portfolio_value_eur, 2), "base_currency": "EUR"},
+        "fx_basis": {"pair": fx_basis.get("pair", "EUR/USD"), "rate": _fx_rate(pricing_audit), "requested_date": fx_basis.get("requested_date"), "returned_date": fx_basis.get("returned_date"), "source": fx_basis.get("source"), "status": fx_basis.get("status")},
         "positions": holdings,
         "pricing": prices,
         "lane_assessment": lane_assessment,
         "macro_policy_pack": macro_policy_pack,
         "recommendation_scorecard": recommendation_scorecard,
         "replacement_duels": duel_candidates,
-        "validation_flags": {
-            "pricing_audit_valid": bool(pricing_audit.get("holdings")),
-            "lane_assessment_present": bool(lane_assessment.get("assessed_lanes")),
-            "lane_assessment_source": str(sources.lane_assessment),
-            "lane_assessment_has_primary_etfs": _lane_artifact_has_etf_contract(lane_assessment),
-            "macro_policy_pack_present": bool(macro_policy_pack.get("regime")),
-            "scorecard_present": len(recommendation_scorecard) > 0,
-            "positions_enriched": any(p.get("short_reason") for p in holdings),
-            "fx_rate_present": _fx_rate(pricing_audit) is not None,
-        },
+        "validation_flags": {"pricing_audit_valid": bool(pricing_audit.get("holdings")), "pricing_revalued_from_price_results": True, "lane_assessment_present": bool(lane_assessment.get("assessed_lanes")), "lane_assessment_source": str(sources.lane_assessment), "lane_assessment_has_primary_etfs": _lane_artifact_has_etf_contract(lane_assessment), "macro_policy_pack_present": bool(macro_policy_pack.get("regime")), "scorecard_present": len(recommendation_scorecard) > 0, "positions_enriched": any(p.get("short_reason") for p in holdings), "fx_rate_present": _fx_rate(pricing_audit) is not None},
     }
-
-    return runtime_state
 
 
 def main() -> None:
     runtime_state = build_runtime_state()
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
-
     report_date = str(runtime_state.get("report_date") or "unknown").replace("-", "")
     out_path = RUNTIME_DIR / f"etf_report_state_{report_date}.json"
-
     out_path.write_text(json.dumps(runtime_state, indent=2), encoding="utf-8")
-
-    print(
-        f"ETF_RUNTIME_STATE_OK | report_date={runtime_state.get('report_date')} | output={out_path} | lane_source={runtime_state.get('source_files', {}).get('lane_assessment')} | macro_source={runtime_state.get('source_files', {}).get('macro_policy_pack')}"
-    )
+    print(f"ETF_RUNTIME_STATE_OK | report_date={runtime_state.get('report_date')} | output={out_path} | lane_source={runtime_state.get('source_files', {}).get('lane_assessment')} | macro_source={runtime_state.get('source_files', {}).get('macro_policy_pack')}")
 
 
 if __name__ == "__main__":
