@@ -128,20 +128,6 @@ HERO_LAYOUT_GUARD_CSS = """
     font-size: 19px;
     line-height: 1.22;
   }
-  .panel.panel-exec,
-  .panel-exec {
-    display: none !important;
-    height: 0 !important;
-    max-height: 0 !important;
-    overflow: hidden !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-  }
-  .panel.panel-exec *,
-  .panel-exec * {
-    display: none !important;
-  }
   @media screen and (max-width: 1100px) {
     .summary-strip .mini-card:nth-child(3) .mini-value {
       font-size: 18px;
@@ -151,7 +137,7 @@ HERO_LAYOUT_GUARD_CSS = """
 </style>
 """
 HIDDEN_EXEC_SUMMARY_MARKER = (
-    "<div class='panel panel-exec-suppressed' style='display:none'>"
+    "<div class='exec-summary-suppressed' style='display:none'>"
     "Executive Summary / Kernsamenvatting"
     "</div>"
 )
