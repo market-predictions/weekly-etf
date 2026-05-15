@@ -1,0 +1,297 @@
+{
+  "carried_forward_holdings_count": 0,
+  "coverage_count_pct": 100.0,
+  "decision": "update_covered_holdings_carry_unresolved",
+  "fresh_holdings_count": 6,
+  "fx_basis": {
+    "error": null,
+    "metadata": {},
+    "pair": "EUR/USD",
+    "rate": 1.16698,
+    "requested_date": "2026-05-14",
+    "returned_date": "2026-05-14",
+    "source": "twelve_data",
+    "status": "fresh_close"
+  },
+  "holdings": [
+    {
+      "currency": "USD",
+      "previous_market_value_eur": 25178.2,
+      "previous_market_value_local": 29440.87,
+      "previous_price_local": 718.07,
+      "previous_weight_pct": 24.32,
+      "shares": 41.0,
+      "ticker": "SPY"
+    },
+    {
+      "currency": "USD",
+      "previous_market_value_eur": 25566.83,
+      "previous_market_value_local": 29895.3,
+      "previous_price_local": 506.7,
+      "previous_weight_pct": 24.69,
+      "shares": 59.0,
+      "ticker": "SMH"
+    },
+    {
+      "currency": "USD",
+      "previous_market_value_eur": 15576.67,
+      "previous_market_value_local": 18213.8,
+      "previous_price_local": 165.58,
+      "previous_weight_pct": 15.04,
+      "shares": 110.0,
+      "ticker": "PPA"
+    },
+    {
+      "currency": "USD",
+      "previous_market_value_eur": 14966.19,
+      "previous_market_value_local": 17499.97,
+      "previous_price_local": 56.27,
+      "previous_weight_pct": 14.45,
+      "shares": 311.0,
+      "ticker": "PAVE"
+    },
+    {
+      "currency": "USD",
+      "previous_market_value_eur": 9817.18,
+      "previous_market_value_local": 11479.23,
+      "previous_price_local": 67.13,
+      "previous_weight_pct": 9.48,
+      "shares": 171.0,
+      "ticker": "URNM"
+    },
+    {
+      "currency": "USD",
+      "previous_market_value_eur": 10495.36,
+      "previous_market_value_local": 12272.22,
+      "previous_price_local": 423.18,
+      "previous_weight_pct": 10.14,
+      "shares": 29.0,
+      "ticker": "GLD"
+    }
+  ],
+  "holdings_count": 6,
+  "invested_weight_coverage_pct": 98.12,
+  "price_results": [
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "ssga_gld"
+      },
+      "price": 427.2099914550781,
+      "requested_close_date": "2026-05-14",
+      "returned_close_date": "2026-05-14",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:ssga_gld",
+      "status": "fresh_close",
+      "symbol": "GLD"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "globalx_pave"
+      },
+      "price": 56.83000183105469,
+      "requested_close_date": "2026-05-14",
+      "returned_close_date": "2026-05-14",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:globalx_pave",
+      "status": "fresh_close",
+      "symbol": "PAVE"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "invesco_ppa"
+      },
+      "price": 169.52000427246094,
+      "requested_close_date": "2026-05-14",
+      "returned_close_date": "2026-05-14",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:invesco_ppa",
+      "status": "fresh_close",
+      "symbol": "PPA"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "vaneck_smh"
+      },
+      "price": 578.3400268554688,
+      "requested_close_date": "2026-05-14",
+      "returned_close_date": "2026-05-14",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:vaneck_smh",
+      "status": "fresh_close",
+      "symbol": "SMH"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "ssga_spy"
+      },
+      "price": 748.1699829101562,
+      "requested_close_date": "2026-05-14",
+      "returned_close_date": "2026-05-14",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:ssga_spy",
+      "status": "fresh_close",
+      "symbol": "SPY"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "sprott_urnm"
+      },
+      "price": 62.5,
+      "requested_close_date": "2026-05-14",
+      "returned_close_date": "2026-05-14",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:sprott_urnm",
+      "status": "fresh_close",
+      "symbol": "URNM"
+    }
+  ],
+  "prices": [
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "ssga_gld"
+      },
+      "price": 427.2099914550781,
+      "requested_close_date": "2026-05-14",
+      "returned_close_date": "2026-05-14",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:ssga_gld",
+      "status": "fresh_close",
+      "symbol": "GLD"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "globalx_pave"
+      },
+      "price": 56.83000183105469,
+      "requested_close_date": "2026-05-14",
+      "returned_close_date": "2026-05-14",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:globalx_pave",
+      "status": "fresh_close",
+      "symbol": "PAVE"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "invesco_ppa"
+      },
+      "price": 169.52000427246094,
+      "requested_close_date": "2026-05-14",
+      "returned_close_date": "2026-05-14",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:invesco_ppa",
+      "status": "fresh_close",
+      "symbol": "PPA"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "vaneck_smh"
+      },
+      "price": 578.3400268554688,
+      "requested_close_date": "2026-05-14",
+      "returned_close_date": "2026-05-14",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:vaneck_smh",
+      "status": "fresh_close",
+      "symbol": "SMH"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "ssga_spy"
+      },
+      "price": 748.1699829101562,
+      "requested_close_date": "2026-05-14",
+      "returned_close_date": "2026-05-14",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:ssga_spy",
+      "status": "fresh_close",
+      "symbol": "SPY"
+    },
+    {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "sprott_urnm"
+      },
+      "price": 62.5,
+      "requested_close_date": "2026-05-14",
+      "returned_close_date": "2026-05-14",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:sprott_urnm",
+      "status": "fresh_close",
+      "symbol": "URNM"
+    }
+  ],
+  "requested_close_date": "2026-05-14",
+  "run_date": "2026-05-15",
+  "unresolved_tickers": []
+}
