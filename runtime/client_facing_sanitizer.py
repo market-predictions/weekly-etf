@@ -27,6 +27,7 @@ DUTCH_HTML_TOKEN_REPLACEMENTS = {
     "Main Takeaway": "Kernconclusie",
     "Risk-on narrow US mega-cap leadership": "Risk-on met smal Amerikaans mega-capleiderschap",
     "Risk-on narrow U.S. mega-cap leadership": "Risk-on met smal Amerikaans mega-capleiderschap",
+    "Risk-on narrow leadership": "Risk-on met smal marktleiderschap",
     "Risk-on smal marktleiderschap": "Risk-on met smal marktleiderschap",
     "confidence": "vertrouwen",
     "Mixed / not yet decisive": "Gemengd / nog niet doorslaggevend",
@@ -97,6 +98,13 @@ DUTCH_DELIVERY_FORBIDDEN_TOKENS = [
 ]
 
 RAW_MARKDOWN_LINK_RE = re.compile(r"\[([A-Z][A-Z0-9.-]{0,14})\]\((https?://[^\s\)]+)\)")
+MINI_CARD_TRIPLE_RE = re.compile(
+    r"(?:<div class=['\"]mini-card['\"]>\s*"
+    r"<div class=['\"]mini-label['\"]>.*?</div>\s*"
+    r"<div class=['\"]mini-value['\"]>.*?</div>\s*"
+    r"</div>\s*){3}",
+    re.DOTALL,
+)
 
 
 def looks_dutch_markdown(md_text: str | None) -> bool:
@@ -106,6 +114,67 @@ def looks_dutch_markdown(md_text: str | None) -> bool:
     return dutch_score >= 2 and dutch_score > english_score
 
 
+def _strip_md(value: str) -> str:
+    value = RAW_MARKDOWN_LINK_RE.sub(lambda m: m.group(1), value)
+    value = value.replace("**", "").replace("`", "")
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def _section_one_pairs(md_text: str | None) -> dict[str, str]:
+    pairs: dict[str, str] = {}
+    in_section = False
+    for raw in (md_text or "").splitlines():
+        stripped = raw.strip()
+        if stripped.startswith("## 1."):
+            in_section = True
+            continue
+        if in_section and stripped.startswith("## 2."):
+            break
+        if not in_section or not stripped.startswith("-") or ":" not in stripped:
+            continue
+        key, value = stripped.lstrip("- ").split(":", 1)
+        pairs[_strip_md(key).lower()] = _strip_md(value)
+    return pairs
+
+
+def _summary_values(md_text: str | None, language: str) -> dict[str, str]:
+    pairs = _section_one_pairs(md_text)
+    if language == "nl":
+        return {
+            "primary": pairs.get("primair regime") or pairs.get("primary regime") or "",
+            "geo": pairs.get("geopolitiek regime") or pairs.get("geopolitical regime") or "",
+            "takeaway": pairs.get("belangrijkste conclusie") or pairs.get("kernconclusie") or pairs.get("main takeaway") or "",
+        }
+    return {
+        "primary": pairs.get("primary regime") or pairs.get("primair regime") or "",
+        "geo": pairs.get("geopolitical regime") or pairs.get("geopolitiek regime") or "",
+        "takeaway": pairs.get("main takeaway") or pairs.get("belangrijkste conclusie") or pairs.get("kernconclusie") or "",
+    }
+
+
+def _hero_cards_html(md_text: str | None, language: str) -> str:
+    values = _summary_values(md_text, language)
+    if language == "nl":
+        labels = ("Primair regime", "Geopolitiek regime", "Kernconclusie")
+        fallbacks = ("Nog niet geclassificeerd", "Nog niet geclassificeerd", "Houd de huidige allocatie gedisciplineerd.")
+    else:
+        labels = ("Primary regime", "Geopolitical regime", "Main takeaway")
+        fallbacks = ("Pending classification", "Pending classification", "Keep the current allocation disciplined.")
+    primary = values.get("primary") or fallbacks[0]
+    geo = values.get("geo") or fallbacks[1]
+    takeaway = values.get("takeaway") or fallbacks[2]
+    return (
+        f"<div class='mini-card'><div class='mini-label'>{escape(labels[0])}</div><div class='mini-value'>{escape(primary)}</div></div>"
+        f"<div class='mini-card'><div class='mini-label'>{escape(labels[1])}</div><div class='mini-value'>{escape(geo)}</div></div>"
+        f"<div class='mini-card'><div class='mini-label'>{escape(labels[2])}</div><div class='mini-value'>{escape(takeaway)}</div></div>"
+    )
+
+
+def replace_hero_cards_from_markdown(html: str, md_text: str | None, language: str) -> str:
+    replacement = _hero_cards_html(md_text, language)
+    return MINI_CARD_TRIPLE_RE.sub(replacement, html, count=1)
+
+
 def localize_dutch_delivery_html(html: str) -> str:
     for source, target in DUTCH_HTML_TOKEN_REPLACEMENTS.items():
         html = html.replace(source, target)
@@ -113,16 +182,7 @@ def localize_dutch_delivery_html(html: str) -> str:
 
 
 def convert_residual_markdown_links(html: str) -> str:
-    """Convert markdown links that survived custom HTML rendering into anchors.
-
-    Report-wide ticker linkification intentionally runs on markdown before the
-    delivery render. Most markdown links are converted by the markdown renderer,
-    but a few strict-layout/custom rendered blocks escape table cell contents and
-    can therefore leave raw `[SMH](https://...)` text inside the final HTML. That
-    is not a report-content problem; it is a final-render contract issue. This
-    safety pass turns any remaining raw markdown link into a real HTML anchor so
-    the PDF/email remains clickable and the delivery validator can stay strict.
-    """
+    """Convert markdown links that survived custom HTML rendering into anchors."""
     def repl(match: re.Match[str]) -> str:
         label = escape(match.group(1))
         url = escape(match.group(2), quote=True)
@@ -132,17 +192,17 @@ def convert_residual_markdown_links(html: str) -> str:
 
 
 def sanitize_client_facing_html(html: str, *, md_text: str | None = None, language: str | None = None) -> str:
-    """Remove internal/runtime placeholder language from final client-facing HTML.
-
-    For Dutch delivery output this also applies the delivery-layer Dutch cover,
-    date and chart-label localization. This keeps markdown localization and
-    delivery HTML localization aligned and avoids validator drift.
-    """
+    """Remove internal/runtime placeholder language from final client-facing HTML."""
+    resolved_language = language or ("nl" if looks_dutch_markdown(md_text) else "en")
+    html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
     for forbidden, replacement in CLIENT_FACING_TOKEN_REPLACEMENTS.items():
         html = html.replace(forbidden, replacement)
     html = convert_residual_markdown_links(html)
-    if language == "nl" or (language is None and looks_dutch_markdown(md_text)):
+    if resolved_language == "nl":
         html = localize_dutch_delivery_html(html)
+    # Re-apply hero cards after generic localization to preserve exact section-1
+    # values and keep the executive summary link-free.
+    html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
     html = convert_residual_markdown_links(html)
     return html
 
