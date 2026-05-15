@@ -156,10 +156,10 @@ def _hero_cards_html(md_text: str | None, language: str) -> str:
     values = _summary_values(md_text, language)
     if language == "nl":
         labels = ("Primair regime", "Geopolitiek regime", "Kernconclusie")
-        fallbacks = ("Nog niet geclassificeerd", "Nog niet geclassificeerd", "Houd de huidige allocatie gedisciplineerd.")
+        fallbacks = ("Gemengd / nog niet doorslaggevend", "Gemengd / nog niet doorslaggevend", "Houd de huidige allocatie gedisciplineerd.")
     else:
         labels = ("Primary regime", "Geopolitical regime", "Main takeaway")
-        fallbacks = ("Pending classification", "Pending classification", "Keep the current allocation disciplined.")
+        fallbacks = ("Mixed / not yet decisive", "Mixed / not yet decisive", "Keep the current allocation disciplined.")
     primary = values.get("primary") or fallbacks[0]
     geo = values.get("geo") or fallbacks[1]
     takeaway = values.get("takeaway") or fallbacks[2]
@@ -191,18 +191,26 @@ def convert_residual_markdown_links(html: str) -> str:
     return RAW_MARKDOWN_LINK_RE.sub(repl, html)
 
 
+def _apply_global_client_token_replacements(html: str) -> str:
+    for forbidden, replacement in CLIENT_FACING_TOKEN_REPLACEMENTS.items():
+        html = html.replace(forbidden, replacement)
+    return html
+
+
 def sanitize_client_facing_html(html: str, *, md_text: str | None = None, language: str | None = None) -> str:
     """Remove internal/runtime placeholder language from final client-facing HTML."""
     resolved_language = language or ("nl" if looks_dutch_markdown(md_text) else "en")
     html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
-    for forbidden, replacement in CLIENT_FACING_TOKEN_REPLACEMENTS.items():
-        html = html.replace(forbidden, replacement)
+    html = _apply_global_client_token_replacements(html)
     html = convert_residual_markdown_links(html)
     if resolved_language == "nl":
         html = localize_dutch_delivery_html(html)
     # Re-apply hero cards after generic localization to preserve exact section-1
-    # values and keep the executive summary link-free.
+    # values and keep the executive summary link-free. Then re-apply global
+    # forbidden-token cleanup so a missing section-1 value cannot reintroduce
+    # delivery-blocking placeholders such as `Pending classification`.
     html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
+    html = _apply_global_client_token_replacements(html)
     html = convert_residual_markdown_links(html)
     return html
 
