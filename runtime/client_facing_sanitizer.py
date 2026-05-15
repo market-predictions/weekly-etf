@@ -105,13 +105,14 @@ MINI_CARD_TRIPLE_RE = re.compile(
     r"</div>\s*){3}",
     re.DOTALL,
 )
-PANEL_EXEC_TO_SNAPSHOT_RE = re.compile(
-    r"<div class=['\"]panel panel-exec['\"]>.*?(?=<div class=['\"]panel panel-snapshot['\"]>)",
-    re.DOTALL,
+PANEL_EXEC_OPEN_RE = re.compile(
+    r"<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bpanel-exec\b)[^>]*>",
+    re.IGNORECASE,
 )
+DIV_TAG_RE = re.compile(r"</?div\b[^>]*>", re.IGNORECASE)
 PANEL_EXEC_TO_NEXT_PANEL_RE = re.compile(
-    r"<div class=['\"]panel panel-exec['\"]>.*?(?=<div class=['\"]panel\s+(?!panel-exec)[^'\"]*['\"]>)",
-    re.DOTALL,
+    r"<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bpanel-exec\b)[^>]*>.*?(?=<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bpanel\b)[^>]*>)",
+    re.DOTALL | re.IGNORECASE,
 )
 HERO_LAYOUT_GUARD_CSS = """
 <style id="etf-hero-layout-guard">
@@ -127,7 +128,8 @@ HERO_LAYOUT_GUARD_CSS = """
     font-size: 19px;
     line-height: 1.22;
   }
-  .panel.panel-exec {
+  .panel.panel-exec,
+  .panel-exec {
     display: none !important;
     height: 0 !important;
     max-height: 0 !important;
@@ -136,7 +138,8 @@ HERO_LAYOUT_GUARD_CSS = """
     padding: 0 !important;
     border: 0 !important;
   }
-  .panel.panel-exec * {
+  .panel.panel-exec *,
+  .panel-exec * {
     display: none !important;
   }
   @media screen and (max-width: 1100px) {
@@ -252,35 +255,67 @@ def inject_hero_layout_guard(html: str) -> str:
     return HERO_LAYOUT_GUARD_CSS + html
 
 
+def _find_matching_div_end(html: str, start: int) -> int | None:
+    depth = 0
+    seen_start = False
+    for tag in DIV_TAG_RE.finditer(html, start):
+        is_close = tag.group(0).startswith("</")
+        if not is_close:
+            depth += 1
+            seen_start = True
+        elif seen_start:
+            depth -= 1
+            if depth == 0:
+                return tag.end()
+    return None
+
+
+def _remove_panel_exec_blocks_by_depth(html: str) -> tuple[str, int]:
+    count = 0
+    cursor = 0
+    out: list[str] = []
+    for match in PANEL_EXEC_OPEN_RE.finditer(html):
+        start = match.start()
+        if start < cursor:
+            continue
+        end = _find_matching_div_end(html, start)
+        if end is None:
+            continue
+        out.append(html[cursor:start])
+        out.append(HIDDEN_EXEC_SUMMARY_MARKER if count == 0 else "")
+        cursor = end
+        count += 1
+    if count == 0:
+        return html, 0
+    out.append(html[cursor:])
+    return "".join(out), count
+
+
 def suppress_duplicate_executive_panel(html: str) -> str:
     """Remove the duplicate Section 1 HTML panel below the hero cards.
 
     The base renderer emits Section 1 twice: once as hero cards and once as a
-    regular `panel-exec` in the client grid. Once the hero cards are populated
-    from markdown, that second panel is duplicate visual content. Use regexes
-    anchored to the next sibling panel so nested divs inside the executive panel
-    cannot truncate the removal.
+    regular `panel-exec`. Regex-to-next-panel fixes were fragile because the
+    executive panel contains nested divs. This pass now finds the actual opening
+    `panel-exec` div and removes the complete balanced div block by depth.
     """
-    updated, count = PANEL_EXEC_TO_SNAPSHOT_RE.subn(HIDDEN_EXEC_SUMMARY_MARKER, html, count=1)
+    updated, count = _remove_panel_exec_blocks_by_depth(html)
     if count:
         return updated
-    updated, count = PANEL_EXEC_TO_NEXT_PANEL_RE.subn(HIDDEN_EXEC_SUMMARY_MARKER, html, count=1)
-    if count:
-        return updated
-    return html
+    updated, fallback_count = PANEL_EXEC_TO_NEXT_PANEL_RE.subn(HIDDEN_EXEC_SUMMARY_MARKER, html, count=1)
+    return updated if fallback_count else html
 
 
 def sanitize_client_facing_html(html: str, *, md_text: str | None = None, language: str | None = None) -> str:
     """Remove internal/runtime placeholder language from final client-facing HTML."""
     resolved_language = language or ("nl" if looks_dutch_markdown(md_text) else "en")
+    html = suppress_duplicate_executive_panel(html)
     html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
     html = _apply_global_client_token_replacements(html)
     html = convert_residual_markdown_links(html)
     if resolved_language == "nl":
         html = localize_dutch_delivery_html(html)
-    # Re-apply hero cards after generic localization to preserve exact section-1
-    # values and keep the executive summary link-free. Then remove the duplicate
-    # Section 1 panel before layout CSS is injected.
+    html = suppress_duplicate_executive_panel(html)
     html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
     html = suppress_duplicate_executive_panel(html)
     html = inject_hero_layout_guard(html)
