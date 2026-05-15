@@ -53,7 +53,6 @@ def md_link(ticker: str) -> str:
 
 
 def _split_protected_spans(text: str) -> list[tuple[str, bool]]:
-    """Return (chunk, protected) spans for existing links, URLs and inline code."""
     spans: list[tuple[str, bool]] = []
     last = 0
     for match in LINK_OR_URL_RE.finditer(text):
@@ -74,24 +73,42 @@ def linkify_segment(segment: str) -> str:
     return "".join(chunk if protected else _linkify_plain_chunk(chunk) for chunk, protected in _split_protected_spans(segment))
 
 
-def linkify_report(text: str) -> str:
-    """Linkify all known ETF tickers in final markdown, including native NL tables.
+def _is_executive_summary_heading(line: str) -> bool:
+    stripped = line.strip().lower()
+    return stripped.startswith("## 1.") and (
+        "executive summary" in stripped
+        or "kernsamenvatting" in stripped
+    )
 
-    The older implementation only targeted a few English sections/columns. The
-    native Dutch renderer creates many client-facing tables with Dutch headers,
-    and the position-performance section is inserted after the old linkification
-    step. This final-pass linkifier is deliberately report-wide while protecting
-    existing links, URLs, inline code and CASH.
+
+def _is_next_major_section(line: str) -> bool:
+    return line.strip().startswith("## 2.")
+
+
+def linkify_report(text: str) -> str:
+    """Linkify ETF tickers in body tables/lists, but preserve the executive summary.
+
+    The final report should make tickers clickable in tables and bullets where a
+    reader is likely to research an instrument. The top executive summary/hero
+    cards should keep a calm boardroom look and therefore must not carry ticker
+    hyperlinks.
     """
     out: list[str] = []
     in_fenced_code = False
+    in_executive_summary = False
     for line in text.splitlines():
         stripped = line.strip()
         if stripped.startswith("```"):
             in_fenced_code = not in_fenced_code
             out.append(line)
             continue
-        if in_fenced_code:
+        if _is_executive_summary_heading(line):
+            in_executive_summary = True
+            out.append(line)
+            continue
+        if in_executive_summary and _is_next_major_section(line):
+            in_executive_summary = False
+        if in_fenced_code or in_executive_summary:
             out.append(line)
             continue
         out.append(linkify_segment(line))
