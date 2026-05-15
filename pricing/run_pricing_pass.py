@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 
 try:
@@ -26,21 +26,15 @@ from .audit_writer import write_price_audit
 REPORT_RE = re.compile(r"weekly_analysis(?:_pro)?_(\d{6})(?:_(\d{2}))?\.md$")
 VALID_SYMBOL_RE = re.compile(r"^[A-Z][A-Z0-9./_-]{0,14}$")
 INVALID_SYMBOL_WORDS = {
-    "NO",
-    "NONE",
-    "N/A",
-    "NA",
-    "CASH",
-    "GEEN",
-    "NIETS",
-    "NOT",
-    "YET",
-    "AND",
-    "OR",
-    "THE",
-    "VS",
-    "VERSUS",
+    "NO", "NONE", "N/A", "NA", "CASH", "GEEN", "NIETS", "NOT", "YET", "AND", "OR", "THE", "VS", "VERSUS",
 }
+
+# Do not request the same UTC calendar day before a normal U.S. cash close has
+# actually completed. A run shortly after midnight UTC on Friday should use the
+# completed Thursday close, not Friday's not-yet-available close. A stale fallback
+# to a much older date should fail loudly instead of being reported as today's NAV.
+US_CLOSE_AVAILABLE_UTC = time(22, 30)
+MAX_HOLDING_CLOSE_LAG_DAYS = 4
 
 
 def latest_report_file(output_dir: Path) -> Path:
@@ -55,6 +49,24 @@ def latest_report_file(output_dir: Path) -> Path:
         raise RuntimeError("No production ETF pro reports found in output/.")
     files.sort(key=lambda x: (x[0], x[1]))
     return files[-1][2]
+
+
+def _previous_weekday(d: date) -> date:
+    d -= timedelta(days=1)
+    while d.weekday() >= 5:
+        d -= timedelta(days=1)
+    return d
+
+
+def requested_close_from_now(now_utc: datetime) -> str:
+    d = now_utc.date()
+    if d.weekday() >= 5:
+        while d.weekday() >= 5:
+            d -= timedelta(days=1)
+        return d.isoformat()
+    if now_utc.time() < US_CLOSE_AVAILABLE_UTC:
+        return _previous_weekday(d).isoformat()
+    return d.isoformat()
 
 
 def requested_close_from_today(today: date) -> str:
@@ -91,12 +103,6 @@ def _clean_symbol(text: str) -> str:
 
 
 def _symbols_from_text(text: str) -> list[str]:
-    """Extract likely ETF tickers from narrative replacement lines.
-
-    This intentionally ignores long uppercase words and common non-ticker words so
-    lines such as `PPA versus ITA`, `GLD versus GSG / BIL / cash`, and
-    `SPY versus QQQ / QUAL / IEFA` become priceable challenger inputs.
-    """
     symbols: list[str] = []
     for raw in re.findall(r"\b[A-Z][A-Z0-9./_-]{1,9}\b", text.upper()):
         symbol = _clean_symbol(raw)
@@ -105,12 +111,27 @@ def _symbols_from_text(text: str) -> list[str]:
     return symbols
 
 
-def parse_portfolio_state_holdings(state_path: Path) -> tuple[list[HoldingSnapshot], dict[str, float]]:
-    """Load current holdings from explicit ETF portfolio state.
+def _date_or_none(value: str | None) -> date | None:
+    try:
+        return None if not value else date.fromisoformat(value[:10])
+    except ValueError:
+        return None
 
-    This is the primary holdings authority for pricing. Markdown Section 15 is
-    retained only as a backward-compatible fallback.
-    """
+
+def _close_lag_days(requested_close_date: str, returned_close_date: str | None) -> int | None:
+    requested = _date_or_none(requested_close_date)
+    returned = _date_or_none(returned_close_date)
+    if requested is None or returned is None:
+        return None
+    return (requested - returned).days
+
+
+def _is_current_enough(requested_close_date: str, returned_close_date: str | None) -> bool:
+    lag = _close_lag_days(requested_close_date, returned_close_date)
+    return lag is not None and 0 <= lag <= MAX_HOLDING_CLOSE_LAG_DAYS
+
+
+def parse_portfolio_state_holdings(state_path: Path) -> tuple[list[HoldingSnapshot], dict[str, float]]:
     if not state_path.exists():
         return [], {}
 
@@ -243,7 +264,6 @@ def parse_section2_replacements(md_text: str) -> list[str]:
 
 
 def parse_replacement_duel_table(md_text: str) -> list[str]:
-    """Parse symbols from the optional Replacement pricing and duel status table."""
     section_start = md_text.find("### Replacement pricing and duel status")
     if section_start == -1:
         return []
@@ -285,8 +305,9 @@ def main() -> None:
     parser.add_argument("--rate-limit-file", default="pricing/rate_limits.yaml")
     args = parser.parse_args()
 
-    today = date.today()
-    requested_close_date = args.requested_close_date or requested_close_from_today(today)
+    now_utc = datetime.now(timezone.utc)
+    today = now_utc.date()
+    requested_close_date = args.requested_close_date or requested_close_from_now(now_utc)
     run_date = today.isoformat()
 
     output_dir = Path(args.output_dir)
@@ -323,14 +344,18 @@ def main() -> None:
     carried_forward_count = 0
     unresolved = []
     fresh_weight = 0.0
+    stale_holdings: list[str] = []
 
     for item in shortlist:
         result = resolver.resolve(PriceRequest(symbol=item.symbol, requested_close_date=requested_close_date, kind=item.kind))
         results.append(result)
         if item.kind == "holding":
-            if result.status in {"fresh_close", "fresh_fallback_source"}:
-                fresh_count += 1
-                fresh_weight += weights.get(item.symbol.upper(), 0.0)
+            if result.status in {"fresh_close", "fresh_fallback_source"} and result.price is not None:
+                if _is_current_enough(requested_close_date, result.returned_close_date):
+                    fresh_count += 1
+                    fresh_weight += weights.get(item.symbol.upper(), 0.0)
+                else:
+                    stale_holdings.append(f"{item.symbol}:{result.returned_close_date or 'missing'}")
             elif result.status == "carried_forward" or result.carried_forward:
                 carried_forward_count += 1
             if result.status == "unresolved":
@@ -364,10 +389,17 @@ def main() -> None:
     )
 
     audit_path = write_price_audit(args.pricing_dir, pass_result)
+
+    if stale_holdings and decision == "blocked_or_partial":
+        raise RuntimeError(
+            "ETF pricing pass failed freshness guard: holding closes are too stale for "
+            f"requested_close={requested_close_date}: " + ", ".join(stale_holdings)
+        )
+
     print(
         f"PRICING_PASS_{'OK' if fresh_count else 'PARTIAL'} | requested_close={requested_close_date} | "
         f"holdings={holdings_count} | holdings_source={holdings_source} | shortlist={len(shortlist)} | "
-        f"fresh={fresh_count} | carried={carried_forward_count} | "
+        f"fresh={fresh_count} | carried={carried_forward_count} | stale={len(stale_holdings)} | "
         f"weight_coverage={invested_weight_coverage_pct:.2f} | audit={audit_path}"
     )
 
