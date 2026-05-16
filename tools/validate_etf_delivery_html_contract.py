@@ -19,9 +19,11 @@ from runtime.delivery_html_overrides import build_report_html_with_state
 
 report_module.build_report_html = build_report_html_with_state(report_module.build_report_html, report_module._base)
 
-PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2})?\.md$)")
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
 RAW_MARKDOWN_LINK_RE = re.compile(r"\[[A-Z][A-Z0-9.-]{0,14}\]\(https?://[^\)]+\)")
+STYLE_OR_SCRIPT_RE = re.compile(r"<(style|script)\b[^>]*>.*?</\1>", re.DOTALL | re.IGNORECASE)
+HIDDEN_EXEC_MARKER_RE = re.compile(r"<div class=['\"]exec-summary-suppressed['\"][^>]*>.*?</div>", re.DOTALL | re.IGNORECASE)
+VISIBLE_PANEL_EXEC_RE = re.compile(r"<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bpanel-exec\b)[^>]*>", re.IGNORECASE)
 FORBIDDEN_CONTENT_TOKENS = [
     "Placeholder for runtime replacement",
     "runtime rebuild required",
@@ -119,7 +121,15 @@ def _render_delivery_html(report_path: Path) -> str:
     return sanitize_client_facing_html(html, md_text=md_text, language="nl" if looks_dutch_markdown(md_text) else "en")
 
 
+def _visible_html(html: str) -> str:
+    """Return HTML that represents visible body content, not CSS/script/hidden markers."""
+    html = STYLE_OR_SCRIPT_RE.sub("", html)
+    html = HIDDEN_EXEC_MARKER_RE.sub("", html)
+    return html
+
+
 def _strip_html(value: str) -> str:
+    value = _visible_html(value)
     return unescape(re.sub(r"<[^>]+>", " ", value)).strip()
 
 
@@ -173,8 +183,8 @@ def _validate_no_forbidden_content(html: str, report_name: str) -> None:
 
 
 def _validate_no_duplicate_executive_summary(html: str, report_name: str) -> None:
-    visible_html = re.sub(r"<div class=['\"]panel panel-exec-suppressed['\"][^>]*>.*?</div>", "", html, flags=re.DOTALL)
-    if "panel-exec" in visible_html:
+    visible_html = _visible_html(html)
+    if VISIBLE_PANEL_EXEC_RE.search(visible_html):
         raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: duplicate executive summary panel still rendered.")
     plain = _strip_html(visible_html)
     for phrase in [
