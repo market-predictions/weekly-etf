@@ -23,6 +23,10 @@ RAW_MARKDOWN_LINK_RE = re.compile(r"\[[A-Z][A-Z0-9.-]{0,14}\]\(https?://[^\)]+\)
 STYLE_OR_SCRIPT_RE = re.compile(r"<(style|script)\b[^>]*>.*?</\1>", re.DOTALL | re.IGNORECASE)
 HIDDEN_EXEC_MARKER_RE = re.compile(r"<div class=['\"](?:exec-summary-suppressed|exec-summary-render-marker)['\"][^>]*>.*?</div>", re.DOTALL | re.IGNORECASE)
 VISIBLE_PANEL_EXEC_RE = re.compile(r"<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bpanel-exec\b)[^>]*>", re.IGNORECASE)
+HTML_TAG_RE = re.compile(r"<[^>]+>")
+HTML_START_TAG_RE = re.compile(r"<([a-zA-Z0-9]+)\b[^>]*>")
+SECTION_LABEL_RE = re.compile(r"<span\b[^>]*class=['\"][^'\"]*section-label[^'\"]*['\"][^>]*>(.*?)</span>", re.DOTALL | re.IGNORECASE)
+MINI_LABEL_RE = re.compile(r"<div\b[^>]*class=['\"][^'\"]*mini-label[^'\"]*['\"][^>]*>(.*?)</div>", re.DOTALL | re.IGNORECASE)
 FORBIDDEN_CONTENT_TOKENS = [
     "Placeholder for runtime replacement",
     "runtime rebuild required",
@@ -61,6 +65,11 @@ STRUCTURAL_RADAR_TITLES = ["Structural Opportunity Radar", "Structurele kansenra
 STRUCTURAL_RADAR_END_TITLE_GROUPS = [
     ["Short Opportunity Radar"],
     ["Key Risks / Invalidators", "Belangrijkste risico’s / invalidaties"],
+]
+EXECUTIVE_DUPLICATE_PHRASES = [
+    "SMH remains the earned leader, but fresh capital and replacement decisions must pass regime, pricing and duel-evidence checks.",
+    "SMH blijft de best onderbouwde kernpositie, maar nieuw kapitaal en vervangingsbeslissingen moeten koersbevestiging, relatieve sterkte en steun vanuit het macrobeeld doorstaan.",
+    "Houd de huidige allocatie gedisciplineerd.",
 ]
 
 
@@ -132,6 +141,102 @@ def _strip_html(value: str) -> str:
     return unescape(re.sub(r"<[^>]+>", " ", value)).strip()
 
 
+def _plain_text_with_offsets(html: str) -> tuple[str, list[int]]:
+    """Convert HTML to plain text while mapping each text character back to HTML offset."""
+    chunks: list[str] = []
+    offsets: list[int] = []
+    cursor = 0
+    for tag in HTML_TAG_RE.finditer(html):
+        if tag.start() > cursor:
+            segment = unescape(html[cursor:tag.start()])
+            chunks.append(segment)
+            offsets.extend(range(cursor, cursor + len(segment)))
+        cursor = tag.end()
+    if cursor < len(html):
+        segment = unescape(html[cursor:])
+        chunks.append(segment)
+        offsets.extend(range(cursor, cursor + len(segment)))
+    return "".join(chunks), offsets
+
+
+def _compact(value: str, limit: int = 360) -> str:
+    value = re.sub(r"\s+", " ", unescape(value)).strip()
+    if len(value) <= limit:
+        return value
+    return value[: limit - 1].rstrip() + "…"
+
+
+def _html_snippet(html: str, offset: int, radius: int = 260) -> str:
+    start = max(0, offset - radius)
+    end = min(len(html), offset + radius)
+    return _compact(html[start:end], limit=520)
+
+
+def _nearest_start_tag(html: str, offset: int) -> str:
+    matches = list(HTML_START_TAG_RE.finditer(html[:offset]))
+    return _compact(matches[-1].group(0), limit=260) if matches else "unknown"
+
+
+def _nearest_label(html: str, offset: int) -> str:
+    labels: list[tuple[int, str, str]] = []
+    for match in SECTION_LABEL_RE.finditer(html[:offset]):
+        labels.append((match.start(), "section-label", _strip_html(match.group(1))))
+    for match in MINI_LABEL_RE.finditer(html[:offset]):
+        labels.append((match.start(), "mini-label", _strip_html(match.group(1))))
+    if not labels:
+        return "unknown"
+    _, kind, value = sorted(labels, key=lambda row: row[0])[-1]
+    return f"{kind}: {_compact(value, 140)}"
+
+
+def _nearest_title_from_known_titles(plain: str, plain_offset: int) -> str:
+    candidates: list[tuple[int, str]] = []
+    known_titles = [title for group in STRICT_TITLE_GROUPS + REPLACEMENT_DUEL_REQUIRED_HEADER_GROUPS for title in group]
+    known_titles += STRUCTURAL_RADAR_TITLES + ["Primary regime", "Primair regime", "Geopolitical regime", "Geopolitiek regime", "Main takeaway", "Kernconclusie"]
+    for title in known_titles:
+        idx = plain.rfind(title, 0, plain_offset)
+        if idx != -1:
+            candidates.append((idx, title))
+    if not candidates:
+        return "unknown"
+    return sorted(candidates, key=lambda row: row[0])[-1][1]
+
+
+def _phrase_context_report(html: str, phrase: str) -> str:
+    visible = _visible_html(html)
+    plain, offsets = _plain_text_with_offsets(visible)
+    occurrences: list[int] = []
+    start = 0
+    while True:
+        idx = plain.find(phrase, start)
+        if idx == -1:
+            break
+        occurrences.append(idx)
+        start = idx + max(1, len(phrase))
+
+    lines = [
+        "DUPLICATE_TAKEAWAY_CONTEXT_BEGIN",
+        f"phrase={phrase}",
+        f"plain_occurrences={len(occurrences)}",
+    ]
+    for number, plain_idx in enumerate(occurrences, start=1):
+        html_idx = offsets[plain_idx] if plain_idx < len(offsets) else -1
+        plain_before = plain[max(0, plain_idx - 220):plain_idx]
+        plain_after = plain[plain_idx + len(phrase):plain_idx + len(phrase) + 220]
+        lines.extend([
+            f"occurrence={number}",
+            f"plain_offset={plain_idx}",
+            f"html_offset={html_idx}",
+            f"nearest_label={_nearest_label(visible, html_idx) if html_idx >= 0 else 'unknown'}",
+            f"nearest_title={_nearest_title_from_known_titles(plain, plain_idx)}",
+            f"nearest_start_tag={_nearest_start_tag(visible, html_idx) if html_idx >= 0 else 'unknown'}",
+            f"plain_context={_compact(plain_before + ' >>> ' + phrase + ' <<< ' + plain_after, 520)}",
+            f"html_context={_html_snippet(visible, html_idx) if html_idx >= 0 else 'unknown'}",
+        ])
+    lines.append("DUPLICATE_TAKEAWAY_CONTEXT_END")
+    return "\n".join(lines)
+
+
 def _ticker(value: Any) -> str:
     return str(value or "").strip().upper()
 
@@ -186,13 +291,12 @@ def _validate_no_duplicate_executive_summary(html: str, report_name: str) -> Non
     if VISIBLE_PANEL_EXEC_RE.search(visible_html):
         raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: duplicate executive summary panel still rendered.")
     plain = _strip_html(visible_html)
-    for phrase in [
-        "SMH remains the earned leader, but fresh capital and replacement decisions must pass regime, pricing and duel-evidence checks.",
-        "SMH blijft de best onderbouwde kernpositie, maar nieuw kapitaal en vervangingsbeslissingen moeten koersbevestiging, relatieve sterkte en steun vanuit het macrobeeld doorstaan.",
-        "Houd de huidige allocatie gedisciplineerd.",
-    ]:
+    for phrase in EXECUTIVE_DUPLICATE_PHRASES:
         if plain.count(phrase) > 1:
-            raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: duplicated executive takeaway phrase: {phrase[:80]}")
+            diagnostics = _phrase_context_report(html, phrase)
+            raise RuntimeError(
+                f"Delivery HTML contract validation failed for {report_name}: duplicated executive takeaway phrase: {phrase[:80]}\n{diagnostics}"
+            )
 
 
 def _validate_required_titles(html: str, report_name: str) -> None:
