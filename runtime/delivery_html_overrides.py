@@ -25,6 +25,17 @@ PRINT_TABLE_PAGINATION_CSS = """
 """
 
 NL_MARKERS = ["belangrijkste conclusie", "wat is er deze week veranderd", "beschikbare cash", "kernsamenvatting", "portefeuille-acties"]
+SUMMARY_STRIP_RE = re.compile(
+    r"(<div\s+class=['\"]summary-strip['\"]>)(.*?)(</div>\s*<div\s+class=['\"]client-grid['\"]>)",
+    re.DOTALL | re.IGNORECASE,
+)
+MINI_CARD_TRIPLE_RE = re.compile(
+    r"(?:<div class=['\"]mini-card['\"]>\s*"
+    r"<div class=['\"]mini-label['\"]>.*?</div>\s*"
+    r"<div class=['\"]mini-value['\"]>.*?</div>\s*"
+    r"</div>\s*){3}",
+    re.DOTALL | re.IGNORECASE,
+)
 
 LABELS = {
     "en": {
@@ -190,10 +201,24 @@ def _hero_cards_html(values: dict[str, str], language: str) -> str:
 
 
 def _replace_hero_cards(html: str, md_text: str, language: str) -> str:
+    """Replace the full summary-strip payload without cutting nested divs.
+
+    The earlier implementation used `(?:<div class='mini-card'>.*?</div>){3}`.
+    Because each mini-card contains nested `mini-label` and `mini-value` divs,
+    that regex stopped at inner closing divs and left an orphan `mini-value`
+    containing the main takeaway outside the card. Anchor the replacement to the
+    `summary-strip` container and the following `client-grid` sibling instead.
+    """
     values = _summary_values(md_text, language)
     replacement = _hero_cards_html(values, language)
-    pattern = re.compile(r"(?:<div class=['\"]mini-card['\"]>.*?</div>\s*){3}", re.DOTALL)
-    return pattern.sub(replacement, html, count=1)
+
+    def replace_summary_strip(match: re.Match[str]) -> str:
+        return f"{match.group(1)}{replacement}{match.group(3)}"
+
+    updated, count = SUMMARY_STRIP_RE.subn(replace_summary_strip, html, count=1)
+    if count:
+        return updated
+    return MINI_CARD_TRIPLE_RE.sub(replacement, html, count=1)
 
 
 def _nl_action(value: Any) -> str:
