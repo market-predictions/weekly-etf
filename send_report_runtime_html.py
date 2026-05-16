@@ -58,7 +58,20 @@ def _render_exec_summary_marker(_section: dict[str, Any]) -> str:
 
 
 def _patch_base_renderer_contract() -> None:
+    """Patch every reference path used by the legacy base renderer.
+
+    Assigning the module attribute alone should normally be enough, but the
+    persistent duplicate-takeaway failure showed that the delivery validator can
+    still execute the original global looked up by `send_report_OLD.build_report_html`.
+    Patch both the module attribute and the function globals used by that legacy
+    function so the source call site cannot render the old visible panel.
+    """
     report_module._base.render_executive_summary = _render_exec_summary_marker
+    report_module._base.build_report_html.__globals__["render_executive_summary"] = _render_exec_summary_marker
+    try:
+        report_module.build_report_html.__globals__["render_executive_summary"] = _render_exec_summary_marker
+    except Exception:
+        pass
 
 
 def _add_aliases(alias_map: dict[str, list[str]], canonical: str, aliases: list[str]) -> None:
