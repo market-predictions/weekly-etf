@@ -12,17 +12,16 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-import send_report as report_module
+import send_report_runtime_html as runtime_delivery
 from runtime.build_etf_report_state import build_runtime_state
 from runtime.client_facing_sanitizer import looks_dutch_markdown, sanitize_client_facing_html, validate_dutch_delivery_language
-from runtime.delivery_html_overrides import build_report_html_with_state
 
-report_module.build_report_html = build_report_html_with_state(report_module.build_report_html, report_module._base)
+report_module = runtime_delivery.report_module
 
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
 RAW_MARKDOWN_LINK_RE = re.compile(r"\[[A-Z][A-Z0-9.-]{0,14}\]\(https?://[^\)]+\)")
 STYLE_OR_SCRIPT_RE = re.compile(r"<(style|script)\b[^>]*>.*?</\1>", re.DOTALL | re.IGNORECASE)
-HIDDEN_EXEC_MARKER_RE = re.compile(r"<div class=['\"]exec-summary-suppressed['\"][^>]*>.*?</div>", re.DOTALL | re.IGNORECASE)
+HIDDEN_EXEC_MARKER_RE = re.compile(r"<div class=['\"](?:exec-summary-suppressed|exec-summary-render-marker)['\"][^>]*>.*?</div>", re.DOTALL | re.IGNORECASE)
 VISIBLE_PANEL_EXEC_RE = re.compile(r"<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bpanel-exec\b)[^>]*>", re.IGNORECASE)
 FORBIDDEN_CONTENT_TOKENS = [
     "Placeholder for runtime replacement",
