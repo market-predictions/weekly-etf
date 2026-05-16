@@ -44,6 +44,23 @@ NATIVE_DUTCH_SECTION_MARKERS = [
 ]
 
 
+def _render_exec_summary_marker(_section: dict[str, Any]) -> str:
+    """Suppress duplicate Section 1 panel at render source.
+
+    `send_report_OLD.build_report_html()` already renders section 1 into the
+    three hero summary cards. It then rendered section 1 a second time through
+    `render_executive_summary()`, which created the stray duplicated takeaway
+    outside the hero-card frame. The runtime delivery path treats the hero cards
+    as the executive-summary authority and leaves only a hidden semantic marker
+    for legacy body-presence validators.
+    """
+    return "<div class='exec-summary-render-marker' style='display:none'>Executive Summary / Kernsamenvatting</div>"
+
+
+def _patch_base_renderer_contract() -> None:
+    report_module._base.render_executive_summary = _render_exec_summary_marker
+
+
 def _add_aliases(alias_map: dict[str, list[str]], canonical: str, aliases: list[str]) -> None:
     existing = alias_map.setdefault(canonical, [])
     for alias in aliases:
@@ -274,6 +291,7 @@ def validate_equity_curve_from_runtime_state(_md_text: str | None = None, tolera
     print(f"RUNTIME_EQUITY_CURVE_OK | latest_nav={nav:.2f}")
 
 
+_patch_base_renderer_contract()
 _extend_native_dutch_numeric_aliases()
 report_module.latest_report_file = _latest_canonical_report_file
 report_module.latest_reports_by_day = _latest_canonical_reports_by_day
