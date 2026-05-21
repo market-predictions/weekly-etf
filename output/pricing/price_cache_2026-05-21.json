@@ -1,0 +1,112 @@
+{
+  "results": {
+    "issuer_override:GLD:2026-05-21": {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "ssga_gld"
+      },
+      "price": 416.989990234375,
+      "requested_close_date": "2026-05-21",
+      "returned_close_date": "2026-05-21",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:ssga_gld",
+      "status": "fresh_close",
+      "symbol": "GLD"
+    },
+    "issuer_override:PAVE:2026-05-21": {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "globalx_pave"
+      },
+      "price": 54.540000915527344,
+      "requested_close_date": "2026-05-21",
+      "returned_close_date": "2026-05-21",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:globalx_pave",
+      "status": "fresh_close",
+      "symbol": "PAVE"
+    },
+    "issuer_override:PPA:2026-05-21": {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "invesco_ppa"
+      },
+      "price": 167.92999267578125,
+      "requested_close_date": "2026-05-21",
+      "returned_close_date": "2026-05-21",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:invesco_ppa",
+      "status": "fresh_close",
+      "symbol": "PPA"
+    },
+    "issuer_override:SMH:2026-05-21": {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "vaneck_smh"
+      },
+      "price": 567.8800048828125,
+      "requested_close_date": "2026-05-21",
+      "returned_close_date": "2026-05-21",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:vaneck_smh",
+      "status": "fresh_close",
+      "symbol": "SMH"
+    },
+    "issuer_override:SPY:2026-05-21": {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "ssga_spy"
+      },
+      "price": 742.719970703125,
+      "requested_close_date": "2026-05-21",
+      "returned_close_date": "2026-05-21",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:ssga_spy",
+      "status": "fresh_close",
+      "symbol": "SPY"
+    },
+    "issuer_override:URNM:2026-05-21": {
+      "carried_forward": false,
+      "confidence": "medium",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "metadata": {
+        "delegated_source": "yahoo_history",
+        "handler": "sprott_urnm"
+      },
+      "price": 58.08000183105469,
+      "requested_close_date": "2026-05-21",
+      "returned_close_date": "2026-05-21",
+      "source": "issuer_override",
+      "source_detail": "issuer_override:sprott_urnm",
+      "status": "fresh_close",
+      "symbol": "URNM"
+    }
+  }
+}
