@@ -31,9 +31,11 @@ INVALID_SYMBOL_WORDS = {
 
 # Do not request the same UTC calendar day before a normal U.S. cash close has
 # actually completed. A run shortly after midnight UTC on Friday should use the
-# completed Thursday close, not Friday's not-yet-available close. A stale fallback
-# to a much older date should fail loudly instead of being reported as today's NAV.
-US_CLOSE_AVAILABLE_UTC = time(22, 30)
+# completed Thursday close, not Friday's not-yet-available close. The cutoff is
+# intentionally set shortly after the regular U.S. cash close during daylight-
+# saving months so evening-Europe runs can use the just-completed close rather
+# than unnecessarily falling back to the previous trading day.
+US_CLOSE_AVAILABLE_UTC = time(20, 45)
 MAX_HOLDING_CLOSE_LAG_DAYS = 4
 
 
