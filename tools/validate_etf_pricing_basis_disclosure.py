@@ -7,6 +7,7 @@ from pathlib import Path
 START = "<!-- ETF_PRICE_BASIS_DISCLOSURE_START -->"
 END = "<!-- ETF_PRICE_BASIS_DISCLOSURE_END -->"
 EN_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
+TV_LINK_RE = re.compile(r"\[([A-Z][A-Z0-9./_-]{1,14})\]\(https://www\.tradingview\.com/chart/\?symbol=[^)]+\)")
 
 REQUIRED_EN = [
     "### Closing prices used in this report",
@@ -49,6 +50,24 @@ def disclosure(text: str) -> str:
     return m.group(1)
 
 
+def normalize_tv_links(markdown: str) -> str:
+    # The pricing-basis disclosure is injected before the ticker-link pass.
+    # By validation time, table cells may contain TradingView markdown links,
+    # e.g. | [SPY](https://...) |. Normalize them back to SPY for row checks.
+    return TV_LINK_RE.sub(r"\1", markdown)
+
+
+def ticker_row_present(block: str, ticker: str) -> bool:
+    normalized = normalize_tv_links(block)
+    for line in normalized.splitlines():
+        if not line.strip().startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if cells and cells[0] == ticker:
+            return True
+    return False
+
+
 def validate_report(path: Path, language: str) -> list[str]:
     text = path.read_text(encoding="utf-8")
     block = disclosure(text)
@@ -60,7 +79,7 @@ def validate_report(path: Path, language: str) -> list[str]:
         if item not in block:
             failures.append(f"{path.name}: missing {item}")
     for ticker in REQUIRED_TICKERS:
-        if not re.search(rf"\|\s*{ticker}\s*\|", block):
+        if not ticker_row_present(block, ticker):
             failures.append(f"{path.name}: missing pricing row for {ticker}")
     if "EUR/USD" not in block:
         failures.append(f"{path.name}: missing EUR/USD FX row")
