@@ -107,7 +107,7 @@ def en_block(state: dict[str, Any]) -> str:
         START,
         "### Closing prices used in this report",
         "",
-        f"The portfolio valuation below is based on the per-position closes shown here. Requested close date: **{requested_close}**. If a holding used a fallback or carried-forward close, it is shown explicitly in this table.",
+        f"The portfolio valuation above is based on the per-position closes shown here. Requested close date: **{requested_close}**. If a holding used a fallback or carried-forward close, it is shown explicitly in this table.",
         "",
         "| Holding | Close date used | Close used | Currency | Pricing source | Status |",
         "|---|---|---:|---|---|---|",
@@ -138,7 +138,7 @@ def nl_block(state: dict[str, Any]) -> str:
         START,
         "### Gebruikte slotkoersen in dit rapport",
         "",
-        f"De onderstaande portefeuillewaardering is gebaseerd op de slotkoersen per positie in deze tabel. Gevraagde slotdatum: **{requested_close}**. Als een positie een fallbackbron of doorgeschoven slotkoers gebruikt, staat dat expliciet in deze tabel.",
+        f"De bovenstaande portefeuillewaardering is gebaseerd op de slotkoersen per positie in deze tabel. Gevraagde slotdatum: **{requested_close}**. Als een positie een fallbackbron of doorgeschoven slotkoers gebruikt, staat dat expliciet in deze tabel.",
         "",
         "| Positie | Gebruikte slotdatum | Gebruikte slotkoers | Valuta | Prijsbron | Status |",
         "|---|---|---:|---|---|---|",
@@ -162,6 +162,21 @@ def nl_block(state: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def end_of_first_table(section: str) -> int | None:
+    lines = section.splitlines(keepends=True)
+    offset = 0
+    for i in range(len(lines) - 1):
+        if lines[i].lstrip().startswith("|") and lines[i + 1].lstrip().startswith("|") and "---" in lines[i + 1]:
+            j = i + 2
+            end_offset = offset + len(lines[i]) + len(lines[i + 1])
+            while j < len(lines) and lines[j].lstrip().startswith("|"):
+                end_offset += len(lines[j])
+                j += 1
+            return end_offset
+        offset += len(lines[i])
+    return None
+
+
 def insert_into_section7(markdown: str, block: str) -> str:
     clean = remove_existing_block(markdown)
     bounds = section_bounds(clean, 7)
@@ -169,10 +184,17 @@ def insert_into_section7(markdown: str, block: str) -> str:
         raise RuntimeError("Section 7 not found for pricing basis disclosure insertion")
     start, end = bounds
     section = clean[start:end]
-    marker = re.search(r"\n\|\s*(?:Date|Datum)\s*\|", section)
-    if marker:
-        insert_at = start + marker.start()
+
+    # Keep the valuation-history table as the first table in Section 7.
+    # send_report.py and the equity-curve validator intentionally parse the
+    # first Section 7 table as the NAV history source. The pricing-basis table
+    # is therefore inserted immediately after that first table, before the
+    # chart placeholder where possible.
+    first_table_end = end_of_first_table(section)
+    if first_table_end is not None:
+        insert_at = start + first_table_end
         return clean[:insert_at].rstrip() + "\n\n" + block + "\n\n" + clean[insert_at:].lstrip()
+
     placeholder = section.find("`EQUITY_CURVE_CHART_PLACEHOLDER`")
     if placeholder >= 0:
         insert_at = start + placeholder
