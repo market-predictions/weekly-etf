@@ -1,16 +1,22 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-05-11
+2026-05-24
 
 ## What this repository currently is
 
-This repository is now a validated runtime-driven production-style weekly ETF review system with:
+This repository is now a validated runtime-driven production-style weekly ETF review system with a new active pricing-lineage hardening track.
+
+The existing runtime baseline can generate bilingual reports, show pricing-basis disclosure, and reconcile Section 7/Section 15 internally. However, the current pricing issue is not considered solved until `control/ETF_PRICING_LINEAGE_CONTRACT_V1.md` is implemented and validated end to end.
+
+Current canonical components include:
 
 - `etf.txt` as the production masterprompt
 - `control/CAPITAL_REUNDERWRITING_RULES.md` as the decision-framework addendum for model discipline
 - `control/LANE_DISCOVERY_CONTRACT.md` as the discovery-layer contract
 - `control/ETF_RUNTIME_STATE_CONTRACT.md` as the runtime state contract
+- `control/ETF_PRICING_LINEAGE_CONTRACT_V1.md` as the active pricing-lineage hardening contract
+- `control/ETF_PRICING_LINEAGE_CHANGELOG.md` as the central pricing-lineage regression/change log
 - `config/etf_discovery_universe.yml` as the broad investable lane universe
 - `runtime/fetch_etf_relative_strength.py` as the historical relative-strength input layer
 - `runtime/discover_etf_lanes.py` and `runtime/score_etf_lanes.py` as the lane discovery/scoring engine
@@ -41,7 +47,7 @@ This repository is now a validated runtime-driven production-style weekly ETF re
 
 ## Stable production baseline
 
-The current proven baseline is now:
+The current proven baseline remains:
 
 ```text
 pricing audit
@@ -52,6 +58,7 @@ pricing audit
 → runtime state
 → EN/NL markdown render
 → full valuation-history Section 7 equity curve
+→ pricing-basis disclosure
 → polish/linkify
 → Dutch localization contract pass
 → equity-curve history validation
@@ -62,11 +69,40 @@ pricing audit
 → PDF/email delivery
 ```
 
-This path has solved the recurring report-render defects where Section 2 ticker links, Current Position Review layout, Replacement Duel Table layout, Dutch terminology quality, bilingual numeric parity, and the Section 7 equity curve could not be made reliable through markdown post-processing alone.
+This path has solved recurring report-render defects where Section 2 ticker links, Current Position Review layout, Replacement Duel Table layout, Dutch terminology quality, bilingual numeric parity, price-basis visibility, and the Section 7 equity curve could not be made reliable through markdown post-processing alone.
+
+## New active pricing-lineage decision
+
+The latest debugging cycle showed that visible fresh closes and internal NAV reconciliation are not enough.
+
+The active engineering direction is now `ETF_PRICING_LINEAGE_CONTRACT_V1`:
+
+```text
+requested_close_date + report_token
+→ immutable pricing audit
+→ explicit run manifest
+→ runtime report state
+→ English/Dutch report render
+→ delivery assets
+→ persisted portfolio state
+→ persisted valuation history
+```
+
+Do not describe the fresh-closing-price issue as fully solved until the repo has:
+
+- immutable audit identity
+- exact audit path passed through runtime/report/delivery steps
+- explicit `fresh_exact_close` versus `prior_valid_close` status semantics
+- provider-symbol and provider-exchange lineage where available
+- independent verification or explicit unverified status
+- deterministic update of `output/etf_portfolio_state.json`
+- deterministic update of `output/etf_valuation_history.csv`
+- valuation-grade pricing for replacement-duel and fundable promoted challengers
+- a hard `tools/validate_etf_pricing_lineage_contract.py` gate before delivery
 
 ## Stable render decision
 
-Strict branded sections are now delivery-render responsibilities, not markdown-polish responsibilities.
+Strict branded sections are delivery-render responsibilities, not markdown-polish responsibilities.
 
 Specifically:
 
@@ -90,6 +126,8 @@ Specifically:
 - `tools/validate_etf_equity_curve_history.py` protects the contract with the marker `ETF_EQUITY_CURVE_HISTORY_OK`.
 - The validator fails if Section 7 has too few points, has duplicate dates, or if the latest Section 7 NAV does not reconcile with Section 15 total NAV.
 
+The next pricing-lineage implementation must go further by persisting the current successful runtime NAV back into `output/etf_valuation_history.csv` and `output/etf_portfolio_state.json`.
+
 ## Stable bilingual decision
 
 The Dutch report is a companion language render of the English canonical report, not a separate research pass.
@@ -105,6 +143,15 @@ Specifically:
 - `tools/validate_etf_delivery_html_contract.py` validates both English and Dutch rendered delivery HTML.
 
 ## What changed recently
+
+### Pricing-lineage contract created
+
+A new control contract now defines how to solve the recurring fresh-pricing problem at the state/audit/run-manifest level rather than through another report-surface patch.
+
+Added:
+
+- `control/ETF_PRICING_LINEAGE_CONTRACT_V1.md`
+- `control/ETF_PRICING_LINEAGE_CHANGELOG.md`
 
 ### Runtime production path stabilized
 
@@ -153,44 +200,63 @@ The workflow is protected by `ETF_EQUITY_CURVE_HISTORY_OK`.
 - Delivery HTML validator checks the rendered output contract before email send.
 - Section 7 now renders full valuation history from `output/etf_valuation_history.csv` plus current runtime NAV.
 - Section 7 and Section 15 are reconciled from the same runtime state and protected by `ETF_EQUITY_CURVE_HISTORY_OK`.
+- Closing-price disclosure is now visible in the report.
 - Dutch report is derived from the English runtime state and preserves numeric parity.
 - Dutch localization now has a dedicated language-contract module and quality gate.
 - Dutch strict-section delivery aliases are validated after render.
 
 ## Current weaknesses
 
-### 1. ETF universe is broader but still curated
+### 1. ETF pricing lineage is not yet fully proven
+The report can show fresh close rows, but the repo still needs immutable audit identity, explicit run manifest linkage, state persistence, exact/prior close semantics, independent verification, and a hard lineage validator.
+
+### 2. ETF universe is broader but still curated
 `config/etf_discovery_universe.yml` is the first broad universe. It needs periodic expansion and review.
 
-### 2. Fundamental evidence is encoded, not fetched live
+### 3. Fundamental evidence is encoded, not fetched live
 The first engine stores evidence summaries and why-now fields, but does not yet fetch current macro/fundamental news or official data automatically.
 
-### 3. Relative strength is broad but not yet fully institutional
+### 4. Relative strength is broad but not yet fully institutional
 The relative-strength layer uses pragmatic public yfinance history. It includes early liquidity/tradability metrics, but does not yet include full factor/sector benchmark normalization or complete direct replacement-duel scoring.
 
-### 4. Challenger pricing is targeted, not full-universe pricing
-Targeted challenger pricing improves comparison quality, but it intentionally does not price the whole ETF universe to protect runtime and API limits.
+### 5. Challenger pricing is targeted, not full-universe pricing
+Targeted challenger pricing improves comparison quality, but it must now be formalized into valuation-grade pricing for replacement-duel/fundable challengers and research-grade pricing for broad discovery candidates.
 
-### 5. Bilingual aliases are still distributed across several files
+### 6. Bilingual aliases are still distributed across several files
 Dutch labels and aliases now work in production, but the alias definitions are still duplicated across `runtime/nl_localization.py`, `runtime/apply_nl_localization.py`, `send_report.py`, and `tools/validate_etf_delivery_html_contract.py`. This should be consolidated to reduce future validator drift.
 
 ## Immediate priorities
 
-### Priority A — consolidate bilingual alias handling
-Next engineering cleanup:
+### Priority A — implement ETF pricing lineage contract
+
+Next engineering track:
+
+- add immutable run id / audit identity
+- write run manifest
+- pass exact pricing audit/runtime/report paths through the workflow
+- upgrade price row schema
+- persist portfolio state and valuation history after successful pricing
+- enforce valuation-grade pricing for replacement-duel and fundable challengers
+- add `tools/validate_etf_pricing_lineage_contract.py`
+
+### Priority B — consolidate bilingual alias handling
+
+Next engineering cleanup after pricing lineage:
 
 - keep Dutch terminology and aliases in one source of truth
 - reuse that source from markdown localization, send-time parity checks, Dutch quality validation, and delivery HTML validation
 - avoid future one-error-at-a-time phrase fixes
 
-### Priority B — add direct challenger-vs-current-holding scoring
+### Priority C — add direct challenger-vs-current-holding scoring
+
 Next model enhancement:
 
 - map challenger lanes to the holding they may replace
 - compute direct 1m and 3m relative strength versus that holding
 - feed direct replacement edge into lane scoring and replacement-duel notes
 
-### Priority C — expand macro/fundamental freshness inputs
+### Priority D — expand macro/fundamental freshness inputs
+
 Future enhancement:
 
 - machine-readable macro/regime input file
@@ -199,4 +265,4 @@ Future enhancement:
 
 ## Current status label
 
-**ETF now has a production-tested runtime-driven bilingual baseline with historical relative-strength scoring, two-pass challenger pricing, Dutch language-contract validation, full valuation-history equity curve rendering, bilingual numeric parity, delivery HTML validation for strict branded sections, and confirmed English/Dutch email delivery. The next engineering cleanup is consolidating bilingual alias handling; the next model phase remains direct challenger-vs-current-holding scoring.**
+**ETF has a production-tested runtime-driven bilingual baseline with visible pricing-basis disclosure and Section 7/Section 15 reconciliation, but the fresh-pricing issue is not fully closed until `ETF_PRICING_LINEAGE_CONTRACT_V1` is implemented with immutable audit identity, explicit run manifest linkage, state persistence, exact close-date semantics, challenger pricing tiers, and a hard pricing-lineage validator.**
