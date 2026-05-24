@@ -12,7 +12,8 @@ def _ts_to_date(ts: int) -> str:
     return datetime.fromtimestamp(ts, tz=timezone.utc).date().isoformat()
 
 
-def fetch_close(symbol: str, requested_close_date: str) -> PriceResult:
+def fetch_close(symbol: str, requested_close_date: str, canonical_symbol: str | None = None, provider_exchange: str | None = None) -> PriceResult:
+    canonical = canonical_symbol or symbol
     url = f"{BASE}/{symbol}?" + q({
         "range": "3mo",
         "interval": "1d",
@@ -25,7 +26,7 @@ def fetch_close(symbol: str, requested_close_date: str) -> PriceResult:
         result = (data.get("chart") or {}).get("result") or []
         if not result:
             return PriceResult(
-                symbol=symbol,
+                symbol=canonical,
                 requested_close_date=requested_close_date,
                 returned_close_date=None,
                 price=None,
@@ -36,6 +37,8 @@ def fetch_close(symbol: str, requested_close_date: str) -> PriceResult:
                 status="unresolved",
                 confidence="low",
                 error="Yahoo chart endpoint returned no result.",
+                provider_symbol=symbol,
+                provider_exchange=provider_exchange,
             )
 
         result0 = result[0]
@@ -43,16 +46,17 @@ def fetch_close(symbol: str, requested_close_date: str) -> PriceResult:
         quotes = ((result0.get("indicators") or {}).get("quote") or [{}])[0]
         closes = quotes.get("close") or []
         currency = (result0.get("meta") or {}).get("currency", "USD")
+        exchange = provider_exchange or (result0.get("meta") or {}).get("exchangeName") or (result0.get("meta") or {}).get("fullExchangeName")
 
         pairs = []
         for ts, close in zip(timestamps, closes):
             if close is None:
                 continue
-            pairs.append((_ts_to_date(ts), float(close)))
+            pairs.append((_ts_to_date(ts), float(close), int(ts)))
 
         if not pairs:
             return PriceResult(
-                symbol=symbol,
+                symbol=canonical,
                 requested_close_date=requested_close_date,
                 returned_close_date=None,
                 price=None,
@@ -63,13 +67,15 @@ def fetch_close(symbol: str, requested_close_date: str) -> PriceResult:
                 status="unresolved",
                 confidence="low",
                 error="Yahoo chart endpoint returned no valid close values.",
+                provider_symbol=symbol,
+                provider_exchange=exchange,
             )
 
         pairs.sort(key=lambda item: item[0])
-        for returned_date, price in pairs:
+        for returned_date, price, ts in pairs:
             if returned_date == requested_close_date:
                 return PriceResult(
-                    symbol=symbol,
+                    symbol=canonical,
                     requested_close_date=requested_close_date,
                     returned_close_date=returned_date,
                     price=price,
@@ -77,18 +83,27 @@ def fetch_close(symbol: str, requested_close_date: str) -> PriceResult:
                     source="yahoo_history",
                     source_detail="query1_chart_v8",
                     field_used="close",
-                    status="fresh_close",
+                    status="fresh_exact_unverified",
                     confidence="medium",
+                    provider_symbol=symbol,
+                    provider_exchange=exchange,
+                    raw_close=price,
+                    selected_close=price,
+                    selected_close_type="raw_close",
+                    provider_timestamp=datetime.fromtimestamp(ts, tz=timezone.utc).isoformat(),
+                    provider_timezone="UTC_timestamp_mapped_to_date",
+                    is_final_eod_bar=True,
+                    metadata={"provider": "yahoo_history", "endpoint": "query1_chart_v8"},
                 )
 
-        prior_pairs = [(dt, price) for dt, price in pairs if dt <= requested_close_date]
+        prior_pairs = [(dt, price, ts) for dt, price, ts in pairs if dt <= requested_close_date]
         if prior_pairs:
-            returned_date, price = prior_pairs[-1]
+            returned_date, price, ts = prior_pairs[-1]
         else:
-            returned_date, price = pairs[-1]
+            returned_date, price, ts = pairs[-1]
 
         return PriceResult(
-            symbol=symbol,
+            symbol=canonical,
             requested_close_date=requested_close_date,
             returned_close_date=returned_date,
             price=price,
@@ -96,12 +111,21 @@ def fetch_close(symbol: str, requested_close_date: str) -> PriceResult:
             source="yahoo_history",
             source_detail="query1_chart_v8",
             field_used="close",
-            status="fresh_fallback_source",
+            status="prior_valid_close",
             confidence="medium",
+            provider_symbol=symbol,
+            provider_exchange=exchange,
+            raw_close=price,
+            selected_close=price,
+            selected_close_type="raw_close",
+            provider_timestamp=datetime.fromtimestamp(ts, tz=timezone.utc).isoformat(),
+            provider_timezone="UTC_timestamp_mapped_to_date",
+            is_final_eod_bar=True,
+            metadata={"provider": "yahoo_history", "endpoint": "query1_chart_v8"},
         )
     except Exception as exc:
         return PriceResult(
-            symbol=symbol,
+            symbol=canonical,
             requested_close_date=requested_close_date,
             returned_close_date=None,
             price=None,
@@ -112,4 +136,6 @@ def fetch_close(symbol: str, requested_close_date: str) -> PriceResult:
             status="unresolved",
             confidence="low",
             error=str(exc),
+            provider_symbol=symbol,
+            provider_exchange=provider_exchange,
         )
