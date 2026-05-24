@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from .clients import twelve_data, ecb_reference
-from .models import FXResult
+from .models import FXResult, PRICED_CLOSE_STATUSES
 
 
 def resolve_fx(requested_date: str) -> FXResult:
@@ -12,11 +12,11 @@ def resolve_fx(requested_date: str) -> FXResult:
     not become unresolved merely because one API key is unavailable.
     """
     primary = twelve_data.fetch_eurusd(requested_date)
-    if primary.status in {"fresh_close", "fresh_fallback_source"} and primary.rate is not None:
+    if primary.status in PRICED_CLOSE_STATUSES and primary.rate is not None:
         return primary
 
     fallback = ecb_reference.fetch_eurusd(requested_date)
-    if fallback.status in {"fresh_close", "fresh_fallback_source"} and fallback.rate is not None:
+    if fallback.status in PRICED_CLOSE_STATUSES and fallback.rate is not None:
         fallback.metadata = {**fallback.metadata, "primary_error": primary.error, "primary_source": primary.source}
         return fallback
 
