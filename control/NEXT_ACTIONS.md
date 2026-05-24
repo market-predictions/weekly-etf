@@ -32,6 +32,7 @@
   → runtime state
   → EN/NL markdown render
   → full valuation-history Section 7 equity curve
+  → pricing-basis disclosure
   → polish/linkify
   → Dutch localization contract pass
   → equity-curve history validation
@@ -68,9 +69,95 @@
 
 ---
 
+## Phase 1B — implement ETF pricing-lineage contract
+
+### 5. Use `ETF_PRICING_LINEAGE_CONTRACT_V1` as authority
+- Owner: `[ASSISTANT]`
+- Status: active priority
+- Source files:
+  - `control/ETF_PRICING_LINEAGE_CONTRACT_V1.md`
+  - `control/ETF_PRICING_LINEAGE_CHANGELOG.md`
+- Action:
+  - treat the fresh-closing-price issue as unresolved until the contract is implemented
+  - track all pricing-lineage changes in the dedicated changelog
+  - preserve root `changelog.md` visibility for repo-level changes
+- Done when: the contract is implemented and the hard lineage validator passes before delivery.
+
+### 6. Add immutable run identity and manifest
+- Owner: `[ASSISTANT]`
+- Status: next implementation step
+- Target files:
+  - `pricing/run_pricing_pass.py`
+  - `pricing/audit_writer.py`
+  - `.github/workflows/send-weekly-report.yml`
+  - new `output/run_manifests/` writer/helper as needed
+- Action:
+  - create a run id for each production pricing run
+  - write immutable audit files using requested close date plus run id
+  - write a central run manifest under `output/run_manifests/`
+  - pass exact audit/runtime/report paths through later workflow steps instead of reselecting latest files
+- Done when: one report can be traced to one exact audit and manifest.
+
+### 7. Upgrade price row schema and status semantics
+- Owner: `[ASSISTANT]`
+- Status: planned
+- Target files:
+  - `pricing/models.py`
+  - `pricing/clients/twelve_data.py`
+  - `pricing/clients/yahoo_history.py`
+  - `pricing/clients/fmp.py`
+  - `pricing/clients/alpha_vantage.py`
+  - `pricing/source_registry.yaml`
+  - `pricing/symbol_resolver.py`
+- Action:
+  - add selected close, selected close type, provider symbol, provider exchange where available, finality flag, verification block, and pricing tier
+  - replace generic fresh labels with `fresh_exact_close`, `fresh_exact_unverified`, `prior_valid_close`, `carried_forward`, `unresolved`, and `blocked`
+- Done when: no close row can be mislabeled fresh when the returned close date differs from the requested close date.
+
+### 8. Persist successful ETF valuation state
+- Owner: `[ASSISTANT]`
+- Status: planned
+- Target files:
+  - `runtime/build_etf_report_state.py`
+  - `runtime/render_etf_report_from_state.py`
+  - state writer/helper as needed
+  - `output/etf_portfolio_state.json`
+  - `output/etf_valuation_history.csv`
+- Action:
+  - update canonical portfolio state after successful pricing/runtime valuation
+  - append or replace the current requested close date in valuation history deterministically
+  - ensure future runs start from the last successful priced state, not stale report-derived values
+- Done when: the latest successful report NAV equals persisted portfolio state and valuation history.
+
+### 9. Enforce challenger pricing tiers
+- Owner: `[ASSISTANT]`
+- Status: planned
+- Target files:
+  - `pricing/augment_challenger_pricing.py`
+  - `runtime/discover_etf_lanes.py`
+  - `runtime/score_etf_lanes.py`
+  - replacement-duel validator files
+- Action:
+  - keep broad discovery candidates research-grade
+  - require valuation-grade pricing for replacement-duel challengers
+  - require valuation-grade pricing before any promoted challenger is shown as fundable/actionable
+- Done when: broad discovery is still efficient, but fundable challengers cannot appear without valuation-grade pricing.
+
+### 10. Add hard pricing-lineage validator
+- Owner: `[ASSISTANT]`
+- Status: planned
+- Target file:
+  - `tools/validate_etf_pricing_lineage_contract.py`
+- Action:
+  - validate manifest → audit → runtime state → report tables → Section 7 NAV → Section 15 NAV → persisted portfolio state → valuation history
+  - fail before render/send if any piece diverges
+- Done when: a visible close-price disclosure is no longer enough; the full lineage must pass.
+
+---
+
 ## Phase 2 — Dutch premium report quality roadmap
 
-### 5. Maintain the Dutch quality roadmap
+### 11. Maintain the Dutch quality roadmap
 - Owner: `[ASSISTANT]`
 - Status: started
 - Source files:
@@ -82,7 +169,7 @@
   - do not let one-off Dutch phrase fixes replace the language-contract layer
 - Done when: Dutch report improvements are tracked as an operating roadmap, not ad-hoc fixes.
 
-### 6. Block mixed English/Dutch sentences before next Dutch publication
+### 12. Block mixed English/Dutch sentences before next Dutch publication
 - Owner: `[ASSISTANT]`
 - Status: implemented; needs test run
 - Changed files:
@@ -92,7 +179,7 @@
   - validate that mixed sentences such as `Keep SMH...`, `but vers kapitaal...`, `Require replacement duels...`, and `Aanhouden under review` fail before send
 - Done when: the Dutch language quality validator fails any mixed-language decision sentence.
 
-### 7. Translate table headers and enum values through controlled mappings
+### 13. Translate table headers and enum values through controlled mappings
 - Owner: `[ASSISTANT]`
 - Status: implemented; needs test run
 - Changed files:
@@ -103,7 +190,7 @@
   - validate table labels such as Theme, Primary ETF, Why it matters, Existing, Yes, No, None, Hold, Add, Current status, Why I’m considering it
 - Done when: table labels and enum values in the Dutch report are mapped through the Dutch terminology contract.
 
-### 8. Remove internal workflow language from the Dutch client report
+### 14. Remove internal workflow language from the Dutch client report
 - Owner: `[ASSISTANT]`
 - Status: implemented; needs test run
 - Changed files:
@@ -113,7 +200,7 @@
   - block `Section`, `runtime`, `state-led`, `output/`, `pricing_audit`, `workflow`, `manifest`, `artifact`, and placeholder language where client-facing
 - Done when: operational runbook terms remain in audit/manifest files only.
 
-### 9. Replace low-quality literal translations
+### 15. Replace low-quality literal translations
 - Owner: `[ASSISTANT]`
 - Status: implemented; needs test run
 - Changed files:
@@ -123,7 +210,7 @@
   - replace `verdiende leider`, `prijsbewijs`, `actiebias`, `thesisfit`, `reviewpositie`, `nuttige ballast`, `vers kapitaal`
 - Done when: executive sections and tables use institutional Dutch such as `best onderbouwde kernpositie`, `koersbevestiging`, `beslissingsrichting`, `aansluiting op de beleggingscase`, and `positie onder actieve herbeoordeling`.
 
-### 10. Make Dutch cover and chart language Dutch
+### 16. Make Dutch cover and chart language Dutch
 - Owner: `[ASSISTANT]`
 - Status: implemented; needs render test
 - Changed file:
@@ -133,7 +220,7 @@
   - validate chart labels are Dutch where practical
 - Done when: Dutch PDF cover and equity-curve labels read as Dutch client-facing output.
 
-### 11. Native Dutch templates for key sections
+### 17. Native Dutch templates for key sections
 - Owner: `[ASSISTANT]`
 - Status: planned after first test result
 - Target files:
@@ -144,7 +231,7 @@
   - render Kernsamenvatting, Conclusie, Portefeuille-acties, Review huidige posities and Vervangingsanalyse from runtime state using Dutch-native templates rather than sentence-by-sentence translation
 - Done when: these sections read as originally written Dutch.
 
-### 12. Human-readable Dutch glossary per section
+### 18. Human-readable Dutch glossary per section
 - Owner: `[ASSISTANT]`
 - Status: started
 - Source file:
@@ -157,7 +244,7 @@
 
 ## Phase 3 — ChatGPT-triggerable report generation
 
-### 13. Use safe report request queue for ChatGPT-initiated fresh reports
+### 19. Use safe report request queue for ChatGPT-initiated fresh reports
 - Owner: `[ASSISTANT]`
 - Status: active baseline
 - Action: when the user asks ChatGPT to generate a fresh Weekly ETF Review, create a request file under:
@@ -167,9 +254,9 @@
 - Do not create trigger files under `output/`.
 - Done when: the send workflow is triggered by the run-queue request path and no placeholder report files are introduced.
 
-### 14. Run one Dutch quality confirmation workflow
+### 20. Run one Dutch quality confirmation workflow
 - Owner: `[JOINT]`
-- Status: next checkpoint
+- Status: deferred behind pricing-lineage implementation unless specifically requested
 - Action:
   - trigger a fresh report only after the user agrees to test the Phase 1 Dutch quality changes
   - inspect validator output and the received PDF
@@ -179,7 +266,7 @@
 
 ## Phase 4 — improve portfolio decision quality
 
-### 15. Continue direct challenger-vs-current-holding scoring
+### 21. Continue direct challenger-vs-current-holding scoring
 - Owner: `[ASSISTANT]`
 - Action:
   - map challenger lanes to likely funded holdings they could replace
@@ -189,7 +276,7 @@
   - surface the direct edge in replacement-duel notes
 - Done when: replacement candidates are compared against the actual holding they would replace, not only versus SPY.
 
-### 16. Expand and curate the discovery universe
+### 22. Expand and curate the discovery universe
 - Owner: `[ASSISTANT]`
 - Source file:
   - `config/etf_discovery_universe.yml`
@@ -198,7 +285,7 @@
   - keep each lane investable, differentiated, and scored
 - Done when: the universe is broad enough to surface new candidates without becoming noisy.
 
-### 17. Add better macro/fundamental freshness inputs
+### 23. Add better macro/fundamental freshness inputs
 - Owner: `[ASSISTANT]`
 - Action:
   - add machine-readable macro/regime input file
@@ -210,4 +297,4 @@
 
 ## Current checkpoint
 
-**Dutch ETF report quality is now on a formal roadmap. Phase 1 contract files and validators have been strengthened to block mixed-language sentences, untranslated table labels, internal workflow language, and low-quality literal translations. The next checkpoint is a controlled fresh bilingual report run to see which remaining Dutch issues are generated by markdown localization versus delivery HTML rendering.**
+**The active engineering checkpoint is now ETF pricing-lineage hardening. The close-price disclosure table is visible and internally useful, but the fresh-closing-price issue remains open until immutable audit identity, explicit run manifests, state persistence, challenger pricing tiers, and the hard pricing-lineage validator are implemented.**
