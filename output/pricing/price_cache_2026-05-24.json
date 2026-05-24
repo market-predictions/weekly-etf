@@ -300,6 +300,36 @@
         "status": "not_checked"
       }
     },
+    "alpha_vantage:TO:2026-05-22": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "No time series returned",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "TO",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-05-22",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "alpha_vantage",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "TO",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "alpha_vantage:URNM:2026-05-22": {
       "carried_forward": false,
       "confidence": "low",
