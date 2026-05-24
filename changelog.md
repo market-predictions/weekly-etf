@@ -2,6 +2,28 @@
 
 This file records meaningful codebase, workflow, rendering, state-contract, pricing, and delivery changes for `market-predictions/weekly-etf`.
 
+## 2026-05-24 — Render ETF close disclosure from pricing audit, not portfolio state
+
+### What changed
+- Updated `runtime/add_etf_pricing_basis_section.py` so the close-price disclosure table is built from the latest `output/pricing/price_audit_*.json` rather than from the simplified portfolio-state position fields.
+- The disclosure now shows requested close date, actual close date used, close price, currency, client-facing market-data source, and status.
+- Internal resolver labels such as `issuer_override`, `source_detail`, and `handler` are no longer rendered client-facing.
+- Removed visible HTML comment markers from the markdown/PDF output.
+- Updated `tools/validate_etf_pricing_basis_disclosure.py` so it validates the heading/table itself instead of relying on hidden marker comments, and fails if internal pricing labels leak into the client report.
+
+### Why
+The previous disclosure made the pricing basis visible but was still not client-grade. It exposed implementation markers and showed `issuer_override` as the source, even when the audit showed delegated market data such as Yahoo history. The report must show the real audit-derived pricing basis in readable language, not internal plumbing labels.
+
+### Affected files
+- `runtime/add_etf_pricing_basis_section.py`
+- `tools/validate_etf_pricing_basis_disclosure.py`
+- `changelog.md`
+
+### Validation / evidence
+- User review showed visible `ETF_PRICE_BASIS_DISCLOSURE_*` markers and `issuer_override` in the delivered report. Next validation step is a fresh ETF production run.
+
+---
+
 ## 2026-05-24 — Prioritize live API close discovery before issuer override
 
 ### What changed
