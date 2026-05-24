@@ -4,11 +4,21 @@ from pathlib import Path
 
 from .budget_manager import BudgetManager
 from .cache import cache_get, cache_put, load_daily_cache, save_daily_cache
-from .models import PriceRequest, PriceResult
+from .models import PRICED_CLOSE_STATUSES, PriceRequest, PriceResult
 from .symbol_resolver import SymbolResolver
 from .clients import alpha_vantage, fmp, issuer_override, twelve_data, yahoo_history
 
-SUCCESS_STATUSES = {"fresh_close", "fresh_fallback_source"}
+SUCCESS_STATUSES = PRICED_CLOSE_STATUSES
+
+
+def _apply_request_lineage(result: PriceResult, req: PriceRequest) -> PriceResult:
+    """Attach role/tier context that is only known at resolver level."""
+    result.asset_role = req.kind
+    if req.kind in {"holding", "challenger"}:
+        result.pricing_tier = "valuation_grade"
+    else:
+        result.pricing_tier = "research_grade"
+    return result
 
 
 class CloseResolver:
@@ -19,17 +29,19 @@ class CloseResolver:
         self.cache = load_daily_cache(run_date)
 
     def _fetch_from_source(self, source: str, req: PriceRequest) -> PriceResult:
+        provider_symbol = self.symbol_resolver.get_provider_symbol(req.symbol, source)
+        provider_exchange = self.symbol_resolver.get_expected_exchange(req.symbol)
         if source == "issuer_override":
             handler = self.symbol_resolver.get_issuer_handler(req.symbol)
-            return issuer_override.fetch_close(req.symbol, req.requested_close_date, handler)
+            return issuer_override.fetch_close(provider_symbol, req.requested_close_date, handler, canonical_symbol=req.symbol, provider_exchange=provider_exchange)
         if source == "twelve_data":
-            return twelve_data.fetch_close(req.symbol, req.requested_close_date)
+            return twelve_data.fetch_close(provider_symbol, req.requested_close_date, canonical_symbol=req.symbol, provider_exchange=provider_exchange)
         if source == "fmp":
-            return fmp.fetch_close(req.symbol, req.requested_close_date)
+            return fmp.fetch_close(provider_symbol, req.requested_close_date, canonical_symbol=req.symbol, provider_exchange=provider_exchange)
         if source == "alpha_vantage":
-            return alpha_vantage.fetch_close(req.symbol, req.requested_close_date)
+            return alpha_vantage.fetch_close(provider_symbol, req.requested_close_date, canonical_symbol=req.symbol, provider_exchange=provider_exchange)
         if source == "yahoo_history":
-            return yahoo_history.fetch_close(req.symbol, req.requested_close_date)
+            return yahoo_history.fetch_close(provider_symbol, req.requested_close_date, canonical_symbol=req.symbol, provider_exchange=provider_exchange)
         return PriceResult(req.symbol, req.requested_close_date, None, None, None, source, None, None, "unresolved", "low", error="Unknown source")
 
     def resolve(self, req: PriceRequest) -> PriceResult:
@@ -39,7 +51,7 @@ class CloseResolver:
         for source in source_order:
             cached = cache_get(self.cache, req.symbol, req.requested_close_date, source)
             if cached:
-                cached_result = PriceResult(**cached)
+                cached_result = _apply_request_lineage(PriceResult(**cached), req)
                 if cached_result.status in SUCCESS_STATUSES and cached_result.price is not None:
                     return cached_result
                 # Do not return an unresolved cached row. Earlier versions did
@@ -53,7 +65,7 @@ class CloseResolver:
                     continue
                 self.budget.sleep_if_needed(source)
 
-            result = self._fetch_from_source(source, req)
+            result = _apply_request_lineage(self._fetch_from_source(source, req), req)
 
             if source in self.budget.budgets:
                 self.budget.register_spend(source)
@@ -68,7 +80,7 @@ class CloseResolver:
             details = "; ".join(
                 f"{item.source}:{item.status}:{item.error or 'no close'}" for item in unresolved_cached[:5]
             )
-            return PriceResult(
+            return _apply_request_lineage(PriceResult(
                 req.symbol,
                 req.requested_close_date,
                 None,
@@ -80,6 +92,6 @@ class CloseResolver:
                 "unresolved",
                 "low",
                 error=f"All configured API sources unresolved; cached unresolved attempts: {details}",
-            )
+            ), req)
 
-        return PriceResult(req.symbol, req.requested_close_date, None, None, None, None, None, None, "unresolved", "low", error="All configured API sources unresolved")
+        return _apply_request_lineage(PriceResult(req.symbol, req.requested_close_date, None, None, None, None, None, None, "unresolved", "low", error="All configured API sources unresolved"), req)
