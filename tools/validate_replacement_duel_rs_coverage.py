@@ -16,13 +16,15 @@ MACRO_PATH = Path("config/etf_macro_fundamental_context.yml")
 PORTFOLIO_STATE_PATH = Path("output/etf_portfolio_state.json")
 
 # These are the current high-priority duels that must be usable for the report.
-# Secondary or illiquid challengers may still be displayed as incomplete rather
-# than blocking the whole production run.
+# Secondary or source-fragile challengers may still be displayed as incomplete
+# rather than blocking the whole production run. In the GLD sleeve, GSG covers
+# the broad-commodity challenger and BIL covers the cash-like ballast challenger;
+# DBC remains configured as an optional commodity proxy when RS data is available.
 REQUIRED_CHALLENGERS_BY_HOLDING: dict[str, set[str]] = {
     "SPY": {"QUAL", "IEFA"},
     "PPA": {"ITA"},
     "PAVE": {"GRID"},
-    "GLD": {"GSG", "DBC", "BIL"},
+    "GLD": {"GSG", "BIL"},
 }
 
 
