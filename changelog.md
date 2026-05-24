@@ -2,6 +2,25 @@
 
 This file records meaningful codebase, workflow, rendering, state-contract, pricing, and delivery changes for `market-predictions/weekly-etf`.
 
+## 2026-05-24 — Treat DBC as optional RS duel proxy
+
+### What changed
+- Updated `tools/validate_replacement_duel_rs_coverage.py` so `DBC` is no longer a hard-required GLD challenger for the 1m/3m relative-strength gate.
+- `GSG` remains the required broad-commodity challenger and `BIL` remains the required cash-like ballast challenger for GLD.
+- `DBC` remains configured in the replacement-duel target map and can still be used when relative-strength data is available.
+
+### Why
+A fresh production run failed before report rendering because `DBC` lacked 1m/3m yfinance return data. That should not block the entire ETF production run when the required GLD replacement-duel coverage is still available through `GSG` and `BIL`. This keeps the RS quality gate intact for strategic required duels while treating source-fragile secondary proxies as optional.
+
+### Affected files
+- `tools/validate_replacement_duel_rs_coverage.py`
+- `changelog.md`
+
+### Validation / evidence
+- Previous workflow failure: `Replacement duel RS coverage failed: required strategic tickers lack 1m/3m returns: DBC`. Next validation step is a fresh ETF production run.
+
+---
+
 ## 2026-05-24 — Keep valuation history as first Section 7 table
 
 ### What changed
