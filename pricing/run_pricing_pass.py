@@ -11,7 +11,7 @@ try:
 except ImportError as exc:
     raise RuntimeError("PyYAML is required for pricing configs. Install with: pip install pyyaml") from exc
 
-from .models import HoldingSnapshot, PriceRequest, PricingPassResult
+from .models import EXACT_CLOSE_STATUSES, PRICED_CLOSE_STATUSES, HoldingSnapshot, PriceRequest, PricingPassResult
 from .shortlist_builder import (
     build_challenger_shortlist,
     build_holdings_shortlist,
@@ -29,12 +29,6 @@ INVALID_SYMBOL_WORDS = {
     "NO", "NONE", "N/A", "NA", "CASH", "GEEN", "NIETS", "NOT", "YET", "AND", "OR", "THE", "VS", "VERSUS",
 }
 
-# Do not request the same UTC calendar day before a normal U.S. cash close has
-# actually completed. A run shortly after midnight UTC on Friday should use the
-# completed Thursday close, not Friday's not-yet-available close. The cutoff is
-# intentionally set shortly after the regular U.S. cash close during daylight-
-# saving months so evening-Europe runs can use the just-completed close rather
-# than unnecessarily falling back to the previous trading day.
 US_CLOSE_AVAILABLE_UTC = time(20, 45)
 MAX_HOLDING_CLOSE_LAG_DAYS = 4
 
@@ -144,12 +138,10 @@ def _is_current_enough(requested_close_date: str, returned_close_date: str | Non
 def parse_portfolio_state_holdings(state_path: Path) -> tuple[list[HoldingSnapshot], dict[str, float]]:
     if not state_path.exists():
         return [], {}
-
     payload = json.loads(state_path.read_text(encoding="utf-8"))
     positions = payload.get("positions") or []
     holdings: list[HoldingSnapshot] = []
     weights: dict[str, float] = {}
-
     for position in positions:
         ticker = _clean_symbol(str(position.get("ticker") or ""))
         if not ticker or ticker == "CASH":
@@ -160,7 +152,6 @@ def parse_portfolio_state_holdings(state_path: Path) -> tuple[list[HoldingSnapsh
         previous_market_value_local = _to_float(position.get("market_value_local"))
         previous_market_value_eur = _to_float(position.get("market_value_eur"))
         previous_weight_pct = _to_float(position.get("current_weight_pct"))
-
         snapshot = HoldingSnapshot(
             ticker=ticker,
             shares=0.0 if shares is None else shares,
@@ -173,7 +164,6 @@ def parse_portfolio_state_holdings(state_path: Path) -> tuple[list[HoldingSnapsh
         holdings.append(snapshot)
         if previous_weight_pct is not None:
             weights[ticker] = previous_weight_pct
-
     return holdings, weights
 
 
@@ -363,15 +353,17 @@ def main() -> None:
         result = resolver.resolve(PriceRequest(symbol=item.symbol, requested_close_date=requested_close_date, kind=item.kind))
         results.append(result)
         if item.kind == "holding":
-            if result.status in {"fresh_close", "fresh_fallback_source"} and result.price is not None:
+            if result.status in EXACT_CLOSE_STATUSES and result.price is not None:
+                fresh_count += 1
+                fresh_weight += weights.get(item.symbol.upper(), 0.0)
+            elif result.status == "prior_valid_close" and result.price is not None:
                 if _is_current_enough(requested_close_date, result.returned_close_date):
-                    fresh_count += 1
-                    fresh_weight += weights.get(item.symbol.upper(), 0.0)
+                    stale_holdings.append(f"{item.symbol}:{result.returned_close_date or 'missing'}:prior_valid_close")
                 else:
-                    stale_holdings.append(f"{item.symbol}:{result.returned_close_date or 'missing'}")
+                    stale_holdings.append(f"{item.symbol}:{result.returned_close_date or 'missing'}:too_stale")
             elif result.status == "carried_forward" or result.carried_forward:
                 carried_forward_count += 1
-            if result.status == "unresolved":
+            if result.status in {"unresolved", "blocked"}:
                 unresolved.append(item.symbol)
 
     fx = resolve_fx(requested_close_date)
@@ -403,22 +395,20 @@ def main() -> None:
 
     audit_path = write_price_audit(args.pricing_dir, pass_result, run_id=run_id)
 
-    # Backward-compatible pointer for legacy scripts. This is intentionally a
-    # copy of the immutable audit, not the primary source of truth.
     latest_pointer = Path(args.pricing_dir) / "latest_price_audit_path.txt"
     latest_pointer.parent.mkdir(parents=True, exist_ok=True)
     latest_pointer.write_text(str(audit_path) + "\n", encoding="utf-8")
 
     if stale_holdings and decision == "blocked_or_partial":
         raise RuntimeError(
-            "ETF pricing pass failed freshness guard: holding closes are too stale for "
+            "ETF pricing pass failed freshness guard: holding closes are not exact enough for "
             f"requested_close={requested_close_date}: " + ", ".join(stale_holdings)
         )
 
     print(
         f"PRICING_PASS_{'OK' if fresh_count else 'PARTIAL'} | requested_close={requested_close_date} | "
         f"run_id={run_id} | report_token={report_token} | holdings={holdings_count} | holdings_source={holdings_source} | shortlist={len(shortlist)} | "
-        f"fresh={fresh_count} | carried={carried_forward_count} | stale={len(stale_holdings)} | "
+        f"fresh_exact={fresh_count} | carried={carried_forward_count} | prior_or_stale={len(stale_holdings)} | "
         f"weight_coverage={invested_weight_coverage_pct:.2f} | audit={audit_path}"
     )
 
