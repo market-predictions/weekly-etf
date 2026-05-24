@@ -14,7 +14,13 @@ ISSUER_DETAIL = {
 }
 
 
-def fetch_close(symbol: str, requested_close_date: str, handler: str | None = None) -> PriceResult:
+def fetch_close(
+    symbol: str,
+    requested_close_date: str,
+    handler: str | None = None,
+    canonical_symbol: str | None = None,
+    provider_exchange: str | None = None,
+) -> PriceResult:
     """Last-resort issuer override hook for known ETF holdings.
 
     This layer is intentionally last in the holding source order. It is not a
@@ -23,12 +29,13 @@ def fetch_close(symbol: str, requested_close_date: str, handler: str | None = No
     metadata. The registry-level source name remains issuer_override only to
     prove this last-resort hook was used.
     """
+    canonical = canonical_symbol or symbol
     if not handler:
-        return PriceResult(symbol, requested_close_date, None, None, None, "issuer_override", None, None, "unresolved", "low", error="No issuer handler configured")
+        return PriceResult(canonical, requested_close_date, None, None, None, "issuer_override", None, None, "unresolved", "low", error="No issuer handler configured", provider_symbol=symbol, provider_exchange=provider_exchange)
 
-    result = yahoo_history.fetch_close(symbol, requested_close_date)
+    result = yahoo_history.fetch_close(symbol, requested_close_date, canonical_symbol=canonical, provider_exchange=provider_exchange)
     detail = ISSUER_DETAIL.get(handler, f"issuer_override:{handler}")
-    if result.status in {"fresh_close", "fresh_fallback_source"}:
+    if result.status in {"fresh_exact_close", "fresh_exact_unverified", "prior_valid_close"}:
         result.source = "issuer_override"
         result.source_detail = f"{detail}:delegated_yahoo_history"
         result.metadata = {**result.metadata, "handler": handler, "delegated_source": "yahoo_history", "last_resort": True}
@@ -37,7 +44,7 @@ def fetch_close(symbol: str, requested_close_date: str, handler: str | None = No
         return result
 
     return PriceResult(
-        symbol,
+        canonical,
         requested_close_date,
         result.returned_close_date,
         result.price,
@@ -49,4 +56,13 @@ def fetch_close(symbol: str, requested_close_date: str, handler: str | None = No
         "low",
         error=result.error or "Issuer override fallback unresolved",
         metadata={"handler": handler, "delegated_source": "yahoo_history", "last_resort": True},
+        provider_symbol=symbol,
+        provider_exchange=provider_exchange,
+        raw_close=result.raw_close,
+        adjusted_close=result.adjusted_close,
+        selected_close=result.selected_close,
+        selected_close_type=result.selected_close_type,
+        provider_timestamp=result.provider_timestamp,
+        provider_timezone=result.provider_timezone,
+        is_final_eod_bar=result.is_final_eod_bar,
     )
