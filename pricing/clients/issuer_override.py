@@ -15,23 +15,23 @@ ISSUER_DETAIL = {
 
 
 def fetch_close(symbol: str, requested_close_date: str, handler: str | None = None) -> PriceResult:
-    """Issuer override layer for known ETF holdings.
+    """Last-resort issuer override hook for known ETF holdings.
 
-    The registry can name issuer handlers per ETF. Many issuer quote pages are
-    JavaScript-rendered or change markup frequently, so this layer provides a
-    stable operational hook while currently delegating to the no-key Yahoo
-    history fallback for the actual close retrieval. The source is still marked
-    as issuer_override and records the configured handler in metadata, so the
-    audit proves that the override layer was attempted first.
+    This layer is intentionally last in the holding source order. It is not a
+    live issuer scraper yet; until issuer-native scrapers exist it delegates to
+    the no-key Yahoo history fallback and keeps the delegated source visible in
+    metadata. The registry-level source name remains issuer_override only to
+    prove this last-resort hook was used.
     """
     if not handler:
         return PriceResult(symbol, requested_close_date, None, None, None, "issuer_override", None, None, "unresolved", "low", error="No issuer handler configured")
 
     result = yahoo_history.fetch_close(symbol, requested_close_date)
+    detail = ISSUER_DETAIL.get(handler, f"issuer_override:{handler}")
     if result.status in {"fresh_close", "fresh_fallback_source"}:
         result.source = "issuer_override"
-        result.source_detail = ISSUER_DETAIL.get(handler, f"issuer_override:{handler}")
-        result.metadata = {**result.metadata, "handler": handler, "delegated_source": "yahoo_history"}
+        result.source_detail = f"{detail}:delegated_yahoo_history"
+        result.metadata = {**result.metadata, "handler": handler, "delegated_source": "yahoo_history", "last_resort": True}
         if result.confidence == "high":
             result.confidence = "medium"
         return result
@@ -43,10 +43,10 @@ def fetch_close(symbol: str, requested_close_date: str, handler: str | None = No
         result.price,
         result.currency,
         "issuer_override",
-        ISSUER_DETAIL.get(handler, f"issuer_override:{handler}"),
+        f"{detail}:delegated_yahoo_history",
         result.field_used,
         "unresolved",
         "low",
         error=result.error or "Issuer override fallback unresolved",
-        metadata={"handler": handler, "delegated_source": "yahoo_history"},
+        metadata={"handler": handler, "delegated_source": "yahoo_history", "last_resort": True},
     )
