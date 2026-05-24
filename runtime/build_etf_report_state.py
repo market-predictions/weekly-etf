@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import argparse
 import csv
 import json
+import os
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -90,11 +92,31 @@ def latest_macro_policy_pack() -> Path | None:
     return files[-1] if files else None
 
 
-def discover_sources() -> RuntimeSources:
+def _explicit_path(value: str | None, *, description: str) -> Path | None:
+    if not value:
+        return None
+    path = Path(value)
+    if not path.exists():
+        raise RuntimeError(f"Explicit {description} does not exist: {path}")
+    return path
+
+
+def discover_sources(
+    pricing_audit_path: str | None = None,
+    lane_assessment_path: str | None = None,
+) -> RuntimeSources:
+    explicit_pricing = _explicit_path(
+        pricing_audit_path or os.environ.get("ETF_PRICING_AUDIT_PATH") or os.environ.get("MRKT_RPRTS_PRICING_AUDIT_PATH"),
+        description="ETF pricing audit path",
+    )
+    explicit_lane = _explicit_path(
+        lane_assessment_path or os.environ.get("ETF_LANE_ARTIFACT_PATH") or os.environ.get("MRKT_RPRTS_LANE_ARTIFACT_PATH"),
+        description="ETF lane artifact path",
+    )
     return RuntimeSources(
         portfolio_state=Path("output/etf_portfolio_state.json"),
-        pricing_audit=latest_file(PRICING_DIR, "price_audit_*.json"),
-        lane_assessment=latest_lane_file(LANE_DIR, "etf_lane_assessment_*.json"),
+        pricing_audit=explicit_pricing or latest_file(PRICING_DIR, "price_audit_*.json"),
+        lane_assessment=explicit_lane or latest_lane_file(LANE_DIR, "etf_lane_assessment_*.json"),
         recommendation_scorecard=Path("output/etf_recommendation_scorecard.csv"),
         macro_policy_pack=latest_macro_policy_pack(),
     )
@@ -160,7 +182,7 @@ def _revalue_holding_from_price(holding: dict[str, Any], price_row: dict[str, An
     if price is None:
         return holding
     status = str(price_row.get("status") or "")
-    if status not in {"fresh_close", "fresh_fallback_source"}:
+    if status not in {"fresh_close", "fresh_fallback_source", "fresh_exact_close", "fresh_exact_unverified", "prior_valid_close"}:
         return holding
 
     shares = _to_float(holding.get("shares"))
@@ -231,8 +253,8 @@ def enrich_positions(pricing_holdings: list[dict[str, Any]], portfolio_state: di
     return enriched
 
 
-def build_runtime_state() -> dict[str, Any]:
-    sources = discover_sources()
+def build_runtime_state(pricing_audit_path: str | None = None, lane_assessment_path: str | None = None) -> dict[str, Any]:
+    sources = discover_sources(pricing_audit_path=pricing_audit_path, lane_assessment_path=lane_assessment_path)
 
     portfolio_state = load_json(sources.portfolio_state)
     pricing_audit = load_json(sources.pricing_audit)
@@ -258,6 +280,7 @@ def build_runtime_state() -> dict[str, Any]:
 
     return {
         "generated_at_utc": datetime.utcnow().isoformat() + "Z",
+        "run_id": pricing_audit.get("run_id") or os.environ.get("ETF_PRICING_RUN_ID") or os.environ.get("MRKT_RPRTS_RUN_ID"),
         "report_date": resolved_report_date,
         "requested_close_date": pricing_audit.get("requested_close_date"),
         "source_files": {"portfolio_state": str(sources.portfolio_state), "pricing_audit": str(sources.pricing_audit), "lane_assessment": str(sources.lane_assessment), "recommendation_scorecard": str(sources.recommendation_scorecard), "macro_policy_pack": str(sources.macro_policy_pack) if sources.macro_policy_pack else None},
@@ -274,12 +297,26 @@ def build_runtime_state() -> dict[str, Any]:
 
 
 def main() -> None:
-    runtime_state = build_runtime_state()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--pricing-audit", default=None)
+    parser.add_argument("--lane-artifact", default=None)
+    parser.add_argument("--output-path", default=None)
+    args = parser.parse_args()
+
+    runtime_state = build_runtime_state(pricing_audit_path=args.pricing_audit, lane_assessment_path=args.lane_artifact)
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
     report_date = str(runtime_state.get("report_date") or "unknown").replace("-", "")
-    out_path = RUNTIME_DIR / f"etf_report_state_{report_date}.json"
+    run_id = str(runtime_state.get("run_id") or "").strip()
+    if args.output_path:
+        out_path = Path(args.output_path)
+    elif run_id:
+        out_path = RUNTIME_DIR / f"etf_report_state_{report_date}_{run_id}.json"
+    else:
+        out_path = RUNTIME_DIR / f"etf_report_state_{report_date}.json"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(runtime_state, indent=2), encoding="utf-8")
-    print(f"ETF_RUNTIME_STATE_OK | report_date={runtime_state.get('report_date')} | output={out_path} | lane_source={runtime_state.get('source_files', {}).get('lane_assessment')} | macro_source={runtime_state.get('source_files', {}).get('macro_policy_pack')}")
+    (RUNTIME_DIR / "latest_etf_report_state_path.txt").write_text(str(out_path) + "\n", encoding="utf-8")
+    print(f"ETF_RUNTIME_STATE_OK | report_date={runtime_state.get('report_date')} | run_id={runtime_state.get('run_id')} | output={out_path} | pricing={runtime_state.get('source_files', {}).get('pricing_audit')} | lane_source={runtime_state.get('source_files', {}).get('lane_assessment')} | macro_source={runtime_state.get('source_files', {}).get('macro_policy_pack')}")
 
 
 if __name__ == "__main__":
