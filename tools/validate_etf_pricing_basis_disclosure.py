@@ -4,24 +4,23 @@ import argparse
 import re
 from pathlib import Path
 
-START = "<!-- ETF_PRICE_BASIS_DISCLOSURE_START -->"
-END = "<!-- ETF_PRICE_BASIS_DISCLOSURE_END -->"
 EN_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
 TV_LINK_RE = re.compile(r"\[([A-Z][A-Z0-9./_-]{1,14})\]\(https://www\.tradingview\.com/chart/\?symbol=[^)]+\)")
 
 REQUIRED_EN = [
     "### Closing prices used in this report",
-    "| Holding | Close date used | Close used | Currency | Pricing source | Status |",
-    "| FX basis | Date used | Rate | Source | Status |",
+    "| Holding | Requested close | Close date used | Close used | Currency | Market-data source | Status |",
+    "| FX basis | Requested date | Date used | Rate | Source | Status |",
 ]
 
 REQUIRED_NL = [
     "### Gebruikte slotkoersen in dit rapport",
-    "| Positie | Gebruikte slotdatum | Gebruikte slotkoers | Valuta | Prijsbron | Status |",
-    "| FX-basis | Gebruikte datum | Koers | Bron | Status |",
+    "| Positie | Gevraagde slotdatum | Gebruikte slotdatum | Gebruikte slotkoers | Valuta | Marktdata-bron | Status |",
+    "| FX-basis | Gevraagde datum | Gebruikte datum | Koers | Bron | Status |",
 ]
 
 REQUIRED_TICKERS = {"SPY", "SMH", "PPA", "PAVE", "URNM", "GLD"}
+FORBIDDEN_INTERNAL = ["ETF_PRICE_BASIS_DISCLOSURE", "issuer_override", "source_detail", "handler"]
 
 
 def latest_pair(output_dir: Path) -> tuple[Path, Path]:
@@ -43,17 +42,19 @@ def latest_pair(output_dir: Path) -> tuple[Path, Path]:
     return en, nl
 
 
-def disclosure(text: str) -> str:
-    m = re.search(rf"{re.escape(START)}(.*?){re.escape(END)}", text, re.S)
-    if not m:
+def disclosure(text: str, language: str) -> str:
+    heading = "### Gebruikte slotkoersen in dit rapport" if language == "nl" else "### Closing prices used in this report"
+    start = text.find(heading)
+    if start == -1:
         return ""
-    return m.group(1)
+    tail = text[start:]
+    next_heading = re.search(r"\n###\s+|\n##\s+|\n`EQUITY_CURVE_CHART_PLACEHOLDER`", tail[len(heading):])
+    if next_heading:
+        return tail[: len(heading) + next_heading.start()]
+    return tail
 
 
 def normalize_tv_links(markdown: str) -> str:
-    # The pricing-basis disclosure is injected before the ticker-link pass.
-    # By validation time, table cells may contain TradingView markdown links,
-    # e.g. | [SPY](https://...) |. Normalize them back to SPY for row checks.
     return TV_LINK_RE.sub(r"\1", markdown)
 
 
@@ -70,7 +71,7 @@ def ticker_row_present(block: str, ticker: str) -> bool:
 
 def validate_report(path: Path, language: str) -> list[str]:
     text = path.read_text(encoding="utf-8")
-    block = disclosure(text)
+    block = disclosure(text, language)
     failures: list[str] = []
     if not block:
         return [f"{path.name}: missing pricing basis disclosure block"]
@@ -83,8 +84,13 @@ def validate_report(path: Path, language: str) -> list[str]:
             failures.append(f"{path.name}: missing pricing row for {ticker}")
     if "EUR/USD" not in block:
         failures.append(f"{path.name}: missing EUR/USD FX row")
+    for forbidden in FORBIDDEN_INTERNAL:
+        if forbidden in text:
+            failures.append(f"{path.name}: client-facing report leaks internal pricing label: {forbidden}")
     if "unknown" in block.lower() or "onbekend" in block.lower():
         failures.append(f"{path.name}: pricing disclosure contains unknown/onbekend")
+    if "Yahoo" not in block and "Twelve Data" not in block and "Opgeslagen" not in block and "Persisted" not in block:
+        failures.append(f"{path.name}: pricing disclosure does not show a client-facing market-data source")
     return failures
 
 
