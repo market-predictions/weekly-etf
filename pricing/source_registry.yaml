@@ -18,14 +18,56 @@ defaults:
 
 overrides:
   SPY:
+    canonical_symbol: SPY
+    expected_exchange: NYSE Arca
+    provider_symbols:
+      twelve_data: SPY
+      fmp: SPY
+      alpha_vantage: SPY
+      yahoo_history: SPY
     issuer_handler: ssga_spy
   GLD:
+    canonical_symbol: GLD
+    expected_exchange: NYSE Arca
+    provider_symbols:
+      twelve_data: GLD
+      fmp: GLD
+      alpha_vantage: GLD
+      yahoo_history: GLD
     issuer_handler: ssga_gld
   SMH:
+    canonical_symbol: SMH
+    expected_exchange: NASDAQ
+    provider_symbols:
+      twelve_data: SMH
+      fmp: SMH
+      alpha_vantage: SMH
+      yahoo_history: SMH
     issuer_handler: vaneck_smh
   PAVE:
+    canonical_symbol: PAVE
+    expected_exchange: Cboe BZX
+    provider_symbols:
+      twelve_data: PAVE
+      fmp: PAVE
+      alpha_vantage: PAVE
+      yahoo_history: PAVE
     issuer_handler: globalx_pave
   URNM:
+    canonical_symbol: URNM
+    expected_exchange: NYSE Arca
+    provider_symbols:
+      twelve_data: URNM
+      fmp: URNM
+      alpha_vantage: URNM
+      yahoo_history: URNM
     issuer_handler: sprott_urnm
   PPA:
+    canonical_symbol: PPA
+    expected_exchange: NYSE Arca
+    provider_symbols:
+      twelve_data: PPA
+      fmp: PPA
+      alpha_vantage: PPA
+      yahoo_history: PPA
     issuer_handler: invesco_ppa
