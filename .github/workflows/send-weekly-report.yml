@@ -255,6 +255,32 @@ jobs:
         run: |
           python pricing/validate_persisted_audit.py
 
+      - name: Persist successful ETF valuation state
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python -m runtime.persist_etf_valuation_state \
+            --runtime-state "$ETF_RUNTIME_STATE_PATH" \
+            --pricing-audit "$ETF_PRICING_AUDIT_PATH" \
+            --english-report "$MRKT_RPRTS_EXPLICIT_REPORT_PATH" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --valuation-history output/etf_valuation_history.csv
+          python tools/validate_etf_persisted_valuation_state.py \
+            --runtime-state "$ETF_RUNTIME_STATE_PATH" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --valuation-history output/etf_valuation_history.csv
+          python tools/write_weekly_etf_run_manifest.py \
+            --run-id "$ETF_PRICING_RUN_ID" \
+            --requested-close-date "$REQUESTED_CLOSE_DATE" \
+            --report-token "$REPORT_TOKEN" \
+            --pricing-audit "$ETF_PRICING_AUDIT_PATH" \
+            --runtime-state "$ETF_RUNTIME_STATE_PATH" \
+            --english-report "$MRKT_RPRTS_EXPLICIT_REPORT_PATH" \
+            --dutch-report "$MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --valuation-history output/etf_valuation_history.csv \
+            --status valuation_state_persisted
+
       - name: Validate lane breadth proof before render
         env:
           MRKT_RPRTS_REPORT_MODE: pro
@@ -341,6 +367,8 @@ jobs:
             --runtime-state "${ETF_RUNTIME_STATE_PATH:-}" \
             --english-report "${MRKT_RPRTS_EXPLICIT_REPORT_PATH:-}" \
             --dutch-report "${MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL:-}" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --valuation-history output/etf_valuation_history.csv \
             --status "workflow_${{ job.status }}" \
             --conclusion "${{ job.status }}"
 
