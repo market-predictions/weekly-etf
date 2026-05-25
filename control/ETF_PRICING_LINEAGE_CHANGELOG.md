@@ -12,6 +12,99 @@ This file is the central changelog for the ETF pricing-lineage repair track. It 
 
 ---
 
+## 2026-05-24 — Upgrade ETF price-row schema and exact/prior status semantics
+
+### Current issue
+
+The ETF report now exposes close-price rows, but the audit still used legacy statuses such as `fresh_close` and `fresh_fallback_source`. That allowed an exact requested-date close and a latest prior provider close to be treated too similarly. The audit also lacked a normalized place for selected close, raw/adjusted close, provider symbol, provider exchange, finality, price role, and pricing tier.
+
+### Root cause
+
+The old pricing model treated provider success as enough. It did not separate the evidence questions required by `ETF_PRICING_LINEAGE_CONTRACT_V1`:
+
+- Was the close exactly on the requested close date?
+- Was it merely the latest valid prior market close?
+- Which provider symbol was requested?
+- Which close field was selected?
+- Was the row valuation-grade or research-grade?
+
+### What changed
+
+- `pricing/models.py`
+  - Added explicit statuses:
+    - `fresh_exact_close`
+    - `fresh_exact_unverified`
+    - `prior_valid_close`
+    - `carried_forward`
+    - `unresolved`
+    - `blocked`
+  - Kept `fresh_close` and `fresh_fallback_source` as legacy inputs, normalized by `PriceResult.__post_init__`.
+  - Added close-lineage fields: `provider_symbol`, `provider_exchange`, `raw_close`, `adjusted_close`, `selected_close`, `selected_close_type`, `provider_timestamp`, `provider_timezone`, `is_final_eod_bar`, `asset_role`, `pricing_tier`, and `verification`.
+  - Added shared status sets for exact and priced closes.
+
+- `pricing/close_resolver.py`
+  - Uses explicit priced-close statuses as success states.
+  - Adds resolver-level asset role and pricing tier to each resolved row.
+  - Passes provider symbol and expected exchange into provider clients.
+
+- `pricing/symbol_resolver.py`
+  - Added provider-symbol and expected-exchange lookup.
+
+- `pricing/source_registry.yaml`
+  - Added explicit provider-symbol and expected-exchange metadata for current ETF holdings.
+
+- Provider clients:
+  - `pricing/clients/twelve_data.py`
+  - `pricing/clients/yahoo_history.py`
+  - `pricing/clients/fmp.py`
+  - `pricing/clients/alpha_vantage.py`
+  - `pricing/clients/issuer_override.py`
+  - `pricing/clients/ecb_reference.py`
+  - `pricing/fx_resolver.py`
+  - These now emit exact/prior status semantics and lineage fields where available.
+
+- Runtime/report consumers:
+  - `pricing/run_pricing_pass.py` now counts only exact-close holdings as fresh and records prior-valid rows separately.
+  - `runtime/build_etf_report_state.py` now values holdings from `selected_close` when present and records pricing close type/tier into runtime positions.
+  - `runtime/add_etf_pricing_basis_section.py` now renders client-facing exact/prior status labels and uses `selected_close` when present.
+  - `pricing/augment_challenger_pricing.py` and `runtime/score_etf_lanes.py` now understand explicit priced-close statuses.
+
+### Affected files
+
+- `pricing/models.py`
+- `pricing/close_resolver.py`
+- `pricing/symbol_resolver.py`
+- `pricing/source_registry.yaml`
+- `pricing/clients/twelve_data.py`
+- `pricing/clients/yahoo_history.py`
+- `pricing/clients/fmp.py`
+- `pricing/clients/alpha_vantage.py`
+- `pricing/clients/issuer_override.py`
+- `pricing/clients/ecb_reference.py`
+- `pricing/fx_resolver.py`
+- `pricing/run_pricing_pass.py`
+- `pricing/augment_challenger_pricing.py`
+- `runtime/build_etf_report_state.py`
+- `runtime/add_etf_pricing_basis_section.py`
+- `runtime/score_etf_lanes.py`
+- `control/ETF_PRICING_LINEAGE_CHANGELOG.md`
+- `changelog.md`
+
+### Validation / evidence
+
+No production workflow run has been executed yet after this implementation. The next validation step is a fresh ETF workflow run. Expected evidence:
+
+- New audit rows contain `selected_close`, `selected_close_type`, `provider_symbol`, `provider_exchange`, `is_final_eod_bar`, `pricing_tier`, and `verification`.
+- Exact requested-date rows are labeled `fresh_exact_unverified` unless/until independent verification is added.
+- Prior rows are labeled `prior_valid_close` rather than generic `fresh_fallback_source`.
+- The report disclosure renders these as readable client-facing statuses.
+
+### Remaining gaps
+
+This closes Phase 1B step 7 at schema/status level, but independent verification remains intentionally open. `fresh_exact_close` should be reserved for rows that pass the future cross-provider verification layer. The next implementation step is Phase 1B step 8: persist successful runtime valuation state into `output/etf_portfolio_state.json` and `output/etf_valuation_history.csv`.
+
+---
+
 ## 2026-05-24 — Implement immutable ETF run identity and run manifest wiring
 
 ### Current issue
@@ -78,8 +171,6 @@ This is a workflow/code commit. No production run has been executed yet after th
 
 This closes Phase 1B step 6 only. It does not yet implement:
 
-- upgraded price-row schema
-- exact/prior close-date status semantics
 - independent verification
 - canonical portfolio-state and valuation-history persistence from runtime valuation
 - hard `tools/validate_etf_pricing_lineage_contract.py`
@@ -149,12 +240,12 @@ Current ETF reports can derive a new runtime NAV without updating `output/etf_po
 
 ### C. Weak fresh-close semantics
 
-A provider row on or before the requested date must not be labeled generically as fresh. The status must distinguish exact requested close from prior valid market close. This remains open.
+Addressed at schema/status level. New rows now distinguish exact requested-date closes from prior valid market closes. Independent verification remains open, so most exact provider closes should be `fresh_exact_unverified` until the cross-provider verifier is added.
 
 ### D. Challenger pricing tier ambiguity
 
-Broad discovery can remain research-grade. Replacement-duel challengers and promoted fundable candidates require valuation-grade pricing before being presented as actionable. This remains open.
+Partly addressed. Resolver-level rows now carry `pricing_tier`, with holdings and challengers treated as valuation-grade and broad radar rows treated as research-grade. Enforcement that fundable challengers must have valuation-grade pricing remains open.
 
 ### E. Missing independent verification
 
-Provider closes should be cross-checked where feasible. When cross-check is unavailable, the audit must say so explicitly. This remains open.
+Provider closes should be cross-checked where feasible. When cross-check is unavailable, the audit now says `verification.status = not_checked`; cross-provider verification remains open.
