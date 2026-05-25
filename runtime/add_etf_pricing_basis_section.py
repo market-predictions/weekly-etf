@@ -86,8 +86,6 @@ def section_bounds(markdown: str, section_number: int) -> tuple[int, int] | None
 
 
 def remove_existing_block(markdown: str) -> str:
-    # Remove the old marker-based implementation, including visible escaped HTML
-    # comment variants, and remove the current heading-based disclosure block.
     out = re.sub(rf"\n?{re.escape(OLD_START)}.*?{re.escape(OLD_END)}\n?", "\n", markdown, flags=re.S)
     out = re.sub(r"\n?&lt;!-- ETF_PRICE_BASIS_DISCLOSURE_START --&gt;.*?&lt;!-- ETF_PRICE_BASIS_DISCLOSURE_END --&gt;\n?", "\n", out, flags=re.S)
     for heading in (EN_HEADING, NL_HEADING):
@@ -99,10 +97,14 @@ def remove_existing_block(markdown: str) -> str:
 def price_status_label(value: Any, language: str) -> str:
     raw = text(value, "unknown")
     labels = {
-        "fresh_close": {"en": "Fresh close", "nl": "Verse slotkoers"},
-        "fresh_fallback_source": {"en": "Fresh fallback source", "nl": "Verse fallbackbron"},
+        "fresh_close": {"en": "Fresh exact close", "nl": "Exacte slotkoers"},
+        "fresh_fallback_source": {"en": "Prior valid close", "nl": "Eerdere geldige slotkoers"},
+        "fresh_exact_close": {"en": "Fresh exact close, verified", "nl": "Exacte slotkoers, geverifieerd"},
+        "fresh_exact_unverified": {"en": "Fresh exact close, unverified", "nl": "Exacte slotkoers, niet onafhankelijk geverifieerd"},
+        "prior_valid_close": {"en": "Prior valid market close", "nl": "Eerdere geldige markt-slotkoers"},
         "carried_forward": {"en": "Carried forward", "nl": "Doorgeschoven"},
         "unresolved": {"en": "Unresolved", "nl": "Niet opgelost"},
+        "blocked": {"en": "Blocked", "nl": "Geblokkeerd"},
     }
     return labels.get(raw, {"en": raw, "nl": raw}).get(language, raw)
 
@@ -115,6 +117,9 @@ def source_label(result: dict[str, Any], language: str) -> str:
         "twelve_data": {"en": "Twelve Data", "nl": "Twelve Data"},
         "yahoo_history": {"en": "Yahoo Finance history", "nl": "Yahoo Finance historie"},
         "yfinance": {"en": "Yahoo Finance history", "nl": "Yahoo Finance historie"},
+        "fmp": {"en": "Financial Modeling Prep", "nl": "Financial Modeling Prep"},
+        "alpha_vantage": {"en": "Alpha Vantage", "nl": "Alpha Vantage"},
+        "ecb_reference": {"en": "ECB reference rate", "nl": "ECB-referentiekoers"},
         "issuer_pages": {"en": "Issuer page", "nl": "Uitgeverpagina"},
         "price_cache": {"en": "Persisted price cache", "nl": "Opgeslagen prijscache"},
         "manual_override": {"en": "Manual override", "nl": "Handmatige override"},
@@ -134,6 +139,10 @@ def audit_price_map(audit: dict[str, Any]) -> dict[str, dict[str, Any]]:
         if symbol:
             out[symbol] = row
     return out
+
+
+def close_value(row: dict[str, Any]) -> Any:
+    return row.get("selected_close") if row.get("selected_close") is not None else row.get("price")
 
 
 def holding_order(state: dict[str, Any], audit: dict[str, Any]) -> list[str]:
@@ -159,7 +168,7 @@ def en_block(state: dict[str, Any], audit: dict[str, Any]) -> str:
         row = price_map.get(ticker, {})
         lines.append(
             f"| {ticker} | {text(row.get('requested_close_date'), requested_close)} | {text(row.get('returned_close_date'), requested_close)} | "
-            f"{f2(row.get('price'))} | {text(row.get('currency'), 'USD')} | {source_label(row, 'en')} | {price_status_label(row.get('status'), 'en')} |"
+            f"{f2(close_value(row))} | {text(row.get('currency'), 'USD')} | {source_label(row, 'en')} | {price_status_label(row.get('status'), 'en')} |"
         )
     fx_date = text(fx.get("returned_date") or fx.get("requested_date"), requested_close)
     lines.extend([
@@ -187,7 +196,7 @@ def nl_block(state: dict[str, Any], audit: dict[str, Any]) -> str:
         row = price_map.get(ticker, {})
         lines.append(
             f"| {ticker} | {text(row.get('requested_close_date'), requested_close)} | {text(row.get('returned_close_date'), requested_close)} | "
-            f"{f2(row.get('price'))} | {text(row.get('currency'), 'USD')} | {source_label(row, 'nl')} | {price_status_label(row.get('status'), 'nl')} |"
+            f"{f2(close_value(row))} | {text(row.get('currency'), 'USD')} | {source_label(row, 'nl')} | {price_status_label(row.get('status'), 'nl')} |"
         )
     fx_date = text(fx.get("returned_date") or fx.get("requested_date"), requested_close)
     lines.extend([
