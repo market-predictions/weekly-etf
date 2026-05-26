@@ -70,25 +70,32 @@ def held_tickers_from_portfolio_state(path: Path) -> set[str]:
     return tickers
 
 
-def pricing_context(pricing_audit: dict[str, Any]) -> tuple[dict[str, str], set[str]]:
+def pricing_context(pricing_audit: dict[str, Any]) -> tuple[dict[str, str], set[str], dict[str, str], dict[str, str]]:
     status_by_symbol: dict[str, str] = {}
     priced: set[str] = set()
+    tier_by_symbol: dict[str, str] = {}
+    source_by_symbol: dict[str, str] = {}
     for item in pricing_audit.get("prices", []) or []:
         symbol = str(item.get("symbol", "")).upper()
         if not symbol:
             continue
         status = str(item.get("status", "unknown"))
         status_by_symbol[symbol] = status
-        if item.get("price") is not None:
+        if item.get("price") is not None or item.get("selected_close") is not None:
             priced.add(symbol)
+        if item.get("pricing_tier"):
+            tier_by_symbol[symbol] = str(item.get("pricing_tier"))
+        if item.get("source"):
+            source_by_symbol[symbol] = str(item.get("source"))
     for item in pricing_audit.get("holdings", []) or []:
         symbol = str(item.get("ticker", "")).upper()
         if not symbol:
             continue
         status_by_symbol.setdefault(symbol, "holding_snapshot")
+        tier_by_symbol.setdefault(symbol, "valuation_grade")
         if item.get("previous_price_local") is not None:
             priced.add(symbol)
-    return status_by_symbol, priced
+    return status_by_symbol, priced, tier_by_symbol, source_by_symbol
 
 
 def prior_promoted_tickers(prior: dict[str, Any] | None) -> set[str]:
@@ -142,7 +149,7 @@ def build_lane_artifact(
     report_filename = f"weekly_analysis_pro_{suffix}.md"
     prior = prior_lane_artifact(suffix)
 
-    status_by_symbol, priced_symbols = pricing_context(pricing_audit)
+    status_by_symbol, priced_symbols, tier_by_symbol, source_by_symbol = pricing_context(pricing_audit)
     rs_metrics = relative_strength_metrics(relative_strength_path)
     macro_policy_pack = load_json(macro_policy_pack_path) if macro_policy_pack_path.exists() else {}
 
@@ -152,6 +159,8 @@ def build_lane_artifact(
         price_status_by_symbol=status_by_symbol,
         priced_symbols=priced_symbols,
         portfolio_gap_themes=dict(config.get("portfolio_gap_themes", {}) or {}),
+        price_tier_by_symbol=tier_by_symbol,
+        price_source_by_symbol=source_by_symbol,
         relative_strength_metrics=rs_metrics,
         macro_policy_pack=macro_policy_pack,
     )
@@ -165,7 +174,7 @@ def build_lane_artifact(
         "report_date": report_date,
         "report_filename": report_filename,
         "prior_report_filename": (prior or {}).get("report_filename"),
-        "discovery_engine_version": "lane_discovery_v3_macro_policy",
+        "discovery_engine_version": "lane_discovery_v4_valuation_grade_fundability",
         "macro_regime": (macro_policy_pack.get("regime") or {}).get("current"),
         "discovery_inputs": {
             "config": str(config_path),
@@ -205,11 +214,12 @@ def main() -> None:
     )
     promoted = [lane for lane in payload["assessed_lanes"] if lane.get("promoted_to_live_radar")]
     challengers = [lane for lane in payload["assessed_lanes"] if lane.get("challenger")]
+    fundable = [lane for lane in promoted if lane.get("is_fundable_candidate")]
     rs_used = bool(payload.get("discovery_inputs", {}).get("relative_strength"))
     print(
         "ETF_LANE_DISCOVERY_OK | "
         f"report={payload['report_filename']} | regime={payload.get('macro_regime')} | lanes={len(payload['assessed_lanes'])} | "
-        f"promoted={len(promoted)} | challengers={len(challengers)} | rs_used={rs_used} | artifact={out_path}"
+        f"promoted={len(promoted)} | challengers={len(challengers)} | fundable={len(fundable)} | rs_used={rs_used} | artifact={out_path}"
     )
 
 
