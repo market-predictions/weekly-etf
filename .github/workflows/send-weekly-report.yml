@@ -164,6 +164,14 @@ jobs:
             --relative-strength output/market_history/etf_relative_strength.json \
             --macro-context config/etf_macro_fundamental_context.yml
 
+      - name: Validate ETF challenger fundability contract
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          python tools/validate_etf_challenger_fundability_contract.py \
+            --lane-artifact "$ETF_LANE_ARTIFACT_PATH" \
+            --pricing-audit "$ETF_PRICING_AUDIT_PATH"
+
       - name: Build runtime ETF state and reports
         env:
           MRKT_RPRTS_REPORT_MODE: pro
