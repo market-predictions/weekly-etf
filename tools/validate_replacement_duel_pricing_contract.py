@@ -12,10 +12,12 @@ if str(REPO_ROOT) not in sys.path:
 from runtime.build_etf_report_state import build_runtime_state
 from runtime.replacement_duel_v2 import PRIORITY_DUEL_PAIRS, replacement_duel_v2_rows
 
+PRICED_STATUSES = {"fresh_close", "fresh_fallback_source", "fresh_exact_close", "fresh_exact_unverified", "prior_valid_close"}
+VALUATION_GRADE = "valuation_grade"
 ACTIONABLE_DECISION_MARKERS = (
     "replacement trigger watch",
     "challenger improving",
-    "fundable",
+    "decision-grade",
     "actionable",
     "promoted",
 )
@@ -25,6 +27,7 @@ NON_ACTIONABLE_DECISION_MARKERS = (
     "close proof incomplete",
     "pricing exception",
     "current holding still leads",
+    "valuation-grade challenger pricing required",
 )
 
 
@@ -41,6 +44,14 @@ def _has_price(value: Any) -> bool:
 
 def _is_incomplete(row: dict[str, Any]) -> bool:
     return not _has_price(row.get("current_close")) or not _has_price(row.get("challenger_close"))
+
+
+def _is_valuation_grade(row: dict[str, Any]) -> bool:
+    return (
+        _has_price(row.get("challenger_close"))
+        and str(row.get("challenger_price_status") or row.get("challenger_status") or "") in PRICED_STATUSES
+        and str(row.get("challenger_pricing_tier") or "") == VALUATION_GRADE
+    )
 
 
 def _looks_actionable(row: dict[str, Any]) -> bool:
@@ -62,13 +73,13 @@ def _current_holding_price_failures(state: dict[str, Any]) -> list[str]:
     return failures
 
 
-def _priced_rows_by_holding(rows: list[dict[str, Any]]) -> dict[str, int]:
+def _decision_grade_rows_by_holding(rows: list[dict[str, Any]]) -> dict[str, int]:
     priced: dict[str, int] = {}
     for row in rows:
         holding = _ticker(row.get("current_holding"))
         if not holding:
             continue
-        if _has_price(row.get("current_close")) and _has_price(row.get("challenger_close")):
+        if _has_price(row.get("current_close")) and _is_valuation_grade(row):
             priced[holding] = priced.get(holding, 0) + 1
     return priced
 
@@ -83,17 +94,19 @@ def validate() -> None:
 
     missing_holding_prices = _current_holding_price_failures(state)
     if missing_holding_prices:
-        hard_failures.append(
-            "current holding closes missing: " + ", ".join(sorted(missing_holding_prices))
-        )
+        hard_failures.append("current holding closes missing: " + ", ".join(sorted(missing_holding_prices)))
 
     for row in rows:
         if _is_incomplete(row) and _looks_actionable(row):
             hard_failures.append(
                 f"incomplete pricing but actionable decision: {_ticker(row.get('current_holding'))}->{_ticker(row.get('challenger'))} decision={row.get('decision')!r}"
             )
+        if _looks_actionable(row) and not _is_valuation_grade(row):
+            hard_failures.append(
+                f"actionable decision without valuation-grade challenger price: {_ticker(row.get('current_holding'))}->{_ticker(row.get('challenger'))} tier={row.get('challenger_pricing_tier')!r} status={row.get('challenger_price_status')!r}"
+            )
 
-    priced_by_holding = _priced_rows_by_holding(rows)
+    decision_grade_by_holding = _decision_grade_rows_by_holding(rows)
     current_holdings = {
         _ticker(position.get("ticker"))
         for position in state.get("positions", []) or []
@@ -101,10 +114,8 @@ def validate() -> None:
     }
     holdings_with_duel_policy = {holding for holding, _challenger in PRIORITY_DUEL_PAIRS}
     for holding in sorted(current_holdings & holdings_with_duel_policy):
-        if priced_by_holding.get(holding, 0) == 0:
-            warnings.append(
-                f"{holding} has no fully priced challenger row; report remains valid but that duel is not decision-grade this week."
-            )
+        if decision_grade_by_holding.get(holding, 0) == 0:
+            warnings.append(f"{holding} has no valuation-grade challenger row; duel remains review-only this week.")
 
     for pair in sorted(PRIORITY_DUEL_PAIRS):
         holding, challenger = pair
@@ -116,11 +127,13 @@ def validate() -> None:
             warnings.append(
                 f"canonical duel pricing incomplete: {holding}->{challenger} current_close={row.get('current_close')} challenger_close={row.get('challenger_close')} basis={row.get('pricing_basis')}"
             )
+        elif not _is_valuation_grade(row):
+            warnings.append(
+                f"canonical duel is priced but not valuation-grade: {holding}->{challenger} tier={row.get('challenger_pricing_tier')} status={row.get('challenger_price_status')}"
+            )
 
     if hard_failures:
-        raise RuntimeError(
-            "Replacement Duel Pricing Contract failed: " + " | ".join(hard_failures)
-        )
+        raise RuntimeError("Replacement Duel Pricing Contract failed: " + " | ".join(hard_failures))
 
     for warning in warnings:
         print(f"::warning title=Replacement Duel Pricing::{warning}")
