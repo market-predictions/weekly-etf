@@ -18,6 +18,8 @@ DEFAULT_REPLACEMENT_MAP = {
     "GLD": ["GSG", "BIL"],
 }
 
+FUNDABLE_STATUS = "funding_candidate_valuation_grade"
+
 
 def latest_file(directory: Path, pattern: str) -> Path:
     files = sorted(directory.glob(pattern))
@@ -146,6 +148,27 @@ def direct_rs_note(direct: dict[str, Any]) -> str:
     return f"Direct replacement duel versus {holding}: {'; '.join(edge_parts) if edge_parts else 'insufficient history'}."
 
 
+def _needs_fundability_note(lane: dict[str, Any]) -> bool:
+    return (
+        lane.get("promoted_to_live_radar") is True
+        and lane.get("challenger") is True
+        and str(lane.get("fundability_status") or "") != FUNDABLE_STATUS
+    )
+
+
+def ensure_fundability_note(lane: dict[str, Any]) -> None:
+    if not _needs_fundability_note(lane):
+        return
+    note = str(lane.get("promotion_fundability_note") or "").strip()
+    if "valuation-grade" not in note:
+        lane["promotion_fundability_note"] = "Promoted to radar only; funding requires valuation-grade pricing."
+
+
+def clear_rejection_if_promoted(lane: dict[str, Any]) -> None:
+    lane["rejection_reason"] = ""
+    ensure_fundability_note(lane)
+
+
 def augment_lane(lane: dict[str, Any], metrics: dict[str, Any], macro: dict[str, Any]) -> dict[str, Any]:
     lane = dict(lane)
     primary = str(lane.get("primary_etf", "")).upper()
@@ -174,6 +197,7 @@ def augment_lane(lane: dict[str, Any], metrics: dict[str, Any], macro: dict[str,
         lane["promoted_to_live_radar"] = False
     elif lane.get("rejection_reason") and lane.get("direct_rs_vs_holding"):
         lane["rejection_reason"] = f"{lane['rejection_reason']} {lane['direct_rs_note']}"
+    ensure_fundability_note(lane)
     return lane
 
 
@@ -188,7 +212,7 @@ def repromote(lanes: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if lane.get("tradability_status") == "fail_or_unknown":
             continue
         lane["promoted_to_live_radar"] = True
-        lane["rejection_reason"] = ""
+        clear_rejection_if_promoted(lane)
         promoted += 1
     if promoted < 5:
         for lane in sorted_lanes:
@@ -197,7 +221,7 @@ def repromote(lanes: list[dict[str, Any]]) -> list[dict[str, Any]]:
             if lane.get("promoted_to_live_radar"):
                 continue
             lane["promoted_to_live_radar"] = True
-            lane["rejection_reason"] = ""
+            clear_rejection_if_promoted(lane)
             promoted += 1
     return sorted_lanes
 
