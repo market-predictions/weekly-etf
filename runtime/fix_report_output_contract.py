@@ -8,7 +8,9 @@ from pathlib import Path
 from typing import Any
 
 from runtime.build_etf_report_state import build_runtime_state
-from runtime.render_etf_report_from_state import f2, position_rows, replacement_duel_table
+from runtime.render_etf_report_from_state import f2, position_rows
+from runtime.replacement_duel_v2 import replacement_duel_v2_markdown
+from runtime.rotation_render_tables import has_rotation_plan, rotation_plan_summary_from_rotation
 
 EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
@@ -118,6 +120,11 @@ def action_snapshot_section(state: dict[str, Any]) -> str:
     replace = [p for p in positions if is_replace(p)]
     reduce = [p for p in positions if is_reduce(p)]
     close = [p for p in positions if is_close(p)]
+    rotation_status = (
+        "- Rotation plan artifact is active; Sections 12-14 are rendered from rotation_decisions, target_weights and trade_intents."
+        if has_rotation_plan(state)
+        else "- Rotation plan artifact not present; legacy recommendation labels are used."
+    )
     return "\n".join([
         "### Add",
         ticker_bullets(add),
@@ -134,12 +141,15 @@ def action_snapshot_section(state: dict[str, Any]) -> str:
         "### Close",
         ticker_bullets(close),
         "",
+        "### Rotation engine status",
+        rotation_status,
+        "",
         "### Best replacements to fund",
         "- No challenger is promoted to a fundable replacement yet. Each named replacement must first clear the same close-date pricing basis and relative-strength duel.",
         "",
         "### Replacement pricing and duel status",
         "",
-        replacement_duel_table(state),
+        replacement_duel_v2_markdown(state),
     ])
 
 
@@ -149,13 +159,15 @@ def current_position_cards(state: dict[str, Any]) -> str:
     ]
     for p in position_rows(state):
         ticker = str(p.get("ticker", "")).upper()
-        action = clean_action(p.get("suggested_action"))
+        action = clean_action(p.get("rotation_action_code") or p.get("suggested_action"))
         score = f2(p.get("total_score")) or "n/a"
         fresh_cash = clean_action(p.get("fresh_cash_test"))
         role = compact(p.get("portfolio_role"), 70)
         next_action = compact(p.get("required_next_action"), 95)
+        rotation_score = clean_optional(p.get("rotation_release_score"))
+        rotation_suffix = f" — Rotation release score: {rotation_score}" if rotation_score else ""
         parts.extend([
-            f"### {ticker} — {action} — Score {score} — Fresh cash: {fresh_cash}",
+            f"### {ticker} — {action} — Score {score} — Fresh cash: {fresh_cash}{rotation_suffix}",
             f"Role: {role}. Required next action: {next_action}.",
             "",
         ])
@@ -163,6 +175,8 @@ def current_position_cards(state: dict[str, Any]) -> str:
 
 
 def rotation_plan_sections(state: dict[str, Any]) -> str:
+    if has_rotation_plan(state):
+        return rotation_plan_summary_from_rotation(state)
     positions = position_rows(state)
     add = [p for p in positions if is_add(p)]
     hold = [p for p in positions if is_hold(p)]
