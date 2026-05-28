@@ -172,13 +172,38 @@ jobs:
             --lane-artifact "$ETF_LANE_ARTIFACT_PATH" \
             --pricing-audit "$ETF_PRICING_AUDIT_PATH"
 
+      - name: Build ETF portfolio rotation plan
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          rotation_log="$(python -m runtime.portfolio_rotation_engine \
+            --portfolio-state output/etf_portfolio_state.json \
+            --scorecard output/etf_recommendation_scorecard.csv \
+            --pricing-audit "$ETF_PRICING_AUDIT_PATH" \
+            --lane-artifact "$ETF_LANE_ARTIFACT_PATH" \
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --run-id "$ETF_PRICING_RUN_ID" \
+            --output-dir output/runtime)"
+          echo "$rotation_log"
+          rotation_path="$(printf '%s\n' "$rotation_log" | sed -n 's/.* plan=\([^ |]*\).*/\1/p' | tail -1)"
+          if [ -z "$rotation_path" ] || [ ! -f "$rotation_path" ]; then
+            echo "Portfolio rotation engine did not emit a valid rotation plan path." >&2
+            exit 1
+          fi
+          echo "ETF_ROTATION_PLAN_PATH=$rotation_path" >> "$GITHUB_ENV"
+          echo "MRKT_RPRTS_ROTATION_PLAN_PATH=$rotation_path" >> "$GITHUB_ENV"
+          echo "ROTATION_PLAN_PATH_OK | plan=$rotation_path"
+          python tools/validate_etf_rotation_output_contract.py --plan "$rotation_path"
+          python tools/validate_etf_rotation_discipline.py --plan "$rotation_path" --warning-only
+
       - name: Build runtime ETF state and reports
         env:
           MRKT_RPRTS_REPORT_MODE: pro
         run: |
           state_log="$(python -m runtime.build_etf_report_state \
             --pricing-audit "$ETF_PRICING_AUDIT_PATH" \
-            --lane-artifact "$ETF_LANE_ARTIFACT_PATH")"
+            --lane-artifact "$ETF_LANE_ARTIFACT_PATH" \
+            --rotation-plan "$ETF_ROTATION_PLAN_PATH")"
           echo "$state_log"
           runtime_state_path="$(printf '%s\n' "$state_log" | sed -n 's/.* output=\([^ |]*\).*/\1/p' | tail -1)"
           if [ -z "$runtime_state_path" ] || [ ! -f "$runtime_state_path" ]; then
