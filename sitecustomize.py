@@ -1,9 +1,9 @@
-"""Runtime-wide safety patch for Dutch ETF delivery chart labels.
+"""Runtime-wide safety patches for ETF delivery rendering.
 
 Python imports ``sitecustomize`` automatically at interpreter start when the
-repository root is on ``sys.path``. Keep this patch deliberately narrow: it only
-changes the known ETF equity-curve labels, and only when the chart being saved
-is the Dutch companion chart file.
+repository root is on ``sys.path``. Keep these patches narrow and defensive:
+- localize the known Dutch ETF equity-curve labels for the Dutch companion PNG
+- add missing Dutch replacement-duel phrase variants created by the runtime
 """
 from __future__ import annotations
 
@@ -48,4 +48,30 @@ def _install_dutch_equity_curve_label_patch() -> None:
     plt.savefig = _patched_savefig
 
 
+def _install_replacement_duel_localization_patch() -> None:
+    try:
+        from runtime import nl_localization as nl
+    except Exception:
+        return
+
+    decision_updates = {
+        "Not fundable - close proof incomplete.": "Niet geschikt voor allocatie — sluitkoersbevestiging is onvolledig.",
+        "Not fundable - close proof incomplete": "Niet geschikt voor allocatie — sluitkoersbevestiging is onvolledig",
+        "Not fundable - valuation-grade challenger pricing required.": "Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist.",
+        "Not fundable - valuation-grade challenger pricing required": "Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist",
+        "Priced valuation-grade, but direct RS duel incomplete.": "Waarderingswaardig geprijsd, maar de directe relatieve-sterkteanalyse is onvolledig.",
+        "Priced valuation-grade, but direct RS duel incomplete": "Waarderingswaardig geprijsd, maar de directe relatieve-sterkteanalyse is onvolledig",
+        "Replacement trigger watch - challenger leading over 3m.": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden.",
+        "Replacement trigger watch - challenger leading over 3m": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden",
+    }
+    trigger_updates = {
+        "Upgrade challenger to valuation-grade pricing before any funding decision.": "Verbeter de prijsbevestiging van het alternatief tot waarderingskwaliteit vóór een allocatiebesluit.",
+        "Upgrade challenger to valuation-grade pricing before any funding decision": "Verbeter de prijsbevestiging van het alternatief tot waarderingskwaliteit vóór een allocatiebesluit",
+    }
+
+    nl.DECISION_TRANSLATIONS.update(decision_updates)
+    nl.TRIGGER_TRANSLATIONS.update(trigger_updates)
+
+
 _install_dutch_equity_curve_label_patch()
+_install_replacement_duel_localization_patch()
