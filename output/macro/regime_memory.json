@@ -14,9 +14,9 @@
   "report_transfer": {
     "max_lines": 2,
     "show_in_report": true,
-    "summary": "Risk-on growth has persisted for 4 run(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed."
+    "summary": "Risk-on growth has persisted for 5 run(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed."
   },
   "transition_state": "stable",
-  "updated_at_utc": "2026-05-28T19:46:17.033251Z",
-  "weeks_in_regime": 4
+  "updated_at_utc": "2026-05-28T20:07:28.763024Z",
+  "weeks_in_regime": 5
 }
