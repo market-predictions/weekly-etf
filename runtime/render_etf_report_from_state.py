@@ -10,6 +10,15 @@ from typing import Any
 from runtime.build_etf_report_state import build_runtime_state
 from runtime.render_etf_report_nl_from_state import render_nl_native
 from runtime.replacement_duel_v2 import replacement_duel_v2_markdown
+from runtime.rotation_render_tables import (
+    final_action_table_from_rotation,
+    final_action_table_from_rotation_nl,
+    has_rotation_plan,
+    position_changes_table_from_rotation,
+    position_changes_table_from_rotation_nl,
+    rotation_plan_summary_from_rotation,
+    rotation_plan_summary_from_rotation_nl,
+)
 
 ETF_NAMES = {
     "SPY": "SPDR S&P 500 ETF Trust",
@@ -44,9 +53,7 @@ def text(value: Any, fallback: str = "") -> str:
 
 def short_text(value: Any, fallback: str = "", max_len: int = 140) -> str:
     raw = text(value, fallback)
-    if len(raw) <= max_len:
-        return raw
-    return raw[: max_len - 1].rstrip() + "…"
+    return raw if len(raw) <= max_len else raw[: max_len - 1].rstrip() + "…"
 
 
 def eurusd_used(state: dict[str, Any]) -> str:
@@ -54,7 +61,7 @@ def eurusd_used(state: dict[str, Any]) -> str:
 
 
 def position_rows(state: dict[str, Any]) -> list[dict[str, Any]]:
-    return list(state.get("positions", []))
+    return list(state.get("positions", []) or [])
 
 
 def cash_eur(state: dict[str, Any]) -> float:
@@ -77,10 +84,6 @@ def weights(state: dict[str, Any]) -> dict[str, float]:
     }
 
 
-def price_by_symbol(state: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    return {str(p.get("symbol", "")).upper(): p for p in state.get("pricing", [])}
-
-
 def promoted_lanes(state: dict[str, Any]) -> list[dict[str, Any]]:
     lanes = state.get("lane_assessment", {}).get("assessed_lanes", [])
     promoted = [lane for lane in lanes if lane.get("promoted_to_live_radar") is True]
@@ -101,18 +104,11 @@ def next_report_paths(output_dir: Path, suffix: str) -> tuple[Path, Path]:
     existing_versions: list[int] = []
     for path in output_dir.glob(f"weekly_analysis_pro_{suffix}*.md"):
         match = pattern.match(path.name)
-        if not match:
-            continue
-        existing_versions.append(int(match.group(1) or "1"))
+        if match:
+            existing_versions.append(int(match.group(1) or "1"))
     next_version = (max(existing_versions) + 1) if existing_versions else 1
     version_suffix = "" if next_version == 1 else f"_{next_version:02d}"
-    en_path = output_dir / f"weekly_analysis_pro_{suffix}{version_suffix}.md"
-    nl_path = output_dir / f"weekly_analysis_pro_nl_{suffix}{version_suffix}.md"
-    return en_path, nl_path
-
-
-def replacement_duel_table(state: dict[str, Any]) -> str:
-    return replacement_duel_v2_markdown(state)
+    return output_dir / f"weekly_analysis_pro_{suffix}{version_suffix}.md", output_dir / f"weekly_analysis_pro_nl_{suffix}{version_suffix}.md"
 
 
 def radar_table(state: dict[str, Any]) -> str:
@@ -133,19 +129,10 @@ def radar_table(state: dict[str, Any]) -> str:
 
 
 def omitted_table(state: dict[str, Any]) -> str:
-    lines = [
-        "| Theme | Primary ETF | Why not promoted | What would change that |",
-        "|---|---|---|---|",
-    ]
+    lines = ["| Theme | Primary ETF | Why not promoted | What would change that |", "|---|---|---|---|"]
     for lane in omitted_lanes(state):
-        rejection = short_text(
-            lane.get("rejection_reason"),
-            "Scored below the live radar cutoff versus stronger funded and challenger lanes.",
-        )
-        needs = short_text(
-            lane.get("why_now") or lane.get("what_would_change") or lane.get("freshness_note"),
-            "Needs better timing, pricing confirmation or portfolio-fit evidence.",
-        )
+        rejection = short_text(lane.get("rejection_reason"), "Scored below the live radar cutoff versus stronger funded and challenger lanes.")
+        needs = short_text(lane.get("why_now") or lane.get("what_would_change") or lane.get("freshness_note"), "Needs better timing, pricing confirmation or portfolio-fit evidence.")
         lines.append(f"| {lane.get('lane_name')} | {lane.get('primary_etf')} | {rejection} | {needs} |")
     return "\n".join(lines)
 
@@ -180,87 +167,60 @@ def valuation_history_points(state: dict[str, Any], history_path: Path = VALUATI
     points_by_date: dict[str, dict[str, Any]] = {}
     if history_path.exists():
         with history_path.open(newline="", encoding="utf-8") as handle:
-            reader = csv.DictReader(handle)
-            for row in reader:
+            for row in csv.DictReader(handle):
                 date = str(row.get("date") or "").strip()
                 nav = _float_or_none(row.get("nav_eur"))
-                if not date or nav is None:
-                    continue
-                points_by_date[date] = {
-                    "date": date,
-                    "nav_eur": round(nav, 2),
-                    "comment": str(row.get("comment") or "Historical runtime valuation").strip(),
-                }
-
+                if date and nav is not None:
+                    points_by_date[date] = {"date": date, "nav_eur": round(nav, 2), "comment": str(row.get("comment") or "Historical runtime valuation").strip()}
     report_date = str(state.get("report_date") or "").strip()
     if report_date:
-        points_by_date[report_date] = {
-            "date": report_date,
-            "nav_eur": total_nav(state),
-            "comment": "Runtime-derived valuation from pricing audit and explicit portfolio state",
-        }
-
+        points_by_date[report_date] = {"date": report_date, "nav_eur": total_nav(state), "comment": "Latest portfolio valuation based on confirmed closing prices and current holdings"}
     return [points_by_date[date] for date in sorted(points_by_date)]
 
 
 def section7_table(state: dict[str, Any]) -> str:
     lines = ["| Date | Portfolio value (EUR) | Comment |", "|---|---:|---|"]
-    points = valuation_history_points(state)
-    if not points:
-        points = [
-            {"date": "2026-03-28", "nav_eur": 100000.0, "comment": "Inaugural model portfolio established"},
-            {"date": state.get("report_date") or "", "nav_eur": total_nav(state), "comment": "Runtime-derived valuation from pricing audit and explicit portfolio state"},
-        ]
+    points = valuation_history_points(state) or [
+        {"date": "2026-03-28", "nav_eur": 100000.0, "comment": "Inaugural model portfolio established"},
+        {"date": state.get("report_date") or "", "nav_eur": total_nav(state), "comment": "Latest portfolio valuation based on confirmed closing prices and current holdings"},
+    ]
     for point in points:
         lines.append(f"| {point['date']} | {float(point['nav_eur']):.2f} | {point.get('comment', '')} |")
     return "\n".join(lines)
 
 
 def current_position_table(state: dict[str, Any]) -> str:
-    lines = [
-        "| Ticker | Score | Action | Conviction | Fresh-cash test | Key point | Required next action |",
-        "|---|---:|---|---|---|---|---|",
-    ]
+    lines = ["| Ticker | Score | Action | Conviction | Fresh-cash test | Key point | Required next action |", "|---|---:|---|---|---|---|---|"]
     for p in position_rows(state):
+        action = p.get("rotation_action_code") or p.get("suggested_action", "Hold")
         lines.append(
-            f"| {p.get('ticker')} | {f2(p.get('total_score'))} | {p.get('suggested_action', 'Hold')} | "
-            f"{p.get('conviction_tier', '')} | {p.get('fresh_cash_test', '')} | "
-            f"{short_text(p.get('short_reason'), 'No material change this run.')} | "
-            f"{short_text(p.get('required_next_action'), 'Hold and reassess next run.')} |"
+            f"| {p.get('ticker')} | {f2(p.get('total_score'))} | {action} | {p.get('conviction_tier', '')} | {p.get('fresh_cash_test', '')} | "
+            f"{short_text(p.get('short_reason'), 'No material change this run.')} | {short_text(p.get('required_next_action'), 'Hold and reassess next run.')} |"
         )
     return "\n".join(lines)
 
 
 def final_action_table(state: dict[str, Any]) -> str:
+    if has_rotation_plan(state):
+        return final_action_table_from_rotation(state, ETF_NAMES)
     w = weights(state)
-    lines = [
-        "| Ticker | ETF | Existing/New | Weight Inherited | Target Weight | Suggested Action | Conviction Tier | Total Score | Portfolio Role | Better Alternative Exists? | Short Reason |",
-        "|---|---|---|---:|---:|---|---|---:|---|---|---|",
-    ]
+    lines = ["| Ticker | ETF | Existing/New | Weight Inherited | Target Weight | Suggested Action | Conviction Tier | Total Score | Portfolio Role | Better Alternative Exists? | Short Reason |", "|---|---|---|---:|---:|---|---|---:|---|---|---|"]
     for p in position_rows(state):
         ticker = str(p.get("ticker", "")).upper()
-        lines.append(
-            f"| {ticker} | {ETF_NAMES.get(ticker, ticker)} | {p.get('existing_new', 'Existing')} | {f2(p.get('weight_inherited_pct') or p.get('previous_weight_pct'))} | {f2(p.get('target_weight_pct') or w.get(ticker))} | "
-            f"{p.get('suggested_action', 'Hold')} | {p.get('conviction_tier', '')} | {f2(p.get('total_score'))} | {p.get('portfolio_role', '')} | "
-            f"{p.get('better_alternative_exists', 'No')} | {p.get('short_reason', '')} |"
-        )
+        lines.append(f"| {ticker} | {ETF_NAMES.get(ticker, ticker)} | {p.get('existing_new', 'Existing')} | {f2(p.get('weight_inherited_pct') or p.get('previous_weight_pct'))} | {f2(p.get('target_weight_pct') or w.get(ticker))} | {p.get('suggested_action', 'Hold')} | {p.get('conviction_tier', '')} | {f2(p.get('total_score'))} | {p.get('portfolio_role', '')} | {p.get('better_alternative_exists', 'No')} | {p.get('short_reason', '')} |")
     return "\n".join(lines)
 
 
 def position_changes_table(state: dict[str, Any]) -> str:
+    if has_rotation_plan(state):
+        return position_changes_table_from_rotation(state)
     w = weights(state)
-    lines = [
-        "| Ticker | Previous weight % | New weight % | Weight change % | Shares delta | Action executed | Funding source / note |",
-        "|---|---:|---:|---:|---:|---|---|",
-    ]
+    lines = ["| Ticker | Previous weight % | New weight % | Weight change % | Shares delta | Action executed | Funding source / note |", "|---|---:|---:|---:|---:|---|---|"]
     for p in position_rows(state):
         ticker = str(p.get("ticker", "")).upper()
         prev = float(p.get("previous_weight_pct") or p.get("current_weight_pct") or 0.0)
         new = w.get(ticker, prev)
-        lines.append(
-            f"| {ticker} | {prev:.2f} | {new:.2f} | {new - prev:.2f} | {f2(p.get('shares_delta_this_run'))} | "
-            f"{p.get('action_executed_this_run', 'None')} | {p.get('funding_source_note', '')} |"
-        )
+        lines.append(f"| {ticker} | {prev:.2f} | {new:.2f} | {new - prev:.2f} | {f2(p.get('shares_delta_this_run'))} | {p.get('action_executed_this_run', 'None')} | {p.get('funding_source_note', '')} |")
     cash_pct = cash_eur(state) / (total_nav(state) or 1.0) * 100.0
     lines.append(f"| CASH | - | {cash_pct:.2f} | - | 0.00 | None | Residual cash |")
     return "\n".join(lines)
@@ -268,16 +228,10 @@ def position_changes_table(state: dict[str, Any]) -> str:
 
 def continuity_table(state: dict[str, Any]) -> str:
     w = weights(state)
-    lines = [
-        "| Ticker | ETF Name | Direction | Weight % | Avg Entry | Current Price | P/L % | Original Thesis | Role |",
-        "|---|---|---:|---:|---:|---:|---:|---|---|",
-    ]
+    lines = ["| Ticker | ETF Name | Direction | Weight % | Avg Entry | Current Price | P/L % | Original Thesis | Role |", "|---|---|---:|---:|---:|---:|---:|---|---|"]
     for p in position_rows(state):
         ticker = str(p.get("ticker", "")).upper()
-        lines.append(
-            f"| {ticker} | {ETF_NAMES.get(ticker, ticker)} | {p.get('direction', 'Long')} | {f2(w.get(ticker))} | {f2(p.get('avg_entry_local'))} | "
-            f"{f2(p.get('previous_price_local'))} | {f2(p.get('pnl_pct'))} | {p.get('original_thesis', '')} | {p.get('portfolio_role', '')} |"
-        )
+        lines.append(f"| {ticker} | {ETF_NAMES.get(ticker, ticker)} | {p.get('direction', 'Long')} | {f2(w.get(ticker))} | {f2(p.get('avg_entry_local'))} | {f2(p.get('previous_price_local'))} | {f2(p.get('pnl_pct'))} | {p.get('original_thesis', '')} | {p.get('portfolio_role', '')} |")
     return "\n".join(lines)
 
 
@@ -287,6 +241,8 @@ def action_tickers(state: dict[str, Any], predicate) -> str:
 
 
 def rotation_plan_table(state: dict[str, Any]) -> str:
+    if has_rotation_plan(state):
+        return rotation_plan_summary_from_rotation(state)
     close = action_tickers(state, lambda action, p: "close" in action.lower() or "sell" in action.lower())
     reduce = action_tickers(state, lambda action, p: "reduce" in action.lower())
     hold = action_tickers(state, lambda action, p: "hold" in action.lower())
@@ -306,6 +262,11 @@ def best_opportunities_text(state: dict[str, Any]) -> str:
     return "\n".join(["- SMH remains the leading funded growth exposure, subject to the max-position rule.", *challenger_lines, "- Replacement candidates remain evidence-gated: pricing basis and duel status must be visible before funding."])
 
 
+def _replace_between(text_value: str, start_heading: str, end_heading: str, replacement_body: str) -> str:
+    pattern = re.compile(rf"({re.escape(start_heading)}\n\n).*?(\n\n{re.escape(end_heading)})", re.DOTALL)
+    return pattern.sub(rf"\1{replacement_body}\2", text_value)
+
+
 def render_en(state: dict[str, Any]) -> str:
     report_date = state.get("report_date") or "unknown"
     nav = total_nav(state)
@@ -315,6 +276,7 @@ def render_en(state: dict[str, Any]) -> str:
     add_candidates = action_tickers(state, lambda action, p: "add" in action.lower() or "buy" in str(p.get("action_executed_this_run", "")).lower())
     hold_review = action_tickers(state, lambda action, p: "review" in action.lower() or str(p.get("better_alternative_exists", "")).lower() == "yes")
     eurusd = eurusd_used(state)
+    rotation_note = "Rotation plan artifact is active and drives target weights/trade intents." if has_rotation_plan(state) else "Legacy recommendation labels are used because no rotation plan artifact is present."
     return f"""# Weekly ETF Pro Review {report_date}
 
 > *This report is for informational and educational purposes only; please see the disclaimer at the end.*
@@ -322,11 +284,11 @@ def render_en(state: dict[str, Any]) -> str:
 ## 1. Executive Summary
 
 - **Primary regime:** Policy Transition / Mixed Regime
-- **Secondary cross-current:** Runtime-derived report generation is active. Pricing, lane discovery, portfolio state and recommendation discipline are separate inputs.
+- **Secondary cross-current:** Runtime-derived report generation is active. Pricing, lane discovery, portfolio state, recommendation discipline and rotation state are separate inputs.
 - **Geopolitical regime:** Elevated but localized
-- **What changed this week:** The Structural Opportunity Radar is now rebuilt from discovery metadata instead of static memory, and current positions are enriched from portfolio state plus recommendation discipline.
-- **Overall portfolio judgment:** Keep the current portfolio intact for now, but treat SPY, PPA, PAVE and GLD as active review items rather than passive holds.
-- **Main takeaway:** **SMH remains the earned leader, but fresh capital and replacement decisions must now pass a stricter close-based evidence test.**
+- **What changed this week:** The Structural Opportunity Radar is rebuilt from discovery metadata and the rotation layer now produces explicit target-weight/trade-intent fields when available.
+- **Overall portfolio judgment:** Keep discipline explicit: every holding must re-earn capital against alternatives and constraints.
+- **Main takeaway:** **SMH remains the earned leader, but portfolio rotation is now governed by source/destination decisions rather than static review labels.**
 
 ## 2. Portfolio Action Snapshot
 
@@ -339,14 +301,8 @@ def render_en(state: dict[str, Any]) -> str:
 ### Hold but replaceable
 - {hold_review} remain under explicit review.
 
-### Reduce
-- None.
-
-### Close
-- None.
-
-### Best replacements to fund
-- No challenger is promoted to a fundable replacement yet. Each named replacement must first clear the same close-date pricing basis and relative-strength duel.
+### Rotation engine status
+- {rotation_note}
 
 ### Replacement Duel Table v2
 
@@ -398,16 +354,16 @@ def render_en(state: dict[str, Any]) -> str:
 ## 5. Key Risks / Invalidators
 
 - SPY plus SMH creates high U.S. tech / AI factor overlap.
-- GLD remains a hedge review, not an unquestioned ballast position.
+- Hedge and defensive sleeves must justify their capital allocation through role validity, pricing and relative-strength evidence.
 - PPA and PAVE remain replaceable until their ETF implementation quality is proven.
 - Non-U.S. equity exposure remains a diversification gap.
 
 ## 6. Bottom Line
 
-- **What should be exited first:** Nothing is closed by the runtime state today.
+- **What should be exited first:** Determined by the rotation plan when active; otherwise no close is executed by legacy state.
 - **What deserves additional capital first:** SMH remains the best-ranked funded lane, subject to the max-position rule.
-- **What is acceptable but replaceable:** SPY, PPA, PAVE and GLD.
-- **Single best portfolio upgrade this week:** **Keep replacement discipline explicit and avoid funding challengers without pricing and duel evidence.**
+- **What is acceptable but replaceable:** Holdings with high release scores require reduce/replace/override discipline.
+- **Single best portfolio upgrade this week:** **Use the rotation artifact as the bridge between evidence and target weights.**
 
 ## 7. Equity Curve and Portfolio Development
 
@@ -444,7 +400,7 @@ def render_en(state: dict[str, Any]) -> str:
 | AI leadership | SMH remains the cleanest growth expression | Concentration must be watched | SMH, SOXX | Lower-quality cyclicals | Hold near max size | Immediate | High |
 | Factor concentration | SPY and SMH overlap | Portfolio is less diversified than ticker count suggests | QUAL, IEFA watchlist | Overlapping U.S. beta | Keep SPY under review | 1-3 months | Medium |
 | Defense thesis vs ETF implementation | Defense remains structurally valid | PPA must justify itself versus ITA | ITA, PPA | Weak vehicle selection | Hold PPA under review | Immediate | Medium |
-| Hedge drawdown | GLD hedge role must be proven | GSG/BIL remain challengers | GSG, BIL, cash | Unproductive hedge | Hold GLD under review | Immediate | Medium |
+| Hedge drawdown | Hedge role must be proven | GSG/BIL remain challengers | GSG, BIL, cash | Unproductive hedge | Hold hedge sleeve under review | Immediate | Medium |
 
 ## 10. Current Position Review
 
@@ -505,10 +461,7 @@ The position review separates three questions: is the thesis still valid, is the
 | Non-U.S. developed diversification | IEFA | EFA | Portfolio has zero non-U.S. exposure. | Watchlist |
 
 ### Recommendation discipline continuity
-- SPY: overlap review versus SMH remains active.
-- PPA: direct duel versus ITA required.
-- PAVE: direct duel versus GRID required.
-- GLD: hedge validity test required.
+- Rotation plan: {'active' if has_rotation_plan(state) else 'not available; legacy labels used'}.
 - Replacement challengers: not fundable without completed duel.
 
 ### Constraints
@@ -532,7 +485,13 @@ This report is provided for informational and educational purposes only. It is n
 
 
 def render_nl(state: dict[str, Any]) -> str:
-    return render_nl_native(state)
+    text_nl = render_nl_native(state)
+    if not has_rotation_plan(state):
+        return text_nl
+    text_nl = _replace_between(text_nl, "## 12. Rotatieplan portefeuille", "## 13. Definitieve actietabel", rotation_plan_summary_from_rotation_nl(state))
+    text_nl = _replace_between(text_nl, "## 13. Definitieve actietabel", "## 14. Positiewijzigingen in deze run", final_action_table_from_rotation_nl(state, ETF_NAMES))
+    text_nl = _replace_between(text_nl, "## 14. Positiewijzigingen in deze run", "## 15. Huidige posities en cash", position_changes_table_from_rotation_nl(state))
+    return text_nl
 
 
 def write_reports(state: dict[str, Any], output_dir: Path) -> tuple[Path, Path]:
