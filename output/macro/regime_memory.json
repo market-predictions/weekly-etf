@@ -10,13 +10,13 @@
   "previous_confidence": 0.66,
   "prior_regime": "Risk-on growth",
   "regime_changed_this_run": false,
-  "report_date": "2026-05-27",
+  "report_date": "2026-05-28",
   "report_transfer": {
     "max_lines": 2,
     "show_in_report": true,
-    "summary": "Risk-on growth has persisted for 5 run(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed."
+    "summary": "Risk-on growth has persisted for 6 run(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed."
   },
   "transition_state": "stable",
-  "updated_at_utc": "2026-05-28T20:07:28.763024Z",
-  "weeks_in_regime": 5
+  "updated_at_utc": "2026-05-28T22:30:04.300917Z",
+  "weeks_in_regime": 6
 }
