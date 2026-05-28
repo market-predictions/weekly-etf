@@ -79,6 +79,22 @@ PARTIAL_MIXED_EXACT_CLEANUPS = {
     "Hold maar vervangbaar": "Aanhouden, maar vervangbaar",
 }
 
+REPLACEMENT_DUEL_PHRASE_CLEANUPS = {
+    "Replacement trigger watch - challenger leading over 3m.": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden.",
+    "Replacement trigger watch - challenger leading over 3m": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden",
+    "Replacement trigger watch — challenger leading over 3m.": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden.",
+    "Replacement trigger watch — challenger leading over 3m": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden",
+    "Replacement trigger watch": "Vervangingskandidaat op de volglijst",
+    "Not fundable - close proof incomplete.": "Niet geschikt voor allocatie — sluitkoersbevestiging is onvolledig.",
+    "Not fundable - close proof incomplete": "Niet geschikt voor allocatie — sluitkoersbevestiging is onvolledig",
+    "Not fundable - valuation-grade challenger pricing required.": "Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist.",
+    "Not fundable - valuation-grade challenger pricing required": "Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist",
+    "Priced valuation-grade, but direct RS duel incomplete.": "Waarderingswaardig geprijsd, maar de directe relatieve-sterkteanalyse is onvolledig.",
+    "Priced valuation-grade, but direct RS duel incomplete": "Waarderingswaardig geprijsd, maar de directe relatieve-sterkteanalyse is onvolledig",
+    "Upgrade challenger to valuation-grade pricing before any funding decision.": "Verbeter de prijsbevestiging van het alternatief tot waarderingskwaliteit vóór een allocatiebesluit.",
+    "Upgrade challenger to valuation-grade pricing before any funding decision": "Verbeter de prijsbevestiging van het alternatief tot waarderingskwaliteit vóór een allocatiebesluit",
+}
+
 
 def is_native_dutch_report(text: str) -> bool:
     markers = [
@@ -137,6 +153,12 @@ def _clean_client_language(text: str) -> str:
     return text
 
 
+def _localize_replacement_duel_phrases(text: str) -> str:
+    for src, dst in sorted(REPLACEMENT_DUEL_PHRASE_CLEANUPS.items(), key=lambda item: len(item[0]), reverse=True):
+        text = text.replace(src, dst)
+    return text
+
+
 def _normalize_ticker_lists(text: str) -> str:
     return re.sub(
         r"\b([A-Z]{2,6}(?:,\s*[A-Z]{2,6})+)\s+and\s+([A-Z]{2,6})\b",
@@ -162,6 +184,7 @@ def _localize_until_stable(text: str, passes: int = 3) -> str:
         current = localize_markdown_table_headers(current, language="nl")
         current = _clean_runtime_artifacts(current)
         current = _clean_client_language(current)
+        current = _localize_replacement_duel_phrases(current)
         current = _normalize_partial_mixed_language(current)
         if current == previous:
             return current
@@ -178,6 +201,7 @@ def localize_report(text: str) -> str:
         text = _replace_disclaimer(text)
         text = _clean_runtime_artifacts(text)
         text = _clean_client_language(text)
+        text = _localize_replacement_duel_phrases(text)
         return text
 
     text = _replace_disclaimer(text)
