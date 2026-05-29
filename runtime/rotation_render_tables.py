@@ -19,7 +19,7 @@ def _f2(value: Any) -> str:
         return ""
 
 
-def _short(value: Any, fallback: str = "", max_len: int = 160) -> str:
+def _short(value: Any, fallback: str = "", max_len: int = 180) -> str:
     raw = _text(value, fallback)
     return raw if len(raw) <= max_len else raw[: max_len - 1].rstrip() + "…"
 
@@ -56,13 +56,103 @@ def _decision_by_ticker(state: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {_ticker(row.get("ticker")): row for row in _decisions(state) if _ticker(row.get("ticker"))}
 
 
+REASON_TEXT = {
+    "fresh_cash_smaller_or_review": "Fresh capital only after review or at smaller size",
+    "failed_fresh_cash_test": "Position does not pass the fresh-capital test",
+    "replaceable_status": "Position is under replacement review",
+    "review_age_ge_2": "Review has persisted for multiple report cycles",
+    "review_age_ge_3": "Review has persisted for several report cycles",
+    "negative_pnl_gt_5": "Position has become a material performance drag",
+    "negative_pnl_gt_10": "Position has become a large performance drag",
+    "better_alternative_exists": "A stronger alternative is available for comparison",
+    "negative_contribution": "Portfolio contribution is negative",
+    "role_impaired": "Portfolio role is impaired",
+    "role_failed": "Portfolio role no longer justifies current capital",
+    "factor_or_concentration_flag": "Concentration or factor-overlap discipline is active",
+    "destination from trade_intents": "Proposed destination from the rotation plan",
+    "destination_score": "Destination score confirmed by the rotation engine",
+}
+
+REASON_TEXT_NL = {
+    "fresh_cash_smaller_or_review": "Vers kapitaal alleen kleiner of na herbeoordeling inzetten",
+    "failed_fresh_cash_test": "Positie voldoet niet aan de vers-kapitaaltoets",
+    "replaceable_status": "Positie staat onder vervangingsreview",
+    "review_age_ge_2": "Review loopt al meerdere rapportcycli",
+    "review_age_ge_3": "Review loopt al meerdere rapportcycli",
+    "negative_pnl_gt_5": "Positie drukt materieel op het rendement",
+    "negative_pnl_gt_10": "Positie drukt zwaar op het rendement",
+    "better_alternative_exists": "Sterker alternatief is beschikbaar voor vergelijking",
+    "negative_contribution": "Portefeuillebĳdrage is negatief",
+    "role_impaired": "Portefeuillerol is verzwakt",
+    "role_failed": "Portefeuillerol rechtvaardigt huidige allocatie niet meer",
+    "factor_or_concentration_flag": "Concentratie- of factoroverlapdiscipline is actief",
+    "destination from trade_intents": "Voorgestelde bestemming uit het rotatieplan",
+    "destination_score": "Bestemmingsscore bevestigd door de rotatie-engine",
+}
+
+OVERRIDE_TEXT = {
+    "churn_budget_used": "Rotation budget for this run is already used",
+    "no_fundable_destination": "No destination cleared the funding constraints",
+    "min_trade_size_not_met": "Minimum trade size was not met",
+    "insufficient_confirming_window": "More confirmation is required before action",
+    "candidate_not_valuation_grade": "Candidate pricing quality is not high enough",
+    "max_position_cap_hit": "Maximum position size would be breached",
+    "role_preservation_required": "Role preservation constraint blocks rotation",
+    "pricing_lineage_insufficient": "Pricing lineage is not sufficient for action",
+    "liquidity_constraint": "Liquidity constraint blocks action",
+    "portfolio_constraint_blocked": "Portfolio constraint blocks action",
+}
+
+OVERRIDE_TEXT_NL = {
+    "churn_budget_used": "Rotatiebudget voor deze run is al gebruikt",
+    "no_fundable_destination": "Geen bestemming voldoet aan de allocatie-eisen",
+    "min_trade_size_not_met": "Minimale transactiegrootte is niet gehaald",
+    "insufficient_confirming_window": "Meer bevestiging is nodig vóór actie",
+    "candidate_not_valuation_grade": "Koerskwaliteit van alternatief is onvoldoende",
+    "max_position_cap_hit": "Maximale positiegrootte zou worden overschreden",
+    "role_preservation_required": "Portefeuillerol moet behouden blijven",
+    "pricing_lineage_insufficient": "Prijsherkomst is onvoldoende voor actie",
+    "liquidity_constraint": "Liquiditeitsvoorwaarde blokkeert actie",
+    "portfolio_constraint_blocked": "Portefeuillerandvoorwaarde blokkeert actie",
+}
+
+
+def _humanize_reason_code(code: Any, *, language: str = "en") -> str:
+    raw = _text(code)
+    if not raw:
+        return ""
+    table = REASON_TEXT_NL if language == "nl" else REASON_TEXT
+    if raw.startswith("destination_score"):
+        return table["destination_score"]
+    return table.get(raw, raw.replace("_", " ").capitalize())
+
+
+def _reason_text(decision: dict[str, Any], *, language: str = "en") -> str:
+    reasons = decision.get("reason_codes") or []
+    if isinstance(reasons, list):
+        human = [_humanize_reason_code(r, language=language) for r in reasons[:4]]
+        return "; ".join(r for r in human if r)
+    return _humanize_reason_code(reasons, language=language)
+
+
+def _override_text(decision: dict[str, Any], *, language: str = "en") -> str:
+    status = _text(decision.get("override_status"), "none")
+    reason = _text(decision.get("override_reason_code"))
+    if status == "none":
+        return "Nee" if language == "nl" else "No"
+    table = OVERRIDE_TEXT_NL if language == "nl" else OVERRIDE_TEXT
+    human_reason = table.get(reason, reason.replace("_", " ").capitalize() if reason else "")
+    prefix = "Systeemoverride" if language == "nl" and status == "engine" else "Operatoroverride" if language == "nl" else "System override" if status == "engine" else "Operator override"
+    return f"{prefix}: {human_reason}" if human_reason else prefix
+
+
 def action_label(action_code: Any) -> str:
     mapping = {
         "hold": "Hold",
         "hold_with_override": "Hold with override",
         "reduce": "Reduce",
-        "replace_partial": "Replace partial",
-        "replace_full": "Replace full",
+        "replace_partial": "Partial replacement",
+        "replace_full": "Full replacement",
         "close": "Close",
         "add_from_cash": "Add from cash",
     }
@@ -72,7 +162,7 @@ def action_label(action_code: Any) -> str:
 def action_label_nl(action_code: Any) -> str:
     mapping = {
         "hold": "Aanhouden",
-        "hold_with_override": "Aanhouden met override",
+        "hold_with_override": "Aanhouden met onderbouwde override",
         "reduce": "Verlagen",
         "replace_partial": "Gedeeltelijk vervangen",
         "replace_full": "Volledig vervangen",
@@ -82,35 +172,11 @@ def action_label_nl(action_code: Any) -> str:
     return mapping.get(_text(action_code), _text(action_code, "Aanhouden"))
 
 
-def _reason_text(decision: dict[str, Any]) -> str:
-    reasons = decision.get("reason_codes") or []
-    if isinstance(reasons, list):
-        return ", ".join(str(r) for r in reasons[:4])
-    return _text(reasons)
-
-
-def _override_text(decision: dict[str, Any]) -> str:
-    status = _text(decision.get("override_status"), "none")
-    reason = _text(decision.get("override_reason_code"))
-    if status == "none":
-        return "No"
-    return f"{status}: {reason}" if reason else status
-
-
-def _override_text_nl(decision: dict[str, Any]) -> str:
-    status = _text(decision.get("override_status"), "none")
-    reason = _text(decision.get("override_reason_code"))
-    if status == "none":
-        return "Nee"
-    prefix = "Engine" if status == "engine" else "Operator"
-    return f"{prefix}: {reason}" if reason else prefix
-
-
 def final_action_table_from_rotation(state: dict[str, Any], etf_names: dict[str, str]) -> str:
     decisions = _decision_by_ticker(state)
     targets = _target_weights(state)
     lines = [
-        "| Ticker | ETF | Current weight | Target weight | Delta weight | Action code | Capital destination | Release score | Reason codes | Override? |",
+        "| Ticker | ETF | Current weight | Target weight | Delta weight | Action | Capital destination | Release score | Decision rationale | Override status |",
         "|---|---|---:|---:|---:|---|---|---:|---|---|",
     ]
     for p in state.get("positions", []) or []:
@@ -125,12 +191,11 @@ def final_action_table_from_rotation(state: dict[str, Any], etf_names: dict[str,
         lines.append(
             f"| {ticker} | {etf_names.get(ticker, ticker)} | {_f2(current)} | {_f2(target)} | {_f2(delta)} | "
             f"{action_label(decision.get('action_code'))} | {_text(decision.get('destination_ticker'), '-')} | "
-            f"{_f2(decision.get('release_score'))} | {_short(_reason_text(decision), '-')} | {_override_text(decision)} |"
+            f"{_f2(decision.get('release_score'))} | {_short(_reason_text(decision, language='en'), '-')} | {_override_text(decision, language='en')} |"
         )
     for ticker, target in sorted(targets.items()):
         if ticker and not any(_ticker(p.get("ticker")) == ticker for p in state.get("positions", []) or []):
-            decision = next((d for d in decisions.values() if _ticker(d.get("destination_ticker")) == ticker), {})
-            lines.append(f"| {ticker} | {etf_names.get(ticker, ticker)} | 0.00 | {_f2(target)} | {_f2(target)} | Add from rotation | - | - | destination from trade_intents | No |")
+            lines.append(f"| {ticker} | {etf_names.get(ticker, ticker)} | 0.00 | {_f2(target)} | {_f2(target)} | Add from rotation | - | - | Proposed destination from the rotation plan | No |")
     return "\n".join(lines)
 
 
@@ -138,7 +203,7 @@ def final_action_table_from_rotation_nl(state: dict[str, Any], etf_names: dict[s
     decisions = _decision_by_ticker(state)
     targets = _target_weights(state)
     lines = [
-        "| Ticker | ETF | Huidig gewicht | Doelgewicht | Delta gewicht | Actiecode | Kapitaalbestemming | Vrijmaakscores | Redencodes | Override? |",
+        "| Ticker | ETF | Huidig gewicht | Doelgewicht | Delta gewicht | Actie | Kapitaalbestemming | Vrijmaakscore | Toelichting | Override-status |",
         "|---|---|---:|---:|---:|---|---|---:|---|---|",
     ]
     for p in state.get("positions", []) or []:
@@ -153,11 +218,11 @@ def final_action_table_from_rotation_nl(state: dict[str, Any], etf_names: dict[s
         lines.append(
             f"| {t} | {etf_names.get(t, t)} | {_f2(current)} | {_f2(target)} | {_f2(delta)} | "
             f"{action_label_nl(decision.get('action_code'))} | {_text(decision.get('destination_ticker'), '-')} | "
-            f"{_f2(decision.get('release_score'))} | {_short(_reason_text(decision), '-')} | {_override_text_nl(decision)} |"
+            f"{_f2(decision.get('release_score'))} | {_short(_reason_text(decision, language='nl'), '-')} | {_override_text(decision, language='nl')} |"
         )
     for t, target in sorted(targets.items()):
         if t and not any(_ticker(p.get("ticker")) == t for p in state.get("positions", []) or []):
-            lines.append(f"| {t} | {etf_names.get(t, t)} | 0.00 | {_f2(target)} | {_f2(target)} | Toevoegen uit rotatie | - | - | bestemming uit trade_intents | Nee |")
+            lines.append(f"| {t} | {etf_names.get(t, t)} | 0.00 | {_f2(target)} | {_f2(target)} | Toevoegen uit rotatie | - | - | Voorgestelde bestemming uit het rotatieplan | Nee |")
     return "\n".join(lines)
 
 
@@ -165,20 +230,17 @@ def position_changes_table_from_rotation(state: dict[str, Any]) -> str:
     trades = _trade_intents(state)
     if not trades:
         return "\n".join([
-            "| Source | Destination | Source delta % | Destination delta % | Estimated notional EUR | Action | Reason |",
+            "| Source | Destination | Source delta % | Destination delta % | Estimated notional EUR | Intent status | Rationale |",
             "|---|---|---:|---:|---:|---|---|",
-            "| None | None | 0.00 | 0.00 | 0.00 | No rotation trade intent | Rotation engine produced no executable trade intent. |",
+            "| None | None | 0.00 | 0.00 | 0.00 | No proposed rotation | No actionable rotation proposal was generated this run. |",
         ])
     lines = [
-        "| Source | Destination | Source delta % | Destination delta % | Estimated notional EUR | Action | Reason |",
+        "| Source | Destination | Source delta % | Destination delta % | Estimated notional EUR | Intent status | Rationale |",
         "|---|---|---:|---:|---:|---|---|",
     ]
     for trade in trades:
         reasons = trade.get("reason_codes") or []
-        if isinstance(reasons, list):
-            reason = ", ".join(str(r) for r in reasons[:4])
-        else:
-            reason = _text(reasons)
+        reason = "; ".join(_humanize_reason_code(r, language="en") for r in reasons[:4]) if isinstance(reasons, list) else _humanize_reason_code(reasons, language="en")
         lines.append(
             f"| {_ticker(trade.get('source_ticker'))} | {_ticker(trade.get('destination_ticker')) or 'CASH'} | "
             f"{_f2(trade.get('delta_weight_pct'))} | {_f2(trade.get('destination_delta_weight_pct'))} | "
@@ -191,17 +253,17 @@ def position_changes_table_from_rotation_nl(state: dict[str, Any]) -> str:
     trades = _trade_intents(state)
     if not trades:
         return "\n".join([
-            "| Bron | Bestemming | Delta bron % | Delta bestemming % | Geschatte waarde EUR | Actie | Reden |",
+            "| Bron | Bestemming | Delta bron % | Delta bestemming % | Geschatte waarde EUR | Intentiestatus | Toelichting |",
             "|---|---|---:|---:|---:|---|---|",
-            "| Geen | Geen | 0.00 | 0.00 | 0.00 | Geen rotatie-intentie | De rotatie-engine leverde geen uitvoerbare trade-intentie op. |",
+            "| Geen | Geen | 0.00 | 0.00 | 0.00 | Geen voorgestelde rotatie | Deze run is geen rotatie voorgesteld. |",
         ])
     lines = [
-        "| Bron | Bestemming | Delta bron % | Delta bestemming % | Geschatte waarde EUR | Actie | Reden |",
+        "| Bron | Bestemming | Delta bron % | Delta bestemming % | Geschatte waarde EUR | Intentiestatus | Toelichting |",
         "|---|---|---:|---:|---:|---|---|",
     ]
     for trade in trades:
         reasons = trade.get("reason_codes") or []
-        reason = ", ".join(str(r) for r in reasons[:4]) if isinstance(reasons, list) else _text(reasons)
+        reason = "; ".join(_humanize_reason_code(r, language="nl") for r in reasons[:4]) if isinstance(reasons, list) else _humanize_reason_code(reasons, language="nl")
         lines.append(
             f"| {_ticker(trade.get('source_ticker'))} | {_ticker(trade.get('destination_ticker')) or 'CASH'} | "
             f"{_f2(trade.get('delta_weight_pct'))} | {_f2(trade.get('destination_delta_weight_pct'))} | "
