@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import json
+import os
 import re
 from html import escape
+from pathlib import Path
 from typing import Any, Callable
 
 from runtime.build_etf_report_state import build_runtime_state
@@ -36,6 +39,7 @@ MINI_CARD_TRIPLE_RE = re.compile(
     r"</div>\s*){3}",
     re.DOTALL | re.IGNORECASE,
 )
+RUNTIME_POINTER = Path("output/runtime/latest_etf_report_state_path.txt")
 
 LABELS = {
     "en": {
@@ -46,8 +50,11 @@ LABELS = {
         "recommendation": "Recommendation",
         "tickers_notes": "Tickers / notes",
         "add": "Add",
+        "add_destination": "Add / destination",
         "hold": "Hold",
+        "hold_override": "Hold with override",
         "hold_replaceable": "Hold but replaceable",
+        "proposed_replace_reduce": "Proposed replace / reduce",
         "reduce": "Reduce",
         "close": "Close",
         "none": "None",
@@ -64,6 +71,8 @@ LABELS = {
         "primary_regime": "Primary regime",
         "geopolitical_regime": "Geopolitical regime",
         "main_takeaway": "Main takeaway",
+        "rotation_status": "Rotation engine status",
+        "rotation_active_note": "Rotation plan artifact is active; target weights and trade intents are proposed until the trade ledger and portfolio state record execution.",
     },
     "nl": {
         "portfolio_action_snapshot": "Portefeuille-acties",
@@ -73,8 +82,11 @@ LABELS = {
         "recommendation": "Advies",
         "tickers_notes": "Tickers / toelichting",
         "add": "Toevoegen",
+        "add_destination": "Toevoegen / bestemming",
         "hold": "Aanhouden",
+        "hold_override": "Aanhouden met override",
         "hold_replaceable": "Aanhouden, maar vervangbaar",
+        "proposed_replace_reduce": "Voorgesteld vervangen / verlagen",
         "reduce": "Verlagen",
         "close": "Sluiten",
         "none": "Geen",
@@ -91,6 +103,8 @@ LABELS = {
         "primary_regime": "Primair regime",
         "geopolitical_regime": "Geopolitiek regime",
         "main_takeaway": "Kernconclusie",
+        "rotation_status": "Status rotatie-engine",
+        "rotation_active_note": "Het rotatieplan is actief; doelgewichten en handelsintenties blijven voorstellen totdat het handelslogboek en de portefeuille-staat uitvoering vastleggen.",
     },
 }
 
@@ -102,6 +116,26 @@ ACTION_NL = {
     "close": "Sluiten",
     "sell": "Verkopen",
     "hold under review": "Aanhouden, onder herbeoordeling",
+}
+ROTATION_ACTION_LABELS = {
+    "en": {
+        "hold": "Hold",
+        "hold_with_override": "Hold with override",
+        "reduce": "Reduce",
+        "replace_partial": "Replace partial",
+        "replace_full": "Replace full",
+        "close": "Close",
+        "add_from_cash": "Add from cash",
+    },
+    "nl": {
+        "hold": "Aanhouden",
+        "hold_with_override": "Aanhouden met override",
+        "reduce": "Verlagen",
+        "replace_partial": "Gedeeltelijk vervangen",
+        "replace_full": "Volledig vervangen",
+        "close": "Sluiten",
+        "add_from_cash": "Toevoegen vanuit cash",
+    },
 }
 FRESH_CASH_NL = {
     "smaller / under review": "Kleiner / onder herbeoordeling",
@@ -201,14 +235,6 @@ def _hero_cards_html(values: dict[str, str], language: str) -> str:
 
 
 def _replace_hero_cards(html: str, md_text: str, language: str) -> str:
-    """Replace the full summary-strip payload without cutting nested divs.
-
-    The earlier implementation used `(?:<div class='mini-card'>.*?</div>){3}`.
-    Because each mini-card contains nested `mini-label` and `mini-value` divs,
-    that regex stopped at inner closing divs and left an orphan `mini-value`
-    containing the main takeaway outside the card. Anchor the replacement to the
-    `summary-strip` container and the following `client-grid` sibling instead.
-    """
     values = _summary_values(md_text, language)
     replacement = _hero_cards_html(values, language)
 
@@ -294,6 +320,10 @@ def _is_close(p: dict[str, Any]) -> bool:
     return "close" in action or "sell" in action
 
 
+def _ticker(value: Any) -> str:
+    return str(value or "").strip().upper()
+
+
 def _ticker_anchor(base: Any, ticker: str, language: str = "en") -> str:
     ticker = ticker.strip().upper()
     if not ticker or ticker == "NONE":
@@ -310,11 +340,117 @@ def _ticker_join(base: Any, tickers: list[str], language: str) -> str:
     return ", ".join(_ticker_anchor(base, t, language) for t in values) if values else _labels(language)["none"]
 
 
+def _ticker_expr_html(base: Any, value: str, language: str) -> str:
+    if "→" not in value:
+        return _ticker_anchor(base, value, language)
+    left, right = value.split("→", 1)
+    return f"{_ticker_anchor(base, left, language)} → {_ticker_anchor(base, right, language)}"
+
+
+def _ticker_expr_join(base: Any, values: list[str], language: str) -> str:
+    cleaned = [v for v in values if v and v != "NONE"]
+    return ", ".join(_ticker_expr_html(base, v, language) for v in cleaned) if cleaned else _labels(language)["none"]
+
+
 def _section_header(base: Any, number: int, title: str) -> str:
     try:
         return base.section_header_html(number, title)
     except Exception:
         return f"<h2>{escape(title)}</h2>"
+
+
+def _runtime_state_from_pointer() -> dict[str, Any] | None:
+    for raw in (os.environ.get("MRKT_RPRTS_RUNTIME_STATE_PATH"), os.environ.get("ETF_RUNTIME_STATE_PATH")):
+        if not raw:
+            continue
+        path = Path(raw)
+        if path.exists():
+            return json.loads(path.read_text(encoding="utf-8"))
+    if RUNTIME_POINTER.exists():
+        raw = RUNTIME_POINTER.read_text(encoding="utf-8").strip()
+        if raw:
+            path = Path(raw)
+            if path.exists():
+                return json.loads(path.read_text(encoding="utf-8"))
+            candidate = RUNTIME_POINTER.parent / path.name
+            if candidate.exists():
+                return json.loads(candidate.read_text(encoding="utf-8"))
+    return None
+
+
+def _load_state() -> dict[str, Any]:
+    state = _runtime_state_from_pointer()
+    if state:
+        return state
+    return build_runtime_state()
+
+
+def _rotation_decisions(state: dict[str, Any]) -> list[dict[str, Any]]:
+    rows = state.get("rotation_decisions") or (state.get("rotation_plan") or {}).get("rotation_decisions") or []
+    return list(rows) if isinstance(rows, list) else []
+
+
+def _trade_intents(state: dict[str, Any]) -> list[dict[str, Any]]:
+    rows = state.get("trade_intents") or (state.get("rotation_plan") or {}).get("trade_intents") or []
+    return list(rows) if isinstance(rows, list) else []
+
+
+def _has_rotation_plan(state: dict[str, Any]) -> bool:
+    return bool(_rotation_decisions(state) or _trade_intents(state))
+
+
+def _decision_by_ticker(state: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {_ticker(row.get("ticker")): row for row in _rotation_decisions(state) if _ticker(row.get("ticker"))}
+
+
+def _rotation_action(value: Any, language: str) -> str:
+    raw = str(value or "").strip()
+    return ROTATION_ACTION_LABELS.get(language, ROTATION_ACTION_LABELS["en"]).get(raw, raw or _labels(language)["none"])
+
+
+def _rotation_bucket_summary(state: dict[str, Any]) -> dict[str, list[str]]:
+    buckets = {"add": [], "hold": [], "override": [], "replace": [], "reduce": [], "close": []}
+    for row in _rotation_decisions(state):
+        ticker = _ticker(row.get("ticker"))
+        action = str(row.get("action_code") or "").strip()
+        destination = _ticker(row.get("destination_ticker"))
+        if not ticker:
+            continue
+        if action == "close":
+            buckets["close"].append(ticker)
+        elif action == "reduce":
+            buckets["reduce"].append(ticker)
+        elif action in {"replace_partial", "replace_full"}:
+            buckets["replace"].append(f"{ticker}→{destination}" if destination else ticker)
+        elif action == "hold_with_override":
+            buckets["override"].append(ticker)
+        elif action == "add_from_cash":
+            buckets["add"].append(ticker)
+        else:
+            buckets["hold"].append(ticker)
+    for trade in _trade_intents(state):
+        destination = _ticker(trade.get("destination_ticker"))
+        if destination and destination not in buckets["add"]:
+            buckets["add"].append(destination)
+    return buckets
+
+
+def _trade_summary_html(base: Any, state: dict[str, Any], language: str) -> str:
+    intents = _trade_intents(state)
+    if not intents:
+        return escape(_labels(language)["best_replacements_note"])
+    parts: list[str] = []
+    for trade in intents:
+        source = _ticker(trade.get("source_ticker"))
+        destination = _ticker(trade.get("destination_ticker")) or "CASH"
+        source_delta = f2(trade.get("delta_weight_pct")) or "0.00"
+        dest_delta = f2(trade.get("destination_delta_weight_pct")) or "0.00"
+        if language == "nl":
+            parts.append(f"verlaag {_ticker_anchor(base, source, language)} met {escape(source_delta)}% NAV en alloceer {escape(dest_delta)}% NAV naar {_ticker_anchor(base, destination, language)}")
+        else:
+            parts.append(f"reduce {_ticker_anchor(base, source, language)} by {escape(source_delta)}% NAV and allocate {escape(dest_delta)}% NAV to {_ticker_anchor(base, destination, language)}")
+    suffix = "in afwachting van uitvoering en verwerking in de portefeuille-staat." if language == "nl" else "pending execution and portfolio-state persistence."
+    return "; ".join(parts) + ", " + escape(suffix)
 
 
 def _classified_positions(state: dict[str, Any]) -> dict[str, list[str]]:
@@ -329,8 +465,25 @@ def _classified_positions(state: dict[str, Any]) -> dict[str, list[str]]:
 
 
 def _action_snapshot_html(base: Any, state: dict[str, Any], language: str) -> str:
-    c = _classified_positions(state)
     l = _labels(language)
+    if _has_rotation_plan(state):
+        c = _rotation_bucket_summary(state)
+        return "".join([
+            "<div class='panel panel-action-snapshot'>", _section_header(base, 2, l["portfolio_action_snapshot"]),
+            "<table class='action-table'><thead><tr>",
+            f"<th>{escape(l['recommendation'])}</th><th>{escape(l['tickers_notes'])}</th></tr></thead><tbody>",
+            f"<tr><th>{escape(l['add_destination'])}</th><td>{_ticker_join(base, c['add'], language)}</td></tr>",
+            f"<tr><th>{escape(l['hold'])}</th><td>{_ticker_join(base, c['hold'], language)}</td></tr>",
+            f"<tr><th>{escape(l['hold_override'])}</th><td>{_ticker_join(base, c['override'], language)}</td></tr>",
+            f"<tr><th>{escape(l['proposed_replace_reduce'])}</th><td>{_ticker_expr_join(base, c['replace'] + c['reduce'], language)}</td></tr>",
+            f"<tr><th>{escape(l['close'])}</th><td>{_ticker_join(base, c['close'], language)}</td></tr>",
+            "</tbody></table>",
+            f"<div class='note-box'><h4>{escape(l['rotation_status'])}</h4><ul><li>{escape(l['rotation_active_note'])}</li></ul></div>",
+            f"<div class='note-box'><h4>{escape(l['best_replacements'])}</h4><ul><li>{_trade_summary_html(base, state, language)}</li></ul></div>",
+            "</div>",
+        ])
+
+    c = _classified_positions(state)
     return "".join([
         "<div class='panel panel-action-snapshot'>", _section_header(base, 2, l["portfolio_action_snapshot"]),
         "<table class='action-table'><thead><tr>",
@@ -347,17 +500,29 @@ def _action_snapshot_html(base: Any, state: dict[str, Any], language: str) -> st
 
 def _position_review_html(base: Any, state: dict[str, Any], language: str) -> str:
     l = _labels(language)
+    decisions = _decision_by_ticker(state)
     rows: list[str] = []
     for p in position_rows(state):
         ticker = str(p.get("ticker", "")).upper()
+        decision = decisions.get(ticker, {})
+        if decision:
+            action = _rotation_action(decision.get("action_code"), language)
+            destination = _ticker(decision.get("destination_ticker"))
+            if destination:
+                action = f"{action} → {destination}"
+            release_score = f2(decision.get("release_score")) or ""
+            next_action = (f"Release score {release_score}. " if language == "en" else f"Vrijmaakscore {release_score}. ") + _display_next_action(ticker, p.get("required_next_action"), language)
+        else:
+            action = _display_action(p.get("suggested_action"), language)
+            next_action = _display_next_action(ticker, p.get("required_next_action"), language)
         rows.append(
             "<tr>"
             f"<td>{_ticker_anchor(base, ticker, language)}</td>"
-            f"<td>{escape(_display_action(p.get('suggested_action'), language))}</td>"
+            f"<td>{escape(action)}</td>"
             f"<td class='num'>{escape(f2(p.get('total_score')) or 'n/a')}</td>"
             f"<td>{escape(_display_fresh_cash(p.get('fresh_cash_test'), language))}</td>"
             f"<td>{escape(_display_role(p.get('portfolio_role'), language))}</td>"
-            f"<td>{escape(_display_next_action(ticker, p.get('required_next_action'), language))}</td>"
+            f"<td>{escape(next_action)}</td>"
             "</tr>"
         )
     return "".join([
@@ -369,8 +534,18 @@ def _position_review_html(base: Any, state: dict[str, Any], language: str) -> st
 
 
 def _rotation_plan_html(base: Any, state: dict[str, Any], language: str) -> str:
-    c = _classified_positions(state)
     l = _labels(language)
+    if _has_rotation_plan(state):
+        c = _rotation_bucket_summary(state)
+        return "".join([
+            "<div class='panel panel-rotation-plan'>", _section_header(base, 5, l["portfolio_rotation_plan"]),
+            "<table class='data-table rotation-plan-table'><thead><tr>",
+            f"<th>{escape(l['close'])}</th><th>{escape(l['reduce'])}</th><th>{escape(l['hold'])}</th><th>{escape(l['hold_override'])}</th><th>{escape(l['add_destination'])}</th><th>{escape(l['replace'])}</th></tr></thead>",
+            "<tbody><tr>",
+            f"<td>{_ticker_join(base, c['close'], language)}</td><td>{_ticker_join(base, c['reduce'], language)}</td><td>{_ticker_join(base, c['hold'], language)}</td><td>{_ticker_join(base, c['override'], language)}</td><td>{_ticker_join(base, c['add'], language)}</td><td>{_ticker_expr_join(base, c['replace'], language)}</td>",
+            "</tr></tbody></table></div>",
+        ])
+    c = _classified_positions(state)
     return "".join([
         "<div class='panel panel-rotation-plan'>", _section_header(base, 5, l["portfolio_rotation_plan"]),
         "<table class='data-table rotation-plan-table'><thead><tr>",
@@ -437,7 +612,7 @@ def _inject_print_table_pagination_css(html: str) -> str:
 def apply_etf_delivery_html_overrides(html: str, base: Any, md_text: str) -> str:
     language = _language(md_text)
     try:
-        state = build_runtime_state()
+        state = _load_state()
     except Exception:
         return _inject_print_table_pagination_css(html)
     html = _replace_hero_cards(html, md_text, language)
