@@ -41,7 +41,7 @@
     "Small-cap and duration signals are not strong enough to justify broad beta expansion.",
     "Gold is treated as a hedge review item unless price behavior improves."
   ],
-  "generated_at_utc": "2026-05-29T08:28:15.672754Z",
+  "generated_at_utc": "2026-05-29T08:52:28.876949Z",
   "lane_adjustments": {
     "AI compute infrastructure": {
       "reason": "Regime and price leadership still support AI compute exposure, but concentration discipline applies.",
@@ -172,11 +172,11 @@
     "report_transfer": {
       "max_lines": 2,
       "show_in_report": true,
-      "summary": "Risk-on growth has persisted for 11 run(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed."
+      "summary": "Risk-on growth has persisted for 12 run(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed."
     },
     "transition_state": "stable",
-    "updated_at_utc": "2026-05-29T08:28:15.672794Z",
-    "weeks_in_regime": 11
+    "updated_at_utc": "2026-05-29T08:52:28.876990Z",
+    "weeks_in_regime": 12
   },
   "report_date": "2026-05-28",
   "report_transfer": {
@@ -187,7 +187,7 @@
   },
   "source_files": {
     "macro_context": "config/etf_macro_fundamental_context.yml",
-    "pricing_audit": "output/pricing/price_audit_2026-05-28_20260529_082711.json",
+    "pricing_audit": "output/pricing/price_audit_2026-05-28_20260529_085225.json",
     "relative_strength": "output/market_history/etf_relative_strength.json"
   }
 }

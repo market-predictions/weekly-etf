@@ -3,7 +3,7 @@
   "portfolio_mode": "client_long_only_thematic",
   "base_currency": "EUR",
   "valuation_source": "runtime_pricing_lineage_state_v1",
-  "pricing_audit_file": "output/pricing/price_audit_2026-05-28_20260529_082711.json",
+  "pricing_audit_file": "output/pricing/price_audit_2026-05-28_20260529_085225.json",
   "trade_ledger_file": "etf_trade_ledger.csv",
   "recommendation_scorecard_file": null,
   "inception_date": "2026-03-28",
@@ -401,7 +401,7 @@
   ],
   "last_report": {
     "date": "2026-05-28",
-    "source_report": "weekly_analysis_pro_260528_06.md",
+    "source_report": "weekly_analysis_pro_260528_07.md",
     "position_count": 6
   },
   "last_valuation": {
@@ -416,6 +416,6 @@
     "equity_curve_state": "New high",
     "valuation_notes": "Runtime valuation from immutable pricing audit and explicit portfolio state"
   },
-  "last_successful_runtime_state_file": "output/runtime/etf_report_state_20260528_20260529_082711.json",
-  "last_state_persisted_at_utc": "2026-05-29T08:28:20.066681+00:00"
+  "last_successful_runtime_state_file": "output/runtime/etf_report_state_20260528_20260529_085225.json",
+  "last_state_persisted_at_utc": "2026-05-29T08:52:34.065878+00:00"
 }
