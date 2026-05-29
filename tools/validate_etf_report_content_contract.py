@@ -11,6 +11,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 import send_report as report_module
+from runtime.scrub_etf_client_surface import scrub_text
 
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
 SNAKE_CASE_RE = re.compile(r"\b[a-z]+(?:_[a-z0-9]+){1,}\b")
@@ -218,6 +219,11 @@ def validate_section15(md_text: str, report_path: Path) -> None:
 
 
 def validate_report(report_path: Path) -> None:
+    original = report_path.read_text(encoding="utf-8")
+    scrubbed = scrub_text(original)
+    if scrubbed != original:
+        report_path.write_text(scrubbed, encoding="utf-8")
+        print(f"ETF_CLIENT_SURFACE_SCRUBBED_BEFORE_CONTENT_VALIDATION | report={report_path.name}")
     md_text = normalize(report_path.read_text(encoding="utf-8"))
     validate_no_forbidden_tokens(md_text, report_path)
     validate_required_sections(md_text, report_path)
