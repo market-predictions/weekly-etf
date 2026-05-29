@@ -9,6 +9,19 @@ CLIENT_FACING_TOKEN_REPLACEMENTS = {
     "Pending classification": "Mixed / not yet decisive",
     "Placeholder for runtime replacement": "Latest available classified input",
     "runtime rebuild required": "Latest available classified input",
+    "fresh_cash_smaller_or_review": "Fresh capital only after review or at smaller size",
+    "failed_fresh_cash_test": "Position does not pass the fresh-capital test",
+    "replaceable_status": "Position is under replacement review",
+    "review_age_ge_2": "Review has persisted for multiple report cycles",
+    "review_age_ge_3": "Review has persisted for several report cycles",
+    "role_impaired": "Portfolio role is impaired",
+    "destination from trade_intents": "Proposed destination from the rotation plan",
+    "trade_intents": "proposed trade intents",
+    "target_weights": "target allocations",
+    "rotation_decisions": "rotation decisions",
+    "churn_budget_used": "rotation budget already used",
+    "Reason codes": "Decision rationale",
+    "Redencodes": "Toelichting",
 }
 
 DUTCH_HTML_TOKEN_REPLACEMENTS = {
@@ -37,6 +50,16 @@ DUTCH_HTML_TOKEN_REPLACEMENTS = {
     "Equity Curve (EUR)": "Portefeuillecurve (EUR)",
     "Portfolio value (EUR)": "Portefeuillewaarde (EUR)",
     "Date": "Datum",
+    "Fresh capital only after review or at smaller size": "Nieuw kapitaal alleen kleiner of na herbeoordeling inzetten",
+    "Position does not pass the fresh-capital test": "Positie voldoet niet aan de vers-kapitaaltoets",
+    "Position is under replacement review": "Positie staat onder vervangingsreview",
+    "Review has persisted for multiple report cycles": "Review loopt al meerdere rapportcycli",
+    "Review has persisted for several report cycles": "Review loopt al meerdere rapportcycli",
+    "Portfolio role is impaired": "Portefeuillerol is verzwakt",
+    "Proposed destination from the rotation plan": "Voorgestelde bestemming uit het rotatieplan",
+    "System override: rotation budget already used": "Systeemoverride: rotatiebudget is al gebruikt",
+    "rotation budget already used": "rotatiebudget is al gebruikt",
+    "Decision rationale": "Toelichting",
 }
 
 DUTCH_MD_MARKERS = [
@@ -95,9 +118,21 @@ DUTCH_DELIVERY_FORBIDDEN_TOKENS = [
     "confidence",
     "Equity Curve (EUR)",
     "Portfolio value (EUR)",
+    "fresh_cash_smaller_or_review",
+    "failed_fresh_cash_test",
+    "replaceable_status",
+    "review_age_ge_2",
+    "review_age_ge_3",
+    "churn_budget_used",
+    "trade_intents",
+    "target_weights",
+    "rotation_decisions",
 ]
 
 RAW_MARKDOWN_LINK_RE = re.compile(r"\[([A-Z][A-Z0-9.-]{0,14})\]\((https?://[^\s\)]+)\)")
+TICKER_REF_RE = r"(?:\[[^\]]+\]\([^\)]+\)|<a\b[^>]*>\s*[A-Z][A-Z0-9.-]*\s*</a>|[A-Z][A-Z0-9.-]*)"
+EN_DOUBLE_NEGATIVE_RE = re.compile(rf"(\breduce\s+{TICKER_REF_RE}\s+by\s+)-(?=\d+(?:\.\d+)?%)", re.IGNORECASE)
+NL_DOUBLE_NEGATIVE_RE = re.compile(rf"(\bverlaag\s+{TICKER_REF_RE}\s+met\s+)-(?=\d+(?:\.\d+)?%)", re.IGNORECASE)
 MINI_CARD_TRIPLE_RE = re.compile(
     r"(?:<div class=['\"]mini-card['\"]>\s*"
     r"<div class=['\"]mini-label['\"]>.*?</div>\s*"
@@ -230,6 +265,8 @@ def convert_residual_markdown_links(html: str) -> str:
 def _apply_global_client_token_replacements(html: str) -> str:
     for forbidden, replacement in CLIENT_FACING_TOKEN_REPLACEMENTS.items():
         html = html.replace(forbidden, replacement)
+    html = EN_DOUBLE_NEGATIVE_RE.sub(r"\1", html)
+    html = NL_DOUBLE_NEGATIVE_RE.sub(r"\1", html)
     return html
 
 
