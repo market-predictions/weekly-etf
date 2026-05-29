@@ -13,12 +13,16 @@ if str(REPO_ROOT) not in sys.path:
 import send_report as report_module
 
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
+SNAKE_CASE_RE = re.compile(r"\b[a-z]+(?:_[a-z0-9]+){1,}\b")
+DOUBLE_NEGATIVE_RE = re.compile(r"\b(?:reduce|verlaag)\s+[A-Z][A-Z0-9.-]*\s+(?:by|met)\s+-\d+(?:\.\d+)?%", re.IGNORECASE)
 
 FORBIDDEN_TOKENS = [
     "Placeholder for runtime replacement",
     "runtime rebuild required",
     "Pending classification",
     "None / None:",
+    "Reason codes",
+    "Redencodes",
 ]
 
 REQUIRED_SECTION_TITLES = {
@@ -61,7 +65,7 @@ MIN_SECTION_CHARS = {
 }
 
 LEGACY_FINAL_ACTION_COLUMNS = ["Ticker", "Suggested Action", "Total Score", "Portfolio Role"]
-ROTATION_FINAL_ACTION_COLUMNS = ["Ticker", "Current weight", "Target weight", "Delta weight", "Action code", "Release score"]
+ROTATION_FINAL_ACTION_COLUMNS = ["Ticker", "Current weight", "Target weight", "Delta weight", "Action", "Release score"]
 
 
 def _canonical_report_key(path: Path) -> tuple[str, int] | None:
@@ -132,7 +136,15 @@ def validate_no_forbidden_tokens(md_text: str, report_path: Path) -> None:
     lower = md_text.lower()
     for token in FORBIDDEN_TOKENS:
         if token.lower() in lower:
-            raise RuntimeError(f"ETF content contract failed for {report_path.name}: forbidden placeholder token found: {token!r}")
+            raise RuntimeError(f"ETF content contract failed for {report_path.name}: forbidden client-surface token found: {token!r}")
+    snake_tokens = sorted(set(match.group(0) for match in SNAKE_CASE_RE.finditer(md_text)))
+    if snake_tokens:
+        raise RuntimeError(
+            f"ETF content contract failed for {report_path.name}: internal snake-case tokens remain: "
+            + ", ".join(snake_tokens[:20])
+        )
+    if DOUBLE_NEGATIVE_RE.search(md_text):
+        raise RuntimeError(f"ETF content contract failed for {report_path.name}: double-negative reduction wording remains.")
 
 
 def validate_required_sections(md_text: str, report_path: Path) -> None:
