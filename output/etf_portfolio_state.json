@@ -3,7 +3,7 @@
   "portfolio_mode": "client_long_only_thematic",
   "base_currency": "EUR",
   "valuation_source": "runtime_pricing_lineage_state_v1",
-  "pricing_audit_file": "output/pricing/price_audit_2026-05-28_20260529_060938.json",
+  "pricing_audit_file": "output/pricing/price_audit_2026-05-28_20260529_074045.json",
   "trade_ledger_file": "etf_trade_ledger.csv",
   "recommendation_scorecard_file": null,
   "inception_date": "2026-03-28",
@@ -24,7 +24,7 @@
       "current_weight_pct": 24.14,
       "existing_new": "Existing",
       "weight_inherited_pct": 24.14,
-      "target_weight_pct": 24.13,
+      "target_weight_pct": 24.14,
       "suggested_action": "Hold",
       "conviction_tier": "Tier 2",
       "total_score": 3.53,
@@ -70,7 +70,7 @@
       "pricing_tier": "valuation_grade",
       "price_date": "2026-05-28",
       "selected_close": 754.59998,
-      "rotation_target_weight_pct": 24.13,
+      "rotation_target_weight_pct": 24.14,
       "rotation_action_code": "hold_with_override",
       "rotation_delta_weight_pct": 0.0,
       "rotation_destination_ticker": "",
@@ -88,7 +88,7 @@
       "current_weight_pct": 27.61,
       "existing_new": "Existing",
       "weight_inherited_pct": 27.61,
-      "target_weight_pct": 27.62,
+      "target_weight_pct": 27.61,
       "suggested_action": "Add",
       "conviction_tier": "Tier 1",
       "total_score": 4.28,
@@ -134,7 +134,7 @@
       "pricing_tier": "valuation_grade",
       "price_date": "2026-05-28",
       "selected_close": 599.83002,
-      "rotation_target_weight_pct": 27.62,
+      "rotation_target_weight_pct": 27.61,
       "rotation_action_code": "hold",
       "rotation_delta_weight_pct": 0.0,
       "rotation_destination_ticker": "",
@@ -216,7 +216,7 @@
       "current_weight_pct": 13.7,
       "existing_new": "Existing",
       "weight_inherited_pct": 13.7,
-      "target_weight_pct": 13.69,
+      "target_weight_pct": 13.7,
       "suggested_action": "Hold under review",
       "conviction_tier": "Tier 2",
       "total_score": 3.68,
@@ -262,7 +262,7 @@
       "pricing_tier": "valuation_grade",
       "price_date": "2026-05-28",
       "selected_close": 56.45,
-      "rotation_target_weight_pct": 13.69,
+      "rotation_target_weight_pct": 13.7,
       "rotation_action_code": "hold_with_override",
       "rotation_delta_weight_pct": 0.0,
       "rotation_destination_ticker": "",
@@ -401,7 +401,7 @@
   ],
   "last_report": {
     "date": "2026-05-28",
-    "source_report": "weekly_analysis_pro_260528_04.md",
+    "source_report": "weekly_analysis_pro_260528_05.md",
     "position_count": 6
   },
   "last_valuation": {
@@ -416,6 +416,6 @@
     "equity_curve_state": "New high",
     "valuation_notes": "Runtime valuation from immutable pricing audit and explicit portfolio state"
   },
-  "last_successful_runtime_state_file": "output/runtime/etf_report_state_20260528_20260529_060938.json",
-  "last_state_persisted_at_utc": "2026-05-29T06:14:59.263514+00:00"
+  "last_successful_runtime_state_file": "output/runtime/etf_report_state_20260528_20260529_074045.json",
+  "last_state_persisted_at_utc": "2026-05-29T07:40:56.161180+00:00"
 }
