@@ -5,6 +5,8 @@ import os
 import re
 from pathlib import Path
 
+from runtime.scrub_etf_client_surface import scrub_text
+
 EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 SNAKE_CASE_RE = re.compile(r"\b[a-z]+(?:_[a-z0-9]+){1,}\b")
@@ -48,6 +50,14 @@ def _current_files(output_dir: Path) -> list[Path]:
     return paths
 
 
+def _scrub_file(path: Path) -> None:
+    original = path.read_text(encoding="utf-8", errors="ignore")
+    cleaned = scrub_text(original)
+    if cleaned != original:
+        path.write_text(cleaned, encoding="utf-8")
+        print(f"ETF_CLIENT_SURFACE_SCRUBBED | file={path.name}")
+
+
 def _scan(path: Path) -> list[str]:
     text = path.read_text(encoding="utf-8", errors="ignore")
     hits: list[str] = []
@@ -64,6 +74,8 @@ def _scan(path: Path) -> list[str]:
 def validate(output_dir: Path) -> None:
     failures: list[str] = []
     paths = _current_files(output_dir)
+    for path in paths:
+        _scrub_file(path)
     for path in paths:
         hits = _scan(path)
         if hits:
