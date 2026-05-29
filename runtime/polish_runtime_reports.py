@@ -10,6 +10,7 @@ from typing import Any
 EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 MACRO_LATEST = Path("output/macro/latest.json")
+RUNTIME_POINTER = Path("output/runtime/latest_etf_report_state_path.txt")
 
 
 def latest_report(output_dir: Path, pattern: re.Pattern[str]) -> Path:
@@ -50,15 +51,38 @@ def load_macro_pack() -> dict[str, Any]:
         return {}
 
 
-def load_runtime_state() -> dict[str, Any]:
-    raw = os.environ.get("MRKT_RPRTS_RUNTIME_STATE_PATH") or os.environ.get("ETF_RUNTIME_STATE_PATH") or ""
-    if not raw:
-        return {}
-    path = Path(raw)
-    if not path.exists():
+def _resolve_runtime_state_path(explicit: str | None = None) -> Path | None:
+    candidates = [
+        explicit,
+        os.environ.get("MRKT_RPRTS_RUNTIME_STATE_PATH"),
+        os.environ.get("ETF_RUNTIME_STATE_PATH"),
+    ]
+    for raw in candidates:
+        if not raw:
+            continue
+        path = Path(str(raw).strip())
+        if path.exists():
+            return path
+    if RUNTIME_POINTER.exists():
+        raw = RUNTIME_POINTER.read_text(encoding="utf-8").strip()
+        if raw:
+            path = Path(raw)
+            if path.exists():
+                return path
+            candidate = RUNTIME_POINTER.parent / path.name
+            if candidate.exists():
+                return candidate
+    return None
+
+
+def load_runtime_state(runtime_state_path: str | None = None) -> dict[str, Any]:
+    path = _resolve_runtime_state_path(runtime_state_path)
+    if path is None:
         return {}
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        state = json.loads(path.read_text(encoding="utf-8"))
+        state.setdefault("_runtime_state_source", str(path))
+        return state
     except Exception:
         return {}
 
@@ -169,6 +193,9 @@ def _patch_rotation_intent_language_en(text: str, state: dict[str, Any]) -> str:
         "- Closed: None.",
         "- Executed reductions/closures: none unless separately recorded in the trade ledger and persisted portfolio state.",
     )
+    marker = "### Recommendation discipline continuity"
+    if marker in text and "Proposed rotation:" not in text:
+        text = text.replace(marker, f"### Proposed rotation\n- {summary}\n\n{marker}")
     return text
 
 
@@ -196,8 +223,6 @@ def _patch_rotation_intent_language_nl(text: str, state: dict[str, Any]) -> str:
         "Gesloten: geen.",
         "Uitgevoerde verlagingen/sluitingen: geen tenzij apart vastgelegd in het handelslogboek en de portefeuille-staat.",
     )
-    # Native Dutch templates have varied wording across iterations; append a
-    # deterministic continuity note if no replacement was possible.
     marker = "### Recommendation discipline continuity"
     nl_marker = "### Aanbevelingsdiscipline-continuïteit"
     continuity_marker = marker if marker in text else nl_marker
@@ -218,7 +243,7 @@ def _macro_executive_summary(pack: dict[str, Any]) -> str:
 - **Primary regime:** {current} ({confidence_text} confidence)
 - **What changed this week:** {what_changed[0] if what_changed else 'No decisive full-regime break; allocation discipline remains more important than theme expansion.'}
 - **Portfolio implication:** {implications[0] if implications else 'Stay invested, but make new capital pass a stricter macro and relative-strength filter.'}
-- **Overall portfolio judgment:** Keep the current portfolio intact for now, but treat SPY, PPA, PAVE and GLD as active review items rather than passive holds.
+- **Overall portfolio judgment:** Keep the current portfolio intact for now, but treat weak or over-budget positions as active capital-source candidates rather than passive holds.
 - **Main takeaway:** **SMH remains the earned leader, but fresh capital and replacement decisions must pass regime, pricing and duel-evidence checks.**
 """
 
@@ -255,8 +280,8 @@ def _macro_regime_dashboard(pack: dict[str, Any]) -> str:
 def _macro_bottom_line(pack: dict[str, Any]) -> str:
     implications = _take(pack.get("portfolio_implications"), 3)
     first = implications[0] if implications else "Stay invested, but make new capital pass a stricter macro and relative-strength filter."
-    second = implications[1] if len(implications) > 1 else "Treat SPY, PPA, PAVE and GLD as active review items rather than passive holds."
-    third = implications[2] if len(implications) > 2 else "Do not fund replacement candidates until pricing basis and direct duel evidence are visible."
+    second = implications[1] if len(implications) > 1 else "Treat replaceable positions as active capital-source candidates rather than indefinite review items."
+    third = implications[2] if len(implications) > 2 else "Use trade_intents[] as proposed rotation output, not as executed trades until the ledger and portfolio state are updated."
     return f"""
 - **Portfolio stance:** {first}
 - **Best earned exposure:** SMH remains the portfolio's strongest contributor and cleanest secular growth expression.
@@ -296,7 +321,7 @@ def polish_english(text: str, runtime_state: dict[str, Any] | None = None) -> st
     text = text.replace("Replacement Duel Table v2", "Replacement Duel Table")
     text = text.replace(
         "- **Secondary cross-current:** Runtime-derived report generation is active. Pricing, lane discovery, portfolio state and recommendation discipline are separate inputs.",
-        "- **Secondary cross-current:** The production process is state-led: pricing, portfolio holdings, lane discovery, macro regime and recommendation discipline are independently validated before delivery."
+        "- **Secondary cross-current:** The production process is state-led: pricing, portfolio holdings, lane discovery, macro regime, rotation plan and recommendation discipline are independently validated before delivery."
     )
     text = text.replace(
         "- None from this renderer unless the runtime state already records an executed Add.",
@@ -304,16 +329,16 @@ def polish_english(text: str, runtime_state: dict[str, Any] | None = None) -> st
     )
     text = text.replace(
         "- No replacement is fundable until the pricing and relative-strength duel is complete.",
-        "- No challenger is promoted to a fundable replacement yet. Each named replacement must first clear the same close-date pricing basis and relative-strength duel."
+        "- Replacement funding is now governed by the rotation plan; trade intents remain proposed until ledger/state persistence records execution."
     )
     text = text.replace("- Equity-curve state: Runtime-derived", "- Equity-curve state: Reconciled to Section 15")
     text = text.replace(
         "- Added: runtime-rendered markdown generation layer.",
-        "- Added: a validated state-led production path with macro-policy regime input; no portfolio position was added unless shown in Section 14."
+        "- Added: a validated state-led production path with macro-policy and rotation-plan inputs; no portfolio position was executed unless recorded in the trade ledger."
     )
     text = text.replace(
         "- Thesis changes: No thesis abandoned; implementation discipline tightened.",
-        "- Thesis changes: No structural thesis was abandoned; implementation and macro-regime discipline are materially tighter."
+        "- Thesis changes: No structural thesis was abandoned; implementation, macro-regime and rotation discipline are materially tighter."
     )
 
     if pack:
@@ -329,14 +354,13 @@ def polish_english(text: str, runtime_state: dict[str, Any] | None = None) -> st
             """
 - **Portfolio stance:** Stay invested, but raise the bar for any new capital deployment.
 - **Best earned exposure:** SMH remains the portfolio's strongest contributor and cleanest secular growth expression.
-- **Main discipline issue:** SPY and SMH still create meaningful U.S. tech / AI overlap; this is concentration with benefits, not full diversification.
+- **Main discipline issue:** Replaceable positions must not remain indefinite review items.
 - **Weakest implementation questions:** PPA must prove itself against ITA, PAVE must prove itself against GRID, and GLD must prove that it still behaves like useful ballast.
-- **Action bias:** No replacement is fundable yet. The right next move is evidence gathering, not forced churn.
+- **Action bias:** Trade intents are proposed rotation output, not executed trades until ledger and portfolio-state persistence record them.
 """
         )
 
-    text = _patch_rotation_intent_language_en(text, runtime_state)
-    return text
+    return _patch_rotation_intent_language_en(text, runtime_state)
 
 
 def polish_dutch(text: str, runtime_state: dict[str, Any] | None = None) -> str:
@@ -345,27 +369,25 @@ def polish_dutch(text: str, runtime_state: dict[str, Any] | None = None) -> str:
     if is_native_dutch_report(text):
         print("ETF_RUNTIME_POLISH_NL_SKIPPED | reason=native_dutch_renderer")
         return text
-
-    # Legacy fallback only. Native Dutch reports should not pass through this
-    # English-to-Dutch patch layer because it can reintroduce half-translated
-    # sentences and English section assumptions.
     return text
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", default="output")
+    parser.add_argument("--runtime-state", default=None)
     args = parser.parse_args()
 
     output_dir = Path(args.output_dir)
     en_path = latest_report(output_dir, EN_RE)
     nl_path = latest_report(output_dir, NL_RE)
-    runtime_state = load_runtime_state()
+    runtime_state = load_runtime_state(args.runtime_state)
 
     en_path.write_text(polish_english(en_path.read_text(encoding="utf-8"), runtime_state), encoding="utf-8")
     nl_path.write_text(polish_dutch(nl_path.read_text(encoding="utf-8"), runtime_state), encoding="utf-8")
 
-    print(f"ETF_RUNTIME_POLISH_OK | en={en_path.name} | nl={nl_path.name}")
+    source = runtime_state.get("_runtime_state_source", "none") if runtime_state else "none"
+    print(f"ETF_RUNTIME_POLISH_OK | en={en_path.name} | nl={nl_path.name} | runtime_state={source}")
 
 
 if __name__ == "__main__":
