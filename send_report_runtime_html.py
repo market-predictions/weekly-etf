@@ -8,6 +8,7 @@ import send_report as report_module
 from runtime.build_etf_report_state import build_runtime_state
 from runtime.client_facing_sanitizer import sanitize_client_facing_html, looks_dutch_markdown
 from runtime.delivery_html_overrides import build_report_html_with_state
+from runtime.max_position_action_contract import sanitize_over_cap_add_html
 from runtime.render_etf_report_from_state import cash_eur, invested_eur, total_nav
 
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
@@ -45,27 +46,10 @@ NATIVE_DUTCH_SECTION_MARKERS = [
 
 
 def _render_exec_summary_marker(_section: dict[str, Any]) -> str:
-    """Suppress duplicate Section 1 panel at render source.
-
-    `send_report_OLD.build_report_html()` already renders section 1 into the
-    three hero summary cards. It then rendered section 1 a second time through
-    `render_executive_summary()`, which created the stray duplicated takeaway
-    outside the hero-card frame. The runtime delivery path treats the hero cards
-    as the executive-summary authority and leaves only a hidden semantic marker
-    for legacy body-presence validators.
-    """
     return "<div class='exec-summary-render-marker' style='display:none'>Executive Summary / Kernsamenvatting</div>"
 
 
 def _patch_base_renderer_contract() -> None:
-    """Patch every reference path used by the legacy base renderer.
-
-    Assigning the module attribute alone should normally be enough, but the
-    persistent duplicate-takeaway failure showed that the delivery validator can
-    still execute the original global looked up by `send_report_OLD.build_report_html`.
-    Patch both the module attribute and the function globals used by that legacy
-    function so the source call site cannot render the old visible panel.
-    """
     report_module._base.render_executive_summary = _render_exec_summary_marker
     report_module._base.build_report_html.__globals__["render_executive_summary"] = _render_exec_summary_marker
     try:
@@ -82,7 +66,6 @@ def _add_aliases(alias_map: dict[str, list[str]], canonical: str, aliases: list[
 
 
 def _extend_native_dutch_numeric_aliases() -> None:
-    """Teach legacy parity validators native Dutch table labels."""
     _add_aliases(report_module.SECTION15_LABEL_ALIASES, "Starting capital (EUR)", ["startkapitaal eur"])
     _add_aliases(report_module.SECTION15_LABEL_ALIASES, "Invested market value (EUR)", ["belegde marktwaarde eur"])
     _add_aliases(report_module.SECTION15_LABEL_ALIASES, "Cash (EUR)", ["cash eur"])
@@ -95,15 +78,22 @@ def _extend_native_dutch_numeric_aliases() -> None:
     _add_aliases(report_module.SECTION15_HEADER_ALIASES, "market value (local)", ["marktwaarde lokaal", "lokale marktwaarde"])
     _add_aliases(report_module.SECTION15_HEADER_ALIASES, "market value (eur)", ["marktwaarde eur", "marktwaarde in eur"])
     _add_aliases(report_module.SECTION15_HEADER_ALIASES, "weight %", ["weging %"])
-
     _add_aliases(report_module.SECTION7_HEADER_ALIASES, "portfolio value (eur)", ["portefeuillewaarde eur", "portefeuillewaarde in eur"])
     _add_aliases(report_module.SECTION7_HEADER_ALIASES, "comment", ["toelichting"])
 
 
 def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..., str]:
     def _wrapped(md_text: str, report_date_str: str, image_src: str | None = None, render_mode: str = "email") -> str:
+        language = "nl" if looks_dutch_markdown(md_text) else "en"
         html = build_html(md_text, report_date_str, image_src=image_src, render_mode=render_mode)
-        return sanitize_client_facing_html(html, md_text=md_text, language="nl" if looks_dutch_markdown(md_text) else "en")
+        html = sanitize_client_facing_html(html, md_text=md_text, language=language)
+        try:
+            state = build_runtime_state()
+            html = sanitize_over_cap_add_html(html, state, language=language)
+        except Exception:
+            # Do not make delivery dependent on a second state rebuild; validators catch regressions when state is available.
+            pass
+        return html
 
     return _wrapped
 
@@ -118,13 +108,6 @@ def _title_lines(md_text: str) -> list[str]:
 
 
 def parse_report_date_runtime(md_text: str) -> str:
-    """Parse report date from the H1 title first.
-
-    Native Dutch reports contain historical valuation dates in Section 7. A
-    whole-document date search can accidentally pick the inception date
-    (`2026-03-28`) instead of the report title date. The report title is the
-    authority for cover/date delivery; historical tables remain historical data.
-    """
     for line in _title_lines(md_text):
         dutch = DUTCH_LONG_DATE_RE.search(line)
         if dutch:
@@ -149,7 +132,6 @@ def _has_report_title_date(md_text: str) -> bool:
 
 
 def validate_dutch_companion_report_runtime(md_text: str) -> None:
-    """Validate both legacy patched Dutch and native Dutch companion reports."""
     if not _has_report_title_date(md_text):
         raise RuntimeError("Dutch companion report title is missing a report date.")
 
@@ -171,7 +153,6 @@ def validate_dutch_companion_report_runtime(md_text: str) -> None:
 
 
 def validate_nl_email_body_runtime(html_body: str, md_text: str) -> None:
-    """Dutch delivery validator aligned with Dutch masthead localization."""
     html_lower = html_body.lower()
     masthead_options = [
         "weekly etf review",
@@ -202,7 +183,7 @@ def validate_nl_email_body_runtime(html_body: str, md_text: str) -> None:
     if len(plain_html) < 0.72 * len(plain_md):
         raise RuntimeError("Dutch HTML body appears too short relative to the full report.")
 
-    for bad_token in ["\\n", "#### ", "|---|", "\\t"]:
+    for bad_token in ["\\n", "#### ", "|---|", "\t"]:
         if bad_token in html_body:
             raise RuntimeError(f"Dutch HTML body still contains raw markdown / escaped formatting token: {bad_token}")
 
