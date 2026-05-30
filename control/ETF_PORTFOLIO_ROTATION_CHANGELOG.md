@@ -150,3 +150,24 @@ The overlay keeps report commentary enrichment, but makes these execution-critic
 - pricing audit fields.
 
 The finalization step then recalculates cash, invested market value, NAV and row weights from the official positions before rendering EN/NL reports.
+
+---
+
+## 2026-05-30 — Executed report wording and before/after table contract
+
+The received `weekly_analysis_pro_260529_09.pdf` showed that Section 15 holdings were now arithmetically correct, but the delivered report still mixed proposed and executed language. Section 14 also showed non-zero share deltas with equal previous/new weights, which is not client-facing acceptable.
+
+Added:
+
+- `runtime/fix_executed_report_contract.py`
+
+Changed:
+
+- `runtime/finalize_executed_etf_report.py` now stores `executed_model_changes` from the guarded-auto artifact and runs the executed-report contract patcher after all normal post-processors.
+
+The new patcher:
+
+- rewrites post-execution wording away from proposed/pending rotation language;
+- rebuilds Section 14 / Dutch Section 14 from `executed_model_changes` using real previous weight, new weight, weight change and share delta values;
+- validates that any row with a non-zero share delta cannot show unchanged previous/new weights;
+- patches both English and Dutch report markdown before delivery render.
