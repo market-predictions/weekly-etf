@@ -12,6 +12,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from runtime.finalize_executed_etf_report import finalize_from_artifact
+from tools.validate_etf_execution_state_authority import validate_execution_artifact, validate_runtime_state_authority
 
 POINTER = Path("output/runtime/latest_etf_model_execution_path.txt")
 
@@ -76,6 +77,9 @@ def validate(path: Path, *, expected_mode: str, finalize_report: bool = True) ->
     post = payload.get("post_trade_shadow_portfolio") or {}
     if abs(_float(post.get("nav_drift_eur"))) > 1.0:
         errors.append(f"nav_drift_too_large:{post.get('nav_drift_eur')}")
+
+    errors.extend(validate_execution_artifact(path, expected_mode=expected_mode, raise_on_error=False))
+
     for row in rows:
         if not _text(row.get("source_ticker")) or not _text(row.get("destination_ticker")):
             errors.append("ledger_row_missing_source_or_destination")
@@ -107,7 +111,10 @@ def validate(path: Path, *, expected_mode: str, finalize_report: bool = True) ->
         raise RuntimeError("ETF model execution validation failed for " + path.name + ": " + "; ".join(sorted(set(errors))))
     print(f"ETF_MODEL_EXECUTION_VALIDATION_OK | artifact={path.name} | mode={expected_mode} | trades={len(rows)} | positions={len(shadow_positions)}")
     if expected_mode == "guarded_auto" and finalize_report:
-        finalize_from_artifact(path)
+        finalization = finalize_from_artifact(path)
+        runtime_state = finalization.get("runtime_state") if isinstance(finalization, dict) else None
+        if runtime_state:
+            validate_runtime_state_authority(Path(runtime_state), context="executed_report_state_after_finalize")
 
 
 def main() -> None:
