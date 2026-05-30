@@ -2,7 +2,16 @@ from __future__ import annotations
 
 import argparse
 import re
+import sys
 from pathlib import Path
+from typing import Any
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from runtime.build_etf_report_state import build_runtime_state
+from runtime.max_position_action_contract import over_cap_tickers
 
 SNAKE_CASE_RE = re.compile(r"\b[a-z]+(?:_[a-z0-9]+){1,}\b")
 EN_NEGATIVE_RE = re.compile(r"(\breduce\s+(?:\[[^\]]+\]\([^\)]+\)|[A-Z][A-Z0-9.-]*)\s+by\s+)-(\d+(?:\.\d+)?%)", re.IGNORECASE)
@@ -45,7 +54,57 @@ def _clean_snake_token(match: re.Match[str]) -> str:
     return token.replace("_", " ")
 
 
-def scrub_text(text: str) -> str:
+def _over_cap_from_state() -> list[str]:
+    try:
+        return over_cap_tickers(build_runtime_state())
+    except Exception:
+        return []
+
+
+def _strip_ticker_from_list(value: str, ticker: str, none_label: str = "None") -> str:
+    value = re.sub(rf"\s*,?\s*\[?{re.escape(ticker)}\]?\([^\)]*\)\s*,?\s*", " ", value)
+    value = re.sub(rf"\s*,?\s*\b{re.escape(ticker)}\b\s*,?\s*", " ", value)
+    value = re.sub(r"\s*,\s*,\s*", ", ", value)
+    value = re.sub(r"^\s*,\s*|\s*,\s*$", "", value.strip())
+    return value if value else none_label
+
+
+def _scrub_over_cap_adds(text: str, tickers: list[str]) -> str:
+    for ticker in tickers:
+        hold_msg = f"{ticker} remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap."
+        text = text.replace(
+            f"- {ticker} remains the leading funded growth exposure, subject to the max-position rule.",
+            f"- {hold_msg}",
+        )
+        text = text.replace(
+            f"- {ticker} remains the first candidate for additional capital only if the 25% position-size rule leaves room.",
+            f"- {hold_msg}",
+        )
+        text = re.sub(
+            rf"\|\s*{re.escape(ticker)}\s*\|\s*Add\s*\|",
+            f"| {ticker} | Hold / no fresh cash while above 25% cap |",
+            text,
+        )
+        text = re.sub(
+            rf"\|\s*{re.escape(ticker)}\s*\|\s*([^\|\n]*)\|\s*([^\|\n]*)\|\s*Add\s*\|",
+            rf"| {ticker} | \1| \2| Hold / no fresh cash while above 25% cap |",
+            text,
+        )
+        text = re.sub(
+            rf"(### Add\s*\n-\s*)([^\n]*)",
+            lambda m: m.group(1) + _strip_ticker_from_list(m.group(2), ticker),
+            text,
+        )
+        text = re.sub(
+            rf"(\|\s*Close\s*\|\s*Reduce\s*\|\s*Hold\s*\|\s*Add(?: / destination)?\s*\|[^\n]*\n\|[^\n]*\n\|\s*[^\|]*\|\s*[^\|]*\|\s*[^\|]*\|\s*)([^\|\n]*{re.escape(ticker)}[^\|\n]*)(\s*\|)",
+            lambda m: m.group(1) + _strip_ticker_from_list(m.group(2), ticker) + m.group(3),
+            text,
+            flags=re.IGNORECASE,
+        )
+    return text
+
+
+def scrub_text(text: str, over_cap: list[str] | None = None) -> str:
     text = EN_NEGATIVE_RE.sub(r"\1\2", text)
     text = NL_NEGATIVE_RE.sub(r"\1\2", text)
     for source, target in EXACT_REPLACEMENTS.items():
@@ -53,6 +112,7 @@ def scrub_text(text: str) -> str:
     for source, target in PHRASE_REPLACEMENTS.items():
         text = text.replace(source, target)
     text = SNAKE_CASE_RE.sub(_clean_snake_token, text)
+    text = _scrub_over_cap_adds(text, over_cap or [])
     for source, target in PHRASE_REPLACEMENTS.items():
         text = text.replace(source, target)
     return text
@@ -60,16 +120,17 @@ def scrub_text(text: str) -> str:
 
 def scrub(output_dir: Path) -> None:
     count = 0
+    over_cap = _over_cap_from_state()
     for path in sorted(output_dir.glob("weekly_analysis_pro*.md")):
         if path.is_dir():
             continue
         original = path.read_text(encoding="utf-8")
-        cleaned = scrub_text(original)
+        cleaned = scrub_text(original, over_cap=over_cap)
         if cleaned != original:
             path.write_text(cleaned, encoding="utf-8")
             count += 1
             print(f"ETF_CLIENT_SURFACE_SCRUBBED | report={path.name}")
-    print(f"ETF_CLIENT_SURFACE_SCRUB_OK | changed={count}")
+    print(f"ETF_CLIENT_SURFACE_SCRUB_OK | changed={count} | over_cap={','.join(over_cap) if over_cap else 'none'}")
 
 
 def main() -> None:
