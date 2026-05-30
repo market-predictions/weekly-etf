@@ -91,3 +91,24 @@ Expected visible result after the next successful run:
 - Section 14 should show executed model changes rather than only proposed trade intents;
 - Continuity input should start the next run from the executed holdings;
 - trade ledger should contain official Sell/Buy model rows.
+
+---
+
+## 2026-05-30 — Execution-state authority validator added
+
+Issue confirmed from `weekly_analysis_pro_260529_05.pdf`: Section 15 mixed stale pre-execution shares with post-execution market values. GLD showed 29 shares, while the displayed EUR market value implied the post-sale GLD share count. NAV-level validation alone was therefore insufficient.
+
+Added:
+
+- `tools/validate_etf_execution_state_authority.py`
+- integration inside `tools/validate_etf_model_execution.py`
+
+The new hard validation checks:
+
+- row-level arithmetic: shares × local price = local market value;
+- local market value / FX = EUR market value;
+- EUR market value / NAV = displayed weight;
+- guarded-auto shadow positions match official `output/etf_portfolio_state.json` after execution;
+- executed final report runtime state matches official portfolio-state quantities after `finalize_executed_etf_report.py` runs.
+
+This is intentionally validator-first. It blocks stale scorecard/report-state quantity leakage before PDF/email delivery instead of patching the report surface after the fact.
