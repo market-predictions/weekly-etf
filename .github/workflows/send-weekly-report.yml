@@ -249,7 +249,7 @@ jobs:
             --mode shadow \
             --output-dir output/runtime)"
           echo "$execution_log"
-          model_execution_path="$(printf '%s\n' "$execution_log" | sed -n 's/^ETF_MODEL_EXECUTION_SHADOW_OK | artifact=\([^|]*\) |.*/\1/p' | xargs)"
+          model_execution_path="$(printf '%s\n' "$execution_log" | sed -n 's/^ETF_MODEL_EXECUTION_OK | artifact=\([^|]*\) |.*/\1/p' | xargs)"
           if [ -z "$model_execution_path" ] || [ ! -f "$model_execution_path" ]; then
             echo "Model execution engine did not emit a valid shadow artifact path." >&2
             exit 1
@@ -335,6 +335,26 @@ jobs:
             --portfolio-state output/etf_portfolio_state.json \
             --valuation-history output/etf_valuation_history.csv \
             --status valuation_state_persisted
+
+      - name: Execute guarded ETF model rotation
+        env:
+          MRKT_RPRTS_REPORT_MODE: pro
+        run: |
+          execution_log="$(python -m runtime.model_execution_engine \
+            --runtime-state "$ETF_RUNTIME_STATE_PATH" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --trade-ledger output/etf_trade_ledger.csv \
+            --mode guarded_auto \
+            --output-dir output/runtime)"
+          echo "$execution_log"
+          model_execution_path="$(printf '%s\n' "$execution_log" | sed -n 's/^ETF_MODEL_EXECUTION_OK | artifact=\([^|]*\) |.*/\1/p' | xargs)"
+          if [ -z "$model_execution_path" ] || [ ! -f "$model_execution_path" ]; then
+            echo "Model execution engine did not emit a valid guarded-auto artifact path." >&2
+            exit 1
+          fi
+          echo "ETF_MODEL_EXECUTION_PATH=$model_execution_path" >> "$GITHUB_ENV"
+          echo "MRKT_RPRTS_MODEL_EXECUTION_PATH=$model_execution_path" >> "$GITHUB_ENV"
+          python tools/validate_etf_model_execution.py --artifact "$model_execution_path" --expected-mode guarded_auto
 
       - name: Validate lane breadth proof before render
         env:
