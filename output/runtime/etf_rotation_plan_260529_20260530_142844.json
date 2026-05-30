@@ -1,0 +1,849 @@
+{
+  "schema_version": "1.0",
+  "created_at_utc": "2026-05-30T14:28:50.570832+00:00",
+  "run_id": "20260530_142844",
+  "report_token": "260529",
+  "requested_close_date": "2026-05-29",
+  "source_files": {
+    "portfolio_state": "output/etf_portfolio_state.json",
+    "scorecard": "output/etf_recommendation_scorecard.csv",
+    "pricing_audit": "output/pricing/price_audit_2026-05-29_20260530_142844.json",
+    "lane_assessment": "output/lane_reviews/etf_lane_assessment_260529.json",
+    "relative_strength": "output/market_history/etf_relative_strength.json"
+  },
+  "policy": {
+    "min_trade_size_pct_nav": 2.0,
+    "max_single_source_reduction_pct_nav": 5.0,
+    "max_major_rotations_per_run": 1,
+    "review_age_watch": 1,
+    "review_age_forced_decision": 2,
+    "review_age_block_passive_hold": 3,
+    "release_score_reduce_threshold": 65,
+    "release_score_replace_threshold": 80,
+    "release_score_close_threshold": 90,
+    "destination_score_min_fundable": 70,
+    "destination_score_preferred": 80,
+    "relative_strength_3m_watch": 5,
+    "relative_strength_3m_rotation_candidate": 10,
+    "relative_strength_3m_strong": 15
+  },
+  "portfolio": {
+    "nav_eur": 125834.28,
+    "cash_eur": 1936.52
+  },
+  "incumbent_reviews": [
+    {
+      "ticker": "GLD",
+      "current_weight_pct": 4.37,
+      "release_score": 100,
+      "release_reasons": [
+        "failed_fresh_cash_test",
+        "replaceable_status",
+        "review_age_ge_2",
+        "review_age_ge_3",
+        "negative_pnl_gt_5",
+        "negative_pnl_gt_10",
+        "better_alternative_exists",
+        "negative_contribution",
+        "role_failed",
+        "factor_or_concentration_flag"
+      ],
+      "role_validity": "fail",
+      "weeks_replaceable": 3,
+      "suggested_action_in": "replace_partial",
+      "fresh_cash_test": "Reduce"
+    },
+    {
+      "ticker": "GSG",
+      "current_weight_pct": 16.48,
+      "release_score": 10,
+      "release_reasons": [
+        "role_impaired"
+      ],
+      "role_validity": "impaired",
+      "weeks_replaceable": 0,
+      "suggested_action_in": "Add from rotation",
+      "fresh_cash_test": "Hold / monitor"
+    },
+    {
+      "ticker": "PAVE",
+      "current_weight_pct": 11.93,
+      "release_score": 85,
+      "release_reasons": [
+        "fresh_cash_smaller_or_review",
+        "replaceable_status",
+        "review_age_ge_2",
+        "review_age_ge_3",
+        "better_alternative_exists",
+        "role_impaired",
+        "factor_or_concentration_flag"
+      ],
+      "role_validity": "impaired",
+      "weeks_replaceable": 3,
+      "suggested_action_in": "hold_with_override",
+      "fresh_cash_test": "Smaller / under review"
+    },
+    {
+      "ticker": "PPA",
+      "current_weight_pct": 13.31,
+      "release_score": 100,
+      "release_reasons": [
+        "failed_fresh_cash_test",
+        "replaceable_status",
+        "review_age_ge_2",
+        "review_age_ge_3",
+        "negative_pnl_gt_5",
+        "better_alternative_exists",
+        "negative_contribution",
+        "role_impaired",
+        "factor_or_concentration_flag"
+      ],
+      "role_validity": "impaired",
+      "weeks_replaceable": 3,
+      "suggested_action_in": "hold_with_override",
+      "fresh_cash_test": "Reduce"
+    },
+    {
+      "ticker": "SMH",
+      "current_weight_pct": 24.08,
+      "release_score": 60,
+      "release_reasons": [
+        "fresh_cash_smaller_or_review",
+        "replaceable_status",
+        "review_age_ge_2",
+        "role_impaired",
+        "factor_or_concentration_flag"
+      ],
+      "role_validity": "impaired",
+      "weeks_replaceable": 2,
+      "suggested_action_in": "hold",
+      "fresh_cash_test": "Smaller / under review"
+    },
+    {
+      "ticker": "SPY",
+      "current_weight_pct": 21.14,
+      "release_score": 85,
+      "release_reasons": [
+        "fresh_cash_smaller_or_review",
+        "replaceable_status",
+        "review_age_ge_2",
+        "review_age_ge_3",
+        "better_alternative_exists",
+        "role_impaired",
+        "factor_or_concentration_flag"
+      ],
+      "role_validity": "impaired",
+      "weeks_replaceable": 3,
+      "suggested_action_in": "hold_with_override",
+      "fresh_cash_test": "Smaller / under review"
+    },
+    {
+      "ticker": "URNM",
+      "current_weight_pct": 7.14,
+      "release_score": 0,
+      "release_reasons": [],
+      "role_validity": "pass",
+      "weeks_replaceable": 0,
+      "suggested_action_in": "hold",
+      "fresh_cash_test": "Hold"
+    }
+  ],
+  "candidate_reviews": [
+    {
+      "candidate": "CIBR",
+      "alternative_etf": "BUG",
+      "lane_name": "Cybersecurity resilience",
+      "destination_score": 100,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "fundable_candidate",
+        "live_radar",
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": true,
+      "promoted_to_live_radar": true,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "GSG",
+      "alternative_etf": "DBC",
+      "lane_name": "Broad commodity inflation hedge",
+      "destination_score": 100,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "liquidity_pass",
+        "portfolio_differentiation",
+        "direct_3m_edge_watch",
+        "direct_3m_edge_rotation",
+        "direct_3m_edge_strong"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "GLD",
+      "direct_rs_vs_holding_1m_pct": -7.92,
+      "direct_rs_vs_holding_3m_pct": 36.27,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "ROBO",
+      "alternative_etf": "IRBO",
+      "lane_name": "Industrial automation and factory software",
+      "destination_score": 100,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "fundable_candidate",
+        "live_radar",
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": true,
+      "promoted_to_live_radar": true,
+      "direct_rs_vs_holding": "SMH",
+      "direct_rs_vs_holding_1m_pct": -7.2,
+      "direct_rs_vs_holding_3m_pct": -34.34,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "SMH",
+      "alternative_etf": "SOXX",
+      "lane_name": "AI compute infrastructure",
+      "destination_score": 100,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "live_radar",
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "liquidity_pass"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": true,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "XBI",
+      "alternative_etf": "IBB",
+      "lane_name": "Biotech innovation / therapeutic platforms",
+      "destination_score": 100,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "fundable_candidate",
+        "live_radar",
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": true,
+      "promoted_to_live_radar": true,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "BOTZ",
+      "alternative_etf": "ROBO",
+      "lane_name": "Robotics / automation",
+      "destination_score": 97,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "fundable_candidate",
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": true,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "SMH",
+      "direct_rs_vs_holding_1m_pct": -12.34,
+      "direct_rs_vs_holding_3m_pct": -44.49,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "IEFA",
+      "alternative_etf": "EFA",
+      "lane_name": "Non-U.S. developed market diversification",
+      "destination_score": 93,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "fundable_candidate",
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": true,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "SPY",
+      "direct_rs_vs_holding_1m_pct": -1.35,
+      "direct_rs_vs_holding_3m_pct": -10.89,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "NLR",
+      "alternative_etf": "NUCL",
+      "lane_name": "Nuclear utilities and clean baseload",
+      "destination_score": 91,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "fundable_candidate",
+        "structural_score_scaled",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": true,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "URNM",
+      "direct_rs_vs_holding_1m_pct": 1.76,
+      "direct_rs_vs_holding_3m_pct": 4.72,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "PAVE",
+      "alternative_etf": "GRID",
+      "lane_name": "Grid buildout / electrification",
+      "destination_score": 91,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "live_radar",
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": true,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "DFEN",
+      "alternative_etf": "NATO",
+      "lane_name": "Europe defense and security rearmament",
+      "destination_score": 88,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "fundable_candidate",
+        "structural_score_scaled",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": true,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "PPA",
+      "direct_rs_vs_holding_1m_pct": 23.38,
+      "direct_rs_vs_holding_3m_pct": -14.93,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "DBA",
+      "alternative_etf": "CORN",
+      "lane_name": "Agricultural commodities",
+      "destination_score": 86,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "fundable_candidate",
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": true,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "PPA",
+      "alternative_etf": "ITA",
+      "lane_name": "Defense innovation / sovereign resilience",
+      "destination_score": 86,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "live_radar",
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": true,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "XLU",
+      "alternative_etf": "VPU",
+      "lane_name": "Power infrastructure and utilities capex",
+      "destination_score": 84,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "fundable_candidate",
+        "structural_score_scaled",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": true,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "PAVE",
+      "direct_rs_vs_holding_1m_pct": -4.9,
+      "direct_rs_vs_holding_3m_pct": -8.49,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "URNM",
+      "alternative_etf": "URA",
+      "lane_name": "Uranium / nuclear fuel cycle",
+      "destination_score": 66,
+      "destination_reasons": [
+        "valuation_grade_pricing",
+        "structural_score_scaled",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "valuation_grade",
+      "price_status": "fresh_exact_unverified"
+    },
+    {
+      "candidate": "COPX",
+      "alternative_etf": "PICK",
+      "lane_name": "Copper and electrification materials",
+      "destination_score": 56,
+      "destination_reasons": [
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "not_priced",
+      "price_status": "not_in_current_pricing_audit"
+    },
+    {
+      "candidate": "REMX",
+      "alternative_etf": "PICK",
+      "lane_name": "Critical minerals / copper / refining",
+      "destination_score": 50,
+      "destination_reasons": [
+        "structural_score_scaled",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "not_priced",
+      "price_status": "not_in_current_pricing_audit"
+    },
+    {
+      "candidate": "XLV",
+      "alternative_etf": "VHT",
+      "lane_name": "Healthcare quality and defensive growth",
+      "destination_score": 50,
+      "destination_reasons": [
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "not_priced",
+      "price_status": "not_in_current_pricing_audit"
+    },
+    {
+      "candidate": "INDA",
+      "alternative_etf": "EPI",
+      "lane_name": "India industrialization / capex",
+      "destination_score": 45,
+      "destination_reasons": [
+        "structural_score_scaled",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "not_priced",
+      "price_status": "not_in_current_pricing_audit"
+    },
+    {
+      "candidate": "MOO",
+      "alternative_etf": "VEGI",
+      "lane_name": "Food security / agriculture inputs",
+      "destination_score": 44,
+      "destination_reasons": [
+        "structural_score_scaled",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "not_priced",
+      "price_status": "not_in_current_pricing_audit"
+    },
+    {
+      "candidate": "FINX",
+      "alternative_etf": "ARKF",
+      "lane_name": "Fintech / payments rails",
+      "destination_score": 43,
+      "destination_reasons": [
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "not_priced",
+      "price_status": "not_in_current_pricing_audit"
+    },
+    {
+      "candidate": "FIW",
+      "alternative_etf": "PHO",
+      "lane_name": "Water infrastructure / treatment",
+      "destination_score": 43,
+      "destination_reasons": [
+        "structural_score_scaled",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "not_priced",
+      "price_status": "not_in_current_pricing_audit"
+    },
+    {
+      "candidate": "MCHI",
+      "alternative_etf": "FXI",
+      "lane_name": "China hard-asset demand recovery",
+      "destination_score": 41,
+      "destination_reasons": [
+        "structural_score_scaled",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "not_priced",
+      "price_status": "not_in_current_pricing_audit"
+    },
+    {
+      "candidate": "PHO",
+      "alternative_etf": "CGW",
+      "lane_name": "Water utilities / defensive infrastructure",
+      "destination_score": 41,
+      "destination_reasons": [
+        "structural_score_scaled",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "not_priced",
+      "price_status": "not_in_current_pricing_audit"
+    },
+    {
+      "candidate": "KCE",
+      "alternative_etf": "IAI",
+      "lane_name": "Financial infrastructure and market plumbing",
+      "destination_score": 40,
+      "destination_reasons": [
+        "structural_score_scaled",
+        "positive_relative_strength",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "not_priced",
+      "price_status": "not_in_current_pricing_audit"
+    },
+    {
+      "candidate": "KWEB",
+      "alternative_etf": "MCHI",
+      "lane_name": "China platform / policy reset",
+      "destination_score": 38,
+      "destination_reasons": [
+        "structural_score_scaled",
+        "liquidity_pass",
+        "portfolio_differentiation"
+      ],
+      "is_fundable_candidate": false,
+      "promoted_to_live_radar": false,
+      "direct_rs_vs_holding": "",
+      "direct_rs_vs_holding_1m_pct": 0.0,
+      "direct_rs_vs_holding_3m_pct": 0.0,
+      "pricing_tier": "not_priced",
+      "price_status": "not_in_current_pricing_audit"
+    }
+  ],
+  "rotation_decisions": [
+    {
+      "ticker": "GLD",
+      "action_code": "replace_partial",
+      "current_weight_pct": 4.37,
+      "target_weight_pct": 0.0,
+      "delta_weight_pct": -4.37,
+      "destination_ticker": "GSG",
+      "release_score": 100,
+      "role_validity": "fail",
+      "weeks_replaceable": 3,
+      "reason_codes": [
+        "failed_fresh_cash_test",
+        "replaceable_status",
+        "review_age_ge_2",
+        "review_age_ge_3",
+        "negative_pnl_gt_5",
+        "negative_pnl_gt_10",
+        "better_alternative_exists",
+        "negative_contribution",
+        "role_failed",
+        "factor_or_concentration_flag"
+      ],
+      "override_status": "none",
+      "override_reason_code": ""
+    },
+    {
+      "ticker": "PPA",
+      "action_code": "hold_with_override",
+      "current_weight_pct": 13.31,
+      "target_weight_pct": 13.31,
+      "delta_weight_pct": 0.0,
+      "destination_ticker": "",
+      "release_score": 100,
+      "role_validity": "impaired",
+      "weeks_replaceable": 3,
+      "reason_codes": [
+        "failed_fresh_cash_test",
+        "replaceable_status",
+        "review_age_ge_2",
+        "review_age_ge_3",
+        "negative_pnl_gt_5",
+        "better_alternative_exists",
+        "negative_contribution",
+        "role_impaired",
+        "factor_or_concentration_flag"
+      ],
+      "override_status": "engine",
+      "override_reason_code": "churn_budget_used"
+    },
+    {
+      "ticker": "PAVE",
+      "action_code": "hold_with_override",
+      "current_weight_pct": 11.93,
+      "target_weight_pct": 11.93,
+      "delta_weight_pct": 0.0,
+      "destination_ticker": "",
+      "release_score": 85,
+      "role_validity": "impaired",
+      "weeks_replaceable": 3,
+      "reason_codes": [
+        "fresh_cash_smaller_or_review",
+        "replaceable_status",
+        "review_age_ge_2",
+        "review_age_ge_3",
+        "better_alternative_exists",
+        "role_impaired",
+        "factor_or_concentration_flag"
+      ],
+      "override_status": "engine",
+      "override_reason_code": "churn_budget_used"
+    },
+    {
+      "ticker": "SPY",
+      "action_code": "hold_with_override",
+      "current_weight_pct": 21.14,
+      "target_weight_pct": 21.14,
+      "delta_weight_pct": 0.0,
+      "destination_ticker": "",
+      "release_score": 85,
+      "role_validity": "impaired",
+      "weeks_replaceable": 3,
+      "reason_codes": [
+        "fresh_cash_smaller_or_review",
+        "replaceable_status",
+        "review_age_ge_2",
+        "review_age_ge_3",
+        "better_alternative_exists",
+        "role_impaired",
+        "factor_or_concentration_flag"
+      ],
+      "override_status": "engine",
+      "override_reason_code": "churn_budget_used"
+    },
+    {
+      "ticker": "SMH",
+      "action_code": "hold",
+      "current_weight_pct": 24.08,
+      "target_weight_pct": 24.08,
+      "delta_weight_pct": 0.0,
+      "destination_ticker": "",
+      "release_score": 60,
+      "role_validity": "impaired",
+      "weeks_replaceable": 2,
+      "reason_codes": [
+        "fresh_cash_smaller_or_review",
+        "replaceable_status",
+        "review_age_ge_2",
+        "role_impaired",
+        "factor_or_concentration_flag"
+      ],
+      "override_status": "none",
+      "override_reason_code": ""
+    },
+    {
+      "ticker": "GSG",
+      "action_code": "hold",
+      "current_weight_pct": 16.48,
+      "target_weight_pct": 20.85,
+      "delta_weight_pct": 4.37,
+      "destination_ticker": "",
+      "release_score": 10,
+      "role_validity": "impaired",
+      "weeks_replaceable": 0,
+      "reason_codes": [
+        "role_impaired"
+      ],
+      "override_status": "none",
+      "override_reason_code": ""
+    },
+    {
+      "ticker": "URNM",
+      "action_code": "hold",
+      "current_weight_pct": 7.14,
+      "target_weight_pct": 7.14,
+      "delta_weight_pct": 0.0,
+      "destination_ticker": "",
+      "release_score": 0,
+      "role_validity": "pass",
+      "weeks_replaceable": 0,
+      "reason_codes": [],
+      "override_status": "none",
+      "override_reason_code": ""
+    }
+  ],
+  "target_weights": [
+    {
+      "ticker": "GLD",
+      "target_weight_pct": 0.0
+    },
+    {
+      "ticker": "GSG",
+      "target_weight_pct": 20.85
+    },
+    {
+      "ticker": "PAVE",
+      "target_weight_pct": 11.93
+    },
+    {
+      "ticker": "PPA",
+      "target_weight_pct": 13.31
+    },
+    {
+      "ticker": "SMH",
+      "target_weight_pct": 24.08
+    },
+    {
+      "ticker": "SPY",
+      "target_weight_pct": 21.14
+    },
+    {
+      "ticker": "URNM",
+      "target_weight_pct": 7.14
+    }
+  ],
+  "trade_intents": [
+    {
+      "source_ticker": "GLD",
+      "destination_ticker": "GSG",
+      "delta_weight_pct": -4.37,
+      "destination_delta_weight_pct": 4.37,
+      "estimated_notional_eur": 5498.96,
+      "action_code": "replace_partial",
+      "reason_codes": [
+        "failed_fresh_cash_test",
+        "replaceable_status",
+        "review_age_ge_2",
+        "review_age_ge_3",
+        "negative_pnl_gt_5",
+        "negative_pnl_gt_10",
+        "better_alternative_exists",
+        "negative_contribution",
+        "role_failed",
+        "factor_or_concentration_flag",
+        "destination_score_100"
+      ]
+    }
+  ],
+  "validation_flags": {
+    "ticker_agnostic_rules": true,
+    "trade_intents_canonical": true,
+    "warning_mode_initial": true
+  }
+}
