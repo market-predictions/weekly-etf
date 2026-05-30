@@ -355,6 +355,8 @@ jobs:
           echo "ETF_MODEL_EXECUTION_PATH=$model_execution_path" >> "$GITHUB_ENV"
           echo "MRKT_RPRTS_MODEL_EXECUTION_PATH=$model_execution_path" >> "$GITHUB_ENV"
           python tools/validate_etf_model_execution.py --artifact "$model_execution_path" --expected-mode guarded_auto
+          python -m runtime.scrub_etf_client_surface --output-dir output
+          python -m runtime.link_runtime_report_tickers --output-dir output
           python tools/validate_etf_trade_ledger_idempotency.py --trade-ledger output/etf_trade_ledger.csv
 
       - name: Validate lane breadth proof before render
