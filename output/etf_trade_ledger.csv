@@ -4,3 +4,5 @@ weekly_analysis_pro_260403-NONE,2026-04-03,weekly_analysis_pro_260403.md,NONE,No
 weekly_analysis_pro_260505-SMH,2026-05-05,weekly_analysis_pro_260505.md,SMH,Buy,8.0,21.35,24.69,3.34,24.69,Tier 1,Growth engine,Funded from cash; stays below 25% max position size
 model-2026-05-29-20260530_101857-01-GLD-SELL,2026-05-29,runtime:etf_report_state_20260529_20260530_101857.json,GLD,Sell,-15.380800,9.4300,4.4300,-5.0000,4.3400,Tier 3,Hedge ballast,Guarded auto-execution: reduce GLD to fund GSG.
 model-2026-05-29-20260530_101857-01-GSG-BUY,2026-05-29,runtime:etf_report_state_20260529_20260530_101857.json,GSG,Buy,201.749658,0.0000,5.0000,5.0000,5.0000,,Rotation destination,Guarded auto-execution: buy GSG funded by GLD.
+model-2026-05-29-20260530_124038-01-GLD-SELL,2026-05-29,runtime:etf_report_state_20260529_20260530_124038.json,GLD,Sell,-13.618968,8.9800,4.7600,-4.2200,4.7600,Tier 3,Hedge ballast,Guarded auto-execution: reduce GLD to fund GSG.
+model-2026-05-29-20260530_124038-01-GSG-BUY,2026-05-29,runtime:etf_report_state_20260529_20260530_124038.json,GSG,Buy,178.639748,4.7600,8.9800,4.2200,8.9800,Tier 2,Rotation destination,Guarded auto-execution: buy GSG funded by GLD.
