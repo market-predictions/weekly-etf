@@ -11,6 +11,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from runtime.finalize_executed_etf_report import finalize_from_artifact
+
 POINTER = Path("output/runtime/latest_etf_model_execution_path.txt")
 
 
@@ -55,7 +57,7 @@ def _resolve(path_arg: str | None) -> Path:
     raise RuntimeError("No ETF model-execution artifact found.")
 
 
-def validate(path: Path, *, expected_mode: str) -> None:
+def validate(path: Path, *, expected_mode: str, finalize_report: bool = True) -> None:
     payload = _read_json(path)
     errors: list[str] = []
     if payload.get("schema_version") != "1.0":
@@ -104,14 +106,17 @@ def validate(path: Path, *, expected_mode: str) -> None:
     if errors:
         raise RuntimeError("ETF model execution validation failed for " + path.name + ": " + "; ".join(sorted(set(errors))))
     print(f"ETF_MODEL_EXECUTION_VALIDATION_OK | artifact={path.name} | mode={expected_mode} | trades={len(rows)} | positions={len(shadow_positions)}")
+    if expected_mode == "guarded_auto" and finalize_report:
+        finalize_from_artifact(path)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--artifact", default=None)
     parser.add_argument("--expected-mode", default="shadow", choices=["shadow", "guarded_auto"])
+    parser.add_argument("--no-finalize-report", action="store_true")
     args = parser.parse_args()
-    validate(_resolve(args.artifact), expected_mode=args.expected_mode)
+    validate(_resolve(args.artifact), expected_mode=args.expected_mode, finalize_report=not args.no_finalize_report)
 
 
 if __name__ == "__main__":
