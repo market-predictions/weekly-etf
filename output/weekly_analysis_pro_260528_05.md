@@ -28,11 +28,11 @@
 - None
 
 ### Rotation engine status
-- Rotation plan artifact is active; Sections 12-14 are rendered from rotation_decisions, target_weights and trade_intents.
+- Rotation plan artifact is active; Sections 12-14 are rendered from the portfolio rotation plan, target allocations and proposed trade intents.
 - Trade intents are proposed rotation output while the engine is in warning mode; they are not executed trades until the ledger and portfolio state record execution.
 
 ### Best replacements to fund
-- reduce [GLD](https://www.tradingview.com/chart/?symbol=GLD) by -5.00% NAV and allocate 5.00% NAV to [GSG](https://www.tradingview.com/chart/?symbol=GSG), pending execution and portfolio-state persistence.
+- reduce [GLD](https://www.tradingview.com/chart/?symbol=GLD) by 5.00% NAV and allocate 5.00% NAV to [GSG](https://www.tradingview.com/chart/?symbol=GSG), pending execution and portfolio-state persistence.
 
 ### Replacement pricing and duel status
 
@@ -76,7 +76,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Actionable now | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
+| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
 | Cybersecurity resilience | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [BUG](https://www.tradingview.com/chart/?symbol=BUG) | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure exposure with less direct semiconductor cyclicality. | 3-12 months |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Power demand, grid bottlenecks and reshoring capex support infrastructure spend. Macro filter: AI power demand and infrastructure policy support the grid lane; funding still depends on [PAVE](https://www.tradingview.com/chart/?symbol=PAVE)-vs-[GRID](https://www.tradingview.com/chart/?symbol=GRID) duel evidence. | 5 | 4 | Actionable now | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) remains useful, but [GRID](https://www.tradingview.com/chart/?symbol=GRID) is the cleaner thematic challenger. | 3-12 months |
 | Broad commodity inflation hedge | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [DBC](https://www.tradingview.com/chart/?symbol=DBC) | Broad commodities may hedge inflation better than single-metal or single-gold exposure. | 3 | 3 | Watchlist / under review | Useful only if commodity breadth confirms. | 3-12 months |
@@ -129,7 +129,7 @@
 - Since inception return (%): 10.03
 - Equity-curve state: Reconciled to Section 15 with full valuation history
 - EUR/USD used: 1.1650
-- Notes: Section 7 uses `output/etf_valuation_history.csv` plus the current runtime NAV; Section 15 is rendered from the same normalized runtime state.
+- Notes: Section 7 uses the validated valuation history plus the current portfolio NAV; Section 15 is rendered from the same reconciled portfolio state.
 
 | Date | Portfolio value (EUR) | Comment |
 |---|---:|---|
@@ -202,16 +202,16 @@ Performance is calculated on the current ETF holdings using the latest validated
 ## 10. Current Position Review
 
 The position review separates thesis quality, ETF implementation quality, fresh-cash test and rotation-engine decision. Existing holdings are not treated as automatic default holds.
-### [SPY](https://www.tradingview.com/chart/?symbol=SPY) — Hold with override — Score 3.53 — Fresh cash: Smaller / under review — release score 85; override churn_budget_used
+### [SPY](https://www.tradingview.com/chart/?symbol=SPY) — Hold with override — Score 3.53 — Fresh cash: Smaller / under review — release score 85; override: rotation budget already used
 Role: Core beta. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
 ### [SMH](https://www.tradingview.com/chart/?symbol=SMH) — Hold — Score 4.28 — Fresh cash: Smaller / under review — release score 60
 Role: Growth engine. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
-### [PPA](https://www.tradingview.com/chart/?symbol=PPA) — Hold with override — Score 3.45 — Fresh cash: Reduce — release score 100; override churn_budget_used
+### [PPA](https://www.tradingview.com/chart/?symbol=PPA) — Hold with override — Score 3.45 — Fresh cash: Reduce — release score 100; override: rotation budget already used
 Role: Resilience. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
-### [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) — Hold with override — Score 3.68 — Fresh cash: Smaller / under review — release score 85; override churn_budget_used
+### [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) — Hold with override — Score 3.68 — Fresh cash: Smaller / under review — release score 85; override: rotation budget already used
 Role: Real-asset capex. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
 ### [URNM](https://www.tradingview.com/chart/?symbol=URNM) — Hold — Score 3.70 — Fresh cash: Hold
@@ -222,8 +222,8 @@ Role: Hedge ballast. Required next action: Run hedge validity test and compare w
 
 ## 11. Best New Opportunities
 
-- [SMH](https://www.tradingview.com/chart/?symbol=SMH) remains the leading funded growth exposure, subject to the max-position rule.
-- Proposed rotation: reduce [GLD](https://www.tradingview.com/chart/?symbol=GLD) by -5.00% NAV and allocate 5.00% NAV to [GSG](https://www.tradingview.com/chart/?symbol=GSG), pending execution and portfolio-state persistence.
+- [SMH](https://www.tradingview.com/chart/?symbol=SMH) remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap.
+- Proposed rotation: reduce [GLD](https://www.tradingview.com/chart/?symbol=GLD) by 5.00% NAV and allocate 5.00% NAV to [GSG](https://www.tradingview.com/chart/?symbol=GSG), pending execution and portfolio-state persistence.
 - [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) / [BUG](https://www.tradingview.com/chart/?symbol=BUG): Cyber spend is linked to AI, cloud, data-center and geopolitical resilience.
 - [GSG](https://www.tradingview.com/chart/?symbol=GSG) / [DBC](https://www.tradingview.com/chart/?symbol=DBC): Broad commodities may hedge inflation better than single-metal or single-gold exposure.
 - [ROBO](https://www.tradingview.com/chart/?symbol=ROBO) / [IRBO](https://www.tradingview.com/chart/?symbol=IRBO): Automation capex can broaden beyond semiconductors into industrial productivity.
@@ -237,21 +237,21 @@ Role: Hedge ballast. Required next action: Run hedge validity test and compare w
 
 ## 13. Final Action Table
 
-| Ticker | ETF | Current weight | Target weight | Delta weight | Action code | Capital destination | Release score | Reason codes | Override? |
+| Ticker | ETF | Current weight | Target weight | Delta weight | Action code | Capital destination | Release score | Decision rationale | Override? |
 |---|---|---:|---:|---:|---|---|---:|---|---|
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | 24.14 | 24.14 | 0.00 | Hold with override | - | 85.00 | fresh_cash_smaller_or_review, replaceable_status, review_age_ge_2, review_age_ge_3 | engine: churn_budget_used |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | 27.61 | 27.61 | 0.00 | Hold | - | 60.00 | fresh_cash_smaller_or_review, replaceable_status, review_age_ge_2, role_impaired | No |
-| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | 15.28 | 15.28 | 0.00 | Hold with override | - | 100.00 | failed_fresh_cash_test, replaceable_status, review_age_ge_2, review_age_ge_3 | engine: churn_budget_used |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | 13.70 | 13.70 | 0.00 | Hold with override | - | 85.00 | fresh_cash_smaller_or_review, replaceable_status, review_age_ge_2, review_age_ge_3 | engine: churn_budget_used |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | 24.14 | 24.14 | 0.00 | Hold with override | - | 85.00 | fresh capital only after review or at smaller size, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles | engine: rotation budget already used |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | 27.61 | 27.61 | 0.00 | Hold | - | 60.00 | fresh capital only after review or at smaller size, position is under replacement review, review has persisted for multiple report cycles, role impaired | No |
+| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | 15.28 | 15.28 | 0.00 | Hold with override | - | 100.00 | position does not pass the fresh-capital test, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles | engine: rotation budget already used |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | 13.70 | 13.70 | 0.00 | Hold with override | - | 85.00 | fresh capital only after review or at smaller size, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles | engine: rotation budget already used |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | 8.18 | 8.18 | 0.00 | Hold | - | 0.00 | - | No |
-| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | SPDR Gold Shares | 9.34 | 4.34 | -5.00 | Replace partial | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 100.00 | failed_fresh_cash_test, replaceable_status, review_age_ge_2, review_age_ge_3 | No |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 0.00 | 5.00 | 5.00 | Add from rotation | - | - | destination from trade_intents | No |
+| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | SPDR Gold Shares | 9.34 | 4.34 | -5.00 | Replace partial | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 100.00 | position does not pass the fresh-capital test, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles | No |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 0.00 | 5.00 | 5.00 | Add from rotation | - | - | destination from proposed trade intents | No |
 
 ## 14. Proposed Position Changes / Rotation Trade Intents
 
 | Source | Destination | Source delta % | Destination delta % | Estimated notional EUR | Action | Reason |
 |---|---|---:|---:|---:|---|---|
-| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | -5.00 | 5.00 | 5501.65 | Replace partial | failed_fresh_cash_test, replaceable_status, review_age_ge_2, review_age_ge_3 |
+| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | -5.00 | 5.00 | 5501.65 | Replace partial | position does not pass the fresh-capital test, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles |
 
 ## 15. Current Portfolio Holdings and Cash
 
@@ -294,7 +294,7 @@ Role: Hedge ballast. Required next action: Run hedge validity test and compare w
 ### Watchlist / dynamic radar memory
 | Theme | Primary ETF | Alternative ETF | Why I’m considering it | Current status |
 |---|---|---|---|---|
-| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Strongest secular growth exposure. | Active |
+| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Strongest secular growth exposure. | Active / capped |
 | Defense innovation / sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructure capex remains valid. | Duel required |
 | Gold hedge review | [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Hedge role must be proven. | Under review |
@@ -314,7 +314,7 @@ Role: Hedge ballast. Required next action: Run hedge validity test and compare w
 
 ### Changes since last review
 - Added: a validated state-led production path with macro-policy and rotation-plan inputs; no portfolio position was executed unless recorded in the trade ledger.
-- Proposed rotation: reduce [GLD](https://www.tradingview.com/chart/?symbol=GLD) by -5.00% NAV and allocate 5.00% NAV to [GSG](https://www.tradingview.com/chart/?symbol=GSG), pending execution and portfolio-state persistence.
+- Proposed rotation: reduce [GLD](https://www.tradingview.com/chart/?symbol=GLD) by 5.00% NAV and allocate 5.00% NAV to [GSG](https://www.tradingview.com/chart/?symbol=GSG), pending execution and portfolio-state persistence.
 - Executed reductions/closures: none unless separately recorded in the trade ledger and persisted portfolio state.
 - Thesis changes: No structural thesis was abandoned; implementation, macro-regime and rotation discipline are materially tighter.
 

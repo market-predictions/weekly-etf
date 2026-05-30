@@ -211,21 +211,21 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 
 ## 13. Definitieve actietabel
 
-| Ticker | ETF | Huidig gewicht | Doelgewicht | Delta gewicht | Actiecode | Kapitaalbestemming | Vrijmaakscores | Redencodes | Override? |
+| Ticker | ETF | Huidig gewicht | Doelgewicht | Delta gewicht | Actiecode | Kapitaalbestemming | Vrijmaakscores | Toelichting | Override? |
 |---|---|---:|---:|---:|---|---|---:|---|---|
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | 24.13 | 24.19 | 0.06 | Aanhouden met override | - | 85.00 | fresh_cash_smaller_or_review, replaceable_status, review_age_ge_2, review_age_ge_3 | Engine: churn_budget_used |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | 27.62 | 27.63 | 0.01 | Aanhouden | - | 60.00 | fresh_cash_smaller_or_review, replaceable_status, review_age_ge_2, role_impaired | Nee |
-| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | 15.28 | 15.09 | -0.19 | Aanhouden met override | - | 100.00 | failed_fresh_cash_test, replaceable_status, review_age_ge_2, review_age_ge_3 | Engine: churn_budget_used |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | 13.69 | 13.87 | 0.18 | Aanhouden met override | - | 85.00 | fresh_cash_smaller_or_review, replaceable_status, review_age_ge_2, review_age_ge_3 | Engine: churn_budget_used |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | 24.13 | 24.19 | 0.06 | Aanhouden met override | - | 85.00 | fresh capital only after review or at smaller size, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles | Engine: rotation budget already used |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | 27.62 | 27.63 | 0.01 | Aanhouden | - | 60.00 | fresh capital only after review or at smaller size, position is under replacement review, review has persisted for multiple report cycles, role impaired | Nee |
+| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | 15.28 | 15.09 | -0.19 | Aanhouden met override | - | 100.00 | position does not pass the fresh-capital test, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles | Engine: rotation budget already used |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | 13.69 | 13.87 | 0.18 | Aanhouden met override | - | 85.00 | fresh capital only after review or at smaller size, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles | Engine: rotation budget already used |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | 8.18 | 8.13 | -0.05 | Aanhouden | - | 0.00 | - | Nee |
-| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | SPDR Gold Shares | 9.34 | 4.32 | -5.02 | Gedeeltelijk vervangen | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 100.00 | failed_fresh_cash_test, replaceable_status, review_age_ge_2, review_age_ge_3 | Nee |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 0.00 | 5.00 | 5.00 | Toevoegen uit rotatie | - | - | bestemming uit trade_intents | Nee |
+| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | SPDR Gold Shares | 9.34 | 4.32 | -5.02 | Gedeeltelijk vervangen | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 100.00 | position does not pass the fresh-capital test, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles | Nee |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 0.00 | 5.00 | 5.00 | Toevoegen uit rotatie | - | - | bestemming uit proposed trade intents | Nee |
 
 ## 14. Positiewijzigingen in deze run
 
 | Bron | Bestemming | Delta bron % | Delta bestemming % | Geschatte waarde EUR | Actie | Reden |
 |---|---|---:|---:|---:|---|---|
-| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | -5.00 | 5.00 | 5469.36 | Gedeeltelijk vervangen | failed_fresh_cash_test, replaceable_status, review_age_ge_2, review_age_ge_3 |
+| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | -5.00 | 5.00 | 5469.36 | Gedeeltelijk vervangen | position does not pass the fresh-capital test, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles |
 
 ## 15. Huidige posities en cash
 
@@ -268,7 +268,7 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 ### Volglijst / dynamisch radargeheugen
 | Thema | Primaire ETF | Alternatieve ETF | Waarom op de radar | Status |
 |---|---|---|---|---|
-| AI-rekenkrachtinfrastructuur | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Sterkste structurele groeiblootstelling. | Actief |
+| AI-rekenkrachtinfrastructuur | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Sterkste structurele groeiblootstelling. | Actief / begrensd |
 | Defensie-innovatie / strategische weerbaarheid | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling. | Vervangingsanalyse vereist |
 | Netuitbreiding / elektrificatie | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructuurcapex blijft valide. | Vervangingsanalyse vereist |
 | Herbeoordeling goudhedge | [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Hedgefunctie moet worden bewezen. | Onder herbeoordeling |

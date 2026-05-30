@@ -67,7 +67,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | SMH | SOXX | AI-capex blijft het schoonste schaalbare groeithema en heeft nog steeds de sterkste gefinancierde uitdrukking in de portefeuille. | 5 | 5 | Actionable now | Rentes moeten een wanordelijke stijging vermijden. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | AI-capex blijft het schoonste schaalbare groeithema en heeft nog steeds de sterkste gefinancierde uitdrukking in de portefeuille. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | Rentes moeten een wanordelijke stijging vermijden. | 3-12 months |
 | Defense innovation / sovereign resilience | PPA | ITA | Veiligheidsuitgaven en geopolitieke weerbaarheid blijven duurzame, belegbare thema's. | 5 | 4 | Actionable now | Budgetzichtbaarheid en backlogsterkte moeten stevig blijven. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Stroomvraag, netdruk, reshoring en infrastructuur-capex blijven structureel ondersteunend. | 5 | 4 | Scale in slowly | Industriële en utility-capex moeten blijven bevestigen. | 3-12 months |
 | Uranium / nuclear fuel cycle | URNM | URA | Nucleaire vraag en energiezekerheidslogica blijven aantrekkelijk, ook als kortetermijntiming volatiel is. | 4 | 4 | Scale in slowly | Uraniumaandelen hebben stabielere relatieve kracht nodig. | 3-12 months |

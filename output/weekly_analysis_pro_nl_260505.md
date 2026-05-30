@@ -14,7 +14,7 @@
 ## 2. Portfolio Action Snapshot
 
 ### Add
-- SMH: voeg 8 aandelen toe met cash.
+- : voeg 8 aandelen toe met cash.
 
 ### Hold
 - SPY, PPA, PAVE, URNM, GLD
@@ -73,7 +73,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | SMH | SOXX | AI-capex blijft het duidelijkste schaalbare groeithema en SMH blijft kapitaal verdienen. | 5 | 5 | Actionable now | Leiderschap vasthouden zonder wanordelijke real-rate shock. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | AI-capex blijft het duidelijkste schaalbare groeithema en SMH blijft kapitaal verdienen. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | Leiderschap vasthouden zonder wanordelijke real-rate shock. | 3-12 months |
 | Defense innovation / sovereign resilience | PPA | ITA | Veiligheidsuitgaven blijven duurzaam, maar de ETF-vehicle moet zich nu bewijzen tegenover ITA. | 5 | 3 | Scale in slowly | PPA moet stabiliseren versus ITA of de defense sleeve verliezen. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Power demand, grid strain en infrastructure capex blijven ondersteunend. | 5 | 4 | Scale in slowly | PAVE moet voldoende relatieve sterkte versus GRID houden. | 3-12 months |
 | Uranium / nuclear fuel cycle | URNM | URA | Nuclear energy security blijft structureel geldig en URNM behoudt optionaliteit. | 4 | 4 | Scale in slowly | Schonere same-day pricing en blijvende relatieve sterkte. | 3-12 months |
@@ -375,7 +375,7 @@ SMH is de enige duidelijke `Actionable now` lane. Defense, grid en uranium blijv
 - SPY, PPA, PAVE, URNM, GLD
 
 ### Add
-- SMH: koop 8 aandelen uit cash.
+- : koop 8 aandelen uit cash.
 
 ### Replace
 - Geen replacement uitgevoerd vandaag.
@@ -386,7 +386,7 @@ SMH is de enige duidelijke `Actionable now` lane. Defense, grid en uranium blijv
 | Ticker | ETF | Existing/New | Weight Inherited | Target Weight | Suggested Action | Conviction Tier | Total Score | Portfolio Role | Better Alternative Exists? | Short Reason |
 |---|---|---|---:|---:|---|---|---:|---|---|---|
 | SPY | SPDR S&P 500 ETF Trust | Existing | 24.32 | 24.32 | Hold | Tier 2 | 3.53 | Core beta | Yes | Useful but overlaps with SMH; no fresh cash add |
-| SMH | VanEck Semiconductor ETF | Existing | 21.35 | 24.69 | Add | Tier 1 | 4.28 | Growth engine | No | Best earned use of cash, capped below 25% |
+| SMH | VanEck Semiconductor ETF | Existing | 21.35 | 24.69 | Add | Tier 1 | 4.28 | Growth engine | No | Best earned exposure, but no fresh cash while above the 25% cap, capped below 25% |
 | PPA | Invesco Aerospace & Defense ETF | Existing | 15.04 | 15.04 | Hold under review | Tier 3 | 3.45 | Resilience | Yes | Valid thesis but must prove itself versus ITA |
 | PAVE | Global X U.S. Infrastructure Development ETF | Existing | 14.45 | 14.45 | Hold under review | Tier 2 | 3.68 | Real-asset capex | Yes | Valid but GRID is the named challenger |
 | URNM | Sprott Uranium Miners ETF | Existing | 9.48 | 9.48 | Hold | Tier 2 | 3.70 | Strategic energy | No | Valid, but not better than SMH for new cash today |

@@ -68,7 +68,7 @@
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
 | Defense innovation / sovereign resilience | PPA | ITA | Security spending and replenishment cycles remain directly supported by the current regime. | 5 | 5 | Actionable now | Backlog support and budget throughput must remain visible. | 3-12 months |
-| AI compute infrastructure | SMH | SOXX | AI capex remains one of the clearest secular spend channels despite a harder macro backdrop. | 5 | 4 | Actionable now | Earnings and capex guidance must continue to offset rate pressure. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | AI capex remains one of the clearest secular spend channels despite a harder macro backdrop. | 5 | 4 | Structurally actionable, but no fresh capital while above cap | Earnings and capex guidance must continue to offset rate pressure. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Power bottlenecks and infrastructure modernization remain credible second-order beneficiaries. | 5 | 4 | Scale in slowly | Utility and industrial capex must continue despite tighter conditions. | 3-12 months |
 | Uranium / nuclear fuel cycle | URNM | URA | Energy security and long-duration power demand still support the nuclear complex. | 4 | 3 | Scale in slowly | Spot and contracting markets need to remain constructive. | 3-12 months |
 | Cyber / digital infrastructure resilience | CIBR | HACK | Security and resilience spending remains structurally supported, even if it is not yet a first-priority capital call. | 4 | 3 | Watchlist | Spending must translate into clearer relative-strength leadership. | 3-12 months |

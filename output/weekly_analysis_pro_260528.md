@@ -13,7 +13,7 @@
 ## 2. Portfolio Action Snapshot
 
 ### Add
-- SMH
+- None
 
 ### Hold
 - SPY, SMH, PPA, PAVE, URNM, GLD
@@ -66,7 +66,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | SMH | SOXX | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Actionable now | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
 | Cybersecurity resilience | CIBR | BUG | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure exposure with less direct semiconductor cyclicality. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Power demand, grid bottlenecks and reshoring capex support infrastructure spend. Macro filter: AI power demand and infrastructure policy support the grid lane; funding still depends on PAVE-vs-GRID duel evidence. | 5 | 4 | Actionable now | PAVE remains useful, but GRID is the cleaner thematic challenger. | 3-12 months |
 | Broad commodity inflation hedge | GSG | DBC | Broad commodities may hedge inflation better than single-metal or single-gold exposure. | 3 | 3 | Watchlist / under review | Useful only if commodity breadth confirms. | 3-12 months |
@@ -120,7 +120,7 @@
 - Since inception return (%): 10.05
 - Equity-curve state: Reconciled to Section 15 with full valuation history
 - EUR/USD used: 1.1650
-- Notes: Section 7 uses `output/etf_valuation_history.csv` plus the current runtime NAV; Section 15 is rendered from the same normalized runtime state.
+- Notes: Section 7 uses the validated valuation history plus the current portfolio NAV; Section 15 is rendered from the same reconciled portfolio state.
 
 | Date | Portfolio value (EUR) | Comment |
 |---|---:|---|
@@ -183,16 +183,16 @@ The position review separates three questions: is the thesis still valid, is the
 
 | Ticker | Score | Action | Conviction | Fresh-cash test | Key point | Required next action |
 |---|---:|---|---|---|---|---|
-| SPY | 3.53 | hold_with_override | Tier 2 | Smaller / under review | Useful but overlaps with SMH; no fresh cash add | Force alternative duel; upgrade, reduce, replace, or close |
-| SMH | 4.28 | hold | Tier 1 | Smaller / under review | Best earned use of cash, capped below 25% | Force alternative duel; upgrade, reduce, replace, or close |
-| PPA | 3.45 | hold_with_override | Tier 3 | Reduce | Valid thesis but must prove itself versus ITA | Force alternative duel; upgrade, reduce, replace, or close |
-| PAVE | 3.68 | hold_with_override | Tier 2 | Smaller / under review | Valid but GRID is the named challenger | Force alternative duel; upgrade, reduce, replace, or close |
+| SPY | 3.53 | hold with override | Tier 2 | Smaller / under review | Useful but overlaps with SMH; no fresh cash add | Force alternative duel; upgrade, reduce, replace, or close |
+| SMH | 4.28 | hold | Tier 1 | Smaller / under review | Best earned exposure, but no fresh cash while above the 25% cap, capped below 25% | Force alternative duel; upgrade, reduce, replace, or close |
+| PPA | 3.45 | hold with override | Tier 3 | Reduce | Valid thesis but must prove itself versus ITA | Force alternative duel; upgrade, reduce, replace, or close |
+| PAVE | 3.68 | hold with override | Tier 2 | Smaller / under review | Valid but GRID is the named challenger | Force alternative duel; upgrade, reduce, replace, or close |
 | URNM | 3.70 | hold | Tier 2 | Hold | Valid, but not better than SMH for new cash today | Hold |
-| GLD | 3.00 | replace_partial | Tier 3 | Reduce | Hedge validity must be proven after double-digit drawdown | Run hedge validity test and compare with alternatives |
+| GLD | 3.00 | replace partial | Tier 3 | Reduce | Hedge validity must be proven after double-digit drawdown | Run hedge validity test and compare with alternatives |
 
 ## 11. Best New Opportunities
 
-- SMH remains the leading funded growth exposure, subject to the max-position rule.
+- SMH remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap.
 - CIBR / BUG: Cyber spend is linked to AI, cloud, data-center and geopolitical resilience.
 - GSG / DBC: Broad commodities may hedge inflation better than single-metal or single-gold exposure.
 - ROBO / IRBO: Automation capex can broaden beyond semiconductors into industrial productivity.
@@ -219,21 +219,21 @@ The position review separates three questions: is the thesis still valid, is the
 
 ## 13. Final Action Table
 
-| Ticker | ETF | Current weight | Target weight | Delta weight | Action code | Capital destination | Release score | Reason codes | Override? |
+| Ticker | ETF | Current weight | Target weight | Delta weight | Action code | Capital destination | Release score | Decision rationale | Override? |
 |---|---|---:|---:|---:|---|---|---:|---|---|
-| SPY | SPDR S&P 500 ETF Trust | 24.13 | 24.19 | 0.06 | Hold with override | - | 85.00 | fresh_cash_smaller_or_review, replaceable_status, review_age_ge_2, review_age_ge_3 | engine: churn_budget_used |
-| SMH | VanEck Semiconductor ETF | 27.62 | 27.63 | 0.01 | Hold | - | 60.00 | fresh_cash_smaller_or_review, replaceable_status, review_age_ge_2, role_impaired | No |
-| PPA | Invesco Aerospace & Defense ETF | 15.28 | 15.09 | -0.19 | Hold with override | - | 100.00 | failed_fresh_cash_test, replaceable_status, review_age_ge_2, review_age_ge_3 | engine: churn_budget_used |
-| PAVE | Global X U.S. Infrastructure Development ETF | 13.69 | 13.87 | 0.18 | Hold with override | - | 85.00 | fresh_cash_smaller_or_review, replaceable_status, review_age_ge_2, review_age_ge_3 | engine: churn_budget_used |
+| SPY | SPDR S&P 500 ETF Trust | 24.13 | 24.19 | 0.06 | Hold with override | - | 85.00 | fresh capital only after review or at smaller size, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles | engine: rotation budget already used |
+| SMH | VanEck Semiconductor ETF | 27.62 | 27.63 | 0.01 | Hold | - | 60.00 | fresh capital only after review or at smaller size, position is under replacement review, review has persisted for multiple report cycles, role impaired | No |
+| PPA | Invesco Aerospace & Defense ETF | 15.28 | 15.09 | -0.19 | Hold with override | - | 100.00 | position does not pass the fresh-capital test, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles | engine: rotation budget already used |
+| PAVE | Global X U.S. Infrastructure Development ETF | 13.69 | 13.87 | 0.18 | Hold with override | - | 85.00 | fresh capital only after review or at smaller size, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles | engine: rotation budget already used |
 | URNM | Sprott Uranium Miners ETF | 8.18 | 8.13 | -0.05 | Hold | - | 0.00 | - | No |
-| GLD | SPDR Gold Shares | 9.34 | 4.32 | -5.02 | Replace partial | GSG | 100.00 | failed_fresh_cash_test, replaceable_status, review_age_ge_2, review_age_ge_3 | No |
-| GSG | GSG | 0.00 | 5.00 | 5.00 | Add from rotation | - | - | destination from trade_intents | No |
+| GLD | SPDR Gold Shares | 9.34 | 4.32 | -5.02 | Replace partial | GSG | 100.00 | position does not pass the fresh-capital test, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles | No |
+| GSG | GSG | 0.00 | 5.00 | 5.00 | Add from rotation | - | - | destination from proposed trade intents | No |
 
 ## 14. Position Changes Executed This Run
 
 | Source | Destination | Source delta % | Destination delta % | Estimated notional EUR | Action | Reason |
 |---|---|---:|---:|---:|---|---|
-| GLD | GSG | -5.00 | 5.00 | 5469.36 | Replace partial | failed_fresh_cash_test, replaceable_status, review_age_ge_2, review_age_ge_3 |
+| GLD | GSG | -5.00 | 5.00 | 5469.36 | Replace partial | position does not pass the fresh-capital test, position is under replacement review, review has persisted for multiple report cycles, review has persisted for several report cycles |
 
 ## 15. Current Portfolio Holdings and Cash
 
@@ -276,7 +276,7 @@ The position review separates three questions: is the thesis still valid, is the
 ### Watchlist / dynamic radar memory
 | Theme | Primary ETF | Alternative ETF | Why I’m considering it | Current status |
 |---|---|---|---|---|
-| AI compute infrastructure | SMH | SOXX | Strongest secular growth exposure. | Active |
+| AI compute infrastructure | SMH | SOXX | Strongest secular growth exposure. | Active / capped |
 | Defense innovation / sovereign resilience | PPA | ITA | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | PAVE | GRID | Infrastructure capex remains valid. | Duel required |
 | Gold hedge review | GLD | GSG / BIL | Hedge role must be proven. | Under review |

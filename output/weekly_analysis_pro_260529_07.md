@@ -82,7 +82,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Actionable now | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
+| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
 | Cybersecurity resilience | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [BUG](https://www.tradingview.com/chart/?symbol=BUG) | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure exposure with less direct semiconductor cyclicality. | 3-12 months |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Power demand, grid bottlenecks and reshoring capex support infrastructure spend. Macro filter: AI power demand and infrastructure policy support the grid lane; funding still depends on [PAVE](https://www.tradingview.com/chart/?symbol=PAVE)-vs-[GRID](https://www.tradingview.com/chart/?symbol=GRID) duel evidence. | 5 | 4 | Watchlist / under review | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) remains useful, but [GRID](https://www.tradingview.com/chart/?symbol=GRID) is the cleaner thematic challenger. | 3-12 months |
 | Biotech innovation / therapeutic platforms | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [IBB](https://www.tradingview.com/chart/?symbol=IBB) | Biotech remains a long-duration innovation lane but needs risk appetite. | 4 | 3 | Watchlist / under review | Can become attractive if breadth improves and rates ease. | 3-12 months |
@@ -135,7 +135,7 @@
 - Since inception return (%): 20.34
 - Equity-curve state: Reconciled to Section 15 with full valuation history
 - EUR/USD used: 1.1661
-- Notes: Section 7 uses `output/etf_valuation_history.csv` plus the current runtime NAV; Section 15 is rendered from the same normalized runtime state.
+- Notes: Section 7 uses the validated valuation history plus the current portfolio NAV; Section 15 is rendered from the same reconciled portfolio state.
 
 | Date | Portfolio value (EUR) | Comment |
 |---|---:|---|
@@ -211,22 +211,22 @@ Performance is calculated on the current ETF holdings using the latest validated
 ## 10. Current Position Review
 
 The position review separates thesis quality, ETF implementation quality, fresh-cash test and rotation-engine decision. Existing holdings are not treated as automatic default holds.
-### [GLD](https://www.tradingview.com/chart/?symbol=GLD) — replace_partial — Score 3.00 — Fresh cash: Reduce — release score 100; destination [GSG](https://www.tradingview.com/chart/?symbol=GSG)
+### [GLD](https://www.tradingview.com/chart/?symbol=GLD) — replace partial — Score 3.00 — Fresh cash: Reduce — release score 100; destination [GSG](https://www.tradingview.com/chart/?symbol=GSG)
 Role: Hedge ballast. Required next action: Run hedge validity test and compare with alternatives.
 
 ### [GSG](https://www.tradingview.com/chart/?symbol=GSG) — hold — Score n/a — Fresh cash: Hold / monitor — release score 10
 Role: Rotation destination. Required next action: Monitor commodity breadth and hedge contribution after execution..
 
-### [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) — hold_with_override — Score 3.68 — Fresh cash: Smaller / under review — release score 85; override churn_budget_used
+### [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) — hold with override — Score 3.68 — Fresh cash: Smaller / under review — release score 85; override: rotation budget already used
 Role: Real-asset capex. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
-### [PPA](https://www.tradingview.com/chart/?symbol=PPA) — hold_with_override — Score 3.45 — Fresh cash: Reduce — release score 100; override churn_budget_used
+### [PPA](https://www.tradingview.com/chart/?symbol=PPA) — hold with override — Score 3.45 — Fresh cash: Reduce — release score 100; override: rotation budget already used
 Role: Resilience. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
 ### [SMH](https://www.tradingview.com/chart/?symbol=SMH) — hold — Score 4.28 — Fresh cash: Smaller / under review — release score 60
 Role: Growth engine. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
-### [SPY](https://www.tradingview.com/chart/?symbol=SPY) — hold_with_override — Score 3.53 — Fresh cash: Smaller / under review — release score 85; override churn_budget_used
+### [SPY](https://www.tradingview.com/chart/?symbol=SPY) — hold with override — Score 3.53 — Fresh cash: Smaller / under review — release score 85; override: rotation budget already used
 Role: Core beta. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
 ### [URNM](https://www.tradingview.com/chart/?symbol=URNM) — hold — Score 3.70 — Fresh cash: Hold
@@ -234,7 +234,7 @@ Role: Strategic energy. Required next action: Hold.
 
 ## 11. Best New Opportunities
 
-- [SMH](https://www.tradingview.com/chart/?symbol=SMH) remains the leading funded growth exposure, subject to the max-position rule.
+- [SMH](https://www.tradingview.com/chart/?symbol=SMH) remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap.
 - [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) / [BUG](https://www.tradingview.com/chart/?symbol=BUG): Cyber spend is linked to AI, cloud, data-center and geopolitical resilience.
 - [XBI](https://www.tradingview.com/chart/?symbol=XBI) / [IBB](https://www.tradingview.com/chart/?symbol=IBB): Biotech remains a long-duration innovation lane but needs risk appetite.
 - [ROBO](https://www.tradingview.com/chart/?symbol=ROBO) / [IRBO](https://www.tradingview.com/chart/?symbol=IRBO): Automation capex can broaden beyond semiconductors into industrial productivity.
@@ -244,7 +244,7 @@ Role: Strategic energy. Required next action: Hold.
 
 | Close | Reduce | Hold | Add | Replace |
 |---|---|---|---|---|
-| None | None | [GLD](https://www.tradingview.com/chart/?symbol=GLD), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [SPY](https://www.tradingview.com/chart/?symbol=SPY), [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [GSG](https://www.tradingview.com/chart/?symbol=GSG), [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [GLD](https://www.tradingview.com/chart/?symbol=GLD), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [SPY](https://www.tradingview.com/chart/?symbol=SPY) |
+| None | None | [GLD](https://www.tradingview.com/chart/?symbol=GLD), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [SPY](https://www.tradingview.com/chart/?symbol=SPY), [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [GSG](https://www.tradingview.com/chart/?symbol=GSG)| [GLD](https://www.tradingview.com/chart/?symbol=GLD), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [SPY](https://www.tradingview.com/chart/?symbol=SPY) |
 
 ## 13. Final Action Table
 
@@ -254,7 +254,7 @@ Role: Strategic energy. Required next action: Hold.
 | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Existing | 13.19 | 13.19 | Add from rotation | Tier 2 |  | Rotation destination | No | Added through guarded model rotation as commodity-breadth replacement for part of [GLD](https://www.tradingview.com/chart/?symbol=GLD). |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Existing | 12.48 | 13.01 | Hold under review | Tier 2 | 3.68 | Real-asset capex | Yes | Valid but [GRID](https://www.tradingview.com/chart/?symbol=GRID) is the named challenger |
 | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | Existing | 13.92 | 14.51 | Hold under review | Tier 3 | 3.45 | Resilience | Yes | Valid thesis but must prove itself versus [ITA](https://www.tradingview.com/chart/?symbol=ITA) |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Existing | 25.18 | 26.24 | Add | Tier 1 | 4.28 | Growth engine | No | Best earned use of cash, capped below 25% |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Existing | 25.18 | 26.24 | Add | Tier 1 | 4.28 | Growth engine | No | Best earned exposure, but no fresh cash while above the 25% cap, capped below 25% |
 | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | Existing | 22.10 | 23.03 | Hold | Tier 2 | 3.53 | Core beta | Yes | Useful but overlaps with [SMH](https://www.tradingview.com/chart/?symbol=SMH); no fresh cash add |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Existing | 7.47 | 7.78 | Hold | Tier 2 | 3.70 | Strategic energy | No | Valid, but not better than [SMH](https://www.tradingview.com/chart/?symbol=SMH) for new cash today |
 
@@ -314,7 +314,7 @@ Role: Strategic energy. Required next action: Hold.
 ### Watchlist / dynamic radar memory
 | Theme | Primary ETF | Alternative ETF | Why I’m considering it | Current status |
 |---|---|---|---|---|
-| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Strongest secular growth exposure. | Active |
+| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Strongest secular growth exposure. | Active / capped |
 | Defense innovation / sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructure capex remains valid. | Duel required |
 | Gold hedge review | [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Hedge role must be proven. | Under review |

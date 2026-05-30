@@ -274,7 +274,7 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 ### Volglijst / dynamisch radargeheugen
 | Thema | Primaire ETF | Alternatieve ETF | Waarom op de radar | Status |
 |---|---|---|---|---|
-| AI-rekenkrachtinfrastructuur | SMH | SOXX | Sterkste structurele groeiblootstelling. | Actief |
+| AI-rekenkrachtinfrastructuur | SMH | SOXX | Sterkste structurele groeiblootstelling. | Actief / begrensd |
 | Defensie-innovatie / strategische weerbaarheid | PPA | ITA | Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling. | Vervangingsanalyse vereist |
 | Netuitbreiding / elektrificatie | PAVE | GRID | Infrastructuurcapex blijft valide. | Vervangingsanalyse vereist |
 | Herbeoordeling goudhedge | GLD | GSG / BIL | Hedgefunctie moet worden bewezen. | Onder herbeoordeling |

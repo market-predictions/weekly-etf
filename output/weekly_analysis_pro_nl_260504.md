@@ -67,7 +67,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | SMH | SOXX | AI-capex blijft het duidelijkste schaalbare groeithema en SMH behoudt de hoogste gefinancierde convictie. | 5 | 5 | Actionable now | Rentes moeten een wanordelijke stijging vermijden. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | AI-capex blijft het duidelijkste schaalbare groeithema en SMH behoudt de hoogste gefinancierde convictie. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | Rentes moeten een wanordelijke stijging vermijden. | 3-12 months |
 | Defense innovation / sovereign resilience | PPA | ITA | Veiligheidsuitgaven blijven duurzaam, maar het recente prijsherstel is zwakker dan de structurele these. | 5 | 3 | Scale in slowly | Prijsbevestiging moet stabiliseren voordat extra kapitaal logisch is. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Stroomvraag, netcongestie, reshoring en infrastructuur-capex blijven structureel ondersteunend. | 5 | 4 | Scale in slowly | Industriële en utility-capex moeten blijven bevestigen. | 3-12 months |
 | Uranium / nuclear fuel cycle | URNM | URA | Het verse herstel in uranium-aandelen verbetert tactische bevestiging terwijl de energy-security-these intact blijft. | 4 | 4 | Scale in slowly | Uranium-aandelen hebben verdere relatieve sterkte nodig. | 3-12 months |
@@ -334,7 +334,7 @@ Er is deze week geen gefinancierde rotatie. De opportunity set blijft bruikbaar,
 ### Data note
 - Pricing recovery basis: SPY, SMH, PPA, PAVE en URNM zijn bijgewerkt vanuit publieke marktquote/history-bronnen voor 2026-05-04 of near-close same-day data.
 - GLD is doorgeschoven vanaf de laatste geverifieerde portefeuillemark omdat een 2026-05-04 regular-session close niet met voldoende zekerheid is hersteld.
-- Pricing decision: `update_covered_holdings_carry_unresolved`; fresh holdings coverage: 5 of 6.
+- Pricing decision: `update covered holdings carry unresolved`; fresh holdings coverage: 5 of 6.
 
 ## 17. Disclaimer
 

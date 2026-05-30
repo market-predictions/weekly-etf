@@ -67,7 +67,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | SMH | SOXX | AI capex remains the cleanest scalable growth theme and still has the strongest funded expression in the book. | 5 | 5 | Actionable now | Yields must avoid a disorderly move higher. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | AI capex remains the cleanest scalable growth theme and still has the strongest funded expression in the book. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | Yields must avoid a disorderly move higher. | 3-12 months |
 | Defense innovation / sovereign resilience | PPA | ITA | Security spending and geopolitical resilience remain durable, investable themes. | 5 | 4 | Actionable now | Budget visibility and backlog strength must remain firm. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Power demand, grid strain, reshoring, and infrastructure capex remain structurally supportive. | 5 | 4 | Scale in slowly | Industrial and utility capex need to keep confirming. | 3-12 months |
 | Uranium / nuclear fuel cycle | URNM | URA | Nuclear demand and energy-security logic remain attractive even if short-term timing is volatile. | 4 | 4 | Scale in slowly | Uranium equities need steadier relative strength. | 3-12 months |

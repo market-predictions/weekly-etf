@@ -67,7 +67,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | SMH | SOXX | AI capex remains the clearest scalable growth theme and SMH continues to carry the highest funded conviction. | 5 | 5 | Actionable now | Yields must avoid a disorderly move higher. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | AI capex remains the clearest scalable growth theme and SMH continues to carry the highest funded conviction. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | Yields must avoid a disorderly move higher. | 3-12 months |
 | Defense innovation / sovereign resilience | PPA | ITA | Security spending remains durable, but the latest price recovery is weaker than the structural thesis. | 5 | 3 | Scale in slowly | Price confirmation needs to stabilize before additional capital is justified. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Power demand, grid strain, reshoring and infrastructure capex remain structurally supportive. | 5 | 4 | Scale in slowly | Industrial and utility capex need to keep confirming. | 3-12 months |
 | Uranium / nuclear fuel cycle | URNM | URA | Fresh uranium-equity recovery improves tactical confirmation while the energy-security thesis remains intact. | 4 | 4 | Scale in slowly | Uranium equities need continued relative-strength follow-through. | 3-12 months |
@@ -334,7 +334,7 @@ There is no funded switch this week. The opportunity set remains useful, but not
 ### Data note
 - Pricing recovery basis: SPY, SMH, PPA, PAVE and URNM updated from public market quote/history sources for 2026-05-04 or near-close same-day data.
 - GLD was carried forward from the latest verified portfolio mark because a 2026-05-04 regular-session close was not recovered with sufficient confidence.
-- Pricing decision: `update_covered_holdings_carry_unresolved`; fresh holdings coverage: 5 of 6.
+- Pricing decision: `update covered holdings carry unresolved`; fresh holdings coverage: 5 of 6.
 
 ## 17. Disclaimer
 

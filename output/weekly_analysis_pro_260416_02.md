@@ -70,7 +70,7 @@ The macro mix is better for sentiment than it was earlier in the Iran-war shock,
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
 | Defense innovation / sovereign resilience | PPA | ITA | Security spending remains directly supported by the geopolitical backdrop. | 5 | 5 | Actionable now | Budget support and backlog strength need to hold. | 3-12 months |
-| AI compute infrastructure | SMH | SOXX | AI capex remains one of the clearest secular spending channels. | 5 | 4 | Actionable now | Yields must stop re-accelerating higher. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | AI capex remains one of the clearest secular spending channels. | 5 | 4 | Structurally actionable, but no fresh capital while above cap | Yields must stop re-accelerating higher. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Power and infrastructure bottlenecks remain real. | 5 | 4 | Scale in slowly | Industrial and utility capex must remain firm. | 3-12 months |
 | Uranium / nuclear fuel cycle | URNM | URA | Long-term nuclear demand remains attractive even after recent volatility. | 4 | 3 | Scale in slowly | Uranium equities need to stabilize after the rebound. | 3-12 months |
 | Cyber / digital infrastructure resilience | CIBR | HACK | Security spending remains structurally supported. | 4 | 3 | Watchlist | Relative strength needs to improve versus current holdings. | 3-12 months |

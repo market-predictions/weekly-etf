@@ -274,7 +274,7 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 ### Volglijst / dynamisch radargeheugen
 | Thema | Primaire ETF | Alternatieve ETF | Waarom op de radar | Status |
 |---|---|---|---|---|
-| AI-rekenkrachtinfrastructuur | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Sterkste structurele groeiblootstelling. | Actief |
+| AI-rekenkrachtinfrastructuur | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Sterkste structurele groeiblootstelling. | Actief / begrensd |
 | Defensie-innovatie / strategische weerbaarheid | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling. | Vervangingsanalyse vereist |
 | Netuitbreiding / elektrificatie | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructuurcapex blijft valide. | Vervangingsanalyse vereist |
 | Herbeoordeling goudhedge | [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Hedgefunctie moet worden bewezen. | Onder herbeoordeling |

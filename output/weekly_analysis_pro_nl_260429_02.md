@@ -67,7 +67,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | SMH | SOXX | AI-capex blijft het duidelijkste schaalbare groeithema en heeft nog steeds de sterkste gefinancierde expressie in de portefeuille. | 5 | 5 | Actionable now | Rentes moeten een wanordelijke stijging vermijden. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | AI-capex blijft het duidelijkste schaalbare groeithema en heeft nog steeds de sterkste gefinancierde expressie in de portefeuille. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | Rentes moeten een wanordelijke stijging vermijden. | 3-12 months |
 | Defense innovation / sovereign resilience | PPA | ITA | Veiligheidsuitgaven en geopolitieke weerbaarheid blijven duurzame, belegbare thema's. | 5 | 4 | Actionable now | Prijsbevestiging moet stabiliseren na de nieuwste daling. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Stroomvraag, netdruk, reshoring en infrastructuur-capex blijven structureel ondersteunend. | 5 | 4 | Scale in slowly | Industriële en utility-capex moeten blijven bevestigen. | 3-12 months |
 | Uranium / nuclear fuel cycle | URNM | URA | Nucleaire vraag en energiezekerheidslogica blijven aantrekkelijk, ook als kortetermijntiming volatiel is. | 4 | 4 | Scale in slowly | Uraniumaandelen hebben stabielere relatieve kracht nodig. | 3-12 months |
@@ -130,7 +130,7 @@ De live radar blijft compact en ongewijzigd. De bredere lane assessment onderste
 - Since inception return (%): 1.85
 - Equity-curve state: Below prior high
 - EUR/USD used: 1.1706
-- Notes: Verse persistente pricing audit `output/pricing/price_audit_2026-04-29.json` heeft alle 6 huidige posities geprijsd met de 2026-04-29 close. FX-basis is de ECB EUR/USD referentiekoers omdat Twelve Data FX niet beschikbaar was.
+- Notes: Verse persistente pricing audit `output/pricing/price audit 2026-04-29.json` heeft alle 6 huidige posities geprijsd met de 2026-04-29 close. FX-basis is de ECB EUR/USD referentiekoers omdat Twelve Data FX niet beschikbaar was.
 
 | Date | Portfolio value (EUR) | Comment |
 |---|---:|---|
@@ -460,8 +460,8 @@ Er is deze week geen gefinancierde rotatie. De kansenset blijft nuttig, maar is 
 - Risk concerns: zwakkere nieuwste waarderingen in PPA, GLD en URNM; aanhoudende rentegevoeligheid in SMH; nog steeds onopgelost energie- en supply-chain risico.
 
 ### Data note
-- Matching pricing audit used: `output/pricing/price_audit_2026-04-29.json`.
-- Pricing decision: `update_covered_holdings_carry_unresolved`.
+- Matching pricing audit used: `output/pricing/price audit 2026-04-29.json`.
+- Pricing decision: `update covered holdings carry unresolved`.
 - Fresh holdings coverage: 6 of 6.
 - FX basis: ECB EUR/USD reference rate 1.1706, returned date 2026-04-29.
 - Watchlist/challenger tickers remain less complete because Twelve Data API is unavailable, but current holdings are fully repriced.

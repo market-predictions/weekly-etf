@@ -67,7 +67,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | SMH | SOXX | AI capex remains one of the clearest long-duration spending trends in the market. | 5 | 4 | Actionable now | Yields must avoid another disorderly leg higher. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | AI capex remains one of the clearest long-duration spending trends in the market. | 5 | 4 | Structurally actionable, but no fresh capital while above cap | Yields must avoid another disorderly leg higher. | 3-12 months |
 | Defense innovation / sovereign resilience | PPA | ITA | Security spending remains durable and headline risk keeps sovereign resilience relevant. | 5 | 4 | Actionable now | Budget visibility and backlog strength must remain firm. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Power demand, reindustrialisation, and utility capex remain structurally supportive. | 5 | 4 | Scale in slowly | Industrial and utility capex must keep confirming. | 3-12 months |
 | Uranium / nuclear fuel cycle | URNM | URA | Nuclear demand and fuel-cycle tightness still support the long-term case. | 4 | 3 | Scale in slowly | Uranium equities need cleaner relative-strength follow-through. | 3-12 months |

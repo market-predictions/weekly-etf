@@ -13,7 +13,7 @@
 ## 2. Portfolio Action Snapshot
 
 ### Add
-- [SMH](https://www.tradingview.com/chart/?symbol=SMH)
+- None
 
 ### Hold
 - [SPY](https://www.tradingview.com/chart/?symbol=SPY)
@@ -77,7 +77,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Actionable now | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
+| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
 | Cybersecurity resilience | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [BUG](https://www.tradingview.com/chart/?symbol=BUG) | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure exposure with less direct semiconductor cyclicality. | 3-12 months |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Power demand, grid bottlenecks and reshoring capex support infrastructure spend. Macro filter: AI power demand and infrastructure policy support the grid lane; funding still depends on [PAVE](https://www.tradingview.com/chart/?symbol=PAVE)-vs-[GRID](https://www.tradingview.com/chart/?symbol=GRID) duel evidence. | 5 | 4 | Actionable now | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) remains useful, but [GRID](https://www.tradingview.com/chart/?symbol=GRID) is the cleaner thematic challenger. | 3-12 months |
 | Broad commodity inflation hedge | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [DBC](https://www.tradingview.com/chart/?symbol=DBC) | Broad commodities may hedge inflation better than single-metal or single-gold exposure. | 3 | 3 | Watchlist / under review | Useful only if commodity breadth confirms. | 3-12 months |
@@ -130,7 +130,7 @@
 - Since inception return (%): 7.38
 - Equity-curve state: Reconciled to Section 15 with full valuation history
 - EUR/USD used: 1.1603
-- Notes: Section 7 uses `output/etf_valuation_history.csv` plus the current runtime NAV; Section 15 is rendered from the same normalized runtime state.
+- Notes: Section 7 uses the validated valuation history plus the current portfolio NAV; Section 15 is rendered from the same reconciled portfolio state.
 
 | Date | Portfolio value (EUR) | Comment |
 |---|---:|---|
@@ -222,7 +222,7 @@ Role: Hedge ballast. Required next action: Run hedge validity test and compare w
 
 ## 11. Best New Opportunities
 
-- [SMH](https://www.tradingview.com/chart/?symbol=SMH) remains the leading funded growth exposure, subject to the max-position rule.
+- [SMH](https://www.tradingview.com/chart/?symbol=SMH) remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap.
 - [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) / [BUG](https://www.tradingview.com/chart/?symbol=BUG): Cyber spend is linked to AI, cloud, data-center and geopolitical resilience.
 - [GSG](https://www.tradingview.com/chart/?symbol=GSG) / [DBC](https://www.tradingview.com/chart/?symbol=DBC): Broad commodities may hedge inflation better than single-metal or single-gold exposure.
 - [ROBO](https://www.tradingview.com/chart/?symbol=ROBO) / [IRBO](https://www.tradingview.com/chart/?symbol=IRBO): Automation capex can broaden beyond semiconductors into industrial productivity.
@@ -232,14 +232,14 @@ Role: Hedge ballast. Required next action: Run hedge validity test and compare w
 
 | Close | Reduce | Hold | Add | Replace |
 |---|---|---|---|---|
-| None | None | [SPY](https://www.tradingview.com/chart/?symbol=SPY), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [URNM](https://www.tradingview.com/chart/?symbol=URNM), [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SPY](https://www.tradingview.com/chart/?symbol=SPY), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [GLD](https://www.tradingview.com/chart/?symbol=GLD) |
+| None | None | [SPY](https://www.tradingview.com/chart/?symbol=SPY), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [URNM](https://www.tradingview.com/chart/?symbol=URNM), [GLD](https://www.tradingview.com/chart/?symbol=GLD) | None| [SPY](https://www.tradingview.com/chart/?symbol=SPY), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [GLD](https://www.tradingview.com/chart/?symbol=GLD) |
 
 ## 13. Final Action Table
 
 | Ticker | ETF | Existing/New | Weight Inherited | Target Weight | Suggested Action | Conviction Tier | Total Score | Portfolio Role | Better Alternative Exists? | Short Reason |
 |---|---|---|---:|---:|---|---|---:|---|---|---|
 | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | Existing | 24.32 | 24.32 | Hold | Tier 2 | 3.53 | Core beta | Yes | Useful but overlaps with [SMH](https://www.tradingview.com/chart/?symbol=SMH); no fresh cash add |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Existing | 21.35 | 24.69 | Add | Tier 1 | 4.28 | Growth engine | No | Best earned use of cash, capped below 25% |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Existing | 21.35 | 24.69 | Add | Tier 1 | 4.28 | Growth engine | No | Best earned exposure, but no fresh cash while above the 25% cap, capped below 25% |
 | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | Existing | 15.04 | 15.04 | Hold under review | Tier 3 | 3.45 | Resilience | Yes | Valid thesis but must prove itself versus [ITA](https://www.tradingview.com/chart/?symbol=ITA) |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Existing | 14.45 | 14.45 | Hold under review | Tier 2 | 3.68 | Real-asset capex | Yes | Valid but [GRID](https://www.tradingview.com/chart/?symbol=GRID) is the named challenger |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Existing | 9.48 | 9.48 | Hold | Tier 2 | 3.70 | Strategic energy | No | Valid, but not better than [SMH](https://www.tradingview.com/chart/?symbol=SMH) for new cash today |
@@ -298,7 +298,7 @@ Role: Hedge ballast. Required next action: Run hedge validity test and compare w
 ### Watchlist / dynamic radar memory
 | Theme | Primary ETF | Alternative ETF | Why I’m considering it | Current status |
 |---|---|---|---|---|
-| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Strongest secular growth exposure. | Active |
+| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Strongest secular growth exposure. | Active / capped |
 | Defense innovation / sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructure capex remains valid. | Duel required |
 | Gold hedge review | [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Hedge role must be proven. | Under review |

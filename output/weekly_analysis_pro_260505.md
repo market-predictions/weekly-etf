@@ -12,7 +12,7 @@
 ## 2. Portfolio Action Snapshot
 
 ### Add
-- SMH: add 8 shares using cash.
+- : add 8 shares using cash.
 
 ### Hold
 - SPY, PPA, PAVE, URNM, GLD

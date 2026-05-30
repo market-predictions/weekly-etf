@@ -67,7 +67,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | SMH | SOXX | AI capex remains the clearest scalable growth theme and still has the strongest funded expression in the book. | 5 | 5 | Actionable now | Yields must avoid a disorderly move higher. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | AI capex remains the clearest scalable growth theme and still has the strongest funded expression in the book. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | Yields must avoid a disorderly move higher. | 3-12 months |
 | Defense innovation / sovereign resilience | PPA | ITA | Security spending and geopolitical resilience remain durable, investable themes. | 5 | 4 | Actionable now | Price confirmation needs to stabilize after the latest drawdown. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Power demand, grid strain, reshoring, and infrastructure capex remain structurally supportive. | 5 | 4 | Scale in slowly | Industrial and utility capex need to keep confirming. | 3-12 months |
 | Uranium / nuclear fuel cycle | URNM | URA | Nuclear demand and energy-security logic remain attractive even if short-term timing is volatile. | 4 | 4 | Scale in slowly | Uranium equities need steadier relative strength. | 3-12 months |
@@ -130,7 +130,7 @@ The live radar remains compact and unchanged. The broader lane assessment still 
 - Since inception return (%): 1.85
 - Equity-curve state: Below prior high
 - EUR/USD used: 1.1706
-- Notes: Fresh persisted pricing audit `output/pricing/price_audit_2026-04-29.json` priced all 6 current holdings using the 2026-04-29 close. FX basis used ECB EUR/USD reference rate after Twelve Data FX was unavailable.
+- Notes: Fresh persisted pricing audit `output/pricing/price audit 2026-04-29.json` priced all 6 current holdings using the 2026-04-29 close. FX basis used ECB EUR/USD reference rate after Twelve Data FX was unavailable.
 
 | Date | Portfolio value (EUR) | Comment |
 |---|---:|---|
@@ -460,8 +460,8 @@ There is no funded switch this week. The opportunity set remains useful, but not
 - Risk concerns: weaker latest marks in PPA, GLD, and URNM; continued rates sensitivity in SMH; still unresolved energy and supply-chain risk.
 
 ### Data note
-- Matching pricing audit used: `output/pricing/price_audit_2026-04-29.json`.
-- Pricing decision: `update_covered_holdings_carry_unresolved`.
+- Matching pricing audit used: `output/pricing/price audit 2026-04-29.json`.
+- Pricing decision: `update covered holdings carry unresolved`.
 - Fresh holdings coverage: 6 of 6.
 - FX basis: ECB EUR/USD reference rate 1.1706, returned date 2026-04-29.
 - Watchlist/challenger tickers remain less complete because Twelve Data API is unavailable, but current holdings are fully repriced.

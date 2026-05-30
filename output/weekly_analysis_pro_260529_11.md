@@ -28,11 +28,11 @@
 - None
 
 ### Rotation engine status
-- Rotation plan artifact is active; Sections 12-14 are rendered from rotation_decisions, target_weights and trade_intents.
+- Rotation plan artifact is active; Sections 12-14 are rendered from the portfolio rotation plan, target allocations and proposed trade intents.
 - Trade intents are proposed rotation output while the engine is in warning mode; they are not executed trades until the ledger and portfolio state record execution.
 
 ### Best replacements to fund
-- reduce GLD by -4.43% NAV and allocate 4.43% NAV to GSG, pending execution and portfolio-state persistence.
+- reduce GLD by 4.43% NAV and allocate 4.43% NAV to GSG, pending execution and portfolio-state persistence.
 
 ### Replacement pricing and duel status
 
@@ -76,7 +76,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | SMH | SOXX | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Actionable now | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
 | Cybersecurity resilience | CIBR | BUG | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure exposure with less direct semiconductor cyclicality. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Power demand, grid bottlenecks and reshoring capex support infrastructure spend. Macro filter: AI power demand and infrastructure policy support the grid lane; funding still depends on PAVE-vs-GRID duel evidence. | 5 | 4 | Watchlist / under review | PAVE remains useful, but GRID is the cleaner thematic challenger. | 3-12 months |
 | Biotech innovation / therapeutic platforms | XBI | IBB | Biotech remains a long-duration innovation lane but needs risk appetite. | 4 | 3 | Watchlist / under review | Can become attractive if breadth improves and rates ease. | 3-12 months |
@@ -129,7 +129,7 @@
 - Since inception return (%): 9.96
 - Equity-curve state: Reconciled to Section 15 with full valuation history
 - EUR/USD used: 1.1661
-- Notes: Section 7 uses `output/etf_valuation_history.csv` plus the current runtime NAV; Section 15 is rendered from the same normalized runtime state.
+- Notes: Section 7 uses the validated valuation history plus the current portfolio NAV; Section 15 is rendered from the same reconciled portfolio state.
 
 | Date | Portfolio value (EUR) | Comment |
 |---|---:|---|
@@ -211,16 +211,16 @@ Role: Hedge ballast. Required next action: Run hedge validity test and compare w
 ### GSG — Hold — Score n/a — Fresh cash: Hold / monitor — release score 10
 Role: Rotation destination. Required next action: Monitor commodity breadth and hedge contribution after execution..
 
-### PAVE — Hold with override — Score 3.68 — Fresh cash: Smaller / under review — release score 85; override churn_budget_used
+### PAVE — Hold with override — Score 3.68 — Fresh cash: Smaller / under review — release score 85; override: rotation budget already used
 Role: Real-asset capex. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
-### PPA — Hold with override — Score 3.45 — Fresh cash: Reduce — release score 100; override churn_budget_used
+### PPA — Hold with override — Score 3.45 — Fresh cash: Reduce — release score 100; override: rotation budget already used
 Role: Resilience. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
 ### SMH — Hold — Score 4.28 — Fresh cash: Smaller / under review — release score 60
 Role: Growth engine. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
-### SPY — Hold with override — Score 3.53 — Fresh cash: Smaller / under review — release score 85; override churn_budget_used
+### SPY — Hold with override — Score 3.53 — Fresh cash: Smaller / under review — release score 85; override: rotation budget already used
 Role: Core beta. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
 ### URNM — Hold — Score 3.70 — Fresh cash: Hold
@@ -228,8 +228,8 @@ Role: Strategic energy. Required next action: Hold.
 
 ## 11. Best New Opportunities
 
-- SMH remains the leading funded growth exposure, subject to the max-position rule.
-- Proposed rotation: reduce GLD by -4.43% NAV and allocate 4.43% NAV to GSG, pending execution and portfolio-state persistence.
+- SMH remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap.
+- Proposed rotation: reduce GLD by 4.43% NAV and allocate 4.43% NAV to GSG, pending execution and portfolio-state persistence.
 - CIBR / BUG: Cyber spend is linked to AI, cloud, data-center and geopolitical resilience.
 - XBI / IBB: Biotech remains a long-duration innovation lane but needs risk appetite.
 - ROBO / IRBO: Automation capex can broaden beyond semiconductors into industrial productivity.
@@ -302,7 +302,7 @@ Role: Strategic energy. Required next action: Hold.
 ### Watchlist / dynamic radar memory
 | Theme | Primary ETF | Alternative ETF | Why I’m considering it | Current status |
 |---|---|---|---|---|
-| AI compute infrastructure | SMH | SOXX | Strongest secular growth exposure. | Active |
+| AI compute infrastructure | SMH | SOXX | Strongest secular growth exposure. | Active / capped |
 | Defense innovation / sovereign resilience | PPA | ITA | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | PAVE | GRID | Infrastructure capex remains valid. | Duel required |
 | Gold hedge review | GLD | GSG / BIL | Hedge role must be proven. | Under review |
@@ -322,7 +322,7 @@ Role: Strategic energy. Required next action: Hold.
 
 ### Changes since last review
 - Added: a validated state-led production path with macro-policy and rotation-plan inputs; no portfolio position was executed unless recorded in the trade ledger.
-- Proposed rotation: reduce GLD by -4.43% NAV and allocate 4.43% NAV to GSG, pending execution and portfolio-state persistence.
+- Proposed rotation: reduce GLD by 4.43% NAV and allocate 4.43% NAV to GSG, pending execution and portfolio-state persistence.
 - Executed reductions/closures: none unless separately recorded in the trade ledger and persisted portfolio state.
 - Thesis changes: No structural thesis was abandoned; implementation, macro-regime and rotation discipline are materially tighter.
 
