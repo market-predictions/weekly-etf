@@ -40,6 +40,13 @@ def _float(value: Any, default: float = 0.0) -> float:
         return default
 
 
+def _first(row: dict[str, Any], *keys: str) -> Any:
+    for key in keys:
+        if key in row and row.get(key) not in (None, ""):
+            return row.get(key)
+    return None
+
+
 def _positions(payload: dict[str, Any]) -> list[dict[str, Any]]:
     return [dict(row) for row in (payload.get("positions") or payload.get("shadow_positions") or []) if isinstance(row, dict)]
 
@@ -48,80 +55,63 @@ def _position_map(payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {_ticker(row.get("ticker")): dict(row) for row in _positions(payload) if _ticker(row.get("ticker"))}
 
 
-def _cash_eur(payload: dict[str, Any]) -> float:
+def _cash(payload: dict[str, Any]) -> float:
     p = payload.get("portfolio") or payload
     return _float(p.get("cash_eur"))
 
 
-def _nav_eur(payload: dict[str, Any]) -> float:
+def _nav(payload: dict[str, Any]) -> float:
     p = payload.get("portfolio") or payload
-    return _float(p.get("total_portfolio_value_eur") or p.get("nav_eur"))
+    return _float(_first(p, "total_portfolio_value_eur", "nav_eur"))
 
 
-def _fx_rate(payload: dict[str, Any]) -> float:
-    fx = payload.get("fx_basis") or {}
-    return _float(fx.get("rate"), 1.0) or 1.0
+def _fx(payload: dict[str, Any]) -> float:
+    return _float((payload.get("fx_basis") or {}).get("rate"), 1.0) or 1.0
 
 
-def _price_local(row: dict[str, Any]) -> float:
-    return _float(row.get("selected_close") or row.get("current_price_local") or row.get("continuity_current_price_local") or row.get("previous_price_local"))
+def _price(row: dict[str, Any]) -> float:
+    return _float(_first(row, "selected_close", "current_price_local", "continuity_current_price_local", "previous_price_local"))
 
 
-def _value_local(row: dict[str, Any]) -> float:
-    return _float(row.get("market_value_local") if row.get("market_value_local") not in (None, "") else row.get("previous_market_value_local"))
+def _local(row: dict[str, Any]) -> float:
+    return _float(_first(row, "market_value_local", "previous_market_value_local"))
 
 
-def _value_eur(row: dict[str, Any]) -> float:
-    return _float(row.get("market_value_eur") if row.get("market_value_eur") not in (None, "") else row.get("previous_market_value_eur"))
+def _eur(row: dict[str, Any]) -> float:
+    return _float(_first(row, "market_value_eur", "previous_market_value_eur"))
 
 
-def _is_cash(row: dict[str, Any]) -> bool:
-    return _ticker(row.get("ticker")) == "CASH"
+def _weight(row: dict[str, Any]) -> float:
+    # Prefer current_weight_pct even when it is exactly 0.00. Do not fall through to stale legacy weight_pct.
+    return _float(_first(row, "current_weight_pct", "previous_weight_pct", "weight_pct"))
 
 
-def _arithmetic_errors(rows: list[dict[str, Any]], *, fx: float, nav: float, context: str) -> list[str]:
+def _row_math_errors(rows: list[dict[str, Any]], *, fx: float, nav: float, context: str) -> list[str]:
     errors: list[str] = []
     for row in rows:
         ticker = _ticker(row.get("ticker"))
-        if not ticker or _is_cash(row):
+        if not ticker or ticker == "CASH":
             continue
         shares = _float(row.get("shares"))
-        price = _price_local(row)
+        price = _price(row)
+        local = _local(row)
+        eur = _eur(row)
         currency = _text(row.get("currency"), "USD").upper()
-        local = _value_local(row)
-        eur = _value_eur(row)
-        weight = _float(row.get("current_weight_pct") or row.get("weight_pct") or row.get("previous_weight_pct"))
         if shares > SHARE_TOL and price <= 0:
             errors.append(f"{context}:missing_price:{ticker}")
         if shares >= 0 and price > 0 and local > 0:
             expected_local = round(shares * price, 2)
             if abs(expected_local - local) > VALUE_TOL:
                 errors.append(f"{context}:local_value_mismatch:{ticker}:expected={expected_local:.2f}:actual={local:.2f}")
-        if local > 0 and eur > 0 and fx > 0:
+        if local > 0 and eur > 0:
             expected_eur = round(local if currency == "EUR" else local / fx, 2)
             if abs(expected_eur - eur) > VALUE_TOL:
                 errors.append(f"{context}:eur_value_mismatch:{ticker}:expected={expected_eur:.2f}:actual={eur:.2f}")
-        if eur > 0 and nav > 0 and weight > 0:
+        if eur > 0 and nav > 0:
             expected_weight = round(eur / nav * 100.0, 2)
+            weight = _weight(row)
             if abs(expected_weight - weight) > WEIGHT_TOL:
                 errors.append(f"{context}:weight_mismatch:{ticker}:expected={expected_weight:.2f}:actual={weight:.2f}")
-    return errors
-
-
-def _compare_to_official(ticker: str, actual: dict[str, Any], official: dict[str, Any], context: str) -> list[str]:
-    errors: list[str] = []
-    actual_shares = _float(actual.get("shares"))
-    official_shares = _float(official.get("shares"))
-    if abs(actual_shares - official_shares) > SHARE_TOL:
-        errors.append(f"{context}:shares_authority_mismatch:{ticker}:expected={official_shares:.6f}:actual={actual_shares:.6f}")
-    actual_currency = _text(actual.get("currency"), "USD").upper()
-    official_currency = _text(official.get("currency"), "USD").upper()
-    if actual_currency != official_currency:
-        errors.append(f"{context}:currency_authority_mismatch:{ticker}:expected={official_currency}:actual={actual_currency}")
-    actual_eur = _value_eur(actual)
-    official_eur = _value_eur(official)
-    if official_eur > 0 and abs(actual_eur - official_eur) > VALUE_TOL:
-        errors.append(f"{context}:market_value_eur_authority_mismatch:{ticker}:expected={official_eur:.2f}:actual={actual_eur:.2f}")
     return errors
 
 
@@ -136,15 +126,15 @@ def validate_runtime_state_authority(runtime_state_path: Path, portfolio_state_p
         if not actual:
             errors.append(f"{context}:official_holding_missing_from_runtime:{ticker}")
             continue
-        errors.extend(_compare_to_official(ticker, actual, official, context))
-    for ticker, actual in runtime_positions.items():
-        if ticker not in official_positions and _value_eur(actual) > VALUE_TOL:
-            errors.append(f"{context}:runtime_has_unofficial_position:{ticker}:market_value_eur={_value_eur(actual):.2f}")
-    if abs(_cash_eur(runtime_state) - _cash_eur(portfolio_state)) > VALUE_TOL:
-        errors.append(f"{context}:cash_authority_mismatch:expected={_cash_eur(portfolio_state):.2f}:actual={_cash_eur(runtime_state):.2f}")
-    if _nav_eur(portfolio_state) > 0 and abs(_nav_eur(runtime_state) - _nav_eur(portfolio_state)) > VALUE_TOL:
-        errors.append(f"{context}:nav_authority_mismatch:expected={_nav_eur(portfolio_state):.2f}:actual={_nav_eur(runtime_state):.2f}")
-    errors.extend(_arithmetic_errors(list(runtime_positions.values()), fx=_fx_rate(runtime_state), nav=_nav_eur(runtime_state), context=context))
+        if abs(_float(actual.get("shares")) - _float(official.get("shares"))) > SHARE_TOL:
+            errors.append(f"{context}:shares_authority_mismatch:{ticker}:expected={_float(official.get('shares')):.6f}:actual={_float(actual.get('shares')):.6f}")
+        if abs(_eur(actual) - _eur(official)) > VALUE_TOL:
+            errors.append(f"{context}:market_value_eur_authority_mismatch:{ticker}:expected={_eur(official):.2f}:actual={_eur(actual):.2f}")
+    if abs(_cash(runtime_state) - _cash(portfolio_state)) > VALUE_TOL:
+        errors.append(f"{context}:cash_authority_mismatch:expected={_cash(portfolio_state):.2f}:actual={_cash(runtime_state):.2f}")
+    if _nav(portfolio_state) > 0 and abs(_nav(runtime_state) - _nav(portfolio_state)) > VALUE_TOL:
+        errors.append(f"{context}:nav_authority_mismatch:expected={_nav(portfolio_state):.2f}:actual={_nav(runtime_state):.2f}")
+    errors.extend(_row_math_errors(list(runtime_positions.values()), fx=_fx(runtime_state), nav=_nav(runtime_state), context=context))
     if errors and raise_on_error:
         raise RuntimeError("ETF execution-state authority validation failed: " + "; ".join(sorted(set(errors))))
     return errors
@@ -166,41 +156,38 @@ def _resolve_artifact(path_arg: str | None) -> Path:
     raise RuntimeError("No ETF model-execution artifact found.")
 
 
-def _runtime_state_for_artifact(artifact: dict[str, Any]) -> dict[str, Any]:
-    raw = (artifact.get("source_files") or {}).get("runtime_state")
-    if raw and Path(raw).exists():
-        return _read_json(Path(raw))
-    return {}
-
-
 def validate_execution_artifact(artifact_path: Path, *, expected_mode: str | None = None, portfolio_state_path: Path | None = None, raise_on_error: bool = True) -> list[str]:
     artifact = _read_json(artifact_path)
     mode = _text(artifact.get("execution_mode"))
     errors: list[str] = []
     if expected_mode and mode != expected_mode:
         errors.append(f"artifact:execution_mode_mismatch:{mode}!={expected_mode}")
-    if portfolio_state_path is None:
-        portfolio_state_path = Path((artifact.get("source_files") or {}).get("portfolio_state") or DEFAULT_PORTFOLIO_STATE)
+    portfolio_state_path = portfolio_state_path or Path((artifact.get("source_files") or {}).get("portfolio_state") or DEFAULT_PORTFOLIO_STATE)
     portfolio_state = _read_json(portfolio_state_path)
-    official_positions = _position_map(portfolio_state)
-    shadow_positions = _position_map({"positions": artifact.get("shadow_positions") or []})
-    runtime_state = _runtime_state_for_artifact(artifact)
-    nav = _float((artifact.get("post_trade_shadow_portfolio") or {}).get("nav_eur") or _nav_eur(portfolio_state))
-    errors.extend(_arithmetic_errors(list(shadow_positions.values()), fx=_fx_rate(runtime_state), nav=nav, context=f"artifact_{mode or 'unknown'}"))
-    for ticker, shadow in shadow_positions.items():
-        official = official_positions.get(ticker)
-        if mode == "guarded_auto":
-            if not official:
-                errors.append(f"artifact_guarded_auto:position_missing_from_official_state:{ticker}")
-            else:
-                errors.extend(_compare_to_official(ticker, shadow, official, "artifact_guarded_auto"))
-        elif mode == "shadow" and official:
-            delta = _float(shadow.get("shares_delta_this_run"))
-            expected_after = _float(official.get("shares")) + delta
-            actual_after = _float(shadow.get("shares"))
-            if abs(expected_after - actual_after) > SHARE_TOL:
-                errors.append(f"artifact_shadow:shares_delta_does_not_bridge_official_state:{ticker}:expected_after={expected_after:.6f}:actual_after={actual_after:.6f}")
+    official = _position_map(portfolio_state)
+    shadow = _position_map({"positions": artifact.get("shadow_positions") or []})
+    runtime_path = (artifact.get("source_files") or {}).get("runtime_state")
+    runtime_state = _read_json(Path(runtime_path)) if runtime_path and Path(runtime_path).exists() else {}
+    post = artifact.get("post_trade_shadow_portfolio") or {}
+    nav = _float(_first(post, "nav_eur") or _nav(portfolio_state))
+    errors.extend(_row_math_errors(list(shadow.values()), fx=_fx(runtime_state), nav=nav, context=f"artifact_{mode or 'unknown'}"))
+    if mode == "shadow":
+        for ticker, row in shadow.items():
+            if ticker not in official:
+                continue
+            delta = _float(row.get("shares_delta_this_run"))
+            if abs(delta) <= SHARE_TOL:
+                continue
+            expected_after = _float(official[ticker].get("shares")) + delta
+            if abs(_float(row.get("shares")) - expected_after) > SHARE_TOL:
+                errors.append(f"artifact_shadow:shares_delta_does_not_bridge_official_state:{ticker}:expected_after={expected_after:.6f}:actual_after={_float(row.get('shares')):.6f}")
     if mode == "guarded_auto":
+        for ticker, row in shadow.items():
+            if ticker not in official:
+                errors.append(f"artifact_guarded_auto:position_missing_from_official_state:{ticker}")
+                continue
+            if abs(_float(row.get("shares")) - _float(official[ticker].get("shares"))) > SHARE_TOL:
+                errors.append(f"artifact_guarded_auto:shares_authority_mismatch:{ticker}:expected={_float(official[ticker].get('shares')):.6f}:actual={_float(row.get('shares')):.6f}")
         result = artifact.get("guarded_auto_result") or {}
         if result.get("portfolio_state_written") is not True:
             errors.append("artifact_guarded_auto:portfolio_state_not_written")
