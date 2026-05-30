@@ -194,6 +194,23 @@ def _run_post_processors(output_dir: Path, runtime_state_path: Path, pricing_aud
         subprocess.run(command, check=True, env=env)
 
 
+def _run_executed_report_contract(runtime_state_path: Path, en_path: Path, nl_path: Path) -> None:
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "runtime.fix_executed_report_contract",
+            "--runtime-state",
+            str(runtime_state_path),
+            "--english-report",
+            str(en_path),
+            "--dutch-report",
+            str(nl_path),
+        ],
+        check=True,
+    )
+
+
 def finalize_from_artifact(artifact_path: Path) -> dict[str, Any]:
     artifact = _read_json(artifact_path)
     if artifact.get("execution_mode") != "guarded_auto" or artifact.get("execution_status") != "executed":
@@ -232,6 +249,7 @@ def finalize_from_artifact(artifact_path: Path) -> dict[str, Any]:
     en_path.write_text(render_en(final_state), encoding="utf-8")
     nl_path.write_text(render_nl(final_state), encoding="utf-8")
     _run_post_processors(output_dir, final_state_path, pricing_audit, en_path, nl_path)
+    _run_executed_report_contract(final_state_path, en_path, nl_path)
 
     result = {
         "finalized": True,
