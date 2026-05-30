@@ -82,7 +82,6 @@ def _eur(row: dict[str, Any]) -> float:
 
 
 def _weight(row: dict[str, Any]) -> float:
-    # Prefer current_weight_pct even when it is exactly 0.00. Do not fall through to stale legacy weight_pct.
     return _float(_first(row, "current_weight_pct", "previous_weight_pct", "weight_pct"))
 
 
@@ -159,6 +158,7 @@ def _resolve_artifact(path_arg: str | None) -> Path:
 def validate_execution_artifact(artifact_path: Path, *, expected_mode: str | None = None, portfolio_state_path: Path | None = None, raise_on_error: bool = True) -> list[str]:
     artifact = _read_json(artifact_path)
     mode = _text(artifact.get("execution_mode"))
+    status = _text(artifact.get("execution_status"))
     errors: list[str] = []
     if expected_mode and mode != expected_mode:
         errors.append(f"artifact:execution_mode_mismatch:{mode}!={expected_mode}")
@@ -189,10 +189,18 @@ def validate_execution_artifact(artifact_path: Path, *, expected_mode: str | Non
             if abs(_float(row.get("shares")) - _float(official[ticker].get("shares"))) > SHARE_TOL:
                 errors.append(f"artifact_guarded_auto:shares_authority_mismatch:{ticker}:expected={_float(official[ticker].get('shares')):.6f}:actual={_float(row.get('shares')):.6f}")
         result = artifact.get("guarded_auto_result") or {}
-        if result.get("portfolio_state_written") is not True:
-            errors.append("artifact_guarded_auto:portfolio_state_not_written")
-        if result.get("trade_ledger_written") is not True:
-            errors.append("artifact_guarded_auto:trade_ledger_not_written")
+        if status == "executed":
+            if result.get("portfolio_state_written") is not True:
+                errors.append("artifact_guarded_auto:portfolio_state_not_written")
+            if result.get("trade_ledger_written") is not True:
+                errors.append("artifact_guarded_auto:trade_ledger_not_written")
+        elif status == "already_executed":
+            if result.get("idempotency_status") != "already_executed":
+                errors.append("artifact_guarded_auto:missing_already_executed_status")
+            if result.get("portfolio_state_written") is True or result.get("trade_ledger_written") is True:
+                errors.append("artifact_guarded_auto:already_executed_must_not_write")
+        else:
+            errors.append(f"artifact_guarded_auto:unexpected_status:{status}")
     if errors and raise_on_error:
         raise RuntimeError("ETF execution artifact authority validation failed: " + "; ".join(sorted(set(errors))))
     return errors
