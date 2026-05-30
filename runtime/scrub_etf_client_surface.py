@@ -72,6 +72,7 @@ def _strip_ticker_from_list(value: str, ticker: str, none_label: str = "None") -
 def _scrub_over_cap_adds(text: str, tickers: list[str]) -> str:
     for ticker in tickers:
         hold_msg = f"{ticker} remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap."
+        short_reason = "Best earned exposure, but no fresh cash while above the 25% cap"
         capped_status = "Structurally actionable, but no fresh capital while above cap"
         text = text.replace(
             f"- {ticker} remains the leading funded growth exposure, subject to the max-position rule.",
@@ -81,6 +82,9 @@ def _scrub_over_cap_adds(text: str, tickers: list[str]) -> str:
             f"- {ticker} remains the first candidate for additional capital only if the 25% position-size rule leaves room.",
             f"- {hold_msg}",
         )
+        text = text.replace("Best earned use of cash, capped below max position size", short_reason)
+        text = text.replace("Best earned use of cash", short_reason)
+        text = text.replace("capped below max position size", "above the 25% max-position cap")
         text = re.sub(
             rf"-\s*{re.escape(ticker)}\s+remains the leading funded growth exposure, subject to the max-position rule\.",
             f"- {hold_msg}",
@@ -124,6 +128,12 @@ def _scrub_over_cap_adds(text: str, tickers: list[str]) -> str:
         text = re.sub(
             rf"(\|[^\n]*\|\s*{re.escape(ticker)}\s*\|[^\n]*\|[^\n]*\|[^\n]*\|[^\n]*\|\s*)Actionable now(\s*\|\s*[^\|\n]*(?:position-size discipline matters|position size discipline matters)[^\|\n]*\|)",
             rf"\1{capped_status}\2",
+            text,
+            flags=re.IGNORECASE,
+        )
+        text = re.sub(
+            rf"(\|\s*AI compute infrastructure\s*\|\s*{re.escape(ticker)}\s*\|\s*SOXX\s*\|\s*Strongest secular growth exposure\.\s*\|\s*)Active(\s*\|)",
+            rf"\1Active / capped\2",
             text,
             flags=re.IGNORECASE,
         )
