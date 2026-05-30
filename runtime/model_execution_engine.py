@@ -24,6 +24,21 @@ LEDGER_FIELDS = [
     "portfolio_role",
     "funding_source_note",
 ]
+CORE_POSITION_FIELDS = {
+    "shares",
+    "current_price_local",
+    "previous_price_local",
+    "continuity_current_price_local",
+    "currency",
+    "market_value_local",
+    "previous_market_value_local",
+    "market_value_eur",
+    "previous_market_value_eur",
+    "current_weight_pct",
+    "previous_weight_pct",
+    "weight_inherited_pct",
+    "target_weight_pct",
+}
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -53,21 +68,12 @@ def _float(value: Any, default: float = 0.0) -> float:
         return default
 
 
-def _round(value: Any, digits: int = 2) -> float:
-    return round(_float(value), digits)
-
-
 def _pricing_map(runtime_state: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {_ticker(row.get("symbol")): dict(row) for row in runtime_state.get("pricing", []) or [] if _ticker(row.get("symbol"))}
 
 
 def _position_map(runtime_state: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {_ticker(row.get("ticker")): dict(row) for row in runtime_state.get("positions", []) or [] if _ticker(row.get("ticker"))}
-
-
-def _target_weights(runtime_state: dict[str, Any]) -> dict[str, float]:
-    rows = runtime_state.get("target_weights") or (runtime_state.get("rotation_plan") or {}).get("target_weights") or []
-    return {_ticker(row.get("ticker")): _float(row.get("target_weight_pct")) for row in rows if _ticker(row.get("ticker"))}
 
 
 def _trade_intents(runtime_state: dict[str, Any]) -> list[dict[str, Any]]:
@@ -87,19 +93,13 @@ def _fx(runtime_state: dict[str, Any]) -> float:
     return _float((runtime_state.get("fx_basis") or {}).get("rate"), 1.0) or 1.0
 
 
-def _market_value_eur(row: dict[str, Any]) -> float:
-    return _float(row.get("previous_market_value_eur") if row.get("previous_market_value_eur") not in (None, "") else row.get("market_value_eur"))
-
-
-def _price_local(row: dict[str, Any], price_map: dict[str, dict[str, Any]]) -> float:
-    ticker = _ticker(row.get("ticker") or row.get("symbol"))
-    price_row = price_map.get(ticker, {})
+def _price_local(ticker: str, row: dict[str, Any], price_map: dict[str, dict[str, Any]]) -> float:
+    price_row = price_map.get(_ticker(ticker), {})
     return _float(price_row.get("selected_close") or price_row.get("price") or row.get("current_price_local") or row.get("previous_price_local"))
 
 
-def _currency(row: dict[str, Any], price_map: dict[str, dict[str, Any]]) -> str:
-    ticker = _ticker(row.get("ticker") or row.get("symbol"))
-    price_row = price_map.get(ticker, {})
+def _currency(ticker: str, row: dict[str, Any], price_map: dict[str, dict[str, Any]]) -> str:
+    price_row = price_map.get(_ticker(ticker), {})
     return _text(price_row.get("currency") or row.get("currency") or "USD").upper()
 
 
@@ -109,6 +109,38 @@ def _local_from_eur(value_eur: float, currency: str, fx: float) -> float:
 
 def _eur_from_local(value_local: float, currency: str, fx: float) -> float:
     return value_local if currency == "EUR" else value_local / fx
+
+
+def _market_value_eur(row: dict[str, Any]) -> float:
+    return _float(row.get("previous_market_value_eur") if row.get("previous_market_value_eur") not in (None, "") else row.get("market_value_eur"))
+
+
+def _shares_for_notional(notional_eur: float, price_local: float, currency: str, fx: float) -> float:
+    if price_local <= 0:
+        return 0.0
+    return _local_from_eur(notional_eur, currency, fx) / price_local
+
+
+def _mark_position(row: dict[str, Any], *, shares: float, price: float, currency: str, nav: float, fx: float) -> dict[str, Any]:
+    item = dict(row)
+    market_value_local = round(max(0.0, shares * price), 2)
+    market_value_eur = round(_eur_from_local(market_value_local, currency, fx), 2)
+    weight = round(market_value_eur / nav * 100.0, 2) if nav else 0.0
+    item.update({
+        "shares": round(max(0.0, shares), 6),
+        "currency": currency,
+        "current_price_local": round(price, 6),
+        "previous_price_local": round(price, 6),
+        "continuity_current_price_local": round(price, 6),
+        "market_value_local": market_value_local,
+        "previous_market_value_local": market_value_local,
+        "market_value_eur": market_value_eur,
+        "previous_market_value_eur": market_value_eur,
+        "current_weight_pct": weight,
+        "previous_weight_pct": weight,
+        "weight_inherited_pct": weight,
+    })
+    return item
 
 
 def _valid_price_row(ticker: str, price_map: dict[str, dict[str, Any]]) -> tuple[bool, str]:
@@ -124,19 +156,65 @@ def _valid_price_row(ticker: str, price_map: dict[str, dict[str, Any]]) -> tuple
     return True, "ok"
 
 
-def _shares_for_notional(notional_eur: float, price_local: float, currency: str, fx: float) -> float:
-    if price_local <= 0:
-        return 0.0
-    return _local_from_eur(notional_eur, currency, fx) / price_local
+def _prepare_runtime_state(runtime_state: dict[str, Any], portfolio_state_path: Path) -> dict[str, Any]:
+    """Use official portfolio state as position authority before model execution.
 
+    Runtime reports may merge analytical scorecard memory into positions. That
+    scorecard is allowed to carry stale advisory metadata, but it must never
+    override official shares or market values for execution. This function
+    re-overlays official positions and revalues them using the current pricing
+    audit so execution sees the true source/destination funding base.
+    """
+    if not portfolio_state_path.exists():
+        return runtime_state
+    portfolio_state = _read_json(portfolio_state_path)
+    price_map = _pricing_map(runtime_state)
+    fx = _fx(runtime_state)
+    runtime_by_ticker = _position_map(runtime_state)
+    prepared_positions: list[dict[str, Any]] = []
+    total_market_value = 0.0
+    official_positions = portfolio_state.get("positions", []) or []
+    for official in official_positions:
+        ticker = _ticker(official.get("ticker"))
+        if not ticker:
+            continue
+        row = dict(runtime_by_ticker.get(ticker, {}))
+        row.update({key: value for key, value in official.items() if key in CORE_POSITION_FIELDS or key not in row})
+        row["ticker"] = ticker
+        price = _price_local(ticker, official, price_map)
+        currency = _currency(ticker, official, price_map)
+        shares = _float(official.get("shares"))
+        if price > 0 and shares >= 0:
+            row = _mark_position(row, shares=shares, price=price, currency=currency, nav=1.0, fx=fx)
+        price_row = price_map.get(ticker, {})
+        if price_row:
+            row.update({
+                "pricing_source": price_row.get("source"),
+                "pricing_status": price_row.get("status"),
+                "pricing_tier": price_row.get("pricing_tier"),
+                "pricing_close_type": price_row.get("selected_close_type"),
+                "price_date": price_row.get("returned_close_date"),
+                "selected_close": price_row.get("selected_close") or price_row.get("price"),
+            })
+        total_market_value += _market_value_eur(row)
+        prepared_positions.append(row)
 
-def _live_source_value_eur(row: dict[str, Any], price_map: dict[str, dict[str, Any]], fx: float) -> float:
-    price = _price_local(row, price_map)
-    currency = _currency(row, price_map)
-    shares = _float(row.get("shares"))
-    if shares > 0 and price > 0:
-        return round(_eur_from_local(shares * price, currency, fx), 2)
-    return _market_value_eur(row)
+    cash = _float(portfolio_state.get("cash_eur") or (runtime_state.get("portfolio") or {}).get("cash_eur"))
+    nav = round(total_market_value + cash, 2)
+    for row in prepared_positions:
+        mv = _market_value_eur(row)
+        weight = round(mv / nav * 100.0, 2) if nav else 0.0
+        row["current_weight_pct"] = weight
+        row["previous_weight_pct"] = weight
+        row["weight_inherited_pct"] = weight
+    prepared = dict(runtime_state)
+    prepared["positions"] = prepared_positions
+    prepared["portfolio"] = {
+        "cash_eur": round(cash, 2),
+        "total_portfolio_value_eur": nav,
+        "base_currency": "EUR",
+    }
+    return prepared
 
 
 def _requested_notional(intent: dict[str, Any], nav: float) -> float:
@@ -146,13 +224,16 @@ def _requested_notional(intent: dict[str, Any], nav: float) -> float:
     return round(requested, 2)
 
 
-def _execution_notional(intent: dict[str, Any], source_row: dict[str, Any], runtime_state: dict[str, Any], price_map: dict[str, dict[str, Any]], fx: float) -> tuple[float, float, bool]:
+def _available_source_value_eur(source_row: dict[str, Any]) -> float:
+    return max(0.0, _market_value_eur(source_row))
+
+
+def _execution_notional(intent: dict[str, Any], source_row: dict[str, Any], runtime_state: dict[str, Any]) -> tuple[float, float, bool]:
     nav = _nav(runtime_state)
     requested = _requested_notional(intent, nav)
-    available = _live_source_value_eur(source_row, price_map, fx)
+    available = _available_source_value_eur(source_row)
     actual = max(0.0, min(requested, available))
-    capped = requested - actual > 1.0
-    return round(actual, 2), round(requested, 2), capped
+    return round(actual, 2), round(requested, 2), requested - actual > 1.0
 
 
 def _validate_inputs(runtime_state: dict[str, Any]) -> tuple[list[str], list[str]]:
@@ -161,7 +242,6 @@ def _validate_inputs(runtime_state: dict[str, Any]) -> tuple[list[str], list[str
     price_map = _pricing_map(runtime_state)
     position_map = _position_map(runtime_state)
     nav = _nav(runtime_state)
-    fx = _fx(runtime_state)
     policy = _policy(runtime_state)
     intents = _trade_intents(runtime_state)
     min_trade = _float(policy.get("min_trade_size_pct_nav"), 2.0)
@@ -203,9 +283,7 @@ def _validate_inputs(runtime_state: dict[str, Any]) -> tuple[list[str], list[str
             errors.append(f"source_delta_not_negative:{source}:{source_delta}")
         if destination_delta <= 0:
             errors.append(f"destination_delta_not_positive:{destination}:{destination_delta}")
-        if abs(abs(source_delta) - abs(destination_delta)) > 0.05:
-            errors.append(f"source_destination_delta_mismatch:{source_delta}:{destination_delta}")
-        actual_notional, requested_notional, capped = _execution_notional(intent, source_row, runtime_state, price_map, fx)
+        actual_notional, requested_notional, capped = _execution_notional(intent, source_row, runtime_state)
         actual_pct = actual_notional / nav * 100.0 if nav else 0.0
         if capped:
             warnings.append(f"source_notional_capped_to_available_value:{source}:{requested_notional:.2f}->{actual_notional:.2f}")
@@ -221,62 +299,33 @@ def _validate_inputs(runtime_state: dict[str, Any]) -> tuple[list[str], list[str
     return errors, warnings
 
 
-def _mark_position(row: dict[str, Any], *, shares: float, price: float, currency: str, nav: float, fx: float) -> dict[str, Any]:
-    item = dict(row)
-    market_value_local = round(max(0.0, shares * price), 2)
-    market_value_eur = round(_eur_from_local(market_value_local, currency, fx), 2)
-    weight = round(market_value_eur / nav * 100.0, 2) if nav else 0.0
-    item.update({
-        "shares": round(max(0.0, shares), 6),
-        "currency": currency,
-        "current_price_local": round(price, 6),
-        "previous_price_local": round(price, 6),
-        "continuity_current_price_local": round(price, 6),
-        "market_value_local": market_value_local,
-        "previous_market_value_local": market_value_local,
-        "market_value_eur": market_value_eur,
-        "previous_market_value_eur": market_value_eur,
-        "current_weight_pct": weight,
-        "previous_weight_pct": weight,
-        "weight_inherited_pct": weight,
-    })
-    return item
-
-
 def _build_shadow_positions(runtime_state: dict[str, Any]) -> list[dict[str, Any]]:
     price_map = _pricing_map(runtime_state)
     positions = {ticker: dict(row) for ticker, row in _position_map(runtime_state).items()}
     fx = _fx(runtime_state)
     nav = _nav(runtime_state)
-    target_weights = _target_weights(runtime_state)
-
     for intent in _trade_intents(runtime_state):
         source = _ticker(intent.get("source_ticker"))
         destination = _ticker(intent.get("destination_ticker"))
         if not source or not destination or source not in positions:
             continue
         source_row = positions[source]
-        executable_notional, requested_notional, capped = _execution_notional(intent, source_row, runtime_state, price_map, fx)
+        executable_notional, requested_notional, capped = _execution_notional(intent, source_row, runtime_state)
         if executable_notional <= 0:
             continue
         actual_delta_pct = round(executable_notional / nav * 100.0, 4) if nav else 0.0
 
-        source_price = _price_local(source_row, price_map)
-        source_currency = _currency(source_row, price_map)
-        source_shares_delta = -_shares_for_notional(executable_notional, source_price, source_currency, fx)
-        source_row = _mark_position(
-            source_row,
-            shares=_float(source_row.get("shares")) + source_shares_delta,
-            price=source_price,
-            currency=source_currency,
-            nav=nav,
-            fx=fx,
-        )
-        source_row["target_weight_pct"] = round(max(0.0, _float(source_row.get("current_weight_pct"))), 2)
-        source_row["shares_delta_this_run"] = round(source_shares_delta, 6)
-        source_row["weight_change_pct"] = round(-actual_delta_pct, 4)
-        source_row["action_executed_this_run"] = "Shadow reduce"
-        source_row["funding_source_note"] = "Shadow execution capped to available source value." if capped else "Shadow execution from rotation intent."
+        source_price = _price_local(source, source_row, price_map)
+        source_currency = _currency(source, source_row, price_map)
+        source_shares_delta = -min(_float(source_row.get("shares")), _shares_for_notional(executable_notional, source_price, source_currency, fx))
+        source_row = _mark_position(source_row, shares=_float(source_row.get("shares")) + source_shares_delta, price=source_price, currency=source_currency, nav=nav, fx=fx)
+        source_row.update({
+            "target_weight_pct": round(max(0.0, _float(source_row.get("current_weight_pct"))), 2),
+            "shares_delta_this_run": round(source_shares_delta, 6),
+            "weight_change_pct": round(-actual_delta_pct, 4),
+            "action_executed_this_run": "Shadow reduce",
+            "funding_source_note": "Shadow execution capped to available source value." if capped else "Shadow execution from rotation intent.",
+        })
         positions[source] = source_row
 
         dest_price_row = price_map.get(destination, {})
@@ -295,28 +344,21 @@ def _build_shadow_positions(runtime_state: dict[str, Any]) -> list[dict[str, Any
             "price_date": dest_price_row.get("returned_close_date"),
             "selected_close": dest_price,
         })
-        dest_base = _mark_position(
-            dest_base,
-            shares=_float(dest_base.get("shares")) + dest_shares_delta,
-            price=dest_price,
-            currency=dest_currency,
-            nav=nav,
-            fx=fx,
-        )
-        dest_base["target_weight_pct"] = round(target_weights.get(destination, dest_base.get("current_weight_pct", 0.0)), 2)
-        dest_base["shares_delta_this_run"] = round(dest_shares_delta, 6)
-        dest_base["weight_change_pct"] = round(actual_delta_pct, 4)
-        dest_base["action_executed_this_run"] = "Shadow buy"
-        dest_base["funding_source_note"] = f"Shadow buy funded by {source}."
+        dest_base = _mark_position(dest_base, shares=_float(dest_base.get("shares")) + dest_shares_delta, price=dest_price, currency=dest_currency, nav=nav, fx=fx)
+        dest_base.update({
+            "target_weight_pct": round(_float(dest_base.get("current_weight_pct")), 2),
+            "shares_delta_this_run": round(dest_shares_delta, 6),
+            "weight_change_pct": round(actual_delta_pct, 4),
+            "action_executed_this_run": "Shadow buy",
+            "funding_source_note": f"Shadow buy funded by {source}.",
+        })
         positions[destination] = dest_base
-
     return sorted(positions.values(), key=lambda row: _ticker(row.get("ticker")))
 
 
 def _build_ledger_rows(runtime_state: dict[str, Any]) -> list[dict[str, Any]]:
     price_map = _pricing_map(runtime_state)
     position_map = _position_map(runtime_state)
-    fx = _fx(runtime_state)
     nav = _nav(runtime_state)
     run_id = _text(runtime_state.get("run_id"), "unknown")
     trade_date = _text(runtime_state.get("requested_close_date") or runtime_state.get("report_date"))
@@ -325,7 +367,7 @@ def _build_ledger_rows(runtime_state: dict[str, Any]) -> list[dict[str, Any]]:
         source = _ticker(intent.get("source_ticker"))
         destination = _ticker(intent.get("destination_ticker"))
         source_row = position_map.get(source, {})
-        actual_notional, requested_notional, capped = _execution_notional(intent, source_row, runtime_state, price_map, fx) if source_row else (0.0, _requested_notional(intent, nav), False)
+        actual_notional, requested_notional, capped = _execution_notional(intent, source_row, runtime_state) if source_row else (0.0, _requested_notional(intent, nav), False)
         source_weight = _float(source_row.get("current_weight_pct") or source_row.get("previous_weight_pct"))
         actual_delta_pct = actual_notional / nav * 100.0 if nav else 0.0
         rows.append({
@@ -375,22 +417,18 @@ def _official_ledger_rows(runtime_state: dict[str, Any], shadow_positions: list[
     for index, intent in enumerate(_trade_intents(runtime_state), start=1):
         source = _ticker(intent.get("source_ticker"))
         destination = _ticker(intent.get("destination_ticker"))
-        source_before = original.get(source, {})
-        source_after = shadow.get(source, {})
-        dest_before = original.get(destination, {})
-        dest_after = shadow.get(destination, {})
-        source_delta_shares = _float(source_after.get("shares")) - _float(source_before.get("shares"))
-        dest_delta_shares = _float(dest_after.get("shares")) - _float(dest_before.get("shares"))
-        source_note = f"Guarded auto-execution: reduce {source} to fund {destination}."
-        dest_note = f"Guarded auto-execution: buy {destination} funded by {source}."
-        for suffix, ticker, action, before, after, share_delta, note in (
-            ("SELL", source, "Sell", source_before, source_after, source_delta_shares, source_note),
-            ("BUY", destination, "Buy", dest_before, dest_after, dest_delta_shares, dest_note),
-        ):
-            if not ticker or abs(share_delta) <= 0.000001:
+        for suffix, ticker, action in (("SELL", source, "Sell"), ("BUY", destination, "Buy")):
+            before = original.get(ticker, {})
+            after = shadow.get(ticker, {})
+            if not ticker or not after:
+                continue
+            share_delta = _float(after.get("shares")) - _float(before.get("shares"))
+            if abs(share_delta) <= 0.000001:
                 continue
             previous_weight = _float(before.get("current_weight_pct") or before.get("previous_weight_pct"))
             new_weight = _float(after.get("current_weight_pct") or after.get("previous_weight_pct"))
+            counterparty = destination if action == "Sell" else source
+            note = f"Guarded auto-execution: {'reduce' if action == 'Sell' else 'buy'} {ticker} {'to fund' if action == 'Sell' else 'funded by'} {counterparty}."
             out.append({
                 "trade_id": f"model-{trade_date}-{run_id}-{index:02d}-{ticker}-{suffix}",
                 "trade_date": trade_date,
@@ -423,13 +461,7 @@ def _guarded_positions(shadow_positions: list[dict[str, Any]]) -> list[dict[str,
     return out
 
 
-def _execute_guarded_auto(
-    runtime_state: dict[str, Any],
-    runtime_state_path: Path,
-    portfolio_state_path: Path,
-    trade_ledger_path: Path,
-    shadow_positions: list[dict[str, Any]],
-) -> dict[str, Any]:
+def _execute_guarded_auto(runtime_state: dict[str, Any], runtime_state_path: Path, portfolio_state_path: Path, trade_ledger_path: Path, shadow_positions: list[dict[str, Any]]) -> dict[str, Any]:
     if not _trade_intents(runtime_state):
         return {"official_ledger_rows": [], "portfolio_state_written": False, "trade_ledger_written": False}
     existing_state = _read_json(portfolio_state_path) if portfolio_state_path.exists() else {}
@@ -474,7 +506,7 @@ def _execute_guarded_auto(
 
 
 def build_execution_artifact(runtime_state_path: Path, portfolio_state_path: Path, trade_ledger_path: Path, mode: str, output_dir: Path) -> dict[str, Any]:
-    runtime_state = _read_json(runtime_state_path)
+    runtime_state = _prepare_runtime_state(_read_json(runtime_state_path), portfolio_state_path)
     errors, warnings = _validate_inputs(runtime_state)
     shadow_positions = _build_shadow_positions(runtime_state) if not errors else []
     nav = _nav(runtime_state)
@@ -536,13 +568,7 @@ def main() -> None:
     parser.add_argument("--mode", choices=["shadow", "guarded_auto"], default="shadow")
     args = parser.parse_args()
 
-    artifact = build_execution_artifact(
-        runtime_state_path=Path(args.runtime_state),
-        portfolio_state_path=Path(args.portfolio_state),
-        trade_ledger_path=Path(args.trade_ledger),
-        mode=args.mode,
-        output_dir=Path(args.output_dir),
-    )
+    artifact = build_execution_artifact(Path(args.runtime_state), Path(args.portfolio_state), Path(args.trade_ledger), args.mode, Path(args.output_dir))
     if artifact["policy_checks"]["errors"]:
         print("ETF_MODEL_EXECUTION_BLOCKED | artifact=" + artifact["artifact_path"] + " | errors=" + ";".join(artifact["policy_checks"]["errors"]))
         raise SystemExit(1)
