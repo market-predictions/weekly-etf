@@ -21,6 +21,8 @@ report_module = runtime_delivery.report_module
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
 RAW_MARKDOWN_LINK_RE = re.compile(r"\[[A-Z][A-Z0-9.-]{0,14}\]\(https?://[^\)]+\)")
 STYLE_BLOCK_RE = re.compile(r"<(style|script)\b[^>]*>.*?</\1>", re.DOTALL | re.IGNORECASE)
+HIDDEN_EXEC_MARKER_RE = re.compile(r"<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\b(?:exec-summary-suppressed|exec-summary-render-marker)\b)[^>]*>.*?</div>", re.DOTALL | re.IGNORECASE)
+VISIBLE_PANEL_EXEC_RE = re.compile(r"<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bpanel-exec\b)[^>]*>", re.IGNORECASE)
 TAG_RE = re.compile(r"<[^>]+>")
 RUNTIME_POINTER = Path("output/runtime/latest_etf_report_state_path.txt")
 
@@ -156,8 +158,14 @@ def _render_delivery_html(report_path: Path) -> str:
     return sanitize_client_facing_html(html, md_text=md_text, language="nl" if looks_dutch_markdown(md_text) else "en")
 
 
-def _visible_text(html: str) -> str:
+def _visible_html(html: str) -> str:
     html = STYLE_BLOCK_RE.sub("", html)
+    html = HIDDEN_EXEC_MARKER_RE.sub("", html)
+    return html
+
+
+def _visible_text(html: str) -> str:
+    html = _visible_html(html)
     text = unescape(TAG_RE.sub(" ", html))
     return re.sub(r"\s+", " ", text).strip()
 
@@ -204,8 +212,9 @@ def _validate_post_execution_copy(html: str, report_name: str, state: dict[str, 
 
 
 def _validate_no_duplicate_executive_summary(html: str, report_name: str) -> None:
+    visible_html = _visible_html(html)
     text = _visible_text(html)
-    if "panel-exec" in html:
+    if VISIBLE_PANEL_EXEC_RE.search(visible_html):
         raise RuntimeError(f"Delivery HTML contract validation failed for {report_name}: duplicate executive summary panel still rendered.")
     for phrase in EXECUTIVE_DUPLICATE_PHRASES:
         if text.count(phrase) > 1:
