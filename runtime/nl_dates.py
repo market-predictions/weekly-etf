@@ -28,6 +28,8 @@ DUTCH_MONTHS = {
     "December": "december",
 }
 
+MONTH_NAMES = "|".join(DUTCH_MONTHS)
+
 DATE_WITH_WEEKDAY_RE = re.compile(
     r"\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\s+"
     r"(\d{1,2})\s+"
@@ -41,15 +43,22 @@ DATE_NO_WEEKDAY_RE = re.compile(
     r"(20\d{2})\b"
 )
 
+DATE_NO_YEAR_RE = re.compile(
+    r"\b(\d{1,2})\s+"
+    r"(January|February|March|April|May|June|July|August|September|October|November|December)\b"
+)
+
+MONTH_ONLY_RE = re.compile(rf"\b({MONTH_NAMES})\b")
 ISO_DATE_RE = re.compile(r"\b(20\d{2})-(\d{2})-(\d{2})\b")
 
 
 def localize_english_report_dates(text: str) -> str:
     """Localize English report-date strings in Dutch client-facing output.
 
-    Handles all weekdays and all months, not a single hard-coded report date.
-    It intentionally leaves ISO dates such as 2026-05-13 unchanged because they
-    are audit/state identifiers and table data, not prose dates.
+    Handles all weekdays and all months, including month references without a
+    year such as "5 May close basis". It intentionally leaves ISO dates such
+    as 2026-05-13 unchanged because they are audit/state identifiers and table
+    data, not prose dates.
     """
 
     def repl_with_weekday(match: re.Match[str]) -> str:
@@ -60,8 +69,17 @@ def localize_english_report_dates(text: str) -> str:
         day, month, year = match.groups()
         return f"{int(day)} {DUTCH_MONTHS[month]} {year}"
 
+    def repl_without_year(match: re.Match[str]) -> str:
+        day, month = match.groups()
+        return f"{int(day)} {DUTCH_MONTHS[month]}"
+
+    def repl_month_only(match: re.Match[str]) -> str:
+        return DUTCH_MONTHS[match.group(1)]
+
     text = DATE_WITH_WEEKDAY_RE.sub(repl_with_weekday, text)
     text = DATE_NO_WEEKDAY_RE.sub(repl_without_weekday, text)
+    text = DATE_NO_YEAR_RE.sub(repl_without_year, text)
+    text = MONTH_ONLY_RE.sub(repl_month_only, text)
     return text
 
 
