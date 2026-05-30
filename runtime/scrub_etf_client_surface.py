@@ -61,9 +61,14 @@ def _over_cap_from_state() -> list[str]:
         return []
 
 
+def _ticker_md_pattern(ticker: str) -> str:
+    escaped = re.escape(ticker)
+    return rf"(?:\[{escaped}\]\([^\)]*\)|{escaped})"
+
+
 def _strip_ticker_from_list(value: str, ticker: str, none_label: str = "None") -> str:
-    value = re.sub(rf"\s*,?\s*\[?{re.escape(ticker)}\]?\([^\)]*\)\s*,?\s*", " ", value)
-    value = re.sub(rf"\s*,?\s*\b{re.escape(ticker)}\b\s*,?\s*", " ", value)
+    ticker_pat = _ticker_md_pattern(ticker)
+    value = re.sub(rf"\s*,?\s*{ticker_pat}\s*,?\s*", " ", value, flags=re.IGNORECASE)
     value = re.sub(r"\s*,\s*,\s*", ", ", value)
     value = re.sub(r"^\s*,\s*|\s*,\s*$", "", value.strip())
     return value if value else none_label
@@ -71,69 +76,80 @@ def _strip_ticker_from_list(value: str, ticker: str, none_label: str = "None") -
 
 def _scrub_over_cap_adds(text: str, tickers: list[str]) -> str:
     for ticker in tickers:
-        hold_msg = f"{ticker} remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap."
+        ticker_pat = _ticker_md_pattern(ticker)
+        hold_msg_plain = f"{ticker} remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap."
+        hold_msg_linked = rf"\1 remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap."
         short_reason = "Best earned exposure, but no fresh cash while above the 25% cap"
         capped_status = "Structurally actionable, but no fresh capital while above cap"
         text = text.replace(
             f"- {ticker} remains the leading funded growth exposure, subject to the max-position rule.",
-            f"- {hold_msg}",
+            f"- {hold_msg_plain}",
         )
         text = text.replace(
             f"- {ticker} remains the first candidate for additional capital only if the 25% position-size rule leaves room.",
-            f"- {hold_msg}",
+            f"- {hold_msg_plain}",
         )
         text = text.replace("Best earned use of cash, capped below max position size", short_reason)
         text = text.replace("Best earned use of cash", short_reason)
         text = text.replace("capped below max position size", "above the 25% max-position cap")
         text = re.sub(
-            rf"-\s*{re.escape(ticker)}\s+remains the leading funded growth exposure, subject to the max-position rule\.",
-            f"- {hold_msg}",
+            rf"-\s*({ticker_pat})\s+remains the leading funded growth exposure, subject to the max-position rule\.",
+            "- " + hold_msg_linked,
             text,
             flags=re.IGNORECASE,
         )
         text = re.sub(
-            rf"-\s*{re.escape(ticker)}\s+remains the first candidate for additional capital[^\.]*\.",
-            f"- {hold_msg}",
+            rf"-\s*({ticker_pat})\s+remains the first candidate for additional capital[^\.]*\.",
+            "- " + hold_msg_linked,
             text,
             flags=re.IGNORECASE,
         )
         text = re.sub(
-            rf"\|\s*{re.escape(ticker)}\s*\|\s*Add\s*\|",
+            rf"\|\s*{ticker_pat}\s*\|\s*Add\s*\|",
             f"| {ticker} | Hold / no fresh cash while above 25% cap |",
             text,
+            flags=re.IGNORECASE,
         )
         text = re.sub(
-            rf"\|\s*{re.escape(ticker)}\s*\|\s*([^\|\n]*)\|\s*([^\|\n]*)\|\s*Add\s*\|",
+            rf"\|\s*{ticker_pat}\s*\|\s*([^\|\n]*)\|\s*([^\|\n]*)\|\s*Add\s*\|",
             rf"| {ticker} | \1| \2| Hold / no fresh cash while above 25% cap |",
             text,
+            flags=re.IGNORECASE,
         )
         text = re.sub(
             rf"(### Add\s*\n-\s*)([^\n]*)",
             lambda m: m.group(1) + _strip_ticker_from_list(m.group(2), ticker),
             text,
+            flags=re.IGNORECASE,
         )
         text = re.sub(
-            rf"(\|\s*Close\s*\|\s*Reduce\s*\|\s*Hold\s*\|\s*Add(?: / destination)?\s*\|[^\n]*\n\|[^\n]*\n\|\s*[^\|]*\|\s*[^\|]*\|\s*[^\|]*\|\s*)([^\|\n]*{re.escape(ticker)}[^\|\n]*)(\s*\|)",
+            rf"(\|\s*Close\s*\|\s*Reduce\s*\|\s*Hold\s*\|\s*Add(?: / destination)?\s*\|[^\n]*\n\|[^\n]*\n\|\s*[^\|]*\|\s*[^\|]*\|\s*[^\|]*\|\s*)([^\|\n]*(?:{ticker_pat})[^\|\n]*)(\s*\|)",
             lambda m: m.group(1) + _strip_ticker_from_list(m.group(2), ticker) + m.group(3),
             text,
             flags=re.IGNORECASE,
         )
         # Structural Opportunity Radar table: a promoted over-cap lane can be structurally valid, but not fundable/actionable for fresh capital.
         text = re.sub(
-            rf"(\|[^\n]*\|\s*{re.escape(ticker)}\s*\|[^\n]*\|[^\n]*\|[^\n]*\|[^\n]*\|\s*)Actionable now(\s*\|)",
+            rf"(\|[^\n]*\|\s*{ticker_pat}\s*\|[^\n]*\|[^\n]*\|[^\n]*\|[^\n]*\|\s*)Actionable now(\s*\|)",
             rf"\1{capped_status}\2",
             text,
             flags=re.IGNORECASE,
         )
         text = re.sub(
-            rf"(\|[^\n]*\|\s*{re.escape(ticker)}\s*\|[^\n]*\|[^\n]*\|[^\n]*\|[^\n]*\|\s*)Actionable now(\s*\|\s*[^\|\n]*(?:position-size discipline matters|position size discipline matters)[^\|\n]*\|)",
+            rf"(\|[^\n]*\|\s*{ticker_pat}\s*\|[^\n]*\|[^\n]*\|[^\n]*\|[^\n]*\|\s*)Actionable now(\s*\|\s*[^\|\n]*(?:position-size discipline matters|position size discipline matters)[^\|\n]*\|)",
             rf"\1{capped_status}\2",
             text,
             flags=re.IGNORECASE,
         )
         text = re.sub(
-            rf"(\|\s*AI compute infrastructure\s*\|\s*{re.escape(ticker)}\s*\|\s*SOXX\s*\|\s*Strongest secular growth exposure\.\s*\|\s*)Active(\s*\|)",
+            rf"(\|\s*AI compute infrastructure\s*\|\s*{ticker_pat}\s*\|\s*(?:\[SOXX\]\([^\)]*\)|SOXX)\s*\|\s*Strongest secular growth exposure\.\s*\|\s*)Active(\s*\|)",
             rf"\1Active / capped\2",
+            text,
+            flags=re.IGNORECASE,
+        )
+        text = re.sub(
+            rf"(\|\s*AI-rekenkrachtinfrastructuur\s*\|\s*{ticker_pat}\s*\|\s*(?:\[SOXX\]\([^\)]*\)|SOXX)\s*\|\s*Sterkste structurele groeiblootstelling\.\s*\|\s*)Actief(\s*\|)",
+            rf"\1Actief / begrensd\2",
             text,
             flags=re.IGNORECASE,
         )
