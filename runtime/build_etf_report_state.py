@@ -15,6 +15,35 @@ LANE_DIR = Path("output/lane_reviews")
 MACRO_DIR = Path("output/macro")
 PRICED_CLOSE_STATUSES = {"fresh_close", "fresh_fallback_source", "fresh_exact_close", "fresh_exact_unverified", "prior_valid_close"}
 
+# Scorecard/report memory may enrich commentary, but it must never overwrite
+# the official portfolio-state quantity/valuation contract.
+POSITION_AUTHORITY_FIELDS = {
+    "shares",
+    "current_price_local",
+    "previous_price_local",
+    "continuity_current_price_local",
+    "currency",
+    "market_value_local",
+    "previous_market_value_local",
+    "market_value_eur",
+    "previous_market_value_eur",
+    "current_weight_pct",
+    "previous_weight_pct",
+    "weight_inherited_pct",
+    "weight_pct",
+    "target_weight_pct",
+    "shares_delta_this_run",
+    "weight_change_pct",
+    "action_executed_this_run",
+    "funding_source_note",
+    "pricing_source",
+    "pricing_status",
+    "pricing_tier",
+    "pricing_close_type",
+    "price_date",
+    "selected_close",
+}
+
 
 @dataclass
 class RuntimeSources:
@@ -247,6 +276,7 @@ def _revalue_holding_from_price(holding: dict[str, Any], price_row: dict[str, An
             "pricing_tier": price_row.get("pricing_tier"),
             "pricing_close_type": price_row.get("selected_close_type"),
             "price_date": price_row.get("returned_close_date"),
+            "selected_close": price,
         }
     )
     return holding
@@ -268,7 +298,7 @@ def _enrich_positions(portfolio_state: dict[str, Any], pricing_audit: dict[str, 
         row = _revalue_holding_from_price(row, price_results.get(ticker), pricing_audit)
         score = score_by_ticker.get(ticker, {})
         if score:
-            row.update({k: v for k, v in score.items() if v not in (None, "")})
+            row.update({k: v for k, v in score.items() if k not in POSITION_AUTHORITY_FIELDS and v not in (None, "")})
         rotation = rotation_by_ticker.get(ticker, {})
         if rotation:
             row.update(
@@ -335,6 +365,7 @@ def build_runtime_state(
         "lane_assessment_has_primary_etfs": _lane_artifact_has_etf_contract(lane_assessment),
         "macro_policy_pack_present": bool(macro_policy_pack.get("regime")),
         "scorecard_present": len(recommendation_scorecard) > 0,
+        "scorecard_authority_limited_to_commentary": True,
         "positions_enriched": any(p.get("short_reason") for p in holdings),
         "fx_rate_present": _fx_rate(pricing_audit) is not None,
         "rotation_plan_present": bool(rotation_plan),
