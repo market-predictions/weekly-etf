@@ -122,6 +122,7 @@ def discover_sources(
     pricing_audit_path: str | None = None,
     lane_assessment_path: str | None = None,
     rotation_plan_path: str | None = None,
+    disable_rotation_plan: bool = False,
 ) -> RuntimeSources:
     explicit_pricing = _explicit_path(
         pricing_audit_path or os.environ.get("ETF_PRICING_AUDIT_PATH") or os.environ.get("MRKT_RPRTS_PRICING_AUDIT_PATH"),
@@ -131,17 +132,20 @@ def discover_sources(
         lane_assessment_path or os.environ.get("ETF_LANE_ARTIFACT_PATH") or os.environ.get("MRKT_RPRTS_LANE_ARTIFACT_PATH"),
         description="ETF lane artifact path",
     )
-    explicit_rotation = _explicit_path(
-        rotation_plan_path or os.environ.get("ETF_ROTATION_PLAN_PATH") or os.environ.get("MRKT_RPRTS_ROTATION_PLAN_PATH"),
-        description="ETF rotation plan path",
-    )
+    if disable_rotation_plan:
+        explicit_rotation = None
+    else:
+        explicit_rotation = _explicit_path(
+            rotation_plan_path or os.environ.get("ETF_ROTATION_PLAN_PATH") or os.environ.get("MRKT_RPRTS_ROTATION_PLAN_PATH"),
+            description="ETF rotation plan path",
+        )
     return RuntimeSources(
         portfolio_state=Path("output/etf_portfolio_state.json"),
         pricing_audit=explicit_pricing or latest_file(PRICING_DIR, "price_audit_*.json"),
         lane_assessment=explicit_lane or latest_lane_file(LANE_DIR, "etf_lane_assessment_*.json"),
         recommendation_scorecard=Path("output/etf_recommendation_scorecard.csv"),
         macro_policy_pack=latest_macro_policy_pack(),
-        rotation_plan=explicit_rotation or latest_rotation_plan_file(),
+        rotation_plan=None if disable_rotation_plan else (explicit_rotation or latest_rotation_plan_file()),
     )
 
 
@@ -200,6 +204,7 @@ def _semantic_defaults(ticker: str) -> dict[str, Any]:
         "PAVE": {"suggested_action": "Hold under review", "conviction_tier": "Tier 2", "portfolio_role": "Real-asset capex", "better_alternative_exists": "Yes", "short_reason": "Infrastructure thesis remains attractive, but GRID is the clean challenger.", "required_next_action": "Complete PAVE-versus-GRID implementation duel.", "fresh_cash_test": "Smaller / under review"},
         "URNM": {"suggested_action": "Hold", "conviction_tier": "Tier 2", "portfolio_role": "Strategic energy", "better_alternative_exists": "No", "short_reason": "Strategic nuclear exposure remains valid, but it is not the first use of fresh cash.", "required_next_action": "Hold unless relative strength confirms add status.", "fresh_cash_test": "Hold / wait for confirmation"},
         "GLD": {"suggested_action": "Hold under review", "conviction_tier": "Tier 3", "portfolio_role": "Hedge ballast", "better_alternative_exists": "Yes", "short_reason": "Hedge role is not automatic after drawdown; ballast behavior must be proven.", "required_next_action": "Run hedge-validity test versus GSG / BIL.", "fresh_cash_test": "No / hedge review"},
+        "GSG": {"suggested_action": "Hold", "conviction_tier": "Tier 2", "portfolio_role": "Commodity inflation hedge", "better_alternative_exists": "No", "short_reason": "Added through guarded model rotation as commodity-breadth replacement for part of GLD.", "required_next_action": "Monitor commodity breadth and hedge contribution after execution.", "fresh_cash_test": "Hold / monitor"},
     }
     return defaults.get(ticker, {})
 
@@ -227,136 +232,99 @@ def _revalue_holding_from_price(holding: dict[str, Any], price_row: dict[str, An
         market_value_eur = round(market_value_local / fx, 2)
     else:
         market_value_eur = _to_float(holding.get("previous_market_value_eur"))
-
     holding = dict(holding)
-    holding["currency"] = currency
-    holding["current_price_local"] = price
-    holding["previous_price_local"] = price
-    holding["market_value_local"] = market_value_local
-    holding["previous_market_value_local"] = market_value_local
-    holding["market_value_eur"] = market_value_eur
-    holding["previous_market_value_eur"] = market_value_eur
-    holding["previous_price_date"] = price_row.get("returned_close_date")
-    holding["pricing_source"] = price_row.get("source")
-    holding["pricing_status"] = price_row.get("status")
-    holding["pricing_close_type"] = price_row.get("selected_close_type")
-    holding["pricing_tier"] = price_row.get("pricing_tier")
+    holding.update(
+        {
+            "previous_price_local": price,
+            "current_price_local": price,
+            "previous_market_value_local": market_value_local,
+            "previous_market_value_eur": market_value_eur,
+            "market_value_local": market_value_local,
+            "market_value_eur": market_value_eur,
+            "currency": currency,
+            "pricing_source": price_row.get("source"),
+            "pricing_status": status,
+            "pricing_tier": price_row.get("pricing_tier"),
+            "pricing_close_type": price_row.get("selected_close_type"),
+            "price_date": price_row.get("returned_close_date"),
+        }
+    )
     return holding
 
 
-def enrich_positions(pricing_holdings: list[dict[str, Any]], portfolio_state: dict[str, Any], recommendation_scorecard: list[dict[str, str]], pricing_audit: dict[str, Any]) -> list[dict[str, Any]]:
-    state_by_ticker = _index_by_ticker(portfolio_state.get("positions", []) or [])
-    score_by_ticker = _index_by_ticker(recommendation_scorecard)
-    price_by_ticker = _index_price_results(pricing_audit)
-
-    enriched: list[dict[str, Any]] = []
-    for holding in pricing_holdings:
-        ticker = _ticker(holding.get("ticker"))
+def _enrich_positions(portfolio_state: dict[str, Any], pricing_audit: dict[str, Any], scorecard: list[dict[str, str]], rotation_plan: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    price_results = _index_price_results(pricing_audit)
+    score_by_ticker = _index_by_ticker(scorecard)
+    rotation_by_ticker = {str(r.get("ticker", "")).upper(): r for r in (rotation_plan or {}).get("rotation_decisions", []) or []}
+    target_by_ticker = {str(r.get("ticker", "")).upper(): r for r in (rotation_plan or {}).get("target_weights", []) or []}
+    holdings = []
+    total_value = 0.0
+    for raw in portfolio_state.get("positions", []):
+        ticker = _ticker(raw.get("ticker"))
         if not ticker:
             continue
-        merged: dict[str, Any] = {}
-        merged.update(_semantic_defaults(ticker))
-        merged.update(state_by_ticker.get(ticker, {}))
-        merged.update(score_by_ticker.get(ticker, {}))
-        merged.update(holding)
-        merged["ticker"] = ticker
-        merged = _revalue_holding_from_price(merged, price_by_ticker.get(ticker), pricing_audit)
+        row = dict(_semantic_defaults(ticker))
+        row.update(raw)
+        row = _revalue_holding_from_price(row, price_results.get(ticker), pricing_audit)
+        score = score_by_ticker.get(ticker, {})
+        if score:
+            row.update({k: v for k, v in score.items() if v not in (None, "")})
+        rotation = rotation_by_ticker.get(ticker, {})
+        if rotation:
+            row.update(
+                {
+                    "rotation_action_code": rotation.get("action_code"),
+                    "suggested_action": rotation.get("action_label") or rotation.get("action_code") or row.get("suggested_action"),
+                    "rotation_release_score": rotation.get("release_score"),
+                    "rotation_destination_ticker": rotation.get("destination_ticker"),
+                    "rotation_override_status": rotation.get("override_status"),
+                    "rotation_override_reason_code": rotation.get("override_reason_code"),
+                    "rotation_reason_codes": rotation.get("reason_codes"),
+                }
+            )
+        target = target_by_ticker.get(ticker, {})
+        if target:
+            row["target_weight_pct"] = target.get("target_weight_pct")
+        mv = _to_float(row.get("previous_market_value_eur")) or 0.0
+        total_value += mv
+        holdings.append(row)
+    cash = _to_float(portfolio_state.get("cash_eur")) or 0.0
+    nav = total_value + cash
+    for row in holdings:
+        mv = _to_float(row.get("previous_market_value_eur")) or 0.0
+        row["current_weight_pct"] = round(mv / nav * 100.0, 2) if nav else 0.0
+        row.setdefault("previous_weight_pct", row["current_weight_pct"])
+        row.setdefault("weight_inherited_pct", row["current_weight_pct"])
+        row.setdefault("target_weight_pct", row["current_weight_pct"])
+    return holdings
 
-        merged["current_price_local"] = _to_float(merged.get("current_price_local")) or _to_float(merged.get("previous_price_local"))
-        merged["market_value_local"] = _to_float(merged.get("market_value_local")) or _to_float(merged.get("previous_market_value_local"))
-        merged["market_value_eur"] = _to_float(merged.get("market_value_eur")) or _to_float(merged.get("previous_market_value_eur"))
-        merged["continuity_current_price_local"] = merged.get("current_price_local")
-        merged["previous_price_local"] = merged.get("current_price_local")
-        merged["previous_market_value_local"] = merged.get("market_value_local")
-        merged["previous_market_value_eur"] = merged.get("market_value_eur")
 
-        for key in ("shares", "total_score", "thesis_score", "implementation_score", "pnl_pct", "avg_entry_local", "shares_delta_this_run", "weight_change_pct", "target_weight_pct", "weight_inherited_pct"):
-            numeric = _to_float(merged.get(key))
-            if numeric is not None:
-                merged[key] = numeric
-
-        enriched.append(merged)
-
-    nav_base = sum(float(h.get("previous_market_value_eur", 0.0) or 0.0) for h in enriched) + float(portfolio_state.get("cash_eur", 0.0) or 0.0)
-    if nav_base > 0:
-        for item in enriched:
-            item["previous_weight_pct"] = round(float(item.get("previous_market_value_eur") or 0.0) / nav_base * 100.0, 2)
-            item["current_weight_pct"] = item["previous_weight_pct"]
-    return enriched
-
-
-def _load_rotation_plan(path: Path | None) -> dict[str, Any]:
-    if path is None:
-        return {}
-    return load_json(path)
-
-
-def _apply_rotation_targets_to_holdings(holdings: list[dict[str, Any]], rotation_plan: dict[str, Any]) -> list[dict[str, Any]]:
-    if not rotation_plan:
-        return holdings
-    target_by_ticker = {
-        _ticker(row.get("ticker")): _to_float(row.get("target_weight_pct"))
-        for row in rotation_plan.get("target_weights", []) or []
-        if _ticker(row.get("ticker"))
-    }
-    decision_by_ticker = {
-        _ticker(row.get("ticker")): row
-        for row in rotation_plan.get("rotation_decisions", []) or []
-        if _ticker(row.get("ticker"))
-    }
-    out: list[dict[str, Any]] = []
-    for holding in holdings:
-        ticker = _ticker(holding.get("ticker"))
-        item = dict(holding)
-        if ticker in target_by_ticker and target_by_ticker[ticker] is not None:
-            item["target_weight_pct"] = target_by_ticker[ticker]
-            item["rotation_target_weight_pct"] = target_by_ticker[ticker]
-        if ticker in decision_by_ticker:
-            decision = decision_by_ticker[ticker]
-            item["rotation_action_code"] = decision.get("action_code")
-            item["rotation_delta_weight_pct"] = decision.get("delta_weight_pct")
-            item["rotation_destination_ticker"] = decision.get("destination_ticker")
-            item["rotation_release_score"] = decision.get("release_score")
-            item["rotation_override_status"] = decision.get("override_status")
-            item["rotation_override_reason_code"] = decision.get("override_reason_code")
-            # Keep suggested_action stable during warning-mode integration; the renderer will switch later.
-        out.append(item)
-    return out
+def _build_replacement_duels(portfolio_state: dict[str, Any], lane_assessment: dict[str, Any], pricing_audit: dict[str, Any]) -> list[dict[str, Any]]:
+    lanes = lane_assessment.get("assessed_lanes", []) or []
+    return [lane for lane in lanes if lane.get("challenger") is True][:12]
 
 
 def build_runtime_state(
     pricing_audit_path: str | None = None,
     lane_assessment_path: str | None = None,
     rotation_plan_path: str | None = None,
+    disable_rotation_plan: bool = False,
 ) -> dict[str, Any]:
-    sources = discover_sources(
-        pricing_audit_path=pricing_audit_path,
-        lane_assessment_path=lane_assessment_path,
-        rotation_plan_path=rotation_plan_path,
-    )
-
+    sources = discover_sources(pricing_audit_path, lane_assessment_path, rotation_plan_path, disable_rotation_plan=disable_rotation_plan)
     portfolio_state = load_json(sources.portfolio_state)
     pricing_audit = load_json(sources.pricing_audit)
     lane_assessment = load_json(sources.lane_assessment)
     recommendation_scorecard = load_scorecard(sources.recommendation_scorecard)
     macro_policy_pack = load_json_if_exists(sources.macro_policy_pack)
-    rotation_plan = _load_rotation_plan(sources.rotation_plan)
+    rotation_plan = load_json_if_exists(sources.rotation_plan) if sources.rotation_plan else {}
 
-    pricing_holdings = pricing_audit.get("holdings", [])
-    holdings = enrich_positions(pricing_holdings, portfolio_state, recommendation_scorecard, pricing_audit)
-    holdings = _apply_rotation_targets_to_holdings(holdings, rotation_plan)
-    prices = pricing_audit.get("prices", [])
+    holdings = _enrich_positions(portfolio_state, pricing_audit, recommendation_scorecard, rotation_plan)
+    total_market_value = round(sum((_to_float(p.get("previous_market_value_eur")) or 0.0) for p in holdings), 2)
+    total_portfolio_value_eur = round(total_market_value + (_to_float(portfolio_state.get("cash_eur")) or 0.0), 2)
+    prices = list(_index_price_results(pricing_audit).values())
     fx_basis = pricing_audit.get("fx_basis") or {}
+    duel_candidates = _build_replacement_duels(portfolio_state, lane_assessment, pricing_audit)
 
-    duel_candidates = []
-    challenger_map = {"PPA": ["ITA"], "PAVE": ["GRID"], "GLD": ["GSG", "BIL"], "SPY": ["QUAL", "IEFA"]}
-    for holding in holdings:
-        ticker = holding.get("ticker")
-        for challenger in challenger_map.get(ticker, []):
-            challenger_price = next((p for p in prices if p.get("symbol") == challenger), None)
-            duel_candidates.append({"current_holding": ticker, "challenger": challenger, "challenger_price": challenger_price, "status": "priced_but_duel_incomplete" if challenger_price else "not_fundable_pricing_missing"})
-
-    total_portfolio_value_eur = sum(float(h.get("previous_market_value_eur", 0.0) or 0.0) for h in holdings) + float(portfolio_state.get("cash_eur", 0.0) or 0.0)
     resolved_report_date = lane_assessment.get("report_date") or pricing_audit.get("requested_close_date") or datetime.utcnow().strftime("%Y-%m-%d")
     validation_flags = {
         "pricing_audit_valid": bool(pricing_audit.get("holdings")),
@@ -371,7 +339,7 @@ def build_runtime_state(
         "fx_rate_present": _fx_rate(pricing_audit) is not None,
         "rotation_plan_present": bool(rotation_plan),
         "rotation_plan_source": str(sources.rotation_plan) if sources.rotation_plan else None,
-        "rotation_warning_mode": True,
+        "rotation_warning_mode": bool(rotation_plan),
     }
 
     return {
@@ -408,6 +376,7 @@ def main() -> None:
     parser.add_argument("--pricing-audit", default=None)
     parser.add_argument("--lane-artifact", default=None)
     parser.add_argument("--rotation-plan", default=None)
+    parser.add_argument("--no-rotation-plan", action="store_true")
     parser.add_argument("--output-path", default=None)
     args = parser.parse_args()
 
@@ -415,6 +384,7 @@ def main() -> None:
         pricing_audit_path=args.pricing_audit,
         lane_assessment_path=args.lane_artifact,
         rotation_plan_path=args.rotation_plan,
+        disable_rotation_plan=args.no_rotation_plan,
     )
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
     report_date = str(runtime_state.get("report_date") or "unknown").replace("-", "")
@@ -422,7 +392,8 @@ def main() -> None:
     if args.output_path:
         out_path = Path(args.output_path)
     elif run_id:
-        out_path = RUNTIME_DIR / f"etf_report_state_{report_date}_{run_id}.json"
+        suffix = "_executed" if args.no_rotation_plan else ""
+        out_path = RUNTIME_DIR / f"etf_report_state_{report_date}_{run_id}{suffix}.json"
     else:
         out_path = RUNTIME_DIR / f"etf_report_state_{report_date}.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
