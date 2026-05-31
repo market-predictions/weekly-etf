@@ -1,0 +1,23 @@
+{
+  "source": "fixture",
+  "metrics": {
+    "SMH": {
+      "rs_vs_spy_1m_pct": 12.0,
+      "rs_vs_spy_3m_pct": 30.0,
+      "trend_quality": 5.0,
+      "tradability_status": "pass"
+    },
+    "IEFA": {
+      "rs_vs_spy_1m_pct": 1.0,
+      "rs_vs_spy_3m_pct": 2.0,
+      "trend_quality": 4.0,
+      "tradability_status": "pass"
+    },
+    "GSG": {
+      "rs_vs_spy_1m_pct": -2.0,
+      "rs_vs_spy_3m_pct": -4.0,
+      "trend_quality": 2.0,
+      "tradability_status": "pass"
+    }
+  }
+}
