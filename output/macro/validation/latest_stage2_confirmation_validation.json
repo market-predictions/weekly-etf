@@ -1,0 +1,43 @@
+{
+  "artifact_type": "stage2_confirmation_shadow_validation_evidence",
+  "authority": {
+    "client_facing_authority": false,
+    "decision_impact": "none_stage2_confirmation_shadow_only",
+    "fundability_authority": false,
+    "lane_scoring_authority": false,
+    "portfolio_action_authority": false,
+    "production_report_path_changed": false,
+    "report_surface_allowed": false,
+    "shadow_only": true
+  },
+  "generated_at_utc": "2026-05-31T23:07:42Z",
+  "guardrails": [
+    "Stage-2 validation evidence is shadow-only.",
+    "Stage-2 fundable-ready shadow is not a portfolio action.",
+    "Do not wire Stage-2 artifacts into reports, scoring, fundability, or recommendations without a later control-layer promotion decision."
+  ],
+  "repository": "market-predictions/weekly-etf",
+  "schema_version": "1.0",
+  "source_artifact": "output/macro/latest_stage2_confirmation.json",
+  "stage2_summary": {
+    "counts_by_status": {
+      "stage_1_candidate": 26,
+      "stage_2_confirmed_not_fundable": 3
+    },
+    "evaluation_count": 29,
+    "reference_date": "2026-05-29",
+    "run_id": "stage2_shadow_validation"
+  },
+  "status": "passed",
+  "validated_markers": [
+    "ETF_STAGE2_CONFIRMATION_SHADOW_OK"
+  ],
+  "workflow": {
+    "commit_sha": "74582c04a7768e4acffeb7d4d3eb91e7bef4df9b",
+    "name": "Validate ETF Stage-2 confirmation shadow",
+    "run_attempt": "1",
+    "run_id": "26727144170",
+    "run_number": "2",
+    "source_ref": "main"
+  }
+}
