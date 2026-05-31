@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "authority": {
+    "shadow_only": true,
+    "client_facing_authority": false,
+    "decision_impact": "legacy_lane_adjustments_only"
+  },
+  "regime": {
+    "current": "Risk-on narrow leadership",
+    "confidence": 0.72
+  },
+  "deterministic_regime_shadow": {
+    "candidate_regime": "Risk-on narrow leadership",
+    "candidate_confidence": 0.72,
+    "shadow_only": true,
+    "client_facing_authority": false,
+    "decision_impact": "none_shadow_comparison_only"
+  },
+  "policy_catalysts": [
+    {
+      "policy_area": "AI infrastructure and semiconductor supply chains",
+      "affected_lanes": ["AI compute infrastructure", "Grid buildout / electrification"],
+      "latest_signal": "AI infrastructure, semiconductor capacity and power demand support compute and grid lanes.",
+      "confidence": 0.72
+    },
+    {
+      "policy_area": "Defense and sovereign resilience",
+      "affected_lanes": ["Defense innovation / sovereign resilience"],
+      "latest_signal": "Defense-budget durability and sovereign resilience remain structurally relevant.",
+      "confidence": 0.65
+    }
+  ],
+  "central_banks": {
+    "fed": {
+      "likely_direction": "Hold-to-ease path, but timing remains data-dependent"
+    }
+  },
+  "macro_signals": {
+    "duration": {"signal": "not_confirmed_as_tailwind"}
+  },
+  "portfolio_implications": [
+    "Growth and infrastructure lanes can be considered only after confirmation gates."
+  ]
+}
