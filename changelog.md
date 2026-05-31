@@ -2,6 +2,37 @@
 
 This file records meaningful codebase, workflow, rendering, state-contract, pricing, and delivery changes for `market-predictions/weekly-etf`.
 
+## 2026-05-31 — Add hard ETF pricing-lineage validator and pre-send gate
+
+### What changed
+- Added `tools/validate_etf_pricing_lineage_contract.py` as the hard end-to-end validator required by `control/ETF_PRICING_LINEAGE_CONTRACT_V1.md`.
+- The validator checks manifest → exact pricing audit → runtime state → report disclosure/Section 7/Section 15 → persisted portfolio state → valuation history.
+- The validator recalculates NAV from shares × selected close ÷ FX + cash and fails on divergence.
+- The validator checks exact/prior close semantics and required priced-row lineage fields.
+- The validator verifies that fundable challenger lanes have valuation-grade priced audit rows.
+- Updated `tools/write_weekly_etf_run_manifest.py` so `pricing_lineage_status=passed` is not overwritten by a later generic `workflow_*` status.
+- Updated `tools/validate_etf_client_surface_clean.py` so the hard pricing-lineage validator runs in the existing pre-send validation path before email delivery.
+- Updated `control/ETF_PRICING_LINEAGE_CHANGELOG.md` with the detailed implementation record.
+
+### Why
+The repo already had run ids, immutable audit filenames, run manifests, runtime state, visible close-price disclosure, and persisted valuation state. The missing piece was one hard gate proving that the full pricing lineage reconciles before delivery. Without this, workflow success and pricing-lineage proof could still be conflated.
+
+### Affected files
+- `tools/validate_etf_pricing_lineage_contract.py`
+- `tools/write_weekly_etf_run_manifest.py`
+- `tools/validate_etf_client_surface_clean.py`
+- `control/ETF_PRICING_LINEAGE_CHANGELOG.md`
+- `changelog.md`
+
+### Validation / evidence
+- No production workflow run has been executed yet after this validator/gate patch.
+- Next fresh ETF run should show:
+  - `ETF_PRICING_LINEAGE_CONTRACT_OK`
+  - `ETF_PRICING_LINEAGE_PRE_SEND_GATE_OK`
+- The final manifest should preserve `pricing_lineage_status=passed` while separately recording workflow lifecycle status/conclusion.
+
+---
+
 ## 2026-05-24 — Upgrade ETF price-row schema and exact/prior close semantics
 
 ### What changed
@@ -157,68 +188,3 @@ A fresh production run failed before report rendering because `DBC` lacked 1m/3m
 
 ### What changed
 - Updated `runtime/add_etf_pricing_basis_section.py` so the explicit closing-price disclosure is inserted after the Section 7 valuation-history table rather than before it.
-
-### Why
-The equity-curve parser and validator intentionally treat the first table in Section 7 as the portfolio valuation history. Placing the new pricing-basis table before that table caused the validator to parse the wrong table and report `Section 7 has only 0 point(s)`. The disclosure remains visible in Section 7, but no longer breaks the existing equity-curve contract.
-
-### Affected files
-- `runtime/add_etf_pricing_basis_section.py`
-- `changelog.md`
-
-### Validation / evidence
-- Previous workflow failure: `ETF equity curve history validation failed ... Section 7 has only 0 point(s); expected at least 3.` Next validation step is a fresh ETF production run.
-
----
-
-## 2026-05-24 — Fix pricing-basis disclosure validator after ticker linkification
-
-### What changed
-- Updated `tools/validate_etf_pricing_basis_disclosure.py` so it normalizes TradingView markdown links back to plain ticker symbols before checking whether each holding row is present.
-
-### Why
-The pricing-basis disclosure was inserted before the ticker-linkification step. By validation time, cells such as `SPY` had become `[SPY](https://www.tradingview.com/chart/?symbol=SPY)`. The validator still looked only for raw `| SPY |` table cells, causing a false failure that looked like missing prices even though the pricing pass itself had completed.
-
-### Affected files
-- `tools/validate_etf_pricing_basis_disclosure.py`
-- `changelog.md`
-
-### Validation / evidence
-- Previous workflow failure: `missing pricing row for PAVE, SMH, PPA, SPY, URNM, GLD` in both EN/NL reports after ticker-linkification. Next validation step is a fresh ETF production run.
-
----
-
-## 2026-05-23 — Add explicit closing-price disclosure to ETF report
-
-### What changed
-- Added `runtime/add_etf_pricing_basis_section.py` to inject an explicit EN/NL Section 7 disclosure table showing each holding's close date used, close price used, currency, pricing source, and pricing status.
-- Added `tools/validate_etf_pricing_basis_disclosure.py` to fail the workflow if the latest EN/NL reports do not show per-holding close-price basis and EUR/USD FX basis.
-- Updated `.github/workflows/send-weekly-report.yml` so the pricing-basis disclosure is inserted before polish/localization/linkification and validated before delivery.
-
-### Why
-The latest report showed the portfolio valuation date and equity curve, but it was still not clear which actual closing prices were used for each ETF holding. The report should make the pricing basis audit visible to the reader, not only persist it in `output/pricing/`.
-
-### Affected files
-- `runtime/add_etf_pricing_basis_section.py`
-- `tools/validate_etf_pricing_basis_disclosure.py`
-- `.github/workflows/send-weekly-report.yml`
-- `changelog.md`
-
-### Validation / evidence
-- Next validation step is a fresh ETF production run. The report should include `Closing prices used in this report` / `Gebruikte slotkoersen in dit rapport` in Section 7.
-
----
-
-## 2026-05-21 — Use earlier ETF close availability cutoff
-
-### What changed
-- Updated `pricing/run_pricing_pass.py` so `US_CLOSE_AVAILABLE_UTC` is now `20:45` instead of `22:30`.
-
-### Why
-A fresh ETF run after the regular U.S. cash close still selected the previous trading day because the close-date resolver waited until 22:30 UTC. The new 20:45 UTC cutoff lets evening-Europe runs use the just-completed U.S. close while still leaving a buffer after the regular market close.
-
-### Affected files
-- `pricing/run_pricing_pass.py`
-- `changelog.md`
-
-### Validation / evidence
-- Next validation step is a fresh ETF production run. It should request the latest completed close rather than falling back to the previous trading day when run after 20:45 UTC.
