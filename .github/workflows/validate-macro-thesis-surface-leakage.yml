@@ -1,0 +1,44 @@
+name: Validate ETF macro thesis surface leakage
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "tools/validate_etf_macro_thesis_surface_leakage.py"
+      - "fixtures/macro_thesis_surface/**"
+      - ".github/workflows/validate-macro-thesis-surface-leakage.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-macro-thesis-surface-leakage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run surface leakage self-test
+        run: |
+          python tools/validate_etf_macro_thesis_surface_leakage.py --self-test
+
+      - name: Validate safe client excerpt
+        run: |
+          python tools/validate_etf_macro_thesis_surface_leakage.py \
+            --file fixtures/macro_thesis_surface/safe_client_excerpt.md
+
+      - name: Prove unsafe client excerpt is blocked
+        run: |
+          if python tools/validate_etf_macro_thesis_surface_leakage.py \
+            --file fixtures/macro_thesis_surface/unsafe_client_excerpt.md; then
+            echo "Unsafe macro/thesis leakage fixture unexpectedly passed" >&2
+            exit 1
+          fi
+          echo "ETF_MACRO_THESIS_SURFACE_LEAKAGE_EXPECTED_FAILURE_OK"
