@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -194,18 +195,24 @@ def build_metrics(prices: pd.DataFrame, volumes: pd.DataFrame) -> dict[str, Any]
     return metrics
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--config", default="config/etf_discovery_universe.yml")
-    parser.add_argument("--macro-context", default=str(DEFAULT_MACRO_CONTEXT))
-    parser.add_argument("--period", default="6mo")
-    parser.add_argument("--output-json", default="output/market_history/etf_relative_strength.json")
-    args = parser.parse_args()
+def _load_cached_payload(path: Path, reason: Exception) -> dict[str, Any]:
+    if not path.exists():
+        raise RuntimeError(f"Relative-strength live refresh failed and no cached artifact exists at {path}: {reason}") from reason
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    metrics = payload.get("metrics") or {}
+    if not isinstance(metrics, dict) or not metrics:
+        raise RuntimeError(f"Relative-strength live refresh failed and cached artifact has no metrics: {path}: {reason}") from reason
+    payload = dict(payload)
+    payload["source"] = "yfinance_cached_fallback"
+    payload["is_live_refresh"] = False
+    payload["fallback_used"] = True
+    payload["fallback_reason"] = str(reason)
+    payload["fallback_at_utc"] = datetime.now(timezone.utc).isoformat()
+    payload["cache_source_file"] = str(path)
+    return payload
 
-    config = load_yaml(Path(args.config))
-    macro_context = load_yaml(Path(args.macro_context))
-    target_map_tickers = replacement_target_tickers(macro_context)
-    tickers = discovery_tickers(config, macro_context)
+
+def _build_live_payload(args: argparse.Namespace, tickers: list[str], target_map_tickers: list[str]) -> dict[str, Any]:
     raw = yf.download(
         tickers=tickers,
         period=args.period,
@@ -218,11 +225,13 @@ def main() -> None:
     prices = extract_close_frame(raw, tickers)
     volumes = extract_volume_frame(raw, tickers)
     metrics = build_metrics(prices, volumes)
-
-    out_path = Path(args.output_json)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {
+    if not metrics:
+        raise RuntimeError("relative-strength fetch produced no metrics")
+    return {
         "source": "yfinance",
+        "is_live_refresh": True,
+        "fallback_used": False,
+        "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
         "period": args.period,
         "config": args.config,
         "macro_context": args.macro_context,
@@ -232,11 +241,35 @@ def main() -> None:
         "missing_replacement_target_map_tickers": sorted([ticker for ticker in target_map_tickers if ticker not in metrics]),
         "metrics": metrics,
     }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", default="config/etf_discovery_universe.yml")
+    parser.add_argument("--macro-context", default=str(DEFAULT_MACRO_CONTEXT))
+    parser.add_argument("--period", default="6mo")
+    parser.add_argument("--output-json", default="output/market_history/etf_relative_strength.json")
+    args = parser.parse_args()
+
+    config = load_yaml(Path(args.config))
+    macro_context = load_yaml(Path(args.macro_context))
+    target_map_tickers = replacement_target_tickers(macro_context)
+    tickers = discovery_tickers(config, macro_context)
+    out_path = Path(args.output_json)
+
+    try:
+        payload = _build_live_payload(args, tickers, target_map_tickers)
+        marker = "ETF_RELATIVE_STRENGTH_OK"
+    except Exception as exc:
+        payload = _load_cached_payload(out_path, exc)
+        marker = "ETF_RELATIVE_STRENGTH_FALLBACK_OK"
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print(
-        "ETF_RELATIVE_STRENGTH_OK | "
-        f"requested={len(tickers)} | returned={len(metrics)} | "
-        f"target_map_tickers={len(target_map_tickers)} | output={out_path}"
+        f"{marker} | "
+        f"requested={len(payload.get('tickers_requested') or tickers)} | returned={len(payload.get('metrics') or {})} | "
+        f"target_map_tickers={len(payload.get('replacement_target_map_tickers') or target_map_tickers)} | output={out_path}"
     )
 
 
