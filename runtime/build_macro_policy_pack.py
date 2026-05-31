@@ -14,6 +14,7 @@ PRICING_DIR = Path("output/pricing")
 MACRO_DIR = Path("output/macro")
 RS_PATH = Path("output/market_history/etf_relative_strength.json")
 MACRO_CONTEXT_PATH = Path("config/etf_macro_fundamental_context.yml")
+MACRO_AUDIT_POINTER = Path("output/macro/latest_macro_data_audit_path.txt")
 
 
 def latest_file(directory: Path, pattern: str) -> Path:
@@ -33,6 +34,24 @@ def load_yaml(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def resolve_macro_data_audit_path(path_value: str | None) -> Path | None:
+    if path_value:
+        path = Path(path_value)
+        if not path.exists():
+            raise RuntimeError(f"Explicit macro data audit path does not exist: {path}")
+        return path
+    if MACRO_AUDIT_POINTER.exists():
+        raw = MACRO_AUDIT_POINTER.read_text(encoding="utf-8").strip()
+        if raw:
+            path = Path(raw)
+            if path.exists():
+                return path
+            candidate = MACRO_AUDIT_POINTER.parent / path.name
+            if candidate.exists():
+                return candidate
+    return None
 
 
 def _num(value: Any, default: float = 0.0) -> float:
@@ -218,11 +237,12 @@ def portfolio_implications(regime: str) -> list[str]:
     ]
 
 
-def build_pack(pricing_audit_path: Path, relative_strength_path: Path, macro_context_path: Path) -> dict[str, Any]:
+def build_pack(pricing_audit_path: Path, relative_strength_path: Path, macro_context_path: Path, macro_data_audit_path: Path | None = None) -> dict[str, Any]:
     pricing = load_json(pricing_audit_path)
     rs_payload = load_json(relative_strength_path)
     metrics = dict(rs_payload.get("metrics", {}) or {})
     macro_context = load_yaml(macro_context_path)
+    macro_data_audit = load_json(macro_data_audit_path) if macro_data_audit_path else {}
     report_date = str(pricing.get("requested_close_date") or datetime.utcnow().date().isoformat())
     regime, confidence, what_changed = classify_regime(metrics)
 
@@ -233,6 +253,17 @@ def build_pack(pricing_audit_path: Path, relative_strength_path: Path, macro_con
             "pricing_audit": str(pricing_audit_path),
             "relative_strength": str(relative_strength_path) if relative_strength_path.exists() else None,
             "macro_context": str(macro_context_path) if macro_context_path.exists() else None,
+            "macro_data_audit": str(macro_data_audit_path) if macro_data_audit_path else None,
+        },
+        "macro_data_audit_summary": {
+            "present": bool(macro_data_audit),
+            "status": macro_data_audit.get("status"),
+            "mode": macro_data_audit.get("mode"),
+            "reference_date": macro_data_audit.get("reference_date"),
+            "observation_count": (macro_data_audit.get("summary") or {}).get("observation_count"),
+            "shadow_only": True,
+            "client_facing_authority": False,
+            "decision_impact": "none_phase2_audit_only",
         },
         "regime": {
             "current": regime,
@@ -283,25 +314,31 @@ def main() -> None:
     parser.add_argument("--pricing-audit", default=None)
     parser.add_argument("--relative-strength", default=str(RS_PATH))
     parser.add_argument("--macro-context", default=str(MACRO_CONTEXT_PATH))
+    parser.add_argument("--macro-data-audit", default=None)
     parser.add_argument("--output-dir", default=str(MACRO_DIR))
+    parser.add_argument("--run-id", default=None)
     args = parser.parse_args()
 
     pricing_audit_path = Path(args.pricing_audit) if args.pricing_audit else latest_file(PRICING_DIR, "price_audit_*.json")
-    pack = build_pack(pricing_audit_path, Path(args.relative_strength), Path(args.macro_context))
+    macro_data_audit_path = resolve_macro_data_audit_path(args.macro_data_audit)
+    pack = build_pack(pricing_audit_path, Path(args.relative_strength), Path(args.macro_context), macro_data_audit_path)
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     suffix = str(pack.get("report_date", "unknown")).replace("-", "")
-    out_path = output_dir / f"etf_macro_policy_pack_{suffix}.json"
+    run_suffix = f"_{args.run_id}" if args.run_id else ""
+    out_path = output_dir / f"etf_macro_policy_pack_{suffix}{run_suffix}.json"
     latest_path = output_dir / "latest.json"
     out_path.write_text(json.dumps(pack, indent=2, sort_keys=True), encoding="utf-8")
     latest_path.write_text(json.dumps(pack, indent=2, sort_keys=True), encoding="utf-8")
 
     memory = pack.get("regime_memory", {})
+    audit_summary = pack.get("macro_data_audit_summary", {})
     print(
         "ETF_MACRO_POLICY_PACK_OK | "
         f"report_date={pack.get('report_date')} | regime={pack.get('regime', {}).get('current')} | "
-        f"transition={memory.get('transition_state')} | weeks={memory.get('weeks_in_regime')} | output={out_path}"
+        f"transition={memory.get('transition_state')} | weeks={memory.get('weeks_in_regime')} | "
+        f"macro_audit_present={audit_summary.get('present')} | output={out_path}"
     )
 
 
