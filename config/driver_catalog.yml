@@ -1,0 +1,155 @@
+schema_version: '1.0'
+authority:
+  shadow_only: true
+  client_facing_authority: false
+  decision_impact: none_stage1_thesis_candidates_only
+  portfolio_action_authority: false
+  fundability_authority: false
+
+drivers:
+  - driver_id: ai_compute_capex
+    label: AI compute capital cycle
+    description: Structural demand for semiconductors, data centers, cloud infrastructure, and AI-enabling hardware/software.
+    activation:
+      source_paths:
+        - deterministic_regime_shadow.candidate_regime
+        - regime.current
+        - policy_catalysts[].policy_area
+        - policy_catalysts[].affected_lanes[]
+        - policy_catalysts[].latest_signal
+      terms:
+        - AI infrastructure
+        - semiconductor
+        - AI compute
+        - Risk-on narrow leadership
+    default_status: stage_1_shadow_candidate_only
+
+  - driver_id: grid_power_demand
+    label: Grid and power demand
+    description: Electricity demand, transmission capex, grid bottlenecks, and power infrastructure linked to AI, reshoring, and electrification.
+    activation:
+      source_paths:
+        - policy_catalysts[].policy_area
+        - policy_catalysts[].affected_lanes[]
+        - policy_catalysts[].latest_signal
+        - cross_asset_confirmation[]
+      terms:
+        - Grid
+        - electrification
+        - power demand
+        - infrastructure
+    default_status: stage_1_shadow_candidate_only
+
+  - driver_id: defense_resilience
+    label: Defense and sovereign resilience
+    description: Defense-budget durability, rearmament, sovereign supply-chain security, and geopolitical resilience.
+    activation:
+      source_paths:
+        - policy_catalysts[].policy_area
+        - policy_catalysts[].affected_lanes[]
+        - policy_catalysts[].latest_signal
+        - deterministic_regime_shadow.candidate_regime
+      terms:
+        - Defense
+        - sovereign resilience
+        - rearmament
+        - Defensive policy stress
+    default_status: stage_1_shadow_candidate_only
+
+  - driver_id: nuclear_energy_security
+    label: Nuclear and energy security
+    description: Nuclear fuel security, baseload scarcity, and energy-security policy.
+    activation:
+      source_paths:
+        - policy_catalysts[].policy_area
+        - policy_catalysts[].affected_lanes[]
+        - policy_catalysts[].latest_signal
+      terms:
+        - Energy security
+        - nuclear
+        - uranium
+    default_status: stage_1_shadow_candidate_only
+
+  - driver_id: china_policy_recovery
+    label: China policy recovery
+    description: China stimulus, policy credibility, platform regulation, and hard-asset demand recovery.
+    activation:
+      source_paths:
+        - central_banks.pboc.stance
+        - central_banks.pboc.likely_direction
+        - central_banks.pboc.etf_implication
+        - policy_catalysts[].policy_area
+        - policy_catalysts[].affected_lanes[]
+        - policy_catalysts[].latest_signal
+      terms:
+        - China
+        - PBoC
+        - stimulus
+        - platform regulation
+        - targeted support
+    default_status: stage_1_shadow_candidate_only
+
+  - driver_id: non_us_developed_diversification
+    label: Non-U.S. developed diversification
+    description: Portfolio diversification away from U.S.-only equity factor concentration when non-U.S. breadth improves.
+    activation:
+      source_paths:
+        - central_banks.ecb.etf_implication
+        - central_banks.ecb.likely_direction
+        - lane_adjustments.Non-U.S. developed diversification.reason
+        - portfolio_implications[]
+      terms:
+        - Non-U.S. developed
+        - Europe
+        - diversification
+        - ECB
+    default_status: stage_1_shadow_candidate_only
+
+  - driver_id: healthcare_defensive_growth
+    label: Healthcare defensive growth
+    description: Healthcare quality and innovation exposure when broad leadership narrows or defensive growth becomes more valuable.
+    activation:
+      source_paths:
+        - deterministic_regime_shadow.candidate_regime
+        - regime.current
+        - portfolio_implications[]
+      terms:
+        - Defensive policy stress
+        - defensive
+        - leadership narrows
+        - narrow leadership
+    default_status: stage_1_shadow_candidate_only
+
+  - driver_id: duration_easing_long_duration
+    label: Duration easing and long-duration risk appetite
+    description: Long-duration growth lanes that may become more relevant when easing is confirmed, not merely anticipated.
+    activation:
+      source_paths:
+        - macro_signals.duration.signal
+        - central_banks.fed.likely_direction
+        - central_banks.ecb.likely_direction
+        - confidence_decomposition.notes[]
+      terms:
+        - easing
+        - duration
+        - Hold-to-ease
+        - rates ease
+    default_status: stage_1_shadow_candidate_only
+
+  - driver_id: commodity_inflation_hedge
+    label: Commodity inflation hedge
+    description: Broad commodity, copper, agriculture, and hard-asset lanes linked to inflation, supply stress, and China/materials confirmation.
+    activation:
+      source_paths:
+        - macro_signals.hedge_ballast.signal
+        - policy_catalysts[].policy_area
+        - policy_catalysts[].latest_signal
+        - lane_adjustments.Gold hedge review.reason
+        - cross_asset_confirmation[]
+      terms:
+        - commodity
+        - inflation
+        - hard-asset
+        - copper
+        - hedge
+    default_status: stage_1_shadow_candidate_only
