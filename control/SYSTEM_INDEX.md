@@ -21,7 +21,7 @@ Always distinguish:
 
 ## Session start rule
 
-For ETF architecture, debugging, prompt, workflow, state, pricing, discovery, or delivery work, read in this order:
+For ETF architecture, debugging, prompt, workflow, state, pricing, discovery, macro/thesis, or delivery work, read in this order:
 
 1. `control/SYSTEM_INDEX.md`
 2. `control/CURRENT_STATE.md`
@@ -32,6 +32,7 @@ For ETF architecture, debugging, prompt, workflow, state, pricing, discovery, or
 
 - `control/ETF_PRICING_LINEAGE_CONTRACT_V1.md` — authoritative design contract for the pricing-lineage hardening cycle, including immutable audit identity, state persistence, exact close-date semantics, provider lineage, independent verification, and challenger pricing tiers.
 - `control/ETF_PRICING_LINEAGE_CHANGELOG.md` — central pricing-lineage changelog for regression review and implementation tracking.
+- `docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md` — approved phased roadmap for macro/thesis modernization. It is a roadmap, not immediate production authority.
 
 ## Canonical execution files
 
@@ -40,10 +41,16 @@ For ETF architecture, debugging, prompt, workflow, state, pricing, discovery, or
 - `control/LANE_DISCOVERY_CONTRACT.md` — authoritative discovery contract for broad ETF lane scanning, historical relative strength, and two-pass challenger pricing.
 - `control/ETF_RUNTIME_STATE_CONTRACT.md` — runtime input/state authority contract.
 - `config/etf_discovery_universe.yml` — broad investable ETF lane universe used by discovery.
+- `config/macro_data_sources.yml` — shadow-mode macro audit source configuration for FRED, ECB, Treasury, and volatility inputs.
+- `config/cb_calendar.yml` — static central-bank calendar/control fixture until vetted official live calendar coverage is added.
+- `macro_sources/build_macro_data_audit.py` — run-scoped macro audit builder.
+- `tools/validate_macro_data_audit.py` — macro audit contract validator.
+- `schemas/macro_data_audit.schema.json` — macro audit schema shell.
 - `runtime/fetch_etf_relative_strength.py` — historical relative-strength fetcher for discovery scoring.
 - `runtime/discover_etf_lanes.py` — lane discovery runtime that writes the matching lane artifact.
 - `runtime/score_etf_lanes.py` — deterministic lane scoring and promotion logic.
 - `pricing/augment_challenger_pricing.py` — targeted second-pass challenger pricing augmenter.
+- `runtime/build_macro_policy_pack.py` — legacy macro policy pack builder, now recording the Phase 2 macro audit artifact as shadow-only input metadata.
 - `runtime/build_etf_report_state.py` — deterministic runtime state builder.
 - `runtime/render_etf_report_from_state.py` — runtime-driven English/Dutch markdown renderer.
 - `runtime/polish_runtime_reports.py` — post-render editorial polish layer.
@@ -70,6 +77,9 @@ For ETF architecture, debugging, prompt, workflow, state, pricing, discovery, or
 - `output/market_history/etf_relative_strength.json` — historical market-strength metrics used by discovery scoring when available.
 - `output/lane_reviews/` — machine-readable lane assessment artifacts created by the lane discovery engine.
 - `output/runtime/` — normalized runtime state artifacts.
+- `output/macro/macro_data_audit_<reference_date>_<run_id>.json` — run-scoped shadow-mode macro audit artifact.
+- `output/macro/latest_macro_data_audit_path.txt` — pointer to the latest macro audit artifact.
+- `output/macro/latest.json` — current macro policy pack consumed by lane discovery.
 
 ## State-model scripts
 
@@ -100,6 +110,7 @@ Lab outputs are never production truth unless explicitly promoted through a revi
 - Do not treat priced challengers as automatically fundable; challenger pricing only enables fairer comparison.
 - Do not repair branded sections that require strict layout/clickable behavior through markdown post-processing; render them from runtime state at the delivery HTML layer and protect them with the delivery HTML validator.
 - Do not describe ETF pricing lineage as solved merely because the closing-price disclosure table is visible; the lineage contract requires immutable audit identity, explicit manifest linkage, state persistence, and audit-to-report validation.
+- Do not let Phase 2 macro audit values change regime, confidence, lane scoring, fundability, or client-facing wording until later regime/compliance/bilingual gates explicitly promote them.
 
 ## Current direction of travel
 
@@ -114,4 +125,5 @@ ETF is moving toward:
 - lane discovery artifacts for breadth, novelty, market strength, and challenger discipline
 - valuation-grade challenger pricing only when a challenger is replacement-ready or fundable
 - recommendation scorecard artifacts for capital discipline
+- provenance-backed macro audit artifacts in shadow mode
 - lab-only optimization as a QA/research surface, not a production allocator
