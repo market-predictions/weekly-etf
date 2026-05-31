@@ -10,181 +10,22 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from runtime.nl_localization import DUTCH_DISCLAIMER, FORBIDDEN_NL_STRINGS, validate_dutch_text
+from runtime import nl_terminology as term
+from runtime.nl_localization import validate_dutch_text
 
+DUTCH_DISCLAIMER = term.DUTCH_DISCLAIMER
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 
-REQUIRED_DUTCH_MARKERS = [
-    "Kernsamenvatting",
-    "Portefeuille-acties",
-    "Review huidige posities",
-    "Rotatieplan portefeuille",
-    "Huidige posities en cash",
-    "Input voor de volgende run",
-]
+REQUIRED_DUTCH_MARKERS = term.REQUIRED_DUTCH_MARKERS
 
-FORBIDDEN_CLIENT_LABELS = [
-    "Executive Summary",
-    "Portfolio Action Snapshot",
-    "Current Position Review",
-    "Portfolio Rotation Plan",
-    "Current Portfolio Holdings and Cash",
-    "Continuity Input for Next Run",
-    "Position Changes Executed This Run",
-    "Final Action Table",
-    "What changed this week",
-    "WAT VERANDERDE THIS WEEK",
-    "Portfolio implication",
-    "Current holding still leads",
-    "Replacement trigger watch",
-    "Needs sustained relative outperformance",
-    "Confirm thesis fit",
-    "Investor Report",
-    "Investment Report",
-    "Analyst Report",
-    "PRIMARY REGIME",
-    "GEOPOLITICAL REGIME",
-    "MAIN TAKEAWAY",
-    "Theme",
-    "Primary ETF",
-    "Alternative ETF",
-    "Why it matters",
-    "What needs to happen",
-    "Time horizon",
-    "Short theme",
-    "Candidate ETF",
-    "Short thesis",
-    "Invalidation",
-    "Bucket",
-    "Stance",
-    "Reason",
-    "First-order effect",
-    "Second-order effect",
-    "Likely beneficiaries",
-    "Likely losers",
-    "ETF implication",
-    "Current status",
-    "Why I’m considering it",
-    "Why I'm considering it",
-]
+FORBIDDEN_CLIENT_LABELS = term.FORBIDDEN_CLIENT_LABELS
 
-FORBIDDEN_DECISION_WORDS = [
-    "Keep ",
-    "Require ",
-    "Force ",
-    "Funding ",
-    "funding ",
-    "fundable",
-    "Existing",
-    "Duel required",
-    "under review",
-    "earned leader",
-    "price proof",
-    "thesisfit",
-    "actiebias",
-    "reviewpositie",
-    "verdiende leider",
-    "prijsbewijs",
-    "vers kapitaal",
-]
+FORBIDDEN_DECISION_WORDS = term.FORBIDDEN_DECISION_WORDS
 
-PDF_AUDIT_FORBIDDEN = [
-    "Wednesday,",
-    "Thursday,",
-    "Friday,",
-    "Saturday,",
-    "Sunday,",
-    "Monday,",
-    "Tuesday,",
-    "confidence",
-    "Mixed / not yet decisive",
-    "Keep the current allocation",
-    "THIS WEEK",
-    "Capital spending",
-    "AI compute infrastructure",
-    "Cyber spend",
-    "Grid buildout",
-    "Useful only if",
-    "Needs supply-chain",
-    "Neetable",
-    "Notable lanes assessed",
-    "not promoted this week",
-    "Structural case is credible",
-    "timing confirmation",
-    "Direct replacement duel",
-    "SPY plus SMH creates",
-    "GLD remains",
-    "remain replaceable",
-    "Non-U.S.",
-    "Neen-U.S.",
-    "Best verdiende exposure",
-    "Actiebias",
-    "with full valuation history",
-    "Inaugural model portfolio established",
-    "Fresh per-ticker",
-    "Fresh six-of-six",
-    "Fresh five-of-six",
-    "Latest 4 May",
-    "Equity Curve (EUR)",
-    "Portfolio value (EUR)",
-    "US equities",
-    "Europe equities",
-    "EM equities",
-    "Investable maar",
-    "Volglijst only",
-    "Zero allocation",
-    "AI leadership",
-    "Factor concentration",
-    "Defense thesis",
-    "Hedge drawdown",
-    "SMH remains",
-    "Concentration must",
-    "Portfolio is less",
-    "Current status",
-    "Core U.S. large-cap exposure",
-    "Growth engine",
-    "Hedge ballast",
-    "Force alternative duel",
-    "Run hedge validity test",
-    "Nieuw weight",
-    "compare versus",
-    "not better than",
-    "under hedge-validity",
-    "Original Thesis",
-    "Defense thesis valid",
-    "Infrastructure capex remains",
-    "Hedge role must",
-    "Replacement challengers",
-    "UCITS only",
-    "Leverage ETFs allowed",
-    "Balanced growth",
-    "Toevoegened",
-    "Verlagend",
-    "Sluitend",
-    "Thesis changes",
-]
+PDF_AUDIT_FORBIDDEN = term.PDF_AUDIT_FORBIDDEN
 
 ALLOWED_ENGLISH_PATTERNS = [
-    r"\bETF\b",
-    r"\bETFs\b",
-    r"\bticker\b",
-    r"\btickers\b",
-    r"\bcash\b",
-    r"\bhedge\b",
-    r"\bdrawdown\b",
-    r"\bbeta\b",
-    r"\bcapex\b",
-    r"\bsmall-cap\b",
-    r"\blarge-cap\b",
-    r"\brisk-on\b",
-    r"\brisk-off\b",
-    r"\bAI\b",
-    r"\bsemiconductor\b",
-    r"\boutperformance\b",
-    r"\bwatchlist\b",
-    r"\bUCITS\b",
-    r"\bUSD\b",
-    r"\bEUR\b",
+    rf"\b{re.escape(token)}\b" for token in sorted(term.ALLOWED_ENGLISH_TERMS)
 ]
 
 
@@ -214,7 +55,7 @@ def _failures_for_text(text: str) -> list[str]:
     for label in FORBIDDEN_CLIENT_LABELS:
         if label in plain:
             failures.append(f"forbidden English client label: {label}")
-    for token in FORBIDDEN_NL_STRINGS:
+    for token in term.FORBIDDEN_NL_STRINGS:
         if token in plain:
             failures.append(f"forbidden Dutch report token: {token}")
     for token in FORBIDDEN_DECISION_WORDS:
@@ -237,7 +78,7 @@ def validate_report(path: Path) -> None:
     failures = _failures_for_text(text)
     if failures:
         raise RuntimeError("Dutch language quality validation failed for " + path.name + ": " + "; ".join(failures))
-    print(f"ETF_DUTCH_LANGUAGE_QUALITY_OK | report={path.name}")
+    print(f"ETF_DUTCH_LANGUAGE_QUALITY_OK | report={path.name} | terminology=central")
 
 
 def main() -> None:
