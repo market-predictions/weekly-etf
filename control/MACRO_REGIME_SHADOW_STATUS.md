@@ -1,10 +1,16 @@
 # Macro Regime Shadow Status
 
 ## Date
-2026-05-31
+2026-06-01
 
 ## Status
-Implemented and workflow-validated as shadow-only scaffolding. Fixture replay has been added; import-path hardening is complete; fixture replay is pending independent workflow proof after the latest workflow fix.
+Implemented and workflow-validated as shadow-only scaffolding. Fixture replay has been added; import-path hardening is complete. A repo-native validation evidence mechanism has now been added so future chats can verify passing shadow validation from committed JSON evidence instead of relying only on GitHub Actions UI visibility.
+
+Fixture replay itself should still be considered **pending repo-visible proof** until the workflow writes a passing evidence file under:
+
+```text
+output/macro/validation/latest_macro_regime_shadow_validation.json
+```
 
 ## Current issue
 
@@ -23,11 +29,14 @@ Added:
 - `.github/workflows/validate-macro-regime-shadow.yml`
 - `fixtures/macro_regime_shadow/regime_shadow_fixtures.json`
 - `tools/replay_macro_regime_shadow_fixtures.py`
+- `tools/write_macro_regime_shadow_validation_evidence.py`
 
 Latest hardening:
 
 - `tools/replay_macro_regime_shadow_fixtures.py` now inserts the repo root into `sys.path` before importing `macro_regime`.
 - `.github/workflows/validate-macro-regime-shadow.yml` now sets `PYTHONPATH: .` at job level.
+- `.github/workflows/validate-macro-regime-shadow.yml` now has `contents: write` permission only so it can commit non-production validation evidence after all shadow validation steps pass.
+- The workflow writes evidence under `output/macro/validation/`, which is not included in the workflow trigger paths, so the evidence commit should not recursively retrigger the workflow.
 
 ## Authority rules
 
@@ -35,6 +44,7 @@ Latest hardening:
 - It must not change client-facing regime, confidence, lane scoring, fundability, portfolio actions, or report wording.
 - The production workflow still uses the legacy macro policy pack builder unless explicitly changed later.
 - Legacy `regime`, `confidence`, and `lane_adjustments` remain the backward-compatible production path.
+- Validation evidence files are audit artifacts only; they are not production report inputs.
 
 ## Shadow output contract
 
@@ -101,6 +111,8 @@ python tools/replay_macro_regime_shadow_fixtures.py
 python -m runtime.build_macro_policy_pack_shadow
 python tools/validate_macro_policy_pack.py --pack output/macro/latest.json
 python inline validate_shadow_payload(...)
+python tools/write_macro_regime_shadow_validation_evidence.py
+commit output/macro/validation/*.json
 ```
 
 Expected markers:
@@ -108,6 +120,27 @@ Expected markers:
 ```text
 ETF_MACRO_REGIME_FIXTURE_REPLAY_OK
 ETF_MACRO_REGIME_SHADOW_OK
+ETF_MACRO_REGIME_SHADOW_EVIDENCE_OK
+```
+
+Expected repo-visible evidence files after a passing run:
+
+```text
+output/macro/validation/macro_regime_shadow_validation_<github_run_id>_<github_run_attempt>.json
+output/macro/validation/latest_macro_regime_shadow_validation.json
+```
+
+The evidence JSON must report:
+
+```text
+status: passed
+authority.shadow_only: true
+authority.client_facing_authority: false
+authority.decision_impact: none_shadow_comparison_only
+authority.production_report_path_changed: false
+authority.lane_scoring_authority: false
+authority.fundability_authority: false
+authority.portfolio_action_authority: false
 ```
 
 ## Validation status
@@ -147,27 +180,34 @@ Fixes applied:
 ```text
 1ec587e6d806b6892a48173e960fd7a3f305ed18 — fix shadow fixture replay import path
 917d3218aa85db10cc9b0d3316650ae6c3a479c5 — set PYTHONPATH for shadow regime validation workflow
+895648d8c37a7b116fd255d27c4e973ebc8b1d68 — add macro regime shadow validation evidence writer
+d994e08db319187f08cf6e2668c7e218d61b56ca — commit shadow macro regime validation evidence after pass
 ```
 
-The connector still does not expose push-triggered workflow runs for these commits:
+The connector still may not expose push-triggered workflow runs for these commits:
 
 ```text
 fetch_commit_workflow_runs: []
 combined_status: []
 ```
 
-Therefore fixture replay is implemented and import-hardened, but not yet independently confirmed through connector-visible workflow evidence or a user-supplied Actions screenshot after commit `917d3218aa85db10cc9b0d3316650ae6c3a479c5`.
+Therefore the new authority for future proof should be the repo-visible evidence JSON once produced by the workflow.
 
 No production report path has been changed to depend on this shadow classifier.
 
 ## Next action
 
-1. Verify the updated `Validate ETF macro regime shadow` workflow after commit `917d3218aa85db10cc9b0d3316650ae6c3a479c5`.
-2. Confirm markers:
+1. Let the updated `Validate ETF macro regime shadow` workflow run after commit `d994e08db319187f08cf6e2668c7e218d61b56ca`.
+2. Verify that the workflow writes:
+   - `output/macro/validation/latest_macro_regime_shadow_validation.json`
+3. Confirm the evidence JSON reports:
+   - `status: passed`
    - `ETF_MACRO_REGIME_FIXTURE_REPLAY_OK`
    - `ETF_MACRO_REGIME_SHADOW_OK`
-3. If it passes, mark fixture replay as workflow-proven.
-4. Keep deterministic regime shadow-only until methodology, compliance, bilingual, and production-report validation gates exist.
+   - `ETF_MACRO_REGIME_SHADOW_EVIDENCE_OK`
+   - all shadow-only authority flags.
+4. Only then mark fixture replay as workflow-proven.
+5. Keep deterministic regime shadow-only until methodology, compliance, bilingual, and production-report validation gates exist.
 
 ## Commits
 
@@ -184,3 +224,5 @@ No production report path has been changed to depend on this shadow classifier.
 - `58509114c84ee1118c930fa38f89c5ec23551903` — run macro regime fixture replay in shadow validation workflow
 - `1ec587e6d806b6892a48173e960fd7a3f305ed18` — fix shadow fixture replay import path
 - `917d3218aa85db10cc9b0d3316650ae6c3a479c5` — set PYTHONPATH for shadow regime validation workflow
+- `895648d8c37a7b116fd255d27c4e973ebc8b1d68` — add macro regime shadow validation evidence writer
+- `d994e08db319187f08cf6e2668c7e218d61b56ca` — commit shadow macro regime validation evidence after pass
