@@ -55,7 +55,7 @@ def _default_run_id() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
 
-def resolve_macro_data_audit_path(path_value: str | None, *, reference_date: str, run_id: str, output_dir: Path) -> Path:
+def resolve_macro_data_audit_path(path_value: str | None, *, reference_date: str, run_id: str, output_dir: Path) -> Path | None:
     if path_value:
         path = Path(path_value)
         if not path.exists():
@@ -64,16 +64,26 @@ def resolve_macro_data_audit_path(path_value: str | None, *, reference_date: str
         return path
 
     fixture = os.environ.get("MRKT_RPRTS_MACRO_DATA_AUDIT_FIXTURE", "").strip()
-    payload = build_macro_data_audit(
-        config_path=MACRO_SOURCE_CONFIG,
-        cb_calendar_path=CB_CALENDAR_PATH,
-        reference_date=reference_date,
-        run_id=run_id,
-        fixture_path=Path(fixture) if fixture else None,
-    )
-    path = _write_macro_audit(payload, output_dir)
-    validate_macro_data_audit(path)
-    return path
+    try:
+        payload = build_macro_data_audit(
+            config_path=MACRO_SOURCE_CONFIG,
+            cb_calendar_path=CB_CALENDAR_PATH,
+            reference_date=reference_date,
+            run_id=run_id,
+            fixture_path=Path(fixture) if fixture else None,
+        )
+        path = _write_macro_audit(payload, output_dir)
+        validate_macro_data_audit(path)
+        return path
+    except Exception as exc:
+        # Phase 2 macro data audit is shadow-only. It must not block production
+        # pricing/report delivery until the later deterministic regime and
+        # compliance gates explicitly promote it to authority.
+        print(
+            "ETF_MACRO_DATA_AUDIT_SHADOW_UNAVAILABLE | "
+            f"reference_date={reference_date} | run_id={run_id} | reason={exc}"
+        )
+        return None
 
 
 def _num(value: Any, default: float = 0.0) -> float:
@@ -164,6 +174,30 @@ def portfolio_implications(regime: str) -> list[str]:
     return ["Stay invested, but make new capital pass a stricter macro and relative-strength filter.", "Treat SPY, PPA, PAVE and GLD as active review items rather than passive holds.", "Do not fund replacement candidates until the pricing basis and direct duel evidence are visible."]
 
 
+def _macro_audit_summary(macro_data_audit_path: Path | None, macro_data_audit: dict[str, Any]) -> dict[str, Any]:
+    if macro_data_audit_path is None:
+        return {
+            "present": False,
+            "status": "shadow_unavailable",
+            "mode": "none",
+            "reference_date": None,
+            "observation_count": 0,
+            "shadow_only": True,
+            "client_facing_authority": False,
+            "decision_impact": "none_phase2_audit_only",
+        }
+    return {
+        "present": bool(macro_data_audit),
+        "status": macro_data_audit.get("status"),
+        "mode": macro_data_audit.get("mode"),
+        "reference_date": macro_data_audit.get("reference_date"),
+        "observation_count": (macro_data_audit.get("summary") or {}).get("observation_count"),
+        "shadow_only": True,
+        "client_facing_authority": False,
+        "decision_impact": "none_phase2_audit_only",
+    }
+
+
 def build_pack(pricing_audit_path: Path, relative_strength_path: Path, macro_context_path: Path, macro_data_audit_path: Path | None = None) -> dict[str, Any]:
     pricing = load_json(pricing_audit_path)
     rs_payload = load_json(relative_strength_path)
@@ -177,7 +211,7 @@ def build_pack(pricing_audit_path: Path, relative_strength_path: Path, macro_con
         "generated_at_utc": datetime.utcnow().isoformat() + "Z",
         "report_date": report_date,
         "source_files": {"pricing_audit": str(pricing_audit_path), "relative_strength": str(relative_strength_path) if relative_strength_path.exists() else None, "macro_context": str(macro_context_path) if macro_context_path.exists() else None, "macro_data_audit": str(macro_data_audit_path) if macro_data_audit_path else None},
-        "macro_data_audit_summary": {"present": bool(macro_data_audit), "status": macro_data_audit.get("status"), "mode": macro_data_audit.get("mode"), "reference_date": macro_data_audit.get("reference_date"), "observation_count": (macro_data_audit.get("summary") or {}).get("observation_count"), "shadow_only": True, "client_facing_authority": False, "decision_impact": "none_phase2_audit_only"},
+        "macro_data_audit_summary": _macro_audit_summary(macro_data_audit_path, macro_data_audit),
         "regime": {"current": regime, "previous": macro_context.get("previous_regime", "Unknown"), "confidence": confidence, "what_changed": what_changed},
         "central_banks": central_banks_for_regime(regime),
         "macro_signals": {
