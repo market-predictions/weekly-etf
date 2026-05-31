@@ -1,0 +1,40 @@
+schema_version: '1.0'
+authority:
+  shadow_only: true
+  client_facing_authority: false
+  decision_impact: none_stage2_confirmation_shadow_only
+  portfolio_action_authority: false
+  fundability_authority: false
+  report_surface_allowed: false
+
+relative_strength:
+  benchmark: SPY
+  min_rs_vs_spy_1m_pct: 0.0
+  min_rs_vs_spy_3m_pct: 0.0
+  min_trend_quality: 3.0
+  require_tradability_status: pass
+
+valuation_pricing:
+  accepted_pricing_tiers:
+    - valuation_grade
+  accepted_statuses:
+    - fresh_exact_close
+    - fresh_exact_unverified
+  require_selected_close: true
+  require_final_eod_bar: true
+
+valuation_crowding:
+  caution_threshold: 4
+  hard_block_threshold: 5
+  hard_block_enabled: false
+
+portfolio_discipline:
+  required_for_fundable_ready: true
+  production_default_clearance: false
+  fixture_clearance_field: portfolio_discipline_clearance
+
+status_labels:
+  no_market_confirmation: stage_1_candidate
+  no_valuation_grade_pricing: stage_2_confirmed_not_fundable
+  portfolio_discipline_missing: stage_2_confirmed_not_fundable
+  all_gates_passed: stage_2_fundable_ready_shadow
