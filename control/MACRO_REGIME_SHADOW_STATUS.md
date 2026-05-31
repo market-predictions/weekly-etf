@@ -4,7 +4,7 @@
 2026-05-31
 
 ## Status
-Implemented as shadow-only scaffolding. Not yet production-proven by a workflow run.
+Implemented and workflow-validated as shadow-only scaffolding. Not production decision authority.
 
 ## Current issue
 
@@ -85,16 +85,36 @@ ETF_MACRO_REGIME_SHADOW_OK
 
 ## Validation status
 
-Not yet proven by GitHub run evidence through the connector at the time this note was written.
+Workflow validation passed in GitHub Actions according to the Actions UI screenshot supplied by the user.
+
+Evidence from the screenshot:
+
+```text
+workflow: Validate ETF macro regime shadow
+run title: Trigger shadow macro regime validation workflow #2
+trigger: push
+commit: ddc8496...
+branch: main
+status: Success
+job: validate-shadow-regime
+job duration: 1m 37s
+total duration: 1m 41s
+```
+
+Connector limitation:
+
+- `fetch_commit_workflow_runs` and commit status lookup did not expose this push-triggered workflow run through the connector.
+- Therefore the exact job log marker `ETF_MACRO_REGIME_SHADOW_OK` was not directly read through the connector.
+- The workflow-level success is still sufficient to mark the shadow validation workflow as passed, because the job contains the validation steps and would fail on validator errors.
 
 No production report path has been changed to depend on this shadow classifier.
 
 ## Next action
 
-1. Verify the `Validate ETF macro regime shadow` workflow run.
-2. If it passes, update this file to production-proven shadow validation.
-3. If it fails, patch only the shadow workflow/modules.
-4. Only after shadow validation passes should we consider adding the shadow field into the main production macro policy pack.
+1. Keep this layer shadow-only.
+2. Add fixture replay examples for deterministic regime behavior.
+3. Only after fixture replay should we consider adding the shadow field into the main production macro policy pack.
+4. Do not promote the deterministic regime to client-facing authority until methodology, compliance, bilingual, and production-report validation gates are in place.
 
 ## Commits
 
@@ -105,3 +125,4 @@ No production report path has been changed to depend on this shadow classifier.
 - `45459c0f8b41edf16e9b15caa3c641ee3e36f60b` — add shadow deterministic regime macro pack wrapper
 - `458d6d2641b65c1348e50456c3ceb40c0263a860` — add minimal shadow regime payload validator
 - `6909a458ad9d5d0ca940725b9c67705d82238076` — add shadow macro regime validation workflow
+- `ddc84962191b8779bfa908b6dac2d09221408890` — trigger shadow macro regime validation workflow
