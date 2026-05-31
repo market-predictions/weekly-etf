@@ -97,6 +97,7 @@ jobs:
           MRKT_RPRTS_REPORT_MODE: pro
         run: |
           python -m runtime.build_macro_policy_pack
+          python tools/validate_macro_policy_pack.py --pack output/macro/latest.json
 
       - name: Validate replacement duel RS coverage
         env:
