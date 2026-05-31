@@ -5,6 +5,7 @@ import os
 import re
 from pathlib import Path
 
+from runtime import nl_terminology as term
 from runtime.nl_table_section_mappings import apply_table_section_mappings, TABLE_SECTION_FORBIDDEN_AFTER_SCRUB
 
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
@@ -18,6 +19,10 @@ NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 # tickers, official product names and accepted market terms intact.
 
 EXACT_REPLACEMENTS = {
+    **term.REPORT_LABELS,
+    **term.TABLE_LABELS,
+    **term.ACTION_REPLACEMENTS,
+    **term.EXACT_CLIENT_LANGUAGE_REPLACEMENTS,
     "Wednesday, 13 May 2026": "Woensdag 13 mei 2026",
     "PRIMARY REGIME": "PRIMAIR REGIME",
     "Primary regime": "Primair regime",
@@ -69,6 +74,7 @@ EXACT_REPLACEMENTS = {
 }
 
 REGEX_REPLACEMENTS = [
+    *[(re.compile(pattern, re.I), replacement) for pattern, replacement in term.REGEX_CLIENT_LANGUAGE_REPLACEMENTS],
     (re.compile(r"\bnot\s+fundable\b", re.I), "niet geschikt voor allocatie"),
     (re.compile(r"\bfunding\s+source\b", re.I), "financieringsbron"),
     (re.compile(r"\bfunding\s+note\b", re.I), "allocatietoelichting"),
@@ -96,7 +102,7 @@ REGEX_REPLACEMENTS = [
     (re.compile(r"###\s*Hold\s+but\s+replaceable", re.I), "### Aanhouden, maar vervangbaar"),
 ]
 
-FORBIDDEN_AFTER_SCRUB = [
+FORBIDDEN_AFTER_SCRUB = sorted(set(term.FORBIDDEN_AFTER_SCRUB + [
     "fundable",
     "funding",
     "Aanhouden but replaceable",
@@ -128,7 +134,7 @@ FORBIDDEN_AFTER_SCRUB = [
     "Investment Report",
     "Investor Report",
     "Analyst Report",
-]
+]))
 
 
 def latest_nl_report(output_dir: Path) -> Path:
@@ -164,7 +170,7 @@ def main() -> None:
     if failures:
         raise RuntimeError("Dutch client-language scrub failed: " + ", ".join(sorted(set(failures))))
     report_path.write_text(scrubbed, encoding="utf-8")
-    print(f"ETF_NL_CLIENT_LANGUAGE_SCRUB_OK | report={report_path.name}")
+    print(f"ETF_NL_CLIENT_LANGUAGE_SCRUB_OK | report={report_path.name} | terminology=central_overlay")
 
 
 if __name__ == "__main__":
