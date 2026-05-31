@@ -1,0 +1,44 @@
+{
+  "artifact_type": "macro_regime_shadow_validation_evidence",
+  "authority": {
+    "client_facing_authority": false,
+    "decision_impact": "none_shadow_comparison_only",
+    "fundability_authority": false,
+    "lane_scoring_authority": false,
+    "portfolio_action_authority": false,
+    "production_report_path_changed": false,
+    "shadow_only": true
+  },
+  "generated_at_utc": "2026-05-31T22:27:25Z",
+  "guardrails": [
+    "Evidence artifact is non-production and shadow-only.",
+    "Do not use deterministic_regime_shadow for client-facing regime/confidence until promoted by control-layer decision.",
+    "Do not use deterministic_regime_shadow for lane scoring, fundability, or portfolio actions.",
+    "Production report workflow remains separate from this validation evidence path."
+  ],
+  "repository": "market-predictions/weekly-etf",
+  "schema_version": "1.0",
+  "shadow_summary": {
+    "axis_labels": {},
+    "candidate_confidence": 0.72,
+    "candidate_regime": "Risk-on narrow leadership",
+    "differs_from_legacy": true,
+    "legacy_confidence": 0.66,
+    "legacy_regime": "Risk-on growth",
+    "method": "deterministic_axis_classifier_v1_shadow"
+  },
+  "source_pack": "output/macro/latest.json",
+  "status": "passed",
+  "validated_markers": [
+    "ETF_MACRO_REGIME_FIXTURE_REPLAY_OK",
+    "ETF_MACRO_REGIME_SHADOW_OK"
+  ],
+  "workflow": {
+    "commit_sha": "348a43f6c2afbae34d8c78c129865a773030e8a2",
+    "name": "Validate ETF macro regime shadow",
+    "run_attempt": "1",
+    "run_id": "26726251811",
+    "run_number": "8",
+    "source_ref": "main"
+  }
+}
