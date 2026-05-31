@@ -1,0 +1,102 @@
+schema_version: '1.0'
+authority:
+  shadow_only: true
+  client_facing_authority: false
+  decision_impact: none_stage1_thesis_candidates_only
+  portfolio_action_authority: false
+  fundability_authority: false
+
+mappings:
+  ai_compute_capex:
+    rationale: AI compute capex maps to semiconductor, cybersecurity, and automation lanes, but funding requires separate market confirmation and valuation-grade pricing.
+    beneficiaries:
+      - taxonomy_tag: ai_compute_infrastructure
+        rationale: Primary hardware expression of AI compute capex.
+      - taxonomy_tag: cyber_security
+        rationale: Security spend is a second-order digital infrastructure beneficiary.
+      - taxonomy_tag: robotics_automation
+        rationale: Automation can broaden the AI hardware impulse.
+      - taxonomy_tag: factory_automation
+        rationale: Industrial productivity can benefit if AI capex broadens into factories.
+
+  grid_power_demand:
+    rationale: Power demand and electrification map to grid, utilities, copper, and nuclear-adjacent lanes.
+    beneficiaries:
+      - taxonomy_tag: grid_power
+        rationale: Direct grid buildout expression.
+      - taxonomy_tag: power_utilities_capex
+        rationale: Defensive power infrastructure expression.
+      - taxonomy_tag: copper_electrification
+        rationale: Copper transmits electrification and grid demand into materials.
+      - taxonomy_tag: nuclear_utilities
+        rationale: Baseload scarcity can support nuclear utility exposure.
+
+  defense_resilience:
+    rationale: Defense and sovereign resilience map to U.S. and European defense lanes and selected critical-mineral supply-chain lanes.
+    beneficiaries:
+      - taxonomy_tag: defense_resilience
+        rationale: Core defense and aerospace exposure.
+      - taxonomy_tag: europe_defense_industry
+        rationale: Regional rearmament exposure.
+      - taxonomy_tag: critical_minerals
+        rationale: Supply-chain resilience and defense inputs.
+
+  nuclear_energy_security:
+    rationale: Nuclear and energy security map to uranium fuel-cycle and nuclear-utility lanes.
+    beneficiaries:
+      - taxonomy_tag: uranium_nuclear
+        rationale: Direct nuclear fuel-cycle expression.
+      - taxonomy_tag: nuclear_utilities
+        rationale: Baseload and nuclear infrastructure expression.
+
+  china_policy_recovery:
+    rationale: China policy recovery maps to China platform, China hard-asset, broad commodity, and copper/materials lanes, but remains highly confirmation-dependent.
+    beneficiaries:
+      - taxonomy_tag: china_policy_recovery
+        rationale: China platform/policy beta expression.
+      - taxonomy_tag: china_materials_recovery
+        rationale: Hard-asset and materials demand expression.
+      - taxonomy_tag: broad_commodities
+        rationale: Commodity breadth can benefit if China demand confirms.
+      - taxonomy_tag: copper_electrification
+        rationale: Copper can transmit China hard-asset demand.
+
+  non_us_developed_diversification:
+    rationale: Non-U.S. developed diversification maps to broad developed-market exposure and European policy-sensitive opportunities, but requires breadth and relative-strength confirmation.
+    beneficiaries:
+      - taxonomy_tag: non_us_developed_equities
+        rationale: Broad non-U.S. developed-market expression.
+      - taxonomy_tag: europe_defense_industry
+        rationale: European fiscal/defense impulse can add regional differentiation.
+
+  healthcare_defensive_growth:
+    rationale: Healthcare defensive growth maps to quality healthcare and biotech only when risk appetite and rate conditions support it.
+    beneficiaries:
+      - taxonomy_tag: healthcare_quality
+        rationale: Defensive growth expression.
+      - taxonomy_tag: biotech_innovation
+        rationale: Higher-beta healthcare innovation expression that requires risk appetite confirmation.
+
+  duration_easing_long_duration:
+    rationale: Easing and duration tailwinds can support long-duration innovation lanes, but only after confirmation, not prediction.
+    beneficiaries:
+      - taxonomy_tag: biotech_innovation
+        rationale: Long-duration healthcare innovation sensitivity.
+      - taxonomy_tag: fintech_infrastructure
+        rationale: Growth infrastructure sensitivity.
+      - taxonomy_tag: robotics_automation
+        rationale: Long-duration productivity growth sensitivity.
+
+  commodity_inflation_hedge:
+    rationale: Commodity/inflation hedge drivers map to broad commodities, agriculture, copper, and water/materials supply-stress lanes.
+    beneficiaries:
+      - taxonomy_tag: broad_commodities
+        rationale: Broad inflation hedge expression.
+      - taxonomy_tag: agriculture_commodities
+        rationale: Food commodity stress expression.
+      - taxonomy_tag: agri_food_security
+        rationale: Agriculture input and food-security equity expression.
+      - taxonomy_tag: copper_electrification
+        rationale: Copper/hard-asset expression.
+      - taxonomy_tag: water_infrastructure
+        rationale: Scarcity infrastructure expression.
