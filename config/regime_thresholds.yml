@@ -1,0 +1,74 @@
+# Weekly ETF deterministic regime thresholds
+#
+# Phase: macro/regime roadmap Phase 3
+# Status: shadow-only. These thresholds must not change client-facing fundable
+# decisions until fixture replay, methodology, compliance, and bilingual gates pass.
+
+schema_version: 1.0
+status: shadow_only
+client_facing_authority: false
+decision_impact: none_shadow_comparison_only
+
+axes:
+  equity:
+    risk_on_spy_3m_pct: 4.0
+    risk_off_spy_3m_pct: -4.0
+  semiconductor_leadership:
+    smh_return_3m_strong_pct: 8.0
+    smh_vs_spy_leadership_pct: 4.0
+  breadth:
+    broad_iwm_rs_vs_spy_3m_pct: 1.5
+    weak_iwm_rs_vs_spy_3m_pct: -2.0
+  duration:
+    supportive_tlt_return_3m_pct: 2.0
+    stress_tlt_return_3m_pct: -3.0
+  hedge:
+    gold_bid_return_3m_pct: 3.0
+    gold_weak_return_3m_pct: -3.0
+  commodities:
+    inflation_bid_gsg_return_3m_pct: 3.0
+    inflation_soft_gsg_return_3m_pct: -3.0
+
+regime_rules:
+  risk_on_narrow_leadership:
+    label: Risk-on narrow leadership
+    requires:
+      equity: risk_on
+      semiconductor_leadership: strong
+    allows_breadth:
+      - narrow
+      - weak
+  risk_on_growth:
+    label: Risk-on growth
+    requires:
+      equity: risk_on
+      breadth: broad
+  rate_hike_repricing:
+    label: Rate-hike repricing
+    requires:
+      duration: stress
+      hedge: gold_bid
+  defensive_policy_stress:
+    label: Defensive / policy stress
+    requires:
+      equity: risk_off
+    allows_duration:
+      - stress
+      - neutral
+  mixed_policy_transition:
+    label: Policy transition / mixed regime
+    fallback: true
+
+confidence:
+  base: 0.45
+  axis_alignment_weight: 0.28
+  signal_strength_weight: 0.17
+  conflict_penalty_weight: 0.12
+  macro_audit_bonus: 0.03
+  min: 0.35
+  max: 0.82
+
+notes:
+  - This file controls the shadow deterministic regime candidate only.
+  - Legacy regime and lane_adjustments remain production-compatible until explicit promotion.
+  - Thresholds should be tuned through fixture replay, not report-by-report patching.
