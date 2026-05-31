@@ -7,16 +7,50 @@
 
 ---
 
+## Phase 0 — approved macro/thesis roadmap control lock
+
+### 0. Record roadmap approval and sequencing
+- Owner: `[ASSISTANT]`
+- Status: completed on 2026-05-31
+- Source files:
+  - `docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md`
+  - `control/CURRENT_STATE.md`
+  - `control/NEXT_ACTIONS.md`
+  - `control/DECISION_LOG.md`
+- Decision:
+  - The team approved the Macro & Thesis Engine roadmap as the next major model-quality track for `weekly-etf`.
+  - The roadmap is approved under strict phased sequencing and shadow-first implementation.
+  - Pricing lineage remains Priority A and must not be displaced.
+- Locked sequence:
+  ```text
+  pricing lineage first
+  → macro audit foundation
+  → deterministic regime and confidence engine
+  → macro policy pack schema
+  → compliance and methodology gates
+  → thesis candidates in shadow mode
+  → Stage-2 confirmation and valuation flags
+  → client-surface integration only after validation
+  ```
+- Authority rule:
+  > Macro/regime modernization is approved as a post-pricing-lineage enhancement. Until validated in fixtures and shadow runs, the new macro engine may produce internal artifacts but must not change client-facing fundable decisions.
+- Done when:
+  - control-layer files record approval
+  - roadmap sequencing is explicit
+  - future sessions do not treat WP-1 to WP-9 as immediate production authority
+
+---
+
 ## Phase 1 — protect the validated runtime and delivery baseline
 
 ### 1. Keep using the control-layer start sequence
 - Owner: `[JOINT]`
 - Status: active standing rule
-- Action: every meaningful ETF architecture, debugging, prompt, state, workflow, delivery, discovery, localization, or lab-optimization session starts with:
+- Action: every meaningful ETF architecture, debugging, prompt, state, workflow, delivery, discovery, localization, macro/thesis, or lab-optimization session starts with:
   1. `control/SYSTEM_INDEX.md`
   2. `control/CURRENT_STATE.md`
   3. `control/NEXT_ACTIONS.md`
-  4. only then the minimum relevant execution file(s)
+  4. only then the minimum relevant execution files
 - Done when: sessions no longer rediscover the architecture.
 
 ### 2. Treat the current runtime + delivery HTML path as the production baseline
@@ -42,15 +76,17 @@
   → bilingual delivery HTML contract validation
   → PDF/email delivery
   ```
-- Action: do not repair strict branded sections through markdown post-processing.
-- Done when: Section 2, Current Position Review, Portfolio Rotation Plan, Vervangingsanalyse, and Section 7 equity curve stay governed by runtime/delivery contracts and validator checks.
+- Action:
+  - do not repair strict branded sections through markdown post-processing
+  - do not let new macro/thesis content bypass runtime-state, bilingual parity, delivery HTML, or compliance validation
+- Done when: Section 2, Current Position Review, Portfolio Rotation Plan, Vervangingsanalyse, Section 7 equity curve, and any future macro/thesis client-surface blocks stay governed by runtime/delivery contracts and validator checks.
 
 ### 3. Keep workflow behavior operational only
 - Owner: `[ASSISTANT]`
 - Status: active standing rule
 - Action:
   - production send workflow should be for production report-output pushes, manual dispatch, or safe run-queue requests only
-  - code changes should not silently resend subscriber emails
+  - code/control changes should not silently resend subscriber emails
   - do not claim delivery success without a real receipt, manifest, or explicit user confirmation of received delivery
 - Done when: delivery status remains verifiable.
 
@@ -81,6 +117,7 @@
   - treat the fresh-closing-price issue as unresolved until the contract is implemented
   - track all pricing-lineage changes in the dedicated changelog
   - preserve root `changelog.md` visibility for repo-level changes
+  - do not allow macro/thesis implementation to displace this priority
 - Done when: the contract is implemented and the hard lineage validator passes before delivery.
 
 ### 6. Add immutable run identity and manifest
@@ -167,6 +204,7 @@
 - Action:
   - keep roadmap phases explicit
   - do not let one-off Dutch phrase fixes replace the language-contract layer
+  - extend Dutch terminology/validators before any macro/thesis client-surface integration
 - Done when: Dutch report improvements are tracked as an operating roadmap, not ad-hoc fixes.
 
 ### 12. Block mixed English/Dutch sentences before next Dutch publication
@@ -268,6 +306,7 @@
 
 ### 21. Continue direct challenger-vs-current-holding scoring
 - Owner: `[ASSISTANT]`
+- Status: planned, but subordinate to pricing-lineage and macro/thesis sequencing
 - Action:
   - map challenger lanes to likely funded holdings they could replace
   - compare challenger 1m and 3m returns directly versus the target holding
@@ -278,23 +317,49 @@
 
 ### 22. Expand and curate the discovery universe
 - Owner: `[ASSISTANT]`
+- Status: ongoing
 - Source file:
   - `config/etf_discovery_universe.yml`
 - Action:
   - add additional sectors, factor ETFs, region ETFs, commodity ETFs, defensive exposures, and non-U.S. exposures
   - keep each lane investable, differentiated, and scored
+  - keep future macro/thesis driver-beneficiary maps aligned to actual lane names in this universe
 - Done when: the universe is broad enough to surface new candidates without becoming noisy.
 
-### 23. Add better macro/fundamental freshness inputs
+### 23. Add better macro/fundamental freshness inputs through the approved roadmap
 - Owner: `[ASSISTANT]`
+- Status: approved roadmap; implementation not yet production authority
+- Source files:
+  - `docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md`
+  - future `macro_sources/`
+  - future `macro_regime/`
+  - future `schemas/macro_policy_pack.schema.json`
+  - future `tools/validate_macro_compliance.py`
 - Action:
-  - add machine-readable macro/regime input file
-  - add policy/geopolitical catalyst tags
-  - add current official or market-based freshness notes where possible
-- Done when: discovery is no longer only config-driven.
+  - build a provenance-backed macro audit foundation as internal artifacts first
+  - replace hardcoded regime/confidence logic with deterministic threshold/config-driven logic
+  - add schema validation and fixture replay before production influence
+  - add methodology and compliance validation before client-surface expansion
+- Done when: discovery is no longer only config-driven, but the new macro inputs have passed fixture, shadow, schema, compliance, and bilingual validation gates.
+
+### 24. Implement WP-9 thesis layer only after macro pack validation
+- Owner: `[ASSISTANT]`
+- Status: approved roadmap; do not start before WP-1 to WP-4 foundation
+- Target future files:
+  - `config/driver_catalog.yml`
+  - `config/driver_beneficiary_map.yml`
+  - `runtime/build_thesis_candidates.py`
+  - `runtime/valuation_sanity.py`
+  - thesis/fundable output artifacts under `output/macro/` or `output/lane_reviews/`
+- Action:
+  - add active-driver vocabulary and deterministic driver activation
+  - map active drivers to candidate lanes through a hand-curated, versioned map
+  - keep Stage-1 candidates internal and never client-facing
+  - promote candidates only after RS/duel confirmation, valuation-grade pricing, valuation/crowding flagging, and portfolio discipline gates
+- Done when: every fundable item exposes a full chain from driver → rationale → confirmation → valuation/pricing → portfolio discipline, and no candidate-stage content leaks into client reports.
 
 ---
 
 ## Current checkpoint
 
-**The active engineering checkpoint is now ETF pricing-lineage hardening. The close-price disclosure table is visible and internally useful, but the fresh-closing-price issue remains open until immutable audit identity, explicit run manifests, state persistence, challenger pricing tiers, and the hard pricing-lineage validator are implemented.**
+**The active engineering checkpoint is now ETF pricing-lineage hardening, with the Macro & Thesis Engine roadmap approved and locked as a shadow-first follow-on model-quality track. The close-price disclosure table is visible and internally useful, but the fresh-closing-price issue remains open until immutable audit identity, explicit run manifests, state persistence, challenger pricing tiers, and the hard pricing-lineage validator are implemented. Macro/thesis work may begin only according to the approved phased roadmap and must not affect client-facing fundable decisions until fixture, shadow, schema, compliance, and bilingual gates pass.**
