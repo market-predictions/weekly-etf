@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import csv
 import json
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import date, datetime, timezone
 from io import StringIO
 from pathlib import Path
@@ -63,19 +64,55 @@ def ensure_fresh(*, label: str, as_of_date: str, reference_date: str, max_stalen
     return age
 
 
-def fetch_text(url: str, *, timeout: int = 25, user_agent: str = "weekly-etf-macro-audit/1.0") -> str:
+def _retry_pause(attempt: int, retry_sleep_seconds: float) -> None:
+    if retry_sleep_seconds <= 0:
+        return
+    time.sleep(retry_sleep_seconds * attempt)
+
+
+def fetch_text(
+    url: str,
+    *,
+    timeout: int = 45,
+    user_agent: str = "weekly-etf-macro-audit/1.0",
+    max_attempts: int = 3,
+    retry_sleep_seconds: float = 2.0,
+) -> str:
+    """Fetch text from an official/public macro source with bounded retries.
+
+    Transient GitHub-runner/network read timeouts should not make the macro
+    audit fragile. But after bounded retries, the function still fails loudly as
+    MacroSourceError so stale/unavailable data never gets silently guessed.
+    """
     request = urllib.request.Request(url, headers={"User-Agent": user_agent})
-    try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - configured official public data sources only
-            raw = response.read()
-            return raw.decode("utf-8")
-    except urllib.error.HTTPError as exc:
-        raise MacroSourceError(f"HTTP {exc.code} while fetching {url}") from exc
-    except urllib.error.URLError as exc:
-        raise MacroSourceError(f"Network error while fetching {url}: {exc.reason}") from exc
+    attempts = max(1, int(max_attempts))
+    last_error: BaseException | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - configured official public data sources only
+                raw = response.read()
+                return raw.decode("utf-8")
+        except urllib.error.HTTPError as exc:
+            last_error = exc
+            if exc.code not in {429, 500, 502, 503, 504} or attempt >= attempts:
+                raise MacroSourceError(f"HTTP {exc.code} while fetching {url} after {attempt}/{attempts} attempts") from exc
+        except urllib.error.URLError as exc:
+            last_error = exc
+            if attempt >= attempts:
+                raise MacroSourceError(f"Network error while fetching {url} after {attempt}/{attempts} attempts: {exc.reason}") from exc
+        except TimeoutError as exc:
+            last_error = exc
+            if attempt >= attempts:
+                raise MacroSourceError(f"Read timeout while fetching {url} after {attempt}/{attempts} attempts") from exc
+        except OSError as exc:
+            last_error = exc
+            if attempt >= attempts:
+                raise MacroSourceError(f"OS/network error while fetching {url} after {attempt}/{attempts} attempts: {exc}") from exc
+        _retry_pause(attempt, retry_sleep_seconds)
+    raise MacroSourceError(f"Network fetch failed for {url}: {last_error}")
 
 
-def fetch_json(url: str, *, timeout: int = 25, user_agent: str = "weekly-etf-macro-audit/1.0") -> dict[str, Any]:
+def fetch_json(url: str, *, timeout: int = 45, user_agent: str = "weekly-etf-macro-audit/1.0") -> dict[str, Any]:
     text = fetch_text(url, timeout=timeout, user_agent=user_agent)
     try:
         return json.loads(text)
