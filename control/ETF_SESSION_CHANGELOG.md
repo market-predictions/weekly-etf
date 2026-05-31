@@ -304,6 +304,91 @@ Continue the approved roadmap with Phase 2/3 macro-regime work, not more broad p
 
 ---
 
+## 2026-05-31 — Macro policy pack schema and compatibility gate added
+
+### Current issue
+
+After pricing-lineage closure, the next approved roadmap item was to formalize the macro policy pack contract before replacing the legacy regime/confidence logic.
+
+### Root cause
+
+`runtime/build_macro_policy_pack.py` already writes `output/macro/latest.json`, and lane discovery consumes that pack. Without a schema and validator, later macro/regime work could silently change lane scoring before fixture replay, methodology, compliance, and bilingual gates are ready.
+
+### What changed
+
+Added:
+
+- `schemas/macro_policy_pack.schema.json`
+- `tools/validate_macro_policy_pack.py`
+- `control/MACRO_POLICY_PACK_SCHEMA_STATUS.md`
+
+Updated:
+
+- `runtime/build_macro_policy_pack.py`
+- `.github/workflows/send-weekly-report.yml`
+- `control/SYSTEM_INDEX.md`
+
+### New contract
+
+The macro policy pack now includes:
+
+- `schema_version`
+- `authority`
+- `macro_data_audit_summary`
+- `confidence_decomposition`
+- `active_drivers`
+- backward-compatible `lane_adjustments`
+
+### Authority rules
+
+- Legacy `lane_adjustments` remain available for existing lane discovery.
+- `confidence_decomposition` is explanatory/shadow-only for now.
+- `active_drivers` is an empty placeholder until WP-9 is built in shadow mode.
+- Phase 2 macro audit remains shadow-only and non-authoritative.
+- Deterministic regime/confidence is not yet production authority.
+
+### Workflow change
+
+The production workflow now validates the macro policy pack immediately after building it and before lane discovery consumes `output/macro/latest.json`.
+
+Expected marker:
+
+```text
+ETF_MACRO_POLICY_PACK_SCHEMA_OK
+```
+
+### Commits
+
+- `7dbaadaaa66ffa44a84b5cd9682619aac0a5828c` — add macro policy pack schema
+- `296559dc4e84c12124a46ef9217106ed0c2602fb` — add macro policy pack validator
+- `54e1f3d8b6408266bd98c72f585d693c24e3bbf4` — add schema compatibility fields to macro pack builder
+- `cacfe1de2546b75303793158ffcaf42577ba5b63` — validate macro policy pack before lane discovery
+- `1690c5f53c8f1200e5a710fc2e8d0be0411bb8c6` — register macro policy pack schema and validator in system index
+- `133e475caa30f46c08b528a213a6bf5ce77390ed` — add macro policy pack schema status note
+
+### Validation status
+
+Not yet production-proven by a fresh workflow run after this patch set.
+
+Next validation run should confirm:
+
+```text
+ETF_MACRO_POLICY_PACK_OK
+ETF_MACRO_POLICY_PACK_SCHEMA_OK
+ETF_LANE_DISCOVERY_OK
+ETF_PRICING_LINEAGE_CONTRACT_OK
+```
+
+### Remaining work
+
+Next roadmap item is deterministic regime/confidence in shadow mode:
+
+- `config/regime_thresholds.yml`
+- `macro_regime/classify.py`
+- `macro_regime/confidence.py`
+
+---
+
 ## Open watch items
 
 ### Delivery evidence
