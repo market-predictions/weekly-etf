@@ -11,6 +11,8 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from runtime.scrub_etf_client_surface import scrub_text
+from tools.validate_etf_pricing_lineage_contract import _manifest_path as _pricing_lineage_manifest_path
+from tools.validate_etf_pricing_lineage_contract import validate_manifest_path as validate_pricing_lineage_manifest
 
 EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
@@ -76,6 +78,16 @@ def _scan(path: Path) -> list[str]:
     return sorted(set(hits))
 
 
+def _validate_pricing_lineage_before_send() -> None:
+    manifest_path = _pricing_lineage_manifest_path(None)
+    summary = validate_pricing_lineage_manifest(manifest_path, update_manifest_status=True)
+    print(
+        "ETF_PRICING_LINEAGE_PRE_SEND_GATE_OK | "
+        f"run_id={summary.get('run_id')} | requested_close={summary.get('requested_close_date')} | "
+        f"holdings={len(summary.get('holdings_validated') or [])} | manifest={manifest_path}"
+    )
+
+
 def validate(output_dir: Path) -> None:
     failures: list[str] = []
     paths = _current_files(output_dir)
@@ -87,6 +99,7 @@ def validate(output_dir: Path) -> None:
             failures.append(f"{path.name}: {', '.join(hits[:12])}")
     if failures:
         raise RuntimeError("ETF client-facing surface contains internal labels in current report pair: " + " | ".join(failures))
+    _validate_pricing_lineage_before_send()
     print("ETF_CLIENT_SURFACE_CLEAN_OK | files=" + ",".join(path.name for path in paths))
 
 
