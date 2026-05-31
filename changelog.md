@@ -2,6 +2,59 @@
 
 This file records meaningful codebase, workflow, rendering, state-contract, pricing, and delivery changes for `market-predictions/weekly-etf`.
 
+## 2026-05-31 — Implement shadow-mode macro audit foundation
+
+### What changed
+- Added `config/macro_data_sources.yml` with source definitions for FRED, ECB Data Portal, Treasury Fiscal Data, and volatility data.
+- Added `config/cb_calendar.yml` as a static central-bank calendar/control fixture for banks where clean official free API coverage is not yet integrated.
+- Added `macro_sources/` package:
+  - `common.py`
+  - `fred_client.py`
+  - `ecb_client.py`
+  - `treasury_client.py`
+  - `vol_client.py`
+  - `cb_calendar.py`
+  - `build_macro_data_audit.py`
+- Added `schemas/macro_data_audit.schema.json` as the schema shell for the audit artifact.
+- Added `tools/validate_macro_data_audit.py` as the deterministic macro-audit validator.
+- Added `tests/fixtures/macro_data_audit_fixture.json` for no-network replay/fixture validation.
+- Updated `runtime/build_macro_policy_pack.py` so it builds and validates a run-scoped macro audit before constructing the existing macro policy pack.
+- The macro policy pack records `source_files.macro_data_audit` and a shadow-only `macro_data_audit_summary`, but the new macro audit does **not** change regime classification, lane scoring, fundability, or client-facing report output yet.
+
+### Why
+Phase 2 of the approved macro/thesis roadmap requires WP-1: a provenance-backed macro data fetch layer that is run-scoped, fail-loud, fixture-replayable, and strictly shadow-only until later regime, confidence, methodology, compliance, and bilingual gates are implemented.
+
+### Affected files
+- `config/macro_data_sources.yml`
+- `config/cb_calendar.yml`
+- `macro_sources/__init__.py`
+- `macro_sources/common.py`
+- `macro_sources/fred_client.py`
+- `macro_sources/ecb_client.py`
+- `macro_sources/treasury_client.py`
+- `macro_sources/vol_client.py`
+- `macro_sources/cb_calendar.py`
+- `macro_sources/build_macro_data_audit.py`
+- `schemas/macro_data_audit.schema.json`
+- `tools/validate_macro_data_audit.py`
+- `tests/fixtures/macro_data_audit_fixture.json`
+- `runtime/build_macro_policy_pack.py`
+- `control/CURRENT_STATE.md`
+- `control/NEXT_ACTIONS.md`
+- `control/DECISION_LOG.md`
+- `changelog.md`
+
+### Validation / evidence
+- No production workflow run has been executed yet after this implementation.
+- Next fresh ETF run should show:
+  - `ETF_MACRO_DATA_AUDIT_OK`
+  - `ETF_MACRO_DATA_AUDIT_VALID_OK`
+  - `ETF_MACRO_POLICY_PACK_OK ... macro_audit_present=True`
+- Fixture replay is available with `MRKT_RPRTS_MACRO_DATA_AUDIT_FIXTURE=tests/fixtures/macro_data_audit_fixture.json`.
+- This phase remains shadow-only and should not alter client-facing report behavior.
+
+---
+
 ## 2026-05-31 — Add hard ETF pricing-lineage validator and pre-send gate
 
 ### What changed
