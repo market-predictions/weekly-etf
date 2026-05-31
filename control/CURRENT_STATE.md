@@ -1,13 +1,26 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-05-24
+2026-05-31
 
 ## What this repository currently is
 
-This repository is now a validated runtime-driven production-style weekly ETF review system with a new active pricing-lineage hardening track.
+This repository is now a validated runtime-driven production-style weekly ETF review system with a new active pricing-lineage hardening track and an approved, shadow-first macro/thesis roadmap.
 
 The existing runtime baseline can generate bilingual reports, show pricing-basis disclosure, and reconcile Section 7/Section 15 internally. However, the current pricing issue is not considered solved until `control/ETF_PRICING_LINEAGE_CONTRACT_V1.md` is implemented and validated end to end.
+
+The team has approved the Macro & Thesis Engine roadmap parked at `docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md`, but this approval does **not** make the new macro/thesis engine production authority yet. The sequencing is locked as:
+
+```text
+pricing lineage first
+→ macro audit foundation
+→ deterministic regime and confidence engine
+→ macro policy pack schema
+→ compliance and methodology gates
+→ thesis candidates in shadow mode
+→ Stage-2 confirmation and valuation flags
+→ client-surface integration only after validation
+```
 
 Current canonical components include:
 
@@ -17,6 +30,7 @@ Current canonical components include:
 - `control/ETF_RUNTIME_STATE_CONTRACT.md` as the runtime state contract
 - `control/ETF_PRICING_LINEAGE_CONTRACT_V1.md` as the active pricing-lineage hardening contract
 - `control/ETF_PRICING_LINEAGE_CHANGELOG.md` as the central pricing-lineage regression/change log
+- `docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md` as the approved discussion roadmap for the future macro/thesis workstream, not yet an execution contract
 - `config/etf_discovery_universe.yml` as the broad investable lane universe
 - `runtime/fetch_etf_relative_strength.py` as the historical relative-strength input layer
 - `runtime/discover_etf_lanes.py` and `runtime/score_etf_lanes.py` as the lane discovery/scoring engine
@@ -75,7 +89,7 @@ This path has solved recurring report-render defects where Section 2 ticker link
 
 The latest debugging cycle showed that visible fresh closes and internal NAV reconciliation are not enough.
 
-The active engineering direction is now `ETF_PRICING_LINEAGE_CONTRACT_V1`:
+The active engineering direction remains `ETF_PRICING_LINEAGE_CONTRACT_V1`:
 
 ```text
 requested_close_date + report_token
@@ -99,6 +113,32 @@ Do not describe the fresh-closing-price issue as fully solved until the repo has
 - deterministic update of `output/etf_valuation_history.csv`
 - valuation-grade pricing for replacement-duel and fundable promoted challengers
 - a hard `tools/validate_etf_pricing_lineage_contract.py` gate before delivery
+
+## Approved macro/thesis roadmap decision
+
+The team has approved the Macro & Thesis Engine roadmap as the next major model-quality track, but under strict sequencing:
+
+1. Complete or confirm pricing-lineage proof first.
+2. Build a provenance-backed macro audit foundation.
+3. Replace hardcoded regime/confidence logic with deterministic classification and derived confidence.
+4. Validate a complete macro policy pack schema.
+5. Add compliance and methodology gates before any client-facing expansion.
+6. Add WP-9 thesis candidates in shadow mode only.
+7. Add Stage-2 market-confirmation and valuation/crowding flags.
+8. Surface confirmed outputs in the client report only after shadow validation and language/compliance gates pass.
+
+Authority rule:
+
+> Macro/regime modernization is approved as a post-pricing-lineage enhancement. Until validated in fixtures and shadow runs, the new macro engine may produce internal artifacts but must not change client-facing fundable decisions.
+
+Implementation implications:
+
+- WP-1 to WP-4 may be built as internal artifacts first.
+- WP-7 compliance gates are mandatory before expanded macro/thesis content reaches the English or Dutch client report.
+- WP-9 Stage-1 thesis candidates are internal reasoning artifacts and must not appear as client-facing recommendations.
+- A lane may become fundable only after thesis, market confirmation, valuation-grade pricing, and portfolio discipline gates all pass.
+- Institutional overlay may cap confidence but may never set regime or portfolio action.
+- Schema corrections are required before WP-9 implementation, especially `active_drivers` and difficult central-bank source coverage.
 
 ## Stable render decision
 
@@ -142,7 +182,17 @@ Specifically:
 - `send_report.py` validates bilingual numeric parity before render/send.
 - `tools/validate_etf_delivery_html_contract.py` validates both English and Dutch rendered delivery HTML.
 
+Any future macro/thesis client-surface integration must extend this bilingual contract. New macro/thesis labels, driver language, candidate/fundable vocabulary, and compliance wording must be validated in both English and Dutch before delivery.
+
 ## What changed recently
+
+### Macro/thesis roadmap approved and parked
+
+Added:
+
+- `docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md`
+
+The team reviewed and approved the roadmap. It is now recorded as the future model-quality track, with the explicit authority rule that it is shadow-first and must not displace pricing-lineage Priority A.
 
 ### Pricing-lineage contract created
 
@@ -204,6 +254,7 @@ The workflow is protected by `ETF_EQUITY_CURVE_HISTORY_OK`.
 - Dutch report is derived from the English runtime state and preserves numeric parity.
 - Dutch localization now has a dedicated language-contract module and quality gate.
 - Dutch strict-section delivery aliases are validated after render.
+- Macro/thesis roadmap is now approved and parked as a phased, shadow-first model-quality track.
 
 ## Current weaknesses
 
@@ -214,7 +265,7 @@ The report can show fresh close rows, but the repo still needs immutable audit i
 `config/etf_discovery_universe.yml` is the first broad universe. It needs periodic expansion and review.
 
 ### 3. Fundamental evidence is encoded, not fetched live
-The first engine stores evidence summaries and why-now fields, but does not yet fetch current macro/fundamental news or official data automatically.
+The first engine stores evidence summaries and why-now fields, but does not yet fetch current macro/fundamental news or official data automatically. The approved roadmap addresses this through a future macro audit foundation, but that foundation must be implemented in shadow mode first.
 
 ### 4. Relative strength is broad but not yet fully institutional
 The relative-strength layer uses pragmatic public yfinance history. It includes early liquidity/tradability metrics, but does not yet include full factor/sector benchmark normalization or complete direct replacement-duel scoring.
@@ -224,6 +275,9 @@ Targeted challenger pricing improves comparison quality, but it must now be form
 
 ### 6. Bilingual aliases are still distributed across several files
 Dutch labels and aliases now work in production, but the alias definitions are still duplicated across `runtime/nl_localization.py`, `runtime/apply_nl_localization.py`, `send_report.py`, and `tools/validate_etf_delivery_html_contract.py`. This should be consolidated to reduce future validator drift.
+
+### 7. Macro/thesis schema and compliance gates do not yet exist
+The approved roadmap requires macro audit schema, macro policy pack schema corrections, active-driver vocabulary, thesis candidate artifacts, and compliance gates before any new macro/thesis content can become client-facing.
 
 ## Immediate priorities
 
@@ -239,15 +293,25 @@ Next engineering track:
 - enforce valuation-grade pricing for replacement-duel and fundable challengers
 - add `tools/validate_etf_pricing_lineage_contract.py`
 
-### Priority B — consolidate bilingual alias handling
+### Priority B — keep macro/thesis roadmap shadow-first behind pricing lineage
 
-Next engineering cleanup after pricing lineage:
+Next architecture track after Phase 0:
+
+- start from `docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md`
+- implement macro audit foundation as internal artifacts first
+- keep WP-1 to WP-4 in fixture/shadow mode until validated
+- do not let macro/thesis outputs change client-facing fundable decisions before compliance gates and replay tests pass
+- update schema before WP-9, especially `active_drivers` and difficult central-bank coverage
+
+### Priority C — consolidate bilingual alias handling
+
+Next engineering cleanup after pricing lineage unless needed by macro/thesis client-surface work:
 
 - keep Dutch terminology and aliases in one source of truth
 - reuse that source from markdown localization, send-time parity checks, Dutch quality validation, and delivery HTML validation
 - avoid future one-error-at-a-time phrase fixes
 
-### Priority C — add direct challenger-vs-current-holding scoring
+### Priority D — add direct challenger-vs-current-holding scoring
 
 Next model enhancement:
 
@@ -255,14 +319,16 @@ Next model enhancement:
 - compute direct 1m and 3m relative strength versus that holding
 - feed direct replacement edge into lane scoring and replacement-duel notes
 
-### Priority D — expand macro/fundamental freshness inputs
+### Priority E — expand macro/fundamental freshness inputs through the approved roadmap
 
-Future enhancement:
+Future enhancement, not yet production authority:
 
-- machine-readable macro/regime input file
+- machine-readable macro audit input file
+- deterministic regime and confidence engine
 - policy/geopolitical catalyst tags
-- official or market-based freshness notes
+- official or market-based freshness notes where possible
+- thesis candidates only as internal artifacts until Stage-2 confirmation gates pass
 
 ## Current status label
 
-**ETF has a production-tested runtime-driven bilingual baseline with visible pricing-basis disclosure and Section 7/Section 15 reconciliation, but the fresh-pricing issue is not fully closed until `ETF_PRICING_LINEAGE_CONTRACT_V1` is implemented with immutable audit identity, explicit run manifest linkage, state persistence, exact close-date semantics, challenger pricing tiers, and a hard pricing-lineage validator.**
+**ETF has a production-tested runtime-driven bilingual baseline with visible pricing-basis disclosure and Section 7/Section 15 reconciliation, plus an approved shadow-first macro/thesis roadmap. The fresh-pricing issue is still not fully closed until `ETF_PRICING_LINEAGE_CONTRACT_V1` is implemented with immutable audit identity, explicit run manifest linkage, state persistence, exact close-date semantics, challenger pricing tiers, and a hard pricing-lineage validator. Macro/thesis modernization may begin only under the approved phased roadmap and must not influence client-facing fundable decisions until fixture, shadow, compliance, and bilingual gates pass.**
