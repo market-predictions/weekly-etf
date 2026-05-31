@@ -7,8 +7,10 @@ on:
       - main
     paths:
       - "config/regime_thresholds.yml"
+      - "fixtures/macro_regime_shadow/**"
       - "macro_regime/**"
       - "runtime/build_macro_policy_pack_shadow.py"
+      - "tools/replay_macro_regime_shadow_fixtures.py"
       - "tools/validate_macro_regime_shadow.py"
       - ".github/workflows/validate-macro-regime-shadow.yml"
 
@@ -31,6 +33,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pyyaml pandas yfinance
+
+      - name: Replay deterministic regime fixtures
+        run: |
+          python tools/replay_macro_regime_shadow_fixtures.py \
+            --fixtures fixtures/macro_regime_shadow/regime_shadow_fixtures.json \
+            --thresholds config/regime_thresholds.yml
 
       - name: Build shadow macro policy pack
         run: |
