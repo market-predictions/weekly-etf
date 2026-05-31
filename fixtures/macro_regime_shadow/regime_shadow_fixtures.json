@@ -1,0 +1,124 @@
+{
+  "schema_version": "1.0",
+  "status": "shadow_only",
+  "client_facing_authority": false,
+  "decision_impact": "none_shadow_comparison_only",
+  "description": "No-network fixture replay scenarios for the Weekly ETF deterministic shadow regime classifier.",
+  "fixtures": [
+    {
+      "id": "risk_on_growth",
+      "description": "Broad risk-on: SPY trend is positive and IWM confirms breadth; semiconductors are positive but not a narrow-leadership spread.",
+      "expected_regime": "Risk-on growth",
+      "expected_axes": {
+        "equity": "risk_on",
+        "semiconductor_leadership": "mixed",
+        "breadth": "broad",
+        "duration": "supportive",
+        "hedge": "neutral",
+        "commodities": "neutral"
+      },
+      "expected_confidence_min": 0.60,
+      "expected_confidence_max": 0.75,
+      "metrics": {
+        "SPY": {"return_1m_pct": 2.2, "return_3m_pct": 7.0, "rs_vs_spy_3m_pct": 0.0},
+        "SMH": {"return_1m_pct": 2.8, "return_3m_pct": 8.0, "rs_vs_spy_3m_pct": 1.0},
+        "IWM": {"return_1m_pct": 3.0, "return_3m_pct": 9.0, "rs_vs_spy_3m_pct": 2.0},
+        "TLT": {"return_1m_pct": 0.8, "return_3m_pct": 3.0, "rs_vs_spy_3m_pct": -4.0},
+        "GLD": {"return_1m_pct": 0.2, "return_3m_pct": 1.0, "rs_vs_spy_3m_pct": -6.0},
+        "GSG": {"return_1m_pct": 0.1, "return_3m_pct": 0.0, "rs_vs_spy_3m_pct": -7.0}
+      }
+    },
+    {
+      "id": "risk_on_narrow_leadership",
+      "description": "Narrow risk-on: equity trend is positive, SMH dominates SPY, and IWM fails to confirm broad participation.",
+      "expected_regime": "Risk-on narrow leadership",
+      "expected_axes": {
+        "equity": "risk_on",
+        "semiconductor_leadership": "strong",
+        "breadth": "weak",
+        "duration": "neutral",
+        "hedge": "gold_weak",
+        "commodities": "neutral"
+      },
+      "expected_confidence_min": 0.58,
+      "expected_confidence_max": 0.72,
+      "metrics": {
+        "SPY": {"return_1m_pct": 1.8, "return_3m_pct": 6.0, "rs_vs_spy_3m_pct": 0.0},
+        "SMH": {"return_1m_pct": 4.0, "return_3m_pct": 14.0, "rs_vs_spy_3m_pct": 8.0},
+        "IWM": {"return_1m_pct": -0.8, "return_3m_pct": 3.0, "rs_vs_spy_3m_pct": -3.0},
+        "TLT": {"return_1m_pct": 0.0, "return_3m_pct": 0.0, "rs_vs_spy_3m_pct": -6.0},
+        "GLD": {"return_1m_pct": -1.5, "return_3m_pct": -4.0, "rs_vs_spy_3m_pct": -10.0},
+        "GSG": {"return_1m_pct": 0.3, "return_3m_pct": 1.0, "rs_vs_spy_3m_pct": -5.0}
+      }
+    },
+    {
+      "id": "defensive_policy_stress",
+      "description": "Defensive stress: equity trend is weak and breadth is poor; duration is not the primary stress signal.",
+      "expected_regime": "Defensive / policy stress",
+      "expected_axes": {
+        "equity": "risk_off",
+        "semiconductor_leadership": "weak",
+        "breadth": "weak",
+        "duration": "neutral",
+        "hedge": "gold_bid",
+        "commodities": "neutral"
+      },
+      "expected_confidence_min": 0.68,
+      "expected_confidence_max": 0.80,
+      "metrics": {
+        "SPY": {"return_1m_pct": -2.2, "return_3m_pct": -7.0, "rs_vs_spy_3m_pct": 0.0},
+        "SMH": {"return_1m_pct": -3.0, "return_3m_pct": -8.0, "rs_vs_spy_3m_pct": -1.0},
+        "IWM": {"return_1m_pct": -4.0, "return_3m_pct": -11.0, "rs_vs_spy_3m_pct": -4.0},
+        "TLT": {"return_1m_pct": 0.1, "return_3m_pct": 0.0, "rs_vs_spy_3m_pct": 7.0},
+        "GLD": {"return_1m_pct": 1.4, "return_3m_pct": 4.0, "rs_vs_spy_3m_pct": 11.0},
+        "GSG": {"return_1m_pct": -0.4, "return_3m_pct": -1.0, "rs_vs_spy_3m_pct": 6.0}
+      }
+    },
+    {
+      "id": "rate_hike_repricing",
+      "description": "Rates repricing: duration sells off and gold catches a bid while broad equity evidence is mixed.",
+      "expected_regime": "Rate-hike repricing",
+      "expected_axes": {
+        "equity": "mixed",
+        "semiconductor_leadership": "mixed",
+        "breadth": "narrow",
+        "duration": "stress",
+        "hedge": "gold_bid",
+        "commodities": "inflation_bid"
+      },
+      "expected_confidence_min": 0.52,
+      "expected_confidence_max": 0.68,
+      "metrics": {
+        "SPY": {"return_1m_pct": -0.4, "return_3m_pct": -1.0, "rs_vs_spy_3m_pct": 0.0},
+        "SMH": {"return_1m_pct": 0.2, "return_3m_pct": 0.0, "rs_vs_spy_3m_pct": 1.0},
+        "IWM": {"return_1m_pct": -0.5, "return_3m_pct": -1.0, "rs_vs_spy_3m_pct": 0.0},
+        "TLT": {"return_1m_pct": -2.1, "return_3m_pct": -5.0, "rs_vs_spy_3m_pct": -4.0},
+        "GLD": {"return_1m_pct": 2.0, "return_3m_pct": 5.0, "rs_vs_spy_3m_pct": 6.0},
+        "GSG": {"return_1m_pct": 1.5, "return_3m_pct": 4.0, "rs_vs_spy_3m_pct": 5.0}
+      }
+    },
+    {
+      "id": "mixed_policy_transition",
+      "description": "Mixed transition: most axes are neutral/mixed and no higher-conviction rule should fire.",
+      "expected_regime": "Policy transition / mixed regime",
+      "expected_axes": {
+        "equity": "mixed",
+        "semiconductor_leadership": "mixed",
+        "breadth": "narrow",
+        "duration": "neutral",
+        "hedge": "neutral",
+        "commodities": "neutral"
+      },
+      "expected_confidence_min": 0.40,
+      "expected_confidence_max": 0.55,
+      "metrics": {
+        "SPY": {"return_1m_pct": 0.4, "return_3m_pct": 1.0, "rs_vs_spy_3m_pct": 0.0},
+        "SMH": {"return_1m_pct": 0.8, "return_3m_pct": 2.0, "rs_vs_spy_3m_pct": 1.0},
+        "IWM": {"return_1m_pct": 0.1, "return_3m_pct": 1.0, "rs_vs_spy_3m_pct": 0.0},
+        "TLT": {"return_1m_pct": 0.0, "return_3m_pct": 0.0, "rs_vs_spy_3m_pct": -1.0},
+        "GLD": {"return_1m_pct": 0.0, "return_3m_pct": 0.0, "rs_vs_spy_3m_pct": -1.0},
+        "GSG": {"return_1m_pct": 0.0, "return_3m_pct": 0.0, "rs_vs_spy_3m_pct": -1.0}
+      }
+    }
+  ]
+}
