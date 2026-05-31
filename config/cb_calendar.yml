@@ -1,0 +1,39 @@
+version: 1
+
+purpose: >-
+  Static central-bank calendar support for the macro audit foundation when a
+  clean official free calendar API is unavailable or not yet integrated. This
+  file is internal provenance metadata only and must not be treated as a live
+  policy forecast.
+
+central_banks:
+  fed:
+    name: Federal Reserve
+    jurisdiction: United States
+    policy_rate_label: Effective federal funds rate
+    source_note: Current policy-rate value is sourced from FRED DFF in the macro audit.
+    calendar_source: Manual control file until official calendar integration is implemented.
+  ecb:
+    name: European Central Bank
+    jurisdiction: Euro Area
+    policy_rate_label: ECB policy-rate complex
+    source_note: Current FX/reference data is sourced from ECB Data Portal in the macro audit; policy-rate series integration is a future WP-4 schema task.
+    calendar_source: Manual control file until official calendar integration is implemented.
+  boe:
+    name: Bank of England
+    jurisdiction: United Kingdom
+    policy_rate_label: Bank Rate
+    source_note: No live BOE series is used in WP-1. Keep static only until a vetted source is added.
+    calendar_source: Manual control file until official calendar integration is implemented.
+  boj:
+    name: Bank of Japan
+    jurisdiction: Japan
+    policy_rate_label: Policy-rate corridor / yield-curve policy context
+    source_note: No live BOJ series is used in WP-1. Keep static only until a vetted source is added.
+    calendar_source: Manual control file until official calendar integration is implemented.
+  pboc:
+    name: People's Bank of China
+    jurisdiction: China
+    policy_rate_label: Loan prime rate / reserve requirement context
+    source_note: No live PBoC series is used in WP-1. Keep static only until a vetted source is added.
+    calendar_source: Manual control file until official calendar integration is implemented.
