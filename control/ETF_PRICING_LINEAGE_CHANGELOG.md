@@ -12,6 +12,83 @@ This file is the central changelog for the ETF pricing-lineage repair track. It 
 
 ---
 
+## 2026-05-31 — Add hard pricing-lineage validator and pre-send gate
+
+### Current issue
+
+The ETF workflow had immutable run ids, run-scoped pricing audits, run manifests, persisted valuation state, and visible close-price disclosure, but it still lacked the hard end-to-end validator required by `ETF_PRICING_LINEAGE_CONTRACT_V1`.
+
+That meant a report could be internally useful while the workflow still did not prove, in one gate, that manifest → audit → runtime state → report tables → persisted portfolio state → valuation history all came from the same immutable pricing audit.
+
+### Root cause
+
+The existing validators covered important pieces separately:
+
+- pricing-basis disclosure
+- equity-curve history
+- persisted valuation state
+- challenger fundability
+- delivery HTML/client-surface cleanliness
+
+But no single validator enforced the complete pricing-lineage contract. In addition, the final always-run manifest write stored generic workflow lifecycle labels such as `workflow_success` in `pricing_lineage_status`, which blurred the difference between workflow completion and pricing-lineage proof.
+
+### What changed
+
+- Added `tools/validate_etf_pricing_lineage_contract.py`.
+  - Validates the current run manifest.
+  - Verifies the manifest points to one exact pricing audit and runtime state.
+  - Verifies `runtime.source_files.pricing_audit` equals the exact audit path.
+  - Verifies audit fresh/exact status semantics.
+  - Verifies required priced-row lineage fields for priced rows.
+  - Verifies runtime holding prices/statuses equal audit selected closes/statuses.
+  - Verifies report close-disclosure values equal audit selected closes.
+  - Verifies Section 7 NAV equals Section 15 NAV and runtime NAV.
+  - Recalculates NAV from shares × selected close ÷ FX + cash.
+  - Verifies `output/etf_portfolio_state.json` and `output/etf_valuation_history.csv` match the runtime valuation.
+  - Verifies fundable challenger lanes have valuation-grade priced audit rows.
+  - Writes `pricing_lineage_status=passed` into the run manifest when the contract passes.
+
+- Updated `tools/write_weekly_etf_run_manifest.py`.
+  - Preserves `pricing_lineage_status=passed` if the final always-run manifest update later writes a generic `workflow_*` status.
+  - Adds a separate `workflow_status` field so workflow lifecycle and pricing-lineage proof are no longer conflated.
+
+- Updated `tools/validate_etf_client_surface_clean.py`.
+  - Calls the hard pricing-lineage validator as part of the existing pre-send validation path.
+  - The production workflow already runs this tool before email delivery, so delivery now fails before send if the pricing-lineage contract does not pass.
+
+### Affected files
+
+- `tools/validate_etf_pricing_lineage_contract.py`
+- `tools/write_weekly_etf_run_manifest.py`
+- `tools/validate_etf_client_surface_clean.py`
+- `control/ETF_PRICING_LINEAGE_CHANGELOG.md`
+- `changelog.md`
+
+### Validation / evidence
+
+No production workflow run has been executed yet after this patch.
+
+Expected evidence in the next fresh workflow run:
+
+```text
+ETF_PRICING_LINEAGE_CONTRACT_OK
+ETF_PRICING_LINEAGE_PRE_SEND_GATE_OK
+```
+
+The final run manifest should keep:
+
+```text
+pricing_lineage_status = passed
+```
+
+while separately recording the generic workflow status/conclusion.
+
+### Status
+
+This implements the missing Phase 1B hard validator and pre-send delivery block. The pricing-lineage baseline should not be called production-proven until the next fresh workflow run passes this gate and commits the resulting run manifest.
+
+---
+
 ## 2026-05-27 — Preserve fundability notes after lane-quality repromotion
 
 ### Current issue
@@ -87,7 +164,6 @@ No production workflow run has been executed yet after this workflow-wiring chan
 
 This closes Phase 1B Step 9 at model + validator + workflow level. Remaining pricing-lineage work:
 
-- add the hard `tools/validate_etf_pricing_lineage_contract.py` gate across manifest → audit → runtime → report → persisted state → valuation history
 - add independent cross-provider verification so `fresh_exact_close` can be used instead of `fresh_exact_unverified`
 
 ---
