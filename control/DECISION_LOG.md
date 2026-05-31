@@ -312,3 +312,47 @@ A production report showed the equity curve with only two dots: the initial star
 - The embedded chart now shows intermediate valuation dates.
 - `tools/validate_etf_equity_curve_history.py` is wired into the send workflow.
 - Fresh delivery fails before email if Section 7 has too few points, duplicate dates, or latest NAV does not reconcile with Section 15 total NAV.
+
+---
+
+## 2026-05-31 — Approve macro/thesis roadmap with phased shadow-first sequencing
+### Decision
+The team approved the Weekly ETF Macro & Thesis Engine roadmap as the next major model-quality track for `weekly-etf`, but only under strict phased sequencing and shadow-first controls.
+
+### Chosen architecture
+```text
+pricing lineage first
+→ macro audit foundation
+→ deterministic regime and confidence engine
+→ macro policy pack schema
+→ compliance and methodology gates
+→ thesis candidates in shadow mode
+→ Stage-2 confirmation and valuation flags
+→ client-surface integration only after validation
+```
+
+### Authority rule
+Macro/regime modernization is approved as a post-pricing-lineage enhancement. Until validated in fixtures and shadow runs, the new macro engine may produce internal artifacts but must not change client-facing fundable decisions.
+
+### Scope
+This decision covers the roadmap parked at:
+
+```text
+docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md
+```
+
+It also governs future implementation of the uploaded macro/regime work packages and WP-9 thesis selection pipeline.
+
+### Reason
+The current macro pack is useful but still too static: regime classification relies on ETF proxies, confidence is hardcoded, central-bank stance is partly static, and macro/fundamental freshness inputs are not yet authoritative. The approved roadmap upgrades that layer while preserving determinism, provenance, compliance discipline, and the existing runtime-driven production baseline.
+
+### Consequence
+- Pricing lineage remains the active Priority A and must not be displaced.
+- Macro and thesis implementation starts only after Phase 0 control-layer recording.
+- WP-1 to WP-4 must run in fixture/shadow mode before they influence production decisions.
+- WP-7 compliance gates are mandatory before expanded macro/thesis content reaches the client report.
+- WP-9 Stage-1 thesis candidates are internal artifacts and must not appear as client-facing actions.
+- A lane becomes fundable only after thesis, market confirmation, valuation-grade pricing, and portfolio discipline gates all pass.
+- Institutional overlay may cap confidence but may never set the regime or portfolio action.
+- Schema corrections are required before WP-9 implementation, especially `active_drivers` and difficult central-bank source coverage.
+- Dutch output must be protected through native terminology and validator coverage before client-surface integration.
