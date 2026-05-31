@@ -7,11 +7,12 @@ on:
       - main
     paths:
       - "tools/validate_etf_macro_thesis_surface_leakage.py"
+      - "tools/write_macro_thesis_surface_leakage_validation_evidence.py"
       - "fixtures/macro_thesis_surface/**"
       - ".github/workflows/validate-macro-thesis-surface-leakage.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validate-macro-thesis-surface-leakage:
@@ -19,6 +20,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -42,3 +45,27 @@ jobs:
             exit 1
           fi
           echo "ETF_MACRO_THESIS_SURFACE_LEAKAGE_EXPECTED_FAILURE_OK"
+
+      - name: Write macro thesis leakage validation evidence
+        run: |
+          python tools/write_macro_thesis_surface_leakage_validation_evidence.py \
+            --output-dir output/macro/validation \
+            --workflow-name "${{ github.workflow }}" \
+            --workflow-run-id "${{ github.run_id }}" \
+            --workflow-run-number "${{ github.run_number }}" \
+            --workflow-attempt "${{ github.run_attempt }}" \
+            --commit-sha "${{ github.sha }}" \
+            --source-ref "${{ github.ref_name }}"
+
+      - name: Commit macro thesis leakage validation evidence
+        if: github.event_name != 'pull_request'
+        run: |
+          if [ -z "$(git status --porcelain -- output/macro/validation)" ]; then
+            echo "ETF_MACRO_THESIS_SURFACE_LEAKAGE_EVIDENCE_NO_CHANGE"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/macro/validation/*macro_thesis_surface_leakage*.json
+          git commit -m "record macro thesis leakage validation evidence [skip ci]"
+          git push
