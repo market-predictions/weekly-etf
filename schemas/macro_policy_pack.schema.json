@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/market-predictions/weekly-etf/schemas/macro_policy_pack.schema.json",
+  "title": "Weekly ETF Macro Policy Pack",
+  "description": "Schema contract for the macro policy pack consumed by ETF lane discovery. Phase 2/3 fields are shadow-first unless explicitly promoted by later control decisions.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at_utc",
+    "report_date",
+    "source_files",
+    "authority",
+    "macro_data_audit_summary",
+    "regime",
+    "confidence_decomposition",
+    "central_banks",
+    "macro_signals",
+    "policy_catalysts",
+    "cross_asset_confirmation",
+    "portfolio_implications",
+    "lane_adjustments",
+    "active_drivers",
+    "regime_memory",
+    "report_transfer"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "generated_at_utc": {
+      "type": "string"
+    },
+    "report_date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "source_files": {
+      "type": "object",
+      "required": ["pricing_audit", "relative_strength", "macro_context", "macro_data_audit"],
+      "additionalProperties": true,
+      "properties": {
+        "pricing_audit": {"type": ["string", "null"]},
+        "relative_strength": {"type": ["string", "null"]},
+        "macro_context": {"type": ["string", "null"]},
+        "macro_data_audit": {"type": ["string", "null"]}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "required": ["decision_framework", "input_state_contract", "output_contract", "operational_runbook", "shadow_only", "client_facing_authority", "decision_impact"],
+      "properties": {
+        "decision_framework": {"type": "string"},
+        "input_state_contract": {"type": "string"},
+        "output_contract": {"type": "string"},
+        "operational_runbook": {"type": "string"},
+        "shadow_only": {"type": "boolean", "const": true},
+        "client_facing_authority": {"type": "boolean", "const": false},
+        "decision_impact": {"type": "string", "const": "legacy_lane_adjustments_only"}
+      }
+    },
+    "macro_data_audit_summary": {
+      "type": "object",
+      "required": ["present", "status", "mode", "reference_date", "observation_count", "shadow_only", "client_facing_authority", "decision_impact"],
+      "properties": {
+        "present": {"type": "boolean"},
+        "status": {"type": ["string", "null"]},
+        "mode": {"type": ["string", "null"]},
+        "reference_date": {"type": ["string", "null"]},
+        "observation_count": {"type": ["integer", "null"]},
+        "shadow_only": {"type": "boolean", "const": true},
+        "client_facing_authority": {"type": "boolean", "const": false},
+        "decision_impact": {"type": "string", "const": "none_phase2_audit_only"}
+      }
+    },
+    "regime": {
+      "type": "object",
+      "required": ["current", "previous", "confidence", "confidence_source", "what_changed"],
+      "properties": {
+        "current": {"type": "string"},
+        "previous": {"type": "string"},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "confidence_source": {"type": "string"},
+        "what_changed": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "confidence_decomposition": {
+      "type": "object",
+      "required": ["method", "shadow_only", "client_facing_authority", "decision_impact", "components", "notes"],
+      "properties": {
+        "method": {"type": "string"},
+        "shadow_only": {"type": "boolean", "const": true},
+        "client_facing_authority": {"type": "boolean", "const": false},
+        "decision_impact": {"type": "string"},
+        "components": {"type": "object"},
+        "notes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "central_banks": {
+      "type": "object"
+    },
+    "macro_signals": {
+      "type": "object"
+    },
+    "policy_catalysts": {
+      "type": "array"
+    },
+    "cross_asset_confirmation": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "portfolio_implications": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "lane_adjustments": {
+      "type": "object"
+    },
+    "active_drivers": {
+      "type": "array",
+      "description": "Closed driver vocabulary for later WP-9 thesis candidates. Empty while the thesis layer is not yet promoted.",
+      "items": {
+        "type": "object",
+        "required": ["driver_id", "status", "source", "shadow_only", "client_facing_authority", "decision_impact"],
+        "properties": {
+          "driver_id": {"type": "string"},
+          "status": {"type": "string"},
+          "source": {"type": "string"},
+          "shadow_only": {"type": "boolean", "const": true},
+          "client_facing_authority": {"type": "boolean", "const": false},
+          "decision_impact": {"type": "string"}
+        }
+      }
+    },
+    "regime_memory": {
+      "type": "object"
+    },
+    "report_transfer": {
+      "type": "object"
+    }
+  }
+}
