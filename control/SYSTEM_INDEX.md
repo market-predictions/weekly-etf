@@ -50,12 +50,15 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `config/etf_discovery_universe.yml` — broad investable ETF lane universe used by discovery.
 - `config/macro_data_sources.yml` — shadow-mode macro audit source configuration for FRED, ECB, Treasury, and volatility inputs.
 - `config/cb_calendar.yml` — static central-bank calendar/control fixture until vetted official live calendar coverage is added.
+- `config/driver_catalog.yml` — closed, versioned Stage-1 macro/thesis driver catalog. Shadow-only; no client-facing or portfolio-action authority.
+- `config/driver_beneficiary_map.yml` — curated Stage-1 driver-to-ETF-lane beneficiary map using existing ETF universe `taxonomy_tag` values. Shadow-only.
 - `macro_sources/build_macro_data_audit.py` — run-scoped macro audit builder.
 - `tools/validate_macro_data_audit.py` — macro audit contract validator.
 - `schemas/macro_data_audit.schema.json` — macro audit schema shell.
 - `schemas/macro_policy_pack.schema.json` — macro policy pack schema/compatibility contract for the legacy pack and future deterministic regime engine.
 - `tools/validate_macro_policy_pack.py` — macro policy pack schema and compatibility validator. It must pass before lane discovery consumes `output/macro/latest.json`.
 - `tools/validate_macro_compliance.py` — macro/regime/thesis compliance validator for predictive wording, uncited overlay, orphan macro figures, Stage-1 candidate leakage, and shadow/internal label leakage before any client-surface promotion.
+- `runtime/build_thesis_candidates.py` — deterministic Stage-1 thesis candidate builder. Writes internal-only shadow artifacts and validates mapped lanes against `config/etf_discovery_universe.yml`.
 - `runtime/fetch_etf_relative_strength.py` — historical relative-strength fetcher for discovery scoring.
 - `runtime/discover_etf_lanes.py` — lane discovery runtime that writes the matching lane artifact.
 - `runtime/score_etf_lanes.py` — deterministic lane scoring and promotion logic.
@@ -73,6 +76,7 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `etf-pro-nl.txt` — Dutch companion delivery layer derived from the completed English report.
 - `.github/workflows/send-weekly-report.yml` — production send workflow.
 - `.github/workflows/validate-macro-compliance.yml` — isolated macro compliance validation workflow with safe and planted-failure fixtures.
+- `.github/workflows/validate-thesis-candidates-shadow.yml` — isolated Stage-1 thesis candidate validation workflow. Not part of production report delivery.
 - `.github/workflows/refresh-etf-state-from-report.yml` — explicit state refresh workflow.
 - `.github/workflows/send-weekly-report-split-test.yml` — split-test delivery comparison workflow.
 - `.github/workflows/lab-pyportfolioopt-optimization.yml` — lab-only optimizer workflow.
@@ -92,6 +96,7 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `output/macro/latest_macro_data_audit_path.txt` — pointer to the latest macro audit artifact.
 - `output/macro/latest.json` — current schema-versioned macro policy pack consumed by lane discovery.
 - `output/macro/validation/latest_macro_regime_shadow_validation.json` — repo-visible proof for the isolated deterministic macro-regime shadow workflow.
+- `output/macro/latest_thesis_candidates.json` — internal Stage-1 thesis candidate artifact when explicitly built. Shadow-only; not a report input or portfolio-action authority.
 
 ## State-model scripts
 
@@ -124,6 +129,7 @@ Lab outputs are never production truth unless explicitly promoted through a revi
 - Do not describe ETF pricing lineage as solved merely because the closing-price disclosure table is visible; the lineage contract requires immutable audit identity, explicit manifest linkage, state persistence, and audit-to-report validation.
 - Do not let Phase 2 macro audit values change regime, confidence, lane scoring, fundability, or client-facing wording until later regime/compliance/bilingual gates explicitly promote them.
 - Do not allow predictive macro/regime/thesis wording, uncited overlay claims, orphan macro figures, Stage-1 candidate leakage, or shadow/internal labels onto the client surface.
+- Do not treat Stage-1 thesis candidates as fundable, reportable, or portfolio-action authority.
 
 ## Current direction of travel
 
@@ -141,4 +147,5 @@ ETF is moving toward:
 - provenance-backed macro audit artifacts in shadow mode
 - schema-versioned macro policy pack compatibility before deterministic regime promotion
 - methodology and compliance gates before client-surface macro/thesis expansion
+- Stage-1 thesis candidates as internal-only shadow artifacts before Stage-2 confirmation and fundable integration
 - lab-only optimization as a QA/research surface, not a production allocator
