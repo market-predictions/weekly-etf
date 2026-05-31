@@ -1,0 +1,40 @@
+{
+  "artifact_type": "macro_thesis_surface_leakage_validation_evidence",
+  "authority": {
+    "client_facing_authority": false,
+    "fundability_authority": false,
+    "lane_scoring_authority": false,
+    "macro_thesis_promotion": false,
+    "portfolio_action_authority": false,
+    "production_report_path_changed": false,
+    "shadow_only": true
+  },
+  "generated_at_utc": "2026-05-31T23:24:18Z",
+  "guardrails": [
+    "Evidence proves leakage detection only.",
+    "Do not treat this as macro/thesis content promotion.",
+    "Stage-1 and Stage-2 artifacts remain internal-only unless a later control-layer promotion decision is made."
+  ],
+  "repository": "market-predictions/weekly-etf",
+  "schema_version": "1.0",
+  "scope": {
+    "delivery_html_guard": true,
+    "dutch_markdown_guard": true,
+    "english_markdown_guard": true,
+    "production_send_workflow_wired": true
+  },
+  "status": "passed",
+  "validated_markers": [
+    "ETF_MACRO_THESIS_SURFACE_LEAKAGE_SELF_TEST_OK",
+    "ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK",
+    "ETF_MACRO_THESIS_SURFACE_LEAKAGE_EXPECTED_FAILURE_OK"
+  ],
+  "workflow": {
+    "commit_sha": "3acef2f5822feb35db0bca2b7b0bcd85cac6ece3",
+    "name": "Validate ETF macro thesis surface leakage",
+    "run_attempt": "1",
+    "run_id": "26727496265",
+    "run_number": "2",
+    "source_ref": "main"
+  }
+}
