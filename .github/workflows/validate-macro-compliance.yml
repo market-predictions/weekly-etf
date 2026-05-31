@@ -1,0 +1,42 @@
+name: Validate ETF macro compliance
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "MACRO_METHODOLOGY.md"
+      - "tools/validate_macro_compliance.py"
+      - "fixtures/macro_compliance/**"
+      - ".github/workflows/validate-macro-compliance.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-macro-compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run macro compliance self-test
+        run: |
+          python tools/validate_macro_compliance.py --self-test
+
+      - name: Validate safe macro fixture
+        run: |
+          python tools/validate_macro_compliance.py \
+            --text fixtures/macro_compliance/safe_macro_note.md
+
+      - name: Prove unsafe macro fixture is blocked
+        run: |
+          python tools/validate_macro_compliance.py \
+            --text fixtures/macro_compliance/bad_predictive_macro_note.md \
+            --expect-fail
