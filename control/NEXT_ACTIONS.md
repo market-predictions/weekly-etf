@@ -1,6 +1,7 @@
 # ETF Review OS — Next Actions
 
 ## Status legend
+
 - `[USER]` = must be done manually by you in UI or external systems
 - `[ASSISTANT]` = I can do directly in chat/repo
 - `[JOINT]` = I prepare, you apply/approve
@@ -10,6 +11,7 @@
 ## Phase 0 — approved macro/thesis roadmap control lock
 
 ### 0. Record roadmap approval and sequencing
+
 - Owner: `[ASSISTANT]`
 - Status: completed on 2026-05-31
 - Source files:
@@ -20,10 +22,9 @@
 - Decision:
   - The team approved the Macro & Thesis Engine roadmap as the next major model-quality track for `weekly-etf`.
   - The roadmap is approved under strict phased sequencing and shadow-first implementation.
-  - Pricing lineage remains Priority A and must not be displaced.
 - Locked sequence:
   ```text
-  pricing lineage first
+  pricing lineage baseline confirmed
   → macro audit foundation
   → deterministic regime and confidence engine
   → macro policy pack schema
@@ -34,16 +35,13 @@
   ```
 - Authority rule:
   > Macro/regime modernization is approved as a post-pricing-lineage enhancement. Until validated in fixtures and shadow runs, the new macro engine may produce internal artifacts but must not change client-facing fundable decisions.
-- Done when:
-  - control-layer files record approval
-  - roadmap sequencing is explicit
-  - future sessions do not treat WP-1 to WP-9 as immediate production authority
 
 ---
 
-## Phase 1 — protect the validated runtime and delivery baseline
+## Phase 1 — pricing-lineage closure and runtime baseline protection
 
 ### 1. Keep using the control-layer start sequence
+
 - Owner: `[JOINT]`
 - Status: active standing rule
 - Action: every meaningful ETF architecture, debugging, prompt, state, workflow, delivery, discovery, localization, macro/thesis, or lab-optimization session starts with:
@@ -51,238 +49,229 @@
   2. `control/CURRENT_STATE.md`
   3. `control/NEXT_ACTIONS.md`
   4. only then the minimum relevant execution files
-- Done when: sessions no longer rediscover the architecture.
 
-### 2. Treat the current runtime + delivery HTML path as the production baseline
+### 2. Treat runtime + delivery HTML as the production baseline
+
 - Owner: `[JOINT]`
 - Status: active baseline
 - Current baseline:
   ```text
   pricing audit
   → historical relative strength
+  → macro policy pack
   → first-pass lane discovery
   → targeted challenger pricing
   → final lane discovery
+  → challenger fundability validation
+  → portfolio rotation plan
   → runtime state
   → EN/NL markdown render
-  → full valuation-history Section 7 equity curve
   → pricing-basis disclosure
-  → polish/linkify
-  → Dutch localization contract pass
-  → equity-curve history validation
-  → Dutch language quality validation
-  → bilingual numeric parity validation
+  → polish/linkify/localization
+  → persisted valuation state
+  → equity-curve validation
+  → Dutch quality validation
   → delivery HTML overrides
-  → bilingual delivery HTML contract validation
-  → PDF/email delivery
+  → bilingual delivery HTML validation
+  → pricing-lineage pre-send gate
+  → PDF/email delivery workflow step
   ```
 - Action:
   - do not repair strict branded sections through markdown post-processing
   - do not let new macro/thesis content bypass runtime-state, bilingual parity, delivery HTML, or compliance validation
-- Done when: Section 2, Current Position Review, Portfolio Rotation Plan, Vervangingsanalyse, Section 7 equity curve, and any future macro/thesis client-surface blocks stay governed by runtime/delivery contracts and validator checks.
+  - do not claim email delivery without a delivery receipt/manifest or explicit user confirmation
 
-### 3. Keep workflow behavior operational only
+### 3. ETF pricing-lineage contract
+
 - Owner: `[ASSISTANT]`
-- Status: active standing rule
-- Action:
-  - production send workflow should be for production report-output pushes, manual dispatch, or safe run-queue requests only
-  - code/control changes should not silently resend subscriber emails
-  - do not claim delivery success without a real receipt, manifest, or explicit user confirmation of received delivery
-- Done when: delivery status remains verifiable.
-
-### 4. Protect the full valuation-history equity curve
-- Owner: `[ASSISTANT]`
-- Status: done / active regression guard
-- Result:
-  - Section 7 now uses `output/etf_valuation_history.csv` plus current runtime NAV.
-  - The embedded equity-curve chart now shows intermediate valuation dates.
-  - `tools/validate_etf_equity_curve_history.py` is wired into `.github/workflows/send-weekly-report.yml`.
-  - Workflow marker: `ETF_EQUITY_CURVE_HISTORY_OK`.
-- Action going forward:
-  - do not hardcode Section 7 as only start/latest
-  - if valuation history changes, preserve Section 7 ↔ Section 15 reconciliation
-- Done when: every fresh report has at least the historical valuation points plus current NAV and latest Section 7 NAV reconciles with Section 15 total NAV.
-
----
-
-## Phase 1B — implement ETF pricing-lineage contract
-
-### 5. Use `ETF_PRICING_LINEAGE_CONTRACT_V1` as authority
-- Owner: `[ASSISTANT]`
-- Status: active priority
-- Source files:
-  - `control/ETF_PRICING_LINEAGE_CONTRACT_V1.md`
-  - `control/ETF_PRICING_LINEAGE_CHANGELOG.md`
-- Action:
-  - treat the fresh-closing-price issue as unresolved until the contract is implemented
-  - track all pricing-lineage changes in the dedicated changelog
-  - preserve root `changelog.md` visibility for repo-level changes
-  - do not allow macro/thesis implementation to displace this priority
-- Done when: the contract is implemented and the hard lineage validator passes before delivery.
-
-### 6. Add immutable run identity and manifest
-- Owner: `[ASSISTANT]`
-- Status: next implementation step
-- Target files:
-  - `pricing/run_pricing_pass.py`
-  - `pricing/audit_writer.py`
-  - `.github/workflows/send-weekly-report.yml`
-  - new `output/run_manifests/` writer/helper as needed
-- Action:
-  - create a run id for each production pricing run
-  - write immutable audit files using requested close date plus run id
-  - write a central run manifest under `output/run_manifests/`
-  - pass exact audit/runtime/report paths through later workflow steps instead of reselecting latest files
-- Done when: one report can be traced to one exact audit and manifest.
-
-### 7. Upgrade price row schema and status semantics
-- Owner: `[ASSISTANT]`
-- Status: planned
-- Target files:
-  - `pricing/models.py`
-  - `pricing/clients/twelve_data.py`
-  - `pricing/clients/yahoo_history.py`
-  - `pricing/clients/fmp.py`
-  - `pricing/clients/alpha_vantage.py`
-  - `pricing/source_registry.yaml`
-  - `pricing/symbol_resolver.py`
-- Action:
-  - add selected close, selected close type, provider symbol, provider exchange where available, finality flag, verification block, and pricing tier
-  - replace generic fresh labels with `fresh_exact_close`, `fresh_exact_unverified`, `prior_valid_close`, `carried_forward`, `unresolved`, and `blocked`
-- Done when: no close row can be mislabeled fresh when the returned close date differs from the requested close date.
-
-### 8. Persist successful ETF valuation state
-- Owner: `[ASSISTANT]`
-- Status: planned
-- Target files:
-  - `runtime/build_etf_report_state.py`
-  - `runtime/render_etf_report_from_state.py`
-  - state writer/helper as needed
-  - `output/etf_portfolio_state.json`
-  - `output/etf_valuation_history.csv`
-- Action:
-  - update canonical portfolio state after successful pricing/runtime valuation
-  - append or replace the current requested close date in valuation history deterministically
-  - ensure future runs start from the last successful priced state, not stale report-derived values
-- Done when: the latest successful report NAV equals persisted portfolio state and valuation history.
-
-### 9. Enforce challenger pricing tiers
-- Owner: `[ASSISTANT]`
-- Status: planned
-- Target files:
-  - `pricing/augment_challenger_pricing.py`
-  - `runtime/discover_etf_lanes.py`
-  - `runtime/score_etf_lanes.py`
-  - replacement-duel validator files
-- Action:
-  - keep broad discovery candidates research-grade
-  - require valuation-grade pricing for replacement-duel challengers
-  - require valuation-grade pricing before any promoted challenger is shown as fundable/actionable
-- Done when: broad discovery is still efficient, but fundable challengers cannot appear without valuation-grade pricing.
-
-### 10. Add hard pricing-lineage validator
-- Owner: `[ASSISTANT]`
-- Status: planned
-- Target file:
+- Status: completed / active regression guard
+- Evidence:
+  - confirmation run id: `20260531_200843`
+  - requested close date: `2026-05-29`
+  - manifest: `output/run_manifests/weekly_etf_run_manifest_2026-05-29_20260531_200843.json`
+  - `pricing_lineage_status: passed`
+  - `workflow_conclusion: success`
+  - English report: `output/weekly_analysis_pro_260529_22.md`
+  - Dutch report: `output/weekly_analysis_pro_nl_260529_22.md`
+  - runtime state: `output/runtime/etf_report_state_20260529_20260531_200843.json`
+  - pricing audit: `output/pricing/price_audit_2026-05-29_20260531_200843.json`
+  - NAV validated: `109964.97`
+- Implemented files:
   - `tools/validate_etf_pricing_lineage_contract.py`
+  - `tools/validate_etf_client_surface_clean.py`
+  - `tools/write_weekly_etf_run_manifest.py`
+  - `.github/workflows/send-weekly-report.yml`
+- Action going forward:
+  - keep the hard pricing-lineage validator before send
+  - keep manifest status `passed` separate from workflow lifecycle status
+  - do not weaken valuation-grade challenger pricing requirements
+  - do not describe delivery as successful without delivery evidence
+
+### 4. Remaining pricing-related enhancement: independent verification
+
+- Owner: `[ASSISTANT]`
+- Status: optional future enhancement, not a blocker
 - Action:
-  - validate manifest → audit → runtime state → report tables → Section 7 NAV → Section 15 NAV → persisted portfolio state → valuation history
-  - fail before render/send if any piece diverges
-- Done when: a visible close-price disclosure is no longer enough; the full lineage must pass.
+  - add cross-provider verification where feasible
+  - upgrade rows from `fresh_exact_unverified` to `fresh_exact_close` only when independent providers agree on requested-date close
+- Done when:
+  - pricing audit records independent verification source/status
+  - exact verified rows can be distinguished from exact unverified rows
 
 ---
 
-## Phase 2 — Dutch premium report quality roadmap
+## Phase 2 — macro audit foundation, shadow-only
 
-### 11. Maintain the Dutch quality roadmap
-- Owner: `[ASSISTANT]`
-- Status: started
-- Source files:
-  - `control/NL_REPORT_QUALITY_ROADMAP.md`
-  - `control/NL_REPORT_LANGUAGE_CONTRACT.md`
-  - `control/NL_TERMINOLOGY.md`
-- Action:
-  - keep roadmap phases explicit
-  - do not let one-off Dutch phrase fixes replace the language-contract layer
-  - extend Dutch terminology/validators before any macro/thesis client-surface integration
-- Done when: Dutch report improvements are tracked as an operating roadmap, not ad-hoc fixes.
+### 5. Preserve Phase 2 macro audit as non-authoritative until promoted
 
-### 12. Block mixed English/Dutch sentences before next Dutch publication
 - Owner: `[ASSISTANT]`
-- Status: implemented; needs test run
-- Changed files:
-  - `runtime/nl_localization.py`
-  - `tools/validate_etf_dutch_language_quality.py`
-- Action:
-  - validate that mixed sentences such as `Keep SMH...`, `but vers kapitaal...`, `Require replacement duels...`, and `Aanhouden under review` fail before send
-- Done when: the Dutch language quality validator fails any mixed-language decision sentence.
+- Status: started / shadow-only
+- Current files:
+  - `config/macro_data_sources.yml`
+  - `config/cb_calendar.yml`
+  - `macro_sources/build_macro_data_audit.py`
+  - `tools/validate_macro_data_audit.py`
+  - `schemas/macro_data_audit.schema.json`
+  - `runtime/build_macro_policy_pack.py`
+- Current rule:
+  - macro audit may build internal provenance artifacts
+  - macro audit values must not change regime, confidence, lane scoring, fundability, portfolio actions, or client-facing wording yet
+  - macro audit unavailability is non-blocking while the layer remains shadow-only
+- Next action:
+  - add fixture replay examples for no-network validation
+  - document which official/market sources are authoritative enough for Phase 3
 
-### 13. Translate table headers and enum values through controlled mappings
-- Owner: `[ASSISTANT]`
-- Status: implemented; needs test run
-- Changed files:
-  - `runtime/nl_localization.py`
-  - `runtime/apply_nl_localization.py`
-  - `control/NL_TERMINOLOGY.md`
-- Action:
-  - validate table labels such as Theme, Primary ETF, Why it matters, Existing, Yes, No, None, Hold, Add, Current status, Why I’m considering it
-- Done when: table labels and enum values in the Dutch report are mapped through the Dutch terminology contract.
+### 6. Define macro policy pack schema before changing decisions
 
-### 14. Remove internal workflow language from the Dutch client report
 - Owner: `[ASSISTANT]`
-- Status: implemented; needs test run
-- Changed files:
-  - `runtime/nl_localization.py`
-  - `tools/validate_etf_dutch_language_quality.py`
-- Action:
-  - block `Section`, `runtime`, `state-led`, `output/`, `pricing_audit`, `workflow`, `manifest`, `artifact`, and placeholder language where client-facing
-- Done when: operational runbook terms remain in audit/manifest files only.
-
-### 15. Replace low-quality literal translations
-- Owner: `[ASSISTANT]`
-- Status: implemented; needs test run
-- Changed files:
-  - `runtime/nl_localization.py`
-  - `control/NL_TERMINOLOGY.md`
-- Action:
-  - replace `verdiende leider`, `prijsbewijs`, `actiebias`, `thesisfit`, `reviewpositie`, `nuttige ballast`, `vers kapitaal`
-- Done when: executive sections and tables use institutional Dutch such as `best onderbouwde kernpositie`, `koersbevestiging`, `beslissingsrichting`, `aansluiting op de beleggingscase`, and `positie onder actieve herbeoordeling`.
-
-### 16. Make Dutch cover and chart language Dutch
-- Owner: `[ASSISTANT]`
-- Status: implemented; needs render test
-- Changed file:
-  - `send_report_runtime_html.py`
-- Action:
-  - validate Dutch delivery HTML/PDF cover no longer shows Investor Report, Analyst Report, PRIMARY REGIME, GEOPOLITICAL REGIME, MAIN TAKEAWAY
-  - validate chart labels are Dutch where practical
-- Done when: Dutch PDF cover and equity-curve labels read as Dutch client-facing output.
-
-### 17. Native Dutch templates for key sections
-- Owner: `[ASSISTANT]`
-- Status: planned after first test result
+- Status: next architecture task
 - Target files:
-  - `runtime/render_etf_report_from_state.py`
-  - `runtime/apply_nl_localization.py`
-  - `runtime/nl_localization.py`
+  - `schemas/macro_policy_pack.schema.json`
+  - `runtime/build_macro_policy_pack.py`
+  - `config/regime_thresholds.yml`
 - Action:
-  - render Kernsamenvatting, Conclusie, Portefeuille-acties, Review huidige posities and Vervangingsanalyse from runtime state using Dutch-native templates rather than sentence-by-sentence translation
-- Done when: these sections read as originally written Dutch.
-
-### 18. Human-readable Dutch glossary per section
-- Owner: `[ASSISTANT]`
-- Status: started
-- Source file:
-  - `control/NL_TERMINOLOGY.md`
-- Action:
-  - expand glossary when new sections/tables are added
-- Done when: changing Dutch report wording requires one terminology update plus one code mapping if needed.
+  - define required fields for regime, confidence decomposition, central-bank stance, active drivers, lane adjustments, and provenance
+  - ensure backward compatibility for `lane_adjustments`
+  - explicitly mark any field that is shadow-only versus decision-authoritative
+- Done when:
+  - current legacy pack validates or has a compatibility adapter
+  - future deterministic regime engine has a stable output contract before implementation
 
 ---
 
-## Phase 3 — ChatGPT-triggerable report generation
+## Phase 3 — deterministic regime and confidence engine
 
-### 19. Use safe report request queue for ChatGPT-initiated fresh reports
+### 7. Replace hardcoded regime/confidence logic in shadow mode first
+
+- Owner: `[ASSISTANT]`
+- Status: planned
+- Target files:
+  - `macro_regime/classify.py`
+  - `macro_regime/confidence.py`
+  - `config/regime_thresholds.yml`
+  - `runtime/regime_memory.py` only if extension is needed
+- Action:
+  - move thresholds out of code into config
+  - compute confidence from cross-axis agreement rather than fixed constants
+  - keep output descriptive, not predictive
+  - preserve current production decisions during shadow comparison
+- Done when:
+  - fixture inputs produce deterministic regime/confidence outputs
+  - old versus new pack differences can be reviewed before promotion
+
+---
+
+## Phase 4 — compliance and methodology gates
+
+### 8. Add macro/thesis methodology and compliance validator
+
+- Owner: `[ASSISTANT]`
+- Status: planned before client-surface expansion
+- Target files:
+  - `MACRO_METHODOLOGY.md`
+  - `tools/validate_macro_compliance.py`
+  - Dutch language validator extensions if macro/thesis wording reaches Dutch reports
+- Action:
+  - block predictive phrasing about market levels or central-bank actions
+  - require cited/paraphrased overlay entries
+  - block Stage-1 candidate leakage
+  - ensure every client-surfaced macro claim traces to provenance
+- Done when:
+  - planted forecast sentences fail validation
+  - uncited overlay entries fail validation
+  - orphan macro claims fail validation
+
+---
+
+## Phase 5 — WP-9 thesis candidates in shadow mode
+
+### 9. Build thesis candidate layer as internal artifact only
+
+- Owner: `[ASSISTANT]`
+- Status: planned
+- Target files:
+  - `config/driver_catalog.yml`
+  - `config/driver_beneficiary_map.yml`
+  - `runtime/build_thesis_candidates.py`
+  - `output/macro/thesis_candidates_<reference_date>_<run_id>.json`
+- Action:
+  - define closed driver IDs
+  - derive active drivers from macro axes
+  - map drivers to beneficiary ETF lanes through curated config
+  - keep candidates internal until Stage-2 confirmation gates pass
+- Done when:
+  - same fixture produces same candidate list
+  - candidate lanes exist in the ETF discovery universe
+  - no candidate-stage content appears in client reports
+
+---
+
+## Phase 6 — Stage-2 confirmation and fundable integration
+
+### 10. Add thesis → fundable promotion discipline
+
+- Owner: `[ASSISTANT]`
+- Status: planned after shadow validation
+- Target files:
+  - `runtime/valuation_sanity.py`
+  - `runtime/score_etf_lanes.py`
+  - `runtime/discover_etf_lanes.py`
+  - challenger/fundability validators
+- Action:
+  - require active thesis driver
+  - require documented driver → beneficiary rationale
+  - require relative-strength / duel confirmation
+  - require valuation-grade pricing
+  - add valuation/crowding caution flag where needed
+- Done when:
+  - no RS confirmation means candidate remains candidate
+  - no valuation-grade pricing means not fundable
+  - every fundable item exposes a complete chain from driver to confirmation
+
+---
+
+## Phase 7 — Dutch quality and alias cleanup
+
+### 11. Consolidate bilingual alias handling
+
+- Owner: `[ASSISTANT]`
+- Status: useful cleanup after pricing-lineage closure
+- Target files:
+  - `runtime/nl_localization.py`
+  - `runtime/apply_nl_localization.py`
+  - `send_report.py`
+  - `tools/validate_etf_delivery_html_contract.py`
+  - `tools/validate_etf_dutch_language_quality.py`
+- Action:
+  - keep Dutch terminology and aliases in one source of truth
+  - reuse that source from markdown localization, send-time parity checks, Dutch quality validation, and delivery HTML validation
+
+---
+
+## Phase 8 — ChatGPT-triggerable report generation
+
+### 12. Use safe report request queue for ChatGPT-initiated fresh reports
+
 - Owner: `[ASSISTANT]`
 - Status: active baseline
 - Action: when the user asks ChatGPT to generate a fresh Weekly ETF Review, create a request file under:
@@ -290,76 +279,18 @@
   control/run_queue/weekly_etf_report_request_YYYYMMDD_HHMMSS.md
   ```
 - Do not create trigger files under `output/`.
-- Done when: the send workflow is triggered by the run-queue request path and no placeholder report files are introduced.
-
-### 20. Run one Dutch quality confirmation workflow
-- Owner: `[JOINT]`
-- Status: deferred behind pricing-lineage implementation unless specifically requested
-- Action:
-  - trigger a fresh report only after the user agrees to test the Phase 1 Dutch quality changes
-  - inspect validator output and the received PDF
-- Done when: the Dutch report passes automated validators and visual inspection for premium Dutch language quality.
+- After triggering, inspect the resulting run artifacts/manifests and workflow logs where available.
+- Do not ask the user to check the Actions tab unless connector access is insufficient and the run cannot be diagnosed from repo evidence.
 
 ---
 
-## Phase 4 — improve portfolio decision quality
+## Immediate next recommended action
 
-### 21. Continue direct challenger-vs-current-holding scoring
-- Owner: `[ASSISTANT]`
-- Status: planned, but subordinate to pricing-lineage and macro/thesis sequencing
-- Action:
-  - map challenger lanes to likely funded holdings they could replace
-  - compare challenger 1m and 3m returns directly versus the target holding
-  - add direct replacement edge to lane scoring
-  - add direct duel fields to lane artifacts
-  - surface the direct edge in replacement-duel notes
-- Done when: replacement candidates are compared against the actual holding they would replace, not only versus SPY.
+Continue the approved roadmap with **Phase 2/3 macro-regime work**, not more pricing repair:
 
-### 22. Expand and curate the discovery universe
-- Owner: `[ASSISTANT]`
-- Status: ongoing
-- Source file:
-  - `config/etf_discovery_universe.yml`
-- Action:
-  - add additional sectors, factor ETFs, region ETFs, commodity ETFs, defensive exposures, and non-U.S. exposures
-  - keep each lane investable, differentiated, and scored
-  - keep future macro/thesis driver-beneficiary maps aligned to actual lane names in this universe
-- Done when: the universe is broad enough to surface new candidates without becoming noisy.
+1. Freeze the latest pricing-lineage evidence as the baseline.
+2. Add macro pack schema / compatibility adapter.
+3. Add deterministic regime/confidence engine in shadow mode.
+4. Add fixture replay tests before any production decision impact.
 
-### 23. Add better macro/fundamental freshness inputs through the approved roadmap
-- Owner: `[ASSISTANT]`
-- Status: approved roadmap; implementation not yet production authority
-- Source files:
-  - `docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md`
-  - future `macro_sources/`
-  - future `macro_regime/`
-  - future `schemas/macro_policy_pack.schema.json`
-  - future `tools/validate_macro_compliance.py`
-- Action:
-  - build a provenance-backed macro audit foundation as internal artifacts first
-  - replace hardcoded regime/confidence logic with deterministic threshold/config-driven logic
-  - add schema validation and fixture replay before production influence
-  - add methodology and compliance validation before client-surface expansion
-- Done when: discovery is no longer only config-driven, but the new macro inputs have passed fixture, shadow, schema, compliance, and bilingual validation gates.
-
-### 24. Implement WP-9 thesis layer only after macro pack validation
-- Owner: `[ASSISTANT]`
-- Status: approved roadmap; do not start before WP-1 to WP-4 foundation
-- Target future files:
-  - `config/driver_catalog.yml`
-  - `config/driver_beneficiary_map.yml`
-  - `runtime/build_thesis_candidates.py`
-  - `runtime/valuation_sanity.py`
-  - thesis/fundable output artifacts under `output/macro/` or `output/lane_reviews/`
-- Action:
-  - add active-driver vocabulary and deterministic driver activation
-  - map active drivers to candidate lanes through a hand-curated, versioned map
-  - keep Stage-1 candidates internal and never client-facing
-  - promote candidates only after RS/duel confirmation, valuation-grade pricing, valuation/crowding flagging, and portfolio discipline gates
-- Done when: every fundable item exposes a full chain from driver → rationale → confirmation → valuation/pricing → portfolio discipline, and no candidate-stage content leaks into client reports.
-
----
-
-## Current checkpoint
-
-**The active engineering checkpoint is now ETF pricing-lineage hardening, with the Macro & Thesis Engine roadmap approved and locked as a shadow-first follow-on model-quality track. The close-price disclosure table is visible and internally useful, but the fresh-closing-price issue remains open until immutable audit identity, explicit run manifests, state persistence, challenger pricing tiers, and the hard pricing-lineage validator are implemented. Macro/thesis work may begin only according to the approved phased roadmap and must not affect client-facing fundable decisions until fixture, shadow, schema, compliance, and bilingual gates pass.**
+Do not move WP-9 thesis candidates into production until schema, compliance, fixture replay, and bilingual gates exist.
