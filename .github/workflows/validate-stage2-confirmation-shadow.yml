@@ -9,13 +9,14 @@ on:
       - "config/stage2_confirmation_rules.yml"
       - "runtime/evaluate_stage2_confirmation.py"
       - "runtime/build_thesis_candidates.py"
+      - "tools/write_stage2_confirmation_validation_evidence.py"
       - "config/driver_catalog.yml"
       - "config/driver_beneficiary_map.yml"
       - "fixtures/stage2_confirmation/**"
       - ".github/workflows/validate-stage2-confirmation-shadow.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validate-stage2-confirmation-shadow:
@@ -23,6 +24,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -54,12 +57,36 @@ jobs:
             --reference-date 2026-05-29 \
             --run-id stage2_shadow_validation
 
-      - name: Validate current Stage-2 shadow artifact
+      - name: Build current Stage-2 shadow artifact
         run: |
           python runtime/evaluate_stage2_confirmation.py \
             --thesis-candidates output/macro/latest_thesis_candidates.json \
             --relative-strength output/market_history/etf_relative_strength.json \
             --price-audit output/pricing/price_audit_2026-05-29_20260531_200843.json \
             --reference-date 2026-05-29 \
-            --run-id stage2_shadow_validation \
-            --validate-only
+            --run-id stage2_shadow_validation
+
+      - name: Write Stage-2 validation evidence
+        run: |
+          python tools/write_stage2_confirmation_validation_evidence.py \
+            --stage2-artifact output/macro/latest_stage2_confirmation.json \
+            --output-dir output/macro/validation \
+            --workflow-name "${{ github.workflow }}" \
+            --workflow-run-id "${{ github.run_id }}" \
+            --workflow-run-number "${{ github.run_number }}" \
+            --workflow-attempt "${{ github.run_attempt }}" \
+            --commit-sha "${{ github.sha }}" \
+            --source-ref "${{ github.ref_name }}"
+
+      - name: Commit Stage-2 validation evidence
+        if: github.event_name != 'pull_request'
+        run: |
+          if [ -z "$(git status --porcelain -- output/macro/validation)" ]; then
+            echo "ETF_STAGE2_CONFIRMATION_EVIDENCE_NO_CHANGE"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/macro/validation/*stage2_confirmation*.json
+          git commit -m "record stage2 confirmation validation evidence [skip ci]"
+          git push
