@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "stage_1_thesis_candidates_shadow",
+  "reference_date": "2026-06-01",
+  "run_id": "fixture_stage2",
+  "authority": {
+    "shadow_only": true,
+    "client_facing_authority": false,
+    "decision_impact": "none_stage1_thesis_candidates_only",
+    "portfolio_action_authority": false,
+    "fundability_authority": false,
+    "report_surface_allowed": false
+  },
+  "active_driver_ids": [
+    "ai_compute_capex",
+    "non_us_developed_diversification",
+    "commodity_inflation_hedge"
+  ],
+  "candidates": [
+    {
+      "driver_id": "ai_compute_capex",
+      "driver_label": "AI compute capital cycle",
+      "taxonomy_tag": "ai_compute_infrastructure",
+      "lane_name": "AI compute infrastructure",
+      "primary_etf": "SMH",
+      "alternative_etf": "SOXX",
+      "driver_to_beneficiary_rationale": "Primary hardware expression of AI compute capex.",
+      "stage": "stage_1_shadow_candidate_only",
+      "client_facing_authority": false,
+      "fundability_status": "not_fundable_stage_1_only",
+      "portfolio_action": "none",
+      "requires_stage_2_confirmation": true,
+      "portfolio_discipline_clearance": true
+    },
+    {
+      "driver_id": "non_us_developed_diversification",
+      "driver_label": "Non-U.S. developed diversification",
+      "taxonomy_tag": "non_us_developed_equities",
+      "lane_name": "Non-U.S. developed market diversification",
+      "primary_etf": "IEFA",
+      "alternative_etf": "EFA",
+      "driver_to_beneficiary_rationale": "Broad non-U.S. developed-market expression.",
+      "stage": "stage_1_shadow_candidate_only",
+      "client_facing_authority": false,
+      "fundability_status": "not_fundable_stage_1_only",
+      "portfolio_action": "none",
+      "requires_stage_2_confirmation": true,
+      "portfolio_discipline_clearance": true
+    },
+    {
+      "driver_id": "commodity_inflation_hedge",
+      "driver_label": "Commodity inflation hedge",
+      "taxonomy_tag": "broad_commodities",
+      "lane_name": "Broad commodity inflation hedge",
+      "primary_etf": "GSG",
+      "alternative_etf": "DBC",
+      "driver_to_beneficiary_rationale": "Broad inflation hedge expression.",
+      "stage": "stage_1_shadow_candidate_only",
+      "client_facing_authority": false,
+      "fundability_status": "not_fundable_stage_1_only",
+      "portfolio_action": "none",
+      "requires_stage_2_confirmation": true,
+      "portfolio_discipline_clearance": true
+    }
+  ]
+}
