@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "authority": {
+    "shadow_only": true,
+    "client_facing_authority": false,
+    "decision_impact": "legacy_lane_adjustments_only"
+  },
+  "regime": {
+    "current": "Mixed policy transition",
+    "confidence": 0.58
+  },
+  "deterministic_regime_shadow": {
+    "candidate_regime": "Mixed policy transition",
+    "candidate_confidence": 0.58,
+    "shadow_only": true,
+    "client_facing_authority": false,
+    "decision_impact": "none_shadow_comparison_only"
+  },
+  "central_banks": {
+    "pboc": {
+      "stance": "Supportive but credibility-sensitive",
+      "likely_direction": "Targeted support rather than broad reflation unless confidence improves",
+      "etf_implication": "China exposure remains tactical watchlist unless price confirmation improves."
+    },
+    "ecb": {
+      "likely_direction": "Gradual easing bias if inflation and growth allow",
+      "etf_implication": "Non-U.S. developed exposure remains watchlist, not automatic add."
+    }
+  },
+  "policy_catalysts": [
+    {
+      "policy_area": "China stimulus and platform regulation",
+      "affected_lanes": ["China platform beta", "EM equity beta"],
+      "latest_signal": "China policy support remains watchlist-relevant, but confidence and earnings confirmation are still required.",
+      "confidence": 0.52
+    },
+    {
+      "policy_area": "Commodity and hard-asset demand",
+      "affected_lanes": ["Broad commodity inflation hedge", "Copper and electrification materials"],
+      "latest_signal": "Commodity and copper confirmation would be needed before a hard-asset thesis becomes fundable.",
+      "confidence": 0.50
+    }
+  ],
+  "macro_signals": {
+    "hedge_ballast": {"signal": "under_review"}
+  },
+  "lane_adjustments": {
+    "Gold hedge review": {
+      "reason": "Gold and commodity hedge behavior remains under review until hard-asset breadth confirms."
+    }
+  }
+}
