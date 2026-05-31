@@ -39,6 +39,7 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `control/ETF_PRICING_LINEAGE_CONTRACT_V1.md` — authoritative design contract for the pricing-lineage hardening cycle, including immutable audit identity, state persistence, exact close-date semantics, provider lineage, independent verification, and challenger pricing tiers.
 - `control/ETF_PRICING_LINEAGE_CHANGELOG.md` — central pricing-lineage changelog for regression review and implementation tracking.
 - `docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md` — approved phased roadmap for macro/thesis modernization. It is a roadmap, not immediate production authority.
+- `MACRO_METHODOLOGY.md` — methodology and compliance boundary for macro/regime/thesis content before client-surface promotion.
 
 ## Canonical execution files
 
@@ -54,6 +55,7 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `schemas/macro_data_audit.schema.json` — macro audit schema shell.
 - `schemas/macro_policy_pack.schema.json` — macro policy pack schema/compatibility contract for the legacy pack and future deterministic regime engine.
 - `tools/validate_macro_policy_pack.py` — macro policy pack schema and compatibility validator. It must pass before lane discovery consumes `output/macro/latest.json`.
+- `tools/validate_macro_compliance.py` — macro/regime/thesis compliance validator for predictive wording, uncited overlay, orphan macro figures, Stage-1 candidate leakage, and shadow/internal label leakage before any client-surface promotion.
 - `runtime/fetch_etf_relative_strength.py` — historical relative-strength fetcher for discovery scoring.
 - `runtime/discover_etf_lanes.py` — lane discovery runtime that writes the matching lane artifact.
 - `runtime/score_etf_lanes.py` — deterministic lane scoring and promotion logic.
@@ -70,6 +72,7 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `etf-pro.txt` — premium English editorial delivery layer.
 - `etf-pro-nl.txt` — Dutch companion delivery layer derived from the completed English report.
 - `.github/workflows/send-weekly-report.yml` — production send workflow.
+- `.github/workflows/validate-macro-compliance.yml` — isolated macro compliance validation workflow with safe and planted-failure fixtures.
 - `.github/workflows/refresh-etf-state-from-report.yml` — explicit state refresh workflow.
 - `.github/workflows/send-weekly-report-split-test.yml` — split-test delivery comparison workflow.
 - `.github/workflows/lab-pyportfolioopt-optimization.yml` — lab-only optimizer workflow.
@@ -88,6 +91,7 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `output/macro/macro_data_audit_<reference_date>_<run_id>.json` — run-scoped shadow-mode macro audit artifact.
 - `output/macro/latest_macro_data_audit_path.txt` — pointer to the latest macro audit artifact.
 - `output/macro/latest.json` — current schema-versioned macro policy pack consumed by lane discovery.
+- `output/macro/validation/latest_macro_regime_shadow_validation.json` — repo-visible proof for the isolated deterministic macro-regime shadow workflow.
 
 ## State-model scripts
 
@@ -119,6 +123,7 @@ Lab outputs are never production truth unless explicitly promoted through a revi
 - Do not repair branded sections that require strict layout/clickable behavior through markdown post-processing; render them from runtime state at the delivery HTML layer and protect them with the delivery HTML validator.
 - Do not describe ETF pricing lineage as solved merely because the closing-price disclosure table is visible; the lineage contract requires immutable audit identity, explicit manifest linkage, state persistence, and audit-to-report validation.
 - Do not let Phase 2 macro audit values change regime, confidence, lane scoring, fundability, or client-facing wording until later regime/compliance/bilingual gates explicitly promote them.
+- Do not allow predictive macro/regime/thesis wording, uncited overlay claims, orphan macro figures, Stage-1 candidate leakage, or shadow/internal labels onto the client surface.
 
 ## Current direction of travel
 
@@ -135,4 +140,5 @@ ETF is moving toward:
 - recommendation scorecard artifacts for capital discipline
 - provenance-backed macro audit artifacts in shadow mode
 - schema-versioned macro policy pack compatibility before deterministic regime promotion
+- methodology and compliance gates before client-surface macro/thesis expansion
 - lab-only optimization as a QA/research surface, not a production allocator
