@@ -3,6 +3,7 @@
 # Phase: macro/regime roadmap Phase 3
 # Status: shadow-only. These thresholds must not change client-facing fundable
 # decisions until fixture replay, methodology, compliance, and bilingual gates pass.
+# Validation trigger: 2026-05-31T20:45:00Z
 
 schema_version: 1.0
 status: shadow_only
