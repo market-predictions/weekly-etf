@@ -356,3 +356,31 @@ The current macro pack is useful but still too static: regime classification rel
 - Institutional overlay may cap confidence but may never set the regime or portfolio action.
 - Schema corrections are required before WP-9 implementation, especially `active_drivers` and difficult central-bank source coverage.
 - Dutch output must be protected through native terminology and validator coverage before client-surface integration.
+
+---
+
+## 2026-05-31 — Keep Phase 2 macro audit foundation shadow-only
+### Decision
+The Phase 2 macro audit foundation is an input/provenance layer only. It may fetch and validate FRED, ECB, Treasury, and volatility observations, but it must not yet set regime, confidence, lane scoring, fundability, portfolio actions, or client-facing report wording.
+
+### Chosen architecture
+```text
+config/macro_data_sources.yml
+→ macro_sources/* clients
+→ output/macro/macro_data_audit_<reference_date>_<run_id>.json
+→ tools/validate_macro_data_audit.py
+→ runtime/build_macro_policy_pack.py records audit summary only
+```
+
+### Scope
+This decision covers WP-1 / Phase 2 only.
+
+### Reason
+The approved roadmap requires provenance-backed macro data before deterministic regime and confidence logic. Pulling the data directly into production decisions before schema, methodology, compliance, and bilingual gates exist would recreate the same uncontrolled patch-cycle risk the repo is trying to avoid.
+
+### Consequence
+- Macro audit values are run-scoped and validated.
+- The macro policy pack records the audit path and summary.
+- Existing regime classification remains unchanged for now.
+- Client-facing macro claims must still come from the existing validated report path until later phases promote the new macro engine.
+- Fixture replay is required to support deterministic no-network validation.
