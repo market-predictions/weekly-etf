@@ -1,0 +1,52 @@
+{
+  "delivery_manifest_path": null,
+  "dutch_report_path": "output/weekly_analysis_pro_nl_260529_22.md",
+  "english_report_path": "output/weekly_analysis_pro_260529_22.md",
+  "notes": null,
+  "portfolio_state_path": "output/etf_portfolio_state.json",
+  "pricing_audit_path": "output/pricing/price_audit_2026-05-29_20260531_200843.json",
+  "pricing_lineage_status": "passed",
+  "pricing_lineage_validated_at_utc": "2026-05-31T20:13:30.472437+00:00",
+  "pricing_lineage_validation": {
+    "english_report_path": "output/weekly_analysis_pro_260529_22.md",
+    "holdings_validated": [
+      "GLD",
+      "GSG",
+      "PAVE",
+      "PPA",
+      "SMH",
+      "SPY",
+      "URNM"
+    ],
+    "pricing_audit_path": "output/pricing/price_audit_2026-05-29_20260531_200843.json",
+    "requested_close_date": "2026-05-29",
+    "run_id": "20260531_200843",
+    "runtime_state_path": "output/runtime/etf_report_state_20260529_20260531_200843.json",
+    "total_portfolio_value_eur": 109964.97
+  },
+  "pricing_summary": {
+    "carried_forward_holdings_count": 0,
+    "coverage_count_pct": 100.0,
+    "decision": "update_covered_holdings_carry_unresolved",
+    "fresh_holdings_count": 7,
+    "holdings_count": 7,
+    "invested_weight_coverage_pct": 98.24,
+    "unresolved_tickers": []
+  },
+  "report_token": "260529",
+  "requested_close_date": "2026-05-29",
+  "run_id": "20260531_200843",
+  "runtime_state_path": "output/runtime/etf_report_state_20260529_20260531_200843.json",
+  "runtime_summary": {
+    "cash_eur": 1936.52,
+    "lane_assessment_source": "output/lane_reviews/etf_lane_assessment_260529.json",
+    "pricing_audit_source": "output/pricing/price_audit_2026-05-29_20260531_200843.json",
+    "report_date": "2026-05-29",
+    "total_portfolio_value_eur": 109964.97
+  },
+  "schema_version": "1.0",
+  "updated_at_utc": "2026-05-31T20:13:41.522768+00:00",
+  "valuation_history_path": "output/etf_valuation_history.csv",
+  "workflow_conclusion": "success",
+  "workflow_status": "workflow_success"
+}
