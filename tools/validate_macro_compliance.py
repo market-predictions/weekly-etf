@@ -14,7 +14,6 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
@@ -35,7 +34,7 @@ STAGE1_LEAK_PATTERNS: tuple[tuple[str, str], ...] = (
 )
 
 ORPHAN_MACRO_FIGURE_PATTERN = re.compile(
-    r"\b(?:CPI|PCE|PMI|GDP|unemployment|payrolls|inflation|yields?|rates?|policy rate|terminal rate|10Y|2Y)\b[^\n]{0,100}\b\d+(?:\.\d+)?\s?(?:%|bp|bps|points?)\b",
+    r"\b(?:CPI|PCE|PMI|GDP|unemployment|payrolls|inflation|yields?|rates?|policy rate|terminal rate|10Y|2Y)\b[^\n]{0,100}\b\d+(?:\.\d+)?\s?(?:%|bp|bps|points?)(?=\s|$|[,.;:)])",
     re.IGNORECASE,
 )
 
@@ -150,7 +149,6 @@ def validate_macro_pack(path: Path) -> list[Finding]:
         if shadow.get("decision_impact") not in {None, "none_shadow_comparison_only"}:
             findings.append(Finding("shadow_decision_impact", "deterministic_regime_shadow has non-shadow decision impact.", 1, str(shadow)[:240]))
 
-    # Scan all string values for client-surface leaks as a conservative guard.
     flattened_strings: list[str] = []
 
     def collect(value: Any) -> None:
