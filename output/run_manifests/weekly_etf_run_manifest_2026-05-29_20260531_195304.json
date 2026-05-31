@@ -1,0 +1,27 @@
+{
+  "delivery_manifest_path": null,
+  "dutch_report_path": null,
+  "english_report_path": null,
+  "notes": null,
+  "portfolio_state_path": "output/etf_portfolio_state.json",
+  "pricing_audit_path": "output/pricing/price_audit_2026-05-29_20260531_195304.json",
+  "pricing_lineage_status": "workflow_failure",
+  "pricing_summary": {
+    "carried_forward_holdings_count": 0,
+    "coverage_count_pct": 100.0,
+    "decision": "update_covered_holdings_carry_unresolved",
+    "fresh_holdings_count": 7,
+    "holdings_count": 7,
+    "invested_weight_coverage_pct": 98.24,
+    "unresolved_tickers": []
+  },
+  "report_token": "260529",
+  "requested_close_date": "2026-05-29",
+  "run_id": "20260531_195304",
+  "runtime_state_path": null,
+  "schema_version": "1.0",
+  "updated_at_utc": "2026-05-31T19:54:29.977238+00:00",
+  "valuation_history_path": "output/etf_valuation_history.csv",
+  "workflow_conclusion": "failure",
+  "workflow_status": "workflow_failure"
+}
