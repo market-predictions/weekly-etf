@@ -243,6 +243,7 @@ jobs:
           python -m runtime.scrub_nl_pdf_audit_leaks --output-dir output
           python -m runtime.localize_nl_report_dates --output-dir output
           python -m runtime.link_runtime_report_tickers --output-dir output
+          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
           execution_log="$(python -m runtime.model_execution_engine \
             --runtime-state "$runtime_state_path" \
             --portfolio-state output/etf_portfolio_state.json \
@@ -299,6 +300,7 @@ jobs:
           MRKT_RPRTS_REPORT_MODE: pro
         run: |
           python tools/validate_etf_report_content_contract.py --output-dir output
+          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
 
       - name: Validate Dutch language quality contract
         env:
@@ -358,6 +360,7 @@ jobs:
           python tools/validate_etf_model_execution.py --artifact "$model_execution_path" --expected-mode guarded_auto
           python -m runtime.scrub_etf_client_surface --output-dir output
           python -m runtime.link_runtime_report_tickers --output-dir output
+          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
           python tools/validate_etf_trade_ledger_idempotency.py --trade-ledger output/etf_trade_ledger.csv
 
       - name: Validate lane breadth proof before render
@@ -406,6 +409,7 @@ jobs:
           else:
               print(f"RENDER_OK | mode=pro | report={bundle['en']['report_path'].name}")
           PY
+          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
 
       - name: Validate ETF delivery HTML contract
         env:
@@ -413,6 +417,7 @@ jobs:
         run: |
           python tools/validate_etf_delivery_html_contract.py --output-dir output
           python tools/validate_etf_client_surface_clean.py --output-dir output
+          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
 
       - name: Validate ETF explicit state derivation before send
         env:
