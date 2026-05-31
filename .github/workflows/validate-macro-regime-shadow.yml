@@ -91,7 +91,7 @@ jobs:
       - name: Commit shadow validation evidence
         if: github.event_name != 'pull_request'
         run: |
-          if git diff --quiet -- output/macro/validation; then
+          if [ -z "$(git status --porcelain -- output/macro/validation)" ]; then
             echo "ETF_MACRO_REGIME_SHADOW_EVIDENCE_NO_CHANGE"
             exit 0
           fi
