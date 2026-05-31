@@ -1,0 +1,28 @@
+{
+  "price_results": [
+    {
+      "symbol": "SMH",
+      "asset_role": "challenger",
+      "pricing_tier": "valuation_grade",
+      "status": "fresh_exact_unverified",
+      "selected_close": 598.93,
+      "is_final_eod_bar": true
+    },
+    {
+      "symbol": "IEFA",
+      "asset_role": "challenger",
+      "pricing_tier": "valuation_grade",
+      "status": "unresolved",
+      "selected_close": null,
+      "is_final_eod_bar": null
+    },
+    {
+      "symbol": "GSG",
+      "asset_role": "challenger",
+      "pricing_tier": "valuation_grade",
+      "status": "fresh_exact_unverified",
+      "selected_close": 31.80,
+      "is_final_eod_bar": true
+    }
+  ]
+}
