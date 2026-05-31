@@ -4,7 +4,7 @@
 2026-05-31
 
 ## Status
-Implemented and workflow-validated as shadow-only scaffolding. Not production decision authority.
+Implemented and workflow-validated as shadow-only scaffolding. Fixture replay has been added and is pending independent workflow proof.
 
 ## Current issue
 
@@ -21,6 +21,8 @@ Added:
 - `runtime/build_macro_policy_pack_shadow.py`
 - `tools/validate_macro_regime_shadow.py`
 - `.github/workflows/validate-macro-regime-shadow.yml`
+- `fixtures/macro_regime_shadow/regime_shadow_fixtures.json`
+- `tools/replay_macro_regime_shadow_fixtures.py`
 
 ## Authority rules
 
@@ -53,6 +55,32 @@ Expected fields include:
 - `axis_scores`
 - `confidence_decomposition`
 
+## Fixture replay contract
+
+The fixture replay file defines five stable no-network scenarios:
+
+```text
+risk_on_growth
+risk_on_narrow_leadership
+defensive_policy_stress
+rate_hike_repricing
+mixed_policy_transition
+```
+
+The replay validator checks:
+
+- expected candidate regime
+- expected axis labels
+- expected confidence range
+- shadow payload authority flags
+- exactly five fixture cases
+
+Expected replay marker:
+
+```text
+ETF_MACRO_REGIME_FIXTURE_REPLAY_OK
+```
+
 ## Current validation route
 
 The separate workflow:
@@ -61,33 +89,27 @@ The separate workflow:
 .github/workflows/validate-macro-regime-shadow.yml
 ```
 
-builds the shadow macro pack using:
+now performs:
 
 ```text
+python tools/replay_macro_regime_shadow_fixtures.py
 python -m runtime.build_macro_policy_pack_shadow
-```
-
-Then validates:
-
-```text
 python tools/validate_macro_policy_pack.py --pack output/macro/latest.json
-python - <<'PY'
-from tools.validate_macro_regime_shadow import validate_shadow_payload
-...
-PY
+python inline validate_shadow_payload(...)
 ```
 
-Expected marker:
+Expected markers:
 
 ```text
+ETF_MACRO_REGIME_FIXTURE_REPLAY_OK
 ETF_MACRO_REGIME_SHADOW_OK
 ```
 
 ## Validation status
 
-Workflow validation passed in GitHub Actions according to the Actions UI screenshot supplied by the user.
+Earlier workflow validation passed in GitHub Actions according to the Actions UI screenshot supplied by the user.
 
-Evidence from the screenshot:
+Evidence from that screenshot:
 
 ```text
 workflow: Validate ETF macro regime shadow
@@ -101,20 +123,27 @@ job duration: 1m 37s
 total duration: 1m 41s
 ```
 
+Fixture replay was added after that passing run. The updated workflow was committed at:
+
+```text
+58509114c84ee1118c930fa38f89c5ec23551903
+```
+
 Connector limitation:
 
-- `fetch_commit_workflow_runs` and commit status lookup did not expose this push-triggered workflow run through the connector.
-- Therefore the exact job log marker `ETF_MACRO_REGIME_SHADOW_OK` was not directly read through the connector.
-- The workflow-level success is still sufficient to mark the shadow validation workflow as passed, because the job contains the validation steps and would fail on validator errors.
+- `fetch_commit_workflow_runs` did not expose this push-triggered workflow run through the connector.
+- Therefore fixture replay is implemented and wired, but not yet independently confirmed through connector-visible workflow evidence or a user-supplied Actions screenshot.
 
 No production report path has been changed to depend on this shadow classifier.
 
 ## Next action
 
-1. Keep this layer shadow-only.
-2. Add fixture replay examples for deterministic regime behavior.
-3. Only after fixture replay should we consider adding the shadow field into the main production macro policy pack.
-4. Do not promote the deterministic regime to client-facing authority until methodology, compliance, bilingual, and production-report validation gates are in place.
+1. Verify the updated `Validate ETF macro regime shadow` workflow after commit `58509114c84ee1118c930fa38f89c5ec23551903`.
+2. Confirm markers:
+   - `ETF_MACRO_REGIME_FIXTURE_REPLAY_OK`
+   - `ETF_MACRO_REGIME_SHADOW_OK`
+3. If it passes, mark fixture replay as workflow-proven.
+4. Keep deterministic regime shadow-only until methodology, compliance, bilingual, and production-report validation gates exist.
 
 ## Commits
 
@@ -126,3 +155,6 @@ No production report path has been changed to depend on this shadow classifier.
 - `458d6d2641b65c1348e50456c3ceb40c0263a860` — add minimal shadow regime payload validator
 - `6909a458ad9d5d0ca940725b9c67705d82238076` — add shadow macro regime validation workflow
 - `ddc84962191b8779bfa908b6dac2d09221408890` — trigger shadow macro regime validation workflow
+- `9fa8b92e2e579ae29b4c68d71661b0876f9d71c4` — add deterministic macro regime shadow fixtures
+- `96253967d9410bc9ad259d1f1d5dc4aeb6efb055` — add macro regime shadow fixture replay validator
+- `58509114c84ee1118c930fa38f89c5ec23551903` — run macro regime fixture replay in shadow validation workflow
