@@ -1,0 +1,65 @@
+name: Validate ETF Stage-2 confirmation shadow
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "config/stage2_confirmation_rules.yml"
+      - "runtime/evaluate_stage2_confirmation.py"
+      - "runtime/build_thesis_candidates.py"
+      - "config/driver_catalog.yml"
+      - "config/driver_beneficiary_map.yml"
+      - "fixtures/stage2_confirmation/**"
+      - ".github/workflows/validate-stage2-confirmation-shadow.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-stage2-confirmation-shadow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Validate three Stage-2 fixture outcomes
+        run: |
+          python runtime/evaluate_stage2_confirmation.py \
+            --thesis-candidates fixtures/stage2_confirmation/thesis_candidates_three_cases.json \
+            --relative-strength fixtures/stage2_confirmation/relative_strength_three_cases.json \
+            --price-audit fixtures/stage2_confirmation/price_audit_three_cases.json \
+            --reference-date 2026-06-01 \
+            --run-id fixture_three_cases \
+            --validate-only \
+            --expect-status stage_1_candidate \
+            --expect-status stage_2_confirmed_not_fundable \
+            --expect-status stage_2_fundable_ready_shadow
+
+      - name: Build current Stage-1 candidates for Stage-2 shadow check
+        run: |
+          python runtime/build_thesis_candidates.py \
+            --macro-pack output/macro/latest.json \
+            --reference-date 2026-05-29 \
+            --run-id stage2_shadow_validation
+
+      - name: Validate current Stage-2 shadow artifact
+        run: |
+          python runtime/evaluate_stage2_confirmation.py \
+            --thesis-candidates output/macro/latest_thesis_candidates.json \
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --price-audit output/pricing/price_audit_2026-05-29_20260531_200843.json \
+            --reference-date 2026-05-29 \
+            --run-id stage2_shadow_validation \
+            --validate-only
