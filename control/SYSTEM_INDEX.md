@@ -52,11 +52,13 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `macro_sources/build_macro_data_audit.py` — run-scoped macro audit builder.
 - `tools/validate_macro_data_audit.py` — macro audit contract validator.
 - `schemas/macro_data_audit.schema.json` — macro audit schema shell.
+- `schemas/macro_policy_pack.schema.json` — macro policy pack schema/compatibility contract for the legacy pack and future deterministic regime engine.
+- `tools/validate_macro_policy_pack.py` — macro policy pack schema and compatibility validator. It must pass before lane discovery consumes `output/macro/latest.json`.
 - `runtime/fetch_etf_relative_strength.py` — historical relative-strength fetcher for discovery scoring.
 - `runtime/discover_etf_lanes.py` — lane discovery runtime that writes the matching lane artifact.
 - `runtime/score_etf_lanes.py` — deterministic lane scoring and promotion logic.
 - `pricing/augment_challenger_pricing.py` — targeted second-pass challenger pricing augmenter.
-- `runtime/build_macro_policy_pack.py` — legacy macro policy pack builder, now recording the Phase 2 macro audit artifact as shadow-only input metadata.
+- `runtime/build_macro_policy_pack.py` — legacy macro policy pack builder, now emitting schema-versioned compatibility fields and recording Phase 2 macro audit metadata as shadow-only input.
 - `runtime/build_etf_report_state.py` — deterministic runtime state builder.
 - `runtime/render_etf_report_from_state.py` — runtime-driven English/Dutch markdown renderer.
 - `runtime/polish_runtime_reports.py` — post-render editorial polish layer.
@@ -85,7 +87,7 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `output/runtime/` — normalized runtime state artifacts.
 - `output/macro/macro_data_audit_<reference_date>_<run_id>.json` — run-scoped shadow-mode macro audit artifact.
 - `output/macro/latest_macro_data_audit_path.txt` — pointer to the latest macro audit artifact.
-- `output/macro/latest.json` — current macro policy pack consumed by lane discovery.
+- `output/macro/latest.json` — current schema-versioned macro policy pack consumed by lane discovery.
 
 ## State-model scripts
 
@@ -132,4 +134,5 @@ ETF is moving toward:
 - valuation-grade challenger pricing only when a challenger is replacement-ready or fundable
 - recommendation scorecard artifacts for capital discipline
 - provenance-backed macro audit artifacts in shadow mode
+- schema-versioned macro policy pack compatibility before deterministic regime promotion
 - lab-only optimization as a QA/research surface, not a production allocator
