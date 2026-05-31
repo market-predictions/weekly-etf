@@ -4,7 +4,7 @@
 2026-05-31
 
 ## Status
-Implemented and workflow-validated as shadow-only scaffolding. Fixture replay has been added and is pending independent workflow proof.
+Implemented and workflow-validated as shadow-only scaffolding. Fixture replay has been added; import-path hardening is complete; fixture replay is pending independent workflow proof after the latest workflow fix.
 
 ## Current issue
 
@@ -23,6 +23,11 @@ Added:
 - `.github/workflows/validate-macro-regime-shadow.yml`
 - `fixtures/macro_regime_shadow/regime_shadow_fixtures.json`
 - `tools/replay_macro_regime_shadow_fixtures.py`
+
+Latest hardening:
+
+- `tools/replay_macro_regime_shadow_fixtures.py` now inserts the repo root into `sys.path` before importing `macro_regime`.
+- `.github/workflows/validate-macro-regime-shadow.yml` now sets `PYTHONPATH: .` at job level.
 
 ## Authority rules
 
@@ -123,22 +128,41 @@ job duration: 1m 37s
 total duration: 1m 41s
 ```
 
-Fixture replay was added after that passing run. The updated workflow was committed at:
+Fixture replay was added after that passing run. The first fixture-replay workflow failed with:
 
 ```text
-58509114c84ee1118c930fa38f89c5ec23551903
+ModuleNotFoundError: No module named 'macro_regime'
 ```
 
-Connector limitation:
+Root cause:
 
-- `fetch_commit_workflow_runs` did not expose this push-triggered workflow run through the connector.
-- Therefore fixture replay is implemented and wired, but not yet independently confirmed through connector-visible workflow evidence or a user-supplied Actions screenshot.
+```text
+python tools/replay_macro_regime_shadow_fixtures.py
+```
+
+starts Python from the `tools/` path, so the repo root was not importable.
+
+Fixes applied:
+
+```text
+1ec587e6d806b6892a48173e960fd7a3f305ed18 — fix shadow fixture replay import path
+917d3218aa85db10cc9b0d3316650ae6c3a479c5 — set PYTHONPATH for shadow regime validation workflow
+```
+
+The connector still does not expose push-triggered workflow runs for these commits:
+
+```text
+fetch_commit_workflow_runs: []
+combined_status: []
+```
+
+Therefore fixture replay is implemented and import-hardened, but not yet independently confirmed through connector-visible workflow evidence or a user-supplied Actions screenshot after commit `917d3218aa85db10cc9b0d3316650ae6c3a479c5`.
 
 No production report path has been changed to depend on this shadow classifier.
 
 ## Next action
 
-1. Verify the updated `Validate ETF macro regime shadow` workflow after commit `58509114c84ee1118c930fa38f89c5ec23551903`.
+1. Verify the updated `Validate ETF macro regime shadow` workflow after commit `917d3218aa85db10cc9b0d3316650ae6c3a479c5`.
 2. Confirm markers:
    - `ETF_MACRO_REGIME_FIXTURE_REPLAY_OK`
    - `ETF_MACRO_REGIME_SHADOW_OK`
@@ -158,3 +182,5 @@ No production report path has been changed to depend on this shadow classifier.
 - `9fa8b92e2e579ae29b4c68d71661b0876f9d71c4` — add deterministic macro regime shadow fixtures
 - `96253967d9410bc9ad259d1f1d5dc4aeb6efb055` — add macro regime shadow fixture replay validator
 - `58509114c84ee1118c930fa38f89c5ec23551903` — run macro regime fixture replay in shadow validation workflow
+- `1ec587e6d806b6892a48173e960fd7a3f305ed18` — fix shadow fixture replay import path
+- `917d3218aa85db10cc9b0d3316650ae6c3a479c5` — set PYTHONPATH for shadow regime validation workflow
