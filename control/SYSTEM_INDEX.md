@@ -28,8 +28,14 @@ For ETF architecture, debugging, prompt, workflow, state, pricing, discovery, ma
 3. `control/NEXT_ACTIONS.md`
 4. only then the minimum relevant execution files
 
+For handover-heavy sessions or when resuming after a pause, also read:
+
+5. `control/ETF_SESSION_CHANGELOG.md`
+6. the relevant specialized changelog, if any
+
 ## Canonical control files
 
+- `control/ETF_SESSION_CHANGELOG.md` — broad session/worklog changelog for all meaningful ETF architecture, workflow, roadmap, validator, runtime, delivery, and handover-relevant changes.
 - `control/ETF_PRICING_LINEAGE_CONTRACT_V1.md` — authoritative design contract for the pricing-lineage hardening cycle, including immutable audit identity, state persistence, exact close-date semantics, provider lineage, independent verification, and challenger pricing tiers.
 - `control/ETF_PRICING_LINEAGE_CHANGELOG.md` — central pricing-lineage changelog for regression review and implementation tracking.
 - `docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md` — approved phased roadmap for macro/thesis modernization. It is a roadmap, not immediate production authority.
