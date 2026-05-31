@@ -130,7 +130,7 @@ def _parse_markdown_table_after_heading(md_text: str, heading: str) -> list[dict
     lines = md_text[marker:].splitlines()
     header: list[str] | None = None
     rows: list[dict[str, str]] = []
-    for line in lines[1:]:
+    for line in lines:
         if line.startswith("## ") and rows:
             break
         if not line.startswith("|"):
