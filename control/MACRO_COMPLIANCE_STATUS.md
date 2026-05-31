@@ -4,7 +4,7 @@
 2026-06-01
 
 ## Status
-Phase 4 methodology/compliance gate has been implemented as an isolated pre-promotion guard. It is not wired into the production report path yet.
+Phase 4 methodology/compliance gate has been implemented and workflow-proven as an isolated pre-promotion guard. It is not wired into the production report path yet.
 
 ## Current purpose
 
@@ -73,9 +73,25 @@ python tools/validate_macro_compliance.py --text fixtures/macro_compliance/bad_p
 
 ## Validation status
 
-Implementation is committed. Workflow proof is pending GitHub Actions confirmation because connector-visible workflow lookup did not expose the push-triggered run.
+Workflow-proven by GitHub Actions screenshot supplied by the user after commit:
 
-The next check should confirm the isolated `Validate ETF macro compliance` workflow passes and logs the expected markers.
+```text
+6701d45ce2109d3b1f4f3ab7801caf4e437fafeb
+```
+
+Evidence from the screenshot:
+
+```text
+workflow: Validate ETF macro compliance
+run title: fix orphan macro percentage detection #2
+trigger: push
+branch: main
+status: Success
+job: validate-macro-compliance
+total duration: 12s
+```
+
+Previous failed run correctly exposed a validator bug: orphan macro-figure detection did not catch `CPI is 3.2%` because the regex used a word boundary after `%`. Commit `6701d45ce2109d3b1f4f3ab7801caf4e437fafeb` fixed this by changing the pattern to use a lookahead after `%`, `bp`, `bps`, or `points`.
 
 ## Authority boundary
 
@@ -83,11 +99,10 @@ This validator does not promote deterministic regime output into production auth
 
 Do not wire expanded macro/thesis content into English or Dutch client-facing reports until:
 
-1. this compliance workflow is confirmed green;
-2. Dutch macro/thesis wording rules are added if Dutch output is affected;
-3. production report validators are extended;
-4. a control-layer promotion decision is made.
+1. Dutch macro/thesis wording rules are added if Dutch output is affected;
+2. production report validators are extended;
+3. a control-layer promotion decision is made.
 
 ## Next action
 
-Confirm the isolated compliance workflow pass. Then extend report validators only when client-facing macro/thesis content is actually introduced.
+The methodology/compliance gate is now ready as an isolated guard. Next roadmap step is Phase 5: build WP-9 thesis candidates as an internal shadow artifact only, with no client-facing leakage and no portfolio-action authority.
