@@ -12,6 +12,7 @@ import yaml
 from macro_sources.build_macro_data_audit import build_macro_data_audit
 from runtime.regime_memory import update_regime_memory
 from tools.validate_macro_data_audit import validate as validate_macro_data_audit
+from tools.validate_macro_policy_pack import _validate_pack
 
 PRICING_DIR = Path("output/pricing")
 MACRO_DIR = Path("output/macro")
@@ -101,6 +102,10 @@ def _metric(metrics: dict[str, Any], symbol: str) -> dict[str, Any]:
 
 def _return_3m(metrics: dict[str, Any], symbol: str) -> float:
     return _num(_metric(metrics, symbol).get("return_3m_pct"), 0.0)
+
+
+def _return_1m(metrics: dict[str, Any], symbol: str) -> float:
+    return _num(_metric(metrics, symbol).get("return_1m_pct"), 0.0)
 
 
 def _rs_3m(metrics: dict[str, Any], symbol: str) -> float:
@@ -198,6 +203,32 @@ def _macro_audit_summary(macro_data_audit_path: Path | None, macro_data_audit: d
     }
 
 
+def _confidence_decomposition(regime: str, confidence: float, metrics: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "method": "legacy_proxy_static_explained_for_schema_v1",
+        "shadow_only": True,
+        "client_facing_authority": False,
+        "decision_impact": "none_shadow_explanation_only",
+        "components": {
+            "legacy_confidence": confidence,
+            "SMH_return_3m_pct": _return_3m(metrics, "SMH"),
+            "SPY_return_3m_pct": _return_3m(metrics, "SPY"),
+            "IWM_rs_vs_SPY_3m_pct": _rs_3m(metrics, "IWM"),
+            "GLD_return_3m_pct": _return_3m(metrics, "GLD"),
+            "TLT_return_3m_pct": _return_3m(metrics, "TLT"),
+        },
+        "notes": [
+            "This is a compatibility decomposition for the legacy proxy regime path.",
+            "Deterministic derived confidence is planned for Phase 3 and is not yet production authority.",
+            f"Current legacy regime label: {regime}",
+        ],
+    }
+
+
+def _active_drivers_placeholder() -> list[dict[str, Any]]:
+    return []
+
+
 def build_pack(pricing_audit_path: Path, relative_strength_path: Path, macro_context_path: Path, macro_data_audit_path: Path | None = None) -> dict[str, Any]:
     pricing = load_json(pricing_audit_path)
     rs_payload = load_json(relative_strength_path)
@@ -208,11 +239,22 @@ def build_pack(pricing_audit_path: Path, relative_strength_path: Path, macro_con
     regime, confidence, what_changed = classify_regime(metrics)
 
     pack = {
+        "schema_version": "1.0",
         "generated_at_utc": datetime.utcnow().isoformat() + "Z",
         "report_date": report_date,
         "source_files": {"pricing_audit": str(pricing_audit_path), "relative_strength": str(relative_strength_path) if relative_strength_path.exists() else None, "macro_context": str(macro_context_path) if macro_context_path.exists() else None, "macro_data_audit": str(macro_data_audit_path) if macro_data_audit_path else None},
+        "authority": {
+            "decision_framework": "Legacy macro lane adjustments remain available for backward-compatible lane discovery only.",
+            "input_state_contract": "Pricing audit and relative-strength artifacts remain production inputs; macro audit is metadata-only until promoted.",
+            "output_contract": "Client-facing macro content remains governed by the existing runtime report path and must not expose shadow-only fields.",
+            "operational_runbook": "Validate schema and compatibility before lane discovery; later phases may replace legacy regime logic after fixture/shadow review.",
+            "shadow_only": True,
+            "client_facing_authority": False,
+            "decision_impact": "legacy_lane_adjustments_only",
+        },
         "macro_data_audit_summary": _macro_audit_summary(macro_data_audit_path, macro_data_audit),
-        "regime": {"current": regime, "previous": macro_context.get("previous_regime", "Unknown"), "confidence": confidence, "what_changed": what_changed},
+        "regime": {"current": regime, "previous": macro_context.get("previous_regime", "Unknown"), "confidence": confidence, "confidence_source": "legacy_proxy_static", "what_changed": what_changed},
+        "confidence_decomposition": _confidence_decomposition(regime, confidence, metrics),
         "central_banks": central_banks_for_regime(regime),
         "macro_signals": {
             "equity_leadership": {"signal": "narrow_ai_leadership" if regime == "Risk-on narrow leadership" else "mixed", "evidence": {"SMH_return_3m_pct": _return_3m(metrics, "SMH"), "SPY_return_3m_pct": _return_3m(metrics, "SPY"), "IWM_rs_vs_SPY_3m_pct": _rs_3m(metrics, "IWM")}},
@@ -223,9 +265,11 @@ def build_pack(pricing_audit_path: Path, relative_strength_path: Path, macro_con
         "cross_asset_confirmation": ["Semiconductor leadership supports SMH, but SPY overlap must remain explicit.", "Small-cap and duration signals are not strong enough to justify broad beta expansion.", "Gold is treated as a hedge review item unless price behavior improves."],
         "portfolio_implications": portfolio_implications(regime),
         "lane_adjustments": lane_adjustments(regime, metrics),
+        "active_drivers": _active_drivers_placeholder(),
         "report_transfer": {"max_what_changed_bullets": 3, "max_portfolio_implications": 3, "max_policy_catalysts": 2, "style_rule": "Transfer only decision-relevant macro information. Do not dump the full research pack into the report."},
     }
     pack["regime_memory"] = update_regime_memory(pack)
+    _validate_pack(pack)
     return pack
 
 
@@ -261,7 +305,7 @@ def main() -> None:
         "ETF_MACRO_POLICY_PACK_OK | "
         f"report_date={pack.get('report_date')} | regime={pack.get('regime', {}).get('current')} | "
         f"transition={memory.get('transition_state')} | weeks={memory.get('weeks_in_regime')} | "
-        f"macro_audit_present={audit_summary.get('present')} | macro_audit={macro_data_audit_path} | output={out_path}"
+        f"macro_audit_present={audit_summary.get('present')} | schema={pack.get('schema_version')} | macro_audit={macro_data_audit_path} | output={out_path}"
     )
 
 
