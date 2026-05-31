@@ -1,0 +1,133 @@
+version: 1
+
+purpose: >-
+  Shadow-mode macro audit input contract for Weekly ETF Review. These sources
+  are fetched to create a provenance-backed macro data audit artifact. They do
+  not become client-facing or decision-authoritative until later regime,
+  compliance, and bilingual gates are implemented.
+
+defaults:
+  request_timeout_seconds: 25
+  user_agent: "weekly-etf-macro-audit/1.0"
+
+freshness_policy:
+  daily_market_max_staleness_days: 7
+  daily_rates_max_staleness_days: 7
+  monthly_macro_max_staleness_days: 75
+  quarterly_macro_max_staleness_days: 140
+
+fred:
+  enabled: true
+  base_url: "https://fred.stlouisfed.org/graph/fredgraph.csv"
+  series:
+    - key: us_10y_yield
+      series_id: DGS10
+      label: US 10Y Treasury constant maturity yield
+      category: rates
+      units: percent
+      frequency: daily
+      max_staleness_days: 7
+    - key: us_2y_yield
+      series_id: DGS2
+      label: US 2Y Treasury constant maturity yield
+      category: rates
+      units: percent
+      frequency: daily
+      max_staleness_days: 7
+    - key: us_10y_real_yield
+      series_id: DFII10
+      label: US 10Y TIPS real yield
+      category: real_rates
+      units: percent
+      frequency: daily
+      max_staleness_days: 7
+    - key: us_10y_breakeven
+      series_id: T10YIE
+      label: US 10Y breakeven inflation rate
+      category: inflation_expectations
+      units: percent
+      frequency: daily
+      max_staleness_days: 7
+    - key: fed_funds_effective
+      series_id: DFF
+      label: Effective federal funds rate
+      category: policy_rates
+      units: percent
+      frequency: daily
+      max_staleness_days: 7
+    - key: us_cpi_index
+      series_id: CPIAUCSL
+      label: US CPI index
+      category: inflation
+      units: index
+      frequency: monthly
+      max_staleness_days: 75
+    - key: us_unemployment_rate
+      series_id: UNRATE
+      label: US unemployment rate
+      category: labor
+      units: percent
+      frequency: monthly
+      max_staleness_days: 75
+
+ecb:
+  enabled: true
+  base_url: "https://data-api.ecb.europa.eu/service/data"
+  series:
+    - key: ecb_eurusd_reference
+      flow: EXR
+      key_path: D.USD.EUR.SP00.A
+      series_id: EXR/D.USD.EUR.SP00.A
+      label: ECB euro foreign exchange reference rate — USD per EUR
+      category: fx
+      units: USD per EUR
+      frequency: daily
+      max_staleness_days: 7
+
+treasury:
+  enabled: true
+  endpoint: "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/daily_treasury_rates"
+  record_date_field: record_date
+  fields:
+    - key: treasury_3m_yield
+      field: bc_3month
+      series_id: fiscaldata.daily_treasury_rates.bc_3month
+      label: US Treasury 3-month par yield
+      category: rates
+      units: percent
+      max_staleness_days: 7
+    - key: treasury_2y_yield
+      field: bc_2year
+      series_id: fiscaldata.daily_treasury_rates.bc_2year
+      label: US Treasury 2-year par yield
+      category: rates
+      units: percent
+      max_staleness_days: 7
+    - key: treasury_10y_yield
+      field: bc_10year
+      series_id: fiscaldata.daily_treasury_rates.bc_10year
+      label: US Treasury 10-year par yield
+      category: rates
+      units: percent
+      max_staleness_days: 7
+    - key: treasury_30y_yield
+      field: bc_30year
+      series_id: fiscaldata.daily_treasury_rates.bc_30year
+      label: US Treasury 30-year par yield
+      category: rates
+      units: percent
+      max_staleness_days: 7
+
+volatility:
+  enabled: true
+  cboe_chart_url: "https://cdn.cboe.com/api/global/delayed_quotes/charts/_VIX.json"
+  fallback_fred:
+    series_id: VIXCLS
+    label: CBOE Volatility Index close via FRED fallback
+  series:
+    - key: vix_close
+      series_id: CBOE/VIX
+      label: CBOE Volatility Index close
+      category: volatility
+      units: index
+      max_staleness_days: 7
