@@ -35,6 +35,21 @@ def _manifest_path(output_dir: Path, requested_close_date: str, run_id: str) -> 
     return output_dir / "run_manifests" / f"weekly_etf_run_manifest_{requested_close_date}_{run_id}.json"
 
 
+def _pricing_lineage_status(existing: dict[str, Any], incoming_status: str | None) -> str:
+    """Keep pricing-lineage status separate from generic workflow status.
+
+    The final workflow manifest write runs with a generic status such as
+    `workflow_success`. Once the hard pricing-lineage validator has marked the
+    manifest as `passed`, that final always-run step must not downgrade the
+    contract status back to a workflow lifecycle label.
+    """
+    existing_status = str(existing.get("pricing_lineage_status") or "").strip()
+    incoming = str(incoming_status or "").strip()
+    if existing_status == "passed" and incoming.startswith("workflow_"):
+        return existing_status
+    return incoming or existing_status or "pending"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Write or update the Weekly ETF run manifest.")
     parser.add_argument("--output-dir", default="output")
@@ -75,7 +90,8 @@ def main() -> None:
             "portfolio_state_path": _text(args.portfolio_state) or existing.get("portfolio_state_path"),
             "valuation_history_path": _text(args.valuation_history) or existing.get("valuation_history_path"),
             "delivery_manifest_path": _text(args.delivery_manifest) or existing.get("delivery_manifest_path"),
-            "pricing_lineage_status": args.status or existing.get("pricing_lineage_status") or "pending",
+            "pricing_lineage_status": _pricing_lineage_status(existing, args.status),
+            "workflow_status": args.status or existing.get("workflow_status"),
             "workflow_conclusion": args.conclusion or existing.get("workflow_conclusion"),
             "notes": args.notes or existing.get("notes"),
         }
