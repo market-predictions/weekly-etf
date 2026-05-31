@@ -1,0 +1,53 @@
+{
+  "title": "Weekly ETF Macro Data Audit",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "mode",
+    "status",
+    "generated_at_utc",
+    "run_id",
+    "reference_date",
+    "report_token",
+    "required_source_groups",
+    "source_group_status",
+    "observations",
+    "summary",
+    "authority"
+  ],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "mode": {"enum": ["live", "fixture"]},
+    "status": {"enum": ["passed"]},
+    "generated_at_utc": {"type": "string"},
+    "run_id": {"type": "string"},
+    "reference_date": {"type": "string"},
+    "report_token": {"type": "string"},
+    "source_config": {"type": ["string", "null"]},
+    "required_source_groups": {"type": "array"},
+    "source_group_status": {"type": "object"},
+    "central_bank_calendar": {"type": "object"},
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "value",
+          "units",
+          "source",
+          "series_id",
+          "label",
+          "category",
+          "as_of_date",
+          "fetched_at_utc",
+          "staleness_days",
+          "max_staleness_days",
+          "status"
+        ]
+      }
+    },
+    "summary": {"type": "object"},
+    "authority": {"type": "object"}
+  }
+}
