@@ -12,10 +12,11 @@ on:
       - "runtime/build_macro_policy_pack_shadow.py"
       - "tools/replay_macro_regime_shadow_fixtures.py"
       - "tools/validate_macro_regime_shadow.py"
+      - "tools/write_macro_regime_shadow_validation_evidence.py"
       - ".github/workflows/validate-macro-regime-shadow.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validate-shadow-regime:
@@ -25,6 +26,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -72,3 +75,28 @@ jobs:
               f"differs={result['differs_from_legacy']}"
           )
           PY
+
+      - name: Write shadow validation evidence
+        run: |
+          python tools/write_macro_regime_shadow_validation_evidence.py \
+            --pack output/macro/latest.json \
+            --output-dir output/macro/validation \
+            --workflow-name "${{ github.workflow }}" \
+            --workflow-run-id "${{ github.run_id }}" \
+            --workflow-run-number "${{ github.run_number }}" \
+            --workflow-attempt "${{ github.run_attempt }}" \
+            --commit-sha "${{ github.sha }}" \
+            --source-ref "${{ github.ref_name }}"
+
+      - name: Commit shadow validation evidence
+        if: github.event_name != 'pull_request'
+        run: |
+          if git diff --quiet -- output/macro/validation; then
+            echo "ETF_MACRO_REGIME_SHADOW_EVIDENCE_NO_CHANGE"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/macro/validation/*.json
+          git commit -m "record macro regime shadow validation evidence [skip ci]"
+          git push
