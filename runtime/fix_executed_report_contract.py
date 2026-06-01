@@ -18,6 +18,9 @@ FORBIDDEN_POST_EXECUTION_PHRASES = [
     "unless separately recorded in the trade ledger and persisted portfolio state",
 ]
 
+EN_POSITION_CHANGES_HEADING = "## 14. Position Changes Reflected in Official State"
+NL_POSITION_CHANGES_HEADING = "## 14. Positiewijzigingen verwerkt in de officiële portefeuillestaat"
+
 
 def _read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
@@ -88,14 +91,14 @@ def _position_change_rows(state: dict[str, Any]) -> list[dict[str, Any]]:
 def _position_changes_table_en(state: dict[str, Any]) -> str:
     rows = _position_change_rows(state)
     lines = [
-        "| Ticker | Previous weight % | New weight % | Weight change % | Shares delta | Action executed | Funding source / note |",
+        "| Ticker | Previous weight % | New weight % | Weight change % | Shares delta | Action reflected | Funding source / note |",
         "|---|---:|---:|---:|---:|---|---|",
     ]
     if not rows:
         if _is_already_executed(state):
             lines.append("| Portfolio | - | - | - | 0.00 | Already reflected | The prior guarded model rotation is already reflected in the official portfolio state; no new state or ledger mutation was performed this run. |")
         else:
-            lines.append("| None | - | - | - | 0.00 | None | No guarded model trade was executed this run. |")
+            lines.append("| None | - | - | - | 0.00 | None | No guarded model trade was executed or reflected this run. |")
         return "\n".join(lines)
     for row in rows:
         prev = _float(row.get("previous_weight_pct"))
@@ -103,7 +106,7 @@ def _position_changes_table_en(state: dict[str, Any]) -> str:
         change = _float(row.get("weight_change_pct"), new - prev)
         lines.append(
             f"| {_ticker(row.get('ticker'))} | {_f2(prev)} | {_f2(new)} | {_f2(change)} | {_f2(row.get('shares_delta'))} | "
-            f"{row.get('action') or 'None'} | {row.get('funding_source_note') or 'Guarded model rotation executed and persisted.'} |"
+            f"{row.get('action') or 'None'} | {row.get('funding_source_note') or 'Guarded model rotation reflected and persisted.'} |"
         )
     cash = _float((state.get("portfolio") or {}).get("cash_eur"))
     nav = _float((state.get("portfolio") or {}).get("total_portfolio_value_eur"))
@@ -112,10 +115,28 @@ def _position_changes_table_en(state: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _localize_nl_funding_note(note: Any) -> str:
+    raw = str(note or "").strip()
+    replacements = {
+        "Guarded auto-execution: reduce PPA to fund CIBR.": "Bewaakte modeluitvoering: PPA verlaagd om CIBR te financieren.",
+        "Guarded auto-execution: buy CIBR funded by PPA.": "Bewaakte modeluitvoering: CIBR gekocht, gefinancierd uit PPA.",
+        "No model trade executed this run.": "Geen modeltransactie uitgevoerd in deze run.",
+        "Residual cash": "Resterende cash",
+    }
+    if raw in replacements:
+        return replacements[raw]
+    raw = re.sub(r"Guarded auto-execution:\s*reduce\s+([A-Z0-9./_-]+)\s+to fund\s+([A-Z0-9./_-]+)\.", r"Bewaakte modeluitvoering: \1 verlaagd om \2 te financieren.", raw)
+    raw = re.sub(r"Guarded auto-execution:\s*buy\s+([A-Z0-9./_-]+)\s+funded by\s+([A-Z0-9./_-]+)\.", r"Bewaakte modeluitvoering: \1 gekocht, gefinancierd uit \2.", raw)
+    raw = raw.replace("Guarded auto-execution", "Bewaakte modeluitvoering")
+    raw = raw.replace("funded by", "gefinancierd uit")
+    raw = raw.replace("to fund", "om te financieren")
+    return raw or "Bewaakte modelrotatie verwerkt in de officiële portefeuillestaat."
+
+
 def _position_changes_table_nl(state: dict[str, Any]) -> str:
     rows = _position_change_rows(state)
     lines = [
-        "| Ticker | Vorig gewicht % | Nieuw gewicht % | Gewichtswijziging % | Wijziging aantal stukken | Uitgevoerde actie | Financieringsbron / toelichting |",
+        "| Ticker | Vorig gewicht % | Nieuw gewicht % | Gewichtswijziging % | Wijziging aantal stukken | Verwerkte actie | Financieringsbron / toelichting |",
         "|---|---:|---:|---:|---:|---|---|",
     ]
     action_nl = {"Sell": "Verkopen", "Buy": "Kopen", "None": "Geen", "Already reflected": "Al verwerkt"}
@@ -123,7 +144,7 @@ def _position_changes_table_nl(state: dict[str, Any]) -> str:
         if _is_already_executed(state):
             lines.append("| Portefeuille | - | - | - | 0.00 | Al verwerkt | De eerdere bewaakte modelrotatie is al verwerkt in de officiële portefeuillestaat; deze run heeft geen nieuwe staat- of handelslogboekmutatie uitgevoerd. |")
         else:
-            lines.append("| Geen | - | - | - | 0.00 | Geen | Deze run is geen bewaakte modeltransactie uitgevoerd. |")
+            lines.append("| Geen | - | - | - | 0.00 | Geen | Deze run is geen bewaakte modeltransactie uitgevoerd of verwerkt. |")
         return "\n".join(lines)
     for row in rows:
         prev = _float(row.get("previous_weight_pct"))
@@ -132,7 +153,7 @@ def _position_changes_table_nl(state: dict[str, Any]) -> str:
         action = str(row.get("action") or "None")
         lines.append(
             f"| {_ticker(row.get('ticker'))} | {_f2(prev)} | {_f2(new)} | {_f2(change)} | {_f2(row.get('shares_delta'))} | "
-            f"{action_nl.get(action, action)} | {row.get('funding_source_note') or 'Bewaakte modelrotatie uitgevoerd en verwerkt.'} |"
+            f"{action_nl.get(action, action)} | {_localize_nl_funding_note(row.get('funding_source_note'))} |"
         )
     cash = _float((state.get("portfolio") or {}).get("cash_eur"))
     nav = _float((state.get("portfolio") or {}).get("total_portfolio_value_eur"))
@@ -171,13 +192,13 @@ def _patch_common_text(text: str) -> str:
         "Rotation plan artifact not present; legacy recommendation labels are used.": "Post-execution report: rotation decisions have been applied to the official portfolio state.",
         "Rotation plan: not available; legacy labels used.": "Rotation execution: completed and persisted in the official portfolio state and trade ledger.",
         "Rotation plan: active.": "Rotation execution: completed and reflected in the official portfolio state.",
-        "Proposed rotation:": "Executed / reflected rotation:",
-        "proposed rotation:": "executed / reflected rotation:",
+        "Proposed rotation:": "Reflected rotation:",
+        "proposed rotation:": "reflected rotation:",
         "pending execution and portfolio-state persistence": "already reflected in official portfolio state",
         "pending portfolio-state persistence": "already reflected in official portfolio state",
         "pending execution": "already reflected in official portfolio state",
         "unless separately recorded in the trade ledger and persisted portfolio state": "because it is recorded in the trade ledger and reflected in official portfolio state",
-        "Executed reductions/closures: none because it is recorded in the trade ledger and reflected in official portfolio state.": "Executed reductions/closures: the GLD to GSG guarded model rotation is recorded in the trade ledger and reflected in official portfolio state.",
+        "Executed reductions/closures: none because it is recorded in the trade ledger and reflected in official portfolio state.": "Executed/reflected reductions and additions are recorded in the trade ledger and reflected in official portfolio state.",
         "Het rotatieplan is actief; doelgewichten en handelsintenties blijven voorstellen totdat het handelslogboek en de portefeuille-staat uitvoering vastleggen.": "De bewaakte modelrotatie is al verwerkt in de officiële portefeuillestaat en het handelslogboek.",
         "Rotatieplan: actief.": "Rotatie-uitvoering: voltooid en verwerkt in de officiële portefeuillestaat.",
         "in afwachting van uitvoering en verwerking in de portefeuille-staat": "al verwerkt in de officiële portefeuillestaat",
@@ -185,7 +206,7 @@ def _patch_common_text(text: str) -> str:
     for old, new in replacements.items():
         text = text.replace(old, new)
     text = re.sub(r"Rotation plan:\s*not available; legacy labels used\.", "Rotation execution: completed and persisted in the official portfolio state and trade ledger.", text, flags=re.IGNORECASE)
-    text = re.sub(r"\bProposed position changes / rotation trade intents\b", "Executed / reflected model rotation status", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bProposed position changes / rotation trade intents\b", "Reflected model rotation status", text, flags=re.IGNORECASE)
     return text
 
 
@@ -193,7 +214,11 @@ def patch_report(path: Path, state: dict[str, Any]) -> None:
     text = path.read_text(encoding="utf-8")
     text = _patch_common_text(text)
     text = _replace_between(text, "## 14. Position Changes Executed This Run", "## 15. Current Portfolio Holdings and Cash", _position_changes_table_en(state))
+    text = _replace_between(text, EN_POSITION_CHANGES_HEADING, "## 15. Current Portfolio Holdings and Cash", _position_changes_table_en(state))
+    text = text.replace("## 14. Position Changes Executed This Run", EN_POSITION_CHANGES_HEADING)
     text = _replace_between(text, "## 14. Positiewijzigingen in deze run", "## 15. Huidige posities en cash", _position_changes_table_nl(state))
+    text = _replace_between(text, NL_POSITION_CHANGES_HEADING, "## 15. Huidige posities en cash", _position_changes_table_nl(state))
+    text = text.replace("## 14. Positiewijzigingen in deze run", NL_POSITION_CHANGES_HEADING)
     validate_no_post_execution_proposed_language(text, report_name=path.name)
     path.write_text(text, encoding="utf-8")
     print(f"ETF_EXECUTED_REPORT_CONTRACT_PATCHED | report={path.name}")
