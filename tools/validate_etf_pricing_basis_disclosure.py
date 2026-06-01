@@ -6,6 +6,7 @@ from pathlib import Path
 
 EN_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
 TV_LINK_RE = re.compile(r"\[([A-Z][A-Z0-9./_-]{1,14})\]\(https://www\.tradingview\.com/chart/\?symbol=[^)]+\)")
+TICKER_RE = re.compile(r"^[A-Z][A-Z0-9./_-]{1,14}$")
 
 REQUIRED_EN = [
     "### Closing prices used in this report",
@@ -19,8 +20,11 @@ REQUIRED_NL = [
     "| FX-basis | Gevraagde datum | Gebruikte datum | Koers | Bron | Status |",
 ]
 
-REQUIRED_TICKERS = {"SPY", "SMH", "PPA", "PAVE", "URNM", "GLD"}
 FORBIDDEN_INTERNAL = ["ETF_PRICE_BASIS_DISCLOSURE", "issuer_override", "source_detail", "handler"]
+SECTION15_HEADINGS = {
+    "en": "## 15. Current Portfolio Holdings and Cash",
+    "nl": "## 15. Huidige posities en cash",
+}
 
 
 def latest_pair(output_dir: Path) -> tuple[Path, Path]:
@@ -54,16 +58,49 @@ def disclosure(text: str, language: str) -> str:
     return tail
 
 
+def section(text: str, heading: str) -> str:
+    start = text.find(heading)
+    if start == -1:
+        return ""
+    tail = text[start:]
+    next_heading = re.search(r"\n##\s+", tail[len(heading):])
+    if next_heading:
+        return tail[: len(heading) + next_heading.start()]
+    return tail
+
+
 def normalize_tv_links(markdown: str) -> str:
     return TV_LINK_RE.sub(r"\1", markdown)
 
 
-def ticker_row_present(block: str, ticker: str) -> bool:
-    normalized = normalize_tv_links(block)
-    for line in normalized.splitlines():
+def _cells(line: str) -> list[str]:
+    return [cell.strip() for cell in normalize_tv_links(line).strip().strip("|").split("|")]
+
+
+def _is_ticker(value: str) -> bool:
+    return value != "CASH" and bool(TICKER_RE.match(value))
+
+
+def current_holding_tickers(text: str, language: str) -> set[str]:
+    block = section(text, SECTION15_HEADINGS[language])
+    tickers: set[str] = set()
+    for line in block.splitlines():
         if not line.strip().startswith("|"):
             continue
-        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        cells = _cells(line)
+        if not cells:
+            continue
+        first = cells[0]
+        if _is_ticker(first):
+            tickers.add(first)
+    return tickers
+
+
+def ticker_row_present(block: str, ticker: str) -> bool:
+    for line in block.splitlines():
+        if not line.strip().startswith("|"):
+            continue
+        cells = _cells(line)
         if cells and cells[0] == ticker:
             return True
     return False
@@ -79,7 +116,10 @@ def validate_report(path: Path, language: str) -> list[str]:
     for item in required:
         if item not in block:
             failures.append(f"{path.name}: missing {item}")
-    for ticker in REQUIRED_TICKERS:
+    required_tickers = current_holding_tickers(text, language)
+    if not required_tickers:
+        failures.append(f"{path.name}: could not derive current holdings from Section 15")
+    for ticker in sorted(required_tickers):
         if not ticker_row_present(block, ticker):
             failures.append(f"{path.name}: missing pricing row for {ticker}")
     if "EUR/USD" not in block:
