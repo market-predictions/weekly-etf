@@ -85,6 +85,24 @@ def _weight(row: dict[str, Any]) -> float:
     return _float(_first(row, "current_weight_pct", "previous_weight_pct", "weight_pct"))
 
 
+def _is_zero_exited_position(row: dict[str, Any]) -> bool:
+    """Return true for a sold-out artifact row omitted from active official state.
+
+    Official portfolio state is an active-holdings file. After guarded execution,
+    a fully sold position can be absent from `output/etf_portfolio_state.json`
+    while still appearing in the execution artifact with zero shares/value as
+    proof of the sell-down. That absence is valid only when shares, EUR/local
+    value and weight are all effectively zero.
+    """
+
+    return (
+        abs(_float(row.get("shares"))) <= SHARE_TOL
+        and abs(_local(row)) <= VALUE_TOL
+        and abs(_eur(row)) <= VALUE_TOL
+        and abs(_weight(row)) <= WEIGHT_TOL
+    )
+
+
 def _row_math_errors(rows: list[dict[str, Any]], *, fx: float, nav: float, context: str) -> list[str]:
     errors: list[str] = []
     for row in rows:
@@ -184,6 +202,8 @@ def validate_execution_artifact(artifact_path: Path, *, expected_mode: str | Non
     if mode == "guarded_auto":
         for ticker, row in shadow.items():
             if ticker not in official:
+                if _is_zero_exited_position(row):
+                    continue
                 errors.append(f"artifact_guarded_auto:position_missing_from_official_state:{ticker}")
                 continue
             if abs(_float(row.get("shares")) - _float(official[ticker].get("shares"))) > SHARE_TOL:
