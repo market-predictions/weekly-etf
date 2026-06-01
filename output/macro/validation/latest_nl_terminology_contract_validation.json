@@ -1,0 +1,39 @@
+{
+  "artifact_type": "nl_terminology_contract_validation_evidence",
+  "authority": {
+    "client_facing_investment_logic_changed": false,
+    "fundability_authority": false,
+    "lane_scoring_authority": false,
+    "macro_thesis_promotion": false,
+    "portfolio_action_authority": false,
+    "production_recommendation_authority": false,
+    "quality_guard_only": true
+  },
+  "generated_at_utc": "2026-06-01T10:21:28Z",
+  "guardrails": [
+    "Evidence proves Dutch terminology contract validation only.",
+    "Do not treat this as macro/thesis promotion or investment-logic change.",
+    "Dutch terminology remains a quality/alias layer derived from central terminology maps."
+  ],
+  "repository": "market-predictions/weekly-etf",
+  "schema_version": "1.0",
+  "scope": {
+    "bad_token_repair_or_block_guard": true,
+    "central_terminology_contract": true,
+    "disclaimer_replacement_guard": true,
+    "localization_overlay_guard": true,
+    "native_dutch_safety_overlay_guard": true
+  },
+  "status": "passed",
+  "validated_markers": [
+    "ETF_NL_TERMINOLOGY_CONTRACT_OK"
+  ],
+  "workflow": {
+    "commit_sha": "0dfec471c377e52e92c6ffe7fa1bb5ce817c0405",
+    "name": "Validate ETF Dutch terminology contract",
+    "run_attempt": "1",
+    "run_id": "26749079689",
+    "run_number": "6",
+    "source_ref": "main"
+  }
+}
