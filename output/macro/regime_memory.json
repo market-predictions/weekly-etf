@@ -1,22 +1,22 @@
 {
   "breadth_trend": "mixed",
-  "confidence_trend": "flat",
+  "confidence_trend": "rising",
   "cross_asset_confirmation": "mixed",
-  "current_confidence": 0.66,
-  "current_regime": "Risk-on growth",
+  "current_confidence": 0.72,
+  "current_regime": "Risk-on narrow leadership",
   "decision_rule": "Do not rotate aggressively unless a regime shift persists for at least two runs or cross-asset confirmation becomes broad.",
   "failed_rotation_count": 0,
-  "last_major_shift": "2026-05-22",
+  "last_major_shift": "2026-05-29",
   "previous_confidence": 0.66,
   "prior_regime": "Risk-on growth",
-  "regime_changed_this_run": false,
+  "regime_changed_this_run": true,
   "report_date": "2026-05-29",
   "report_transfer": {
     "max_lines": 2,
     "show_in_report": true,
-    "summary": "Risk-on growth has persisted for 40 run(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed."
+    "summary": "Risk-on narrow leadership has persisted for 1 run(s); transition state is transition_candidate, breadth is mixed, and cross-asset confirmation is mixed."
   },
-  "transition_state": "stable",
-  "updated_at_utc": "2026-06-01T10:34:46.254926Z",
-  "weeks_in_regime": 40
+  "transition_state": "transition_candidate",
+  "updated_at_utc": "2026-06-01T17:49:59.350292Z",
+  "weeks_in_regime": 1
 }
