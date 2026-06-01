@@ -183,9 +183,11 @@ def validate_nl_email_body_runtime(html_body: str, md_text: str) -> None:
     if len(plain_html) < 0.72 * len(plain_md):
         raise RuntimeError("Dutch HTML body appears too short relative to the full report.")
 
-    for bad_token in ["\n", "#### ", "|---|", "\t"]:
+    # Normal HTML may contain line breaks. Keep this check focused on raw markdown
+    # and escaped formatting artifacts that should not survive HTML rendering.
+    for bad_token in ["#### ", "|---|", "\t"]:
         if bad_token in html_body:
-            raise RuntimeError(f"Dutch HTML body still contains raw markdown / escaped formatting token: {bad_token}")
+            raise RuntimeError(f"Dutch HTML body still contains raw markdown / escaped formatting token: {bad_token!r}")
 
 
 def _canonical_report_key(path: Path, mode: str) -> tuple[str, int] | None:
