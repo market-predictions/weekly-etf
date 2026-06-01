@@ -5,74 +5,23 @@ import os
 import re
 from pathlib import Path
 
-from runtime.nl_localization import DUTCH_DISCLAIMER, localize_markdown_table_headers, localize_text, validate_dutch_text
+from runtime import nl_terminology as term
+from runtime.nl_localization import localize_markdown_table_headers, localize_text, validate_dutch_text
 
+DUTCH_DISCLAIMER = term.DUTCH_DISCLAIMER
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 
-SECTION_TITLE_REPLACEMENTS = {
-    "## 1. Executive Summary": "## 1. Kernsamenvatting",
-    "## 2. Portfolio Action Snapshot": "## 2. Portefeuille-acties",
-    "## 3. Regime Dashboard": "## 3. Regime-dashboard",
-    "## 4. Structural Opportunity Radar": "## 4. Structurele kansenradar",
-    "## 5. Key Risks / Invalidators": "## 5. Belangrijkste risico’s / invalidaties",
-    "## 6. Bottom Line": "## 6. Conclusie",
-    "## 7. Equity Curve and Portfolio Development": "## 7. Portefeuillecurve en portefeuilleontwikkeling",
-    "## 7A. ETF Position Performance": "## 7A. ETF-positieperformance",
-    "## 8. Asset Allocation Map": "## 8. Allocatiekaart",
-    "## 9. Second-Order Effects Map": "## 9. Tweede-orde-effectenkaart",
-    "## 10. Current Position Review": "## 10. Review huidige posities",
-    "## 11. Best New Opportunities": "## 11. Beste nieuwe kansen",
-    "## 12. Portfolio Rotation Plan": "## 12. Rotatieplan portefeuille",
-    "## 13. Final Action Table": "## 13. Definitieve actietabel",
-    "## 14. Position Changes Executed This Run": "## 14. Positiewijzigingen in deze run",
-    "## 15. Current Portfolio Holdings and Cash": "## 15. Huidige posities en cash",
-    "## 16. Continuity Input for Next Run": "## 16. Input voor de volgende run",
-    "## 17. Disclaimer": "## 17. Disclaimer",
-    "### Replacement Duel Table v2": "### Vervangingsanalyse",
-    "### Replacement Duel Table": "### Vervangingsanalyse",
-}
-
+SECTION_TITLE_REPLACEMENTS = term.SECTION_TITLE_REPLACEMENTS
 CLIENT_PHRASES = {
-    "ETF Position Performance": "ETF-positieperformance",
-    "Performance is calculated on the current ETF holdings using the latest validated close-price audit and available market-history inputs.": "Performance wordt berekend op de huidige ETF-posities op basis van de meest recente gevalideerde slotkoers-audit en beschikbare markthistorie.",
-    "Portfolio Action Snapshot": "Portefeuille-acties",
-    "Replacement Duel Table v2": "Vervangingsanalyse",
-    "Replacement Duel Table": "Vervangingsanalyse",
-    "Investment Report": "Beleggersrapport",
-    "Investor Report": "Beleggersrapport",
-    "Analyst Report": "Analistenrapport",
-    "Starting capital": "Startkapitaal",
-    "Invested market value": "Belegde marktwaarde",
-    "Total portfolio value": "Totale portefeuillewaarde",
-    "Since inception return": "Rendement sinds start",
-    "EUR/USD used": "EUR/USD gebruikt",
+    **term.REPORT_LABELS,
+    **term.PHRASE_REPLACEMENTS,
+    **term.EXACT_CLIENT_LANGUAGE_REPLACEMENTS,
 }
+ACTION_PHRASES = term.ACTION_REPLACEMENTS
+CLIENT_LANGUAGE_CLEANUPS = term.CLIENT_LANGUAGE_CLEANUPS
 
-ACTION_PHRASES = {
-    "Hold but replaceable": "Aanhouden, maar vervangbaar",
-    "Aanhouden but replaceable": "Aanhouden, maar vervangbaar",
-    "Buy": "Kopen",
-    "Add": "Toevoegen",
-    "Hold": "Aanhouden",
-    "Reduce": "Verlagen",
-    "Close": "Sluiten",
-    "Existing": "Bestaand",
-    "New": "Nieuw",
-    "Yes": "Ja",
-    "No": "Nee",
-    "None": "Geen",
-}
-
-CLIENT_LANGUAGE_CLEANUPS = {
-    "output/etf_valuation_history.csv": "de waarderingshistorie",
-    "output/": "",
-    "1-3 months": "1-3 maanden",
-    "3-12 months": "3-12 maanden",
-    "Tier 1": "Niveau 1",
-    "Tier 2": "Niveau 2",
-    "Tier 3": "Niveau 3",
-}
-
+# Keep these tiny local repair maps only for mixed strings created by earlier
+# partial localization passes. All broad terminology lives in nl_terminology.py.
 PARTIAL_MIXED_EXACT_CLEANUPS = {
     "Aanhouden but replaceable": "Aanhouden, maar vervangbaar",
     "Aanhouden maar replaceable": "Aanhouden, maar vervangbaar",
@@ -80,11 +29,11 @@ PARTIAL_MIXED_EXACT_CLEANUPS = {
 }
 
 REPLACEMENT_DUEL_PHRASE_CLEANUPS = {
+    **term.DECISION_TRANSLATIONS,
+    **term.TRIGGER_TRANSLATIONS,
     "Replacement trigger watch - challenger leading over 3m.": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden.",
     "Replacement trigger watch - challenger leading over 3m": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden",
-    "Replacement trigger watch — challenger leading over 3m.": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden.",
     "Replacement trigger watch — challenger leading over 3m": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden",
-    "Replacement trigger watch": "Vervangingskandidaat op de volglijst",
     "Not fundable - close proof incomplete.": "Niet geschikt voor allocatie — sluitkoersbevestiging is onvolledig.",
     "Not fundable - close proof incomplete": "Niet geschikt voor allocatie — sluitkoersbevestiging is onvolledig",
     "Not fundable - valuation-grade challenger pricing required.": "Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist.",
@@ -128,16 +77,18 @@ def _replace_disclaimer(text: str) -> str:
     return text[: idx + len(marker)] + "\n\n" + DUTCH_DISCLAIMER + "\n"
 
 
-def _localize_section_titles(text: str) -> str:
-    for src, dst in SECTION_TITLE_REPLACEMENTS.items():
+def _replace_longest_first(text: str, replacements: dict[str, str]) -> str:
+    for src, dst in sorted(replacements.items(), key=lambda item: len(item[0]), reverse=True):
         text = text.replace(src, dst)
     return text
+
+
+def _localize_section_titles(text: str) -> str:
+    return _replace_longest_first(text, SECTION_TITLE_REPLACEMENTS)
 
 
 def _localize_phrases(text: str) -> str:
-    for src, dst in {**CLIENT_PHRASES, **ACTION_PHRASES}.items():
-        text = text.replace(src, dst)
-    return text
+    return _replace_longest_first(text, {**CLIENT_PHRASES, **ACTION_PHRASES})
 
 
 def _clean_runtime_artifacts(text: str) -> str:
@@ -148,15 +99,15 @@ def _clean_runtime_artifacts(text: str) -> str:
 
 
 def _clean_client_language(text: str) -> str:
-    for src, dst in sorted(CLIENT_LANGUAGE_CLEANUPS.items(), key=lambda item: len(item[0]), reverse=True):
-        text = text.replace(src, dst)
+    text = _replace_longest_first(text, term.EXACT_CLIENT_LANGUAGE_REPLACEMENTS)
+    text = _replace_longest_first(text, CLIENT_LANGUAGE_CLEANUPS)
+    for pattern, replacement in term.REGEX_CLIENT_LANGUAGE_REPLACEMENTS:
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
     return text
 
 
 def _localize_replacement_duel_phrases(text: str) -> str:
-    for src, dst in sorted(REPLACEMENT_DUEL_PHRASE_CLEANUPS.items(), key=lambda item: len(item[0]), reverse=True):
-        text = text.replace(src, dst)
-    return text
+    return _replace_longest_first(text, REPLACEMENT_DUEL_PHRASE_CLEANUPS)
 
 
 def _normalize_ticker_lists(text: str) -> str:
@@ -168,8 +119,7 @@ def _normalize_ticker_lists(text: str) -> str:
 
 
 def _normalize_partial_mixed_language(text: str) -> str:
-    for src, dst in sorted(PARTIAL_MIXED_EXACT_CLEANUPS.items(), key=lambda item: len(item[0]), reverse=True):
-        text = text.replace(src, dst)
+    text = _replace_longest_first(text, PARTIAL_MIXED_EXACT_CLEANUPS)
     text = _normalize_ticker_lists(text)
     text = re.sub(r"###\s*Aanhouden\s+maar\s+vervangbaar", "### Aanhouden, maar vervangbaar", text, flags=re.IGNORECASE)
     text = re.sub(r"###\s*Aanhouden\s+but\s+replaceable", "### Aanhouden, maar vervangbaar", text, flags=re.IGNORECASE)
@@ -202,6 +152,7 @@ def localize_report(text: str) -> str:
         text = _clean_runtime_artifacts(text)
         text = _clean_client_language(text)
         text = _localize_replacement_duel_phrases(text)
+        text = _normalize_partial_mixed_language(text)
         return text
 
     text = _replace_disclaimer(text)
@@ -222,7 +173,7 @@ def main() -> None:
     if failures:
         raise RuntimeError("Dutch localization failed before write: " + ", ".join(failures))
     report_path.write_text(localized, encoding="utf-8")
-    print(f"ETF_NL_LOCALIZATION_OK | report={report_path.name} | native_dutch={is_native_dutch_report(localized)}")
+    print(f"ETF_NL_LOCALIZATION_OK | report={report_path.name} | native_dutch={is_native_dutch_report(localized)} | terminology=central")
 
 
 if __name__ == "__main__":
