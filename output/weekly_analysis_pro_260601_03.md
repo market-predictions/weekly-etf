@@ -12,27 +12,33 @@
 
 ## 2. Portfolio Action Snapshot
 
-### Add / destination
+### Add
 - [DFEN](https://www.tradingview.com/chart/?symbol=DFEN)
+- [SMH](https://www.tradingview.com/chart/?symbol=SMH)
 
 ### Hold
-- [SMH](https://www.tradingview.com/chart/?symbol=SMH), [GSG](https://www.tradingview.com/chart/?symbol=GSG), [URNM](https://www.tradingview.com/chart/?symbol=URNM)
+- [DFEN](https://www.tradingview.com/chart/?symbol=DFEN)
+- [GSG](https://www.tradingview.com/chart/?symbol=GSG)
+- [PAVE](https://www.tradingview.com/chart/?symbol=PAVE)
+- [PPA](https://www.tradingview.com/chart/?symbol=PPA)
+- [SMH](https://www.tradingview.com/chart/?symbol=SMH)
+- [SPY](https://www.tradingview.com/chart/?symbol=SPY)
+- [URNM](https://www.tradingview.com/chart/?symbol=URNM)
 
-### Hold with override
-- [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [SPY](https://www.tradingview.com/chart/?symbol=SPY)
+### Hold but replaceable
+- [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [SPY](https://www.tradingview.com/chart/?symbol=SPY) remain under explicit review.
 
-### Proposed replace / reduce
-- [PPA](https://www.tradingview.com/chart/?symbol=PPA)→[DFEN](https://www.tradingview.com/chart/?symbol=DFEN)
+### Reduce
+- None
 
 ### Close
 - None
 
 ### Rotation engine status
-- Rotation plan artifact is active; Sections 12-14 are rendered from the portfolio rotation plan, target allocations and proposed trade intents.
-- Trade intents are proposed rotation output while the engine is in warning mode; they are not executed trades until the ledger and portfolio state record execution.
+- Post-execution report: rotation decisions have been applied to the official portfolio state.
 
 ### Best replacements to fund
-- reduce [PPA](https://www.tradingview.com/chart/?symbol=PPA) by 5.00% NAV and allocate 5.00% NAV to [DFEN](https://www.tradingview.com/chart/?symbol=DFEN), pending execution and portfolio-state persistence.
+- No challenger is promoted to a fundable replacement yet. Each named replacement must first clear the same close-date pricing basis and relative-strength duel.
 
 ### Replacement pricing and duel status
 
@@ -125,10 +131,10 @@
 ## 7. Equity Curve and Portfolio Development
 
 - Starting capital (EUR): 100000.00
-- Current portfolio value (EUR): 110165.30
-- Since inception return (%): 10.17
+- Current portfolio value (EUR): 110290.91
+- Since inception return (%): 10.29
 - Equity-curve state: Reconciled to Section 15 with full valuation history
-- EUR/USD used: 1.1646
+- EUR/USD used: 1.1632
 - Notes: Section 7 uses the validated valuation history plus the current portfolio NAV; Section 15 is rendered from the same reconciled portfolio state.
 
 | Date | Portfolio value (EUR) | Comment |
@@ -143,7 +149,7 @@
 | 2026-05-27 | 109387.17 | Runtime valuation from immutable pricing audit and explicit portfolio state |
 | 2026-05-28 | 110032.93 | Runtime valuation from immutable pricing audit and explicit portfolio state |
 | 2026-05-29 | 109964.97 | Runtime valuation repriced from official portfolio-state shares |
-| 2026-06-01 | 110165.30 | Latest portfolio valuation based on confirmed closing prices and current holdings |
+| 2026-06-01 | 110290.91 | Latest portfolio valuation based on confirmed closing prices and current holdings |
 
 ### Closing prices used in this report
 
@@ -151,6 +157,7 @@ The portfolio valuation above is based on the per-position closes shown here. Re
 
 | Holding | Requested close | Close date used | Close used | Currency | Market-data source | Status |
 |---|---|---|---:|---|---|---|
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 2026-06-01 | 2026-06-01 | 69.90 | USD | Twelve Data | Fresh exact close, unverified |
 | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 2026-06-01 | 2026-06-01 | 32.46 | USD | Twelve Data | Fresh exact close, unverified |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 2026-06-01 | 2026-06-01 | 55.97 | USD | Twelve Data | Fresh exact close, unverified |
 | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | 2026-06-01 | 2026-06-01 | 173.57 | USD | Twelve Data | Fresh exact close, unverified |
@@ -160,7 +167,7 @@ The portfolio valuation above is based on the per-position closes shown here. Re
 
 | FX basis | Requested date | Date used | Rate | Source | Status |
 |---|---|---|---:|---|---|
-| EUR/USD | 2026-06-01 | 2026-06-01 | 1.1646 | ECB reference rate | Fresh exact close, unverified |
+| EUR/USD | 2026-06-01 | 2026-06-01 | 1.1632 | Twelve Data | Fresh exact close, unverified |
 
 `EQUITY_CURVE_CHART_PLACEHOLDER`
 
@@ -170,12 +177,13 @@ Performance is calculated on the current ETF holdings using the latest validated
 
 | Portfolio sleeve | Investment thesis | Tradable ETF | Weight % | 1w return | 1m return | 3m return | Since-entry | P/L EUR | Contribution % |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|
-| Rotation destination | Rotation destination | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 9.47% | -2.35% | -5.58% | +20.53% | n.v.t. | 212.12 | +0.21% |
-| Real-asset capex | Grid and infrastructure capex | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 13.57% | +1.89% | -1.43% | +1.10% | +8.25% | 1,064.18 | +1.06% |
-| Resilience | Defense and sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | 14.88% | +1.97% | +3.67% | -6.44% | -6.97% | -417.49 | -0.42% |
-| Growth engine | AI compute / semiconductor leadership | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 27.94% | +5.46% | +19.95% | +49.56% | +20.61% | 9,491.37 | +9.49% |
-| Core beta | Core U.S. large-cap exposure | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 24.23% | +1.73% | +5.55% | +10.81% | +6.17% | 2,887.88 | +2.89% |
-| Strategic energy | Nuclear and uranium cycle exposure | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 8.15% | +5.02% | -10.81% | -19.08% | -0.55% | -927.98 | -0.93% |
+| Rotation destination | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 5.00% | +6.06% | +13.89% | -28.19% | n.v.t. | n.v.t. | n.v.t. |
+| Rotation destination | Rotation destination | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 9.47% | -2.35% | -5.58% | +20.53% | n.v.t. | 212.37 | +0.21% |
+| Real-asset capex | Grid and infrastructure capex | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 13.57% | +1.89% | -1.43% | +1.10% | +8.25% | 1,065.41 | +1.07% |
+| Resilience | Defense and sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | 9.88% | +1.97% | +3.67% | -6.44% | -6.97% | -277.54 | -0.28% |
+| Growth engine | AI compute / semiconductor leadership | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 27.94% | +5.46% | +19.95% | +49.56% | +20.61% | 9,502.38 | +9.50% |
+| Core beta | Core U.S. large-cap exposure | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 24.24% | +1.73% | +5.55% | +10.81% | +6.17% | 2,891.24 | +2.89% |
+| Strategic energy | Nuclear and uranium cycle exposure | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 8.15% | +5.02% | -10.81% | -19.08% | -0.55% | -929.05 | -0.93% |
 
 ## 8. Asset Allocation Map
 
@@ -204,28 +212,30 @@ Performance is calculated on the current ETF holdings using the latest validated
 ## 10. Current Position Review
 
 The position review separates thesis quality, ETF implementation quality, fresh-cash test and rotation-engine decision. Existing holdings are not treated as automatic default holds.
-### [GSG](https://www.tradingview.com/chart/?symbol=GSG) — Hold — Score n/a — Fresh cash: Hold / monitor — release score 10
+### [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) — Add from rotation — Score n/a — Fresh cash: None
+Role: Rotation destination. Required next action: None.
+
+### [GSG](https://www.tradingview.com/chart/?symbol=GSG) — hold — Score n/a — Fresh cash: Hold / monitor — release score 10
 Role: Rotation destination. Required next action: Monitor commodity breadth and hedge contribution after execution..
 
-### [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) — Hold with override — Score 3.68 — Fresh cash: Smaller / under review — release score 85; override: rotation budget already used
+### [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) — hold with override — Score 3.68 — Fresh cash: Smaller / under review — release score 85; override: rotation budget already used
 Role: Real-asset capex. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
-### [PPA](https://www.tradingview.com/chart/?symbol=PPA) — Replace partial — Score 3.45 — Fresh cash: Reduce — release score 100; destination [DFEN](https://www.tradingview.com/chart/?symbol=DFEN)
+### [PPA](https://www.tradingview.com/chart/?symbol=PPA) — replace partial — Score 3.45 — Fresh cash: Reduce — release score 100; destination [DFEN](https://www.tradingview.com/chart/?symbol=DFEN)
 Role: Resilience. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
-### [SMH](https://www.tradingview.com/chart/?symbol=SMH) — Hold — Score 4.28 — Fresh cash: Smaller / under review — release score 60
+### [SMH](https://www.tradingview.com/chart/?symbol=SMH) — hold — Score 4.28 — Fresh cash: Smaller / under review — release score 60
 Role: Growth engine. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
-### [SPY](https://www.tradingview.com/chart/?symbol=SPY) — Hold with override — Score 3.53 — Fresh cash: Smaller / under review — release score 85; override: rotation budget already used
+### [SPY](https://www.tradingview.com/chart/?symbol=SPY) — hold with override — Score 3.53 — Fresh cash: Smaller / under review — release score 85; override: rotation budget already used
 Role: Core beta. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
-### [URNM](https://www.tradingview.com/chart/?symbol=URNM) — Hold — Score 3.70 — Fresh cash: Hold
+### [URNM](https://www.tradingview.com/chart/?symbol=URNM) — hold — Score 3.70 — Fresh cash: Hold
 Role: Strategic energy. Required next action: Hold.
 
 ## 11. Best New Opportunities
 
 - [SMH](https://www.tradingview.com/chart/?symbol=SMH) remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap.
-- Proposed rotation: reduce [PPA](https://www.tradingview.com/chart/?symbol=PPA) by 5.00% NAV and allocate 5.00% NAV to [DFEN](https://www.tradingview.com/chart/?symbol=DFEN), pending execution and portfolio-state persistence.
 - [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) / [BUG](https://www.tradingview.com/chart/?symbol=BUG): Cyber spend is linked to AI, cloud, data-center and geopolitical resilience.
 - [ROBO](https://www.tradingview.com/chart/?symbol=ROBO) / [IRBO](https://www.tradingview.com/chart/?symbol=IRBO): Automation capex can broaden beyond semiconductors into industrial productivity.
 - [COPX](https://www.tradingview.com/chart/?symbol=COPX) / [PICK](https://www.tradingview.com/chart/?symbol=PICK): Copper transmits grid, AI power and electrification demand into commodity equities.
@@ -233,45 +243,48 @@ Role: Strategic energy. Required next action: Hold.
 
 ## 12. Portfolio Rotation Plan
 
-| Close | Reduce | Hold | Add | Replace | Override |
-|---|---|---|---|---|---|
-| None | None | [SMH](https://www.tradingview.com/chart/?symbol=SMH), [GSG](https://www.tradingview.com/chart/?symbol=GSG), [URNM](https://www.tradingview.com/chart/?symbol=URNM) | None | [PPA](https://www.tradingview.com/chart/?symbol=PPA)→[DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [SPY](https://www.tradingview.com/chart/?symbol=SPY) |
+| Close | Reduce | Hold | Add | Replace |
+|---|---|---|---|---|
+| None | None | [GSG](https://www.tradingview.com/chart/?symbol=GSG), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [SPY](https://www.tradingview.com/chart/?symbol=SPY), [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN)| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [SPY](https://www.tradingview.com/chart/?symbol=SPY) |
 
 ## 13. Final Action Table
 
-| Ticker | ETF | Current weight | Target weight | Delta weight | Action | Capital destination | Release score | Decision rationale | Override status |
-|---|---|---:|---:|---:|---|---|---:|---|---|
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 9.47 | 9.47 | 0.00 | Hold | - | 10.00 | Portfolio role is impaired | No |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | 13.57 | 13.57 | 0.00 | Hold with override | - | 85.00 | Fresh capital only after review or at smaller size; Position is under replacement review; Review has persisted for multiple report cycles; Review has persisted for several report… | System override: Rotation budget for this run is already used |
-| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | 14.88 | 9.88 | -5.00 | Partial replacement | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 100.00 | Position does not pass the fresh-capital test; Position is under replacement review; Review has persisted for multiple report cycles; Review has persisted for several report cycles | No |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | 27.94 | 27.94 | 0.00 | Hold | - | 60.00 | Fresh capital only after review or at smaller size; Position is under replacement review; Review has persisted for multiple report cycles; Portfolio role is impaired | No |
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | 24.24 | 24.24 | 0.00 | Hold with override | - | 85.00 | Fresh capital only after review or at smaller size; Position is under replacement review; Review has persisted for multiple report cycles; Review has persisted for several report… | System override: Rotation budget for this run is already used |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | 8.15 | 8.15 | 0.00 | Hold | - | 0.00 | - | No |
-| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 0.00 | 5.00 | 5.00 | Add from rotation | - | - | Proposed destination from the rotation plan | No |
+| Ticker | ETF | Existing/New | Weight Inherited | Target Weight | Suggested Action | Conviction Tier | Total Score | Portfolio Role | Better Alternative Exists? | Short Reason |
+|---|---|---|---:|---:|---|---|---:|---|---|---|
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | Existing | 0.00 | 5.00 | Add from rotation |  |  | Rotation destination | No |  |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Existing | 9.47 | 9.47 | hold | Tier 2 |  | Rotation destination | No | Added as commodity-breadth replacement for part of [GLD](https://www.tradingview.com/chart/?symbol=GLD). |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Existing | 13.57 | 13.66 | Hold under review | Tier 2 | 3.68 | Real-asset capex | Yes | Valid but [GRID](https://www.tradingview.com/chart/?symbol=GRID) is the named challenger |
+| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | Existing | 14.88 | 9.88 | Hold under review | Tier 3 | 3.45 | Resilience | Yes | Valid thesis but must prove itself versus [ITA](https://www.tradingview.com/chart/?symbol=ITA) |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Existing | 27.94 | 27.56 | Add | Tier 1 | 4.28 | Growth engine | No | Best earned exposure, but no fresh cash while above the 25% cap |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | Existing | 24.24 | 24.19 | Hold | Tier 2 | 3.53 | Core beta | Yes | Useful but overlaps with [SMH](https://www.tradingview.com/chart/?symbol=SMH); no fresh cash add |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Existing | 8.15 | 8.17 | Hold | Tier 2 | 3.70 | Strategic energy | No | Valid, but not better than [SMH](https://www.tradingview.com/chart/?symbol=SMH) for new cash today |
 
-## 14. Proposed Position Changes / Rotation Trade Intents
+## 14. Position Changes Executed This Run
 
-| Source | Destination | Source delta % | Destination delta % | Estimated notional EUR | Intent status | Rationale |
-|---|---|---:|---:|---:|---|---|
-| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | -5.00 | 5.00 | 5514.36 | Partial replacement | Position does not pass the fresh-capital test; Position is under replacement review; Review has persisted for multiple report cycles; Review has persisted for several report cycles |
+| Ticker | Previous weight % | New weight % | Weight change % | Shares delta | Action executed | Funding source / note |
+|---|---:|---:|---:|---:|---|---|
+| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | 14.88 | 9.88 | -5.00 | -36.96 | Sell | Guarded auto-execution: reduce [PPA](https://www.tradingview.com/chart/?symbol=PPA) to fund [DFEN](https://www.tradingview.com/chart/?symbol=DFEN). |
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 0.00 | 5.00 | 5.00 | 91.77 | Buy | Guarded auto-execution: buy [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) funded by [PPA](https://www.tradingview.com/chart/?symbol=PPA). |
+| CASH | - | 1.76 | - | 0.00 | None | Residual cash |
 
 ## 15. Current Portfolio Holdings and Cash
 
 - Starting capital (EUR): 100000.00
-- Invested market value (EUR): 108228.78
+- Invested market value (EUR): 108354.39
 - Cash (EUR): 1936.52
-- Total portfolio value (EUR): 110165.30
-- Since inception return (%): 10.17
-- EUR/USD used: 1.1646
+- Total portfolio value (EUR): 110290.91
+- Since inception return (%): 10.29
+- EUR/USD used: 1.1632
 
 | Ticker | Shares | Price (local) | Currency | Market value (local) | Market value (EUR) | Weight % |
 |---|---:|---:|---|---:|---:|---:|
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 374.29 | 32.46 | USD | 12149.56 | 10432.39 | 9.47 |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 311.00 | 55.97 | USD | 17405.12 | 14945.15 | 13.57 |
-| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | 110.00 | 173.57 | USD | 19092.70 | 16394.21 | 14.88 |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 59.00 | 607.48 | USD | 35841.32 | 30775.65 | 27.94 |
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 41.00 | 758.36 | USD | 31092.76 | 26698.23 | 24.23 |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 171.00 | 61.18 | USD | 10461.78 | 8983.15 | 8.15 |
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 91.77 | 69.90 | USD | 6414.58 | 5514.36 | 5.00 |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 374.29 | 32.46 | USD | 12149.56 | 10444.50 | 9.47 |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 311.00 | 55.97 | USD | 17405.12 | 14962.49 | 13.57 |
+| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | 73.04 | 173.57 | USD | 12678.12 | 10898.88 | 9.88 |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 59.00 | 607.48 | USD | 35841.32 | 30811.36 | 27.94 |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 41.00 | 758.36 | USD | 31092.76 | 26729.22 | 24.24 |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 171.00 | 61.18 | USD | 10461.78 | 8993.58 | 8.15 |
 | CASH | - | 1.00 | EUR | 1936.52 | 1936.52 | 1.76 |
 
 ## 16. Continuity Input for Next Run
@@ -281,11 +294,12 @@ Role: Strategic energy. Required next action: Hold.
 ### Portfolio table
 | Ticker | ETF Name | Direction | Weight % | Avg Entry | Current Price | P/L % | Original Thesis | Role |
 |---|---|---:|---:|---:|---:|---:|---|---|
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | Long | 5.00 |  | 69.90 |  |  | Rotation destination |
 | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Long | 9.47 | 31.80 | 32.46 |  | Rotation destination | Rotation destination |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Long | 13.57 | 51.98 | 55.97 | 8.25 | Grid and infrastructure capex | Real-asset capex |
-| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | Long | 14.88 | 177.99 | 173.57 | -6.97 | Defense and sovereign resilience | Resilience |
+| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | Long | 9.88 | 177.99 | 173.57 | -6.97 | Defense and sovereign resilience | Resilience |
 | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Long | 27.94 | 420.13 | 607.48 | 20.61 | AI compute / semiconductor leadership | Growth engine |
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | Long | 24.23 | 676.33 | 758.36 | 6.17 | Core U.S. large-cap exposure | Core beta |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | Long | 24.24 | 676.33 | 758.36 | 6.17 | Core U.S. large-cap exposure | Core beta |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Long | 8.15 | 67.50 | 61.18 | -0.55 | Nuclear and uranium cycle exposure | Strategic energy |
 
 ### Available cash
@@ -303,7 +317,7 @@ Role: Strategic energy. Required next action: Hold.
 | Non-U.S. developed diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | Portfolio has zero non-U.S. exposure. | Watchlist |
 
 ### Recommendation discipline continuity
-- Rotation execution: active.
+- Rotation execution: completed and persisted in the official portfolio state and trade ledger.
 - Replacement challengers: not fundable without completed duel.
 
 ### Constraints
@@ -315,9 +329,9 @@ Role: Strategic energy. Required next action: Hold.
 - Income vs growth preference: Balanced growth with resilience bias
 
 ### Changes since last review
-- Added: a validated state-led production path with macro-policy and rotation-plan inputs; no portfolio position was executed unless recorded in the trade ledger.
-- Proposed rotation: reduce [PPA](https://www.tradingview.com/chart/?symbol=PPA) by 5.00% NAV and allocate 5.00% NAV to [DFEN](https://www.tradingview.com/chart/?symbol=DFEN), pending execution and portfolio-state persistence.
-- Executed reductions/closures: none unless separately recorded in the trade ledger and persisted portfolio state.
+- Added: a guarded model rotation state in which [GLD](https://www.tradingview.com/chart/?symbol=GLD) → [GSG](https://www.tradingview.com/chart/?symbol=GSG) is already reflected; no duplicate execution was performed.
+- Reduced: None unless explicit state says otherwise.
+- Closed: None.
 - Thesis changes: No structural thesis was abandoned; implementation, macro-regime and rotation discipline are materially tighter.
 
 ## 17. Disclaimer

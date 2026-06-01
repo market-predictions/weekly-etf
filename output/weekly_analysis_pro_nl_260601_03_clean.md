@@ -14,9 +14,9 @@
 
 | Advies | Tickers / toelichting |
 |---|---|
-| Toevoegen | Geen |
-| Aanhouden | [GLD](https://www.tradingview.com/chart/?symbol=GLD), [GSG](https://www.tradingview.com/chart/?symbol=GSG), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [SMH](https://www.tradingview.com/chart/?symbol=SMH), [SPY](https://www.tradingview.com/chart/?symbol=SPY), [URNM](https://www.tradingview.com/chart/?symbol=URNM) |
-| Aanhouden, maar vervangbaar | [GLD](https://www.tradingview.com/chart/?symbol=GLD), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [SPY](https://www.tradingview.com/chart/?symbol=SPY) blijven expliciet onder herbeoordeling. |
+| Toevoegen | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN), [SMH](https://www.tradingview.com/chart/?symbol=SMH) |
+| Aanhouden | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN), [GSG](https://www.tradingview.com/chart/?symbol=GSG), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [SMH](https://www.tradingview.com/chart/?symbol=SMH), [SPY](https://www.tradingview.com/chart/?symbol=SPY), [URNM](https://www.tradingview.com/chart/?symbol=URNM) |
+| Aanhouden, maar vervangbaar | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [SPY](https://www.tradingview.com/chart/?symbol=SPY) blijven expliciet onder herbeoordeling. |
 | Verlagen | Geen |
 | Sluiten | Geen |
 
@@ -96,10 +96,10 @@
 ## 7. Portefeuillecurve en portefeuilleontwikkeling
 
 - Startkapitaal (EUR): 100000.00
-- Huidige portefeuillewaarde (EUR): 110287.18
+- Huidige portefeuillewaarde (EUR): 110290.91
 - Rendement sinds start (%): 10.29
 - Status portefeuillecurve: aangesloten op sectie 15 met volledige waarderingshistorie
-- EUR/USD gebruikt: 1.1633
+- EUR/USD gebruikt: 1.1632
 - Toelichting: Sectie 7 gebruikt de volledige waarderingshistorie plus de actuele portefeuillewaarde; sectie 15 wordt uit dezelfde genormaliseerde portefeuillestaat opgebouwd.
 
 | Datum | Portefeuillewaarde EUR | Opmerking |
@@ -114,7 +114,7 @@
 | 2026-05-27 | 109387.17 | Waardering uit onveranderlijke prijsaudit en expliciete portefeuillestaat |
 | 2026-05-28 | 110032.93 | Waardering uit onveranderlijke prijsaudit en expliciete portefeuillestaat |
 | 2026-05-29 | 109964.97 | Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen |
-| 2026-06-01 | 110287.18 | Doorgeschoven waardering uit prijsaudit en expliciete portefeuillestaat |
+| 2026-06-01 | 110290.91 | Doorgeschoven waardering uit prijsaudit en expliciete portefeuillestaat |
 
 ### Gebruikte slotkoersen in dit rapport
 
@@ -122,7 +122,7 @@ De bovenstaande portefeuillewaardering is gebaseerd op de slotkoersen per positi
 
 | Positie | Gevraagde slotdatum | Gebruikte slotdatum | Gebruikte slotkoers | Valuta | Marktdata-bron | Status |
 |---|---|---|---:|---|---|---|
-| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | 2026-06-01 | 2026-06-01 | 411.24 | USD | Twelve Data | Exacte slotkoers, niet onafhankelijk geverifieerd |
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 2026-06-01 | 2026-06-01 | 69.90 | USD | Twelve Data | Exacte slotkoers, niet onafhankelijk geverifieerd |
 | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 2026-06-01 | 2026-06-01 | 32.46 | USD | Twelve Data | Exacte slotkoers, niet onafhankelijk geverifieerd |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 2026-06-01 | 2026-06-01 | 55.97 | USD | Twelve Data | Exacte slotkoers, niet onafhankelijk geverifieerd |
 | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | 2026-06-01 | 2026-06-01 | 173.57 | USD | Twelve Data | Exacte slotkoers, niet onafhankelijk geverifieerd |
@@ -132,7 +132,7 @@ De bovenstaande portefeuillewaardering is gebaseerd op de slotkoersen per positi
 
 | FX-basis | Gevraagde datum | Gebruikte datum | Koers | Bron | Status |
 |---|---|---|---:|---|---|
-| EUR/USD | 2026-06-01 | 2026-06-01 | 1.1633 | Twelve Data | Exacte slotkoers, niet onafhankelijk geverifieerd |
+| EUR/USD | 2026-06-01 | 2026-06-01 | 1.1632 | Twelve Data | Exacte slotkoers, niet onafhankelijk geverifieerd |
 
 `EQUITY_CURVE_CHART_PLACEHOLDER`
 
@@ -142,13 +142,13 @@ Rendement wordt berekend op de huidige ETF-posities op basis van de meest recent
 
 | Portefeuillesegment | Beleggingsthese | ETF | Gewicht % | 1w rendement | 1m rendement | 3m rendement | Sinds instap | P/L EUR | Bijdrage % |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|
-| Hedgepositie | Reële activa / geopolitieke en inflatiehedge | [GLD](https://www.tradingview.com/chart/?symbol=GLD) | 4.37% | -0.62% | -2.93% | -16.07% | -11.14% | -760.98 | -0.76% |
-| Rotatiebestemming | Rotatiebestemming | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 5.10% | -2.35% | -5.58% | +20.53% | n.v.t. | 114.46 | +0.11% |
-| Reële activa / capex | Netwerk- en infrastructuurcapex | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 13.57% | +1.89% | -1.43% | +1.10% | +8.25% | 1,065.38 | +1.07% |
-| Weerbaarheid | Defensie en strategische weerbaarheid | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | 14.88% | +1.97% | +3.67% | -6.44% | -6.97% | -417.96 | -0.42% |
-| Groeimotor | AI-rekenkracht en semiconductorleiderschap | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 27.94% | +5.46% | +19.95% | +49.56% | +20.61% | 9,502.06 | +9.50% |
-| Kernbeta | Amerikaanse large-cap kernblootstelling | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 24.24% | +1.73% | +5.55% | +10.81% | +6.17% | 2,891.14 | +2.89% |
-| Strategische energie | Kernenergie- en uraniumcyclus | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 8.15% | +5.02% | -10.81% | -19.08% | -0.55% | -929.02 | -0.93% |
+| Rotatiebestemming | Portefeuilleblootstelling | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 5.00% | +6.06% | +13.89% | -28.19% | n.v.t. | n.v.t. | n.v.t. |
+| Rotatiebestemming | Rotatiebestemming | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 9.47% | -2.35% | -5.58% | +20.53% | n.v.t. | 212.37 | +0.21% |
+| Reële activa / capex | Netwerk- en infrastructuurcapex | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 13.57% | +1.89% | -1.43% | +1.10% | +8.25% | 1,065.41 | +1.07% |
+| Weerbaarheid | Defensie en strategische weerbaarheid | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | 9.88% | +1.97% | +3.67% | -6.44% | -6.97% | -277.54 | -0.28% |
+| Groeimotor | AI-rekenkracht en semiconductorleiderschap | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 27.94% | +5.46% | +19.95% | +49.56% | +20.61% | 9,502.38 | +9.50% |
+| Kernbeta | Amerikaanse large-cap kernblootstelling | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 24.24% | +1.73% | +5.55% | +10.81% | +6.17% | 2,891.24 | +2.89% |
+| Strategische energie | Kernenergie- en uraniumcyclus | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 8.15% | +5.02% | -10.81% | -19.08% | -0.55% | -929.05 | -0.93% |
 
 ## 8. Allocatiekaart
 
@@ -180,11 +180,11 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 
 | Ticker | Actie | Score | Nieuw-kapitaaltoets | Rol | Volgende toets |
 |---|---|---:|---|---|---|
-| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | Aanhouden | 3.00 | Verlagen | Hedgepositie | Voer de hedge-validiteitstest opnieuw uit tegenover [GSG](https://www.tradingview.com/chart/?symbol=GSG) en [BIL](https://www.tradingview.com/chart/?symbol=BIL). |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Aanhouden |  | Aanhouden | Rotatiebestemming | Aanhouden en opnieuw toetsen in de volgende run. |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Aanhouden | 3.68 | Kleiner / onder herbeoordeling | Reële activa / capex | Voer de vervangingsanalyse tegenover [GRID](https://www.tradingview.com/chart/?symbol=GRID) opnieuw uit. |
-| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Aanhouden | 3.45 | Verlagen | Weerbaarheid | Voer de vervangingsanalyse tegenover [ITA](https://www.tradingview.com/chart/?symbol=ITA) opnieuw uit. |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | Aanhouden | 4.28 | Kleiner / onder herbeoordeling | Groeimotor | Aanhouden binnen de maximale positiegrootte en opnieuw toetsen op concentratie. |
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | Toevoegen | | Onder herbeoordeling | Rotatiebestemming | Aanhouden en opnieuw toetsen in de volgende run. |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Aanhouden | | Aanhouden | Rotatiebestemming | Aanhouden en opnieuw toetsen in de volgende run. |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Aanhouden, onder herbeoordeling | 3.68 | Kleiner / onder herbeoordeling | Reële activa / capex | Voer de vervangingsanalyse tegenover [GRID](https://www.tradingview.com/chart/?symbol=GRID) opnieuw uit. |
+| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Aanhouden, onder herbeoordeling | 3.45 | Verlagen | Weerbaarheid | Voer de vervangingsanalyse tegenover [ITA](https://www.tradingview.com/chart/?symbol=ITA) opnieuw uit. |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | Toevoegen | 4.28 | Kleiner / onder herbeoordeling | Groeimotor | Aanhouden binnen de maximale positiegrootte en opnieuw toetsen op concentratie. |
 | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | Aanhouden | 3.53 | Kleiner / onder herbeoordeling | Kernbeta | Toets overlap met [SMH](https://www.tradingview.com/chart/?symbol=SMH) voordat extra kapitaal wordt toegewezen. |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Aanhouden | 3.70 | Aanhouden | Strategische energie | Aanhouden en vergelijken met [URA](https://www.tradingview.com/chart/?symbol=URA)/[NLR](https://www.tradingview.com/chart/?symbol=NLR) als uraniumbreedte verbetert. |
 
@@ -205,51 +205,53 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | -3.48% | -9.71% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-01. | Huidige positie blijft sterker; geen vervanging. | Vereist aanhoudende relatieve outperformance. |
 | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | +1.52% | -1.75% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-01. | Alleen vroege 1-maands verbetering; wacht op 3-maands bevestiging. | Vereist 3-maands bevestiging. |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | +2.67% | +8.48% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-01. | Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden. | Bevestig aansluiting op de beleggingscase, liquiditeit en financieringsbron. |
-| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | -2.65% | +36.60% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-01. | Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden. | Bevestig aansluiting op de beleggingscase, liquiditeit en financieringsbron. |
-| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [BIL](https://www.tradingview.com/chart/?symbol=BIL) | +2.96% | +16.67% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-01. | Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden. | Bevestig aansluiting op de beleggingscase, liquiditeit en financieringsbron. |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [URA](https://www.tradingview.com/chart/?symbol=URA) | +0.39% | +8.61% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-01. | Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden. | Bevestig aansluiting op de beleggingscase, liquiditeit en financieringsbron. |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | +3.99% | +13.00% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-01. | Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden. | Bevestig aansluiting op de beleggingscase, liquiditeit en financieringsbron. |
 
 ## 12. Rotatieplan portefeuille
 
-| Sluiten | Verlagen | Aanhouden | Toevoegen | Vervangen | Override |
-|---|---|---|---|---|---|
-| Geen | Geen | [SMH](https://www.tradingview.com/chart/?symbol=SMH), [GSG](https://www.tradingview.com/chart/?symbol=GSG), [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Geen | [GLD](https://www.tradingview.com/chart/?symbol=GLD)→[GSG](https://www.tradingview.com/chart/?symbol=GSG) | [PPA](https://www.tradingview.com/chart/?symbol=PPA), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [SPY](https://www.tradingview.com/chart/?symbol=SPY) |
+| Sluiten | Verlagen | Aanhouden | Toevoegen | Vervangen |
+|---|---|---|---|---|
+| Geen | Geen | [GSG](https://www.tradingview.com/chart/?symbol=GSG), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [SPY](https://www.tradingview.com/chart/?symbol=SPY), [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN), [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [PPA](https://www.tradingview.com/chart/?symbol=PPA), [SPY](https://www.tradingview.com/chart/?symbol=SPY) |
 
 ## 13. Definitieve actietabel
 
-| Ticker | ETF | Huidig gewicht | Doelgewicht | Delta gewicht | Actie | Kapitaalbestemming | Vrijmaakscore | Toelichting | Override-status |
-|---|---|---:|---:|---:|---|---|---:|---|---|
-| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | SPDR Gold Shares | 4.43 | 0.00 | -4.43 | Gedeeltelijk vervangen | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 100.00 | Positie voldoet niet aan de vers-kapitaaltoets; Positie staat onder vervangingsreview; Review loopt al meerdere rapportcycli; Review loopt al meerdere rapportcycli | Nee |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 5.00 | 9.43 | 4.43 | Aanhouden | - | 10.00 | Portefeuillerol is verzwakt | Nee |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | 13.66 | 13.66 | 0.00 | Aanhouden met onderbouwde override | - | 85.00 | Vers kapitaal alleen kleiner of na herbeoordeling inzetten; Positie staat onder vervangingsreview; Review loopt al meerdere rapportcycli; Review loopt al meerdere rapportcycli | Systeemoverride: Rotatiebudget voor deze run is al gebruikt |
-| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | 15.23 | 15.23 | 0.00 | Aanhouden met onderbouwde override | - | 100.00 | Positie voldoet niet aan de vers-kapitaaltoets; Positie staat onder vervangingsreview; Review loopt al meerdere rapportcycli; Review loopt al meerdere rapportcycli | Systeemoverride: Rotatiebudget voor deze run is al gebruikt |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | 27.56 | 27.56 | 0.00 | Aanhouden | - | 60.00 | Vers kapitaal alleen kleiner of na herbeoordeling inzetten; Positie staat onder vervangingsreview; Review loopt al meerdere rapportcycli; Portefeuillerol is verzwakt | Nee |
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | 24.19 | 24.19 | 0.00 | Aanhouden met onderbouwde override | - | 85.00 | Vers kapitaal alleen kleiner of na herbeoordeling inzetten; Positie staat onder vervangingsreview; Review loopt al meerdere rapportcycli; Review loopt al meerdere rapportcycli | Systeemoverride: Rotatiebudget voor deze run is al gebruikt |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | 8.17 | 8.17 | 0.00 | Aanhouden | - | 0.00 | - | Nee |
+| Ticker | ETF | Bestaand/nieuw | Vorig gewicht | Doelgewicht | Advies | Convictieniveau | Totaalscore | Portefeuillerol | Sterker alternatief? | Korte toelichting |
+|---|---|---|---:|---:|---|---|---:|---|---|---|
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | Bestaand | 0.00 | 5.00 | Toevoegen | | | Rotatiebestemming | Nee | Geen materiële wijziging deze run. |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Bestaand | 9.47 | 9.47 | Aanhouden | Niveau 2 | | Rotatiebestemming | Nee | Geen materiële wijziging deze run. |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Bestaand | 13.57 | 13.66 | Aanhouden, onder herbeoordeling | Niveau 2 | 3.68 | Reële activa / capex | Ja | Infrastructuurcase blijft valide, maar [GRID](https://www.tradingview.com/chart/?symbol=GRID) is de scherpste vervangingskandidaat. |
+| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | Bestaand | 14.88 | 9.88 | Aanhouden, onder herbeoordeling | Niveau 3 | 3.45 | Weerbaarheid | Ja | Structurele defensiecase blijft valide, maar de ETF-implementatie moet zich bewijzen tegenover [ITA](https://www.tradingview.com/chart/?symbol=ITA). |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Bestaand | 27.94 | 27.56 | Toevoegen | Niveau 1 | 4.28 | Groeimotor | Nee | Best onderbouwde groeiblootstelling; uitbreiding blijft begrensd door de maximale positiegrootte. |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | Bestaand | 24.24 | 24.19 | Aanhouden | Niveau 2 | 3.53 | Kernbeta | Ja | Nuttig als kernblootstelling, maar de overlap met [SMH](https://www.tradingview.com/chart/?symbol=SMH) blijft expliciet onder herbeoordeling. |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Bestaand | 8.15 | 8.17 | Aanhouden | Niveau 2 | 3.70 | Strategische energie | Nee | Strategische energiecase blijft valide, maar krijgt deze run geen extra kapitaal boven [SMH](https://www.tradingview.com/chart/?symbol=SMH). |
 
-## 14. Voorgestelde positiewijzigingen / rotatie-intenties
+## 14. Positiewijzigingen in deze run
 
-| Bron | Bestemming | Delta bron % | Delta bestemming % | Geschatte waarde EUR | Intentiestatus | Toelichting |
-|---|---|---:|---:|---:|---|---|
-| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | -4.43 | 4.43 | 4871.45 | Gedeeltelijk vervangen | Positie voldoet niet aan de vers-kapitaaltoets; Positie staat onder vervangingsreview; Review loopt al meerdere rapportcycli; Review loopt al meerdere rapportcycli |
+| Ticker | Vorig gewicht % | Nieuw gewicht % | Gewichtswijziging % | Wijziging aantal stukken | Uitgevoerde actie | Financieringsbron / toelichting |
+|---|---:|---:|---:|---:|---|---|
+| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | 14.88 | 9.88 | -5.00 | -36.96 | Verkopen | Guarded auto-execution: reduce [PPA](https://www.tradingview.com/chart/?symbol=PPA) to fund [DFEN](https://www.tradingview.com/chart/?symbol=DFEN). |
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 0.00 | 5.00 | 5.00 | 91.77 | Kopen | Guarded auto-execution: buy [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) funded by [PPA](https://www.tradingview.com/chart/?symbol=PPA). |
+| CASH | - | 1.76 | - | 0.00 | Geen | Resterende cash |
 
 ## 15. Huidige posities en cash
 
 - Startkapitaal (EUR): 100000.00
-- Belegde marktwaarde (EUR): 108350.66
+- Belegde marktwaarde (EUR): 108354.39
 - Cash (EUR): 1936.52
-- Totale portefeuillewaarde (EUR): 110287.18
+- Totale portefeuillewaarde (EUR): 110290.91
 - Rendement sinds start (%): 10.29
-- EUR/USD gebruikt: 1.1633
+- EUR/USD gebruikt: 1.1632
 
 | Ticker | Aantal aandelen | Prijs lokaal | Valuta | Marktwaarde lokaal | Marktwaarde EUR | Gewicht % |
 |---|---:|---:|---|---:|---:|---:|
-| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | 13.62 | 411.24 | USD | 5600.76 | 4814.59 | 4.37 |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 201.75 | 32.46 | USD | 6548.79 | 5629.54 | 5.10 |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 311.00 | 55.97 | USD | 17405.12 | 14961.98 | 13.57 |
-| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | 110.00 | 173.57 | USD | 19092.70 | 16412.67 | 14.88 |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 59.00 | 607.48 | USD | 35841.32 | 30810.31 | 27.94 |
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 41.00 | 758.36 | USD | 31092.76 | 26728.30 | 24.24 |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 171.00 | 61.18 | USD | 10461.78 | 8993.27 | 8.15 |
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 91.77 | 69.90 | USD | 6414.58 | 5514.36 | 5.00 |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 374.29 | 32.46 | USD | 12149.56 | 10444.50 | 9.47 |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 311.00 | 55.97 | USD | 17405.12 | 14962.49 | 13.57 |
+| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | 73.04 | 173.57 | USD | 12678.12 | 10898.88 | 9.88 |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 59.00 | 607.48 | USD | 35841.32 | 30811.36 | 27.94 |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 41.00 | 758.36 | USD | 31092.76 | 26729.22 | 24.24 |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 171.00 | 61.18 | USD | 10461.78 | 8993.58 | 8.15 |
 | CASH | - | 1.00 | EUR | 1936.52 | 1936.52 | 1.76 |
 
 ## 16. Input voor de volgende run
@@ -259,10 +261,10 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 ### Portefeuilletabel
 | Ticker | ETF-naam | Richting | Gewicht % | Gem. instap | Huidige prijs | P/L % | Oorspronkelijke thesis | Rol |
 |---|---|---|---:|---:|---:|---:|---|---|
-| [GLD](https://www.tradingview.com/chart/?symbol=GLD) | SPDR Gold Shares | Longpositie | 4.37 | 476.24 | 411.24 | -11.14 | Reële activa / geopolitieke en inflatiehedge | Hedgepositie |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Longpositie | 5.10 | 31.80 | 32.46 |  | Rotatiebestemming | Rotatiebestemming |
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | Longpositie | 5.00 | | 69.90 | | Portefeuilleblootstelling | Rotatiebestemming |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Longpositie | 9.47 | 31.80 | 32.46 | | Rotatiebestemming | Rotatiebestemming |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Longpositie | 13.57 | 51.98 | 55.97 | 8.25 | Netwerk- en infrastructuurcapex | Reële activa / capex |
-| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | Longpositie | 14.88 | 177.99 | 173.57 | -6.97 | Defensie en strategische weerbaarheid | Weerbaarheid |
+| [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | Longpositie | 9.88 | 177.99 | 173.57 | -6.97 | Defensie en strategische weerbaarheid | Weerbaarheid |
 | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Longpositie | 27.94 | 420.13 | 607.48 | 20.61 | AI-rekenkracht en semiconductorleiderschap | Groeimotor |
 | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | Longpositie | 24.24 | 676.33 | 758.36 | 6.17 | Amerikaanse large-cap kernblootstelling | Kernbeta |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Longpositie | 8.15 | 67.50 | 61.18 | -0.55 | Kernenergie- en uraniumcyclus | Strategische energie |
