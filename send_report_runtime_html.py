@@ -183,7 +183,7 @@ def validate_nl_email_body_runtime(html_body: str, md_text: str) -> None:
     if len(plain_html) < 0.72 * len(plain_md):
         raise RuntimeError("Dutch HTML body appears too short relative to the full report.")
 
-    for bad_token in ["\\n", "#### ", "|---|", "\t"]:
+    for bad_token in ["\n", "#### ", "|---|", "\t"]:
         if bad_token in html_body:
             raise RuntimeError(f"Dutch HTML body still contains raw markdown / escaped formatting token: {bad_token}")
 
@@ -285,6 +285,35 @@ def validate_equity_curve_from_runtime_state(_md_text: str | None = None, tolera
     print(f"RUNTIME_EQUITY_CURVE_OK | latest_nav={nav:.2f}")
 
 
+def create_equity_curve_png_runtime(output_dir: Path, chart_path: Path, mode: str = "standard", md_text: str | None = None):
+    points: list[tuple[str, float]] = []
+    if md_text:
+        points = report_module.parse_section7_equity_points_generic(md_text)
+    if not points:
+        for report_path in report_module.latest_reports_by_day(output_dir, mode=mode):
+            hist_md = report_path.read_text(encoding="utf-8")
+            report_date = report_module.parse_report_date(hist_md)
+            nav = report_module.parse_section15_totals_generic(hist_md).get("Total portfolio value (EUR)")
+            if nav is not None:
+                points.append((report_date, nav))
+    if not points:
+        return None
+
+    is_dutch = bool(md_text and looks_dutch_markdown(md_text))
+    dates = [report_module.datetime.strptime(d, "%Y-%m-%d") for d, _ in points]
+    values = [v for _, v in points]
+    report_module.plt.figure(figsize=(8.8, 3.7))
+    report_module.plt.plot(dates, values, marker="o", linewidth=2.2)
+    report_module.plt.title("Portefeuillecurve (EUR)" if is_dutch else "Equity Curve (EUR)")
+    report_module.plt.xlabel("Datum" if is_dutch else "Date")
+    report_module.plt.ylabel("Portefeuillewaarde (EUR)" if is_dutch else "Portfolio value (EUR)")
+    report_module.plt.grid(True, alpha=0.28)
+    report_module.plt.tight_layout()
+    report_module.plt.savefig(chart_path, dpi=180)
+    report_module.plt.close()
+    return chart_path
+
+
 _patch_base_renderer_contract()
 _extend_native_dutch_numeric_aliases()
 report_module.latest_report_file = _latest_canonical_report_file
@@ -294,6 +323,7 @@ report_module.validate_dutch_companion_report = validate_dutch_companion_report_
 report_module.validate_section15_arithmetic = validate_section15_from_runtime_state
 report_module.validate_equity_curve_alignment = validate_equity_curve_from_runtime_state
 report_module.validate_nl_email_body = validate_nl_email_body_runtime
+report_module.create_equity_curve_png = create_equity_curve_png_runtime
 report_module.build_report_html = _with_client_facing_sanitizer(
     build_report_html_with_state(report_module.build_report_html, report_module._base)
 )
