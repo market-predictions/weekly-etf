@@ -6,17 +6,17 @@ import re
 from pathlib import Path
 
 from runtime import nl_terminology as term
+from runtime.apply_nl_localization import is_native_dutch_report
 from runtime.nl_table_section_mappings import apply_table_section_mappings, TABLE_SECTION_FORBIDDEN_AFTER_SCRUB
 
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 
 # Client-facing Dutch scrub layer.
 #
-# This file is deliberately broader than the strict language validator. The
-# validator should fail bad Dutch output; this scrubber should first normalize
-# known recurring English fragments that come from runtime state, tables,
-# chart/history comments, lane artifacts and delivery templates. Keep official
-# tickers, official product names and accepted market terms intact.
+# Broad replacements are now legacy-only. Native Dutch runtime reports are
+# independently constructed from the same runtime state/key figures as the English
+# report, so this module must not broadly rewrite them. For native reports it only
+# validates/guards against leakage and malformed Dutch tokens.
 
 EXACT_REPLACEMENTS = {
     **term.REPORT_LABELS,
@@ -154,7 +154,13 @@ def latest_nl_report(output_dir: Path) -> Path:
     return reports[-1]
 
 
-def scrub_text(text: str) -> str:
+def scrub_text(text: str, *, native_dutch: bool | None = None) -> str:
+    native = is_native_dutch_report(text) if native_dutch is None else native_dutch
+    if native:
+        # Guard-only mode: native Dutch reports must be generated correctly by the
+        # runtime renderer. Broad replacement maps are legacy-only and may mutate
+        # valid Dutch prose.
+        return text
     for source, target in sorted(EXACT_REPLACEMENTS.items(), key=lambda item: len(item[0]), reverse=True):
         text = text.replace(source, target)
     for pattern, target in REGEX_REPLACEMENTS:
@@ -169,13 +175,14 @@ def main() -> None:
     args = parser.parse_args()
     report_path = latest_nl_report(Path(args.output_dir))
     text = report_path.read_text(encoding="utf-8")
-    scrubbed = scrub_text(text)
+    native = is_native_dutch_report(text)
+    scrubbed = scrub_text(text, native_dutch=native)
     forbidden = FORBIDDEN_AFTER_SCRUB + TABLE_SECTION_FORBIDDEN_AFTER_SCRUB
     failures = [token for token in forbidden if token.lower() in scrubbed.lower()]
     if failures:
         raise RuntimeError("Dutch client-language scrub failed: " + ", ".join(sorted(set(failures))))
     report_path.write_text(scrubbed, encoding="utf-8")
-    print(f"ETF_NL_CLIENT_LANGUAGE_SCRUB_OK | report={report_path.name} | terminology=central_overlay")
+    print(f"ETF_NL_CLIENT_LANGUAGE_SCRUB_OK | report={report_path.name} | mode={'native_guard_only' if native else 'legacy_scrub'}")
 
 
 if __name__ == "__main__":
