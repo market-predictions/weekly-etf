@@ -1,7 +1,7 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-05-31
+2026-06-01
 
 ## What this repository currently is
 
@@ -11,26 +11,33 @@
 - explicit run manifests in `output/run_manifests/`
 - runtime report-state artifacts in `output/runtime/`
 - persisted portfolio state and valuation history
-- English canonical and Dutch companion report generation
+- guarded model execution and trade-ledger idempotency checks
+- English canonical and Dutch native companion report generation
 - delivery HTML overrides for strict branded sections
 - a hard pricing-lineage validator before send
 - an approved, shadow-first macro/thesis roadmap
 
-The pricing-lineage hardening cycle has moved from active repair to **closed baseline / active regression guard** after the confirmation run:
+The latest confirmed production validation run is:
 
 ```text
-run_id: 20260531_200843
-requested_close_date: 2026-05-29
-pricing_lineage_status: passed
+workflow: Send weekly ETF Pro report
+run_number: 195
+trigger_commit: e0a6f075127f1a079ca880accd26923928349f9c
+run_id: 20260601_213417
+requested_close_date: 2026-06-01
+workflow_status: workflow_success
 workflow_conclusion: success
-english_report_path: output/weekly_analysis_pro_260529_22.md
-dutch_report_path: output/weekly_analysis_pro_nl_260529_22.md
-runtime_state_path: output/runtime/etf_report_state_20260529_20260531_200843.json
-pricing_audit_path: output/pricing/price_audit_2026-05-29_20260531_200843.json
-total_portfolio_value_eur: 109964.97
+pricing_lineage_status: passed
+report_authority_source: portfolio_state_post_execution
+english_report_path: output/weekly_analysis_pro_260601_04.md
+dutch_report_path: output/weekly_analysis_pro_nl_260601_04.md
+runtime_state_path: output/runtime/etf_report_state_20260601_20260601_213417.json
+pricing_audit_path: output/pricing/price_audit_2026-06-01_20260601_213417.json
+portfolio_state_path: output/etf_portfolio_state.json
+total_portfolio_value_eur: 110290.91
 ```
 
-Do **not** claim independent email delivery success from this status alone. The run produced report/PDF artifacts and a successful workflow conclusion, but `delivery_manifest_path` was `null` in the manifest. Delivery success still requires a delivery receipt/manifest or explicit user confirmation.
+Do **not** claim independent email delivery success from this status alone. The run produced report/PDF artifacts and a successful workflow conclusion, but `delivery_manifest_path` is `null` in the manifest. Delivery success still requires a delivery receipt/manifest or explicit user confirmation.
 
 ## Four-layer operating status
 
@@ -41,8 +48,17 @@ The current decision framework remains:
 - capital re-underwriting discipline from `control/CAPITAL_REUNDERWRITING_RULES.md`
 - broad lane discovery from `control/LANE_DISCOVERY_CONTRACT.md`
 - valuation-grade challenger discipline
+- guarded model execution with trade-ledger idempotency
 - no indefinite `Hold but replaceable` inertia
 - macro/thesis modernization approved only as a future phased enhancement
+
+Post-execution authority is now explicit:
+
+```text
+runtime state = pre-execution pricing/report-state provenance
+official portfolio state = post-execution active holdings after guarded execution
+client report Section 7 / Section 15 = post-execution official portfolio state when execution occurred in the same run
+```
 
 ### 2. Input/state contract
 
@@ -51,6 +67,7 @@ Current authoritative state inputs are:
 - `output/pricing/price_audit_<requested_close_date>_<run_id>.json`
 - `output/run_manifests/weekly_etf_run_manifest_<requested_close_date>_<run_id>.json`
 - `output/runtime/etf_report_state_<report_token>_<run_id>.json`
+- `output/runtime/etf_model_execution_<date>_<run_id>.json`
 - `output/etf_portfolio_state.json`
 - `output/etf_valuation_history.csv`
 - `output/etf_trade_ledger.csv`
@@ -64,22 +81,27 @@ The latest confirmed run proves the chain:
 ```text
 pricing audit
 → runtime state
+→ guarded model execution
+→ post-execution portfolio state
 → EN/NL report artifacts
-→ persisted portfolio state
 → valuation history
 → run manifest
-→ pricing-lineage validator
+→ delivery HTML/PDF validation
+→ pricing-lineage validator using post-execution report authority
 ```
 
 ### 3. Output contract
 
-The report output contract remains:
+The report output contract is now:
 
-- English is canonical.
-- Dutch is a companion render from the same runtime state, not a separate research pass.
-- Section 7 equity curve and Section 15 holdings reconcile to the same runtime NAV.
-- Pricing-basis disclosure must show requested close, close date used, source, status, and close used.
+- English is the canonical analytical report.
+- Dutch is a native companion render from the same runtime state/key figures, not a broad translation of the English markdown and not a second research pass.
+- Native Dutch localization/scrub layers are guard-only except for narrow structured runtime-state display-label normalization.
+- Section 7 equity curve and Section 15 holdings reconcile to the post-execution official portfolio state when guarded execution occurred in the same run.
+- Pricing-basis disclosure dynamically derives required rows from current active holdings, not stale hardcoded ticker sets.
+- Pricing-basis disclosure must show requested close, close date used, source, status, and close used for all active holdings.
 - Strict branded sections are rendered from runtime state at delivery HTML level, not fixed through markdown-only patches.
+- Dutch PDF chart labels are generated in Dutch in the runtime delivery path.
 - Client-facing reports must not leak internal plumbing labels.
 
 ### 4. Operational runbook
@@ -90,7 +112,7 @@ The current production path is:
 run-queue request or manual dispatch
 → resolve run identity
 → persistent ETF pricing pass
-→ historical relative-strength fetch, with cached fallback if public history is unavailable
+→ historical relative-strength fetch
 → macro policy pack build, with Phase 2 macro audit shadow-only / non-blocking
 → first-pass lane discovery
 → challenger pricing augmentation
@@ -98,104 +120,87 @@ run-queue request or manual dispatch
 → challenger fundability validation
 → portfolio rotation plan
 → runtime report state
-→ EN/NL markdown reports
+→ EN/NL native markdown reports
 → pricing-basis disclosure
 → report polish / localization / ticker links
-→ model execution shadow artifact
 → run manifest
 → persisted valuation state
-→ equity-curve validation
+→ guarded ETF model execution
+→ post-execution official portfolio state
+→ delivery HTML/PDF validation
 → Dutch quality validation
-→ delivery HTML validation
 → hard pricing-lineage pre-send gate
 → PDF/email delivery workflow step
 → final manifest update
 ```
 
-## Pricing-lineage closure status
-
-The pricing-lineage contract is now implemented as an active regression guard.
-
-Current evidence:
-
-- `tools/validate_etf_pricing_lineage_contract.py` validates manifest → pricing audit → runtime state → report tables → recalculated NAV → persisted portfolio state → valuation history → fundable challenger pricing.
-- `tools/validate_etf_client_surface_clean.py` calls the pricing-lineage validator before send and writes `pricing_lineage_status=passed` into the manifest when validation succeeds.
-- The latest successful run manifest records `pricing_lineage_status: passed` for run `20260531_200843`.
-- The same manifest records `workflow_conclusion: success`.
-- The validator confirmed holdings: GLD, GSG, PAVE, PPA, SMH, SPY, URNM.
-- Pricing coverage was 100%, with 7 fresh holdings, 0 carried-forward holdings, and no unresolved tickers.
-
-Remaining pricing-related improvement, not a blocker:
-
-- independent cross-provider verification could upgrade some rows from `fresh_exact_unverified` to `fresh_exact_close` when multiple sources agree.
-
-## Macro/thesis roadmap status
-
-The Macro & Thesis Engine roadmap is approved but remains **shadow-first**.
-
-Locked sequence:
-
-```text
-pricing lineage baseline confirmed
-→ macro audit foundation
-→ deterministic regime and confidence engine
-→ macro policy pack schema
-→ compliance and methodology gates
-→ thesis candidates in shadow mode
-→ Stage-2 confirmation and valuation flags
-→ client-surface integration only after validation
-```
-
-Authority rule:
-
-> Macro/regime modernization is approved as a post-pricing-lineage enhancement. Until validated in fixtures and shadow runs, the new macro engine may produce internal artifacts but must not change client-facing fundable decisions.
-
-Current macro status:
-
-- Phase 2 macro audit foundation exists, but remains shadow-only.
-- `runtime/build_macro_policy_pack.py` records macro audit availability as metadata only.
-- Macro audit unavailability is non-blocking while the layer has no production authority.
-- Existing regime logic still uses the legacy macro policy pack path.
-- Deterministic regime/confidence, schema correction, methodology, compliance, and WP-9 thesis candidates are not production authority yet.
-
 ## Current strengths
 
 - Pricing retrieval and report reconciliation are validated at artifact level.
-- Hard pricing-lineage validation is now implemented and passed in a fresh run.
-- Runtime pipeline produces bilingual report artifacts from the same state.
-- Section 7 and Section 15 reconcile to the runtime NAV.
-- Portfolio state and valuation history are persisted after successful valuation.
+- Pricing-lineage validation is a hard pre-send gate and passed in a fresh run.
+- Post-execution portfolio-state authority is explicit and validated.
+- Runtime pipeline produces bilingual report artifacts from the same state/key figures.
+- Dutch report generation is native and guard-only, not broad translated markdown.
+- Portfolio state and valuation history are persisted after successful valuation/execution.
+- Guarded model execution handles fully exited zero-share positions correctly.
+- Pricing-basis disclosure derives required tickers dynamically from active Section 15 holdings.
 - Challenger pricing/fundability discipline is active.
-- Relative-strength refresh is more robust because cached fallback is explicit and marked.
-- Shadow macro audit no longer blocks production report delivery while it remains non-authoritative.
-- Dutch report generation remains governed by language-contract and quality checks.
-- Macro/thesis roadmap is approved and sequenced behind the now-confirmed pricing-lineage baseline.
+- Shadow macro audit remains non-authoritative and non-blocking.
 
 ## Current weaknesses / watch items
 
-### 1. Email delivery evidence is still separate from workflow success
+### 1. Delivery evidence is still separate from workflow success
 
 A successful workflow and generated PDF artifacts are not the same as a delivery receipt. Do not claim delivery unless a delivery manifest/receipt exists or the user confirms receipt.
 
-### 2. Independent price verification is not yet upgraded
+### 2. Direct visual PDF inspection still needs a renderable artifact
+
+The repo contains generated PDFs/assets, but the GitHub connector exposes binary files as base64 text resources rather than sandbox-renderable files. Visual inspection should use either user-uploaded PDFs or an Actions artifact/download path that can be rendered.
+
+### 3. Independent price verification is not yet upgraded
 
 Rows can remain `fresh_exact_unverified` when one provider gives exact requested-date closes but no independent cross-provider verification has been recorded.
 
-### 3. Macro/thesis schema and compliance gates do not yet exist
+### 4. Macro/thesis schema and compliance gates do not yet exist
 
 The approved roadmap still requires macro policy pack schema correction, active-driver vocabulary, thesis candidate artifacts, methodology, and compliance gates before expanded macro/thesis content can become client-facing.
 
-### 4. Dutch aliases are still distributed across several files
+### 5. Dutch aliases remain partially distributed
 
-Dutch terminology and validator aliases work, but they remain spread across localization, send-time parity, and delivery validation layers. Consolidation remains useful.
+Dutch terminology and validator aliases are more controlled, but some narrow runtime-state labels still live in delivery/scrub layers. Further consolidation remains useful.
 
-### 5. Direct challenger-vs-current-holding scoring is still a model enhancement
+### 6. Direct challenger-vs-current-holding scoring is still a model enhancement
 
 The system has challenger pricing and broad relative strength, but direct 1m/3m replacement-edge scoring versus each current holding remains a future improvement.
 
 ## Immediate priorities
 
-### Priority A — move into macro/thesis roadmap Phase 2/3 carefully
+### Priority A — preserve post-execution pricing-lineage regression guard
+
+Going forward:
+
+- do not weaken `tools/validate_etf_pricing_lineage_contract.py`
+- keep runtime provenance and post-execution report authority separate
+- keep manifest → audit → runtime → official portfolio state → reports → persisted state validation before send
+- keep state and valuation history updates deterministic
+- keep challenger fundability tied to valuation-grade pricing
+
+### Priority B — add delivery receipt/manifest evidence
+
+Next operational hardening:
+
+- write a delivery receipt/manifest when delivery actually completes
+- keep workflow success separate from delivery success
+
+### Priority C — consolidate Dutch language/alias handling
+
+Next cleanup:
+
+- keep Dutch terminology and aliases in one source of truth
+- reuse that source from native render, markdown validation, send-time parity checks, Dutch quality validation, and delivery HTML validation
+- keep native Dutch guard-only; do not reintroduce broad English-to-Dutch scrub passes
+
+### Priority D — move into macro/thesis roadmap Phase 2/3 carefully
 
 Next architecture track:
 
@@ -204,23 +209,7 @@ Next architecture track:
 - define the full macro policy pack schema
 - design deterministic regime/confidence classification without changing production decisions yet
 
-### Priority B — preserve pricing-lineage regression guard
-
-Going forward:
-
-- do not weaken `tools/validate_etf_pricing_lineage_contract.py`
-- keep manifest → audit → runtime → reports → persisted state validation before send
-- keep state and valuation history updates deterministic
-- keep challenger fundability tied to valuation-grade pricing
-
-### Priority C — consolidate Dutch language/alias handling
-
-Next cleanup after pricing-lineage closure:
-
-- keep Dutch terminology and aliases in one source of truth
-- reuse that source from markdown localization, send-time parity checks, Dutch quality validation, and delivery HTML validation
-
-### Priority D — add direct challenger-vs-current-holding scoring
+### Priority E — add direct challenger-vs-current-holding scoring
 
 Next model enhancement:
 
@@ -230,4 +219,4 @@ Next model enhancement:
 
 ## Current status label
 
-**ETF has a production-tested runtime-driven bilingual baseline with pricing-lineage proof now passed for run `20260531_200843`. Pricing lineage is closed as a baseline and remains an active regression guard. The next major roadmap is macro/regime/thesis modernization, but only through the approved shadow-first sequence and without client-facing decision impact until fixture, schema, compliance, and bilingual gates pass.**
+**ETF has a production-tested runtime-driven bilingual baseline with pricing-lineage proof passed for run `20260601_213417`. The system now distinguishes pre-execution runtime provenance from post-execution official portfolio-state authority. Dutch output is native/guard-only rather than broad-translated markdown. Pricing lineage, guarded execution, Dutch quality, and HTML/PDF render validation are green. Email delivery still requires a separate receipt/manifest or user confirmation.**
