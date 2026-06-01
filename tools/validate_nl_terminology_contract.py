@@ -2,8 +2,9 @@
 """Validate the central Dutch terminology contract.
 
 This is a Phase 7 guardrail. It verifies that the central terminology module is
-usable by localization, scrubbing, and Dutch quality validation layers, without
-changing production report content by itself.
+usable by legacy localization, while native Dutch runtime reports remain
+independently constructed from runtime state and are protected from broad
+translation-style mutation.
 """
 
 from __future__ import annotations
@@ -75,6 +76,7 @@ KNOWN_BAD_OUTPUT_TOKENS = [
     "Toevoegened",
     "Verlagend",
     "Sluitend",
+    "Neeg",
 ]
 
 
@@ -119,30 +121,29 @@ def validate_bad_value_absence() -> None:
         _assert(token not in joined, f"forbidden low-quality Dutch token appears in client-facing terminology values: {token}")
 
 
-def validate_known_bad_tokens_are_repaired_or_blocked() -> None:
+def validate_known_bad_tokens_are_repaired_or_blocked_in_legacy_mode() -> None:
     forbidden_joined = "\n".join(str(token) for token in term.FORBIDDEN_AFTER_SCRUB)
     for token in KNOWN_BAD_OUTPUT_TOKENS:
-        repaired = scrub_text(token)
+        repaired = scrub_text(token, native_dutch=False)
         if token not in repaired:
             continue
-        _assert(token in forbidden_joined, f"known bad token is neither repaired by scrub_text nor present in forbidden guard: {token}")
+        _assert(token in forbidden_joined, f"known bad token is neither repaired by legacy scrub_text nor present in forbidden guard: {token}")
 
 
-def validate_runtime_overlay() -> None:
+def validate_legacy_runtime_overlay() -> None:
     sample = "## 1. Executive Summary\n\n| Theme | Primary ETF | What needs to happen |\n|---|---|---|\n| AI compute infrastructure | SMH | Hold but replaceable |"
     localized = localize_text(sample, language="nl")
-    scrubbed = scrub_text(localized)
+    scrubbed = scrub_text(localized, native_dutch=False)
     required = ["Kernsamenvatting", "Thema", "Primaire ETF", "Benodigde bevestiging", "Aanhouden, maar vervangbaar"]
     for token in required:
-        _assert(token in scrubbed, f"runtime overlay missing expected Dutch token: {token}")
+        _assert(token in scrubbed, f"legacy runtime overlay missing expected Dutch token: {token}")
     forbidden = ["Executive Summary", "What needs to happen", "Hold but replaceable"]
     for token in forbidden:
-        _assert(token not in scrubbed, f"runtime overlay left forbidden English token: {token}")
+        _assert(token not in scrubbed, f"legacy runtime overlay left forbidden English token: {token}")
 
 
-def validate_apply_nl_localization_overlay() -> None:
-    source_phrase = "Replacement trigger watch — challenger leading over 3m."
-    sample = f"""# Wekelijkse ETF-review
+def validate_native_dutch_guard_only_overlay() -> None:
+    native = """# Wekelijkse ETF-review
 
 ## 1. Kernsamenvatting
 ## 2. Portefeuille-acties
@@ -152,29 +153,47 @@ def validate_apply_nl_localization_overlay() -> None:
 ## 15. Huidige posities en cash
 ## 16. Input voor de volgende run
 
-{source_phrase}
-Not fundable - close proof incomplete.
-Hold but replaceable
+Nog geen alternatief is sterk genoeg om direct te financieren.
 
 ## 17. Disclaimer
 
 Old placeholder disclaimer.
 """
-    localized = localize_report(sample)
+    localized = localize_report(native)
+    scrubbed = scrub_text(localized, native_dutch=True)
     required = [
-        term.DECISION_TRANSLATIONS[source_phrase],
-        "Niet geschikt voor allocatie",
-        "Aanhouden, maar vervangbaar",
+        "Nog geen alternatief is sterk genoeg om direct te financieren.",
         term.DUTCH_DISCLAIMER,
     ]
     for token in required:
-        _assert(token in localized, f"apply_nl_localization overlay missing expected Dutch token: {token}")
-    forbidden = ["Replacement trigger watch", "Not fundable - close proof incomplete", "Hold but replaceable", "Old placeholder disclaimer"]
+        _assert(token in scrubbed, f"native Dutch guard-only output missing expected token: {token}")
+    forbidden = ["Neeg", "Old placeholder disclaimer"]
     for token in forbidden:
-        _assert(token not in localized, f"apply_nl_localization overlay left forbidden token: {token}")
-    quality_failures = _failures_for_text(localized)
+        _assert(token not in scrubbed, f"native Dutch guard-only output left forbidden token: {token}")
+    quality_failures = _failures_for_text(scrubbed)
     if quality_failures:
-        raise ContractError("apply_nl_localization output fails Dutch quality: " + "; ".join(quality_failures))
+        raise ContractError("native Dutch guard-only output fails Dutch quality: " + "; ".join(quality_failures))
+
+
+def validate_native_dutch_does_not_translate_english_leakage() -> None:
+    native_with_leak = """# Wekelijkse ETF-review
+
+## 1. Kernsamenvatting
+## 2. Portefeuille-acties
+## 3. Regime-dashboard
+## 10. Review huidige posities
+## 15. Huidige posities en cash
+
+Replacement trigger watch — challenger leading over 3m.
+
+## 17. Disclaimer
+
+Old placeholder disclaimer.
+"""
+    localized = localize_report(native_with_leak)
+    _assert("Replacement trigger watch" in localized, "native guard-only mode incorrectly translated an English leakage phrase")
+    failures = _failures_for_text(localized)
+    _assert(any("Replacement trigger watch" in failure for failure in failures), "native English leakage did not fail Dutch quality validation")
 
 
 def validate_regex_entries() -> None:
@@ -188,10 +207,11 @@ def main() -> None:
     args = parser.parse_args()
     validate_maps()
     validate_bad_value_absence()
-    validate_known_bad_tokens_are_repaired_or_blocked()
+    validate_known_bad_tokens_are_repaired_or_blocked_in_legacy_mode()
     validate_regex_entries()
-    validate_runtime_overlay()
-    validate_apply_nl_localization_overlay()
+    validate_legacy_runtime_overlay()
+    validate_native_dutch_guard_only_overlay()
+    validate_native_dutch_does_not_translate_english_leakage()
     print("ETF_NL_TERMINOLOGY_CONTRACT_OK")
 
 
