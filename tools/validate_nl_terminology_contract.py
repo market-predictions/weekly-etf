@@ -141,7 +141,8 @@ def validate_runtime_overlay() -> None:
 
 
 def validate_apply_nl_localization_overlay() -> None:
-    sample = """# Wekelijkse ETF-review
+    source_phrase = "Replacement trigger watch — challenger leading over 3m."
+    sample = f"""# Wekelijkse ETF-review
 
 ## 1. Kernsamenvatting
 ## 2. Portefeuille-acties
@@ -150,22 +151,25 @@ def validate_apply_nl_localization_overlay() -> None:
 ## 12. Rotatieplan portefeuille
 ## 15. Huidige posities en cash
 ## 16. Input voor de volgende run
-## 17. Disclaimer
 
-Replacement trigger watch — challenger leading over 3m.
+{source_phrase}
 Not fundable - close proof incomplete.
 Hold but replaceable
+
+## 17. Disclaimer
+
+Old placeholder disclaimer.
 """
     localized = localize_report(sample)
     required = [
-        "Vervangingskandidaat blijft op de volglijst",
+        term.DECISION_TRANSLATIONS[source_phrase],
         "Niet geschikt voor allocatie",
         "Aanhouden, maar vervangbaar",
         term.DUTCH_DISCLAIMER,
     ]
     for token in required:
         _assert(token in localized, f"apply_nl_localization overlay missing expected Dutch token: {token}")
-    forbidden = ["Replacement trigger watch", "Not fundable - close proof incomplete", "Hold but replaceable"]
+    forbidden = ["Replacement trigger watch", "Not fundable - close proof incomplete", "Hold but replaceable", "Old placeholder disclaimer"]
     for token in forbidden:
         _assert(token not in localized, f"apply_nl_localization overlay left forbidden token: {token}")
     quality_failures = _failures_for_text(localized)
