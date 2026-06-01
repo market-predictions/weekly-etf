@@ -1,0 +1,34 @@
+name: Validate ETF Dutch terminology contract
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "runtime/nl_terminology.py"
+      - "runtime/nl_localization.py"
+      - "runtime/apply_nl_localization.py"
+      - "runtime/scrub_nl_client_language.py"
+      - "tools/validate_etf_dutch_language_quality.py"
+      - "tools/validate_nl_terminology_contract.py"
+      - ".github/workflows/validate-nl-terminology-contract.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-nl-terminology-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate central Dutch terminology contract
+        run: |
+          python tools/validate_nl_terminology_contract.py --self-test
