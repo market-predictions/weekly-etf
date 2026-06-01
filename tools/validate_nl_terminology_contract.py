@@ -119,10 +119,13 @@ def validate_bad_value_absence() -> None:
         _assert(token not in joined, f"forbidden low-quality Dutch token appears in client-facing terminology values: {token}")
 
 
-def validate_forbidden_guard_contains_known_bad_tokens() -> None:
+def validate_known_bad_tokens_are_repaired_or_blocked() -> None:
     forbidden_joined = "\n".join(str(token) for token in term.FORBIDDEN_AFTER_SCRUB)
     for token in KNOWN_BAD_OUTPUT_TOKENS:
-        _assert(token in forbidden_joined, f"forbidden-after-scrub guard missing known bad token: {token}")
+        repaired = scrub_text(token)
+        if token not in repaired:
+            continue
+        _assert(token in forbidden_joined, f"known bad token is neither repaired by scrub_text nor present in forbidden guard: {token}")
 
 
 def validate_runtime_overlay() -> None:
@@ -181,7 +184,7 @@ def main() -> None:
     args = parser.parse_args()
     validate_maps()
     validate_bad_value_absence()
-    validate_forbidden_guard_contains_known_bad_tokens()
+    validate_known_bad_tokens_are_repaired_or_blocked()
     validate_regex_entries()
     validate_runtime_overlay()
     validate_apply_nl_localization_overlay()
