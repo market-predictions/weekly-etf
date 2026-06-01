@@ -14,9 +14,9 @@
   "report_transfer": {
     "max_lines": 2,
     "show_in_report": true,
-    "summary": "Risk-on narrow leadership has persisted for 6 run(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed."
+    "summary": "Risk-on narrow leadership has persisted for 7 run(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed."
   },
   "transition_state": "stable",
-  "updated_at_utc": "2026-06-01T21:17:02.754278Z",
-  "weeks_in_regime": 6
+  "updated_at_utc": "2026-06-01T21:35:42.148759Z",
+  "weeks_in_regime": 7
 }

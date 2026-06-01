@@ -1,23 +1,72 @@
 {
-  "schema_version": "1.1",
-  "portfolio_mode": "client_long_only_thematic",
-  "base_currency": "EUR",
-  "valuation_source": "guarded_model_execution_v1",
-  "pricing_audit_file": "output/pricing/price_audit_2026-06-01_20260601_213417.json",
-  "trade_ledger_file": "etf_trade_ledger.csv",
-  "recommendation_scorecard_file": null,
-  "inception_date": "2026-03-28",
-  "starting_capital_eur": 100000.0,
-  "cash_eur": 1936.52,
-  "invested_market_value_eur": 108354.39,
-  "nav_eur": 110290.91,
-  "peak_nav_eur": 110290.91,
-  "max_drawdown_pct": -2.5105,
-  "positions": [
+  "schema_version": "1.0",
+  "created_at_utc": "2026-06-01T21:35:52.807624+00:00",
+  "execution_mode": "guarded_auto",
+  "execution_status": "executed",
+  "run_id": "20260601_213417",
+  "report_date": "2026-06-01",
+  "requested_close_date": "2026-06-01",
+  "source_files": {
+    "runtime_state": "output/runtime/etf_report_state_20260601_20260601_213417.json",
+    "portfolio_state": "output/etf_portfolio_state.json",
+    "trade_ledger": "output/etf_trade_ledger.csv",
+    "pricing_audit": "output/pricing/price_audit_2026-06-01_20260601_213417.json",
+    "rotation_plan": "output/runtime/etf_rotation_plan_260601_20260601_213417.json"
+  },
+  "policy_checks": {
+    "passed": true,
+    "errors": [],
+    "warnings": [],
+    "mode_note": "Guarded auto-execution writes official model trade-ledger and portfolio-state changes when all hard gates pass."
+  },
+  "pre_trade_portfolio": {
+    "cash_eur": 1936.52,
+    "total_portfolio_value_eur": 110290.91,
+    "base_currency": "EUR"
+  },
+  "post_trade_shadow_portfolio": {
+    "cash_eur": 1936.52,
+    "invested_market_value_eur": 108354.39,
+    "nav_eur": 110290.91,
+    "nav_drift_eur": 0.0
+  },
+  "proposed_ledger_rows": [
+    {
+      "trade_id": "shadow-2026-06-01-20260601_213417-01-PPA-CIBR",
+      "trade_date": "2026-06-01",
+      "execution_mode": "shadow",
+      "source_ticker": "PPA",
+      "destination_ticker": "CIBR",
+      "action": "replace_partial",
+      "source_delta_weight_pct": -5.0,
+      "destination_delta_weight_pct": 5.0,
+      "estimated_notional_eur": 5514.55,
+      "requested_notional_eur": 5514.55,
+      "source_previous_weight_pct": 9.88,
+      "source_target_weight_pct": 4.88,
+      "destination_target_weight_pct": 5.0,
+      "source_price_status": "fresh_exact_unverified",
+      "destination_price_status": "fresh_exact_unverified",
+      "notional_capped_to_source_value": false,
+      "reason_codes": [
+        "failed_fresh_cash_test",
+        "replaceable_status",
+        "review_age_ge_2",
+        "review_age_ge_3",
+        "negative_pnl_gt_5",
+        "better_alternative_exists",
+        "negative_contribution",
+        "role_impaired",
+        "factor_or_concentration_flag",
+        "destination_score_100"
+      ]
+    }
+  ],
+  "shadow_positions": [
     {
       "shares_delta_this_run": 68.14107,
       "weight_change_pct": 5.0,
-      "action_executed_this_run": "Buy",
+      "action_executed_this_run": "Shadow buy",
       "funding_source_note": "Shadow buy funded by PPA.",
       "ticker": "CIBR",
       "suggested_action": "Add from rotation",
@@ -219,7 +268,7 @@
       "original_thesis": "Defense and sovereign resilience",
       "shares_delta_this_run": -36.958001,
       "weight_change_pct": -5.0,
-      "action_executed_this_run": "Sell",
+      "action_executed_this_run": "Shadow reduce",
       "funding_source_note": "Shadow execution from rotation intent.",
       "pricing_source": "twelve_data",
       "pricing_status": "fresh_exact_unverified",
@@ -450,31 +499,44 @@
       "rotation_reason_codes": []
     }
   ],
-  "last_report": {
-    "date": "2026-06-01",
-    "source_report": "weekly_analysis_pro_260601_04.md",
-    "position_count": 7
-  },
-  "last_valuation": {
-    "date": "2026-06-01",
-    "nav_eur": 110290.91,
-    "invested_market_value_eur": 108354.39,
-    "cash_eur": 1936.52,
-    "since_inception_return_pct": 10.2909,
-    "daily_return_pct": 0.2964,
-    "drawdown_pct": 0.0,
-    "eurusd_used": 1.1632,
-    "equity_curve_state": "New high",
-    "valuation_notes": "Runtime valuation repriced from official portfolio-state shares"
-  },
-  "last_successful_runtime_state_file": "output/runtime/etf_report_state_20260601_20260601_213417.json",
-  "last_state_persisted_at_utc": "2026-06-01T21:35:52.645850+00:00",
-  "last_model_execution": {
-    "date": "2026-06-01",
-    "run_id": "20260601_213417",
-    "runtime_state": "output/runtime/etf_report_state_20260601_20260601_213417.json",
-    "mode": "guarded_auto",
-    "trade_count": 1,
-    "executed_at_utc": "2026-06-01T21:35:52.807906+00:00"
+  "artifact_path": "output/runtime/etf_model_execution_20260601_20260601_213417.json",
+  "guarded_auto_result": {
+    "official_ledger_rows": [
+      {
+        "trade_id": "model-2026-06-01-20260601_213417-01-PPA-SELL",
+        "trade_date": "2026-06-01",
+        "source_report": "runtime:etf_report_state_20260601_20260601_213417.json",
+        "ticker": "PPA",
+        "action": "Sell",
+        "shares_delta": "-36.958001",
+        "previous_weight_pct": "9.8800",
+        "new_weight_pct": "4.8800",
+        "weight_change_pct": "-5.0000",
+        "target_weight_pct": "4.8800",
+        "conviction_tier": "Tier 3",
+        "portfolio_role": "Resilience",
+        "funding_source_note": "Guarded auto-execution: reduce PPA to fund CIBR."
+      },
+      {
+        "trade_id": "model-2026-06-01-20260601_213417-01-CIBR-BUY",
+        "trade_date": "2026-06-01",
+        "source_report": "runtime:etf_report_state_20260601_20260601_213417.json",
+        "ticker": "CIBR",
+        "action": "Buy",
+        "shares_delta": "68.141070",
+        "previous_weight_pct": "0.0000",
+        "new_weight_pct": "5.0000",
+        "weight_change_pct": "5.0000",
+        "target_weight_pct": "5.0000",
+        "conviction_tier": "",
+        "portfolio_role": "Rotation destination",
+        "funding_source_note": "Guarded auto-execution: buy CIBR funded by PPA."
+      }
+    ],
+    "portfolio_state_written": true,
+    "trade_ledger_written": true,
+    "post_trade_nav_eur": 110290.91,
+    "post_trade_invested_market_value_eur": 108354.39,
+    "post_trade_cash_eur": 1936.52
   }
 }
