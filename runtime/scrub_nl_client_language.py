@@ -76,6 +76,14 @@ EXACT_REPLACEMENTS = {
     "Section 14": "sectie 14",
 }
 
+# Narrow structured-state labels that may still appear inside native Dutch tables
+# when the runtime state carries English enum/display names. This is not a broad
+# translation pass over prose; it is a deterministic runtime-label alias map.
+NATIVE_STATE_LABEL_REPLACEMENTS = {
+    "Non-U.S. developed market diversification": "Ontwikkelde markten buiten de VS",
+    "Non-U.S. developed diversification": "Ontwikkelde markten buiten de VS",
+}
+
 REGEX_REPLACEMENTS = [
     *[(re.compile(pattern, re.I), replacement) for pattern, replacement in term.REGEX_CLIENT_LANGUAGE_REPLACEMENTS],
     (re.compile(r"\bnot\s+fundable\b", re.I), "niet geschikt voor allocatie"),
@@ -154,13 +162,20 @@ def latest_nl_report(output_dir: Path) -> Path:
     return reports[-1]
 
 
+def _normalize_native_state_labels(text: str) -> str:
+    for source, target in sorted(NATIVE_STATE_LABEL_REPLACEMENTS.items(), key=lambda item: len(item[0]), reverse=True):
+        text = text.replace(source, target)
+    return text
+
+
 def scrub_text(text: str, *, native_dutch: bool | None = None) -> str:
     native = is_native_dutch_report(text) if native_dutch is None else native_dutch
     if native:
         # Guard-only mode: native Dutch reports must be generated correctly by the
         # runtime renderer. Broad replacement maps are legacy-only and may mutate
-        # valid Dutch prose.
-        return text
+        # valid Dutch prose. Only narrow runtime-state display-label aliases are
+        # normalized here before validation.
+        return _normalize_native_state_labels(text)
     for source, target in sorted(EXACT_REPLACEMENTS.items(), key=lambda item: len(item[0]), reverse=True):
         text = text.replace(source, target)
     for pattern, target in REGEX_REPLACEMENTS:
