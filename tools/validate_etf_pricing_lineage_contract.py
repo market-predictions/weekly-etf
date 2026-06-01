@@ -56,6 +56,13 @@ def _ticker(value: Any) -> str:
     return cleaned
 
 
+def _first(row: dict[str, Any], *keys: str) -> Any:
+    for key in keys:
+        if key in row and row.get(key) not in (None, ""):
+            return row.get(key)
+    return None
+
+
 def _manifest_path(explicit: str | None) -> Path:
     if explicit:
         return Path(explicit)
@@ -86,6 +93,50 @@ def _price_index(audit: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return indexed
 
 
+def _state_positions(payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    indexed: dict[str, dict[str, Any]] = {}
+    for row in payload.get("positions", []) or []:
+        ticker = _ticker(row.get("ticker"))
+        if ticker and ticker != "CASH":
+            indexed[ticker] = dict(row)
+    return indexed
+
+
+def _runtime_positions(runtime: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return _state_positions(runtime)
+
+
+def _state_container(payload: dict[str, Any]) -> dict[str, Any]:
+    return payload.get("portfolio") or payload
+
+
+def _state_cash(payload: dict[str, Any]) -> float:
+    return _money(_state_container(payload).get("cash_eur"))
+
+
+def _state_nav(payload: dict[str, Any]) -> float:
+    container = _state_container(payload)
+    return _money(_first(container, "total_portfolio_value_eur", "nav_eur"))
+
+
+def _state_invested(payload: dict[str, Any]) -> float:
+    container = _state_container(payload)
+    direct = _first(container, "invested_market_value_eur")
+    if direct not in (None, ""):
+        return _money(direct)
+    return round(sum(_money(_first(row, "previous_market_value_eur", "market_value_eur")) for row in _state_positions(payload).values()), 2)
+
+
+def _state_report_date(payload: dict[str, Any], fallback: dict[str, Any] | None = None) -> str:
+    last = payload.get("last_valuation") or {}
+    value = _text(last.get("date") or payload.get("requested_close_date") or payload.get("report_date"))
+    if value:
+        return value
+    if fallback is not None:
+        return _state_report_date(fallback)
+    raise RuntimeError("Could not resolve report date from state authority")
+
+
 def _holding_symbols(audit: dict[str, Any], runtime: dict[str, Any]) -> list[str]:
     symbols: list[str] = []
     for row in audit.get("holdings", []) or []:
@@ -93,22 +144,38 @@ def _holding_symbols(audit: dict[str, Any], runtime: dict[str, Any]) -> list[str
         if symbol and symbol not in symbols:
             symbols.append(symbol)
     if not symbols:
-        for row in runtime.get("positions", []) or []:
-            symbol = _ticker(row.get("ticker"))
-            if symbol and symbol != "CASH" and symbol not in symbols:
+        for symbol in _state_positions(runtime):
+            if symbol not in symbols:
                 symbols.append(symbol)
     if not symbols:
         raise RuntimeError("No holding symbols found in audit or runtime state.")
     return symbols
 
 
-def _runtime_positions(runtime: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    indexed: dict[str, dict[str, Any]] = {}
-    for row in runtime.get("positions", []) or []:
-        ticker = _ticker(row.get("ticker"))
-        if ticker and ticker != "CASH":
-            indexed[ticker] = dict(row)
-    return indexed
+def _position_symbols(state: dict[str, Any]) -> list[str]:
+    symbols = sorted(_state_positions(state))
+    if not symbols:
+        raise RuntimeError("No active holding symbols found in state authority")
+    return symbols
+
+
+def _select_report_authority(runtime: dict[str, Any], portfolio_state: dict[str, Any]) -> tuple[dict[str, Any], str]:
+    """Select the state layer that should reconcile to client-facing tables.
+
+    The runtime report-state artifact is built before guarded execution. If the
+    guarded model executes during the same run, `output/etf_portfolio_state.json`
+    becomes the official active-holdings authority and the report can be updated
+    to that post-execution state. In that case, report tables must validate
+    against the official portfolio state, while the pre-execution runtime still
+    remains the audit/provenance input.
+    """
+
+    last_execution = portfolio_state.get("last_model_execution") or {}
+    if _text(last_execution.get("run_id")) == _text(runtime.get("run_id")):
+        return portfolio_state, "portfolio_state_post_execution"
+    if _text(portfolio_state.get("valuation_source")).startswith("guarded_model_execution"):
+        return portfolio_state, "portfolio_state_guarded_execution"
+    return runtime, "runtime_state"
 
 
 def _client_status(status: str) -> str:
@@ -210,7 +277,7 @@ def _validate_price_rows(audit: dict[str, Any]) -> None:
 def _validate_runtime_vs_audit(runtime: dict[str, Any], audit: dict[str, Any], *, price_tolerance: float, value_tolerance: float) -> None:
     prices = _price_index(audit)
     positions = _runtime_positions(runtime)
-    for symbol in _holding_symbols(audit, runtime):
+    for symbol in _position_symbols(runtime):
         price_row = prices.get(symbol)
         if not price_row:
             raise RuntimeError(f"Holding {symbol} missing from pricing audit price_results")
@@ -232,26 +299,29 @@ def _validate_runtime_vs_audit(runtime: dict[str, Any], audit: dict[str, Any], *
         mv = _float(runtime_row.get("previous_market_value_eur") if runtime_row.get("previous_market_value_eur") is not None else runtime_row.get("market_value_eur"), None)
         if mv is None or mv <= 0:
             raise RuntimeError(f"Holding {symbol} runtime market value missing or invalid: {mv}")
-    cash = _money((runtime.get("portfolio") or {}).get("cash_eur"))
-    invested = round(sum(_money(row.get("previous_market_value_eur") if row.get("previous_market_value_eur") is not None else row.get("market_value_eur")) for row in positions.values()), 2)
-    nav = _money((runtime.get("portfolio") or {}).get("total_portfolio_value_eur"))
+    cash = _state_cash(runtime)
+    invested = _state_invested(runtime)
+    nav = _state_nav(runtime)
     if abs((invested + cash) - nav) > value_tolerance:
         raise RuntimeError(f"Runtime NAV mismatch: invested {invested} + cash {cash} != nav {nav}")
 
 
-def _validate_report_tables(report_path: Path, runtime: dict[str, Any], audit: dict[str, Any], *, price_tolerance: float, value_tolerance: float) -> None:
+def _validate_report_tables(report_path: Path, authority_state: dict[str, Any], audit: dict[str, Any], *, authority_label: str, price_tolerance: float, value_tolerance: float) -> None:
     md_text = _read_text(report_path)
     prices = _price_index(audit)
-    runtime_positions = _runtime_positions(runtime)
+    authority_positions = _state_positions(authority_state)
+    required_symbols = _position_symbols(authority_state)
     requested = _text(audit.get("requested_close_date"))
 
     disclosure_rows = _parse_markdown_table_after_heading(md_text, "| Holding | Requested close | Close date used | Close used | Currency | Market-data source | Status |")
     disclosure_by_symbol = {_ticker(row.get("Holding")): row for row in disclosure_rows}
-    for symbol in _holding_symbols(audit, runtime):
+    for symbol in required_symbols:
         report_row = disclosure_by_symbol.get(symbol)
         if not report_row:
             raise RuntimeError(f"Report pricing disclosure missing holding {symbol}")
-        price_row = prices[symbol]
+        price_row = prices.get(symbol)
+        if not price_row:
+            raise RuntimeError(f"Report disclosure {symbol} has no matching audit price row")
         if _text(report_row.get("Requested close")) != requested:
             raise RuntimeError(f"Report disclosure {symbol} requested close mismatch")
         if _text(report_row.get("Close date used")) != _text(price_row.get("returned_close_date")):
@@ -268,32 +338,35 @@ def _validate_report_tables(report_path: Path, runtime: dict[str, Any], audit: d
 
     section15_nav = _section_scalar(md_text, "Total portfolio value (EUR)")
     section7_nav = _section_scalar(md_text, "Current portfolio value (EUR)")
-    runtime_nav = _money((runtime.get("portfolio") or {}).get("total_portfolio_value_eur"))
-    if abs(section15_nav - runtime_nav) > value_tolerance:
-        raise RuntimeError(f"Section 15 NAV {section15_nav} does not match runtime NAV {runtime_nav}")
+    authority_nav = _state_nav(authority_state)
+    if abs(section15_nav - authority_nav) > value_tolerance:
+        raise RuntimeError(f"Section 15 NAV {section15_nav} does not match {authority_label} NAV {authority_nav}")
     if abs(section7_nav - section15_nav) > value_tolerance:
         raise RuntimeError(f"Section 7 NAV {section7_nav} does not match Section 15 NAV {section15_nav}")
 
     section15_rows = _parse_markdown_table_after_heading(md_text, "| Ticker | Shares | Price (local) | Currency | Market value (local) | Market value (EUR) | Weight % |")
     section15_by_symbol = {_ticker(row.get("Ticker")): row for row in section15_rows}
-    for symbol, runtime_row in runtime_positions.items():
+    for symbol in section15_by_symbol:
+        if symbol and symbol != "CASH" and symbol not in authority_positions:
+            raise RuntimeError(f"Section 15 contains holding {symbol} not present in {authority_label}")
+    for symbol, authority_row in authority_positions.items():
         report_row = section15_by_symbol.get(symbol)
         if not report_row:
-            raise RuntimeError(f"Section 15 missing runtime holding {symbol}")
-        for label, runtime_key in [("Price (local)", "current_price_local"), ("Market value (EUR)", "previous_market_value_eur")]:
+            raise RuntimeError(f"Section 15 missing {authority_label} holding {symbol}")
+        for label, state_key in [("Price (local)", "current_price_local"), ("Market value (EUR)", "previous_market_value_eur")]:
             report_value = _float(report_row.get(label), None)
-            runtime_value = _float(runtime_row.get(runtime_key), None)
-            if report_value is None or runtime_value is None or abs(report_value - runtime_value) > value_tolerance:
-                raise RuntimeError(f"Section 15 {symbol} {label}={report_value}, runtime {runtime_key}={runtime_value}")
+            state_value = _float(authority_row.get(state_key), None)
+            if report_value is None or state_value is None or abs(report_value - state_value) > value_tolerance:
+                raise RuntimeError(f"Section 15 {symbol} {label}={report_value}, {authority_label} {state_key}={state_value}")
 
 
-def _validate_recalculated_nav(runtime: dict[str, Any], audit: dict[str, Any], *, value_tolerance: float) -> None:
+def _validate_recalculated_nav(authority_state: dict[str, Any], audit: dict[str, Any], *, authority_label: str, value_tolerance: float) -> None:
     prices = _price_index(audit)
-    positions = _runtime_positions(runtime)
-    fx_rate = _float((audit.get("fx_basis") or {}).get("rate") or (runtime.get("fx_basis") or {}).get("rate"), None)
+    positions = _state_positions(authority_state)
+    fx_rate = _float((audit.get("fx_basis") or {}).get("rate") or (authority_state.get("fx_basis") or {}).get("rate"), None)
     if not fx_rate:
         raise RuntimeError("FX rate missing for NAV recalculation")
-    cash = _money((runtime.get("portfolio") or {}).get("cash_eur"))
+    cash = _state_cash(authority_state)
     invested = 0.0
     for symbol, position in positions.items():
         price_row = prices.get(symbol)
@@ -307,23 +380,23 @@ def _validate_recalculated_nav(runtime: dict[str, Any], audit: dict[str, Any], *
         local_value = shares * price
         invested += local_value if currency == "EUR" else local_value / fx_rate
     recalculated = round(invested + cash, 2)
-    reported = _money((runtime.get("portfolio") or {}).get("total_portfolio_value_eur"))
+    reported = _state_nav(authority_state)
     if abs(recalculated - reported) > value_tolerance:
-        raise RuntimeError(f"Recalculated NAV {recalculated} does not match reported runtime NAV {reported}")
+        raise RuntimeError(f"Recalculated NAV {recalculated} does not match {authority_label} NAV {reported}")
 
 
-def _validate_persisted_state(portfolio_state_path: Path, valuation_history_path: Path, runtime: dict[str, Any], audit_path: Path, *, value_tolerance: float) -> None:
+def _validate_persisted_state(portfolio_state_path: Path, valuation_history_path: Path, runtime: dict[str, Any], authority_state: dict[str, Any], audit_path: Path, *, value_tolerance: float) -> None:
     portfolio_state = _read_json(portfolio_state_path)
-    report_date = _text(runtime.get("requested_close_date") or runtime.get("report_date"))
-    runtime_nav = _money((runtime.get("portfolio") or {}).get("total_portfolio_value_eur"))
-    runtime_cash = _money((runtime.get("portfolio") or {}).get("cash_eur"))
-    runtime_invested = round(sum(_money(row.get("previous_market_value_eur") if row.get("previous_market_value_eur") is not None else row.get("market_value_eur")) for row in _runtime_positions(runtime).values()), 2)
+    report_date = _state_report_date(authority_state, fallback=runtime)
+    expected_nav = _state_nav(authority_state)
+    expected_cash = _state_cash(authority_state)
+    expected_invested = _state_invested(authority_state)
     checks = {
-        "nav_eur": (portfolio_state.get("nav_eur"), runtime_nav),
-        "cash_eur": (portfolio_state.get("cash_eur"), runtime_cash),
-        "invested_market_value_eur": (portfolio_state.get("invested_market_value_eur"), runtime_invested),
+        "nav_eur": (portfolio_state.get("nav_eur"), expected_nav),
+        "cash_eur": (portfolio_state.get("cash_eur"), expected_cash),
+        "invested_market_value_eur": (portfolio_state.get("invested_market_value_eur"), expected_invested),
         "last_valuation.date": ((portfolio_state.get("last_valuation") or {}).get("date"), report_date),
-        "last_valuation.nav_eur": ((portfolio_state.get("last_valuation") or {}).get("nav_eur"), runtime_nav),
+        "last_valuation.nav_eur": ((portfolio_state.get("last_valuation") or {}).get("nav_eur"), expected_nav),
     }
     for label, (actual, expected) in checks.items():
         if isinstance(expected, str):
@@ -342,8 +415,8 @@ def _validate_persisted_state(portfolio_state_path: Path, valuation_history_path
     if len(matches) != 1:
         raise RuntimeError(f"Expected one valuation-history row for {report_date}; found {len(matches)}")
     row = matches[0]
-    if abs(_float(row.get("nav_eur"), -1.0) - runtime_nav) > value_tolerance:
-        raise RuntimeError(f"Valuation history nav_eur={row.get('nav_eur')}, expected {runtime_nav}")
+    if abs(_float(row.get("nav_eur"), -1.0) - expected_nav) > value_tolerance:
+        raise RuntimeError(f"Valuation history nav_eur={row.get('nav_eur')}, expected {expected_nav}")
 
 
 def _validate_fundable_challengers(runtime: dict[str, Any], audit: dict[str, Any]) -> None:
@@ -387,13 +460,22 @@ def validate_manifest_path(
     pricing_audit_path, runtime_state_path, english_report_path, portfolio_state_path, valuation_history_path = _validate_manifest(manifest_path, manifest)
     audit = _read_json(pricing_audit_path)
     runtime = _read_json(runtime_state_path)
+    portfolio_state = _read_json(portfolio_state_path)
+    report_authority, report_authority_source = _select_report_authority(runtime, portfolio_state)
 
     _validate_audit_identity(manifest, pricing_audit_path, runtime, audit)
     _validate_price_rows(audit)
     _validate_runtime_vs_audit(runtime, audit, price_tolerance=price_tolerance, value_tolerance=value_tolerance)
-    _validate_report_tables(english_report_path, runtime, audit, price_tolerance=price_tolerance, value_tolerance=value_tolerance)
-    _validate_recalculated_nav(runtime, audit, value_tolerance=value_tolerance)
-    _validate_persisted_state(portfolio_state_path, valuation_history_path, runtime, pricing_audit_path, value_tolerance=value_tolerance)
+    _validate_report_tables(
+        english_report_path,
+        report_authority,
+        audit,
+        authority_label=report_authority_source,
+        price_tolerance=price_tolerance,
+        value_tolerance=value_tolerance,
+    )
+    _validate_recalculated_nav(report_authority, audit, authority_label=report_authority_source, value_tolerance=value_tolerance)
+    _validate_persisted_state(portfolio_state_path, valuation_history_path, runtime, report_authority, pricing_audit_path, value_tolerance=value_tolerance)
     _validate_fundable_challengers(runtime, audit)
 
     summary = {
@@ -402,8 +484,9 @@ def validate_manifest_path(
         "pricing_audit_path": str(pricing_audit_path),
         "runtime_state_path": str(runtime_state_path),
         "english_report_path": str(english_report_path),
-        "holdings_validated": _holding_symbols(audit, runtime),
-        "total_portfolio_value_eur": (runtime.get("portfolio") or {}).get("total_portfolio_value_eur"),
+        "report_authority_source": report_authority_source,
+        "holdings_validated": _position_symbols(report_authority),
+        "total_portfolio_value_eur": _state_nav(report_authority),
     }
     if update_manifest_status:
         _update_manifest_status(manifest_path, manifest, "passed", summary)
@@ -428,7 +511,7 @@ def main() -> None:
     print(
         "ETF_PRICING_LINEAGE_CONTRACT_OK | "
         f"run_id={summary.get('run_id')} | requested_close={summary.get('requested_close_date')} | "
-        f"holdings={len(summary.get('holdings_validated') or [])} | manifest={manifest_path}"
+        f"authority={summary.get('report_authority_source')} | holdings={len(summary.get('holdings_validated') or [])} | manifest={manifest_path}"
     )
 
 
