@@ -1,0 +1,34 @@
+{
+  "delivery_manifest_path": null,
+  "dutch_report_path": "output/weekly_analysis_pro_nl_260601_02.md",
+  "english_report_path": "output/weekly_analysis_pro_260601_02.md",
+  "notes": null,
+  "portfolio_state_path": "output/etf_portfolio_state.json",
+  "pricing_audit_path": "output/pricing/price_audit_2026-06-01_20260601_210552.json",
+  "pricing_lineage_status": "workflow_failure",
+  "pricing_summary": {
+    "carried_forward_holdings_count": 0,
+    "coverage_count_pct": 100.0,
+    "decision": "update_covered_holdings_carry_unresolved",
+    "fresh_holdings_count": 6,
+    "holdings_count": 6,
+    "invested_weight_coverage_pct": 98.25,
+    "unresolved_tickers": []
+  },
+  "report_token": "260601",
+  "requested_close_date": "2026-06-01",
+  "run_id": "20260601_210552",
+  "runtime_state_path": "output/runtime/etf_report_state_20260601_20260601_210552.json",
+  "runtime_summary": {
+    "cash_eur": 1936.52,
+    "lane_assessment_source": "output/lane_reviews/etf_lane_assessment_260601.json",
+    "pricing_audit_source": "output/pricing/price_audit_2026-06-01_20260601_210552.json",
+    "report_date": "2026-06-01",
+    "total_portfolio_value_eur": 110165.3
+  },
+  "schema_version": "1.0",
+  "updated_at_utc": "2026-06-01T21:08:30.706402+00:00",
+  "valuation_history_path": "output/etf_valuation_history.csv",
+  "workflow_conclusion": "failure",
+  "workflow_status": "workflow_failure"
+}
