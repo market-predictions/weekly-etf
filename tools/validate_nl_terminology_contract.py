@@ -39,6 +39,18 @@ REQUIRED_MAPS = [
     "FORBIDDEN_AFTER_SCRUB",
 ]
 
+CLIENT_FACING_VALUE_MAPS = [
+    "REPORT_LABELS",
+    "TABLE_LABELS",
+    "ACTION_REPLACEMENTS",
+    "ROLE_TRANSLATIONS",
+    "THESIS_TRANSLATIONS",
+    "LANE_TRANSLATIONS",
+    "PHRASE_REPLACEMENTS",
+    "CLIENT_LANGUAGE_CLEANUPS",
+    "EXACT_CLIENT_LANGUAGE_REPLACEMENTS",
+]
+
 REQUIRED_TRANSLATIONS = {
     "Executive Summary": "Kernsamenvatting",
     "Portfolio Action Snapshot": "Portefeuille-acties",
@@ -50,12 +62,19 @@ REQUIRED_TRANSLATIONS = {
     "Replacement Duel Table": "Vervangingsanalyse",
 }
 
-FORBIDDEN_IN_CENTRAL_VALUES = [
+FORBIDDEN_IN_CLIENT_FACING_VALUES = [
     "Neetable",
     "Toevoegened",
     "Verlagend",
     "Sluitend",
     "Aanhouden but replaceable",
+]
+
+KNOWN_BAD_OUTPUT_TOKENS = [
+    "Neetable",
+    "Toevoegened",
+    "Verlagend",
+    "Sluitend",
 ]
 
 
@@ -87,15 +106,23 @@ def validate_maps() -> None:
 
 def validate_bad_value_absence() -> None:
     values = []
-    for name in REQUIRED_MAPS:
+    for name in CLIENT_FACING_VALUE_MAPS:
         payload = getattr(term, name)
         if isinstance(payload, dict):
             values.extend(str(v) for v in payload.values())
         elif isinstance(payload, list | tuple | set):
             values.extend(str(v) for v in payload)
+    for _pattern, replacement in term.REGEX_CLIENT_LANGUAGE_REPLACEMENTS:
+        values.append(str(replacement))
     joined = "\n".join(values)
-    for token in FORBIDDEN_IN_CENTRAL_VALUES:
-        _assert(token not in joined, f"forbidden low-quality Dutch token appears in central values: {token}")
+    for token in FORBIDDEN_IN_CLIENT_FACING_VALUES:
+        _assert(token not in joined, f"forbidden low-quality Dutch token appears in client-facing terminology values: {token}")
+
+
+def validate_forbidden_guard_contains_known_bad_tokens() -> None:
+    forbidden_joined = "\n".join(str(token) for token in term.FORBIDDEN_AFTER_SCRUB)
+    for token in KNOWN_BAD_OUTPUT_TOKENS:
+        _assert(token in forbidden_joined, f"forbidden-after-scrub guard missing known bad token: {token}")
 
 
 def validate_runtime_overlay() -> None:
@@ -154,6 +181,7 @@ def main() -> None:
     args = parser.parse_args()
     validate_maps()
     validate_bad_value_absence()
+    validate_forbidden_guard_contains_known_bad_tokens()
     validate_regex_entries()
     validate_runtime_overlay()
     validate_apply_nl_localization_overlay()
