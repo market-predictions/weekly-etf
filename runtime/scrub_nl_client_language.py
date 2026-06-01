@@ -82,6 +82,12 @@ EXACT_REPLACEMENTS = {
 NATIVE_STATE_LABEL_REPLACEMENTS = {
     "Non-U.S. developed market diversification": "Ontwikkelde markten buiten de VS",
     "Non-U.S. developed diversification": "Ontwikkelde markten buiten de VS",
+    "Latest 4 mei close basis; +8 SMH from cash": "Laatste slotkoersbasis van 4 mei; +8 SMH vanuit cash",
+    "Latest 4 May close basis; +8 SMH from cash": "Laatste slotkoersbasis van 4 mei; +8 SMH vanuit cash",
+    "Runtime valuation from immutable pricing audit and explicit portfolio state": "Waardering uit onveranderlijke prijsaudit en expliciete portefeuillestaat",
+    "Runtime valuation repriced from official portfolio-state shares": "Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen",
+    "Rotation destination": "Rotatiebestemming",
+    "| Long |": "| Longpositie |",
 }
 
 REGEX_REPLACEMENTS = [
@@ -141,6 +147,11 @@ FORBIDDEN_AFTER_SCRUB = sorted(set(term.FORBIDDEN_AFTER_SCRUB + [
     "with full valuation history",
     "Inaugural model portfolio established",
     "Fresh per-ticker",
+    "Latest 4 mei close basis",
+    "Latest 4 May close basis",
+    "Runtime valuation from immutable pricing audit",
+    "Runtime valuation repriced from official portfolio-state shares",
+    "Rotation destination",
     "Equity Curve (EUR)",
     "Portfolio value (EUR)",
     "US equities",
