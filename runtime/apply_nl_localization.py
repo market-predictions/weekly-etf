@@ -133,8 +133,8 @@ def _localize_until_stable(text: str, passes: int = 3) -> str:
         current = localize_text(previous, language="nl")
         current = localize_markdown_table_headers(current, language="nl")
         current = _clean_runtime_artifacts(current)
-        current = _clean_client_language(current)
         current = _localize_replacement_duel_phrases(current)
+        current = _clean_client_language(current)
         current = _normalize_partial_mixed_language(current)
         if current == previous:
             return current
@@ -147,11 +147,13 @@ def localize_report(text: str) -> str:
         # Native Dutch output is already rendered from Dutch templates. Keep this
         # module as a safety net only: do not run broad English-to-Dutch phrase
         # replacement over it, because that is exactly what created mixed-language
-        # table sentences in earlier iterations.
+        # table sentences in earlier iterations. Exact decision/trigger phrases
+        # must run before generic cleanup so regex replacements do not partially
+        # mutate the source phrase before the central phrase map can match it.
         text = _replace_disclaimer(text)
         text = _clean_runtime_artifacts(text)
-        text = _clean_client_language(text)
         text = _localize_replacement_duel_phrases(text)
+        text = _clean_client_language(text)
         text = _normalize_partial_mixed_language(text)
         return text
 
