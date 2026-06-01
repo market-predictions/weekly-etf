@@ -18,8 +18,10 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from runtime import nl_terminology as term
+from runtime.apply_nl_localization import localize_report
 from runtime.scrub_nl_client_language import scrub_text
 from runtime.nl_localization import localize_text
+from tools.validate_etf_dutch_language_quality import _failures_for_text
 
 
 REQUIRED_MAPS = [
@@ -31,6 +33,8 @@ REQUIRED_MAPS = [
     "LANE_TRANSLATIONS",
     "PHRASE_REPLACEMENTS",
     "CLIENT_LANGUAGE_CLEANUPS",
+    "EXACT_CLIENT_LANGUAGE_REPLACEMENTS",
+    "REGEX_CLIENT_LANGUAGE_REPLACEMENTS",
     "FORBIDDEN_CLIENT_LABELS",
     "FORBIDDEN_AFTER_SCRUB",
 ]
@@ -65,12 +69,12 @@ def _assert(condition: bool, message: str) -> None:
 
 
 def validate_maps() -> None:
+    combined = term.combined_text_replacements()
     for name in REQUIRED_MAPS:
         value = getattr(term, name, None)
         _assert(value is not None, f"missing central terminology object: {name}")
         _assert(len(value) > 0, f"central terminology object is empty: {name}")
     for src, expected in REQUIRED_TRANSLATIONS.items():
-        combined = term.combined_text_replacements()
         actual = (
             combined.get(src)
             or term.LANE_TRANSLATIONS.get(src)
@@ -106,6 +110,39 @@ def validate_runtime_overlay() -> None:
         _assert(token not in scrubbed, f"runtime overlay left forbidden English token: {token}")
 
 
+def validate_apply_nl_localization_overlay() -> None:
+    sample = """# Wekelijkse ETF-review
+
+## 1. Kernsamenvatting
+## 2. Portefeuille-acties
+## 3. Regime-dashboard
+## 10. Review huidige posities
+## 12. Rotatieplan portefeuille
+## 15. Huidige posities en cash
+## 16. Input voor de volgende run
+## 17. Disclaimer
+
+Replacement trigger watch — challenger leading over 3m.
+Not fundable - close proof incomplete.
+Hold but replaceable
+"""
+    localized = localize_report(sample)
+    required = [
+        "Vervangingskandidaat blijft op de volglijst",
+        "Niet geschikt voor allocatie",
+        "Aanhouden, maar vervangbaar",
+        term.DUTCH_DISCLAIMER,
+    ]
+    for token in required:
+        _assert(token in localized, f"apply_nl_localization overlay missing expected Dutch token: {token}")
+    forbidden = ["Replacement trigger watch", "Not fundable - close proof incomplete", "Hold but replaceable"]
+    for token in forbidden:
+        _assert(token not in localized, f"apply_nl_localization overlay left forbidden token: {token}")
+    quality_failures = _failures_for_text(localized)
+    if quality_failures:
+        raise ContractError("apply_nl_localization output fails Dutch quality: " + "; ".join(quality_failures))
+
+
 def validate_regex_entries() -> None:
     for pattern, _replacement in term.REGEX_CLIENT_LANGUAGE_REPLACEMENTS:
         re.compile(pattern, re.IGNORECASE)
@@ -119,6 +156,7 @@ def main() -> None:
     validate_bad_value_absence()
     validate_regex_entries()
     validate_runtime_overlay()
+    validate_apply_nl_localization_overlay()
     print("ETF_NL_TERMINOLOGY_CONTRACT_OK")
 
 
