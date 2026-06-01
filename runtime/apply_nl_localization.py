@@ -20,8 +20,10 @@ CLIENT_PHRASES = {
 ACTION_PHRASES = term.ACTION_REPLACEMENTS
 CLIENT_LANGUAGE_CLEANUPS = term.CLIENT_LANGUAGE_CLEANUPS
 
-# Keep these tiny local repair maps only for mixed strings created by earlier
-# partial localization passes. All broad terminology lives in nl_terminology.py.
+# These maps are legacy safety overlays for reports that are not natively rendered
+# in Dutch. Native runtime Dutch reports must not pass through broad translation
+# style repair; they should already be constructed from runtime state in Dutch and
+# then fail validation if English/internal wording leaks.
 PARTIAL_MIXED_EXACT_CLEANUPS = {
     "Aanhouden but replaceable": "Aanhouden, maar vervangbaar",
     "Aanhouden maar replaceable": "Aanhouden, maar vervangbaar",
@@ -144,17 +146,13 @@ def _localize_until_stable(text: str, passes: int = 3) -> str:
 
 def localize_report(text: str) -> str:
     if is_native_dutch_report(text):
-        # Native Dutch output is already rendered from Dutch templates. Keep this
-        # module as a safety net only: do not run broad English-to-Dutch phrase
-        # replacement over it, because that is exactly what created mixed-language
-        # table sentences in earlier iterations. Exact decision/trigger phrases
-        # must run before generic cleanup so regex replacements do not partially
-        # mutate the source phrase before the central phrase map can match it.
+        # Native Dutch output is independently constructed from the same runtime
+        # state/key figures as the English report. Do not run broad translation or
+        # generic language-repair maps over it; that can mutate valid Dutch text.
+        # Keep only deterministic artifact/disclaimer cleanup. Any remaining
+        # English or malformed Dutch must fail validation downstream.
         text = _replace_disclaimer(text)
         text = _clean_runtime_artifacts(text)
-        text = _localize_replacement_duel_phrases(text)
-        text = _clean_client_language(text)
-        text = _normalize_partial_mixed_language(text)
         return text
 
     text = _replace_disclaimer(text)
@@ -175,7 +173,7 @@ def main() -> None:
     if failures:
         raise RuntimeError("Dutch localization failed before write: " + ", ".join(failures))
     report_path.write_text(localized, encoding="utf-8")
-    print(f"ETF_NL_LOCALIZATION_OK | report={report_path.name} | native_dutch={is_native_dutch_report(localized)} | terminology=central")
+    print(f"ETF_NL_LOCALIZATION_OK | report={report_path.name} | native_dutch={is_native_dutch_report(localized)} | mode={'native_guard_only' if is_native_dutch_report(localized) else 'legacy_localization'}")
 
 
 if __name__ == "__main__":
