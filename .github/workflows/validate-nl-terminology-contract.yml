@@ -12,10 +12,11 @@ on:
       - "runtime/scrub_nl_client_language.py"
       - "tools/validate_etf_dutch_language_quality.py"
       - "tools/validate_nl_terminology_contract.py"
+      - "tools/write_nl_terminology_contract_validation_evidence.py"
       - ".github/workflows/validate-nl-terminology-contract.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validate-nl-terminology-contract:
@@ -23,6 +24,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -32,3 +35,27 @@ jobs:
       - name: Validate central Dutch terminology contract
         run: |
           python tools/validate_nl_terminology_contract.py --self-test
+
+      - name: Write Dutch terminology validation evidence
+        run: |
+          python tools/write_nl_terminology_contract_validation_evidence.py \
+            --output-dir output/macro/validation \
+            --workflow-name "${{ github.workflow }}" \
+            --workflow-run-id "${{ github.run_id }}" \
+            --workflow-run-number "${{ github.run_number }}" \
+            --workflow-attempt "${{ github.run_attempt }}" \
+            --commit-sha "${{ github.sha }}" \
+            --source-ref "${{ github.ref_name }}"
+
+      - name: Commit Dutch terminology validation evidence
+        if: github.event_name != 'pull_request'
+        run: |
+          if [ -z "$(git status --porcelain -- output/macro/validation)" ]; then
+            echo "ETF_NL_TERMINOLOGY_EVIDENCE_NO_CHANGE"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/macro/validation/*nl_terminology_contract*.json
+          git commit -m "record Dutch terminology validation evidence [skip ci]"
+          git push
