@@ -153,6 +153,10 @@ PANEL_EXEC_TO_NEXT_PANEL_RE = re.compile(
     r"<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bpanel-exec\b)[^>]*>.*?(?=<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bpanel\b)[^>]*>)",
     re.DOTALL | re.IGNORECASE,
 )
+SECTION_BADGE_REPLACEMENT_DUEL_RE = re.compile(
+    r"(<span\s+class=['\"]section-badge['\"]>)\s*11\s*(</span>\s*</td>\s*<td\s+class=['\"]section-label-cell['\"]>\s*<span\s+class=['\"]section-label['\"]>\s*Replacement Duel Table\s*</span>)",
+    re.IGNORECASE,
+)
 HERO_LAYOUT_GUARD_CSS = """
 <style id="etf-hero-layout-guard">
   .summary-strip .mini-card {
@@ -341,19 +345,46 @@ def suppress_duplicate_executive_panel(html: str, *, language: str = "en") -> st
     return updated if fallback_count else html
 
 
-def remove_duplicate_replacement_duel_panel(html: str) -> str:
-    """Avoid rendering replacement duels twice.
+def _has_embedded_replacement_duel(html: str) -> bool:
+    """Detect a markdown-rendered replacement-duel table before the branded panel.
 
-    Markdown reports intentionally embed the replacement-duel table under Best New
-    Opportunities. The delivery override may also append a branded replacement
-    duel panel. When the embedded marker is present, keep the embedded table and
-    remove the appended duplicate panel with stale numbering.
+    Mistune may strip HTML comments, so do not rely only on the explicit marker.
+    Dutch currently embeds the duel table under Best New Opportunities; English
+    currently relies on the appended delivery panel. The checks below detect the
+    embedded table header/labels without treating the appended branded HTML table
+    itself as embedded.
     """
-    has_embedded = "ETF_REPLACEMENT_DUEL_V2_EMBEDDED" in html
+
+    if "ETF_REPLACEMENT_DUEL_V2_EMBEDDED" in html:
+        return True
+    panel_pos = html.find("panel-replacement-duel")
+    prefix = html if panel_pos == -1 else html[:panel_pos]
+    dutch_header = "Huidige positie" in prefix and "Alternatief" in prefix and "Benodigde bevestiging" in prefix
+    english_header = "Current holding" in prefix and "Challenger" in prefix and "Required trigger" in prefix
+    return dutch_header or english_header
+
+
+def _de_stale_replacement_duel_badge(html: str) -> str:
+    """Keep the English appended duel panel but remove the stale Section 11 badge.
+
+    In the compact PDF analyst surface, the appended replacement-duel panel is a
+    subsection under the opportunity radar, not the original markdown Section 11.
+    A `4B` badge keeps it visible without creating the old 4→11→5 jump.
+    """
+
+    return SECTION_BADGE_REPLACEMENT_DUEL_RE.sub(r"\g<1>4B\g<2>", html)
+
+
+def remove_duplicate_replacement_duel_panel(html: str) -> str:
+    """Avoid rendering replacement duels twice and remove stale numbering."""
+
+    has_embedded = _has_embedded_replacement_duel(html)
     if has_embedded:
         html, _ = _remove_panel_blocks_by_depth(html, PANEL_REPLACEMENT_DUEL_OPEN_RE, "")
         html = html.replace("<!-- ETF_REPLACEMENT_DUEL_V2_EMBEDDED -->", "")
         html = html.replace("ETF_REPLACEMENT_DUEL_V2_EMBEDDED", "")
+    else:
+        html = _de_stale_replacement_duel_badge(html)
     html = html.replace("Replacement Duel Table v2", "Replacement Duel Table")
     return html
 
