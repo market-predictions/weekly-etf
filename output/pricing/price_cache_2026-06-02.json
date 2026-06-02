@@ -846,6 +846,39 @@
         "status": "not_checked"
       }
     },
+    "twelve_data:IAI:2026-06-01": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "high",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "is_final_eod_bar": true,
+      "metadata": {
+        "endpoint": "time_series",
+        "provider": "twelve_data"
+      },
+      "price": 183.88,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": "NYSE",
+      "provider_symbol": "IAI",
+      "provider_timestamp": null,
+      "provider_timezone": "provider_daily_bar",
+      "raw_close": 183.88,
+      "requested_close_date": "2026-06-01",
+      "returned_close_date": "2026-06-01",
+      "selected_close": 183.88,
+      "selected_close_type": "raw_close",
+      "source": "twelve_data",
+      "source_detail": "time_series",
+      "status": "fresh_exact_unverified",
+      "symbol": "IAI",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "twelve_data:IEFA:2026-06-01": {
       "adjusted_close": null,
       "asset_role": "challenger",
@@ -1003,6 +1036,39 @@
       "source_detail": "time_series",
       "status": "fresh_exact_unverified",
       "symbol": "IWM",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "twelve_data:KCE:2026-06-01": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "high",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "is_final_eod_bar": true,
+      "metadata": {
+        "endpoint": "time_series",
+        "provider": "twelve_data"
+      },
+      "price": 152.56,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": "NYSE",
+      "provider_symbol": "KCE",
+      "provider_timestamp": null,
+      "provider_timezone": "provider_daily_bar",
+      "raw_close": 152.56,
+      "requested_close_date": "2026-06-01",
+      "returned_close_date": "2026-06-01",
+      "selected_close": 152.56,
+      "selected_close_type": "raw_close",
+      "source": "twelve_data",
+      "source_detail": "time_series",
+      "status": "fresh_exact_unverified",
+      "symbol": "KCE",
       "verification": {
         "source": null,
         "status": "not_checked"
@@ -1264,6 +1330,39 @@
       "source_detail": "time_series",
       "status": "fresh_exact_unverified",
       "symbol": "QUAL",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "twelve_data:REMX:2026-06-01": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "high",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "is_final_eod_bar": true,
+      "metadata": {
+        "endpoint": "time_series",
+        "provider": "twelve_data"
+      },
+      "price": 99.45,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": "NYSE",
+      "provider_symbol": "REMX",
+      "provider_timestamp": null,
+      "provider_timezone": "provider_daily_bar",
+      "raw_close": 99.45,
+      "requested_close_date": "2026-06-01",
+      "returned_close_date": "2026-06-01",
+      "selected_close": 99.45,
+      "selected_close_type": "raw_close",
+      "source": "twelve_data",
+      "source_detail": "time_series",
+      "status": "fresh_exact_unverified",
+      "symbol": "REMX",
       "verification": {
         "source": null,
         "status": "not_checked"
