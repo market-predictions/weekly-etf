@@ -144,6 +144,10 @@ PANEL_EXEC_OPEN_RE = re.compile(
     r"<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bpanel-exec\b)[^>]*>",
     re.IGNORECASE,
 )
+PANEL_REPLACEMENT_DUEL_OPEN_RE = re.compile(
+    r"<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bpanel-replacement-duel\b)[^>]*>",
+    re.IGNORECASE,
+)
 DIV_TAG_RE = re.compile(r"</?div\b[^>]*>", re.IGNORECASE)
 PANEL_EXEC_TO_NEXT_PANEL_RE = re.compile(
     r"<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bpanel-exec\b)[^>]*>.*?(?=<div\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bpanel\b)[^>]*>)",
@@ -171,11 +175,18 @@ HERO_LAYOUT_GUARD_CSS = """
   }
 </style>
 """
-HIDDEN_EXEC_SUMMARY_MARKER = (
-    "<div class='exec-summary-suppressed' style='display:none'>"
-    "Executive Summary / Kernsamenvatting"
-    "</div>"
-)
+
+
+def _visible_exec_summary_marker(language: str) -> str:
+    label = "Kernsamenvatting" if language == "nl" else "Executive Summary"
+    return (
+        "<div class='panel panel-exec-visible'>"
+        "<table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr>"
+        "<td class='section-badge-cell'><span class='section-badge'>1</span></td>"
+        f"<td class='section-label-cell'><span class='section-label'>{escape(label)}</span></td>"
+        "</tr></table>"
+        "</div>"
+    )
 
 
 def looks_dutch_markdown(md_text: str | None) -> bool:
@@ -293,11 +304,11 @@ def _find_matching_div_end(html: str, start: int) -> int | None:
     return None
 
 
-def _remove_panel_exec_blocks_by_depth(html: str) -> tuple[str, int]:
+def _remove_panel_blocks_by_depth(html: str, pattern: re.Pattern[str], replacement: str = "") -> tuple[str, int]:
     count = 0
     cursor = 0
     out: list[str] = []
-    for match in PANEL_EXEC_OPEN_RE.finditer(html):
+    for match in pattern.finditer(html):
         start = match.start()
         if start < cursor:
             continue
@@ -305,7 +316,7 @@ def _remove_panel_exec_blocks_by_depth(html: str) -> tuple[str, int]:
         if end is None:
             continue
         out.append(html[cursor:start])
-        out.append(HIDDEN_EXEC_SUMMARY_MARKER if count == 0 else "")
+        out.append(replacement if count == 0 else "")
         cursor = end
         count += 1
     if count == 0:
@@ -314,36 +325,57 @@ def _remove_panel_exec_blocks_by_depth(html: str) -> tuple[str, int]:
     return "".join(out), count
 
 
-def suppress_duplicate_executive_panel(html: str) -> str:
-    """Remove the duplicate Section 1 HTML panel below the hero cards.
+def suppress_duplicate_executive_panel(html: str, *, language: str = "en") -> str:
+    """Replace the duplicate Section 1 panel with a compact visible marker.
 
-    The base renderer emits Section 1 twice: once as hero cards and once as a
-    regular `panel-exec`. Regex-to-next-panel fixes were fragile because the
-    executive panel contains nested divs. This pass now finds the actual opening
-    `panel-exec` div and removes the complete balanced div block by depth.
+    The hero cards already carry the executive-summary content, but a fully hidden
+    section made the first visible report panel start at 2. We keep a lightweight
+    Section 1 marker so the PDF reads sequentially without duplicating the full
+    executive summary text.
     """
-    updated, count = _remove_panel_exec_blocks_by_depth(html)
+    marker = _visible_exec_summary_marker(language)
+    updated, count = _remove_panel_blocks_by_depth(html, PANEL_EXEC_OPEN_RE, marker)
     if count:
         return updated
-    updated, fallback_count = PANEL_EXEC_TO_NEXT_PANEL_RE.subn(HIDDEN_EXEC_SUMMARY_MARKER, html, count=1)
+    updated, fallback_count = PANEL_EXEC_TO_NEXT_PANEL_RE.subn(marker, html, count=1)
     return updated if fallback_count else html
+
+
+def remove_duplicate_replacement_duel_panel(html: str) -> str:
+    """Avoid rendering replacement duels twice.
+
+    Markdown reports intentionally embed the replacement-duel table under Best New
+    Opportunities. The delivery override may also append a branded replacement
+    duel panel. When the embedded marker is present, keep the embedded table and
+    remove the appended duplicate panel with stale numbering.
+    """
+    has_embedded = "ETF_REPLACEMENT_DUEL_V2_EMBEDDED" in html
+    if has_embedded:
+        html, _ = _remove_panel_blocks_by_depth(html, PANEL_REPLACEMENT_DUEL_OPEN_RE, "")
+        html = html.replace("<!-- ETF_REPLACEMENT_DUEL_V2_EMBEDDED -->", "")
+        html = html.replace("ETF_REPLACEMENT_DUEL_V2_EMBEDDED", "")
+    html = html.replace("Replacement Duel Table v2", "Replacement Duel Table")
+    return html
 
 
 def sanitize_client_facing_html(html: str, *, md_text: str | None = None, language: str | None = None) -> str:
     """Remove internal/runtime placeholder language from final client-facing HTML."""
     resolved_language = language or ("nl" if looks_dutch_markdown(md_text) else "en")
-    html = suppress_duplicate_executive_panel(html)
+    html = remove_duplicate_replacement_duel_panel(html)
+    html = suppress_duplicate_executive_panel(html, language=resolved_language)
     html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
     html = _apply_global_client_token_replacements(html)
     html = convert_residual_markdown_links(html)
     if resolved_language == "nl":
         html = localize_dutch_delivery_html(html)
-    html = suppress_duplicate_executive_panel(html)
+    html = remove_duplicate_replacement_duel_panel(html)
+    html = suppress_duplicate_executive_panel(html, language=resolved_language)
     html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
-    html = suppress_duplicate_executive_panel(html)
+    html = suppress_duplicate_executive_panel(html, language=resolved_language)
     html = inject_hero_layout_guard(html)
     html = _apply_global_client_token_replacements(html)
     html = convert_residual_markdown_links(html)
+    html = remove_duplicate_replacement_duel_panel(html)
     return html
 
 
