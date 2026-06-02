@@ -1,19 +1,66 @@
 {
-  "schema_version": "1.1",
-  "portfolio_mode": "client_long_only_thematic",
-  "base_currency": "EUR",
-  "valuation_source": "guarded_model_execution_v1",
-  "pricing_audit_file": "output/pricing/price_audit_2026-06-02_20260602_224139.json",
-  "trade_ledger_file": "etf_trade_ledger.csv",
-  "recommendation_scorecard_file": null,
-  "inception_date": "2026-03-28",
-  "starting_capital_eur": 100000.0,
-  "cash_eur": 1936.52,
-  "invested_market_value_eur": 110431.34,
-  "nav_eur": 112367.86,
-  "peak_nav_eur": 112367.86,
-  "max_drawdown_pct": -2.5105,
-  "positions": [
+  "schema_version": "1.0",
+  "created_at_utc": "2026-06-02T22:43:15.443626+00:00",
+  "execution_mode": "guarded_auto",
+  "execution_status": "executed",
+  "run_id": "20260602_224139",
+  "report_date": "2026-06-02",
+  "requested_close_date": "2026-06-02",
+  "source_files": {
+    "runtime_state": "output/runtime/etf_report_state_20260602_20260602_224139.json",
+    "portfolio_state": "output/etf_portfolio_state.json",
+    "trade_ledger": "output/etf_trade_ledger.csv",
+    "pricing_audit": "output/pricing/price_audit_2026-06-02_20260602_224139.json",
+    "rotation_plan": "output/runtime/etf_rotation_plan_260602_20260602_224139.json"
+  },
+  "policy_checks": {
+    "passed": true,
+    "errors": [],
+    "warnings": [],
+    "mode_note": "Guarded auto-execution writes official model trade-ledger and portfolio-state changes when all hard gates pass."
+  },
+  "pre_trade_portfolio": {
+    "cash_eur": 1936.52,
+    "total_portfolio_value_eur": 112367.86,
+    "base_currency": "EUR"
+  },
+  "post_trade_shadow_portfolio": {
+    "cash_eur": 1936.52,
+    "invested_market_value_eur": 110431.34,
+    "nav_eur": 112367.86,
+    "nav_drift_eur": 0.0
+  },
+  "proposed_ledger_rows": [
+    {
+      "trade_id": "shadow-2026-06-02-20260602_224139-01-PAVE-XLU",
+      "trade_date": "2026-06-02",
+      "execution_mode": "shadow",
+      "source_ticker": "PAVE",
+      "destination_ticker": "XLU",
+      "action": "replace_partial",
+      "source_delta_weight_pct": -5.0,
+      "destination_delta_weight_pct": 5.0,
+      "estimated_notional_eur": 5618.39,
+      "requested_notional_eur": 5618.39,
+      "source_previous_weight_pct": 13.54,
+      "source_target_weight_pct": 8.54,
+      "destination_target_weight_pct": 5.0,
+      "source_price_status": "fresh_exact_unverified",
+      "destination_price_status": "fresh_exact_unverified",
+      "notional_capped_to_source_value": false,
+      "reason_codes": [
+        "fresh_cash_smaller_or_review",
+        "replaceable_status",
+        "review_age_ge_2",
+        "review_age_ge_3",
+        "better_alternative_exists",
+        "role_impaired",
+        "factor_or_concentration_flag",
+        "destination_score_83"
+      ]
+    }
+  ],
+  "shadow_positions": [
     {
       "shares_delta_this_run": 0.0,
       "weight_change_pct": 0.0,
@@ -160,7 +207,7 @@
       "original_thesis": "Grid and infrastructure capex",
       "shares_delta_this_run": -114.874299,
       "weight_change_pct": -5.0,
-      "action_executed_this_run": "Sell",
+      "action_executed_this_run": "Shadow reduce",
       "funding_source_note": "Shadow execution from rotation intent.",
       "pricing_source": "twelve_data",
       "pricing_status": "fresh_exact_unverified",
@@ -391,7 +438,7 @@
     {
       "shares_delta_this_run": 148.865578,
       "weight_change_pct": 5.0,
-      "action_executed_this_run": "Buy",
+      "action_executed_this_run": "Shadow buy",
       "funding_source_note": "Shadow buy funded by PAVE.",
       "ticker": "XLU",
       "suggested_action": "Add from rotation",
@@ -417,31 +464,44 @@
       "target_weight_pct": 5.0
     }
   ],
-  "last_report": {
-    "date": "2026-06-02",
-    "source_report": "weekly_analysis_pro_260602_02.md",
-    "position_count": 7
-  },
-  "last_valuation": {
-    "date": "2026-06-02",
-    "nav_eur": 112367.86,
-    "invested_market_value_eur": 110431.34,
-    "cash_eur": 1936.52,
-    "since_inception_return_pct": 12.3679,
-    "daily_return_pct": 1.8548,
-    "drawdown_pct": 0.0,
-    "eurusd_used": 1.1632,
-    "equity_curve_state": "New high",
-    "valuation_notes": "Runtime valuation repriced from official portfolio-state shares"
-  },
-  "last_successful_runtime_state_file": "output/runtime/etf_report_state_20260602_20260602_224139.json",
-  "last_state_persisted_at_utc": "2026-06-02T22:43:15.261814+00:00",
-  "last_model_execution": {
-    "date": "2026-06-02",
-    "run_id": "20260602_224139",
-    "runtime_state": "output/runtime/etf_report_state_20260602_20260602_224139.json",
-    "mode": "guarded_auto",
-    "trade_count": 1,
-    "executed_at_utc": "2026-06-02T22:43:15.443926+00:00"
+  "artifact_path": "output/runtime/etf_model_execution_20260602_20260602_224139.json",
+  "guarded_auto_result": {
+    "official_ledger_rows": [
+      {
+        "trade_id": "model-2026-06-02-20260602_224139-01-PAVE-SELL",
+        "trade_date": "2026-06-02",
+        "source_report": "runtime:etf_report_state_20260602_20260602_224139.json",
+        "ticker": "PAVE",
+        "action": "Sell",
+        "shares_delta": "-114.874299",
+        "previous_weight_pct": "13.5400",
+        "new_weight_pct": "8.5400",
+        "weight_change_pct": "-5.0000",
+        "target_weight_pct": "8.5400",
+        "conviction_tier": "Tier 2",
+        "portfolio_role": "Real-asset capex",
+        "funding_source_note": "Guarded auto-execution: reduce PAVE to fund XLU."
+      },
+      {
+        "trade_id": "model-2026-06-02-20260602_224139-01-XLU-BUY",
+        "trade_date": "2026-06-02",
+        "source_report": "runtime:etf_report_state_20260602_20260602_224139.json",
+        "ticker": "XLU",
+        "action": "Buy",
+        "shares_delta": "148.865578",
+        "previous_weight_pct": "0.0000",
+        "new_weight_pct": "5.0000",
+        "weight_change_pct": "5.0000",
+        "target_weight_pct": "5.0000",
+        "conviction_tier": "",
+        "portfolio_role": "Rotation destination",
+        "funding_source_note": "Guarded auto-execution: buy XLU funded by PAVE."
+      }
+    ],
+    "portfolio_state_written": true,
+    "trade_ledger_written": true,
+    "post_trade_nav_eur": 112367.86,
+    "post_trade_invested_market_value_eur": 110431.34,
+    "post_trade_cash_eur": 1936.52
   }
 }
