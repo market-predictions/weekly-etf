@@ -362,9 +362,9 @@ def replacement_duel_v2_rows(state: dict[str, Any], limit: int = INVESTOR_REPLAC
 
 def replacement_duel_v2_markdown(state: dict[str, Any], language: str = "en") -> str:
     if language == "nl":
-        lines = ["| Huidige positie | Alternatief | 1m relatieve sterkte | 3m relatieve sterkte | Prijsbasis | Beoordeling | Benodigde bevestiging |", "|---|---|---:|---:|---|---|---|"]
+        lines = ["<!-- ETF_REPLACEMENT_DUEL_V2_EMBEDDED -->", "| Huidige positie | Alternatief | 1m relatieve sterkte | 3m relatieve sterkte | Prijsbasis | Beoordeling | Benodigde bevestiging |", "|---|---|---:|---:|---|---|---|"]
     else:
-        lines = ["| Current holding | Challenger | 1m edge | 3m edge | Pricing basis | Decision | Required trigger |", "|---|---|---:|---:|---|---|---|"]
+        lines = ["<!-- ETF_REPLACEMENT_DUEL_V2_EMBEDDED -->", "| Current holding | Challenger | 1m edge | 3m edge | Pricing basis | Decision | Required trigger |", "|---|---|---:|---:|---|---|---|"]
     for row in replacement_duel_v2_rows(state):
         lines.append(
             f"| {row['current_holding']} | {row['challenger']} | "
