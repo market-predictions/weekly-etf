@@ -3,7 +3,6 @@
 # Phase: macro/regime roadmap Phase 3
 # Status: shadow-only. These thresholds must not change client-facing fundable
 # decisions until fixture replay, methodology, compliance, and bilingual gates pass.
-# Validation trigger: 2026-05-31T20:45:00Z
 
 schema_version: 1.0
 status: shadow_only
@@ -29,6 +28,23 @@ axes:
   commodities:
     inflation_bid_gsg_return_3m_pct: 3.0
     inflation_soft_gsg_return_3m_pct: -3.0
+
+macro_axes:
+  volatility:
+    vix_calm_below: 16.0
+    vix_stress_above: 25.0
+  real_rates:
+    restrictive_above: 1.75
+    supportive_below: 0.75
+  yield_curve:
+    inverted_below: -0.25
+    normalizing_above: 0.25
+  inflation_expectations:
+    elevated_above: 2.6
+    contained_below: 2.3
+  policy_rate:
+    restrictive_above: 4.25
+    accommodative_below: 2.0
 
 regime_rules:
   risk_on_narrow_leadership:
@@ -66,10 +82,12 @@ confidence:
   signal_strength_weight: 0.17
   conflict_penalty_weight: 0.12
   macro_audit_bonus: 0.03
+  macro_alignment_weight: 0.06
   min: 0.35
   max: 0.82
 
 notes:
   - This file controls the shadow deterministic regime candidate only.
   - Legacy regime and lane_adjustments remain production-compatible until explicit promotion.
+  - Macro axes are audit-derived shadow evidence only; they do not set client-facing regime or portfolio actions.
   - Thresholds should be tuned through fixture replay, not report-by-report patching.
