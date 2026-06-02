@@ -11,6 +11,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from runtime.scrub_etf_client_surface import scrub_text
+from tools.validate_etf_pdf_polish_contract import latest_delivery_html, validate_en, validate_nl
 from tools.validate_etf_pricing_lineage_contract import _manifest_path as _pricing_lineage_manifest_path
 from tools.validate_etf_pricing_lineage_contract import validate_manifest_path as validate_pricing_lineage_manifest
 
@@ -88,6 +89,13 @@ def _validate_pricing_lineage_before_send() -> None:
     )
 
 
+def _validate_pdf_polish_contract(output_dir: Path) -> None:
+    failures = validate_en(latest_delivery_html(output_dir, language="en")) + validate_nl(latest_delivery_html(output_dir, language="nl"))
+    if failures:
+        raise RuntimeError("ETF PDF polish contract failed: " + " | ".join(failures))
+    print("ETF_PDF_POLISH_CONTRACT_OK")
+
+
 def validate(output_dir: Path) -> None:
     failures: list[str] = []
     paths = _current_files(output_dir)
@@ -99,6 +107,7 @@ def validate(output_dir: Path) -> None:
             failures.append(f"{path.name}: {', '.join(hits[:12])}")
     if failures:
         raise RuntimeError("ETF client-facing surface contains internal labels in current report pair: " + " | ".join(failures))
+    _validate_pdf_polish_contract(output_dir)
     _validate_pricing_lineage_before_send()
     print("ETF_CLIENT_SURFACE_CLEAN_OK | files=" + ",".join(path.name for path in paths))
 
