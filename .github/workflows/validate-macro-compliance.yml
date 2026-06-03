@@ -7,7 +7,10 @@ on:
       - main
     paths:
       - "MACRO_METHODOLOGY.md"
+      - "runtime/macro_report_surface.py"
       - "tools/validate_macro_compliance.py"
+      - "tools/validate_macro_report_surface.py"
+      - "tools/validate_etf_macro_thesis_surface_leakage.py"
       - "fixtures/macro_compliance/**"
       - ".github/workflows/validate-macro-compliance.yml"
 
@@ -30,12 +33,24 @@ jobs:
         run: |
           python tools/validate_macro_compliance.py --self-test
 
+      - name: Run macro report surface self-test
+        run: |
+          python tools/validate_macro_report_surface.py --self-test
+
+      - name: Validate current macro report surface if pack exists
+        run: |
+          if [ -f output/macro/latest.json ]; then
+            python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json
+          else
+            echo "ETF_MACRO_REPORT_SURFACE_PACK_SKIPPED | reason=no_output_macro_latest"
+          fi
+
       - name: Validate safe macro fixture
         run: |
           python tools/validate_macro_compliance.py \
             --text fixtures/macro_compliance/safe_macro_note.md
 
-      - name: Prove unsafe macro fixture is blocked
+      - name: Validate blocked macro fixture behavior
         run: |
           python tools/validate_macro_compliance.py \
             --text fixtures/macro_compliance/bad_predictive_macro_note.md \
