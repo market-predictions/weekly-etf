@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "status": "passed",
+  "mode": "fixture",
+  "reference_date": "2026-06-02",
+  "run_id": "fixture_macro_audit_accommodative",
+  "summary": {
+    "shadow_only": true,
+    "client_facing_authority": false,
+    "observation_count": 6
+  },
+  "observations": [
+    {"key": "us_10y_yield", "value": 2.4, "status": "fresh"},
+    {"key": "us_2y_yield", "value": 1.6, "status": "fresh"},
+    {"key": "us_10y_real_yield", "value": 0.4, "status": "fresh"},
+    {"key": "us_10y_breakeven", "value": 2.1, "status": "fresh"},
+    {"key": "fed_funds_effective", "value": 1.25, "status": "fresh"},
+    {"key": "vix_close", "value": 13.0, "status": "fresh"}
+  ]
+}
