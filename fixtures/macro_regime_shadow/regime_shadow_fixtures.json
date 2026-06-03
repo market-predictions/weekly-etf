@@ -119,6 +119,42 @@
         "GLD": {"return_1m_pct": 0.0, "return_3m_pct": 0.0, "rs_vs_spy_3m_pct": -1.0},
         "GSG": {"return_1m_pct": 0.0, "return_3m_pct": 0.0, "rs_vs_spy_3m_pct": -1.0}
       }
+    },
+    {
+      "id": "risk_on_narrow_restrictive_macro",
+      "description": "Risk-on narrow leadership with restrictive macro-audit axes; confidence should expose the macro-conflict diagnostic and cap.",
+      "macro_data_audit_fixture": "fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json",
+      "expected_regime": "Risk-on narrow leadership",
+      "expected_axes": {
+        "equity": "risk_on",
+        "semiconductor_leadership": "strong",
+        "breadth": "narrow",
+        "duration": "neutral",
+        "hedge": "gold_weak",
+        "commodities": "inflation_bid"
+      },
+      "expected_macro_axes": {
+        "volatility": "calm",
+        "real_rates": "restrictive",
+        "yield_curve": "inverted",
+        "inflation_expectations": "neutral",
+        "policy_rate": "restrictive"
+      },
+      "expected_confidence_min": 0.70,
+      "expected_confidence_max": 0.72,
+      "expected_confidence_components": {
+        "macro_audit_present": true,
+        "macro_conflict_score": 1.0,
+        "confidence_cap_applied": true
+      },
+      "metrics": {
+        "SPY": {"return_1m_pct": 2.1, "return_3m_pct": 10.54, "rs_vs_spy_3m_pct": 0.0},
+        "SMH": {"return_1m_pct": 8.5, "return_3m_pct": 59.88, "rs_vs_spy_3m_pct": 49.34},
+        "IWM": {"return_1m_pct": 1.0, "return_3m_pct": 10.17, "rs_vs_spy_3m_pct": -0.37},
+        "TLT": {"return_1m_pct": 0.0, "return_3m_pct": 0.0, "rs_vs_spy_3m_pct": -10.54},
+        "GLD": {"return_1m_pct": -2.0, "return_3m_pct": -13.65, "rs_vs_spy_3m_pct": -24.19},
+        "GSG": {"return_1m_pct": 4.2, "return_3m_pct": 18.98, "rs_vs_spy_3m_pct": 8.44}
+      }
     }
   ]
 }
