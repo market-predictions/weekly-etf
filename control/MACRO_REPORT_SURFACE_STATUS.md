@@ -107,11 +107,22 @@ d4ab9873c5120b73160ad4eb567bffd070870990  wire macro report surface validator in
 
 ## Validation status
 
-Implemented and wired, but not yet claimed green in CI.
+Validated by the isolated macro report-output workflow in GitHub Actions.
 
-The GitHub connector did not expose a completed Actions check for the latest macro report-output workflow commit when inspected.
+User-provided UI evidence shows:
 
-Do not claim the macro report surface is production-proven until one of the following is available:
+```text
+workflow/job: validate-macro-report-output
+status: passed
+duration: 9s
+observed_at: 2026-06-03
+```
+
+This is sufficient to treat the isolated no-secrets macro report-output validation workflow as green for the current stage.
+
+Do not overstate this as a fresh production-send validation. It proves the isolated macro surface/output validation job passed. It does not prove a fresh production report was sent, and it does not by itself prove the production send workflow has a pre-send macro surface guard.
+
+Expected validation markers for future log review remain:
 
 ```text
 ETF_MACRO_REPORT_SURFACE_OK
@@ -119,8 +130,6 @@ ETF_MACRO_REPORT_OUTPUT_OK
 ETF_MACRO_COMPLIANCE_OK
 ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK
 ```
-
-from a real workflow/job log or committed validation evidence.
 
 ## Authority boundary
 
@@ -145,7 +154,7 @@ Still not allowed:
 
 ## Next action
 
-1. Verify the isolated macro report-output workflow.
-2. If green, add the macro report-surface validator to the production send workflow carefully. The direct edit of `send-weekly-report.yml` was blocked by the tool safety layer because the workflow contains SMTP secret references.
-3. Safer production integration path: add a separate reusable validation script/workflow step or patch only the non-secret validation blocks through a PR/review path.
-4. Then trigger a fresh weekly ETF report run and verify the generated English/Dutch reports use the shared macro surface without leakage.
+1. Add production-send pre-send validation through a safe path. The direct full-file edit of `send-weekly-report.yml` was blocked by the tool safety layer because the workflow contains SMTP secret references.
+2. Safer production integration path: add a helper script or small workflow patch through a review/PR route that inserts only validation commands and does not expose or rewrite the secret block.
+3. Trigger a fresh weekly ETF report run and verify the generated English/Dutch reports use the shared macro surface without leakage.
+4. Then update `control/CURRENT_STATE.md`, `control/NEXT_ACTIONS.md`, and the session changelog with production-run evidence.
