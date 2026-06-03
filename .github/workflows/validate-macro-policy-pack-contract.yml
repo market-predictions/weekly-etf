@@ -1,5 +1,8 @@
 name: Validate ETF macro policy pack contract
 
+# Validation workflow for the macro policy-pack authority contract.
+# It intentionally has read-only permissions and does not send reports.
+
 on:
   workflow_dispatch:
   push:
