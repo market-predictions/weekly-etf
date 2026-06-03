@@ -13,6 +13,8 @@ REQUIRED_TOP_LEVEL = {
     "report_date",
     "source_files",
     "authority",
+    "field_authority",
+    "promotion_gates",
     "macro_data_audit_summary",
     "regime",
     "confidence_decomposition",
@@ -28,8 +30,56 @@ REQUIRED_TOP_LEVEL = {
 }
 REQUIRED_SOURCE_FILES = {"pricing_audit", "relative_strength", "macro_context", "macro_data_audit"}
 REQUIRED_CENTRAL_BANKS = {"fed", "ecb", "boe", "boj", "pboc"}
+REQUIRED_FIELD_AUTHORITY = {
+    "regime",
+    "confidence_decomposition",
+    "central_banks",
+    "macro_signals",
+    "policy_catalysts",
+    "portfolio_implications",
+    "lane_adjustments",
+    "macro_data_audit_summary",
+    "deterministic_regime_shadow",
+    "active_drivers",
+    "report_transfer",
+}
 ALLOWED_MACRO_AUDIT_IMPACT = {"none_phase2_audit_only"}
 ALLOWED_AUTHORITY_IMPACT = {"legacy_lane_adjustments_only"}
+ALLOWED_AUTHORITY_CLASS = {"legacy_compatibility_pack"}
+ALLOWED_DECISION_AUTHORITY = {"legacy_lane_adjustments_only"}
+CLIENT_SURFACE_ALLOWED_FIELDS = {"regime", "central_banks", "policy_catalysts", "portfolio_implications", "report_transfer"}
+CLIENT_SURFACE_BLOCKED_FIELDS = {"confidence_decomposition", "macro_signals", "lane_adjustments", "macro_data_audit_summary", "deterministic_regime_shadow", "active_drivers"}
+DECISION_AUTHORITY_BY_FIELD = {
+    "regime": "descriptive_only",
+    "confidence_decomposition": "none_shadow_explanation_only",
+    "central_banks": "descriptive_only",
+    "macro_signals": "none_internal_evidence_only",
+    "policy_catalysts": "descriptive_only",
+    "portfolio_implications": "descriptive_only",
+    "lane_adjustments": "legacy_lane_adjustments_only",
+    "macro_data_audit_summary": "none_phase2_audit_only",
+    "deterministic_regime_shadow": "none_shadow_comparison_only",
+    "active_drivers": "none_wp9_not_promoted",
+    "report_transfer": "output_contract_only",
+}
+PROMOTION_BLOCKED_AUTHORITY = {
+    "raw_macro_axes_client_surface",
+    "raw_macro_axis_scores_client_surface",
+    "deterministic_regime_shadow_client_surface",
+    "stage1_thesis_candidates_client_surface",
+    "macro_direct_lane_scoring_authority",
+    "macro_direct_fundability_authority",
+    "macro_direct_portfolio_trade_authority",
+}
+PROMOTION_REQUIRED_GATES = {
+    "macro_policy_pack_schema_contract_green",
+    "deterministic_regime_fixture_replay_green",
+    "macro_audit_fixture_replay_green",
+    "macro_compliance_validator_green",
+    "bilingual_report_surface_validation_green",
+    "production_report_validation_green",
+    "explicit_control_layer_promotion_decision",
+}
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -52,11 +102,49 @@ def _num(value: Any, label: str) -> float:
 
 def _validate_authority(pack: dict[str, Any]) -> None:
     authority = pack.get("authority") or {}
+    for key in ("authority_class", "client_surface_allowed", "decision_authority", "decision_framework", "input_state_contract", "output_contract", "operational_runbook"):
+        _require(key in authority, f"authority.{key} is required")
     for key in ("decision_framework", "input_state_contract", "output_contract", "operational_runbook"):
         _require(isinstance(authority.get(key), str) and authority.get(key).strip(), f"authority.{key} is required")
+    _require(authority.get("authority_class") in ALLOWED_AUTHORITY_CLASS, "authority.authority_class is invalid")
+    _require(authority.get("client_surface_allowed") is True, "authority.client_surface_allowed must be true for the client-safe descriptive surface")
+    _require(authority.get("decision_authority") in ALLOWED_DECISION_AUTHORITY, "authority.decision_authority is invalid")
     _require(authority.get("shadow_only") is True, "authority.shadow_only must be true")
     _require(authority.get("client_facing_authority") is False, "authority.client_facing_authority must be false")
     _require(authority.get("decision_impact") in ALLOWED_AUTHORITY_IMPACT, "authority.decision_impact is invalid")
+
+
+def _validate_field_authority(pack: dict[str, Any]) -> None:
+    payload = pack.get("field_authority") or {}
+    _require(isinstance(payload, dict), "field_authority must be an object")
+    missing = sorted(REQUIRED_FIELD_AUTHORITY - set(payload))
+    _require(not missing, "field_authority missing required fields: " + ", ".join(missing))
+    extras = sorted(set(payload) - REQUIRED_FIELD_AUTHORITY)
+    _require(not extras, "field_authority has unsupported fields: " + ", ".join(extras))
+    for field, authority in payload.items():
+        _require(isinstance(authority, dict), f"field_authority.{field} must be an object")
+        for key in ("authority_class", "client_surface_allowed", "decision_authority"):
+            _require(key in authority, f"field_authority.{field}.{key} is required")
+        _require(isinstance(authority.get("authority_class"), str) and authority.get("authority_class").strip(), f"field_authority.{field}.authority_class is required")
+        _require(authority.get("decision_authority") == DECISION_AUTHORITY_BY_FIELD[field], f"field_authority.{field}.decision_authority is invalid")
+        expected_surface = field in CLIENT_SURFACE_ALLOWED_FIELDS
+        _require(authority.get("client_surface_allowed") is expected_surface, f"field_authority.{field}.client_surface_allowed must be {expected_surface}")
+        if field in CLIENT_SURFACE_BLOCKED_FIELDS:
+            _require(authority.get("client_surface_allowed") is False, f"field_authority.{field} must not be client-surface allowed")
+        if "notes" in authority:
+            _require(isinstance(authority.get("notes"), list), f"field_authority.{field}.notes must be a list")
+
+
+def _validate_promotion_gates(pack: dict[str, Any]) -> None:
+    gates = pack.get("promotion_gates") or {}
+    _require(isinstance(gates, dict), "promotion_gates must be an object")
+    _require(gates.get("status") == "not_promoted", "promotion_gates.status must remain not_promoted")
+    _require(gates.get("client_surface_status") == "descriptive_surface_only", "promotion_gates.client_surface_status is invalid")
+    _require(gates.get("decision_authority_status") == "legacy_lane_adjustments_only", "promotion_gates.decision_authority_status is invalid")
+    required = set(gates.get("required_before_decision_authority") or [])
+    blocked = set(gates.get("blocked_authority") or [])
+    _require(PROMOTION_REQUIRED_GATES <= required, "promotion_gates.required_before_decision_authority is missing required gates")
+    _require(PROMOTION_BLOCKED_AUTHORITY <= blocked, "promotion_gates.blocked_authority is missing required blockers")
 
 
 def _validate_macro_audit_summary(pack: dict[str, Any]) -> None:
@@ -138,6 +226,19 @@ def _validate_active_drivers(pack: dict[str, Any]) -> None:
         _require(str(driver.get("decision_impact")) == "none_wp9_not_promoted", f"active_drivers[{index}].decision_impact is invalid")
 
 
+def _validate_shadow_promotion_firewall(pack: dict[str, Any]) -> None:
+    shadow = pack.get("deterministic_regime_shadow")
+    if shadow is None:
+        return
+    _require(isinstance(shadow, dict), "deterministic_regime_shadow must be an object when present")
+    field_authority = (pack.get("field_authority") or {}).get("deterministic_regime_shadow") or {}
+    _require(field_authority.get("client_surface_allowed") is False, "deterministic_regime_shadow must not be client-surface allowed")
+    _require(field_authority.get("decision_authority") == "none_shadow_comparison_only", "deterministic_regime_shadow decision authority must remain none_shadow_comparison_only")
+    _require(shadow.get("shadow_only") is True, "deterministic_regime_shadow.shadow_only must be true")
+    _require(shadow.get("client_facing_authority") is False, "deterministic_regime_shadow.client_facing_authority must be false")
+    _require(shadow.get("decision_impact") == "none_shadow_comparison_only", "deterministic_regime_shadow.decision_impact must remain none_shadow_comparison_only")
+
+
 def _validate_pack(pack: dict[str, Any]) -> dict[str, Any]:
     missing = sorted(REQUIRED_TOP_LEVEL - set(pack))
     _require(not missing, "macro policy pack missing top-level fields: " + ", ".join(missing))
@@ -148,12 +249,15 @@ def _validate_pack(pack: dict[str, Any]) -> dict[str, Any]:
     _require(isinstance(source_files.get("pricing_audit"), str) and source_files.get("pricing_audit"), "source_files.pricing_audit is required")
     _require(isinstance(source_files.get("relative_strength"), str) and source_files.get("relative_strength"), "source_files.relative_strength is required")
     _validate_authority(pack)
+    _validate_field_authority(pack)
+    _validate_promotion_gates(pack)
     _validate_macro_audit_summary(pack)
     _validate_regime(pack)
     _validate_confidence_decomposition(pack)
     _validate_central_banks(pack)
     _validate_lane_adjustments(pack)
     _validate_active_drivers(pack)
+    _validate_shadow_promotion_firewall(pack)
     _require(isinstance(pack.get("policy_catalysts"), list), "policy_catalysts must be a list")
     _require(isinstance(pack.get("cross_asset_confirmation"), list), "cross_asset_confirmation must be a list")
     _require(isinstance(pack.get("portfolio_implications"), list), "portfolio_implications must be a list")
@@ -165,6 +269,7 @@ def _validate_pack(pack: dict[str, Any]) -> dict[str, Any]:
         "lane_adjustments": len(pack.get("lane_adjustments") or {}),
         "active_drivers": len(pack.get("active_drivers") or []),
         "macro_audit_present": (pack.get("macro_data_audit_summary") or {}).get("present"),
+        "promotion_status": (pack.get("promotion_gates") or {}).get("status"),
     }
 
 
@@ -183,7 +288,8 @@ def main() -> None:
         "ETF_MACRO_POLICY_PACK_SCHEMA_OK | "
         f"report_date={result['report_date']} | regime={result['regime']} | "
         f"confidence={result['confidence']} | lane_adjustments={result['lane_adjustments']} | "
-        f"active_drivers={result['active_drivers']} | macro_audit_present={result['macro_audit_present']}"
+        f"active_drivers={result['active_drivers']} | macro_audit_present={result['macro_audit_present']} | "
+        f"promotion_status={result['promotion_status']}"
     )
 
 
