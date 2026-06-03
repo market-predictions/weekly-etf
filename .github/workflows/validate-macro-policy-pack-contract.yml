@@ -1,0 +1,76 @@
+name: Validate ETF macro policy pack contract
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "schemas/macro_policy_pack.schema.json"
+      - "runtime/build_macro_policy_pack.py"
+      - "runtime/build_macro_policy_pack_shadow.py"
+      - "tools/validate_macro_policy_pack.py"
+      - "MACRO_METHODOLOGY.md"
+      - ".github/workflows/validate-macro-policy-pack-contract.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-macro-policy-pack-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml pandas yfinance
+
+      - name: Build and validate macro policy pack contract
+        run: |
+          pricing_audit="$(ls -1 output/pricing/price_audit_*.json | sort | tail -1)"
+          python -m runtime.build_macro_policy_pack \
+            --pricing-audit "$pricing_audit" \
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --macro-context config/etf_macro_fundamental_context.yml \
+            --output-dir output/macro \
+            --run-id macro_policy_contract_validation
+          python tools/validate_macro_policy_pack.py --pack output/macro/latest.json
+
+      - name: Build and validate shadow macro policy pack contract
+        run: |
+          pricing_audit="$(ls -1 output/pricing/price_audit_*.json | sort | tail -1)"
+          python -m runtime.build_macro_policy_pack_shadow \
+            --pricing-audit "$pricing_audit" \
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --macro-context config/etf_macro_fundamental_context.yml \
+            --macro-data-audit fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json \
+            --output-dir output/macro \
+            --run-id macro_policy_shadow_contract_validation
+          python tools/validate_macro_policy_pack.py --pack output/macro/latest.json
+
+      - name: Prove shadow promotion firewall rejects accidental promotion
+        run: |
+          python - <<'PY'
+          import copy
+          import json
+          from pathlib import Path
+          from tools.validate_macro_policy_pack import _validate_pack
+
+          pack = json.loads(Path('output/macro/latest.json').read_text(encoding='utf-8'))
+          promoted = copy.deepcopy(pack)
+          promoted['field_authority']['deterministic_regime_shadow']['client_surface_allowed'] = True
+          try:
+              _validate_pack(promoted)
+          except RuntimeError as exc:
+              print(f"ETF_MACRO_POLICY_PACK_PROMOTION_FIREWALL_OK | rejected=deterministic_regime_shadow_client_surface | reason={exc}")
+          else:
+              raise SystemExit('promotion firewall failed to reject deterministic_regime_shadow client surface')
+          PY
