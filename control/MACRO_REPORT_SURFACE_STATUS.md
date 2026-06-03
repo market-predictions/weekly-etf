@@ -138,9 +138,9 @@ This is sufficient to treat the isolated no-secrets macro report-output validati
 
 ### Production validation
 
-Validated by a fresh production send workflow run after the Dutch macro-surface localization fix.
+Validated by fresh production send workflow runs.
 
-User-provided UI evidence shows:
+First production validation after Dutch macro-surface localization fix:
 
 ```text
 workflow: Send weekly ETF Pro report
@@ -166,7 +166,29 @@ pricing_audit_path: output/pricing/price_audit_2026-06-02_20260603_165723.json
 total_portfolio_value_eur: 112376.10
 ```
 
-Do not overstate this as recipient receipt. The manifest still has:
+Final production verification after commit `b6631167ea94483eff127b6675437882a26e7c29`:
+
+```text
+run_id: 20260603_172009
+requested_close_date: 2026-06-02
+workflow_status: workflow_success
+workflow_conclusion: success
+pricing_lineage_status: passed
+english_report_path: output/weekly_analysis_pro_260602_05.md
+dutch_report_path: output/weekly_analysis_pro_nl_260602_05.md
+runtime_state_path: output/runtime/etf_report_state_20260602_20260603_172009.json
+pricing_audit_path: output/pricing/price_audit_2026-06-02_20260603_172009.json
+total_portfolio_value_eur: 112376.10
+```
+
+The final generated Dutch Regime Dashboard confirms the previously leaking English macro memory and decision-rule sentences are now native Dutch:
+
+```text
+Regimegeheugen: Risk-on met smal marktleiderschap houdt al 3 runs aan; de overgangsfase is stabiel, de marktbreedte is gemengd en cross-asset bevestiging blijft gemengd.
+Beslisregel: Roteer niet agressief tenzij een regimeverschuiving minstens twee runs aanhoudt of cross-asset bevestiging breed wordt.
+```
+
+Do not overstate these runs as recipient receipt. The manifest still has:
 
 ```text
 delivery_manifest_path: null
@@ -176,21 +198,21 @@ The user explicitly paused delivery-receipt development; workflow/send success i
 
 ## Current output evidence
 
-The English report now includes client-facing macro/geopolitical/regime content in:
+The English report includes client-facing macro/geopolitical/regime content in:
 
 ```text
 ## 1. Executive Summary
 ## 3. Regime Dashboard
 ```
 
-The Dutch report now includes native macro/geopolitical/regime content in:
+The Dutch report includes native macro/geopolitical/regime content in:
 
 ```text
 ## 1. Kernsamenvatting
 ## 3. Regime-dashboard
 ```
 
-The successful report confirmed the Dutch macro surface passed the production workflow. A follow-up source fix was added after reviewing the generated Dutch report, because two English macro-pack sentences were still visible in the Dutch Regime Dashboard even though validation passed. The source-level fix should remove those in the next generated report.
+The macro report surface work package is closed for this stage.
 
 ## Expected validation markers for future log review
 
@@ -225,6 +247,4 @@ Still not allowed:
 
 ## Next action
 
-1. Optionally trigger one more fresh report after commit `b6631167ea94483eff127b6675437882a26e7c29` to confirm the Dutch Regime Dashboard no longer contains English macro memory/decision-rule sentences.
-2. Then update `control/CURRENT_STATE.md`, `control/NEXT_ACTIONS.md`, and the session changelog with final production-run evidence.
-3. Continue with macro policy pack schema hardening and promotion contract work before expanding macro/thesis authority further.
+Continue with macro policy pack schema hardening and promotion contract work before expanding macro/thesis authority further.
