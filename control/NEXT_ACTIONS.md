@@ -184,7 +184,7 @@
 ### 8. Preserve Phase 2 macro audit as non-authoritative until promoted
 
 - Owner: `[ASSISTANT]`
-- Status: started / shadow-only
+- Status: fixture replay wired / shadow-only baseline green
 - Current files:
   - `config/macro_data_sources.yml`
   - `config/cb_calendar.yml`
@@ -192,13 +192,36 @@
   - `tools/validate_macro_data_audit.py`
   - `schemas/macro_data_audit.schema.json`
   - `runtime/build_macro_policy_pack.py`
+  - `fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json`
+  - `tools/replay_macro_data_audit_shadow_fixture.py`
+  - `.github/workflows/validate-macro-regime-shadow.yml`
+  - `output/macro/validation/latest_macro_audit_axis_shadow_validation.json`
 - Current rule:
   - macro audit may build internal provenance artifacts
   - macro audit values must not change regime, confidence, lane scoring, fundability, portfolio actions, or client-facing wording yet
   - macro audit unavailability is non-blocking while the layer remains shadow-only
-- Next action:
-  - add fixture replay examples for no-network validation
-  - document which official/market sources are authoritative enough for Phase 3
+  - macro-audit-derived axes may be validated as shadow evidence only
+- Latest evidence:
+  ```text
+  workflow: Validate ETF macro regime shadow
+  run_number: 14
+  workflow_run_id: 26877273381
+  trigger_commit: 3a7d87323a0a83bdaab5a81bb8a037f3babf9fff
+  status: passed
+  macro_data_audit_fixture: fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json
+  macro_axis_evidence_path: output/macro/validation/latest_macro_audit_axis_shadow_validation.json
+  regime_shadow_evidence_path: output/macro/validation/latest_macro_regime_shadow_validation.json
+  markers: ETF_MACRO_REGIME_FIXTURE_REPLAY_OK, ETF_MACRO_DATA_AUDIT_VALID_OK, ETF_MACRO_AUDIT_AXIS_SHADOW_OK, ETF_MACRO_REGIME_SHADOW_OK
+  ```
+- Completed in this stage:
+  - no-network macro-data-audit fixture replay is wired into CI
+  - fixture validates required groups: `fred`, `ecb`, `treasury_fiscaldata`, `volatility`
+  - shadow policy-pack builder consumes the fixture
+  - `deterministic_regime_shadow.macro_axes` is populated and validated
+  - repo-visible evidence is written under `output/macro/validation/`
+- Remaining action:
+  - document which official/market sources are authoritative enough for later Phase 3 promotion
+  - keep all macro-audit-derived axes out of client reports and portfolio authority until methodology/compliance/promotion gates pass
 
 ### 9. Define macro policy pack schema before changing decisions
 
@@ -223,20 +246,29 @@
 ### 10. Replace hardcoded regime/confidence logic in shadow mode first
 
 - Owner: `[ASSISTANT]`
-- Status: planned
+- Status: shadow implementation started; fixture replay green; not promoted
 - Target files:
   - `macro_regime/classify.py`
   - `macro_regime/confidence.py`
   - `config/regime_thresholds.yml`
+  - `runtime/build_macro_policy_pack_shadow.py`
+  - `tools/replay_macro_regime_shadow_fixtures.py`
+  - `tools/replay_macro_data_audit_shadow_fixture.py`
   - `runtime/regime_memory.py` only if extension is needed
+- Current evidence:
+  - deterministic market-proxy regime fixtures replay successfully
+  - macro-audit-derived axes replay successfully via no-network fixture
+  - output remains under `deterministic_regime_shadow`
+  - authority flags remain shadow-only and non-client-facing
 - Action:
-  - move thresholds out of code into config
-  - compute confidence from cross-axis agreement rather than fixed constants
+  - move any remaining thresholds out of code into config where useful
+  - review old-versus-new pack differences before promotion
   - keep output descriptive, not predictive
   - preserve current production decisions during shadow comparison
 - Done when:
-  - fixture inputs produce deterministic regime/confidence outputs
+  - fixture inputs produce deterministic regime/confidence outputs across both market-proxy and macro-audit inputs
   - old versus new pack differences can be reviewed before promotion
+  - methodology/compliance/bilingual gates are ready for any client-surface test
 
 ---
 
