@@ -16,13 +16,118 @@ Until a later control-layer promotion decision is made, the shadow engine may pr
 
 It must not change:
 
-- client-facing regime wording
-- confidence wording
-- lane scoring
+- client-facing regime wording outside the approved client-safe report surface
+- confidence wording outside the approved client-safe report surface
+- lane scoring beyond current legacy-compatible `lane_adjustments`
 - fundability
 - portfolio actions
 - final recommendations
-- Dutch companion wording
+- Dutch companion wording outside the same authority and language-quality gates
+
+## Macro policy pack authority contract
+
+The macro policy pack must explicitly state its authority model. Every pack must include:
+
+```text
+authority.authority_class
+authority.client_surface_allowed
+authority.decision_authority
+field_authority
+promotion_gates
+```
+
+Current allowed top-level authority is:
+
+```text
+authority_class: legacy_compatibility_pack
+client_surface_allowed: true
+decision_authority: legacy_lane_adjustments_only
+shadow_only: true
+client_facing_authority: false
+decision_impact: legacy_lane_adjustments_only
+```
+
+This means the pack may support descriptive macro context in the client-safe report surface and preserve legacy-compatible lane adjustments, but it does not promote the deterministic macro/regime shadow engine to production decision authority.
+
+## Field-level authority classes
+
+The following field-level contract applies until a later control-layer decision changes it:
+
+```text
+regime:
+  client_surface_allowed: true
+  decision_authority: descriptive_only
+
+central_banks:
+  client_surface_allowed: true
+  decision_authority: descriptive_only
+
+policy_catalysts:
+  client_surface_allowed: true
+  decision_authority: descriptive_only
+
+portfolio_implications:
+  client_surface_allowed: true
+  decision_authority: descriptive_only
+
+report_transfer:
+  client_surface_allowed: true
+  decision_authority: output_contract_only
+
+lane_adjustments:
+  client_surface_allowed: false
+  decision_authority: legacy_lane_adjustments_only
+
+confidence_decomposition:
+  client_surface_allowed: false
+  decision_authority: none_shadow_explanation_only
+
+macro_signals:
+  client_surface_allowed: false
+  decision_authority: none_internal_evidence_only
+
+macro_data_audit_summary:
+  client_surface_allowed: false
+  decision_authority: none_phase2_audit_only
+
+deterministic_regime_shadow:
+  client_surface_allowed: false
+  decision_authority: none_shadow_comparison_only
+
+active_drivers:
+  client_surface_allowed: false
+  decision_authority: none_wp9_not_promoted
+```
+
+The validator must fail if a shadow-only field is marked client-surface allowed or if its decision authority is upgraded without an explicit control-layer promotion decision.
+
+## Promotion gates
+
+The macro policy pack must include `promotion_gates.status: not_promoted` until a later control-layer decision changes it.
+
+Decision authority is blocked until all required gates exist and pass:
+
+```text
+macro_policy_pack_schema_contract_green
++ deterministic_regime_fixture_replay_green
++ macro_audit_fixture_replay_green
++ macro_compliance_validator_green
++ bilingual_report_surface_validation_green
++ production_report_validation_green
++ explicit_control_layer_promotion_decision
+```
+
+The following remain blocked:
+
+```text
+raw_macro_axes_client_surface
+raw_macro_axis_scores_client_surface
+deterministic_regime_shadow_client_surface
+stage1_thesis_candidates_client_surface
+macro_direct_lane_scoring_authority
+macro_direct_fundability_authority
+macro_direct_portfolio_trade_authority
+```
 
 ## Descriptive, not predictive
 
