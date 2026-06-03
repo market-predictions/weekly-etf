@@ -384,3 +384,74 @@ The approved roadmap requires provenance-backed macro data before deterministic 
 - Existing regime classification remains unchanged for now.
 - Client-facing macro claims must still come from the existing validated report path until later phases promote the new macro engine.
 - Fixture replay is required to support deterministic no-network validation.
+
+---
+
+## 2026-06-03 — Validate macro-audit-derived regime axes in shadow CI only
+### Decision
+Macro-audit-derived axes are now validated in the isolated macro-regime shadow workflow, but they remain non-authoritative for production reports, lane scoring, fundability, portfolio actions, and client-facing recommendations.
+
+### Chosen architecture
+```text
+fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json
+→ tools/replay_macro_data_audit_shadow_fixture.py
+→ runtime/build_macro_policy_pack_shadow.py
+→ deterministic_regime_shadow.macro_axes / macro_axis_scores
+→ tools/validate_macro_regime_shadow.py
+→ output/macro/validation/latest_macro_audit_axis_shadow_validation.json
+→ output/macro/validation/latest_macro_regime_shadow_validation.json
+```
+
+The same isolated workflow also continues to replay the older deterministic market-proxy regime fixtures.
+
+### Evidence
+```text
+workflow: Validate ETF macro regime shadow
+run_number: 14
+workflow_run_id: 26877273381
+trigger_commit: 3a7d87323a0a83bdaab5a81bb8a037f3babf9fff
+status: passed
+validated_markers:
+  - ETF_MACRO_REGIME_FIXTURE_REPLAY_OK
+  - ETF_MACRO_DATA_AUDIT_VALID_OK
+  - ETF_MACRO_AUDIT_AXIS_SHADOW_OK
+  - ETF_MACRO_REGIME_SHADOW_OK
+```
+
+The validated fixture produced shadow macro axes:
+
+```text
+volatility: calm
+real_rates: restrictive
+yield_curve: inverted
+inflation_expectations: neutral
+policy_rate: restrictive
+```
+
+### Authority rule
+The validated fields remain internal shadow evidence only:
+
+```text
+deterministic_regime_shadow
+macro_axes
+macro_axis_scores
+macro_evidence
+confidence_decomposition
+```
+
+They must not be used for:
+
+```text
+client-facing regime labels
+lane scoring
+fundability decisions
+portfolio trades
+report recommendations
+```
+
+until a future control-layer decision promotes the layer after methodology, compliance, bilingual, and production-output gates pass.
+
+### Consequence
+- The no-network macro-audit fixture replay requirement is complete for this stage.
+- Future macro/regime work can review old-versus-new pack differences using repo-visible evidence.
+- The next promotion blockers are macro policy pack schema hardening, methodology documentation, compliance validation, bilingual/client-surface checks, and explicit authority promotion.
