@@ -177,6 +177,10 @@ def compute_shadow_confidence(
             macro_conflict_points += 0.5
         if axes.get("breadth") in {"narrow", "weak"} and macro_defensive >= 2:
             macro_conflict_points += 0.5
+    elif candidate_regime.startswith("Defensive") and macro_risk >= 3:
+        macro_conflict_points += 1.5
+    elif candidate_regime.startswith("Rate-hike") and macro_axes.get("policy_rate") == "accommodative":
+        macro_conflict_points += 1.0
     macro_conflict_score = round(min(macro_conflict_points / 4.0, 1.0), 4)
 
     macro_audit_present = bool((macro_data_audit_summary or {}).get("present"))
