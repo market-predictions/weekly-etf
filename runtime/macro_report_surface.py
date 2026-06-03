@@ -59,6 +59,7 @@ NL_TEXT_REPLACEMENTS = {
     "AI / semiconductor leadership remains the dominant equity impulse.": "AI- en semiconductorleiderschap blijft de dominante aandelenimpuls.",
     "Gold hedge behavior remains under review rather than automatic ballast.": "Het gedrag van goud als hedge blijft onder herbeoordeling en is geen automatische stabilisator.",
     "Macro status informs selectivity; it does not override pricing, risk or portfolio-discipline gates.": "Het macrobeeld ondersteunt selectiviteit, maar vervangt geen koers-, risico- of portefeuillediscipline.",
+    "Do not rotate aggressively unless a regime shift persists for at least two runs or cross-asset confirmation becomes broad.": "Roteer niet agressief tenzij een regimeverschuiving minstens twee runs aanhoudt of cross-asset bevestiging breed wordt.",
     "Regime memory is available but has no report summary.": "Regimegeheugen is beschikbaar, maar bevat geen rapportsamenvatting.",
     "The macro pack is present, but no specific regime change was recorded.": "De macro-pack is aanwezig, maar er is geen specifieke regimewijziging vastgelegd.",
     "Portfolio actions still require pricing, relative strength and position discipline.": "Portefeuilleacties vereisen nog steeds koersbevestiging, relatieve sterkte en positiediscipline.",
@@ -71,8 +72,12 @@ NL_TEXT_REPLACEMENTS = {
 
 NL_REGEX_REPLACEMENTS = [
     (
-        re.compile(r"\bRisk-on growth has persisted for (\d+) runs; transition state is stable, breadth is mixed, and cross-asset confirmation is mixed\.?,?", re.IGNORECASE),
+        re.compile(r"\bRisk-on growth has persisted for (\d+) run\(s\); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed\.?,?", re.IGNORECASE),
         lambda m: f"Risk-on groei houdt al {m.group(1)} runs aan; de overgangsfase is stabiel, de marktbreedte is gemengd en cross-asset bevestiging blijft gemengd.",
+    ),
+    (
+        re.compile(r"\bRisk-on narrow leadership has persisted for (\d+) run\(s\); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed\.?,?", re.IGNORECASE),
+        lambda m: f"Risk-on met smal marktleiderschap houdt al {m.group(1)} runs aan; de overgangsfase is stabiel, de marktbreedte is gemengd en cross-asset bevestiging blijft gemengd.",
     ),
 ]
 
