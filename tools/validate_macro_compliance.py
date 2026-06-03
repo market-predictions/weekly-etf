@@ -4,9 +4,9 @@
 This validator is intentionally conservative. It protects the macro/thesis roadmap
 while the deterministic regime engine remains shadow-only.
 
-It can validate report text, macro-pack JSON, or embedded self-tests. The first
-production use should be as a gate before any expanded macro/regime/thesis text is
-allowed onto the client surface.
+It can validate report text, macro-pack JSON, methodology notes, or embedded
+self-tests. The first production use should be as a gate before any expanded
+macro/regime/thesis text is allowed onto the client surface.
 """
 
 from __future__ import annotations
@@ -45,6 +45,17 @@ PROVENANCE_HINT_PATTERN = re.compile(
 
 OVERLAY_PATTERN = re.compile(r"\b(?:institutional overlay|consensus overlay|bank view|strategist view|broker view)\b", re.IGNORECASE)
 CITATION_HINT_PATTERN = re.compile(r"\b(?:source|citation|cited|according to|paraphrased|as of|provider)\b|https?://", re.IGNORECASE)
+
+REQUIRED_CAP_METHODOLOGY_PHRASES: tuple[str, ...] = (
+    "stable shadow methodology rule",
+    "risk-on shadow candidate",
+    "macro_conflict_cap_threshold",
+    "risk_on_macro_conflict_cap",
+    "descriptive cross-axis agreement score",
+    "not a forecast probability",
+    "diagnostic only",
+    "no client-facing, lane-scoring, fundability, or portfolio-action authority",
+)
 
 
 @dataclass(frozen=True)
@@ -124,6 +135,26 @@ def validate_text(text: str) -> list[Finding]:
     return findings
 
 
+def validate_cap_methodology(path: Path) -> list[Finding]:
+    if not path.exists():
+        return [Finding("cap_methodology_missing", "Macro conflict cap methodology note is missing.", 1, str(path))]
+    text = path.read_text(encoding="utf-8")
+    lower = text.lower()
+    findings: list[Finding] = []
+    for phrase in REQUIRED_CAP_METHODOLOGY_PHRASES:
+        if phrase.lower() not in lower:
+            findings.append(
+                Finding(
+                    "cap_methodology_phrase_missing",
+                    f"Required macro conflict cap methodology phrase is missing: {phrase}",
+                    1,
+                    phrase,
+                )
+            )
+    findings.extend(validate_text(text))
+    return findings
+
+
 def _load_json(path: Path) -> dict[str, Any]:
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -196,6 +227,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--text", type=Path, action="append", default=[], help="Text/markdown report file to validate")
     parser.add_argument("--macro-pack", type=Path, action="append", default=[], help="Macro policy pack JSON to validate")
+    parser.add_argument("--cap-methodology", type=Path, action="append", default=[], help="Macro conflict cap methodology note to validate")
     parser.add_argument("--self-test", action="store_true", help="Run embedded positive and negative validator tests")
     parser.add_argument("--expect-fail", action="store_true", help="Exit 0 only if findings are produced")
     args = parser.parse_args()
@@ -211,6 +243,8 @@ def main() -> None:
         if not path.exists():
             raise SystemExit(f"Macro pack not found: {path}")
         findings.extend(validate_macro_pack(path))
+    for path in args.cap_methodology:
+        findings.extend(validate_cap_methodology(path))
 
     if args.expect_fail:
         if findings:
