@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - "MACRO_METHODOLOGY.md"
+      - "control/MACRO_CONFLICT_CAP_METHODOLOGY.md"
       - "runtime/macro_report_surface.py"
       - "tools/validate_macro_compliance.py"
       - "tools/validate_macro_report_surface.py"
@@ -32,6 +33,11 @@ jobs:
       - name: Run macro compliance self-test
         run: |
           python tools/validate_macro_compliance.py --self-test
+
+      - name: Validate macro conflict cap methodology
+        run: |
+          python tools/validate_macro_compliance.py \
+            --cap-methodology control/MACRO_CONFLICT_CAP_METHODOLOGY.md
 
       - name: Run macro report surface self-test
         run: |
