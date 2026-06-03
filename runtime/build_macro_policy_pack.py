@@ -179,6 +179,103 @@ def portfolio_implications(regime: str) -> list[str]:
     return ["Stay invested, but make new capital pass a stricter macro and relative-strength filter.", "Treat SPY, PPA, PAVE and GLD as active review items rather than passive holds.", "Do not fund replacement candidates until the pricing basis and direct duel evidence are visible."]
 
 
+def _field_authority_contract() -> dict[str, dict[str, Any]]:
+    return {
+        "regime": {
+            "authority_class": "client_safe_descriptive_legacy",
+            "client_surface_allowed": True,
+            "decision_authority": "descriptive_only",
+            "notes": ["May be shown as current descriptive regime wording through the client-safe macro report surface.", "Does not by itself authorize lane scoring, fundability, or trades."],
+        },
+        "confidence_decomposition": {
+            "authority_class": "shadow_explanation",
+            "client_surface_allowed": False,
+            "decision_authority": "none_shadow_explanation_only",
+            "notes": ["Internal explanation of legacy confidence only; do not expose components directly in client reports."],
+        },
+        "central_banks": {
+            "authority_class": "client_safe_descriptive_policy_context",
+            "client_surface_allowed": True,
+            "decision_authority": "descriptive_only",
+            "notes": ["May be paraphrased as policy context; it cannot create portfolio action by itself."],
+        },
+        "macro_signals": {
+            "authority_class": "internal_evidence_context",
+            "client_surface_allowed": False,
+            "decision_authority": "none_internal_evidence_only",
+            "notes": ["Internal evidence layer; only sanitized summaries may transfer through report_transfer and macro_report_surface."],
+        },
+        "policy_catalysts": {
+            "authority_class": "client_safe_descriptive_catalyst_context",
+            "client_surface_allowed": True,
+            "decision_authority": "descriptive_only",
+            "notes": ["Only catalysts explicitly marked transfer_to_report=true may be surfaced."],
+        },
+        "portfolio_implications": {
+            "authority_class": "client_safe_discipline_context",
+            "client_surface_allowed": True,
+            "decision_authority": "descriptive_only",
+            "notes": ["May describe discipline and review implications; does not authorize trades without portfolio gates."],
+        },
+        "lane_adjustments": {
+            "authority_class": "legacy_compatibility_decision_input",
+            "client_surface_allowed": False,
+            "decision_authority": "legacy_lane_adjustments_only",
+            "notes": ["Maintained for backward-compatible lane discovery only; not a promotion of deterministic regime output."],
+        },
+        "macro_data_audit_summary": {
+            "authority_class": "shadow_provenance_only",
+            "client_surface_allowed": False,
+            "decision_authority": "none_phase2_audit_only",
+            "notes": ["Audit summary may support provenance review but cannot set regime or portfolio authority."],
+        },
+        "deterministic_regime_shadow": {
+            "authority_class": "shadow_comparison_only",
+            "client_surface_allowed": False,
+            "decision_authority": "none_shadow_comparison_only",
+            "notes": ["Raw macro_axes, macro_axis_scores, macro_evidence and shadow regime output must not enter client reports or decisions."],
+        },
+        "active_drivers": {
+            "authority_class": "stage1_thesis_shadow_only",
+            "client_surface_allowed": False,
+            "decision_authority": "none_wp9_not_promoted",
+            "notes": ["Stage-1 drivers are internal only until Stage-2 confirmation and explicit promotion."],
+        },
+        "report_transfer": {
+            "authority_class": "client_surface_filter",
+            "client_surface_allowed": True,
+            "decision_authority": "output_contract_only",
+            "notes": ["Limits what descriptive macro content can reach the report; does not add investment authority."],
+        },
+    }
+
+
+def _promotion_gates_contract() -> dict[str, Any]:
+    return {
+        "status": "not_promoted",
+        "client_surface_status": "descriptive_surface_only",
+        "decision_authority_status": "legacy_lane_adjustments_only",
+        "required_before_decision_authority": [
+            "macro_policy_pack_schema_contract_green",
+            "deterministic_regime_fixture_replay_green",
+            "macro_audit_fixture_replay_green",
+            "macro_compliance_validator_green",
+            "bilingual_report_surface_validation_green",
+            "production_report_validation_green",
+            "explicit_control_layer_promotion_decision",
+        ],
+        "blocked_authority": [
+            "raw_macro_axes_client_surface",
+            "raw_macro_axis_scores_client_surface",
+            "deterministic_regime_shadow_client_surface",
+            "stage1_thesis_candidates_client_surface",
+            "macro_direct_lane_scoring_authority",
+            "macro_direct_fundability_authority",
+            "macro_direct_portfolio_trade_authority",
+        ],
+    }
+
+
 def _macro_audit_summary(macro_data_audit_path: Path | None, macro_data_audit: dict[str, Any]) -> dict[str, Any]:
     if macro_data_audit_path is None:
         return {
@@ -244,14 +341,19 @@ def build_pack(pricing_audit_path: Path, relative_strength_path: Path, macro_con
         "report_date": report_date,
         "source_files": {"pricing_audit": str(pricing_audit_path), "relative_strength": str(relative_strength_path) if relative_strength_path.exists() else None, "macro_context": str(macro_context_path) if macro_context_path.exists() else None, "macro_data_audit": str(macro_data_audit_path) if macro_data_audit_path else None},
         "authority": {
+            "authority_class": "legacy_compatibility_pack",
+            "client_surface_allowed": True,
+            "decision_authority": "legacy_lane_adjustments_only",
             "decision_framework": "Legacy macro lane adjustments remain available for backward-compatible lane discovery only.",
             "input_state_contract": "Pricing audit and relative-strength artifacts remain production inputs; macro audit is metadata-only until promoted.",
-            "output_contract": "Client-facing macro content remains governed by the existing runtime report path and must not expose shadow-only fields.",
-            "operational_runbook": "Validate schema and compatibility before lane discovery; later phases may replace legacy regime logic after fixture/shadow review.",
+            "output_contract": "Client-facing macro content is allowed only through the client-safe macro report surface and must not expose shadow-only fields.",
+            "operational_runbook": "Validate schema and compatibility before lane discovery; later phases may replace legacy regime logic after fixture/shadow review and explicit promotion.",
             "shadow_only": True,
             "client_facing_authority": False,
             "decision_impact": "legacy_lane_adjustments_only",
         },
+        "field_authority": _field_authority_contract(),
+        "promotion_gates": _promotion_gates_contract(),
         "macro_data_audit_summary": _macro_audit_summary(macro_data_audit_path, macro_data_audit),
         "regime": {"current": regime, "previous": macro_context.get("previous_regime", "Unknown"), "confidence": confidence, "confidence_source": "legacy_proxy_static", "what_changed": what_changed},
         "confidence_decomposition": _confidence_decomposition(regime, confidence, metrics),
@@ -301,11 +403,13 @@ def main() -> None:
 
     memory = pack.get("regime_memory", {})
     audit_summary = pack.get("macro_data_audit_summary", {})
+    promotion = pack.get("promotion_gates", {})
     print(
         "ETF_MACRO_POLICY_PACK_OK | "
         f"report_date={pack.get('report_date')} | regime={pack.get('regime', {}).get('current')} | "
         f"transition={memory.get('transition_state')} | weeks={memory.get('weeks_in_regime')} | "
-        f"macro_audit_present={audit_summary.get('present')} | schema={pack.get('schema_version')} | macro_audit={macro_data_audit_path} | output={out_path}"
+        f"macro_audit_present={audit_summary.get('present')} | schema={pack.get('schema_version')} | "
+        f"promotion_status={promotion.get('status')} | macro_audit={macro_data_audit_path} | output={out_path}"
     )
 
 
