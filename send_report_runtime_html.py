@@ -8,6 +8,7 @@ import send_report as report_module
 from runtime.build_etf_report_state import build_runtime_state
 from runtime.client_facing_sanitizer import sanitize_client_facing_html, looks_dutch_markdown
 from runtime.delivery_html_overrides import build_report_html_with_state
+from runtime.macro_report_pre_send_guard import validate_macro_report_pre_send
 from runtime.max_position_action_contract import sanitize_over_cap_add_html
 from runtime.render_etf_report_from_state import cash_eur, invested_eur, total_nav
 
@@ -316,6 +317,15 @@ def create_equity_curve_png_runtime(output_dir: Path, chart_path: Path, mode: st
     return chart_path
 
 
+def _with_macro_pre_send_guard(generate_assets_for_run: Callable[..., dict]) -> Callable[..., dict]:
+    def _wrapped(output_dir: Path, report_path_en: Path, mode: str = "standard") -> dict:
+        bundle = generate_assets_for_run(output_dir, report_path_en, mode=mode)
+        validate_macro_report_pre_send(bundle)
+        return bundle
+
+    return _wrapped
+
+
 _patch_base_renderer_contract()
 _extend_native_dutch_numeric_aliases()
 report_module.latest_report_file = _latest_canonical_report_file
@@ -329,6 +339,7 @@ report_module.create_equity_curve_png = create_equity_curve_png_runtime
 report_module.build_report_html = _with_client_facing_sanitizer(
     build_report_html_with_state(report_module.build_report_html, report_module._base)
 )
+report_module.generate_delivery_assets_for_run = _with_macro_pre_send_guard(report_module.generate_delivery_assets_for_run)
 
 if __name__ == "__main__":
     report_module.main()
