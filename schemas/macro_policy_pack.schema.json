@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/market-predictions/weekly-etf/schemas/macro_policy_pack.schema.json",
   "title": "Weekly ETF Macro Policy Pack",
-  "description": "Schema contract for the macro policy pack consumed by ETF lane discovery. Phase 2/3 fields are shadow-first unless explicitly promoted by later control decisions.",
+  "description": "Schema contract for the macro policy pack consumed by ETF lane discovery and the client-safe macro report surface. Phase 2/3 fields remain shadow-first unless explicitly promoted by a later control-layer decision.",
   "type": "object",
   "required": [
     "schema_version",
@@ -10,6 +10,8 @@
     "report_date",
     "source_files",
     "authority",
+    "field_authority",
+    "promotion_gates",
     "macro_data_audit_summary",
     "regime",
     "confidence_decomposition",
@@ -49,8 +51,22 @@
     },
     "authority": {
       "type": "object",
-      "required": ["decision_framework", "input_state_contract", "output_contract", "operational_runbook", "shadow_only", "client_facing_authority", "decision_impact"],
+      "required": [
+        "authority_class",
+        "client_surface_allowed",
+        "decision_authority",
+        "decision_framework",
+        "input_state_contract",
+        "output_contract",
+        "operational_runbook",
+        "shadow_only",
+        "client_facing_authority",
+        "decision_impact"
+      ],
       "properties": {
+        "authority_class": {"type": "string", "const": "legacy_compatibility_pack"},
+        "client_surface_allowed": {"type": "boolean", "const": true},
+        "decision_authority": {"type": "string", "const": "legacy_lane_adjustments_only"},
         "decision_framework": {"type": "string"},
         "input_state_contract": {"type": "string"},
         "output_contract": {"type": "string"},
@@ -58,6 +74,48 @@
         "shadow_only": {"type": "boolean", "const": true},
         "client_facing_authority": {"type": "boolean", "const": false},
         "decision_impact": {"type": "string", "const": "legacy_lane_adjustments_only"}
+      }
+    },
+    "field_authority": {
+      "type": "object",
+      "description": "Field-level authority and client-surface eligibility contract. This is the promotion firewall between descriptive report wording, legacy lane adjustments, and shadow-only macro/regime fields.",
+      "required": [
+        "regime",
+        "confidence_decomposition",
+        "central_banks",
+        "macro_signals",
+        "policy_catalysts",
+        "portfolio_implications",
+        "lane_adjustments",
+        "macro_data_audit_summary",
+        "deterministic_regime_shadow",
+        "active_drivers",
+        "report_transfer"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "required": ["authority_class", "client_surface_allowed", "decision_authority"],
+          "properties": {
+            "authority_class": {"type": "string"},
+            "client_surface_allowed": {"type": "boolean"},
+            "decision_authority": {"type": "string"},
+            "notes": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "promotion_gates": {
+      "type": "object",
+      "description": "Explicit promotion status for macro/regime authority. Current status must remain not_promoted until a later control-layer decision changes it.",
+      "required": ["status", "client_surface_status", "decision_authority_status", "required_before_decision_authority", "blocked_authority"],
+      "properties": {
+        "status": {"type": "string", "const": "not_promoted"},
+        "client_surface_status": {"type": "string", "const": "descriptive_surface_only"},
+        "decision_authority_status": {"type": "string", "const": "legacy_lane_adjustments_only"},
+        "required_before_decision_authority": {"type": "array", "items": {"type": "string"}},
+        "blocked_authority": {"type": "array", "items": {"type": "string"}}
       }
     },
     "macro_data_audit_summary": {
