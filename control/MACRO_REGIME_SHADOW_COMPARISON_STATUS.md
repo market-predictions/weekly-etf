@@ -8,7 +8,7 @@
 
 The macro policy-pack authority contract is validated. The controlled macro phase compares the legacy macro regime path with the deterministic shadow regime/confidence path without changing production authority.
 
-The prior ambiguity in `differs_from_legacy` has been resolved with split flags, and the latest confidence-calibration task reviewed whether the shadow confidence was too high for a market-led risk-on narrow regime while macro-audit axes were mixed/restrictive.
+The prior ambiguity in `differs_from_legacy` has been resolved with split flags. The initial confidence-calibration task capped the risk-on narrow leadership confidence when macro-audit evidence is restrictive. The latest task broadened fixture coverage so that the cap is not validated only against one hand-picked case.
 
 ## Root cause
 
@@ -21,6 +21,14 @@ differs_from_legacy
 That flag became true when either the regime label changed or the confidence differed beyond threshold. In the current fixture, the legacy and shadow regime labels were the same, but confidence differed by `0.08`, so the combined flag alone was ambiguous.
 
 Separately, the shadow confidence model gave `0.80` for `Risk-on narrow leadership` even though macro-audit axes included restrictive real rates, an inverted yield curve, and a restrictive policy rate. That was too opaque for methodology review because the confidence decomposition did not explicitly expose a macro-conflict diagnostic or cap.
+
+A further risk was overfitting the new cap to only that one restrictive-macro risk-on case. The replay set needed additional macro-audit variants:
+
+```text
+broad risk-on with supportive macro axes
+risk-off with supportive macro axes
+rate-hike repricing with accommodative-policy conflict
+```
 
 ## Implemented change
 
@@ -52,7 +60,7 @@ tools/replay_macro_regime_shadow_fixtures.py
 fixtures/macro_regime_shadow/regime_shadow_fixtures.json
 ```
 
-The confidence model now records shadow-only diagnostic components:
+The confidence model records shadow-only diagnostic components:
 
 ```text
 macro_conflict_score
@@ -62,7 +70,7 @@ confidence_cap_applied
 uncapped_confidence
 ```
 
-The specific calibration rule is intentionally narrow:
+The current cap is intentionally narrow:
 
 ```text
 if macro audit is present
@@ -79,21 +87,38 @@ macro_conflict_cap_threshold: 0.75
 risk_on_macro_conflict_cap: 0.72
 ```
 
-The replay tool now supports optional per-fixture macro-audit input through:
+The replay tool supports optional per-fixture macro-audit input through:
 
 ```text
 macro_data_audit_fixture
 ```
 
-and validates expected macro axes and expected confidence components when a fixture declares them.
+and validates expected macro axes and expected confidence components when a fixture declares them. The replay fixture count is now dynamic, so adding future fixtures does not require changing the replay script count.
 
-A new fixture was added:
+### Broader macro fixture coverage
+
+Added compact no-network macro-audit fixtures:
+
+```text
+fixtures/macro_data_audit/macro_audit_supportive_fixture_2026-06-02.json
+fixtures/macro_data_audit/macro_audit_accommodative_fixture_2026-06-02.json
+```
+
+Added / validated these regime replay scenarios:
 
 ```text
 risk_on_narrow_restrictive_macro
+risk_on_growth_supportive_macro
+risk_off_supportive_macro_conflict
+rate_hike_accommodative_policy_conflict
 ```
 
-This fixture isolates the exact case under review: market-led risk-on narrow leadership with restrictive macro-audit axes.
+The broader cases prove:
+
+- broad risk-on with supportive macro axes does not trigger the cap;
+- risk-off with supportive macro axes records a non-capping macro-conflict diagnostic;
+- rate-hike repricing with accommodative policy-rate evidence records a non-capping macro-conflict diagnostic;
+- the original restrictive-macro risk-on case still triggers the cap.
 
 ## Commits
 
@@ -121,6 +146,16 @@ Confidence calibration:
 27e4bf1341999aa49df1c5bfb51f983fd59b0c8b  add risk-on macro conflict replay fixture
 ```
 
+Broader fixture coverage:
+
+```text
+f239fffc9be9ef862ad8c58a821b1c5c5a473b4d  add supportive macro audit shadow fixture
+e2f3f0486a6cef7fbf10a872123658aa0a49c879  add accommodative macro audit shadow fixture
+9b5564145f16c35731cbeabfd197a2c1c032df83  make macro regime fixture replay count dynamic
+f12fdc61604f91f4574b1b23a0ffc740170d1a28  broaden shadow macro conflict diagnostics
+1c84de597cef54c17babb38389c0094cfc8e5c10  add broader macro conflict replay fixtures
+```
+
 ## Validation status
 
 Validated by isolated GitHub Actions workflow.
@@ -129,16 +164,16 @@ Latest confirmed workflow evidence:
 
 ```text
 workflow: Validate ETF macro regime shadow
-run_number: 22
-workflow_run_id: 26917489620
+run_number: 27
+workflow_run_id: 26918418953
 job: validate-shadow-regime
 job_status: completed
 job_conclusion: success
-trigger_commit: 27e4bf1341999aa49df1c5bfb51f983fd59b0c8b
+trigger_commit: 1c84de597cef54c17babb38389c0094cfc8e5c10
 source_ref: main
 status: passed
-validated_artifact: output/macro/validation/latest_macro_regime_shadow_comparison.json
-schema_version: 1.1
+validated_artifact: output/macro/validation/latest_macro_regime_shadow_validation.json
+schema_version: 1.0
 ```
 
 The workflow job completed successfully, including the steps:
@@ -258,6 +293,7 @@ Allowed now:
 - use this evidence for methodology review and future promotion discussions
 - use split flags to clarify internal comparison evidence
 - use macro-conflict diagnostics for shadow-only confidence calibration review
+- use broader no-network macro fixture replay to detect overfitting before any future promotion decision
 
 Still blocked:
 
@@ -288,26 +324,25 @@ Legacy-vs-shadow comparison evidence with split difference flags: **closed for t
 
 Shadow confidence calibration for the current restrictive-macro risk-on case: **closed for this stage**.
 
+Broader macro-conflict replay coverage to reduce overfitting risk: **closed for this stage**.
+
 This does not promote deterministic macro/regime output to client-facing, lane-scoring, fundability, or portfolio-action authority.
 
 ## Next action
 
-Continue with broader shadow fixture coverage and methodology review before any promotion:
+Continue with methodology review before any promotion:
 
 ```text
-fixtures/macro_regime_shadow/regime_shadow_fixtures.json
-macro_regime/confidence.py
-tools/replay_macro_regime_shadow_fixtures.py
 MACRO_METHODOLOGY.md
+control/MACRO_POLICY_PACK_CONTRACT_STATUS.md
 tools/validate_macro_compliance.py
 ```
 
-Recommended next step: add 2-3 more macro-audit fixture variants so the cap does not overfit one case:
+Recommended next step: document whether the macro-conflict cap is a stable shadow methodology rule or a temporary calibration rule. If kept, add methodology language explaining:
 
 ```text
-broad risk-on with supportive macro axes
-risk-off with supportive macro axes
-rate-hike repricing with accommodative-policy conflict
+confidence is descriptive cross-axis agreement, not forecast probability;
+macro conflict can cap risk-on confidence when audited macro axes are materially restrictive;
+non-risk-on conflicts are currently diagnostics unless explicitly promoted later;
+all deterministic regime/confidence output remains shadow-only until promotion gates pass.
 ```
-
-Then decide whether the macro-conflict cap belongs in the stable methodology or remains a temporary shadow calibration rule.
