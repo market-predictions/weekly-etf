@@ -80,6 +80,7 @@ EXACT_REPLACEMENTS = {
 # when the runtime state carries English enum/display names. This is not a broad
 # translation pass over prose; it is a deterministic runtime-label alias map.
 NATIVE_STATE_LABEL_REPLACEMENTS = {
+    "Healthcare quality and defensive growth": "Healthcarekwaliteit en defensieve groei",
     "Non-U.S. developed market diversification": "Ontwikkelde markten buiten de VS",
     "Non-U.S. developed diversification": "Ontwikkelde markten buiten de VS",
     "Latest 4 mei close basis; +8 SMH from cash": "Laatste slotkoersbasis van 4 mei; +8 SMH vanuit cash",
@@ -121,6 +122,7 @@ REGEX_REPLACEMENTS = [
 ]
 
 FORBIDDEN_AFTER_SCRUB = sorted(set(term.FORBIDDEN_AFTER_SCRUB + [
+    "Healthcare quality and defensive growth",
     "fundable",
     "funding",
     "Aanhouden but replaceable",
