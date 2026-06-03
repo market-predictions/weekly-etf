@@ -1,14 +1,5 @@
 #!/usr/bin/env python3
-"""Write repo-native validation evidence for the ETF macro-regime shadow workflow.
-
-This script is intentionally narrow and non-production:
-- It reads the already-built shadow macro policy pack.
-- It verifies that the deterministic regime payload is present and shadow-only.
-- It writes JSON evidence under output/macro/validation/.
-
-The evidence file is for future ChatGPT/repo audits only. It must not be used as
-client-facing report authority, lane-scoring authority, or portfolio-action input.
-"""
+"""Write repo-native validation evidence for the ETF macro-regime shadow workflow."""
 
 from __future__ import annotations
 
@@ -22,6 +13,8 @@ from typing import Any
 EXPECTED_DECISION_IMPACT = "none_shadow_comparison_only"
 EXPECTED_MARKERS = [
     "ETF_MACRO_REGIME_FIXTURE_REPLAY_OK",
+    "ETF_MACRO_DATA_AUDIT_VALID_OK",
+    "ETF_MACRO_AUDIT_AXIS_SHADOW_OK",
     "ETF_MACRO_REGIME_SHADOW_OK",
 ]
 
@@ -43,6 +36,12 @@ def _require_shadow_payload(pack: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(shadow, dict):
         raise SystemExit("deterministic_regime_shadow missing or not an object")
 
+    macro_axes = shadow.get("macro_axes")
+    macro_scores = shadow.get("macro_axis_scores")
+    macro_evidence = shadow.get("macro_evidence")
+    confidence = shadow.get("confidence_decomposition") or {}
+    components = confidence.get("components") or {}
+
     checks = {
         "shadow_only": shadow.get("shadow_only") is True,
         "client_facing_authority_false": shadow.get("client_facing_authority") is False,
@@ -51,6 +50,10 @@ def _require_shadow_payload(pack: dict[str, Any]) -> dict[str, Any]:
         "candidate_confidence_present": shadow.get("candidate_confidence") is not None,
         "legacy_regime_present": bool(shadow.get("legacy_regime")),
         "axes_present": isinstance(shadow.get("axes"), dict) and bool(shadow.get("axes")),
+        "macro_axes_present": isinstance(macro_axes, dict) and bool(macro_axes),
+        "macro_axis_scores_present": isinstance(macro_scores, dict) and bool(macro_scores),
+        "macro_evidence_present": isinstance(macro_evidence, dict) and bool(macro_evidence),
+        "macro_audit_confidence_component_present": components.get("macro_audit_present") is True,
     }
     failed = [name for name, ok in checks.items() if not ok]
     if failed:
@@ -66,6 +69,11 @@ def _safe_token(value: str) -> str:
 def _build_evidence(args: argparse.Namespace, pack: dict[str, Any], shadow: dict[str, Any]) -> dict[str, Any]:
     generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     axes = shadow.get("axes") if isinstance(shadow.get("axes"), dict) else {}
+    macro_axes = shadow.get("macro_axes") if isinstance(shadow.get("macro_axes"), dict) else {}
+    macro_axis_scores = shadow.get("macro_axis_scores") if isinstance(shadow.get("macro_axis_scores"), dict) else {}
+    macro_evidence = shadow.get("macro_evidence") if isinstance(shadow.get("macro_evidence"), dict) else {}
+    confidence = shadow.get("confidence_decomposition") if isinstance(shadow.get("confidence_decomposition"), dict) else {}
+    components = confidence.get("components") if isinstance(confidence.get("components"), dict) else {}
 
     return {
         "schema_version": "1.0",
@@ -92,6 +100,7 @@ def _build_evidence(args: argparse.Namespace, pack: dict[str, Any], shadow: dict
             "fundability_authority": False,
             "portfolio_action_authority": False,
         },
+        "macro_data_audit_summary": pack.get("macro_data_audit_summary") or {},
         "shadow_summary": {
             "method": shadow.get("method"),
             "candidate_regime": shadow.get("candidate_regime"),
@@ -99,12 +108,16 @@ def _build_evidence(args: argparse.Namespace, pack: dict[str, Any], shadow: dict
             "legacy_regime": shadow.get("legacy_regime"),
             "legacy_confidence": shadow.get("legacy_confidence"),
             "differs_from_legacy": shadow.get("differs_from_legacy"),
-            "axis_labels": {key: value.get("label") for key, value in axes.items() if isinstance(value, dict)},
+            "axes": axes,
+            "macro_axes": macro_axes,
+            "macro_axis_scores": macro_axis_scores,
+            "macro_evidence": macro_evidence,
+            "confidence_components": components,
         },
         "guardrails": [
             "Evidence artifact is non-production and shadow-only.",
             "Do not use deterministic_regime_shadow for client-facing regime/confidence until promoted by control-layer decision.",
-            "Do not use deterministic_regime_shadow for lane scoring, fundability, or portfolio actions.",
+            "Do not use deterministic_regime_shadow, macro_axes, or macro_axis_scores for lane scoring, fundability, or portfolio actions.",
             "Production report workflow remains separate from this validation evidence path.",
         ],
     }
@@ -138,7 +151,8 @@ def main() -> None:
     print(
         "ETF_MACRO_REGIME_SHADOW_EVIDENCE_OK | "
         f"status={evidence['status']} | "
-        f"run_path={run_path} | latest_path={latest_path}"
+        f"run_path={run_path} | latest_path={latest_path} | "
+        f"macro_axes={','.join(sorted(evidence['shadow_summary']['macro_axes']))}"
     )
 
 
