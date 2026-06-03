@@ -104,6 +104,14 @@ Added isolated read-only report-output workflow:
 
 This workflow has no SMTP/email secrets and validates committed macro pack/report artifacts only.
 
+Added narrow Dutch client-language cleanup:
+
+```text
+runtime/scrub_nl_client_language.py
+```
+
+The structured-state label `Healthcare quality and defensive growth` now normalizes to `Healthcarekwaliteit en defensieve groei` in native Dutch output and is forbidden after scrub.
+
 ## Commits
 
 ```text
@@ -117,6 +125,7 @@ d4ab9873c5120b73160ad4eb567bffd070870990  wire macro report surface validator in
 419a3c6096cef59cb6fb1a66e839f5c7a787d1dd  enforce macro report guard before runtime HTML delivery
 fe1a4a809f1b79382512115185db40ef9d070d9b  localize Dutch macro report surface text at source
 b6631167ea94483eff127b6675437882a26e7c29  complete Dutch macro dashboard source localization
+374a46166752c191ed5c5357ca9de3a176a3cada  localize healthcare defensive growth lane in Dutch scrub
 ```
 
 ## Validation status
@@ -181,12 +190,35 @@ pricing_audit_path: output/pricing/price_audit_2026-06-02_20260603_172009.json
 total_portfolio_value_eur: 112376.10
 ```
 
-The final generated Dutch Regime Dashboard confirms the previously leaking English macro memory and decision-rule sentences are now native Dutch:
+The generated Dutch Regime Dashboard confirms the previously leaking English macro memory and decision-rule sentences are now native Dutch:
 
 ```text
 Regimegeheugen: Risk-on met smal marktleiderschap houdt al 3 runs aan; de overgangsfase is stabiel, de marktbreedte is gemengd en cross-asset bevestiging blijft gemengd.
 Beslisregel: Roteer niet agressief tenzij een regimeverschuiving minstens twee runs aanhoudt of cross-asset bevestiging breed wordt.
 ```
+
+Final Dutch client-language cleanup verification after commit `374a46166752c191ed5c5357ca9de3a176a3cada`:
+
+```text
+run_id: 20260603_175012
+requested_close_date: 2026-06-02
+workflow_status: workflow_success
+workflow_conclusion: success
+pricing_lineage_status: passed
+english_report_path: output/weekly_analysis_pro_260602_06.md
+dutch_report_path: output/weekly_analysis_pro_nl_260602_06.md
+runtime_state_path: output/runtime/etf_report_state_20260602_20260603_175012.json
+pricing_audit_path: output/pricing/price_audit_2026-06-02_20260603_175012.json
+total_portfolio_value_eur: 112376.10
+```
+
+The generated Dutch report now contains:
+
+```text
+Healthcarekwaliteit en defensieve groei
+```
+
+and repository search no longer finds `Healthcare quality and defensive growth` in the generated Dutch report.
 
 Do not overstate these runs as recipient receipt. The manifest still has:
 
@@ -212,7 +244,13 @@ The Dutch report includes native macro/geopolitical/regime content in:
 ## 3. Regime-dashboard
 ```
 
-The macro report surface work package is closed for this stage.
+The Dutch notable-lanes table now renders the healthcare lane as:
+
+```text
+Healthcarekwaliteit en defensieve groei
+```
+
+The macro report surface and Dutch client-language cleanup work package is closed for this stage.
 
 ## Expected validation markers for future log review
 
@@ -222,6 +260,7 @@ ETF_MACRO_REPORT_OUTPUT_OK
 ETF_MACRO_COMPLIANCE_OK
 ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK
 ETF_MACRO_REPORT_PRE_SEND_GUARD_OK
+ETF_NL_CLIENT_LANGUAGE_SCRUB_OK
 ```
 
 ## Authority boundary
