@@ -83,6 +83,8 @@ confidence:
   conflict_penalty_weight: 0.12
   macro_audit_bonus: 0.03
   macro_alignment_weight: 0.06
+  macro_conflict_cap_threshold: 0.75
+  risk_on_macro_conflict_cap: 0.72
   min: 0.35
   max: 0.82
 
@@ -91,3 +93,4 @@ notes:
   - Legacy regime and lane_adjustments remain production-compatible until explicit promotion.
   - Macro axes are audit-derived shadow evidence only; they do not set client-facing regime or portfolio actions.
   - Thresholds should be tuned through fixture replay, not report-by-report patching.
+  - Macro conflict settings are diagnostics for shadow confidence calibration only; they are not production authority.
