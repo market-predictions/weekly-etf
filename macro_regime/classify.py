@@ -5,6 +5,9 @@ from typing import Any
 from macro_regime.confidence import compute_shadow_confidence
 
 
+CONFIDENCE_DIFF_THRESHOLD = 0.05
+
+
 def _num(value: Any, default: float = 0.0) -> float:
     try:
         if value is None or value == "":
@@ -239,8 +242,12 @@ def classify_regime_shadow(
         macro_axes=macro_axes,
         macro_scores=macro_scores,
     )
-    confidence = confidence_payload["confidence"]
-    differs = candidate != legacy_regime or abs(float(confidence) - float(legacy_confidence)) >= 0.05
+    confidence = float(confidence_payload["confidence"])
+    legacy_confidence_float = float(legacy_confidence)
+    confidence_delta = round(confidence - legacy_confidence_float, 4)
+    regime_label_differs = candidate != legacy_regime
+    confidence_differs = abs(confidence_delta) >= CONFIDENCE_DIFF_THRESHOLD
+    differs = regime_label_differs or confidence_differs
 
     return {
         "schema_version": "1.0",
@@ -253,6 +260,10 @@ def classify_regime_shadow(
         "legacy_regime": legacy_regime,
         "legacy_confidence": legacy_confidence,
         "differs_from_legacy": differs,
+        "regime_label_differs": regime_label_differs,
+        "confidence_differs": confidence_differs,
+        "confidence_delta": confidence_delta,
+        "confidence_diff_threshold": CONFIDENCE_DIFF_THRESHOLD,
         "axes": axes,
         "axis_scores": axis_scores,
         "macro_axes": macro_axes,
@@ -264,5 +275,6 @@ def classify_regime_shadow(
         "notes": [
             "Shadow-only deterministic candidate; not used for production lane scoring or client-facing decisions.",
             "Legacy regime and lane_adjustments remain the production-compatible path until explicit promotion.",
+            "differs_from_legacy is retained for backward compatibility and equals regime_label_differs OR confidence_differs.",
         ],
     }
