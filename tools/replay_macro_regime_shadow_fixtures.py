@@ -79,8 +79,9 @@ def replay(fixtures_path: Path, thresholds_path: Path) -> list[dict[str, Any]]:
     thresholds = _load_yaml(thresholds_path)
     _require(payload.get("status") == "shadow_only", "fixture payload must be shadow_only")
     _require(payload.get("client_facing_authority") is False, "fixtures must not be client-facing authority")
+    fixtures = payload.get("fixtures") or []
     results: list[dict[str, Any]] = []
-    for fixture in payload.get("fixtures") or []:
+    for fixture in fixtures:
         macro_audit = None
         macro_summary = {"present": False}
         if fixture.get("macro_data_audit_fixture"):
@@ -95,7 +96,7 @@ def replay(fixtures_path: Path, thresholds_path: Path) -> list[dict[str, Any]]:
             macro_data_audit=macro_audit,
         )
         results.append(_validate_fixture_result(fixture, result))
-    _require(len(results) == 6, f"Expected 6 regime fixtures, got {len(results)}")
+    _require(len(results) == len(fixtures), f"Expected {len(fixtures)} regime fixtures, got {len(results)}")
     return results
 
 
