@@ -1,0 +1,124 @@
+{
+  "artifact_type": "macro_regime_legacy_vs_shadow_comparison_evidence",
+  "authority": {
+    "client_facing_authority": false,
+    "decision_impact": "none_shadow_comparison_only",
+    "field_authority_deterministic_regime_shadow": {
+      "authority_class": "shadow_comparison_only",
+      "client_surface_allowed": false,
+      "decision_authority": "none_shadow_comparison_only",
+      "notes": [
+        "Raw macro_axes, macro_axis_scores, macro_evidence and shadow regime output must not enter client reports or decisions."
+      ]
+    },
+    "fundability_authority": false,
+    "lane_scoring_authority": false,
+    "pack_authority_class": "legacy_compatibility_pack",
+    "pack_decision_authority": "legacy_lane_adjustments_only",
+    "portfolio_action_authority": false,
+    "production_report_path_changed": false,
+    "promotion_status": "not_promoted",
+    "shadow_only": true
+  },
+  "comparison": {
+    "axes": {
+      "breadth": "narrow",
+      "commodities": "inflation_bid",
+      "duration": "neutral",
+      "equity": "risk_on",
+      "hedge": "gold_weak",
+      "semiconductor_leadership": "strong"
+    },
+    "axis_scores": {
+      "GLD_return_3m_pct": -13.65,
+      "GSG_return_3m_pct": 18.98,
+      "IWM_rs_vs_SPY_3m_pct": -0.37,
+      "SMH_return_3m_pct": 59.88,
+      "SMH_vs_SPY_3m_pct": 49.34,
+      "SPY_return_3m_pct": 10.54,
+      "TLT_return_3m_pct": 0.0
+    },
+    "confidence_decomposition": {
+      "client_facing_authority": false,
+      "components": {
+        "axis_alignment": 0.6,
+        "base": 0.45,
+        "conflict_score": 0.1875,
+        "macro_alignment": 0.6,
+        "macro_audit_present": true,
+        "macro_signal_strength": 0.42,
+        "max": 0.82,
+        "min": 0.35,
+        "raw_confidence": 0.7964,
+        "signal_strength": 0.7196
+      },
+      "confidence": 0.8,
+      "decision_impact": "none_shadow_comparison_only",
+      "method": "deterministic_axis_agreement_v1_shadow",
+      "notes": [
+        "Confidence measures cross-axis agreement, not forecast accuracy.",
+        "Market support axes: risk=3, defensive=0, mixed=2.",
+        "Candidate regime: Risk-on narrow leadership.",
+        "Macro-audit support axes: risk=1, defensive=3, mixed=1.",
+        "Confidence is reduced for mixed or internally conflicting market/macro evidence."
+      ],
+      "shadow_only": true
+    },
+    "confidence_delta": 0.08,
+    "differs_from_legacy": true,
+    "legacy_confidence": 0.72,
+    "legacy_confidence_source": "legacy_proxy_static",
+    "legacy_regime": "Risk-on narrow leadership",
+    "macro_axes": {
+      "inflation_expectations": "neutral",
+      "policy_rate": "restrictive",
+      "real_rates": "restrictive",
+      "volatility": "calm",
+      "yield_curve": "inverted"
+    },
+    "macro_axis_scores": {
+      "fed_funds_effective": 5.33,
+      "us_10y_2y_spread": -0.45,
+      "us_10y_breakeven": 2.42,
+      "us_10y_real_yield": 2.05,
+      "us_10y_yield": 4.35,
+      "us_2y_yield": 4.8,
+      "vix_close": 14.8
+    },
+    "shadow_candidate_confidence": 0.8,
+    "shadow_candidate_regime": "Risk-on narrow leadership",
+    "shadow_method": "deterministic_axis_classifier_v1_shadow",
+    "what_changed": [
+      "Equity trend is positive, but leadership is concentrated rather than broadly confirmed.",
+      "Semiconductor leadership is strong versus SPY (49.34 percentage points over 3m).",
+      "Small-cap relative strength is not broad enough to confirm full-market participation.",
+      "Gold is not confirming hedge demand in the current evidence window.",
+      "Duration evidence is neutral rather than a clean easing or stress signal."
+    ]
+  },
+  "generated_at_utc": "2026-06-03T20:05:51Z",
+  "guardrails": [
+    "Comparison evidence is shadow-only and non-production authority.",
+    "Do not use the shadow candidate for client-facing regime labels until explicit control-layer promotion.",
+    "Do not use the shadow candidate, macro_axes, or macro_axis_scores for lane scoring, fundability, or portfolio actions.",
+    "Legacy macro policy pack decision authority remains legacy_lane_adjustments_only."
+  ],
+  "repository": "market-predictions/weekly-etf",
+  "schema_version": "1.0",
+  "source_inputs": {
+    "macro_context": "config/etf_macro_fundamental_context.yml",
+    "macro_data_audit": "fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json",
+    "pricing_audit": "output/pricing/price_audit_2026-05-29_20260531_203900.json",
+    "relative_strength": "output/market_history/etf_relative_strength.json",
+    "thresholds": "config/regime_thresholds.yml"
+  },
+  "status": "passed",
+  "workflow": {
+    "commit_sha": "318135659b6039c9b861732f352c3d903815c775",
+    "name": "Validate ETF macro regime shadow",
+    "run_attempt": "1",
+    "run_id": "26909884800",
+    "run_number": "15",
+    "source_ref": "main"
+  }
+}
