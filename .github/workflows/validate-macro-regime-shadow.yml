@@ -8,9 +8,12 @@ on:
     paths:
       - "config/regime_thresholds.yml"
       - "fixtures/macro_regime_shadow/**"
+      - "fixtures/macro_data_audit/**"
       - "macro_regime/**"
       - "runtime/build_macro_policy_pack_shadow.py"
       - "tools/replay_macro_regime_shadow_fixtures.py"
+      - "tools/replay_macro_data_audit_shadow_fixture.py"
+      - "tools/validate_macro_data_audit.py"
       - "tools/validate_macro_regime_shadow.py"
       - "tools/write_macro_regime_shadow_validation_evidence.py"
       - ".github/workflows/validate-macro-regime-shadow.yml"
@@ -45,15 +48,22 @@ jobs:
             --fixtures fixtures/macro_regime_shadow/regime_shadow_fixtures.json \
             --thresholds config/regime_thresholds.yml
 
-      - name: Build shadow macro policy pack
+      - name: Replay macro-audit fixture through shadow regime stack
         run: |
-          python -m runtime.build_macro_policy_pack_shadow \
+          python tools/replay_macro_data_audit_shadow_fixture.py \
+            --audit fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json \
             --pricing-audit output/pricing/price_audit_2026-05-29_20260531_203900.json \
             --relative-strength output/market_history/etf_relative_strength.json \
             --macro-context config/etf_macro_fundamental_context.yml \
-            --macro-data-audit '' \
             --output-dir output/macro \
-            --run-id shadow_validation
+            --validation-output-dir output/macro/validation \
+            --run-id macro_audit_axis_shadow_validation \
+            --workflow-name "${{ github.workflow }}" \
+            --workflow-run-id "${{ github.run_id }}" \
+            --workflow-run-number "${{ github.run_number }}" \
+            --workflow-attempt "${{ github.run_attempt }}" \
+            --commit-sha "${{ github.sha }}" \
+            --source-ref "${{ github.ref_name }}"
 
       - name: Validate macro policy pack schema
         run: |
@@ -66,13 +76,18 @@ jobs:
           from pathlib import Path
           from tools.validate_macro_regime_shadow import validate_shadow_payload
           pack = json.loads(Path('output/macro/latest.json').read_text(encoding='utf-8'))
-          result = validate_shadow_payload(pack.get('deterministic_regime_shadow') or {})
+          shadow = pack.get('deterministic_regime_shadow') or {}
+          result = validate_shadow_payload(shadow)
+          macro_axes = shadow.get('macro_axes') or {}
+          if not macro_axes:
+              raise SystemExit('deterministic_regime_shadow.macro_axes is missing after macro-audit fixture replay')
           print(
               'ETF_MACRO_REGIME_SHADOW_OK | '
               f"candidate={result['candidate_regime']} | "
               f"confidence={result['candidate_confidence']} | "
               f"legacy={result['legacy_regime']} | "
-              f"differs={result['differs_from_legacy']}"
+              f"differs={result['differs_from_legacy']} | "
+              f"macro_axes={','.join(sorted(macro_axes))}"
           )
           PY
 
