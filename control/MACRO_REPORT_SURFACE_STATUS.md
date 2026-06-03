@@ -18,6 +18,7 @@ output/macro/latest.json
 → runtime state
 → client-safe English/Dutch macro report wording
 → compliance/leakage validation
+→ production pre-send delivery guard
 ```
 
 Raw shadow fields such as `deterministic_regime_shadow`, `macro_axes`, `macro_axis_scores`, authority flags, driver IDs, or Stage-1 thesis candidates still must not be copied directly into the client report.
@@ -45,7 +46,7 @@ This surface renders:
 - portfolio implications
 - selected report-transfer policy catalysts
 
-It sanitizes internal vocabulary before report use.
+It sanitizes internal vocabulary before report use and now includes source-level Dutch replacements for macro memory, decision-rule, and portfolio-implication strings.
 
 Updated:
 
@@ -80,6 +81,15 @@ The validator proves that the shared surface renders from the macro pack without
 - Stage-1/Stage-2 leakage
 - direct authority-field leakage
 
+Added production delivery-entrypoint guard:
+
+```text
+runtime/macro_report_pre_send_guard.py
+send_report_runtime_html.py
+```
+
+The guard runs before SMTP delivery from the runtime HTML delivery entrypoint and blocks sending if the already-rendered English/Dutch markdown or delivery HTML leaks macro/thesis internals or fails macro compliance.
+
 Updated isolated compliance workflow:
 
 ```text
@@ -103,9 +113,15 @@ e1fbf7faf6d8ca5485bb38ae4e4e351dcdf0cf38  apply client-safe macro surface to Eng
 d4ab9873c5120b73160ad4eb567bffd070870990  wire macro report surface validator into compliance workflow
 4f1f79f14942a3950d4a85cf6fd965554ce6b08d  add isolated macro report output validation workflow
 81dd6f29602435ba0930e6cbeeb9b99cb3871da8  register macro report surface workflow and validators in system index
+612fa545f021a4bd2abd380b2545ddaa948ad0c1  add production macro report pre-send guard
+419a3c6096cef59cb6fb1a66e839f5c7a787d1dd  enforce macro report guard before runtime HTML delivery
+fe1a4a809f1b79382512115185db40ef9d070d9b  localize Dutch macro report surface text at source
+b6631167ea94483eff127b6675437882a26e7c29  complete Dutch macro dashboard source localization
 ```
 
 ## Validation status
+
+### Isolated validation
 
 Validated by the isolated macro report-output workflow in GitHub Actions.
 
@@ -120,15 +136,70 @@ observed_at: 2026-06-03
 
 This is sufficient to treat the isolated no-secrets macro report-output validation workflow as green for the current stage.
 
-Do not overstate this as a fresh production-send validation. It proves the isolated macro surface/output validation job passed. It does not prove a fresh production report was sent, and it does not by itself prove the production send workflow has a pre-send macro surface guard.
+### Production validation
 
-Expected validation markers for future log review remain:
+Validated by a fresh production send workflow run after the Dutch macro-surface localization fix.
+
+User-provided UI evidence shows:
+
+```text
+workflow: Send weekly ETF Pro report
+run title: request weekly ETF rerun after Dutch macro surface localization fix #201
+status: success
+duration: 4m 35s
+trigger_commit: fec9ff7cf53257891a4c6ef227a173e92ccdf4fb
+observed_at: 2026-06-03
+```
+
+Repo evidence from the resulting manifest:
+
+```text
+run_id: 20260603_165723
+requested_close_date: 2026-06-02
+workflow_status: workflow_success
+workflow_conclusion: success
+pricing_lineage_status: passed
+english_report_path: output/weekly_analysis_pro_260602_04.md
+dutch_report_path: output/weekly_analysis_pro_nl_260602_04.md
+runtime_state_path: output/runtime/etf_report_state_20260602_20260603_165723.json
+pricing_audit_path: output/pricing/price_audit_2026-06-02_20260603_165723.json
+total_portfolio_value_eur: 112376.10
+```
+
+Do not overstate this as recipient receipt. The manifest still has:
+
+```text
+delivery_manifest_path: null
+```
+
+The user explicitly paused delivery-receipt development; workflow/send success is sufficient for the current macro-regime integration track, but not proof of recipient-side receipt.
+
+## Current output evidence
+
+The English report now includes client-facing macro/geopolitical/regime content in:
+
+```text
+## 1. Executive Summary
+## 3. Regime Dashboard
+```
+
+The Dutch report now includes native macro/geopolitical/regime content in:
+
+```text
+## 1. Kernsamenvatting
+## 3. Regime-dashboard
+```
+
+The successful report confirmed the Dutch macro surface passed the production workflow. A follow-up source fix was added after reviewing the generated Dutch report, because two English macro-pack sentences were still visible in the Dutch Regime Dashboard even though validation passed. The source-level fix should remove those in the next generated report.
+
+## Expected validation markers for future log review
 
 ```text
 ETF_MACRO_REPORT_SURFACE_OK
 ETF_MACRO_REPORT_OUTPUT_OK
 ETF_MACRO_COMPLIANCE_OK
 ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK
+ETF_MACRO_REPORT_PRE_SEND_GUARD_OK
 ```
 
 ## Authority boundary
@@ -154,7 +225,6 @@ Still not allowed:
 
 ## Next action
 
-1. Add production-send pre-send validation through a safe path. The direct full-file edit of `send-weekly-report.yml` was blocked by the tool safety layer because the workflow contains SMTP secret references.
-2. Safer production integration path: add a helper script or small workflow patch through a review/PR route that inserts only validation commands and does not expose or rewrite the secret block.
-3. Trigger a fresh weekly ETF report run and verify the generated English/Dutch reports use the shared macro surface without leakage.
-4. Then update `control/CURRENT_STATE.md`, `control/NEXT_ACTIONS.md`, and the session changelog with production-run evidence.
+1. Optionally trigger one more fresh report after commit `b6631167ea94483eff127b6675437882a26e7c29` to confirm the Dutch Regime Dashboard no longer contains English macro memory/decision-rule sentences.
+2. Then update `control/CURRENT_STATE.md`, `control/NEXT_ACTIONS.md`, and the session changelog with final production-run evidence.
+3. Continue with macro policy pack schema hardening and promotion contract work before expanding macro/thesis authority further.
