@@ -38,16 +38,54 @@ SAFE_REPLACEMENTS = {
     "shadow_only": "internal-only",
 }
 
+NL_TEXT_REPLACEMENTS = {
+    "Keep SMH as the earned leader, but do not confuse narrow leadership with broad diversification.": "SMH blijft de best onderbouwde kernpositie, maar smal marktleiderschap mag niet worden verward met brede portefeuillediversificatie.",
+    "Keep SMH as the earned leader": "SMH blijft de best onderbouwde kernpositie",
+    "Keep SMH": "Behoud SMH",
+    "SMH remains the earned leader": "SMH blijft de best onderbouwde kernpositie",
+    "earned leader": "best onderbouwde kernpositie",
+    "Require replacement duels for SPY overlap, PPA implementation quality and PAVE versus GRID before funding challengers.": "Vervangingsanalyses zijn vereist voor SPY-overlap, de implementatiekwaliteit van PPA en PAVE versus GRID voordat alternatieven worden gefinancierd.",
+    "Require replacement duels": "Vervangingsanalyses zijn vereist",
+    "Require replacement": "Vervangingsanalyse vereist",
+    "Force alternative duel; upgrade, reduce, replace, or close": "Vervangingsanalyse vereist; verhoog, verlaag, vervang of sluit de positie",
+    "Replacement candidates remain evidence-gated": "Vervangingskandidaten blijven afhankelijk van voldoende bewijs",
+    "pricing basis and duel status must be visible before funding": "prijsbasis en status van de vervangingsanalyse moeten zichtbaar zijn vóór allocatie",
+    "Keep cash discipline because the regime supports selectivity more than broad risk expansion.": "Behoud kasdiscipline, omdat het regime selectiviteit sterker ondersteunt dan brede risico-uitbreiding.",
+    "Keep cash discipline": "Behoud kasdiscipline",
+    "Risk appetite is supportive, but fresh adds still need position-size room and pricing confirmation.": "De risicobereidheid blijft ondersteunend, maar aanvullende allocaties vragen nog ruimte binnen de positielimiet en koersbevestiging.",
+    "Growth and infrastructure lanes can be considered if they do not worsen concentration.": "Groei- en infrastructuurthema’s kunnen worden overwogen zolang ze de concentratie niet vergroten.",
+    "Defensive hedges should be reviewed for opportunity cost.": "Defensieve hedgeposities moeten worden getoetst op opportuniteitskosten.",
+    "AI and semiconductor leadership remains the dominant equity impulse.": "AI- en semiconductorleiderschap blijft de dominante aandelenimpuls.",
+    "AI / semiconductor leadership remains the dominant equity impulse.": "AI- en semiconductorleiderschap blijft de dominante aandelenimpuls.",
+    "Gold hedge behavior remains under review rather than automatic ballast.": "Het gedrag van goud als hedge blijft onder herbeoordeling en is geen automatische stabilisator.",
+    "Macro status informs selectivity; it does not override pricing, risk or portfolio-discipline gates.": "Het macrobeeld ondersteunt selectiviteit, maar vervangt geen koers-, risico- of portefeuillediscipline.",
+    "Regime memory is available but has no report summary.": "Regimegeheugen is beschikbaar, maar bevat geen rapportsamenvatting.",
+    "The macro pack is present, but no specific regime change was recorded.": "De macro-pack is aanwezig, maar er is geen specifieke regimewijziging vastgelegd.",
+    "Portfolio actions still require pricing, relative strength and position discipline.": "Portefeuilleacties vereisen nog steeds koersbevestiging, relatieve sterkte en positiediscipline.",
+    "No direct portfolio action from policy stance alone.": "Geen directe portefeuilleactie op basis van beleid alleen.",
+    "Prefer quality, profitable growth and cash discipline over weak balance-sheet beta.": "Geef voorkeur aan kwaliteit, winstgevende groei en kasdiscipline boven zwakke balans-bèta.",
+    "Non-U.S. developed exposure remains watchlist, not automatic add.": "Blootstelling aan ontwikkelde markten buiten de VS blijft op de volglijst en is geen automatische toevoeging.",
+    "Capital spending and strategic supply-chain policy continue to support semiconductor and infrastructure lanes.": "Kapitaaluitgaven en strategisch toeleveringsbeleid blijven semiconductor- en infrastructuurthema’s ondersteunen.",
+    "Defense-budget durability remains a structural support, but ETF vehicle choice still matters.": "De duurzaamheid van defensiebudgetten blijft een structurele steun, maar de ETF-keuze blijft belangrijk.",
+}
+
+NL_REGEX_REPLACEMENTS = [
+    (
+        re.compile(r"\bRisk-on growth has persisted for (\d+) runs; transition state is stable, breadth is mixed, and cross-asset confirmation is mixed\.?,?", re.IGNORECASE),
+        lambda m: f"Risk-on groei houdt al {m.group(1)} runs aan; de overgangsfase is stabiel, de marktbreedte is gemengd en cross-asset bevestiging blijft gemengd.",
+    ),
+]
+
 
 def _text(value: Any, fallback: str = "") -> str:
     raw = str(value or "").strip()
     return raw if raw else fallback
 
 
-def _short(value: Any, fallback: str = "", max_len: int = 190) -> str:
-    cleaned = _client_safe(value) or fallback
-    cleaned = re.sub(r"\s+", " ", cleaned).strip()
-    return cleaned if len(cleaned) <= max_len else cleaned[: max_len - 1].rstrip() + "…"
+def _replace_longest_first(text: str, replacements: dict[str, str]) -> str:
+    for src, dst in sorted(replacements.items(), key=lambda item: len(item[0]), reverse=True):
+        text = text.replace(src, dst)
+    return text
 
 
 def _client_safe(value: Any) -> str:
@@ -59,6 +97,30 @@ def _client_safe(value: Any) -> str:
     return text.strip()
 
 
+def _client_safe_nl(value: Any) -> str:
+    text = _client_safe(value)
+    for pattern, replacement in NL_REGEX_REPLACEMENTS:
+        text = pattern.sub(replacement, text)
+    text = _replace_longest_first(text, NL_TEXT_REPLACEMENTS)
+    text = re.sub(r"\bbut\b", "maar", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bfunding\b", "allocatie", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bfundable\b", "geschikt voor allocatie", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bunder review\b", "onder herbeoordeling", text, flags=re.IGNORECASE)
+    return text.strip()
+
+
+def _short(value: Any, fallback: str = "", max_len: int = 190) -> str:
+    cleaned = _client_safe(value) or fallback
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned if len(cleaned) <= max_len else cleaned[: max_len - 1].rstrip() + "…"
+
+
+def _short_nl(value: Any, fallback: str = "", max_len: int = 190) -> str:
+    cleaned = _client_safe_nl(value) or fallback
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned if len(cleaned) <= max_len else cleaned[: max_len - 1].rstrip() + "…"
+
+
 def _confidence_pct(value: Any) -> str:
     try:
         number = float(value)
@@ -67,6 +129,11 @@ def _confidence_pct(value: Any) -> str:
     if number <= 1.0:
         number *= 100.0
     return f"{number:.0f}%"
+
+
+def _confidence_pct_nl(value: Any) -> str:
+    result = _confidence_pct(value)
+    return "niet gescoord" if result == "not scored" else result
 
 
 def _macro_pack(state: dict[str, Any]) -> dict[str, Any]:
@@ -116,9 +183,28 @@ def _list_values(value: Any, limit: int = MAX_BULLETS) -> list[str]:
     return result
 
 
+def _list_values_nl(value: Any, limit: int = MAX_BULLETS) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    result = []
+    for item in value:
+        cleaned = _short_nl(item)
+        if cleaned:
+            result.append(cleaned)
+        if len(result) >= limit:
+            break
+    return result
+
+
 def _portfolio_implications(pack: dict[str, Any]) -> list[str]:
     return _list_values(pack.get("portfolio_implications"), limit=3) or [
         "Portfolio actions still require pricing, relative strength and position discipline.",
+    ]
+
+
+def _portfolio_implications_nl(pack: dict[str, Any]) -> list[str]:
+    return _list_values_nl(pack.get("portfolio_implications"), limit=3) or [
+        "Portefeuilleacties vereisen nog steeds koersbevestiging, relatieve sterkte en positiediscipline.",
     ]
 
 
@@ -130,6 +216,16 @@ def _what_changed(pack: dict[str, Any]) -> list[str]:
     memory = _regime_memory(pack)
     summary = ((memory.get("report_transfer") or {}) if isinstance(memory.get("report_transfer"), dict) else {}).get("summary")
     return [_short(summary, "The macro pack is present, but no specific regime change was recorded.")]
+
+
+def _what_changed_nl(pack: dict[str, Any]) -> list[str]:
+    regime = _regime(pack)
+    values = _list_values_nl(regime.get("what_changed"), limit=3)
+    if values:
+        return values
+    memory = _regime_memory(pack)
+    summary = ((memory.get("report_transfer") or {}) if isinstance(memory.get("report_transfer"), dict) else {}).get("summary")
+    return [_short_nl(summary, "De macro-pack is aanwezig, maar er is geen specifieke regimewijziging vastgelegd.")]
 
 
 def _geopolitical_status(pack: dict[str, Any]) -> str:
@@ -149,6 +245,15 @@ def _decision_rule(pack: dict[str, Any]) -> str:
     )
 
 
+def _decision_rule_nl(pack: dict[str, Any]) -> str:
+    memory = _regime_memory(pack)
+    return _short_nl(
+        memory.get("decision_rule"),
+        "Het macrobeeld ondersteunt selectiviteit, maar vervangt geen koers-, risico- of portefeuillediscipline.",
+        max_len=210,
+    )
+
+
 def _current_regime(pack: dict[str, Any]) -> str:
     regime = _regime(pack)
     return _short(regime.get("current"), "Macro status pending", max_len=90)
@@ -159,10 +264,21 @@ def _confidence(pack: dict[str, Any]) -> str:
     return _confidence_pct(regime.get("confidence"))
 
 
+def _confidence_nl(pack: dict[str, Any]) -> str:
+    regime = _regime(pack)
+    return _confidence_pct_nl(regime.get("confidence"))
+
+
 def _memory_summary(pack: dict[str, Any]) -> str:
     memory = _regime_memory(pack)
     report_transfer = memory.get("report_transfer") if isinstance(memory.get("report_transfer"), dict) else {}
     return _short(report_transfer.get("summary"), "Regime memory is available but has no report summary.", max_len=220)
+
+
+def _memory_summary_nl(pack: dict[str, Any]) -> str:
+    memory = _regime_memory(pack)
+    report_transfer = memory.get("report_transfer") if isinstance(memory.get("report_transfer"), dict) else {}
+    return _short_nl(report_transfer.get("summary"), "Regimegeheugen is beschikbaar, maar bevat geen rapportsamenvatting.", max_len=220)
 
 
 def _central_bank_lines_en(pack: dict[str, Any]) -> list[str]:
@@ -179,8 +295,8 @@ def _central_bank_lines_nl(pack: dict[str, Any]) -> list[str]:
     lines = []
     for key, label in (("fed", "Fed"), ("ecb", "ECB")):
         bank = _central_bank(pack, key)
-        stance = STANCE_NL.get(_text(bank.get("stance")), _short(bank.get("stance"), "niet geclassificeerd", max_len=80))
-        implication = _short(bank.get("etf_implication"), "Geen directe portefeuilleactie op basis van beleid alleen.", max_len=160)
+        stance = STANCE_NL.get(_text(bank.get("stance")), _short_nl(bank.get("stance"), "niet geclassificeerd", max_len=80))
+        implication = _short_nl(bank.get("etf_implication"), "Geen directe portefeuilleactie op basis van beleid alleen.", max_len=160)
         lines.append(f"- {label}-houding: {stance}. Portefeuillelezing: {implication}")
     return lines
 
@@ -197,8 +313,8 @@ def _policy_catalyst_lines_en(pack: dict[str, Any]) -> list[str]:
 def _policy_catalyst_lines_nl(pack: dict[str, Any]) -> list[str]:
     lines = []
     for item in _transfer_catalysts(pack):
-        area = POLICY_AREA_NL.get(_text(item.get("policy_area")), _short(item.get("policy_area"), "Beleidscatalysator", max_len=80))
-        signal = _short(item.get("latest_signal"), "Het beleidssignaal blijft relevant maar niet beslissend.", max_len=180)
+        area = POLICY_AREA_NL.get(_text(item.get("policy_area")), _short_nl(item.get("policy_area"), "Beleidscatalysator", max_len=80))
+        signal = _short_nl(item.get("latest_signal"), "Het beleidssignaal blijft relevant maar niet beslissend.", max_len=180)
         lines.append(f"- {area}: {signal}")
     return lines or ["- Er is geen beleidscatalysator geselecteerd voor rapportage."]
 
@@ -217,7 +333,7 @@ def executive_lines_nl(state: dict[str, Any]) -> dict[str, str]:
     pack = _macro_pack(state)
     regime = REGIME_NL.get(_current_regime(pack), _current_regime(pack))
     geo = GEOPOLITICAL_NL.get(_geopolitical_status(pack), _geopolitical_status(pack))
-    changed = _what_changed(pack)[0]
+    changed = _what_changed_nl(pack)[0]
     return {
         "primary_regime": regime,
         "geopolitical_regime": geo,
@@ -255,15 +371,15 @@ def dashboard_nl(state: dict[str, Any]) -> str:
     pack = _macro_pack(state)
     regime = REGIME_NL.get(_current_regime(pack), _current_regime(pack))
     geo = GEOPOLITICAL_NL.get(_geopolitical_status(pack), _geopolitical_status(pack))
-    changed = "\n".join(f"- {item}" for item in _what_changed(pack))
-    implications = "\n".join(f"- {item}" for item in _portfolio_implications(pack))
+    changed = "\n".join(f"- {item}" for item in _what_changed_nl(pack))
+    implications = "\n".join(f"- {item}" for item in _portfolio_implications_nl(pack))
     banks = "\n".join(_central_bank_lines_nl(pack))
     catalysts = "\n".join(_policy_catalyst_lines_nl(pack))
     return f"""### Regimesamenvatting
 - Huidig regime: {regime}.
-- Vertrouwen: {_confidence(pack)}.
-- Regimegeheugen: {_memory_summary(pack)}
-- Beslisregel: {_decision_rule(pack)}
+- Vertrouwen: {_confidence_nl(pack)}.
+- Regimegeheugen: {_memory_summary_nl(pack)}
+- Beslisregel: {_decision_rule_nl(pack)}
 
 ### Beleids- en geopolitieke status
 - Status: {geo}.
