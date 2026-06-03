@@ -155,6 +155,114 @@
         "GLD": {"return_1m_pct": -2.0, "return_3m_pct": -13.65, "rs_vs_spy_3m_pct": -24.19},
         "GSG": {"return_1m_pct": 4.2, "return_3m_pct": 18.98, "rs_vs_spy_3m_pct": 8.44}
       }
+    },
+    {
+      "id": "risk_on_growth_supportive_macro",
+      "description": "Broad risk-on with supportive macro-audit axes; the macro-conflict cap should not apply.",
+      "macro_data_audit_fixture": "fixtures/macro_data_audit/macro_audit_supportive_fixture_2026-06-02.json",
+      "expected_regime": "Risk-on growth",
+      "expected_axes": {
+        "equity": "risk_on",
+        "semiconductor_leadership": "mixed",
+        "breadth": "broad",
+        "duration": "supportive",
+        "hedge": "neutral",
+        "commodities": "neutral"
+      },
+      "expected_macro_axes": {
+        "volatility": "calm",
+        "real_rates": "supportive",
+        "yield_curve": "normalizing",
+        "inflation_expectations": "contained",
+        "policy_rate": "accommodative"
+      },
+      "expected_confidence_min": 0.72,
+      "expected_confidence_max": 0.82,
+      "expected_confidence_components": {
+        "macro_audit_present": true,
+        "macro_conflict_score": 0.0,
+        "confidence_cap_applied": false
+      },
+      "metrics": {
+        "SPY": {"return_1m_pct": 2.2, "return_3m_pct": 7.0, "rs_vs_spy_3m_pct": 0.0},
+        "SMH": {"return_1m_pct": 2.8, "return_3m_pct": 8.0, "rs_vs_spy_3m_pct": 1.0},
+        "IWM": {"return_1m_pct": 3.0, "return_3m_pct": 9.0, "rs_vs_spy_3m_pct": 2.0},
+        "TLT": {"return_1m_pct": 0.8, "return_3m_pct": 3.0, "rs_vs_spy_3m_pct": -4.0},
+        "GLD": {"return_1m_pct": 0.2, "return_3m_pct": 1.0, "rs_vs_spy_3m_pct": -6.0},
+        "GSG": {"return_1m_pct": 0.1, "return_3m_pct": 0.0, "rs_vs_spy_3m_pct": -7.0}
+      }
+    },
+    {
+      "id": "risk_off_supportive_macro_conflict",
+      "description": "Risk-off market evidence with supportive macro-audit axes; confidence should expose a non-capping macro-conflict diagnostic.",
+      "macro_data_audit_fixture": "fixtures/macro_data_audit/macro_audit_supportive_fixture_2026-06-02.json",
+      "expected_regime": "Defensive / policy stress",
+      "expected_axes": {
+        "equity": "risk_off",
+        "semiconductor_leadership": "weak",
+        "breadth": "weak",
+        "duration": "neutral",
+        "hedge": "gold_bid",
+        "commodities": "neutral"
+      },
+      "expected_macro_axes": {
+        "volatility": "calm",
+        "real_rates": "supportive",
+        "yield_curve": "normalizing",
+        "inflation_expectations": "contained",
+        "policy_rate": "accommodative"
+      },
+      "expected_confidence_min": 0.74,
+      "expected_confidence_max": 0.82,
+      "expected_confidence_components": {
+        "macro_audit_present": true,
+        "macro_conflict_score": 0.375,
+        "confidence_cap_applied": false
+      },
+      "metrics": {
+        "SPY": {"return_1m_pct": -2.2, "return_3m_pct": -7.0, "rs_vs_spy_3m_pct": 0.0},
+        "SMH": {"return_1m_pct": -3.0, "return_3m_pct": -8.0, "rs_vs_spy_3m_pct": -1.0},
+        "IWM": {"return_1m_pct": -4.0, "return_3m_pct": -11.0, "rs_vs_spy_3m_pct": -4.0},
+        "TLT": {"return_1m_pct": 0.1, "return_3m_pct": 0.0, "rs_vs_spy_3m_pct": 7.0},
+        "GLD": {"return_1m_pct": 1.4, "return_3m_pct": 4.0, "rs_vs_spy_3m_pct": 11.0},
+        "GSG": {"return_1m_pct": -0.4, "return_3m_pct": -1.0, "rs_vs_spy_3m_pct": 6.0}
+      }
+    },
+    {
+      "id": "rate_hike_accommodative_policy_conflict",
+      "description": "Rate-hike repricing market evidence with accommodative policy-rate macro evidence; confidence should expose the conflict without changing regime authority.",
+      "macro_data_audit_fixture": "fixtures/macro_data_audit/macro_audit_accommodative_fixture_2026-06-02.json",
+      "expected_regime": "Rate-hike repricing",
+      "expected_axes": {
+        "equity": "mixed",
+        "semiconductor_leadership": "mixed",
+        "breadth": "narrow",
+        "duration": "stress",
+        "hedge": "gold_bid",
+        "commodities": "inflation_bid"
+      },
+      "expected_macro_axes": {
+        "volatility": "calm",
+        "real_rates": "supportive",
+        "yield_curve": "normalizing",
+        "inflation_expectations": "contained",
+        "policy_rate": "accommodative"
+      },
+      "expected_confidence_min": 0.58,
+      "expected_confidence_max": 0.75,
+      "expected_confidence_components": {
+        "macro_audit_present": true,
+        "macro_conflict_score": 0.25,
+        "confidence_cap_applied": false
+      },
+      "metrics": {
+        "SPY": {"return_1m_pct": -0.4, "return_3m_pct": -1.0, "rs_vs_spy_3m_pct": 0.0},
+        "SMH": {"return_1m_pct": 0.2, "return_3m_pct": 0.0, "rs_vs_spy_3m_pct": 1.0},
+        "IWM": {"return_1m_pct": -0.5, "return_3m_pct": -1.0, "rs_vs_spy_3m_pct": 0.0},
+        "TLT": {"return_1m_pct": -2.1, "return_3m_pct": -5.0, "rs_vs_spy_3m_pct": -4.0},
+        "GLD": {"return_1m_pct": 2.0, "return_3m_pct": 5.0, "rs_vs_spy_3m_pct": 6.0},
+        "GSG": {"return_1m_pct": 1.5, "return_3m_pct": 4.0, "rs_vs_spy_3m_pct": 5.0}
+      }
     }
   ]
 }
