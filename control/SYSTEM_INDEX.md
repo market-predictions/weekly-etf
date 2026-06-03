@@ -40,6 +40,7 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `control/ETF_PRICING_LINEAGE_CHANGELOG.md` — central pricing-lineage changelog for regression review and implementation tracking.
 - `docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md` — approved phased roadmap for macro/thesis modernization. It is a roadmap, not immediate production authority.
 - `MACRO_METHODOLOGY.md` — methodology and compliance boundary for macro/regime/thesis content before client-surface promotion.
+- `control/MACRO_REPORT_SURFACE_STATUS.md` — current implementation/validation status for the client-safe macro report surface.
 
 ## Canonical execution files
 
@@ -57,6 +58,8 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `schemas/macro_data_audit.schema.json` — macro audit schema shell.
 - `schemas/macro_policy_pack.schema.json` — macro policy pack schema/compatibility contract for the legacy pack and future deterministic regime engine.
 - `tools/validate_macro_policy_pack.py` — macro policy pack schema and compatibility validator. It must pass before lane discovery consumes `output/macro/latest.json`.
+- `runtime/macro_report_surface.py` — shared client-safe macro/geopolitical/regime report surface for English and Dutch report wording.
+- `tools/validate_macro_report_surface.py` — validator proving the macro report surface renders from the macro pack without predictive wording or internal/shadow leakage.
 - `tools/validate_macro_compliance.py` — macro/regime/thesis compliance validator for predictive wording, uncited overlay, orphan macro figures, Stage-1 candidate leakage, and shadow/internal label leakage before any client-surface promotion.
 - `runtime/build_thesis_candidates.py` — deterministic Stage-1 thesis candidate builder. Writes internal-only shadow artifacts and validates mapped lanes against `config/etf_discovery_universe.yml`.
 - `runtime/fetch_etf_relative_strength.py` — historical relative-strength fetcher for discovery scoring.
@@ -66,7 +69,7 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `runtime/build_macro_policy_pack.py` — legacy macro policy pack builder, now emitting schema-versioned compatibility fields and recording Phase 2 macro audit metadata as shadow-only input.
 - `runtime/build_etf_report_state.py` — deterministic runtime state builder.
 - `runtime/render_etf_report_from_state.py` — runtime-driven English/Dutch markdown renderer.
-- `runtime/polish_runtime_reports.py` — post-render editorial polish layer.
+- `runtime/polish_runtime_reports.py` — post-render editorial polish layer, including the shared macro report surface.
 - `runtime/link_runtime_report_tickers.py` — context-aware ticker linkification layer.
 - `runtime/delivery_html_overrides.py` — delivery-layer HTML overrides for branded sections that require strict layout/clickable behavior.
 - `tools/validate_etf_delivery_html_contract.py` — dynamic render-regression validator for delivery HTML.
@@ -76,6 +79,7 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `etf-pro-nl.txt` — Dutch companion delivery layer derived from the completed English report.
 - `.github/workflows/send-weekly-report.yml` — production send workflow.
 - `.github/workflows/validate-macro-compliance.yml` — isolated macro compliance validation workflow with safe and planted-failure fixtures.
+- `.github/workflows/validate-macro-report-output.yml` — isolated read-only macro report-output validation workflow for committed report artifacts and macro pack surface checks.
 - `.github/workflows/validate-thesis-candidates-shadow.yml` — isolated Stage-1 thesis candidate validation workflow. Not part of production report delivery.
 - `.github/workflows/refresh-etf-state-from-report.yml` — explicit state refresh workflow.
 - `.github/workflows/send-weekly-report-split-test.yml` — split-test delivery comparison workflow.
@@ -94,7 +98,7 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `output/runtime/` — normalized runtime state artifacts.
 - `output/macro/macro_data_audit_<reference_date>_<run_id>.json` — run-scoped shadow-mode macro audit artifact.
 - `output/macro/latest_macro_data_audit_path.txt` — pointer to the latest macro audit artifact.
-- `output/macro/latest.json` — current schema-versioned macro policy pack consumed by lane discovery.
+- `output/macro/latest.json` — current schema-versioned macro policy pack consumed by lane discovery and the client-safe macro report surface.
 - `output/macro/validation/latest_macro_regime_shadow_validation.json` — repo-visible proof for the isolated deterministic macro-regime shadow workflow.
 - `output/macro/latest_thesis_candidates.json` — internal Stage-1 thesis candidate artifact when explicitly built. Shadow-only; not a report input or portfolio-action authority.
 
@@ -146,6 +150,7 @@ ETF is moving toward:
 - recommendation scorecard artifacts for capital discipline
 - provenance-backed macro audit artifacts in shadow mode
 - schema-versioned macro policy pack compatibility before deterministic regime promotion
-- methodology and compliance gates before client-surface macro/thesis expansion
+- client-safe macro/geopolitical/regime report surface backed by compliance/leakage validators
+- methodology and compliance gates before broader macro/thesis expansion
 - Stage-1 thesis candidates as internal-only shadow artifacts before Stage-2 confirmation and fundable integration
 - lab-only optimization as a QA/research surface, not a production allocator
