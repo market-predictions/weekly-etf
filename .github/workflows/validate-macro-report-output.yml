@@ -1,0 +1,56 @@
+name: Validate ETF macro report output
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "runtime/macro_report_surface.py"
+      - "runtime/polish_runtime_reports.py"
+      - "tools/validate_macro_report_surface.py"
+      - "tools/validate_macro_compliance.py"
+      - "tools/validate_etf_macro_thesis_surface_leakage.py"
+      - "output/macro/latest.json"
+      - "output/weekly_analysis_pro_*.md"
+      - "output/weekly_analysis_pro_nl_*.md"
+      - ".github/workflows/validate-macro-report-output.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-macro-report-output:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate macro report surface self-test
+        run: |
+          python tools/validate_macro_report_surface.py --self-test
+
+      - name: Validate current macro pack report surface
+        run: |
+          if [ -f output/macro/latest.json ]; then
+            python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json
+          else
+            echo "ETF_MACRO_REPORT_SURFACE_PACK_SKIPPED | reason=no_output_macro_latest"
+          fi
+
+      - name: Validate latest English and Dutch report macro compliance
+        run: |
+          en_report="$(ls -1 output/weekly_analysis_pro_*.md 2>/dev/null | grep -v '_nl_' | sort | tail -1 || true)"
+          nl_report="$(ls -1 output/weekly_analysis_pro_nl_*.md 2>/dev/null | sort | tail -1 || true)"
+          if [ -z "$en_report" ] || [ -z "$nl_report" ]; then
+            echo "ETF_MACRO_REPORT_OUTPUT_SKIPPED | reason=missing_latest_report_pair | en=$en_report | nl=$nl_report"
+            exit 0
+          fi
+          python tools/validate_macro_compliance.py --text "$en_report" --text "$nl_report"
+          python tools/validate_etf_macro_thesis_surface_leakage.py --file "$en_report" --file "$nl_report"
+          echo "ETF_MACRO_REPORT_OUTPUT_OK | en=$en_report | nl=$nl_report"
