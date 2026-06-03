@@ -1,0 +1,96 @@
+{
+  "artifact_type": "macro_audit_axis_shadow_validation_evidence",
+  "authority": {
+    "client_facing_authority": false,
+    "decision_impact": "none_shadow_comparison_only",
+    "fundability_authority": false,
+    "lane_scoring_authority": false,
+    "portfolio_action_authority": false,
+    "production_report_path_changed": false,
+    "shadow_only": true
+  },
+  "generated_at_utc": "2026-06-03T09:50:44Z",
+  "macro_data_audit_summary": {
+    "groups": [
+      "ecb",
+      "fred",
+      "treasury_fiscaldata",
+      "volatility"
+    ],
+    "mode": "fixture",
+    "observations": 11,
+    "reference_date": "2026-06-02"
+  },
+  "repository": "market-predictions/weekly-etf",
+  "schema_version": "1.0",
+  "shadow_summary": {
+    "candidate_confidence": 0.8,
+    "candidate_regime": "Risk-on narrow leadership",
+    "confidence_components": {
+      "axis_alignment": 0.6,
+      "base": 0.45,
+      "conflict_score": 0.1875,
+      "macro_alignment": 0.6,
+      "macro_audit_present": true,
+      "macro_signal_strength": 0.42,
+      "max": 0.82,
+      "min": 0.35,
+      "raw_confidence": 0.7974,
+      "signal_strength": 0.7251
+    },
+    "macro_axes": {
+      "inflation_expectations": "neutral",
+      "policy_rate": "restrictive",
+      "real_rates": "restrictive",
+      "volatility": "calm",
+      "yield_curve": "inverted"
+    },
+    "macro_axis_scores": {
+      "fed_funds_effective": 5.33,
+      "us_10y_2y_spread": -0.45,
+      "us_10y_breakeven": 2.42,
+      "us_10y_real_yield": 2.05,
+      "us_10y_yield": 4.35,
+      "us_2y_yield": 4.8,
+      "vix_close": 14.8
+    },
+    "macro_evidence": {
+      "macro_audit_mode": "fixture",
+      "macro_audit_reference_date": "2026-06-02",
+      "observation_count": 11,
+      "observation_keys_used": [
+        "ecb_eurusd_reference",
+        "fed_funds_effective",
+        "treasury_10y_yield",
+        "treasury_2y_yield",
+        "treasury_30y_yield",
+        "treasury_3m_yield",
+        "us_10y_breakeven",
+        "us_10y_real_yield",
+        "us_10y_yield",
+        "us_2y_yield",
+        "vix_close"
+      ]
+    }
+  },
+  "source_files": {
+    "macro_context": "config/etf_macro_fundamental_context.yml",
+    "macro_data_audit_fixture": "fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json",
+    "pricing_audit": "output/pricing/price_audit_2026-05-29_20260531_203900.json",
+    "relative_strength": "output/market_history/etf_relative_strength.json",
+    "shadow_policy_pack": "output/macro/etf_macro_policy_pack_20260529_macro_audit_axis_shadow_validation.json"
+  },
+  "status": "passed",
+  "validated_markers": [
+    "ETF_MACRO_DATA_AUDIT_VALID_OK",
+    "ETF_MACRO_AUDIT_AXIS_SHADOW_OK"
+  ],
+  "workflow": {
+    "commit_sha": "bfc1b2823f3f2caed664043bd15a2a580d46bf4f",
+    "name": "Validate ETF macro regime shadow",
+    "run_attempt": "1",
+    "run_id": "26877082443",
+    "run_number": "13",
+    "source_ref": "main"
+  }
+}
