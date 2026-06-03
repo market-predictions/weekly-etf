@@ -1,7 +1,7 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-06-01
+2026-06-03
 
 ## What this repository currently is
 
@@ -16,6 +16,7 @@
 - delivery HTML overrides for strict branded sections
 - a hard pricing-lineage validator before send
 - an approved, shadow-first macro/thesis roadmap
+- no-network macro-audit fixture replay wired into the isolated macro-regime shadow workflow
 
 The latest confirmed production validation run is:
 
@@ -39,6 +40,26 @@ total_portfolio_value_eur: 110290.91
 
 Do **not** claim independent email delivery success from this status alone. The run produced report/PDF artifacts and a successful workflow conclusion, but `delivery_manifest_path` is `null` in the manifest. Delivery success still requires a delivery receipt/manifest or explicit user confirmation.
 
+The latest confirmed isolated macro-regime shadow validation run is:
+
+```text
+workflow: Validate ETF macro regime shadow
+run_number: 14
+workflow_run_id: 26877273381
+trigger_commit: 3a7d87323a0a83bdaab5a81bb8a037f3babf9fff
+macro_data_audit_fixture: fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json
+macro_axis_evidence_path: output/macro/validation/latest_macro_audit_axis_shadow_validation.json
+regime_shadow_evidence_path: output/macro/validation/latest_macro_regime_shadow_validation.json
+status: passed
+validated_markers:
+  - ETF_MACRO_REGIME_FIXTURE_REPLAY_OK
+  - ETF_MACRO_DATA_AUDIT_VALID_OK
+  - ETF_MACRO_AUDIT_AXIS_SHADOW_OK
+  - ETF_MACRO_REGIME_SHADOW_OK
+```
+
+This proves that the no-network macro-audit fixture validates, that the shadow policy-pack builder consumes it, and that `deterministic_regime_shadow.macro_axes` is populated. It does **not** promote macro/regime output to client-facing, lane-scoring, fundability, or portfolio-action authority.
+
 ## Four-layer operating status
 
 ### 1. Decision framework
@@ -51,6 +72,7 @@ The current decision framework remains:
 - guarded model execution with trade-ledger idempotency
 - no indefinite `Hold but replaceable` inertia
 - macro/thesis modernization approved only as a future phased enhancement
+- deterministic macro/regime classification remains shadow-only until later promotion gates pass
 
 Post-execution authority is now explicit:
 
@@ -76,7 +98,14 @@ Current authoritative state inputs are:
 - `output/market_history/etf_relative_strength.json`
 - `output/macro/latest.json`
 
-The latest confirmed run proves the chain:
+Shadow-only macro/regime validation evidence is recorded at:
+
+- `output/macro/validation/latest_macro_regime_shadow_validation.json`
+- `output/macro/validation/latest_macro_audit_axis_shadow_validation.json`
+
+These validation evidence files are review/audit artifacts only. They are not production report, lane-scoring, fundability, or portfolio-action inputs.
+
+The latest confirmed production run proves the chain:
 
 ```text
 pricing audit
@@ -88,6 +117,17 @@ pricing audit
 → run manifest
 → delivery HTML/PDF validation
 → pricing-lineage validator using post-execution report authority
+```
+
+The latest isolated macro shadow run proves the separate chain:
+
+```text
+macro-regime fixture replay
+→ macro-data-audit fixture validation
+→ shadow macro policy-pack build with fixture input
+→ deterministic_regime_shadow.macro_axes assertion
+→ macro-regime shadow payload validation
+→ repo-visible validation evidence
 ```
 
 ### 3. Output contract
@@ -103,6 +143,7 @@ The report output contract is now:
 - Strict branded sections are rendered from runtime state at delivery HTML level, not fixed through markdown-only patches.
 - Dutch PDF chart labels are generated in Dutch in the runtime delivery path.
 - Client-facing reports must not leak internal plumbing labels.
+- Macro-audit-derived `macro_axes`, `macro_axis_scores`, and `deterministic_regime_shadow` must not appear in client-facing reports until future methodology, compliance, and bilingual gates explicitly promote them.
 
 ### 4. Operational runbook
 
@@ -134,6 +175,18 @@ run-queue request or manual dispatch
 → final manifest update
 ```
 
+The isolated macro-regime shadow validation path is:
+
+```text
+workflow_dispatch or qualifying push
+→ replay deterministic regime fixtures
+→ replay no-network macro-data-audit fixture through shadow regime stack
+→ validate macro policy pack schema
+→ validate deterministic_regime_shadow payload and macro_axes presence
+→ write macro-regime shadow validation evidence
+→ commit evidence under output/macro/validation/
+```
+
 ## Current strengths
 
 - Pricing retrieval and report reconciliation are validated at artifact level.
@@ -146,6 +199,7 @@ run-queue request or manual dispatch
 - Pricing-basis disclosure derives required tickers dynamically from active Section 15 holdings.
 - Challenger pricing/fundability discipline is active.
 - Shadow macro audit remains non-authoritative and non-blocking.
+- No-network macro-audit fixture replay is now wired into the isolated macro-regime shadow workflow and has passed with repo-visible evidence.
 
 ## Current weaknesses / watch items
 
@@ -161,9 +215,9 @@ The repo contains generated PDFs/assets, but the GitHub connector exposes binary
 
 Rows can remain `fresh_exact_unverified` when one provider gives exact requested-date closes but no independent cross-provider verification has been recorded.
 
-### 4. Macro/thesis schema and compliance gates do not yet exist
+### 4. Macro/thesis schema, methodology, and compliance gates are still not promotion-complete
 
-The approved roadmap still requires macro policy pack schema correction, active-driver vocabulary, thesis candidate artifacts, methodology, and compliance gates before expanded macro/thesis content can become client-facing.
+The macro-audit fixture replay is now green in CI, but expanded macro/thesis content still requires methodology, compliance, bilingual parity, and promotion decisions before any client-facing or portfolio-authority use.
 
 ### 5. Dutch aliases remain partially distributed
 
@@ -200,14 +254,19 @@ Next cleanup:
 - reuse that source from native render, markdown validation, send-time parity checks, Dutch quality validation, and delivery HTML validation
 - keep native Dutch guard-only; do not reintroduce broad English-to-Dutch scrub passes
 
-### Priority D — move into macro/thesis roadmap Phase 2/3 carefully
+### Priority D — move into macro/thesis roadmap Phase 3+ carefully
+
+Current status:
+
+- Phase 2 macro audit remains shadow-only.
+- No-network macro-audit fixture replay is wired into CI and green.
+- Deterministic regime/confidence output remains shadow-only and non-authoritative.
 
 Next architecture track:
 
-- keep Phase 2 macro audit as shadow-only
-- add fixture replay discipline
-- define the full macro policy pack schema
-- design deterministic regime/confidence classification without changing production decisions yet
+- define the full macro policy pack schema / promotion contract
+- add methodology and compliance gates before any client-surface expansion
+- design deterministic regime/confidence promotion review without changing production decisions yet
 
 ### Priority E — add direct challenger-vs-current-holding scoring
 
@@ -219,4 +278,4 @@ Next model enhancement:
 
 ## Current status label
 
-**ETF has a production-tested runtime-driven bilingual baseline with pricing-lineage proof passed for run `20260601_213417`. The system now distinguishes pre-execution runtime provenance from post-execution official portfolio-state authority. Dutch output is native/guard-only rather than broad-translated markdown. Pricing lineage, guarded execution, Dutch quality, and HTML/PDF render validation are green. Email delivery still requires a separate receipt/manifest or user confirmation.**
+**ETF has a production-tested runtime-driven bilingual baseline with pricing-lineage proof passed for run `20260601_213417`. The system now distinguishes pre-execution runtime provenance from post-execution official portfolio-state authority. Dutch output is native/guard-only rather than broad-translated markdown. Pricing lineage, guarded execution, Dutch quality, and HTML/PDF render validation are green. Email delivery still requires a separate receipt/manifest or user confirmation. Macro-audit-derived regime axes are now validated in isolated shadow CI via a no-network fixture replay, but remain non-client-facing and non-authoritative for lane scoring, fundability, portfolio actions, and report recommendations.**
