@@ -47,10 +47,22 @@ def _validate_fixture_result(fixture: dict[str, Any], result: dict[str, Any]) ->
         actual = axes.get(axis)
         _require(actual == expected_value, f"{fixture_id}: axis {axis} expected {expected_value!r}, got {actual!r}")
 
+    expected_macro_axes = fixture.get("expected_macro_axes") or {}
+    macro_axes = result.get("macro_axes") or {}
+    for axis, expected_value in expected_macro_axes.items():
+        actual = macro_axes.get(axis)
+        _require(actual == expected_value, f"{fixture_id}: macro axis {axis} expected {expected_value!r}, got {actual!r}")
+
     confidence = float(result.get("candidate_confidence"))
     minimum = float(fixture.get("expected_confidence_min", 0.0))
     maximum = float(fixture.get("expected_confidence_max", 1.0))
     _require(minimum <= confidence <= maximum, f"{fixture_id}: confidence {confidence} outside expected range [{minimum}, {maximum}]")
+
+    expected_components = fixture.get("expected_confidence_components") or {}
+    components = (result.get("confidence_decomposition") or {}).get("components") or {}
+    for key, expected_value in expected_components.items():
+        actual = components.get(key)
+        _require(actual == expected_value, f"{fixture_id}: confidence component {key} expected {expected_value!r}, got {actual!r}")
 
     validate_shadow_payload(result)
     return {
@@ -58,6 +70,7 @@ def _validate_fixture_result(fixture: dict[str, Any], result: dict[str, Any]) ->
         "candidate_regime": result.get("candidate_regime"),
         "candidate_confidence": confidence,
         "axes": axes,
+        "macro_axes": macro_axes,
     }
 
 
@@ -68,15 +81,21 @@ def replay(fixtures_path: Path, thresholds_path: Path) -> list[dict[str, Any]]:
     _require(payload.get("client_facing_authority") is False, "fixtures must not be client-facing authority")
     results: list[dict[str, Any]] = []
     for fixture in payload.get("fixtures") or []:
+        macro_audit = None
+        macro_summary = {"present": False}
+        if fixture.get("macro_data_audit_fixture"):
+            macro_audit = _load_json(Path(str(fixture["macro_data_audit_fixture"])))
+            macro_summary = {"present": True}
         result = classify_regime_shadow(
             metrics=fixture.get("metrics") or {},
-            macro_data_audit_summary={"present": False},
+            macro_data_audit_summary=macro_summary,
             thresholds=thresholds,
             legacy_regime="Legacy comparison placeholder",
             legacy_confidence=0.50,
+            macro_data_audit=macro_audit,
         )
         results.append(_validate_fixture_result(fixture, result))
-    _require(len(results) == 5, f"Expected 5 regime fixtures, got {len(results)}")
+    _require(len(results) == 6, f"Expected 6 regime fixtures, got {len(results)}")
     return results
 
 
@@ -91,7 +110,8 @@ def main() -> None:
         print(
             "ETF_MACRO_REGIME_FIXTURE_OK | "
             f"id={result['id']} | regime={result['candidate_regime']} | "
-            f"confidence={result['candidate_confidence']} | axes={json.dumps(result['axes'], sort_keys=True)}"
+            f"confidence={result['candidate_confidence']} | axes={json.dumps(result['axes'], sort_keys=True)} | "
+            f"macro_axes={json.dumps(result['macro_axes'], sort_keys=True)}"
         )
 
 
