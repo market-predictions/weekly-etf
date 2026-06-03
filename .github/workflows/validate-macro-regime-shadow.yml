@@ -16,6 +16,7 @@ on:
       - "tools/validate_macro_data_audit.py"
       - "tools/validate_macro_regime_shadow.py"
       - "tools/write_macro_regime_shadow_validation_evidence.py"
+      - "tools/write_macro_regime_shadow_comparison_evidence.py"
       - ".github/workflows/validate-macro-regime-shadow.yml"
 
 permissions:
@@ -96,6 +97,22 @@ jobs:
           python tools/write_macro_regime_shadow_validation_evidence.py \
             --pack output/macro/latest.json \
             --output-dir output/macro/validation \
+            --workflow-name "${{ github.workflow }}" \
+            --workflow-run-id "${{ github.run_id }}" \
+            --workflow-run-number "${{ github.run_number }}" \
+            --workflow-attempt "${{ github.run_attempt }}" \
+            --commit-sha "${{ github.sha }}" \
+            --source-ref "${{ github.ref_name }}"
+
+      - name: Write legacy-vs-shadow comparison evidence
+        run: |
+          python tools/write_macro_regime_shadow_comparison_evidence.py \
+            --pricing-audit output/pricing/price_audit_2026-05-29_20260531_203900.json \
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --macro-context config/etf_macro_fundamental_context.yml \
+            --macro-data-audit fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json \
+            --output-dir output/macro/validation \
+            --run-id legacy_vs_shadow_${{ github.run_id }}_${{ github.run_attempt }} \
             --workflow-name "${{ github.workflow }}" \
             --workflow-run-id "${{ github.run_id }}" \
             --workflow-run-number "${{ github.run_number }}" \
