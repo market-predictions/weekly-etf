@@ -28,7 +28,7 @@
 ### Regimesamenvatting
 - Huidig regime: Risk-on met smal marktleiderschap.
 - Vertrouwen: 72%.
-- Regimegeheugen: Risk-on narrow leadership has persisted for 1 run(s); transition state is transition_candidate, breadth is mixed, and cross-asset confirmation is mixed.
+- Regimegeheugen: Risk-on narrow leadership has persisted for 1 run(s); transition state is transition candidate, breadth is mixed, and cross-asset confirmation is mixed.
 - Beslisregel: Do not rotate aggressively unless a regime shift persists for at least two runs or cross-asset confirmation becomes broad.
 
 ### Beleids- en geopolitieke status
@@ -289,7 +289,7 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 ### Volglijst / dynamisch radargeheugen
 | Thema | Primaire ETF | Alternatieve ETF | Waarom op de radar | Status |
 |---|---|---|---|---|
-| AI-rekenkrachtinfrastructuur | SMH | SOXX | Sterkste structurele groeiblootstelling. | Actief |
+| AI-rekenkrachtinfrastructuur | SMH | SOXX | Sterkste structurele groeiblootstelling. | Actief / begrensd |
 | Defensie-innovatie / strategische weerbaarheid | PPA | ITA | Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling. | Vervangingsanalyse vereist |
 | Netuitbreiding / elektrificatie | PAVE | GRID | Infrastructuurcapex blijft valide. | Vervangingsanalyse vereist |
 | Herbeoordeling goudhedge | GLD | GSG / BIL | Hedgefunctie moet worden bewezen. | Onder herbeoordeling |

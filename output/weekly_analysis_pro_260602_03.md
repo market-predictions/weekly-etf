@@ -29,11 +29,11 @@
 - None
 
 ### Rotation engine status
-- Rotation plan artifact is active; Sections 12-14 are rendered from rotation_decisions, target_weights and trade_intents.
+- Rotation plan artifact is active; Sections 12-14 are rendered from the portfolio rotation plan, target allocations and proposed trade intents.
 - Trade intents are proposed rotation output while the engine is in warning mode; they are not executed trades until the ledger and portfolio state record execution.
 
 ### Best replacements to fund
-- reduce PAVE by -5.00% NAV and allocate 5.00% NAV to CIBR, pending execution and portfolio-state persistence.
+- reduce PAVE by 5.00% NAV and allocate 5.00% NAV to CIBR, pending execution and portfolio-state persistence.
 
 ### Replacement pricing and duel status
 
@@ -54,7 +54,7 @@
 ### Macro regime
 - Current regime: Risk-on narrow leadership.
 - Confidence: 72%.
-- Regime memory: Risk-on narrow leadership has persisted for 1 run(s); transition state is transition_candidate, breadth is mixed, and cross-asset confirmation is mixed.
+- Regime memory: Risk-on narrow leadership has persisted for 1 run(s); transition state is transition candidate, breadth is mixed, and cross-asset confirmation is mixed.
 - Decision rule: Do not rotate aggressively unless a regime shift persists for at least two runs or cross-asset confirmation becomes broad.
 
 ### Policy and geopolitical status
@@ -79,7 +79,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | SMH | SOXX | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Actionable now | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
 | Cybersecurity resilience | CIBR | BUG | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure exposure with less direct semiconductor cyclicality. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Power demand, grid bottlenecks and reshoring capex support infrastructure spend. Macro filter: AI power demand and infrastructure policy support the grid lane; funding still depends on PAVE-vs-GRID duel evidence. | 5 | 4 | Actionable now | PAVE remains useful, but GRID is the cleaner thematic challenger. | 3-12 months |
 | Copper and electrification materials | COPX | PICK | Copper transmits grid, AI power and electrification demand into commodity equities. | 4 | 3 | Watchlist / under review | Becomes more fundable if copper momentum and China demand confirm. | 3-12 months |
@@ -131,7 +131,7 @@
 - Since inception return (%): 12.38
 - Equity-curve state: Reconciled to Section 15 with full valuation history
 - EUR/USD used: 1.1632
-- Notes: Section 7 uses `output/etf_valuation_history.csv` plus the current runtime NAV; Section 15 is rendered from the same normalized runtime state.
+- Notes: Section 7 uses the validated valuation history plus the current portfolio NAV; Section 15 is rendered from the same reconciled portfolio state.
 
 | Date | Portfolio value (EUR) | Comment |
 |---|---:|---|
@@ -226,7 +226,7 @@ Role: Real-asset capex. Required next action: Force alternative duel; upgrade, r
 ### SMH — Hold — Score 4.28 — Fresh cash: Smaller / under review — release score 60
 Role: Growth engine. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
-### SPY — Hold with override — Score 3.53 — Fresh cash: Smaller / under review — release score 85; override churn_budget_used
+### SPY — Hold with override — Score 3.53 — Fresh cash: Smaller / under review — release score 85; override: rotation budget already used
 Role: Core beta. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
 ### URNM — Hold — Score 3.70 — Fresh cash: Hold
@@ -237,8 +237,8 @@ Role: Rotation destination. Required next action: None.
 
 ## 11. Best New Opportunities
 
-- SMH remains the leading funded growth exposure, subject to the max-position rule.
-- Proposed rotation: reduce PAVE by -5.00% NAV and allocate 5.00% NAV to CIBR, pending execution and portfolio-state persistence.
+- SMH remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap.
+- Proposed rotation: reduce PAVE by 5.00% NAV and allocate 5.00% NAV to CIBR, pending execution and portfolio-state persistence.
 - COPX / PICK: Copper transmits grid, AI power and electrification demand into commodity equities.
 - ROBO / IRBO: Automation capex can broaden beyond semiconductors into industrial productivity.
 - REMX / PICK: Critical mineral supply chains matter for electrification, defense and grid capex.
@@ -314,7 +314,7 @@ Role: Rotation destination. Required next action: None.
 ### Watchlist / dynamic radar memory
 | Theme | Primary ETF | Alternative ETF | Why I’m considering it | Current status |
 |---|---|---|---|---|
-| AI compute infrastructure | SMH | SOXX | Strongest secular growth exposure. | Active |
+| AI compute infrastructure | SMH | SOXX | Strongest secular growth exposure. | Active / capped |
 | Defense innovation / sovereign resilience | PPA | ITA | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | PAVE | GRID | Infrastructure capex remains valid. | Duel required |
 | Gold hedge review | GLD | GSG / BIL | Hedge role must be proven. | Under review |
@@ -334,7 +334,7 @@ Role: Rotation destination. Required next action: None.
 
 ### Changes since last review
 - Added: runtime-rendered markdown generation layer.
-- Proposed rotation: reduce PAVE by -5.00% NAV and allocate 5.00% NAV to CIBR, pending execution and portfolio-state persistence.
+- Proposed rotation: reduce PAVE by 5.00% NAV and allocate 5.00% NAV to CIBR, pending execution and portfolio-state persistence.
 - Executed reductions/closures: none unless separately recorded in the trade ledger and persisted portfolio state.
 - Thesis changes: No structural thesis was abandoned; implementation, macro-regime and rotation discipline are materially tighter.
 

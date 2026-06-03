@@ -10,4 +10,4 @@ date,nav_eur,cash_eur,invested_market_value_eur,daily_return_pct,since_inception
 2026-05-28,110032.93,1936.52,108096.41,0.5903,10.0329,0.0,1.165,Runtime valuation from immutable pricing audit and explicit portfolio state,weekly_analysis_pro_260528_11.md
 2026-05-29,109964.97,1936.52,108028.45,-0.0618,9.965,-0.0618,1.1661,Runtime valuation repriced from official portfolio-state shares,weekly_analysis_pro_260529_27.md
 2026-06-01,110321.58,1936.52,108385.06,0.3243,10.3216,0.0,1.1632,Runtime valuation repriced from official portfolio-state shares,weekly_analysis_pro_260601_06.md
-2026-06-02,112367.86,1936.52,110431.34,1.8548,12.3679,0.0,1.1632,Runtime valuation repriced from official portfolio-state shares,weekly_analysis_pro_260602_02.md
+2026-06-02,112376.11,1936.52,110439.59,1.8623,12.3761,0.0,1.1632,Runtime valuation repriced from official portfolio-state shares,weekly_analysis_pro_260602_04.md
