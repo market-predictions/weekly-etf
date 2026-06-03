@@ -6,21 +6,27 @@
 
 ## Current issue
 
-The macro policy-pack authority contract is validated. The controlled macro phase is now to compare the legacy macro regime path with the deterministic shadow regime/confidence path without changing production authority.
+The macro policy-pack authority contract is validated. The controlled macro phase compares the legacy macro regime path with the deterministic shadow regime/confidence path without changing production authority.
 
-The latest validation task was to verify the split shadow comparison flags added after the first legacy-vs-shadow comparison evidence run.
+The prior ambiguity in `differs_from_legacy` has been resolved with split flags, and the latest confidence-calibration task reviewed whether the shadow confidence was too high for a market-led risk-on narrow regime while macro-audit axes were mixed/restrictive.
 
 ## Root cause
 
-The first durable comparison artifact answered the core legacy-vs-shadow questions, but used one combined flag:
+The original comparison artifact used one combined flag:
 
 ```text
 differs_from_legacy
 ```
 
-That flag became true when either the regime label changed or the confidence differed beyond threshold. In the current fixture, the legacy and shadow regime labels are the same, but confidence differs by `0.08`, so the combined flag alone was ambiguous.
+That flag became true when either the regime label changed or the confidence differed beyond threshold. In the current fixture, the legacy and shadow regime labels were the same, but confidence differed by `0.08`, so the combined flag alone was ambiguous.
 
-The comparison evidence therefore needed separate fields for:
+Separately, the shadow confidence model gave `0.80` for `Risk-on narrow leadership` even though macro-audit axes included restrictive real rates, an inverted yield curve, and a restrictive policy rate. That was too opaque for methodology review because the confidence decomposition did not explicitly expose a macro-conflict diagnostic or cap.
+
+## Implemented change
+
+### Split comparison flags
+
+The comparison evidence now records:
 
 ```text
 regime_label_differs
@@ -35,45 +41,59 @@ while retaining backward compatibility:
 differs_from_legacy = regime_label_differs OR confidence_differs
 ```
 
-## Implemented change
+### Macro-conflict confidence calibration
 
-Added comparison evidence writer:
-
-```text
-tools/write_macro_regime_shadow_comparison_evidence.py
-```
-
-The tool writes:
+Updated:
 
 ```text
-output/macro/validation/macro_regime_shadow_comparison_<run_id>.json
-output/macro/validation/latest_macro_regime_shadow_comparison.json
+config/regime_thresholds.yml
+macro_regime/confidence.py
+tools/replay_macro_regime_shadow_fixtures.py
+fixtures/macro_regime_shadow/regime_shadow_fixtures.json
 ```
 
-It records:
-
-- legacy regime
-- legacy confidence
-- legacy confidence source
-- deterministic shadow candidate regime
-- deterministic shadow candidate confidence
-- regime-label difference flag
-- confidence-difference flag
-- confidence delta
-- confidence-difference threshold
-- market axes and axis scores
-- macro-audit axes and macro-axis scores
-- confidence decomposition
-- workflow metadata
-- explicit no-authority guardrails
-
-Updated workflow:
+The confidence model now records shadow-only diagnostic components:
 
 ```text
-.github/workflows/validate-macro-regime-shadow.yml
+macro_conflict_score
+macro_conflict_cap_threshold
+risk_on_macro_conflict_cap
+confidence_cap_applied
+uncapped_confidence
 ```
 
-The workflow writes legacy-vs-shadow comparison evidence after fixture replay, macro-audit replay, schema validation, and shadow payload validation.
+The specific calibration rule is intentionally narrow:
+
+```text
+if macro audit is present
+and candidate regime starts with Risk-on
+and macro_conflict_score >= macro_conflict_cap_threshold
+and raw confidence > risk_on_macro_conflict_cap:
+    cap shadow confidence at risk_on_macro_conflict_cap
+```
+
+Current config values:
+
+```text
+macro_conflict_cap_threshold: 0.75
+risk_on_macro_conflict_cap: 0.72
+```
+
+The replay tool now supports optional per-fixture macro-audit input through:
+
+```text
+macro_data_audit_fixture
+```
+
+and validates expected macro axes and expected confidence components when a fixture declares them.
+
+A new fixture was added:
+
+```text
+risk_on_narrow_restrictive_macro
+```
+
+This fixture isolates the exact case under review: market-led risk-on narrow leadership with restrictive macro-audit axes.
 
 ## Commits
 
@@ -92,20 +112,29 @@ Split-flag change:
 1255984ff656a58e0581fbb5553ef3684506e964  record split shadow regime difference flags in comparison evidence
 ```
 
+Confidence calibration:
+
+```text
+0e984bb3b69141939d2c9cef46e7666da6f5b20c  add shadow macro conflict confidence settings
+5dfedfa68d23abe2b5c66634c872faf1419f55c0  apply shadow macro conflict confidence cap
+4500e8f74e4199d5d5f3ef35d426e3c634fab7af  replay macro-audit conflict fixture
+27e4bf1341999aa49df1c5bfb51f983fd59b0c8b  add risk-on macro conflict replay fixture
+```
+
 ## Validation status
 
 Validated by isolated GitHub Actions workflow.
 
-Latest confirmed split-flag workflow evidence:
+Latest confirmed workflow evidence:
 
 ```text
 workflow: Validate ETF macro regime shadow
-run_number: 18
-workflow_run_id: 26915491624
+run_number: 22
+workflow_run_id: 26917489620
 job: validate-shadow-regime
 job_status: completed
 job_conclusion: success
-trigger_commit: 1255984ff656a58e0581fbb5553ef3684506e964
+trigger_commit: 27e4bf1341999aa49df1c5bfb51f983fd59b0c8b
 source_ref: main
 status: passed
 validated_artifact: output/macro/validation/latest_macro_regime_shadow_comparison.json
@@ -141,17 +170,26 @@ legacy_regime: Risk-on narrow leadership
 legacy_confidence: 0.72
 legacy_confidence_source: legacy_proxy_static
 shadow_candidate_regime: Risk-on narrow leadership
-shadow_candidate_confidence: 0.80
+shadow_candidate_confidence: 0.72
 regime_label_differs: false
-confidence_delta: +0.08
+confidence_delta: 0.00
 confidence_diff_threshold: 0.05
-confidence_differs: true
-differs_from_legacy: true
+confidence_differs: false
+differs_from_legacy: false
 ```
 
-Important nuance:
+The prior shadow confidence of `0.80` is now recorded as:
 
-The regime label is the same. The artifact marks `differs_from_legacy: true` only because `confidence_differs: true`. This resolves the earlier ambiguity in the combined flag and keeps the comparison evidence reviewable without changing production authority.
+```text
+uncapped_confidence: 0.7964
+```
+
+and the capped shadow confidence is:
+
+```text
+raw_confidence: 0.72
+confidence: 0.72
+```
 
 ## Market axes
 
@@ -176,7 +214,7 @@ policy_rate: restrictive
 
 ## Confidence decomposition snapshot
 
-Current shadow confidence is `0.80` from method:
+Current shadow confidence is `0.72` from method:
 
 ```text
 deterministic_axis_agreement_v1_shadow
@@ -191,7 +229,12 @@ macro_alignment: 0.60
 macro_signal_strength: 0.42
 signal_strength: 0.7196
 conflict_score: 0.1875
-raw_confidence: 0.7964
+macro_conflict_score: 1.0
+macro_conflict_cap_threshold: 0.75
+risk_on_macro_conflict_cap: 0.72
+confidence_cap_applied: true
+uncapped_confidence: 0.7964
+raw_confidence: 0.72
 min: 0.35
 max: 0.82
 ```
@@ -201,7 +244,9 @@ Notes from the artifact:
 - confidence measures cross-axis agreement, not forecast accuracy;
 - market axes support risk-on narrow leadership;
 - macro-audit axes are mixed/restrictive;
-- confidence is reduced for mixed or internally conflicting market/macro evidence.
+- confidence is reduced for mixed or internally conflicting market/macro evidence;
+- macro conflict diagnostic score is `1.0`;
+- risk-on confidence was capped by the shadow macro-conflict rule.
 
 ## Authority boundary
 
@@ -212,6 +257,7 @@ Allowed now:
 - inspect market axes and macro-audit axes internally
 - use this evidence for methodology review and future promotion discussions
 - use split flags to clarify internal comparison evidence
+- use macro-conflict diagnostics for shadow-only confidence calibration review
 
 Still blocked:
 
@@ -240,18 +286,28 @@ promotion_status: not_promoted
 
 Legacy-vs-shadow comparison evidence with split difference flags: **closed for this stage**.
 
+Shadow confidence calibration for the current restrictive-macro risk-on case: **closed for this stage**.
+
 This does not promote deterministic macro/regime output to client-facing, lane-scoring, fundability, or portfolio-action authority.
 
 ## Next action
 
-Continue with threshold and confidence review in shadow mode:
+Continue with broader shadow fixture coverage and methodology review before any promotion:
 
 ```text
-config/regime_thresholds.yml
 fixtures/macro_regime_shadow/regime_shadow_fixtures.json
 macro_regime/confidence.py
 tools/replay_macro_regime_shadow_fixtures.py
-tools/validate_macro_regime_shadow.py
+MACRO_METHODOLOGY.md
+tools/validate_macro_compliance.py
 ```
 
-Goal: review whether the current confidence model is too high for mixed macro axes and whether a transparent macro-conflict cap or penalty is better than changing base scoring, without changing production authority.
+Recommended next step: add 2-3 more macro-audit fixture variants so the cap does not overfit one case:
+
+```text
+broad risk-on with supportive macro axes
+risk-off with supportive macro axes
+rate-hike repricing with accommodative-policy conflict
+```
+
+Then decide whether the macro-conflict cap belongs in the stable methodology or remains a temporary shadow calibration rule.
