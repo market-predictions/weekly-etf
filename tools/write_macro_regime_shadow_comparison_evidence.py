@@ -69,7 +69,7 @@ def _build_shadow_pack(args: argparse.Namespace) -> dict[str, Any]:
     return shadow_pack
 
 
-def _require_shadow_authority(shadow: dict[str, Any]) -> None:
+def _require_shadow_authority(shadow: dict[str, Any]) -> dict[str, Any]:
     result = validate_shadow_payload(shadow)
     for key, expected in EXPECTED_AUTHORITY.items():
         actual = shadow.get(key)
@@ -80,21 +80,24 @@ def _require_shadow_authority(shadow: dict[str, Any]) -> None:
     print(
         "ETF_MACRO_REGIME_SHADOW_COMPARE_PAYLOAD_OK | "
         f"candidate={result['candidate_regime']} | confidence={result['candidate_confidence']} | "
-        f"legacy={result['legacy_regime']} | differs={result['differs_from_legacy']}"
+        f"legacy={result['legacy_regime']} | label_differs={result['regime_label_differs']} | "
+        f"confidence_differs={result['confidence_differs']} | confidence_delta={result['confidence_delta']} | "
+        f"differs={result['differs_from_legacy']}"
     )
+    return result
 
 
 def _build_evidence(args: argparse.Namespace, pack: dict[str, Any]) -> dict[str, Any]:
     generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     regime = pack.get("regime") if isinstance(pack.get("regime"), dict) else {}
     shadow = pack.get("deterministic_regime_shadow") if isinstance(pack.get("deterministic_regime_shadow"), dict) else {}
-    _require_shadow_authority(shadow)
+    validation_result = _require_shadow_authority(shadow)
     authority = pack.get("authority") if isinstance(pack.get("authority"), dict) else {}
     field_authority = pack.get("field_authority") if isinstance(pack.get("field_authority"), dict) else {}
     promotion_gates = pack.get("promotion_gates") if isinstance(pack.get("promotion_gates"), dict) else {}
 
     return {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "artifact_type": "macro_regime_legacy_vs_shadow_comparison_evidence",
         "status": "passed",
         "generated_at_utc": generated_at,
@@ -134,8 +137,11 @@ def _build_evidence(args: argparse.Namespace, pack: dict[str, Any]) -> dict[str,
             "shadow_candidate_regime": shadow.get("candidate_regime"),
             "shadow_candidate_confidence": shadow.get("candidate_confidence"),
             "shadow_method": shadow.get("method"),
-            "differs_from_legacy": shadow.get("differs_from_legacy"),
-            "confidence_delta": round(float(shadow.get("candidate_confidence") or 0.0) - float(regime.get("confidence") or 0.0), 4),
+            "differs_from_legacy": validation_result.get("differs_from_legacy"),
+            "regime_label_differs": validation_result.get("regime_label_differs"),
+            "confidence_differs": validation_result.get("confidence_differs"),
+            "confidence_delta": validation_result.get("confidence_delta"),
+            "confidence_diff_threshold": shadow.get("confidence_diff_threshold"),
             "axes": shadow.get("axes") or {},
             "axis_scores": shadow.get("axis_scores") or {},
             "macro_axes": shadow.get("macro_axes") or {},
@@ -148,6 +154,7 @@ def _build_evidence(args: argparse.Namespace, pack: dict[str, Any]) -> dict[str,
             "Do not use the shadow candidate for client-facing regime labels until explicit control-layer promotion.",
             "Do not use the shadow candidate, macro_axes, or macro_axis_scores for lane scoring, fundability, or portfolio actions.",
             "Legacy macro policy pack decision authority remains legacy_lane_adjustments_only.",
+            "differs_from_legacy is retained for backward compatibility and equals regime_label_differs OR confidence_differs.",
         ],
     }
 
@@ -191,6 +198,9 @@ def main() -> None:
         f"shadow={comparison.get('shadow_candidate_regime')} | "
         f"legacy_confidence={comparison.get('legacy_confidence')} | "
         f"shadow_confidence={comparison.get('shadow_candidate_confidence')} | "
+        f"label_differs={comparison.get('regime_label_differs')} | "
+        f"confidence_differs={comparison.get('confidence_differs')} | "
+        f"confidence_delta={comparison.get('confidence_delta')} | "
         f"differs={comparison.get('differs_from_legacy')} | "
         f"macro_axes={','.join(sorted(macro_axes)) or 'none'} | "
         f"run_path={run_path} | latest_path={latest_path}"
