@@ -441,6 +441,23 @@ jobs:
           MRKT_RPRTS_MAIL_TO_NL: ${{ secrets.MRKT_RPRTS_MAIL_TO_NL }}
         run: python send_report_runtime_html.py
 
+      - name: Write ETF delivery manifest summary
+        run: |
+          delivery_log="$(python tools/write_etf_delivery_manifest_summary.py \
+            --run-id "$ETF_PRICING_RUN_ID" \
+            --requested-close-date "$REQUESTED_CLOSE_DATE" \
+            --report-token "$REPORT_TOKEN" \
+            --english-report "$MRKT_RPRTS_EXPLICIT_REPORT_PATH" \
+            --dutch-report "$MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL")"
+          echo "$delivery_log"
+          delivery_path="$(printf '%s\n' "$delivery_log" | sed -n 's/.* manifest=\([^ ]*\).*/\1/p' | tail -1)"
+          if [ -z "$delivery_path" ] || [ ! -f "$delivery_path" ]; then
+            echo "Delivery summary writer did not emit a valid manifest path." >&2
+            exit 1
+          fi
+          echo "ETF_DELIVERY_MANIFEST_PATH=$delivery_path" >> "$GITHUB_ENV"
+          echo "DELIVERY_MANIFEST_PATH_OK | manifest=$delivery_path"
+
       - name: Write final ETF run manifest
         if: always()
         run: |
@@ -454,6 +471,7 @@ jobs:
             --dutch-report "${MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL:-}" \
             --portfolio-state output/etf_portfolio_state.json \
             --valuation-history output/etf_valuation_history.csv \
+            --delivery-manifest "${ETF_DELIVERY_MANIFEST_PATH:-}" \
             --status "workflow_${{ job.status }}" \
             --conclusion "${{ job.status }}"
 
@@ -474,6 +492,8 @@ jobs:
             output/runtime/*.txt \
             output/run_manifests/*.json \
             output/run_manifests/*.txt \
+            output/delivery/*.json \
+            output/delivery/*.txt \
             output/market_history/*.json \
             output/lane_reviews/*.json \
             output/macro/*.json \
