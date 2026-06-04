@@ -185,6 +185,10 @@ def _index_positions(state: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return out
 
 
+def _active_holdings(state: dict[str, Any]) -> set[str]:
+    return set(_index_positions(state))
+
+
 def _holding_close(state: dict[str, Any], holding: str) -> dict[str, Any]:
     position = _index_positions(state).get(_ticker(holding), {})
     price = _num(position.get("previous_price_local") or position.get("current_price_local"))
@@ -313,7 +317,7 @@ def _row_payload(state: dict[str, Any], holding: str, challenger: str, edge_1m: 
 
 def _strategic_rows(state: dict[str, Any]) -> list[dict[str, Any]]:
     metrics = _rs_metrics(state)
-    holdings = {_ticker(p.get("ticker")) for p in state.get("positions", []) or []}
+    holdings = _active_holdings(state)
     rows: list[dict[str, Any]] = []
     for holding, challengers in _target_map().items():
         if holding not in holdings:
@@ -327,11 +331,14 @@ def _strategic_rows(state: dict[str, Any]) -> list[dict[str, Any]]:
 
 def _lane_rows(state: dict[str, Any], existing: set[tuple[str, str]]) -> list[dict[str, Any]]:
     lanes = state.get("lane_assessment", {}).get("assessed_lanes", []) or []
+    holdings = _active_holdings(state)
     rows: list[dict[str, Any]] = []
     for lane in lanes:
         holding = _ticker(lane.get("direct_rs_vs_holding"))
         challenger = _ticker(lane.get("primary_etf"))
         if not holding or not challenger or holding == challenger:
+            continue
+        if holding not in holdings:
             continue
         key = (holding, challenger)
         if key in existing:
