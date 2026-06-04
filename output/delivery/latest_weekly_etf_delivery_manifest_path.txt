@@ -1,0 +1,1 @@
+output/delivery/weekly_etf_delivery_manifest_2026-06-03_20260604_190001.json

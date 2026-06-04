@@ -1,23 +1,70 @@
 {
-  "schema_version": "1.1",
-  "portfolio_mode": "client_long_only_thematic",
-  "base_currency": "EUR",
-  "valuation_source": "guarded_model_execution_v1",
-  "pricing_audit_file": "output/pricing/price_audit_2026-06-03_20260604_190001.json",
-  "trade_ledger_file": "etf_trade_ledger.csv",
-  "recommendation_scorecard_file": null,
-  "inception_date": "2026-03-28",
-  "starting_capital_eur": 100000.0,
-  "cash_eur": 1936.52,
-  "invested_market_value_eur": 109660.44,
-  "nav_eur": 111596.96,
-  "peak_nav_eur": 112376.1,
-  "max_drawdown_pct": -2.5105,
-  "positions": [
+  "schema_version": "1.0",
+  "created_at_utc": "2026-06-04T19:07:16.015354+00:00",
+  "execution_mode": "guarded_auto",
+  "execution_status": "executed",
+  "run_id": "20260604_190001",
+  "report_date": "2026-06-03",
+  "requested_close_date": "2026-06-03",
+  "source_files": {
+    "runtime_state": "output/runtime/etf_report_state_20260603_20260604_190001.json",
+    "portfolio_state": "output/etf_portfolio_state.json",
+    "trade_ledger": "output/etf_trade_ledger.csv",
+    "pricing_audit": "output/pricing/price_audit_2026-06-03_20260604_190001.json",
+    "rotation_plan": "output/runtime/etf_rotation_plan_260603_20260604_190001.json"
+  },
+  "policy_checks": {
+    "passed": true,
+    "errors": [],
+    "warnings": [],
+    "mode_note": "Guarded auto-execution writes official model trade-ledger and portfolio-state changes when all hard gates pass."
+  },
+  "pre_trade_portfolio": {
+    "cash_eur": 1936.52,
+    "total_portfolio_value_eur": 111596.95,
+    "base_currency": "EUR"
+  },
+  "post_trade_shadow_portfolio": {
+    "cash_eur": 1936.52,
+    "invested_market_value_eur": 109660.44,
+    "nav_eur": 111596.96,
+    "nav_drift_eur": 0.01
+  },
+  "proposed_ledger_rows": [
+    {
+      "trade_id": "shadow-2026-06-03-20260604_190001-01-PAVE-CIBR",
+      "trade_date": "2026-06-03",
+      "execution_mode": "shadow",
+      "source_ticker": "PAVE",
+      "destination_ticker": "CIBR",
+      "action": "replace_partial",
+      "source_delta_weight_pct": -3.5647,
+      "destination_delta_weight_pct": 3.5647,
+      "estimated_notional_eur": 3978.11,
+      "requested_notional_eur": 3978.11,
+      "source_previous_weight_pct": 3.6,
+      "source_target_weight_pct": 0.0353,
+      "destination_target_weight_pct": 3.5647,
+      "source_price_status": "fresh_exact_unverified",
+      "destination_price_status": "fresh_exact_unverified",
+      "notional_capped_to_source_value": false,
+      "reason_codes": [
+        "fresh_cash_smaller_or_review",
+        "replaceable_status",
+        "review_age_ge_2",
+        "review_age_ge_3",
+        "better_alternative_exists",
+        "role_impaired",
+        "factor_or_concentration_flag",
+        "destination_score_100"
+      ]
+    }
+  ],
+  "shadow_positions": [
     {
       "shares_delta_this_run": 50.3324,
       "weight_change_pct": 3.5647,
-      "action_executed_this_run": "Buy",
+      "action_executed_this_run": "Shadow buy",
       "funding_source_note": "Shadow buy funded by PAVE.",
       "ticker": "CIBR",
       "suggested_action": "Add from rotation",
@@ -160,7 +207,7 @@
       "original_thesis": "Grid and infrastructure capex",
       "shares_delta_this_run": -80.537111,
       "weight_change_pct": -3.5647,
-      "action_executed_this_run": "Sell",
+      "action_executed_this_run": "Shadow reduce",
       "funding_source_note": "Shadow execution from rotation intent.",
       "pricing_source": "twelve_data",
       "pricing_status": "fresh_exact_unverified",
@@ -425,31 +472,44 @@
       ]
     }
   ],
-  "last_report": {
-    "date": "2026-06-03",
-    "source_report": "weekly_analysis_pro_260603.md",
-    "position_count": 8
-  },
-  "last_valuation": {
-    "date": "2026-06-03",
-    "nav_eur": 111596.95,
-    "invested_market_value_eur": 109660.43,
-    "cash_eur": 1936.52,
-    "since_inception_return_pct": 11.597,
-    "daily_return_pct": -0.6933,
-    "drawdown_pct": -0.6933,
-    "eurusd_used": 1.1598,
-    "equity_curve_state": "Below prior high",
-    "valuation_notes": "Runtime valuation repriced from official portfolio-state shares"
-  },
-  "last_successful_runtime_state_file": "output/runtime/etf_report_state_20260603_20260604_190001.json",
-  "last_state_persisted_at_utc": "2026-06-04T19:07:15.867297+00:00",
-  "last_model_execution": {
-    "date": "2026-06-03",
-    "run_id": "20260604_190001",
-    "runtime_state": "output/runtime/etf_report_state_20260603_20260604_190001.json",
-    "mode": "guarded_auto",
-    "trade_count": 1,
-    "executed_at_utc": "2026-06-04T19:07:16.015628+00:00"
+  "artifact_path": "output/runtime/etf_model_execution_20260603_20260604_190001.json",
+  "guarded_auto_result": {
+    "official_ledger_rows": [
+      {
+        "trade_id": "model-2026-06-03-20260604_190001-01-PAVE-SELL",
+        "trade_date": "2026-06-03",
+        "source_report": "runtime:etf_report_state_20260603_20260604_190001.json",
+        "ticker": "PAVE",
+        "action": "Sell",
+        "shares_delta": "-80.537111",
+        "previous_weight_pct": "3.6000",
+        "new_weight_pct": "0.0300",
+        "weight_change_pct": "-3.5700",
+        "target_weight_pct": "0.0300",
+        "conviction_tier": "Tier 2",
+        "portfolio_role": "Real-asset capex",
+        "funding_source_note": "Guarded auto-execution: reduce PAVE to fund CIBR."
+      },
+      {
+        "trade_id": "model-2026-06-03-20260604_190001-01-CIBR-BUY",
+        "trade_date": "2026-06-03",
+        "source_report": "runtime:etf_report_state_20260603_20260604_190001.json",
+        "ticker": "CIBR",
+        "action": "Buy",
+        "shares_delta": "50.332400",
+        "previous_weight_pct": "14.4200",
+        "new_weight_pct": "17.9800",
+        "weight_change_pct": "3.5600",
+        "target_weight_pct": "17.9800",
+        "conviction_tier": "",
+        "portfolio_role": "Rotation destination",
+        "funding_source_note": "Guarded auto-execution: buy CIBR funded by PAVE."
+      }
+    ],
+    "portfolio_state_written": true,
+    "trade_ledger_written": true,
+    "post_trade_nav_eur": 111596.96,
+    "post_trade_invested_market_value_eur": 109660.44,
+    "post_trade_cash_eur": 1936.52
   }
 }
