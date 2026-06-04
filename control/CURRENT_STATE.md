@@ -1,7 +1,7 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-06-03
+2026-06-04
 
 ## What this repository currently is
 
@@ -17,6 +17,7 @@
 - a hard pricing-lineage validator before send
 - an approved, shadow-first macro/thesis roadmap
 - no-network macro-audit fixture replay wired into the isolated macro-regime shadow workflow
+- macro compliance validation covering methodology, planted failures, macro pack surface, and latest committed EN/NL report macro sections
 
 The latest confirmed production validation run is:
 
@@ -44,21 +45,43 @@ The latest confirmed isolated macro-regime shadow validation run is:
 
 ```text
 workflow: Validate ETF macro regime shadow
-run_number: 14
-workflow_run_id: 26877273381
-trigger_commit: 3a7d87323a0a83bdaab5a81bb8a037f3babf9fff
-macro_data_audit_fixture: fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json
-macro_axis_evidence_path: output/macro/validation/latest_macro_audit_axis_shadow_validation.json
-regime_shadow_evidence_path: output/macro/validation/latest_macro_regime_shadow_validation.json
+run_number: 27
+workflow_run_id: 26918418953
+trigger_commit: 1c84de597cef54c17babb38389c0094cfc8e5c10
 status: passed
-validated_markers:
-  - ETF_MACRO_REGIME_FIXTURE_REPLAY_OK
-  - ETF_MACRO_DATA_AUDIT_VALID_OK
-  - ETF_MACRO_AUDIT_AXIS_SHADOW_OK
-  - ETF_MACRO_REGIME_SHADOW_OK
+validated_artifact: output/macro/validation/latest_macro_regime_shadow_validation.json
 ```
 
-This proves that the no-network macro-audit fixture validates, that the shadow policy-pack builder consumes it, and that `deterministic_regime_shadow.macro_axes` is populated. It does **not** promote macro/regime output to client-facing, lane-scoring, fundability, or portfolio-action authority.
+This proves that no-network macro-regime and macro-audit fixtures validate, that the shadow policy-pack builder consumes macro audit input, and that `deterministic_regime_shadow.macro_axes` is populated. It does **not** promote macro/regime output to client-facing, lane-scoring, fundability, or portfolio-action authority.
+
+The latest confirmed isolated macro compliance validation run is:
+
+```text
+workflow: Validate ETF macro compliance
+run_number: 15
+trigger_commit: 28b6ddda28bd7f287bef7e0622ef8e9c70e726eb
+status: passed
+branch: main
+duration: 18s
+observed_at: 2026-06-04
+source: user-provided GitHub Actions UI screenshot
+```
+
+The macro compliance workflow now validates:
+
+```text
+macro compliance self-test
+macro conflict cap methodology
+macro report surface self-test
+current macro report surface if pack exists
+latest committed English/Dutch report macro sections
+safe macro fixture passes
+combined blocked macro fixture fails as expected
+shadow label leakage fixture fails as expected
+orphan macro figure fixture fails as expected
+```
+
+This is a compliance/output-surface gate only. It does **not** promote deterministic macro/regime output to client-facing, lane-scoring, fundability, or portfolio-action authority.
 
 ## Four-layer operating status
 
@@ -73,6 +96,7 @@ The current decision framework remains:
 - no indefinite `Hold but replaceable` inertia
 - macro/thesis modernization approved only as a future phased enhancement
 - deterministic macro/regime classification remains shadow-only until later promotion gates pass
+- macro compliance gates may validate wording/surface safety, but they do not grant decision authority by themselves
 
 Post-execution authority is now explicit:
 
@@ -102,8 +126,16 @@ Shadow-only macro/regime validation evidence is recorded at:
 
 - `output/macro/validation/latest_macro_regime_shadow_validation.json`
 - `output/macro/validation/latest_macro_audit_axis_shadow_validation.json`
+- `output/macro/validation/latest_macro_regime_shadow_comparison.json`
 
-These validation evidence files are review/audit artifacts only. They are not production report, lane-scoring, fundability, or portfolio-action inputs.
+Macro compliance/methodology status is recorded at:
+
+- `control/MACRO_CONFLICT_CAP_METHODOLOGY.md`
+- `control/MACRO_CONFLICT_CAP_STATUS_20260604.md`
+- `.github/workflows/validate-macro-compliance.yml`
+- `tools/validate_macro_compliance.py`
+
+These validation evidence files and control files are review/audit artifacts only. They are not production report, lane-scoring, fundability, or portfolio-action inputs.
 
 The latest confirmed production run proves the chain:
 
@@ -130,6 +162,18 @@ macro-regime fixture replay
 → repo-visible validation evidence
 ```
 
+The latest isolated macro compliance run proves the separate output-surface safety chain:
+
+```text
+macro compliance self-test
+→ macro conflict cap methodology validation
+→ macro report surface self-test
+→ macro pack surface validation when output/macro/latest.json exists
+→ latest committed EN/NL report macro-section validation
+→ safe fixture pass
+→ planted failure fixtures fail as expected
+```
+
 ### 3. Output contract
 
 The report output contract is now:
@@ -143,7 +187,8 @@ The report output contract is now:
 - Strict branded sections are rendered from runtime state at delivery HTML level, not fixed through markdown-only patches.
 - Dutch PDF chart labels are generated in Dutch in the runtime delivery path.
 - Client-facing reports must not leak internal plumbing labels.
-- Macro-audit-derived `macro_axes`, `macro_axis_scores`, and `deterministic_regime_shadow` must not appear in client-facing reports until future methodology, compliance, and bilingual gates explicitly promote them.
+- Macro-audit-derived `macro_axes`, `macro_axis_scores`, and `deterministic_regime_shadow` must not appear in client-facing reports until future methodology, compliance, bilingual gates, and explicit promotion gates approve them.
+- The isolated macro compliance workflow validates the actual committed EN/NL macro-sensitive report sections, but only as a surface-safety check.
 
 ### 4. Operational runbook
 
@@ -187,6 +232,19 @@ workflow_dispatch or qualifying push
 → commit evidence under output/macro/validation/
 ```
 
+The isolated macro compliance validation path is:
+
+```text
+workflow_dispatch or qualifying push
+→ run macro compliance self-test
+→ validate macro conflict cap methodology
+→ run macro report surface self-test
+→ validate current macro report surface if output/macro/latest.json exists
+→ validate latest committed EN/NL report macro sections
+→ validate safe macro fixture
+→ validate planted failure fixtures with --expect-fail
+```
+
 ## Current strengths
 
 - Pricing retrieval and report reconciliation are validated at artifact level.
@@ -199,7 +257,8 @@ workflow_dispatch or qualifying push
 - Pricing-basis disclosure derives required tickers dynamically from active Section 15 holdings.
 - Challenger pricing/fundability discipline is active.
 - Shadow macro audit remains non-authoritative and non-blocking.
-- No-network macro-audit fixture replay is now wired into the isolated macro-regime shadow workflow and has passed with repo-visible evidence.
+- No-network macro-audit fixture replay is wired into the isolated macro-regime shadow workflow and has passed with repo-visible evidence.
+- Macro compliance now validates methodology, planted failures, macro pack surface, and latest committed EN/NL macro report sections.
 
 ## Current weaknesses / watch items
 
@@ -215,9 +274,9 @@ The repo contains generated PDFs/assets, but the GitHub connector exposes binary
 
 Rows can remain `fresh_exact_unverified` when one provider gives exact requested-date closes but no independent cross-provider verification has been recorded.
 
-### 4. Macro/thesis schema, methodology, and compliance gates are still not promotion-complete
+### 4. Macro/thesis promotion remains blocked despite stronger compliance coverage
 
-The macro-audit fixture replay is now green in CI, but expanded macro/thesis content still requires methodology, compliance, bilingual parity, and promotion decisions before any client-facing or portfolio-authority use.
+Macro compliance is now materially stronger, including methodology checks, planted-failure fixtures, macro pack surface validation, and latest committed EN/NL macro-section validation. That still does not complete promotion. Expanded deterministic macro/thesis content still requires explicit promotion decisions, bilingual parity checks, and authority review before any client-facing or portfolio-authority use.
 
 ### 5. Dutch aliases remain partially distributed
 
@@ -254,19 +313,21 @@ Next cleanup:
 - reuse that source from native render, markdown validation, send-time parity checks, Dutch quality validation, and delivery HTML validation
 - keep native Dutch guard-only; do not reintroduce broad English-to-Dutch scrub passes
 
-### Priority D — move into macro/thesis roadmap Phase 3+ carefully
+### Priority D — macro/thesis roadmap remains shadow-first and promotion-gated
 
 Current status:
 
 - Phase 2 macro audit remains shadow-only.
 - No-network macro-audit fixture replay is wired into CI and green.
 - Deterministic regime/confidence output remains shadow-only and non-authoritative.
+- Macro-conflict cap methodology is documented as a stable shadow methodology rule.
+- Macro compliance covers methodology, macro pack surface, planted failures, and latest committed EN/NL macro report sections.
 
 Next architecture track:
 
-- define the full macro policy pack schema / promotion contract
-- add methodology and compliance gates before any client-surface expansion
-- design deterministic regime/confidence promotion review without changing production decisions yet
+- keep deterministic regime/confidence promotion review separate from client-surface wording validation
+- do not promote macro axes, shadow regime payload, Stage-1 thesis candidates, lane scoring, fundability, or portfolio-action authority without explicit control-layer promotion
+- continue only with shadow methodology, compliance, and promotion-readiness work unless a later decision changes authority
 
 ### Priority E — add direct challenger-vs-current-holding scoring
 
@@ -278,4 +339,4 @@ Next model enhancement:
 
 ## Current status label
 
-**ETF has a production-tested runtime-driven bilingual baseline with pricing-lineage proof passed for run `20260601_213417`. The system now distinguishes pre-execution runtime provenance from post-execution official portfolio-state authority. Dutch output is native/guard-only rather than broad-translated markdown. Pricing lineage, guarded execution, Dutch quality, and HTML/PDF render validation are green. Email delivery still requires a separate receipt/manifest or user confirmation. Macro-audit-derived regime axes are now validated in isolated shadow CI via a no-network fixture replay, but remain non-client-facing and non-authoritative for lane scoring, fundability, portfolio actions, and report recommendations.**
+**ETF has a production-tested runtime-driven bilingual baseline with pricing-lineage proof passed for run `20260601_213417`. The system now distinguishes pre-execution runtime provenance from post-execution official portfolio-state authority. Dutch output is native/guard-only rather than broad-translated markdown. Pricing lineage, guarded execution, Dutch quality, and HTML/PDF render validation are green. Email delivery still requires a separate receipt/manifest or user confirmation. Macro-audit-derived regime axes are validated in isolated shadow CI, and macro compliance now validates methodology, planted failures, macro pack surface, and latest committed EN/NL macro report sections. Deterministic macro/regime/thesis outputs remain non-client-facing and non-authoritative for lane scoring, fundability, portfolio actions, and report recommendations until explicit promotion gates pass.**
