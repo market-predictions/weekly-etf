@@ -117,6 +117,20 @@ def _contribution_pct(pl_eur: float | None, state: dict[str, Any]) -> float | No
     return round(pl_eur / starting * 100.0, 2)
 
 
+def _source_thesis(position: dict[str, Any], ticker: str) -> tuple[str, bool]:
+    raw = str(position.get("original_thesis") or "").strip()
+    if raw:
+        return raw, True
+    return ETF_NAMES.get(ticker, ticker), False
+
+
+def _display_thesis(position: dict[str, Any], ticker: str, language: str = "en") -> str:
+    source, has_explicit_thesis = _source_thesis(position, ticker)
+    if language == "nl" and has_explicit_thesis:
+        return nl_thesis(source, ticker)
+    return source
+
+
 def _performance_rows(state: dict[str, Any], language: str = "en") -> list[dict[str, Any]]:
     metrics = _load_market_metrics()
     weights = _weight_map(state)
@@ -129,10 +143,9 @@ def _performance_rows(state: dict[str, Any], language: str = "en") -> list[dict[
         pl_eur = _position_pl_eur(position, state)
         if language == "nl":
             sleeve = nl_role(position.get("portfolio_role") or "Position")
-            thesis = nl_thesis(position.get("original_thesis"), ticker)
         else:
             sleeve = position.get("portfolio_role") or "Position"
-            thesis = position.get("original_thesis") or ETF_NAMES.get(ticker, ticker)
+        thesis = _display_thesis(position, ticker, language)
         rows.append(
             {
                 "portfolio_sleeve": sleeve,
