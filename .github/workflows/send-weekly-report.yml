@@ -306,6 +306,7 @@ jobs:
         env:
           MRKT_RPRTS_REPORT_MODE: pro
         run: |
+          python tools/validate_nl_terminology_contract.py
           python tools/validate_etf_dutch_language_quality.py --output-dir output
           python tools/validate_etf_dutch_client_surface_clean.py --output-dir output
 
