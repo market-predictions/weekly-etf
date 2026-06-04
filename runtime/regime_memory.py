@@ -8,6 +8,26 @@ from typing import Any
 MACRO_DIR = Path("output/macro")
 REGIME_MEMORY_PATH = MACRO_DIR / "regime_memory.json"
 
+TRANSITION_LABELS = {
+    "new_baseline": "a new baseline",
+    "transition_candidate": "a possible transition",
+    "confirmed_transition": "a confirmed transition",
+    "newly_confirmed": "newly confirmed",
+    "stable": "stable",
+}
+
+BREADTH_LABELS = {
+    "improving": "improving",
+    "weakening": "weakening",
+    "mixed": "mixed",
+}
+
+CROSS_ASSET_LABELS = {
+    "confirmed_but_narrow": "confirmed but narrow",
+    "diverging": "diverging",
+    "mixed": "mixed",
+}
+
 
 def _num(value: Any, default: float = 0.0) -> float:
     try:
@@ -16,6 +36,11 @@ def _num(value: Any, default: float = 0.0) -> float:
         return float(value)
     except (TypeError, ValueError):
         return default
+
+
+def _client_label(value: Any, labels: dict[str, str]) -> str:
+    raw = str(value or "").strip()
+    return labels.get(raw, raw.replace("_", " "))
 
 
 def load_regime_memory(path: Path = REGIME_MEMORY_PATH) -> dict[str, Any]:
@@ -132,9 +157,9 @@ def update_regime_memory(pack: dict[str, Any], path: Path = REGIME_MEMORY_PATH) 
 def regime_memory_summary(memory: dict[str, Any]) -> str:
     regime = memory.get("current_regime", "Unknown")
     weeks = memory.get("weeks_in_regime", 1)
-    transition = memory.get("transition_state", "stable")
-    breadth = memory.get("breadth_trend", "mixed")
-    cross = memory.get("cross_asset_confirmation", "mixed")
+    transition = _client_label(memory.get("transition_state", "stable"), TRANSITION_LABELS)
+    breadth = _client_label(memory.get("breadth_trend", "mixed"), BREADTH_LABELS)
+    cross = _client_label(memory.get("cross_asset_confirmation", "mixed"), CROSS_ASSET_LABELS)
     return (
         f"{regime} has persisted for {weeks} run(s); transition state is {transition}, "
         f"breadth is {breadth}, and cross-asset confirmation is {cross}."
