@@ -1,19 +1,66 @@
 {
-  "schema_version": "1.1",
-  "portfolio_mode": "client_long_only_thematic",
-  "base_currency": "EUR",
-  "valuation_source": "guarded_model_execution_v1",
-  "pricing_audit_file": "output/pricing/price_audit_2026-06-04_20260604_221223.json",
-  "trade_ledger_file": "etf_trade_ledger.csv",
-  "recommendation_scorecard_file": null,
-  "inception_date": "2026-03-28",
-  "starting_capital_eur": 100000.0,
-  "cash_eur": 1936.52,
-  "invested_market_value_eur": 109216.72,
-  "nav_eur": 111153.24,
-  "peak_nav_eur": 112376.1,
-  "max_drawdown_pct": -2.5105,
-  "positions": [
+  "schema_version": "1.0",
+  "created_at_utc": "2026-06-04T22:19:25.925764+00:00",
+  "execution_mode": "guarded_auto",
+  "execution_status": "executed",
+  "run_id": "20260604_221223",
+  "report_date": "2026-06-04",
+  "requested_close_date": "2026-06-04",
+  "source_files": {
+    "runtime_state": "output/runtime/etf_report_state_20260604_20260604_221223.json",
+    "portfolio_state": "output/etf_portfolio_state.json",
+    "trade_ledger": "output/etf_trade_ledger.csv",
+    "pricing_audit": "output/pricing/price_audit_2026-06-04_20260604_221223.json",
+    "rotation_plan": "output/runtime/etf_rotation_plan_260604_20260604_221223.json"
+  },
+  "policy_checks": {
+    "passed": true,
+    "errors": [],
+    "warnings": [],
+    "mode_note": "Guarded auto-execution writes official model trade-ledger and portfolio-state changes when all hard gates pass."
+  },
+  "pre_trade_portfolio": {
+    "cash_eur": 1936.52,
+    "total_portfolio_value_eur": 111153.24,
+    "base_currency": "EUR"
+  },
+  "post_trade_shadow_portfolio": {
+    "cash_eur": 1936.52,
+    "invested_market_value_eur": 109216.72,
+    "nav_eur": 111153.24,
+    "nav_drift_eur": 0.0
+  },
+  "proposed_ledger_rows": [
+    {
+      "trade_id": "shadow-2026-06-04-20260604_221223-01-SPY-IEFA",
+      "trade_date": "2026-06-04",
+      "execution_mode": "shadow",
+      "source_ticker": "SPY",
+      "destination_ticker": "IEFA",
+      "action": "replace_partial",
+      "source_delta_weight_pct": -5.02,
+      "destination_delta_weight_pct": 5.02,
+      "estimated_notional_eur": 5579.85,
+      "requested_notional_eur": 5579.85,
+      "source_previous_weight_pct": 24.05,
+      "source_target_weight_pct": 19.03,
+      "destination_target_weight_pct": 5.02,
+      "source_price_status": "fresh_exact_unverified",
+      "destination_price_status": "fresh_exact_unverified",
+      "notional_capped_to_source_value": false,
+      "reason_codes": [
+        "fresh_cash_smaller_or_review",
+        "replaceable_status",
+        "review_age_ge_2",
+        "review_age_ge_3",
+        "better_alternative_exists",
+        "role_impaired",
+        "factor_or_concentration_flag",
+        "destination_score_98"
+      ]
+    }
+  ],
+  "shadow_positions": [
     {
       "shares_delta_this_run": 0.0,
       "weight_change_pct": 0.0,
@@ -134,7 +181,7 @@
     {
       "shares_delta_this_run": 66.035145,
       "weight_change_pct": 5.02,
-      "action_executed_this_run": "Buy",
+      "action_executed_this_run": "Shadow buy",
       "funding_source_note": "Shadow buy funded by SPY.",
       "ticker": "IEFA",
       "suggested_action": "Add from rotation",
@@ -320,7 +367,7 @@
       "original_thesis": "Core U.S. large-cap exposure",
       "shares_delta_this_run": -8.557381,
       "weight_change_pct": -5.02,
-      "action_executed_this_run": "Sell",
+      "action_executed_this_run": "Shadow reduce",
       "funding_source_note": "Shadow execution from rotation intent.",
       "pricing_source": "twelve_data",
       "pricing_status": "fresh_exact_unverified",
@@ -453,31 +500,44 @@
       ]
     }
   ],
-  "last_report": {
-    "date": "2026-06-04",
-    "source_report": "weekly_analysis_pro_260604.md",
-    "position_count": 8
-  },
-  "last_valuation": {
-    "date": "2026-06-04",
-    "nav_eur": 111153.24,
-    "invested_market_value_eur": 109216.72,
-    "cash_eur": 1936.52,
-    "since_inception_return_pct": 11.1532,
-    "daily_return_pct": -0.3976,
-    "drawdown_pct": -1.0882,
-    "eurusd_used": 1.1611,
-    "equity_curve_state": "Below prior high",
-    "valuation_notes": "Runtime valuation repriced from official portfolio-state shares"
-  },
-  "last_successful_runtime_state_file": "output/runtime/etf_report_state_20260604_20260604_221223.json",
-  "last_state_persisted_at_utc": "2026-06-04T22:19:25.765323+00:00",
-  "last_model_execution": {
-    "date": "2026-06-04",
-    "run_id": "20260604_221223",
-    "runtime_state": "output/runtime/etf_report_state_20260604_20260604_221223.json",
-    "mode": "guarded_auto",
-    "trade_count": 1,
-    "executed_at_utc": "2026-06-04T22:19:25.926063+00:00"
+  "artifact_path": "output/runtime/etf_model_execution_20260604_20260604_221223.json",
+  "guarded_auto_result": {
+    "official_ledger_rows": [
+      {
+        "trade_id": "model-2026-06-04-20260604_221223-01-SPY-SELL",
+        "trade_date": "2026-06-04",
+        "source_report": "runtime:etf_report_state_20260604_20260604_221223.json",
+        "ticker": "SPY",
+        "action": "Sell",
+        "shares_delta": "-8.557381",
+        "previous_weight_pct": "24.0500",
+        "new_weight_pct": "19.0300",
+        "weight_change_pct": "-5.0200",
+        "target_weight_pct": "19.0300",
+        "conviction_tier": "Tier 2",
+        "portfolio_role": "Core beta",
+        "funding_source_note": "Guarded auto-execution: reduce SPY to fund IEFA."
+      },
+      {
+        "trade_id": "model-2026-06-04-20260604_221223-01-IEFA-BUY",
+        "trade_date": "2026-06-04",
+        "source_report": "runtime:etf_report_state_20260604_20260604_221223.json",
+        "ticker": "IEFA",
+        "action": "Buy",
+        "shares_delta": "66.035145",
+        "previous_weight_pct": "0.0000",
+        "new_weight_pct": "5.0200",
+        "weight_change_pct": "5.0200",
+        "target_weight_pct": "5.0200",
+        "conviction_tier": "",
+        "portfolio_role": "Rotation destination",
+        "funding_source_note": "Guarded auto-execution: buy IEFA funded by SPY."
+      }
+    ],
+    "portfolio_state_written": true,
+    "trade_ledger_written": true,
+    "post_trade_nav_eur": 111153.24,
+    "post_trade_invested_market_value_eur": 109216.72,
+    "post_trade_cash_eur": 1936.52
   }
 }
