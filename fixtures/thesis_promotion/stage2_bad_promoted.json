@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "stage_2_thesis_promotion_chain",
+  "authority": {
+    "client_facing_authority": true,
+    "lane_scoring_authority": true,
+    "fundability_authority": true,
+    "portfolio_action_authority": true,
+    "report_surface_allowed": true,
+    "production_report_path_changed": true
+  },
+  "stage_2_chain_status": "fundable",
+  "active_driver_id": "ai_compute_capex",
+  "taxonomy_tag": "ai_compute_infrastructure",
+  "lane_name": "AI compute infrastructure",
+  "primary_etf": "SMH",
+  "driver_to_beneficiary_rationale": "Unsafe fixture: this should not be promoted by contract validation.",
+  "relative_strength_confirmation": {},
+  "valuation_grade_pricing": {},
+  "portfolio_discipline_clearance": {},
+  "missing_requirements": [],
+  "promotion_status": "promoted"
+}
