@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -14,8 +15,9 @@ from runtime.build_etf_report_state import build_runtime_state
 from runtime.max_position_action_contract import over_cap_tickers
 
 SNAKE_CASE_RE = re.compile(r"\b[a-z]+(?:_[a-z0-9]+){1,}\b")
-EN_NEGATIVE_RE = re.compile(r"(\breduce\s+(?:\[[^\]]+\]\([^\)]+\)|[A-Z][A-Z0-9.-]*)\s+by\s+)-(\d+(?:\.\d+)?%)", re.IGNORECASE)
+EN_NEGATIVE_RE = re.compile(r"(\breduce\s+(?:\[[^\]]+\]\([^\)]+\)|[A-Z][A-Z0-9.-]*)\s+(?:by)\s+)-(\d+(?:\.\d+)?%)", re.IGNORECASE)
 NL_NEGATIVE_RE = re.compile(r"(\bverlaag\s+(?:\[[^\]]+\]\([^\)]+\)|[A-Z][A-Z0-9.-]*)\s+met\s+)-(\d+(?:\.\d+)?%)", re.IGNORECASE)
+PORTFOLIO_STATE_PATH = Path("output/etf_portfolio_state.json")
 
 EXACT_REPLACEMENTS = {
     "rotation_decisions, target_weights and trade_intents": "the portfolio rotation plan, target allocations and proposed trade intents",
@@ -45,6 +47,24 @@ PHRASE_REPLACEMENTS = {
     "override rotation budget already used": "override: rotation budget already used",
 }
 
+EXITED_GLD_REPLACEMENTS = {
+    "GLD → GSG": "prior commodity-breadth rotation into GSG",
+    "GLD -> GSG": "prior commodity-breadth rotation into GSG",
+    "Added as commodity-breadth replacement for part of GLD.": "Added as current commodity-breadth hedge exposure after the prior gold-sleeve exit.",
+    "Added as commodity-breadth replacement for part of GLD": "Added as current commodity-breadth hedge exposure after the prior gold-sleeve exit",
+    "Gold hedge review": "Commodity-breadth hedge review",
+    "gold hedge review": "commodity-breadth hedge review",
+    "Gold hedge behavior remains under review rather than automatic ballast.": "Commodity-breadth hedge behavior remains under review rather than automatic ballast.",
+    "Het gedrag van goud als hedge blijft onder herbeoordeling en is geen automatische stabilisator.": "De grondstoffenbrede hedgefunctie blijft onder herbeoordeling en is geen automatische stabilisator.",
+    "Laat de huidige portefeuille voorlopig intact, maar behandel SPY, PPA, PAVE en GLD als posities onder actieve herbeoordeling.": "Laat de huidige portefeuille voorlopig intact, maar behandel SPY, PPA, PAVE en de hedgefunctie als posities onder actieve herbeoordeling.",
+    "GLD blijft een hedgepositie onder herbeoordeling en is geen vanzelfsprekende stabilisator.": "De hedgefunctie blijft onder herbeoordeling en is geen vanzelfsprekende stabilisator.",
+    "PPA moet zich bewijzen tegenover ITA, PAVE tegenover GRID, en GLD moet bewijzen dat het nog steeds een stabiliserende hedgefunctie heeft.": "PPA moet zich bewijzen tegenover ITA, PAVE tegenover GRID, en de hedgefunctie moet bewijzen dat zij nog steeds stabiliseert.",
+    "| Herbeoordeling goudhedge | GLD | GSG / BIL | Hedgefunctie moet worden bewezen. | Onder herbeoordeling |": "| Herbeoordeling grondstoffenhedge | GSG | DBC / BIL | De huidige grondstoffenbrede hedgefunctie moet worden bewezen tegenover cash en alternatieven. | Onder herbeoordeling |",
+    "| Goud | Neutraal | Hedgerol onder herbeoordeling. |": "| Defensieve ballast | Neutraal | Hedge- en cashachtige rollen blijven onder opportunity-cost-review. |",
+    "| Hedgedrawdown | GLD moet zijn hedgefunctie bewijzen | GSG en BIL blijven alternatieven | GSG, BIL, cash | Onproductieve hedgepositie | Houd GLD onder herbeoordeling | Direct | Gemiddeld |": "| Hedgedrawdown | De hedgefunctie moet zichzelf bewijzen | GSG, BIL en cash blijven alternatieven | GSG, BIL, cash | Onproductieve hedgepositie | Houd de huidige hedgefunctie onder herbeoordeling | Direct | Gemiddeld |",
+    "- GLD: hedge-validiteitstest vereist.\n": "",
+}
+
 
 def _clean_snake_token(match: re.Match[str]) -> str:
     token = match.group(0)
@@ -52,6 +72,14 @@ def _clean_snake_token(match: re.Match[str]) -> str:
     if replacement:
         return replacement
     return token.replace("_", " ")
+
+
+def _active_tickers_from_portfolio_state() -> set[str]:
+    try:
+        payload = json.loads(PORTFOLIO_STATE_PATH.read_text(encoding="utf-8"))
+        return {str(position.get("ticker") or "").upper() for position in payload.get("positions", []) if str(position.get("ticker") or "").strip()}
+    except Exception:
+        return set()
 
 
 def _over_cap_from_state() -> list[str]:
@@ -72,6 +100,15 @@ def _strip_ticker_from_list(value: str, ticker: str, none_label: str = "None") -
     value = re.sub(r"\s*,\s*,\s*", ", ", value)
     value = re.sub(r"^\s*,\s*|\s*,\s*$", "", value.strip())
     return value if value else none_label
+
+
+def _scrub_exited_holding_references(text: str) -> str:
+    active = _active_tickers_from_portfolio_state()
+    if "GLD" in active:
+        return text
+    for source, target in EXITED_GLD_REPLACEMENTS.items():
+        text = text.replace(source, target)
+    return text
 
 
 def _scrub_over_cap_adds(text: str, tickers: list[str]) -> str:
@@ -128,7 +165,6 @@ def _scrub_over_cap_adds(text: str, tickers: list[str]) -> str:
             text,
             flags=re.IGNORECASE,
         )
-        # Structural Opportunity Radar table: a promoted over-cap lane can be structurally valid, but not fundable/actionable for fresh capital.
         text = re.sub(
             rf"(\|[^\n]*\|\s*{ticker_pat}\s*\|[^\n]*\|[^\n]*\|[^\n]*\|[^\n]*\|\s*)Actionable now(\s*\|)",
             rf"\1{capped_status}\2",
@@ -164,9 +200,11 @@ def scrub_text(text: str, over_cap: list[str] | None = None) -> str:
     for source, target in PHRASE_REPLACEMENTS.items():
         text = text.replace(source, target)
     text = SNAKE_CASE_RE.sub(_clean_snake_token, text)
+    text = _scrub_exited_holding_references(text)
     text = _scrub_over_cap_adds(text, over_cap or [])
     for source, target in PHRASE_REPLACEMENTS.items():
         text = text.replace(source, target)
+    text = _scrub_exited_holding_references(text)
     return text
 
 
