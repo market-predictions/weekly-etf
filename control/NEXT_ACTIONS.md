@@ -31,17 +31,18 @@
 - Latest evidence:
   ```text
   workflow: Send weekly ETF Pro report
-  run_number: 195
-  trigger_commit: e0a6f075127f1a079ca880accd26923928349f9c
-  run_id: 20260601_213417
-  requested_close_date: 2026-06-01
+  run_number: 205
+  trigger_commit: 3bd07f7ff31af77adbd23359d66a8c5ab7ab3343
+  run_id: 20260604_190001
+  requested_close_date: 2026-06-03
   workflow_status: workflow_success
   workflow_conclusion: success
   pricing_lineage_status: passed
+  delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-03_20260604_190001.json
   report_authority_source: portfolio_state_post_execution
-  english_report_path: output/weekly_analysis_pro_260601_04.md
-  dutch_report_path: output/weekly_analysis_pro_nl_260601_04.md
-  total_portfolio_value_eur: 110290.91
+  english_report_path: output/weekly_analysis_pro_260603.md
+  dutch_report_path: output/weekly_analysis_pro_nl_260603.md
+  total_portfolio_value_eur: 111596.96
   ```
 - Current baseline:
   ```text
@@ -64,14 +65,16 @@
   → delivery HTML/PDF validation
   → pricing-lineage pre-send gate
   → PDF/email delivery workflow step
+  → redaction-safe delivery manifest summary
+  → final run manifest with delivery_manifest_path
   ```
 - Action:
   - preserve the split between runtime provenance and post-execution official portfolio state
   - do not repair strict branded sections through markdown post-processing
   - do not let new macro/thesis content bypass runtime-state, bilingual parity, delivery HTML, or compliance validation
-  - do not claim email delivery without a delivery receipt/manifest or explicit user confirmation
+  - keep workflow success, pricing-lineage success, SMTP-send evidence, and inbox receipt distinct
 
-### 2. ETF pricing-lineage contract
+### 2. ETF pricing-lineage and delivery-evidence contract
 
 - Owner: `[ASSISTANT]`
 - Status: completed / active regression guard
@@ -79,35 +82,46 @@
   - `tools/validate_etf_pricing_lineage_contract.py`
   - `tools/validate_etf_client_surface_clean.py`
   - `tools/write_weekly_etf_run_manifest.py`
+  - `tools/write_etf_delivery_manifest_summary.py`
   - `.github/workflows/send-weekly-report.yml`
-- Current rule:
+  - `control/DELIVERY_MANIFEST_STATUS_20260604.md`
+- Current rules:
   ```text
   runtime state = pre-execution pricing/report-state provenance
   official portfolio state = post-execution active holdings after guarded execution
   client report Section 7 / Section 15 = post-execution official portfolio state when execution occurred in the same run
+  delivery manifest = redaction-safe SMTP-send evidence, not inbox receipt
   ```
 - Action going forward:
   - keep the hard pricing-lineage validator before send
   - keep manifest status `passed` separate from workflow lifecycle status
   - keep current active-holdings pricing rows dynamic, not stale hardcoded ticker sets
   - keep valuation-grade challenger pricing requirements
-  - do not describe delivery as successful without delivery evidence
+  - keep delivery summary redaction-safe
+  - do not describe delivery as end-recipient receipt unless user confirms receipt or a true receipt artifact exists
 
-### 3. Add delivery receipt/manifest evidence
+### 3. Delivery receipt/manifest evidence
 
 - Owner: `[ASSISTANT]`
-- Status: next operational hardening
-- Problem:
-  - `workflow_conclusion: success` proves the workflow passed.
-  - `pricing_lineage_status: passed` proves the report/state/pricing chain passed.
-  - But latest manifest still has `delivery_manifest_path: null`, so email delivery is not independently proven from repo evidence.
-- Action:
-  - add or repair a delivery receipt/manifest writer after the actual send step
-  - record sent timestamp, report paths, PDF attachment paths, and redaction-safe recipient/transport metadata if available
-  - keep delivery success separate from workflow success
-- Done when:
-  - run manifest points to a real `delivery_manifest_path`
-  - the delivery manifest is committed or uploaded as an artifact in a durable place
+- Status: closed for this stage / SMTP-send evidence green
+- Latest evidence:
+  ```text
+  workflow: Send weekly ETF Pro report
+  run_number: 205
+  run_id: 20260604_190001
+  requested_close_date: 2026-06-03
+  delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-03_20260604_190001.json
+  delivery_status: smtp_sendmail_returned_no_exception
+  language_count: 2
+  recipient_data_policy: redacted_hash_only
+  ```
+- Completed:
+  - delivery summary writer added after successful send step
+  - final run manifest receives `--delivery-manifest`
+  - `output/delivery/*.json` and `output/delivery/*.txt` are committed
+  - latest manifest has non-null `delivery_manifest_path`
+- Remaining boundary:
+  - this is SMTP-send evidence only, not inbox placement / end-recipient receipt
 
 ### 4. Direct visual PDF inspection
 
@@ -115,7 +129,7 @@
 - Status: pending only because binary artifacts are not sandbox-renderable through the current GitHub connector
 - Boundary:
   - repo evidence confirms latest PDFs and chart assets exist and validations passed
-  - the GitHub connector exposes binary files as base64 text resources, not sandbox-renderable files
+  - the GitHub connector exposes binary files as base64 text resources rather than sandbox-renderable files
 - Action:
   - upload the latest English and Dutch PDFs here for visual inspection; or
   - expose/download the Actions artifact ZIP so the PDFs can be rendered with the PDF skill
