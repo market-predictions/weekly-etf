@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import sys
@@ -16,6 +17,7 @@ from runtime.scrub_etf_client_surface import scrub_text
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
 SNAKE_CASE_RE = re.compile(r"\b[a-z]+(?:_[a-z0-9]+){1,}\b")
 DOUBLE_NEGATIVE_RE = re.compile(r"\b(?:reduce|verlaag)\s+[A-Z][A-Z0-9.-]*\s+(?:by|met)\s+-\d+(?:\.\d+)?%", re.IGNORECASE)
+PORTFOLIO_STATE_PATH = Path("output/etf_portfolio_state.json")
 
 FORBIDDEN_TOKENS = [
     "Placeholder for runtime replacement",
@@ -67,6 +69,15 @@ MIN_SECTION_CHARS = {
 
 LEGACY_FINAL_ACTION_COLUMNS = ["Ticker", "Suggested Action", "Total Score", "Portfolio Role"]
 ROTATION_FINAL_ACTION_COLUMNS = ["Ticker", "Current weight", "Target weight", "Delta weight", "Action", "Release score"]
+
+INACTIVE_HOLDING_CURRENT_SURFACE_BLOCKS = {
+    "GLD": [
+        "GLD → GSG",
+        "GLD -> GSG",
+        "Gold hedge review",
+        "Added as commodity-breadth replacement for part of GLD",
+    ]
+}
 
 
 def _canonical_report_key(path: Path) -> tuple[str, int] | None:
@@ -133,6 +144,13 @@ def _section_title_options(section_number: int, canonical: str) -> list[str]:
     return SECTION_TITLE_ALIASES.get(section_number, [canonical])
 
 
+def active_portfolio_tickers(path: Path = PORTFOLIO_STATE_PATH) -> set[str]:
+    if not path.exists():
+        return set()
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    return {str(position.get("ticker") or "").upper() for position in payload.get("positions", []) if str(position.get("ticker") or "").strip()}
+
+
 def validate_no_forbidden_tokens(md_text: str, report_path: Path) -> None:
     lower = md_text.lower()
     for token in FORBIDDEN_TOKENS:
@@ -146,6 +164,19 @@ def validate_no_forbidden_tokens(md_text: str, report_path: Path) -> None:
         )
     if DOUBLE_NEGATIVE_RE.search(md_text):
         raise RuntimeError(f"ETF content contract failed for {report_path.name}: double-negative reduction wording remains.")
+
+
+def validate_no_stale_inactive_holding_surface(md_text: str, report_path: Path) -> None:
+    active = active_portfolio_tickers()
+    for ticker, blocked_phrases in INACTIVE_HOLDING_CURRENT_SURFACE_BLOCKS.items():
+        if ticker in active:
+            continue
+        found = [phrase for phrase in blocked_phrases if phrase in md_text]
+        if found:
+            raise RuntimeError(
+                f"ETF content contract failed for {report_path.name}: exited holding {ticker} leaks into current-state report surface: "
+                + ", ".join(found)
+            )
 
 
 def validate_required_sections(md_text: str, report_path: Path) -> None:
@@ -226,6 +257,7 @@ def validate_report(report_path: Path) -> None:
         print(f"ETF_CLIENT_SURFACE_SCRUBBED_BEFORE_CONTENT_VALIDATION | report={report_path.name}")
     md_text = normalize(report_path.read_text(encoding="utf-8"))
     validate_no_forbidden_tokens(md_text, report_path)
+    validate_no_stale_inactive_holding_surface(md_text, report_path)
     validate_required_sections(md_text, report_path)
     validate_structural_radar(md_text, report_path)
     validate_equity_curve(md_text, report_path)
