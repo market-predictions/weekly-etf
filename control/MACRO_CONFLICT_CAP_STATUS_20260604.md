@@ -48,6 +48,22 @@ The validator now supports:
 
 The workflow now runs that check.
 
+## Targeted planted-failure fixtures
+
+Added targeted expected-failure fixtures:
+
+```text
+fixtures/macro_compliance/bad_shadow_label_leakage.md
+fixtures/macro_compliance/bad_orphan_macro_figure.md
+```
+
+The workflow validates them separately:
+
+```text
+Validate shadow label leakage fixture fails
+Validate orphan macro figure fixture fails
+```
+
 ## Commits
 
 ```text
@@ -55,11 +71,15 @@ be38f0e976e648c23647f8a19886b62ccc11185a  document macro conflict cap methodolog
 cdb09fa7868193839789ec11b6c2d48714d594a4  validate macro conflict cap methodology note
 5c54f11edfe40f9735a86b3ded33f8678fda253c  validate macro conflict cap methodology in compliance workflow
 f53eac45473c5863bdad8214a75f3fcf090d4661  trigger macro compliance validation rerun
+021f87e2fe08c1f5d62cc18b23a22285b4afd994  add macro compliance shadow label leakage fixture
+57ab7d32f96ab6e9a56b8a7359c8b61404f8ff1f  add macro compliance orphan figure fixture
+ce5097f672be98054730762a85350f7e5dc89651  validate targeted macro compliance failure fixtures
+ef12aa4167be1fe97732c1cadadb102cd4d47d27  fix orphan macro figure planted failure fixture
 ```
 
 ## Verification status
 
-The macro compliance workflow was rerun by a harmless watched fixture commit:
+Macro-conflict cap methodology workflow validation:
 
 ```text
 workflow: Validate ETF macro compliance
@@ -70,14 +90,26 @@ observed_at: 2026-06-04
 source: user-provided GitHub Actions UI screenshot
 ```
 
-The screenshot shows the green checkmark for:
+Targeted macro compliance fixture validation:
 
 ```text
-trigger macro compliance validation rerun
-Validate ETF macro compliance #9
-commit f53eac4
-branch main
-duration 11s
+workflow: Validate ETF macro compliance
+run_number: 13
+trigger_commit: ef12aa4167be1fe97732c1cadadb102cd4d47d27
+status: passed
+branch: main
+duration: 14s
+observed_at: 2026-06-04
+source: user-provided GitHub Actions UI screenshot
+```
+
+The run validates that:
+
+```text
+safe macro fixture passes
+combined blocked macro fixture fails as expected
+shadow label leakage fixture fails as expected
+orphan macro figure fixture fails as expected
 ```
 
 ## Work-package status
@@ -85,6 +117,8 @@ duration 11s
 Macro-conflict cap methodology decision: closed for this stage.
 
 Macro-conflict cap methodology workflow validation: confirmed green by user-provided Actions UI evidence.
+
+Targeted macro compliance planted-failure fixtures: closed for this stage and confirmed green by user-provided Actions UI evidence.
 
 ## Next action
 
@@ -96,4 +130,4 @@ tools/validate_macro_compliance.py
 .github/workflows/validate-macro-compliance.yml
 ```
 
-Recommended next step: add targeted planted-failure fixtures for shadow-label leakage and orphan macro figures if not already sufficiently covered.
+Recommended next step: review whether macro compliance should now also validate the actual latest committed English and Dutch report artifacts, not only fixtures and the macro pack surface.
