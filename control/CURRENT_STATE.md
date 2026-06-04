@@ -18,6 +18,8 @@
 - an approved, shadow-first macro/thesis roadmap
 - no-network macro-audit fixture replay wired into the isolated macro-regime shadow workflow
 - macro compliance validation covering methodology, planted failures, macro pack surface, and latest committed EN/NL report macro sections
+- Stage-1 thesis candidate shadow validation evidence
+- a green Stage-2 thesis promotion discipline contract, still contract-only and not promoted
 
 The latest confirmed production validation run is:
 
@@ -83,6 +85,38 @@ orphan macro figure fixture fails as expected
 
 This is a compliance/output-surface gate only. It does **not** promote deterministic macro/regime output to client-facing, lane-scoring, fundability, or portfolio-action authority.
 
+The latest confirmed Stage-1 thesis candidate shadow validation run is:
+
+```text
+workflow: Validate ETF thesis candidates shadow
+run_number: 2
+workflow_run_id: 26969716983
+trigger_commit: b0579f1f30134b4fdd1b277025867e9db87961da
+status: passed
+validated_artifact: output/macro/validation/latest_thesis_candidates_validation.json
+active_driver_count: 9
+candidate_count: 29
+observed_at: 2026-06-04
+source: user-provided GitHub Actions UI screenshot and repo-visible evidence file
+```
+
+This proves the Stage-1 thesis candidate builder and fixtures validate and that repo-visible evidence is written. It does **not** make any candidate client-facing, fundable, lane-scoring-authoritative, or actionable.
+
+The latest confirmed Stage-2 thesis promotion contract validation run is:
+
+```text
+workflow: Validate ETF stage 2 thesis promotion contract
+run_number: 1
+trigger_commit: 09c175276a243593908660332a101778845dbc9f
+status: passed
+branch: main
+duration: 12s
+observed_at: 2026-06-04
+source: user-provided GitHub Actions UI screenshot
+```
+
+This proves the promotion-readiness contract and fixtures validate. It is still contract-only. It does **not** promote thesis candidates into production runtime behavior, lane scoring, fundability, report wording, recommendations, or portfolio actions.
+
 ## Four-layer operating status
 
 ### 1. Decision framework
@@ -96,6 +130,8 @@ The current decision framework remains:
 - no indefinite `Hold but replaceable` inertia
 - macro/thesis modernization approved only as a future phased enhancement
 - deterministic macro/regime classification remains shadow-only until later promotion gates pass
+- Stage-1 thesis candidates remain internal-only shadow artifacts
+- Stage-2 thesis promotion discipline is a contract gate only, not production authority
 - macro compliance gates may validate wording/surface safety, but they do not grant decision authority by themselves
 
 Post-execution authority is now explicit:
@@ -127,6 +163,19 @@ Shadow-only macro/regime validation evidence is recorded at:
 - `output/macro/validation/latest_macro_regime_shadow_validation.json`
 - `output/macro/validation/latest_macro_audit_axis_shadow_validation.json`
 - `output/macro/validation/latest_macro_regime_shadow_comparison.json`
+
+Stage-1 thesis candidate shadow validation evidence is recorded at:
+
+- `output/macro/validation/latest_thesis_candidates_validation.json`
+- `control/THESIS_CANDIDATES_SHADOW_STATUS_20260604.md`
+
+Stage-2 thesis promotion contract status is recorded at:
+
+- `control/STAGE2_THESIS_PROMOTION_CONTRACT.md`
+- `control/STAGE2_THESIS_PROMOTION_CONTRACT_STATUS_20260604.md`
+- `tools/validate_stage2_thesis_promotion_contract.py`
+- `.github/workflows/validate-stage2-thesis-promotion-contract.yml`
+- `fixtures/thesis_promotion/**`
 
 Macro compliance/methodology status is recorded at:
 
@@ -174,6 +223,24 @@ macro compliance self-test
 → planted failure fixtures fail as expected
 ```
 
+The latest isolated thesis candidate shadow run proves the separate internal-candidate chain:
+
+```text
+Stage-1 driver catalog and beneficiary map validation
+→ thesis candidate fixture replay
+→ current shadow thesis candidate artifact build
+→ thesis candidate validation evidence
+→ repo-visible evidence under output/macro/validation/
+```
+
+The latest isolated Stage-2 contract run proves the separate promotion-readiness contract chain:
+
+```text
+contract text validation
+→ safe ready-for-review-not-promoted fixture passes
+→ illegally promoted fixture fails as expected
+```
+
 ### 3. Output contract
 
 The report output contract is now:
@@ -188,6 +255,7 @@ The report output contract is now:
 - Dutch PDF chart labels are generated in Dutch in the runtime delivery path.
 - Client-facing reports must not leak internal plumbing labels.
 - Macro-audit-derived `macro_axes`, `macro_axis_scores`, and `deterministic_regime_shadow` must not appear in client-facing reports until future methodology, compliance, bilingual gates, and explicit promotion gates approve them.
+- Stage-1 thesis candidates and Stage-2 promotion-chain artifacts must not appear in client-facing reports until explicit promotion gates approve them.
 - The isolated macro compliance workflow validates the actual committed EN/NL macro-sensitive report sections, but only as a surface-safety check.
 
 ### 4. Operational runbook
@@ -245,6 +313,25 @@ workflow_dispatch or qualifying push
 → validate planted failure fixtures with --expect-fail
 ```
 
+The isolated thesis candidate shadow validation path is:
+
+```text
+workflow_dispatch or qualifying push
+→ validate Stage-1 thesis candidate fixtures
+→ build current shadow thesis candidate artifact
+→ write thesis candidate validation evidence
+→ commit thesis candidate validation evidence under output/macro/validation/
+```
+
+The isolated Stage-2 thesis promotion contract validation path is:
+
+```text
+workflow_dispatch or qualifying push
+→ validate Stage-2 contract text
+→ validate ready-for-review-not-promoted fixture
+→ validate illegally promoted fixture fails
+```
+
 ## Current strengths
 
 - Pricing retrieval and report reconciliation are validated at artifact level.
@@ -259,6 +346,8 @@ workflow_dispatch or qualifying push
 - Shadow macro audit remains non-authoritative and non-blocking.
 - No-network macro-audit fixture replay is wired into the isolated macro-regime shadow workflow and has passed with repo-visible evidence.
 - Macro compliance now validates methodology, planted failures, macro pack surface, and latest committed EN/NL macro report sections.
+- Stage-1 thesis candidate validation now writes repo-visible shadow evidence.
+- Stage-2 thesis promotion discipline now has a green contract-only validator and workflow.
 
 ## Current weaknesses / watch items
 
@@ -274,9 +363,9 @@ The repo contains generated PDFs/assets, but the GitHub connector exposes binary
 
 Rows can remain `fresh_exact_unverified` when one provider gives exact requested-date closes but no independent cross-provider verification has been recorded.
 
-### 4. Macro/thesis promotion remains blocked despite stronger compliance coverage
+### 4. Macro/thesis promotion remains blocked despite stronger compliance and contract coverage
 
-Macro compliance is now materially stronger, including methodology checks, planted-failure fixtures, macro pack surface validation, and latest committed EN/NL macro-section validation. That still does not complete promotion. Expanded deterministic macro/thesis content still requires explicit promotion decisions, bilingual parity checks, and authority review before any client-facing or portfolio-authority use.
+Macro/thesis controls are materially stronger, including methodology checks, planted-failure fixtures, macro pack surface validation, latest committed EN/NL macro-section validation, Stage-1 thesis candidate shadow evidence, and a Stage-2 promotion contract. That still does not complete promotion. Expanded deterministic macro/thesis content still requires explicit promotion decisions, bilingual parity checks, authority review, and runtime integration before any client-facing or portfolio-authority use.
 
 ### 5. Dutch aliases remain partially distributed
 
@@ -322,12 +411,14 @@ Current status:
 - Deterministic regime/confidence output remains shadow-only and non-authoritative.
 - Macro-conflict cap methodology is documented as a stable shadow methodology rule.
 - Macro compliance covers methodology, macro pack surface, planted failures, and latest committed EN/NL macro report sections.
+- Stage-1 thesis candidate shadow evidence is green and repo-visible.
+- Stage-2 thesis promotion discipline contract is green and contract-only.
 
 Next architecture track:
 
 - keep deterministic regime/confidence promotion review separate from client-surface wording validation
-- do not promote macro axes, shadow regime payload, Stage-1 thesis candidates, lane scoring, fundability, or portfolio-action authority without explicit control-layer promotion
-- continue only with shadow methodology, compliance, and promotion-readiness work unless a later decision changes authority
+- do not promote macro axes, shadow regime payload, Stage-1 thesis candidates, Stage-2 promotion chains, lane scoring, fundability, or portfolio-action authority without explicit control-layer promotion
+- continue only with shadow methodology, compliance, promotion-readiness contracts, and operational hardening unless a later decision changes authority
 
 ### Priority E — add direct challenger-vs-current-holding scoring
 
@@ -339,4 +430,4 @@ Next model enhancement:
 
 ## Current status label
 
-**ETF has a production-tested runtime-driven bilingual baseline with pricing-lineage proof passed for run `20260601_213417`. The system now distinguishes pre-execution runtime provenance from post-execution official portfolio-state authority. Dutch output is native/guard-only rather than broad-translated markdown. Pricing lineage, guarded execution, Dutch quality, and HTML/PDF render validation are green. Email delivery still requires a separate receipt/manifest or user confirmation. Macro-audit-derived regime axes are validated in isolated shadow CI, and macro compliance now validates methodology, planted failures, macro pack surface, and latest committed EN/NL macro report sections. Deterministic macro/regime/thesis outputs remain non-client-facing and non-authoritative for lane scoring, fundability, portfolio actions, and report recommendations until explicit promotion gates pass.**
+**ETF has a production-tested runtime-driven bilingual baseline with pricing-lineage proof passed for run `20260601_213417`. The system now distinguishes pre-execution runtime provenance from post-execution official portfolio-state authority. Dutch output is native/guard-only rather than broad-translated markdown. Pricing lineage, guarded execution, Dutch quality, and HTML/PDF render validation are green. Email delivery still requires a separate receipt/manifest or user confirmation. Macro-audit-derived regime axes are validated in isolated shadow CI, macro compliance validates methodology, planted failures, macro pack surface, and latest committed EN/NL macro report sections, Stage-1 thesis candidate shadow evidence is repo-visible and green, and the Stage-2 thesis promotion contract is green but contract-only. Deterministic macro/regime/thesis outputs remain non-client-facing and non-authoritative for lane scoring, fundability, portfolio actions, and report recommendations until explicit promotion gates pass.**
