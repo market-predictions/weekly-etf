@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "stage_2_thesis_promotion_chain",
+  "authority": {
+    "client_facing_authority": false,
+    "lane_scoring_authority": false,
+    "fundability_authority": false,
+    "portfolio_action_authority": false,
+    "report_surface_allowed": false,
+    "production_report_path_changed": false
+  },
+  "stage_2_chain_status": "ready_for_promotion_review_not_promoted",
+  "active_driver_id": "ai_compute_capex",
+  "taxonomy_tag": "ai_compute_infrastructure",
+  "lane_name": "AI compute infrastructure",
+  "primary_etf": "SMH",
+  "driver_to_beneficiary_rationale": "AI compute capex maps to semiconductor hardware exposure, but it still requires separate review before funding.",
+  "relative_strength_confirmation": {
+    "return_1m_pct": 8.5,
+    "return_3m_pct": 59.88,
+    "rs_vs_spy_1m_pct": 6.4,
+    "rs_vs_spy_3m_pct": 49.34,
+    "relative_strength_score": 1.25,
+    "source_artifact": "output/market_history/etf_relative_strength.json"
+  },
+  "valuation_grade_pricing": {
+    "primary_etf": "SMH",
+    "price_status": "fresh_exact_close",
+    "pricing_tier": "valuation_grade",
+    "source": "pricing_audit_fixture",
+    "requested_close_date": "2026-06-01",
+    "close_date_used": "2026-06-01"
+  },
+  "portfolio_discipline_clearance": {
+    "current_holding_overlap": false,
+    "cash_policy_sizing_room": true,
+    "capital_reunderwriting_status": "review_required",
+    "recommendation_scorecard_memory": "no_blocking_recent_reversal",
+    "replacement_or_addition_rationale": "candidate is ready for promotion review only; no action authority granted",
+    "clearance_status": "review_ready_not_actionable"
+  },
+  "missing_requirements": [],
+  "promotion_status": "not_promoted"
+}
