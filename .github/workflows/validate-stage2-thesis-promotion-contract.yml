@@ -1,0 +1,42 @@
+name: Validate ETF stage 2 thesis promotion contract
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/STAGE2_THESIS_PROMOTION_CONTRACT.md"
+      - "tools/validate_stage2_thesis_promotion_contract.py"
+      - "fixtures/thesis_promotion/**"
+      - ".github/workflows/validate-stage2-thesis-promotion-contract.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-stage2-thesis-promotion-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate contract text
+        run: |
+          python tools/validate_stage2_thesis_promotion_contract.py
+
+      - name: Validate safe Stage-2 fixture
+        run: |
+          python tools/validate_stage2_thesis_promotion_contract.py \
+            --artifact fixtures/thesis_promotion/stage2_ready_not_promoted.json
+
+      - name: Validate blocked promoted fixture fails
+        run: |
+          python tools/validate_stage2_thesis_promotion_contract.py \
+            --artifact fixtures/thesis_promotion/stage2_bad_promoted.json \
+            --expect-fail
