@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Validate the central Dutch terminology contract.
 
-This is a Phase 7 guardrail. It verifies that the central terminology module is
-usable by legacy localization, while native Dutch runtime reports remain
-independently constructed from runtime state and are protected from broad
-translation-style mutation.
+This is a guardrail for Dutch output quality. It verifies that the central
+terminology module is usable by legacy localization, that native Dutch runtime
+reports remain guard-only, and that runtime.nl_localization sources its alias
+maps from runtime.nl_terminology rather than maintaining duplicate dictionaries.
 """
 
 from __future__ import annotations
@@ -18,10 +18,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from runtime import nl_localization as loc
 from runtime import nl_terminology as term
 from runtime.apply_nl_localization import localize_report
-from runtime.scrub_nl_client_language import scrub_text
 from runtime.nl_localization import localize_text
+from runtime.scrub_nl_client_language import scrub_text
 from tools.validate_etf_dutch_language_quality import _failures_for_text
 
 
@@ -87,6 +88,22 @@ class ContractError(RuntimeError):
 def _assert(condition: bool, message: str) -> None:
     if not condition:
         raise ContractError(message)
+
+
+def _assert_same(name: str, left: object, right: object) -> None:
+    _assert(left is right, f"{name} is not sourced from runtime.nl_terminology")
+
+
+def validate_localization_aliases_are_centralized() -> None:
+    _assert_same("DUTCH_DISCLAIMER", loc.DUTCH_DISCLAIMER, term.DUTCH_DISCLAIMER)
+    _assert_same("ALLOWED_ENGLISH_TERMS", loc.ALLOWED_ENGLISH_TERMS, term.ALLOWED_ENGLISH_TERMS)
+    _assert_same("LABELS", loc.LABELS, term.REPORT_LABELS)
+    _assert_same("TABLE_LABELS", loc.TABLE_LABELS, term.TABLE_LABELS)
+    _assert_same("ACTION_REPLACEMENTS", loc.ACTION_REPLACEMENTS, term.ACTION_REPLACEMENTS)
+    _assert_same("PHRASE_REPLACEMENTS", loc.PHRASE_REPLACEMENTS, term.PHRASE_REPLACEMENTS)
+    _assert_same("DECISION_TRANSLATIONS", loc.DECISION_TRANSLATIONS, term.DECISION_TRANSLATIONS)
+    _assert_same("TRIGGER_TRANSLATIONS", loc.TRIGGER_TRANSLATIONS, term.TRIGGER_TRANSLATIONS)
+    _assert_same("FORBIDDEN_NL_STRINGS", loc.FORBIDDEN_NL_STRINGS, term.FORBIDDEN_NL_STRINGS)
 
 
 def validate_maps() -> None:
@@ -204,7 +221,8 @@ def validate_regex_entries() -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--self-test", action="store_true", help="Run embedded central terminology checks")
-    args = parser.parse_args()
+    parser.parse_args()
+    validate_localization_aliases_are_centralized()
     validate_maps()
     validate_bad_value_absence()
     validate_known_bad_tokens_are_repaired_or_blocked_in_legacy_mode()
@@ -212,7 +230,7 @@ def main() -> None:
     validate_legacy_runtime_overlay()
     validate_native_dutch_guard_only_overlay()
     validate_native_dutch_does_not_translate_english_leakage()
-    print("ETF_NL_TERMINOLOGY_CONTRACT_OK")
+    print("ETF_NL_TERMINOLOGY_CONTRACT_OK | source=runtime.nl_terminology")
 
 
 if __name__ == "__main__":
