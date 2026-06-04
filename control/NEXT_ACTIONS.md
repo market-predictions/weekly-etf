@@ -204,14 +204,11 @@
 - Latest evidence:
   ```text
   workflow: Validate ETF macro regime shadow
-  run_number: 14
-  workflow_run_id: 26877273381
-  trigger_commit: 3a7d87323a0a83bdaab5a81bb8a037f3babf9fff
+  run_number: 27
+  workflow_run_id: 26918418953
+  trigger_commit: 1c84de597cef54c17babb38389c0094cfc8e5c10
   status: passed
-  macro_data_audit_fixture: fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json
-  macro_axis_evidence_path: output/macro/validation/latest_macro_audit_axis_shadow_validation.json
-  regime_shadow_evidence_path: output/macro/validation/latest_macro_regime_shadow_validation.json
-  markers: ETF_MACRO_REGIME_FIXTURE_REPLAY_OK, ETF_MACRO_DATA_AUDIT_VALID_OK, ETF_MACRO_AUDIT_AXIS_SHADOW_OK, ETF_MACRO_REGIME_SHADOW_OK
+  validated_artifact: output/macro/validation/latest_macro_regime_shadow_validation.json
   ```
 - Completed in this stage:
   - no-network macro-data-audit fixture replay is wired into CI
@@ -223,21 +220,29 @@
   - document which official/market sources are authoritative enough for later Phase 3 promotion
   - keep all macro-audit-derived axes out of client reports and portfolio authority until methodology/compliance/promotion gates pass
 
-### 9. Define macro policy pack schema before changing decisions
+### 9. Macro policy pack schema / promotion contract
 
 - Owner: `[ASSISTANT]`
-- Status: next architecture task
-- Target files:
+- Status: closed for this stage / active promotion firewall
+- Current files:
   - `schemas/macro_policy_pack.schema.json`
   - `runtime/build_macro_policy_pack.py`
-  - `config/regime_thresholds.yml`
-- Action:
-  - define required fields for regime, confidence decomposition, central-bank stance, active drivers, lane adjustments, and provenance
-  - ensure backward compatibility for `lane_adjustments`
-  - explicitly mark any field that is shadow-only versus decision-authoritative
-- Done when:
-  - current legacy pack validates or has a compatibility adapter
-  - future deterministic regime engine has a stable output contract before implementation
+  - `runtime/build_macro_policy_pack_shadow.py`
+  - `tools/validate_macro_policy_pack.py`
+  - `control/MACRO_POLICY_PACK_CONTRACT_STATUS.md`
+- Current rule:
+  - current macro policy pack remains a legacy compatibility pack
+  - `lane_adjustments` remain legacy-compatible only
+  - `deterministic_regime_shadow`, `macro_axes`, `macro_axis_scores`, confidence decomposition, and active drivers remain shadow/internal unless explicitly promoted
+  - promotion gates remain `not_promoted`
+- Completed in this stage:
+  - policy pack schema requires authority, field authority, and promotion gates
+  - policy pack builder emits explicit authority contract
+  - validator enforces the promotion firewall
+  - isolated policy-pack contract workflow was validated from UI evidence
+- Remaining action:
+  - keep this contract active as a firewall for later deterministic regime/thesis work
+  - do not expand authority without explicit control-layer promotion
 
 ---
 
@@ -246,7 +251,7 @@
 ### 10. Replace hardcoded regime/confidence logic in shadow mode first
 
 - Owner: `[ASSISTANT]`
-- Status: shadow implementation started; fixture replay green; not promoted
+- Status: shadow implementation/calibration closed for this stage; not promoted
 - Target files:
   - `macro_regime/classify.py`
   - `macro_regime/confidence.py`
@@ -254,15 +259,21 @@
   - `runtime/build_macro_policy_pack_shadow.py`
   - `tools/replay_macro_regime_shadow_fixtures.py`
   - `tools/replay_macro_data_audit_shadow_fixture.py`
-  - `runtime/regime_memory.py` only if extension is needed
+  - `output/macro/validation/latest_macro_regime_shadow_comparison.json`
 - Current evidence:
   - deterministic market-proxy regime fixtures replay successfully
   - macro-audit-derived axes replay successfully via no-network fixture
+  - split legacy-vs-shadow comparison flags are validated
+  - macro-conflict confidence cap is documented and fixture-tested
+  - broader macro-conflict replay coverage is green
   - output remains under `deterministic_regime_shadow`
   - authority flags remain shadow-only and non-client-facing
-- Action:
-  - move any remaining thresholds out of code into config where useful
-  - review old-versus-new pack differences before promotion
+- Current rule:
+  - shadow confidence measures descriptive cross-axis agreement, not forecast probability
+  - risk-on shadow confidence can be capped when audited macro axes materially disagree
+  - non-risk-on macro disagreements are diagnostic only at this stage
+- Remaining action:
+  - review old-versus-new pack differences before any promotion discussion
   - keep output descriptive, not predictive
   - preserve current production decisions during shadow comparison
 - Done when:
@@ -274,23 +285,48 @@
 
 ## Phase 5 — compliance and methodology gates
 
-### 11. Add macro/thesis methodology and compliance validator
+### 11. Macro/thesis methodology and compliance validator
 
 - Owner: `[ASSISTANT]`
-- Status: planned before client-surface expansion
-- Target files:
+- Status: closed for current shadow-compliance stage / active regression guard
+- Current files:
   - `MACRO_METHODOLOGY.md`
+  - `control/MACRO_CONFLICT_CAP_METHODOLOGY.md`
+  - `control/MACRO_CONFLICT_CAP_STATUS_20260604.md`
   - `tools/validate_macro_compliance.py`
-  - Dutch language validator extensions if macro/thesis wording reaches Dutch reports
-- Action:
-  - block predictive phrasing about market levels or central-bank actions
-  - require cited/paraphrased overlay entries
-  - block Stage-1 candidate leakage
-  - ensure every client-surfaced macro claim traces to provenance
-- Done when:
-  - planted forecast sentences fail validation
-  - uncited overlay entries fail validation
-  - orphan macro claims fail validation
+  - `.github/workflows/validate-macro-compliance.yml`
+  - `fixtures/macro_compliance/**`
+- Current coverage:
+  - predictive macro/market/central-bank phrasing blocks
+  - uncited overlay claims block
+  - orphan macro figures block
+  - Stage-1 candidate leakage blocks
+  - shadow/internal label leakage blocks
+  - macro-conflict cap methodology is validated
+  - macro pack report surface is validated when `output/macro/latest.json` exists
+  - latest committed English/Dutch report macro sections are validated
+- Latest evidence:
+  ```text
+  workflow: Validate ETF macro compliance
+  run_number: 15
+  trigger_commit: 28b6ddda28bd7f287bef7e0622ef8e9c70e726eb
+  status: passed
+  branch: main
+  duration: 18s
+  observed_at: 2026-06-04
+  source: user-provided GitHub Actions UI screenshot
+  ```
+- Completed in this stage:
+  - planted forecast/predictive sentences fail validation
+  - shadow label leakage fixture fails validation
+  - orphan macro figure fixture fails validation
+  - safe macro fixture passes
+  - macro-conflict cap methodology validates
+  - latest committed EN/NL report macro sections validate
+- Remaining action:
+  - keep this as an active regression guard
+  - add further planted-failure fixtures only if a new macro/thesis surface risk appears
+  - do not interpret green compliance as promotion authority
 
 ---
 
@@ -299,7 +335,7 @@
 ### 12. Build thesis candidate layer as internal artifact only
 
 - Owner: `[ASSISTANT]`
-- Status: planned
+- Status: planned / still shadow-only
 - Target files:
   - `config/driver_catalog.yml`
   - `config/driver_beneficiary_map.yml`
@@ -322,7 +358,7 @@
 ### 13. Add thesis → fundable promotion discipline
 
 - Owner: `[ASSISTANT]`
-- Status: planned after shadow validation
+- Status: planned after shadow validation and explicit promotion review
 - Target files:
   - `runtime/valuation_sanity.py`
   - `runtime/score_etf_lanes.py`
