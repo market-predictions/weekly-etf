@@ -335,21 +335,40 @@
 ### 12. Build thesis candidate layer as internal artifact only
 
 - Owner: `[ASSISTANT]`
-- Status: planned / still shadow-only
-- Target files:
+- Status: closed for this stage / shadow-only evidence green
+- Current files:
   - `config/driver_catalog.yml`
   - `config/driver_beneficiary_map.yml`
   - `runtime/build_thesis_candidates.py`
-  - `output/macro/thesis_candidates_<reference_date>_<run_id>.json`
-- Action:
-  - define closed driver IDs
-  - derive active drivers from macro axes
-  - map drivers to beneficiary ETF lanes through curated config
-  - keep candidates internal until Stage-2 confirmation gates pass
-- Done when:
-  - same fixture produces same candidate list
-  - candidate lanes exist in the ETF discovery universe
-  - no candidate-stage content appears in client reports
+  - `tools/write_thesis_candidates_validation_evidence.py`
+  - `.github/workflows/validate-thesis-candidates-shadow.yml`
+  - `output/macro/validation/latest_thesis_candidates_validation.json`
+  - `control/THESIS_CANDIDATES_SHADOW_STATUS_20260604.md`
+- Latest evidence:
+  ```text
+  workflow: Validate ETF thesis candidates shadow
+  run_number: 2
+  workflow_run_id: 26969716983
+  trigger_commit: b0579f1f30134b4fdd1b277025867e9db87961da
+  status: passed
+  active_driver_count: 9
+  candidate_count: 29
+  source: user-provided GitHub Actions UI screenshot and repo-visible evidence file
+  ```
+- Current rule:
+  - Stage-1 thesis candidates are internal only
+  - candidates are not fundable without Stage-2 confirmation, valuation-grade pricing, and portfolio discipline gates
+  - candidates must not appear in English or Dutch reports
+  - candidates must not feed lane scoring, fundability, portfolio actions, or recommendations until explicitly promoted
+- Completed in this stage:
+  - closed driver IDs exist
+  - beneficiary mappings exist and resolve to ETF discovery universe lanes
+  - fixture packs replay deterministically
+  - current shadow thesis candidates build successfully
+  - repo-visible validation evidence is committed under `output/macro/validation/`
+- Remaining action:
+  - keep as an active shadow evidence guard
+  - do not consume `output/macro/latest_thesis_candidates.json` in production runtime paths without explicit promotion
 
 ---
 
@@ -358,22 +377,47 @@
 ### 13. Add thesis → fundable promotion discipline
 
 - Owner: `[ASSISTANT]`
-- Status: planned after shadow validation and explicit promotion review
-- Target files:
-  - `runtime/valuation_sanity.py`
-  - `runtime/score_etf_lanes.py`
-  - `runtime/discover_etf_lanes.py`
-  - challenger/fundability validators
-- Action:
-  - require active thesis driver
-  - require documented driver → beneficiary rationale
-  - require relative-strength / duel confirmation
-  - require valuation-grade pricing
-  - add valuation/crowding caution flag where needed
-- Done when:
-  - no RS confirmation means candidate remains candidate
-  - no valuation-grade pricing means not fundable
-  - every fundable item exposes a complete chain from driver to confirmation
+- Status: contract baseline green / not promoted
+- Current files:
+  - `control/STAGE2_THESIS_PROMOTION_CONTRACT.md`
+  - `control/STAGE2_THESIS_PROMOTION_CONTRACT_STATUS_20260604.md`
+  - `tools/validate_stage2_thesis_promotion_contract.py`
+  - `fixtures/thesis_promotion/stage2_ready_not_promoted.json`
+  - `fixtures/thesis_promotion/stage2_bad_promoted.json`
+  - `.github/workflows/validate-stage2-thesis-promotion-contract.yml`
+- Latest evidence:
+  ```text
+  workflow: Validate ETF stage 2 thesis promotion contract
+  run_number: 1
+  trigger_commit: 09c175276a243593908660332a101778845dbc9f
+  status: passed
+  branch: main
+  duration: 12s
+  observed_at: 2026-06-04
+  source: user-provided GitHub Actions UI screenshot
+  ```
+- Current contract chain:
+  ```text
+  active thesis driver
+  + mapped beneficiary lane
+  + documented driver-to-beneficiary rationale
+  + relative-strength confirmation
+  + valuation-grade pricing
+  + portfolio-discipline clearance
+  + explicit control-layer promotion decision
+  ```
+- Current rule:
+  - `ready_for_promotion_review_not_promoted` is the maximum allowed status before explicit promotion
+  - `fundable`, `recommended`, `portfolio_action_ready`, and `client_facing` are blocked by contract validation
+  - authority flags for client surface, lane scoring, fundability, portfolio actions, report surface, and production report path must remain false
+- Completed in this stage:
+  - Stage-2 promotion contract added
+  - safe ready-for-review-not-promoted fixture passes
+  - illegal promoted fixture fails as expected
+  - dedicated workflow is green
+- Remaining action:
+  - do not integrate Stage-2 output into `runtime/score_etf_lanes.py`, `runtime/discover_etf_lanes.py`, reports, or execution until a later explicit promotion review
+  - if promotion is later requested, first design non-authoritative Stage-2 chain artifacts and compare them against lane discovery without changing fundability
 
 ---
 
