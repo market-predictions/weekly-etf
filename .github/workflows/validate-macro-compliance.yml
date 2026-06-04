@@ -61,3 +61,15 @@ jobs:
           python tools/validate_macro_compliance.py \
             --text fixtures/macro_compliance/bad_predictive_macro_note.md \
             --expect-fail
+
+      - name: Validate shadow label leakage fixture fails
+        run: |
+          python tools/validate_macro_compliance.py \
+            --text fixtures/macro_compliance/bad_shadow_label_leakage.md \
+            --expect-fail
+
+      - name: Validate orphan macro figure fixture fails
+        run: |
+          python tools/validate_macro_compliance.py \
+            --text fixtures/macro_compliance/bad_orphan_macro_figure.md \
+            --expect-fail
