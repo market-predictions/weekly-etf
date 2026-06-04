@@ -4,9 +4,10 @@
 This validator is intentionally conservative. It protects the macro/thesis roadmap
 while the deterministic regime engine remains shadow-only.
 
-It can validate report text, macro-pack JSON, methodology notes, or embedded
-self-tests. The first production use should be as a gate before any expanded
-macro/regime/thesis text is allowed onto the client surface.
+It can validate report text, macro-pack JSON, methodology notes, committed report
+macro sections, or embedded self-tests. The first production use should be as a
+gate before any expanded macro/regime/thesis text is allowed onto the client
+surface.
 """
 
 from __future__ import annotations
@@ -135,6 +136,39 @@ def validate_text(text: str) -> list[Finding]:
     return findings
 
 
+def _extract_report_macro_sections(text: str) -> str:
+    lines = text.splitlines()
+    selected: list[str] = []
+    for line in lines:
+        if re.match(r"^##\s+5\.", line):
+            break
+        selected.append(line)
+    return "\n".join(selected).strip() + "\n"
+
+
+def _latest_report_artifacts(output_dir: Path) -> list[Path]:
+    if not output_dir.exists():
+        raise SystemExit(f"Report output directory not found: {output_dir}")
+    english = sorted(p for p in output_dir.glob("weekly_analysis_pro_*.md") if "_nl_" not in p.name)
+    dutch = sorted(output_dir.glob("weekly_analysis_pro_nl_*.md"))
+    if not english:
+        raise SystemExit("No English weekly_analysis_pro_*.md report artifact found")
+    if not dutch:
+        raise SystemExit("No Dutch weekly_analysis_pro_nl_*.md report artifact found")
+    return [english[-1], dutch[-1]]
+
+
+def validate_report_macro_sections(path: Path) -> list[Finding]:
+    if not path.exists():
+        return [Finding("report_artifact_missing", "Report artifact is missing.", 1, str(path))]
+    text = path.read_text(encoding="utf-8")
+    section = _extract_report_macro_sections(text)
+    if not section.strip():
+        return [Finding("report_macro_section_empty", "Report macro section extraction produced no text.", 1, str(path))]
+    print(f"ETF_MACRO_COMPLIANCE_REPORT_SECTION_CHECK | path={path}")
+    return validate_text(section)
+
+
 def validate_cap_methodology(path: Path) -> list[Finding]:
     if not path.exists():
         return [Finding("cap_methodology_missing", "Macro conflict cap methodology note is missing.", 1, str(path))]
@@ -228,6 +262,9 @@ def main() -> None:
     parser.add_argument("--text", type=Path, action="append", default=[], help="Text/markdown report file to validate")
     parser.add_argument("--macro-pack", type=Path, action="append", default=[], help="Macro policy pack JSON to validate")
     parser.add_argument("--cap-methodology", type=Path, action="append", default=[], help="Macro conflict cap methodology note to validate")
+    parser.add_argument("--report-macro-sections", type=Path, action="append", default=[], help="Report artifact whose macro-sensitive sections should be validated")
+    parser.add_argument("--latest-report-macro-sections", action="store_true", help="Validate macro-sensitive sections of latest committed English and Dutch report artifacts")
+    parser.add_argument("--report-output-dir", type=Path, default=Path("output"), help="Directory containing committed report artifacts")
     parser.add_argument("--self-test", action="store_true", help="Run embedded positive and negative validator tests")
     parser.add_argument("--expect-fail", action="store_true", help="Exit 0 only if findings are produced")
     args = parser.parse_args()
@@ -245,6 +282,11 @@ def main() -> None:
         findings.extend(validate_macro_pack(path))
     for path in args.cap_methodology:
         findings.extend(validate_cap_methodology(path))
+    for path in args.report_macro_sections:
+        findings.extend(validate_report_macro_sections(path))
+    if args.latest_report_macro_sections:
+        for path in _latest_report_artifacts(args.report_output_dir):
+            findings.extend(validate_report_macro_sections(path))
 
     if args.expect_fail:
         if findings:
