@@ -44,9 +44,10 @@ The validator now supports:
 
 ```text
 --cap-methodology control/MACRO_CONFLICT_CAP_METHODOLOGY.md
+--latest-report-macro-sections
 ```
 
-The workflow now runs that check.
+The workflow now runs both checks.
 
 ## Targeted planted-failure fixtures
 
@@ -64,6 +65,18 @@ Validate shadow label leakage fixture fails
 Validate orphan macro figure fixture fails
 ```
 
+## Latest report macro-section validation
+
+Added focused report-artifact validation:
+
+```text
+tools/validate_macro_compliance.py --latest-report-macro-sections
+```
+
+This dynamically finds the latest committed English and Dutch markdown report artifacts and validates only the macro-sensitive early report surface, ending before Section 5.
+
+This avoids treating the full portfolio report as a macro-only compliance target while still checking the actual committed client-facing macro/regime surface.
+
 ## Commits
 
 ```text
@@ -75,6 +88,8 @@ f53eac45473c5863bdad8214a75f3fcf090d4661  trigger macro compliance validation re
 57ab7d32f96ab6e9a56b8a7359c8b61404f8ff1f  add macro compliance orphan figure fixture
 ce5097f672be98054730762a85350f7e5dc89651  validate targeted macro compliance failure fixtures
 ef12aa4167be1fe97732c1cadadb102cd4d47d27  fix orphan macro figure planted failure fixture
+d1566788361ba65ef97cf61259d7d83cf2bdbfde  validate latest report macro sections
+28b6ddda28bd7f287bef7e0622ef8e9c70e726eb  validate latest report macro sections
 ```
 
 ## Verification status
@@ -103,9 +118,27 @@ observed_at: 2026-06-04
 source: user-provided GitHub Actions UI screenshot
 ```
 
-The run validates that:
+Latest committed EN/NL report macro-section validation:
 
 ```text
+workflow: Validate ETF macro compliance
+run_number: 15
+trigger_commit: 28b6ddda28bd7f287bef7e0622ef8e9c70e726eb
+status: passed
+branch: main
+duration: 18s
+observed_at: 2026-06-04
+source: user-provided GitHub Actions UI screenshot
+```
+
+The macro compliance workflow now validates:
+
+```text
+macro compliance self-test
+macro conflict cap methodology
+macro report surface self-test
+current macro report surface if pack exists
+latest committed English/Dutch report macro sections
 safe macro fixture passes
 combined blocked macro fixture fails as expected
 shadow label leakage fixture fails as expected
@@ -120,6 +153,8 @@ Macro-conflict cap methodology workflow validation: confirmed green by user-prov
 
 Targeted macro compliance planted-failure fixtures: closed for this stage and confirmed green by user-provided Actions UI evidence.
 
+Latest committed EN/NL report macro-section validation: closed for this stage and confirmed green by user-provided Actions UI evidence.
+
 ## Next action
 
 Continue with macro compliance hardening only if needed:
@@ -130,4 +165,4 @@ tools/validate_macro_compliance.py
 .github/workflows/validate-macro-compliance.yml
 ```
 
-Recommended next step: review whether macro compliance should now also validate the actual latest committed English and Dutch report artifacts, not only fixtures and the macro pack surface.
+Recommended next step: update `control/CURRENT_STATE.md` and `control/NEXT_ACTIONS.md` to reflect that macro compliance now covers methodology, planted failures, macro pack surface, and latest committed report macro sections.
