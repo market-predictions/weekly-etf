@@ -9,11 +9,12 @@ on:
       - "config/driver_catalog.yml"
       - "config/driver_beneficiary_map.yml"
       - "runtime/build_thesis_candidates.py"
+      - "tools/write_thesis_candidates_validation_evidence.py"
       - "fixtures/thesis_candidates/**"
       - ".github/workflows/validate-thesis-candidates-shadow.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validate-thesis-candidates-shadow:
@@ -21,6 +22,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -60,3 +63,28 @@ jobs:
             --macro-pack output/macro/latest.json \
             --reference-date 2026-05-29 \
             --run-id shadow_validation
+
+      - name: Write thesis candidates validation evidence
+        run: |
+          python tools/write_thesis_candidates_validation_evidence.py \
+            --artifact output/macro/latest_thesis_candidates.json \
+            --output-dir output/macro/validation \
+            --workflow-name "${{ github.workflow }}" \
+            --workflow-run-id "${{ github.run_id }}" \
+            --workflow-run-number "${{ github.run_number }}" \
+            --workflow-attempt "${{ github.run_attempt }}" \
+            --commit-sha "${{ github.sha }}" \
+            --source-ref "${{ github.ref_name }}"
+
+      - name: Commit thesis candidate validation evidence
+        if: github.event_name != 'pull_request'
+        run: |
+          if [ -z "$(git status --porcelain -- output/macro/validation/*thesis_candidates*.json)" ]; then
+            echo "ETF_THESIS_CANDIDATES_EVIDENCE_NO_CHANGE"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/macro/validation/*thesis_candidates*.json
+          git commit -m "record thesis candidate shadow validation evidence [skip ci]"
+          git push
