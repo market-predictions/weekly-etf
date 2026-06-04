@@ -1,0 +1,77 @@
+{
+  "artifact_type": "stage_1_thesis_candidates_validation_evidence",
+  "authority": {
+    "client_facing_authority": false,
+    "decision_impact": "none_stage1_thesis_candidates_only",
+    "fundability_authority": false,
+    "lane_scoring_authority": false,
+    "portfolio_action_authority": false,
+    "production_report_path_changed": false,
+    "report_surface_allowed": false,
+    "shadow_only": true
+  },
+  "generated_at_utc": "2026-06-04T17:55:28Z",
+  "guardrails": [
+    "Stage-1 thesis candidates are internal only.",
+    "No candidate is fundable without Stage-2 confirmation, valuation-grade pricing, and portfolio discipline gates.",
+    "Do not surface this artifact in English or Dutch reports.",
+    "Do not feed Stage-1 thesis candidates into lane scoring, fundability, portfolio actions, or recommendations until explicitly promoted."
+  ],
+  "repository": "market-predictions/weekly-etf",
+  "schema_version": "1.0",
+  "source_artifact": "output/macro/latest_thesis_candidates.json",
+  "status": "passed",
+  "summary": {
+    "active_driver_count": 9,
+    "active_driver_ids": [
+      "ai_compute_capex",
+      "china_policy_recovery",
+      "commodity_inflation_hedge",
+      "defense_resilience",
+      "duration_easing_long_duration",
+      "grid_power_demand",
+      "healthcare_defensive_growth",
+      "non_us_developed_diversification",
+      "nuclear_energy_security"
+    ],
+    "candidate_count": 29,
+    "candidate_taxonomy_tags": [
+      "agri_food_security",
+      "agriculture_commodities",
+      "ai_compute_infrastructure",
+      "biotech_innovation",
+      "broad_commodities",
+      "china_materials_recovery",
+      "china_policy_recovery",
+      "copper_electrification",
+      "critical_minerals",
+      "cyber_security",
+      "defense_resilience",
+      "europe_defense_industry",
+      "factory_automation",
+      "fintech_infrastructure",
+      "grid_power",
+      "healthcare_quality",
+      "non_us_developed_equities",
+      "nuclear_utilities",
+      "power_utilities_capex",
+      "robotics_automation",
+      "uranium_nuclear",
+      "water_infrastructure"
+    ],
+    "driver_count": 9,
+    "reference_date": "2026-05-29",
+    "run_id": "shadow_validation"
+  },
+  "validated_markers": [
+    "ETF_THESIS_CANDIDATES_SHADOW_OK"
+  ],
+  "workflow": {
+    "commit_sha": "b0579f1f30134b4fdd1b277025867e9db87961da",
+    "name": "Validate ETF thesis candidates shadow",
+    "run_attempt": "1",
+    "run_id": "26969716983",
+    "run_number": "2",
+    "source_ref": "main"
+  }
+}
