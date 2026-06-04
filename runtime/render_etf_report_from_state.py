@@ -30,6 +30,7 @@ ETF_NAMES = {
     "GSG": "GSG",
 }
 VALUATION_HISTORY_PATH = Path("output/etf_valuation_history.csv")
+EXITED_TICKERS_WITH_STRICT_SURFACE_RULES = {"GLD"}
 
 
 def f2(value: Any) -> str:
@@ -64,6 +65,37 @@ def position_rows(state: dict[str, Any]) -> list[dict[str, Any]]:
     return list(state.get("positions", []) or [])
 
 
+def active_tickers(state: dict[str, Any]) -> set[str]:
+    return {str(p.get("ticker", "")).upper() for p in position_rows(state) if str(p.get("ticker", "")).strip()}
+
+
+def is_active(state: dict[str, Any], ticker: str) -> bool:
+    return str(ticker).upper() in active_tickers(state)
+
+
+def sanitize_client_text_for_active_state(value: Any, state: dict[str, Any]) -> str:
+    """Remove stale active-position wording for exited holdings.
+
+    Historical source data may still contain references such as GLD -> GSG.
+    Client-facing current-state sections must not make exited holdings look active.
+    """
+    out = text(value)
+    if not out:
+        return out
+    if not is_active(state, "GLD"):
+        replacements = {
+            "Added as commodity-breadth replacement for part of GLD.": "Added as current commodity-breadth hedge exposure after the prior gold-sleeve exit.",
+            "Added as commodity-breadth replacement for part of GLD": "Added as current commodity-breadth hedge exposure after the prior gold-sleeve exit",
+            "GLD → GSG": "prior commodity-breadth rotation into GSG",
+            "GLD -> GSG": "prior commodity-breadth rotation into GSG",
+            "Gold hedge review": "Commodity-breadth hedge review",
+            "gold hedge review": "commodity-breadth hedge review",
+        }
+        for old, new in replacements.items():
+            out = out.replace(old, new)
+    return out
+
+
 def is_post_execution_state(state: dict[str, Any]) -> bool:
     context = state.get("execution_context") or {}
     flags = state.get("validation_flags") or {}
@@ -71,8 +103,12 @@ def is_post_execution_state(state: dict[str, Any]) -> bool:
 
 
 def reflected_rotation_label(state: dict[str, Any]) -> str:
-    tickers = {str(p.get("ticker", "")).upper() for p in position_rows(state)}
-    return "GLD → GSG" if {"GLD", "GSG"}.issubset(tickers) else "guarded model rotation"
+    tickers = active_tickers(state)
+    if "GSG" in tickers and "GLD" not in tickers:
+        return "prior commodity-breadth rotation into GSG"
+    if {"GLD", "GSG"}.issubset(tickers):
+        return "GLD to GSG rotation"
+    return "guarded model rotation"
 
 
 def cash_eur(state: dict[str, Any]) -> float:
@@ -184,7 +220,9 @@ def current_position_table(state: dict[str, Any]) -> str:
     lines = ["| Ticker | Score | Action | Conviction | Fresh-cash test | Key point | Required next action |", "|---|---:|---|---|---|---|---|"]
     for p in position_rows(state):
         action = p.get("rotation_action_code") or p.get("suggested_action", "Hold")
-        lines.append(f"| {p.get('ticker')} | {f2(p.get('total_score'))} | {action} | {p.get('conviction_tier', '')} | {p.get('fresh_cash_test', '')} | {short_text(p.get('short_reason'), 'No material change this run.')} | {short_text(p.get('required_next_action'), 'Hold and reassess next run.')} |")
+        key_point = sanitize_client_text_for_active_state(short_text(p.get("short_reason"), "No material change this run."), state)
+        required = sanitize_client_text_for_active_state(short_text(p.get("required_next_action"), "Hold and reassess next run."), state)
+        lines.append(f"| {p.get('ticker')} | {f2(p.get('total_score'))} | {action} | {p.get('conviction_tier', '')} | {p.get('fresh_cash_test', '')} | {key_point} | {required} |")
     return "\n".join(lines)
 
 
@@ -195,7 +233,8 @@ def final_action_table(state: dict[str, Any]) -> str:
     lines = ["| Ticker | ETF | Existing/New | Weight Inherited | Target Weight | Suggested Action | Conviction Tier | Total Score | Portfolio Role | Better Alternative Exists? | Short Reason |", "|---|---|---|---:|---:|---|---|---:|---|---|---|"]
     for p in position_rows(state):
         ticker = str(p.get("ticker", "")).upper()
-        lines.append(f"| {ticker} | {ETF_NAMES.get(ticker, ticker)} | {p.get('existing_new', 'Existing')} | {f2(p.get('weight_inherited_pct') or p.get('previous_weight_pct'))} | {f2(p.get('target_weight_pct') or w.get(ticker))} | {p.get('suggested_action', 'Hold')} | {p.get('conviction_tier', '')} | {f2(p.get('total_score'))} | {p.get('portfolio_role', '')} | {p.get('better_alternative_exists', 'No')} | {p.get('short_reason', '')} |")
+        short_reason = sanitize_client_text_for_active_state(p.get("short_reason", ""), state)
+        lines.append(f"| {ticker} | {ETF_NAMES.get(ticker, ticker)} | {p.get('existing_new', 'Existing')} | {f2(p.get('weight_inherited_pct') or p.get('previous_weight_pct'))} | {f2(p.get('target_weight_pct') or w.get(ticker))} | {p.get('suggested_action', 'Hold')} | {p.get('conviction_tier', '')} | {f2(p.get('total_score'))} | {p.get('portfolio_role', '')} | {p.get('better_alternative_exists', 'No')} | {short_reason} |")
     return "\n".join(lines)
 
 
@@ -214,7 +253,8 @@ def position_changes_table(state: dict[str, Any]) -> str:
         ticker = str(p.get("ticker", "")).upper()
         prev = float(p.get("previous_weight_pct") or p.get("current_weight_pct") or 0.0)
         new = w.get(ticker, prev)
-        lines.append(f"| {ticker} | {prev:.2f} | {new:.2f} | {new - prev:.2f} | {f2(p.get('shares_delta_this_run'))} | {p.get('action_executed_this_run', 'None')} | {p.get('funding_source_note', '')} |")
+        note = sanitize_client_text_for_active_state(p.get("funding_source_note", ""), state)
+        lines.append(f"| {ticker} | {prev:.2f} | {new:.2f} | {new - prev:.2f} | {f2(p.get('shares_delta_this_run'))} | {p.get('action_executed_this_run', 'None')} | {note} |")
     cash_pct = cash_eur(state) / (total_nav(state) or 1.0) * 100.0
     lines.append(f"| CASH | - | {cash_pct:.2f} | - | 0.00 | None | Residual cash |")
     return "\n".join(lines)
@@ -225,7 +265,9 @@ def continuity_table(state: dict[str, Any]) -> str:
     lines = ["| Ticker | ETF Name | Direction | Weight % | Avg Entry | Current Price | P/L % | Original Thesis | Role |", "|---|---|---:|---:|---:|---:|---:|---|---|"]
     for p in position_rows(state):
         ticker = str(p.get("ticker", "")).upper()
-        lines.append(f"| {ticker} | {ETF_NAMES.get(ticker, ticker)} | {p.get('direction', 'Long')} | {f2(w.get(ticker))} | {f2(p.get('avg_entry_local'))} | {f2(p.get('previous_price_local'))} | {f2(p.get('pnl_pct'))} | {p.get('original_thesis', '')} | {p.get('portfolio_role', '')} |")
+        thesis = sanitize_client_text_for_active_state(p.get("original_thesis", ""), state)
+        role = sanitize_client_text_for_active_state(p.get("portfolio_role", ""), state)
+        lines.append(f"| {ticker} | {ETF_NAMES.get(ticker, ticker)} | {p.get('direction', 'Long')} | {f2(w.get(ticker))} | {f2(p.get('avg_entry_local'))} | {f2(p.get('previous_price_local'))} | {f2(p.get('pnl_pct'))} | {thesis} | {role} |")
     return "\n".join(lines)
 
 
@@ -260,6 +302,22 @@ def best_opportunities_text(state: dict[str, Any]) -> str:
     return "\n".join(["- SMH remains the leading funded growth exposure, subject to the max-position rule.", *challenger_lines, "- Replacement candidates remain evidence-gated: pricing basis and duel status must be visible before funding."])
 
 
+def continuity_watchlist_table(state: dict[str, Any]) -> str:
+    lines = [
+        "| Theme | Primary ETF | Alternative ETF | Why I’m considering it | Current status |",
+        "|---|---|---|---|---|",
+        "| AI compute infrastructure | SMH | SOXX | Strongest secular growth exposure. | Active |",
+        "| Defense innovation / sovereign resilience | PPA | ITA | Defense thesis valid but vehicle under review. | Duel required |",
+        "| Grid buildout / electrification | PAVE | GRID | Infrastructure capex remains valid. | Duel required |",
+    ]
+    if is_active(state, "GSG"):
+        lines.append("| Commodity-breadth hedge review | GSG | DBC / BIL | Current commodity-breadth hedge role must be proven against cash and broad commodity alternatives. | Under review |")
+    else:
+        lines.append("| Defensive ballast review | BIL | SHV | Defensive ballast must earn its role versus cash and opportunity cost. | Watchlist |")
+    lines.append("| Non-U.S. developed diversification | IEFA | EFA | Portfolio has limited non-U.S. exposure. | Watchlist |")
+    return "\n".join(lines)
+
+
 def _replace_between(text_value: str, start_heading: str, end_heading: str, replacement_body: str) -> str:
     pattern = re.compile(rf"({re.escape(start_heading)}\n\n).*?(\n\n{re.escape(end_heading)})", re.DOTALL)
     return pattern.sub(rf"\1{replacement_body}\2", text_value)
@@ -276,10 +334,10 @@ def render_en(state: dict[str, Any]) -> str:
     eurusd = eurusd_used(state)
     if is_post_execution_state(state):
         rotation_note = f"{reflected_rotation_label(state)} is already reflected in the official portfolio state and trade ledger; this run performed no duplicate state or ledger mutation."
-        bottom_line_exit = f"No new exit is being executed in this report; the prior {reflected_rotation_label(state)} rotation is already reflected."
+        bottom_line_exit = f"No new exit is being executed in this report; the prior rotation is already reflected in official state."
         portfolio_upgrade = f"{reflected_rotation_label(state)} is reflected in official state; next upgrades remain evidence-gated."
         continuity_rotation = "completed and persisted in the official portfolio state and trade ledger"
-        changes_added = "a guarded model rotation state in which GLD → GSG is already reflected; no duplicate execution was performed"
+        changes_added = "the latest guarded model rotation is already reflected in the official portfolio state; no duplicate execution was performed"
     else:
         rotation_note = "Rotation plan is active and drives target weights/trade intents." if has_rotation_plan(state) else "Legacy recommendation labels are used because no rotation plan is present."
         bottom_line_exit = "Determined by the rotation plan when active; otherwise no close is executed by legacy state."
@@ -398,7 +456,7 @@ def render_en(state: dict[str, Any]) -> str:
 | small cap | Underweight | Rates and refinancing remain difficult. |
 | growth | Neutral | Selective growth led by SMH remains attractive. |
 | quality | Overweight | Earnings durability remains valuable. |
-| gold | Neutral | Hedge role under review. |
+| defensive ballast | Neutral | Hedge and cash-like roles remain under opportunity-cost review. |
 | industrials / defense | Overweight | Structural thesis valid; vehicle under review. |
 | non-USD assets | Watchlist | Zero allocation is an explicit U.S. exceptionalism bet. |
 
@@ -461,13 +519,7 @@ The position review separates three questions: is the thesis still valid, is the
 - Leverage allowed: No
 
 ### Watchlist / dynamic radar memory
-| Theme | Primary ETF | Alternative ETF | Why I’m considering it | Current status |
-|---|---|---|---|---|
-| AI compute infrastructure | SMH | SOXX | Strongest secular growth exposure. | Active |
-| Defense innovation / sovereign resilience | PPA | ITA | Defense thesis valid but vehicle under review. | Duel required |
-| Grid buildout / electrification | PAVE | GRID | Infrastructure capex remains valid. | Duel required |
-| Gold hedge review | GLD | GSG / BIL | Hedge role must be proven. | Under review |
-| Non-U.S. developed diversification | IEFA | EFA | Portfolio has zero non-U.S. exposure. | Watchlist |
+{continuity_watchlist_table(state)}
 
 ### Recommendation discipline continuity
 - Rotation execution: {continuity_rotation}.
