@@ -28,6 +28,30 @@ ETF_NAMES = {
     "GLD": "SPDR Gold Shares",
 }
 
+THESIS_FALLBACK_EN = {
+    "CIBR": "Cybersecurity resilience",
+    "DFEN": "Defense innovation / tactical defense beta",
+    "GSG": "Commodity-breadth hedge exposure",
+    "IEFA": "Non-U.S. developed-market diversification",
+    "PAVE": "Grid and infrastructure capex",
+    "SMH": "AI compute / semiconductor leadership",
+    "SPY": "Core U.S. large-cap exposure",
+    "URNM": "Nuclear and uranium cycle exposure",
+    "XLU": "Defensive utilities / rate-sensitive ballast",
+}
+
+THESIS_FALLBACK_NL = {
+    "CIBR": "Cybersecurityweerbaarheid",
+    "DFEN": "Defensie-innovatie / tactische defensiebèta",
+    "GSG": "Grondstoffenbrede hedge-blootstelling",
+    "IEFA": "Diversificatie in ontwikkelde markten buiten de VS",
+    "PAVE": "Netwerk- en infrastructuurcapex",
+    "SMH": "AI-rekenkracht en semiconductorleiderschap",
+    "SPY": "Amerikaanse large-cap kernblootstelling",
+    "URNM": "Kernenergie- en uraniumcyclus",
+    "XLU": "Defensieve nutsbedrijven / rentegevoelige ballast",
+}
+
 
 def _latest_report(output_dir: Path, language: str) -> Path:
     env_key = "MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL" if language == "nl" else "MRKT_RPRTS_EXPLICIT_REPORT_PATH"
@@ -121,13 +145,15 @@ def _source_thesis(position: dict[str, Any], ticker: str) -> tuple[str, bool]:
     raw = str(position.get("original_thesis") or "").strip()
     if raw:
         return raw, True
-    return ETF_NAMES.get(ticker, ticker), False
+    return THESIS_FALLBACK_EN.get(ticker, ETF_NAMES.get(ticker, ticker)), False
 
 
 def _display_thesis(position: dict[str, Any], ticker: str, language: str = "en") -> str:
     source, has_explicit_thesis = _source_thesis(position, ticker)
-    if language == "nl" and has_explicit_thesis:
-        return nl_thesis(source, ticker)
+    if language == "nl":
+        if has_explicit_thesis:
+            return nl_thesis(source, ticker)
+        return THESIS_FALLBACK_NL.get(ticker, source)
     return source
 
 
