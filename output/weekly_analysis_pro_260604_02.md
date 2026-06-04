@@ -71,7 +71,7 @@
 
 ### What changed
 - AI / semiconductor leadership remains the dominant equity impulse.
-- Gold hedge behavior remains under review rather than automatic ballast.
+- Commodity-breadth hedge behavior remains under review rather than automatic ballast.
 
 ### Portfolio implications
 - Risk appetite is supportive, but fresh adds still need position-size room and pricing confirmation.
@@ -333,7 +333,7 @@ Role: Rotation destination. Required next action: None.
 | AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Strongest secular growth exposure. | Active / capped |
 | Defense innovation / sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructure capex remains valid. | Duel required |
-| Gold hedge review | [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Hedge role must be proven. | Under review |
+| Commodity-breadth hedge review | [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Hedge role must be proven. | Under review |
 | Non-U.S. developed diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | Portfolio has zero non-U.S. exposure. | Watchlist |
 
 ### Recommendation discipline continuity

@@ -38,7 +38,7 @@
 
 ### Wat veranderde
 - AI / semiconductor leadership remains the dominant equity impulse.
-- Gold hedge behavior remains under review rather than automatic ballast.
+- Commodity-breadth hedge behavior remains under review rather than automatic ballast.
 
 ### Portefeuille-implicaties
 - Keep SMH as the earned leader, but do not confuse narrow leadership with broad diversification.
@@ -88,7 +88,7 @@
 ## 5. Belangrijkste risico’s / invalidaties
 
 - SPY plus SMH creëert hoge Amerikaanse tech-/AI-factoroverlap.
-- GLD blijft een hedgepositie onder herbeoordeling en is geen vanzelfsprekende stabilisator.
+- De hedgefunctie blijft onder herbeoordeling en is geen vanzelfsprekende stabilisator.
 - PPA en PAVE blijven vervangbaar totdat de kwaliteit van de ETF-implementatie is bewezen.
 - Niet-Amerikaanse aandelenblootstelling blijft een diversificatiekloof.
 
@@ -97,7 +97,7 @@
 - **Portefeuillehouding:** SMH blijft de best onderbouwde kernpositie, maar smal marktleiderschap mag niet worden verward met brede portefeuillediversificatie.
 - **Best onderbouwde blootstelling:** SMH blijft de sterkste bijdrage in de portefeuille en de zuiverste structurele groeiblootstelling.
 - **Belangrijkste disciplinepunt:** Voordat nieuw kapitaal naar alternatieven gaat, moeten SPY, PPA en PAVE expliciet worden getoetst aan hun belangrijkste vervangingskandidaten.
-- **Zwakste implementatievragen:** PPA moet zich bewijzen tegenover ITA, PAVE tegenover GRID, en GLD moet bewijzen dat het nog steeds een stabiliserende hedgefunctie heeft.
+- **Zwakste implementatievragen:** PPA moet zich bewijzen tegenover ITA, PAVE tegenover GRID, en de hedgefunctie moet bewijzen dat zij nog steeds stabiliseert.
 
 ## 7. Portefeuillecurve en portefeuilleontwikkeling
 
@@ -170,7 +170,7 @@ Rendement wordt berekend op de huidige ETF-posities op basis van de meest recent
 | Small-cap | Onderwogen | Rentes en herfinanciering blijven lastig. |
 | Groei | Neutraal | Selectieve groei onder leiding van SMH blijft aantrekkelijk. |
 | Kwaliteit | Overwogen | Winstbestendigheid blijft waardevol. |
-| Goud | Neutraal | Hedgerol onder herbeoordeling. |
+| Defensieve ballast | Neutraal | Hedge- en cashachtige rollen blijven onder opportunity-cost-review. |
 | Industrie / defensie | Overwogen | Structurele thesis is valide; ETF-implementatie onder herbeoordeling. |
 | Niet-USD activa | Volglijst | Nulallocatie is een expliciete inzet op Amerikaanse uitzonderingskracht. |
 
@@ -181,7 +181,7 @@ Rendement wordt berekend op de huidige ETF-posities op basis van de meest recent
 | AI-leiderschap | SMH blijft de zuiverste groeiblootstelling | Concentratie moet worden bewaakt | SMH, SOXX | Cyclische waarden van lagere kwaliteit | Aanhouden rond maximale positiegrootte | Direct | Hoog |
 | Factorconcentratie | SPY en SMH overlappen | De portefeuille is minder gediversifieerd dan het aantal tickers suggereert | QUAL, IEFA op de volglijst | Overlappende Amerikaanse beta | Houd SPY onder herbeoordeling | 1-3 maanden | Gemiddeld |
 | Defensiethesis versus ETF-implementatie | Defensie blijft structureel valide | PPA moet zich bewijzen tegenover ITA | ITA, PPA | Zwakke ETF-selectie | Houd PPA onder herbeoordeling | Direct | Gemiddeld |
-| Hedgedrawdown | GLD moet zijn hedgefunctie bewijzen | GSG en BIL blijven alternatieven | GSG, BIL, cash | Onproductieve hedgepositie | Houd GLD onder herbeoordeling | Direct | Gemiddeld |
+| Hedgedrawdown | De hedgefunctie moet zichzelf bewijzen | GSG, BIL en cash blijven alternatieven | GSG, BIL, cash | Onproductieve hedgepositie | Houd de huidige hedgefunctie onder herbeoordeling | Direct | Gemiddeld |
 
 ## 10. Review huidige posities
 
@@ -292,14 +292,13 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 | AI-rekenkrachtinfrastructuur | SMH | SOXX | Sterkste structurele groeiblootstelling. | Actief / begrensd |
 | Defensie-innovatie / strategische weerbaarheid | PPA | ITA | Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling. | Vervangingsanalyse vereist |
 | Netuitbreiding / elektrificatie | PAVE | GRID | Infrastructuurcapex blijft valide. | Vervangingsanalyse vereist |
-| Herbeoordeling goudhedge | GLD | GSG / BIL | Hedgefunctie moet worden bewezen. | Onder herbeoordeling |
+| Herbeoordeling grondstoffenhedge | GSG | DBC / BIL | De huidige grondstoffenbrede hedgefunctie moet worden bewezen tegenover cash en alternatieven. | Onder herbeoordeling |
 | Ontwikkelde markten buiten de VS | IEFA | EFA | De portefeuille heeft geen blootstelling aan ontwikkelde markten buiten de VS. | Volglijst |
 
 ### Continuïteit in aanbevelingsdiscipline
 - SPY: overlapreview tegenover SMH blijft actief.
 - PPA: directe vervangingsanalyse tegenover ITA vereist.
 - PAVE: directe vervangingsanalyse tegenover GRID vereist.
-- GLD: hedge-validiteitstest vereist.
 - Vervangingskandidaten: niet geschikt voor allocatie zonder afgeronde vervangingsanalyse.
 
 ### Randvoorwaarden

@@ -64,7 +64,7 @@
 
 ### What changed
 - AI / semiconductor leadership remains the dominant equity impulse.
-- Gold hedge behavior remains under review rather than automatic ballast.
+- Commodity-breadth hedge behavior remains under review rather than automatic ballast.
 
 ### Portfolio implications
 - Keep SMH as the earned leader, but do not confuse narrow leadership with broad diversification.
@@ -317,7 +317,7 @@ Role: Rotation destination. Required next action: None.
 | AI compute infrastructure | SMH | SOXX | Strongest secular growth exposure. | Active / capped |
 | Defense innovation / sovereign resilience | PPA | ITA | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | PAVE | GRID | Infrastructure capex remains valid. | Duel required |
-| Gold hedge review | GLD | GSG / BIL | Hedge role must be proven. | Under review |
+| Commodity-breadth hedge review | GLD | GSG / BIL | Hedge role must be proven. | Under review |
 | Non-U.S. developed diversification | IEFA | EFA | Portfolio has zero non-U.S. exposure. | Watchlist |
 
 ### Recommendation discipline continuity

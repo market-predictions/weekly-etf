@@ -38,7 +38,7 @@
 
 ### Wat veranderde
 - AI- en semiconductorleiderschap blijft de dominante aandelenimpuls.
-- Het gedrag van goud als hedge blijft onder herbeoordeling en is geen automatische stabilisator.
+- De grondstoffenbrede hedgefunctie blijft onder herbeoordeling en is geen automatische stabilisator.
 
 ### Portefeuille-implicaties
 - De risicobereidheid blijft ondersteunend, maar aanvullende allocaties vragen nog ruimte binnen de positielimiet en koersbevestiging.
@@ -174,7 +174,7 @@ Rendement wordt berekend op de huidige ETF-posities op basis van de meest recent
 | Small-cap | Onderwogen | Rentes en herfinanciering blijven lastig. |
 | Groei | Neutraal | Selectieve groei onder leiding van [SMH](https://www.tradingview.com/chart/?symbol=SMH) blijft aantrekkelijk. |
 | Kwaliteit | Overwogen | Winstbestendigheid blijft waardevol. |
-| Goud | Neutraal | Hedgerol onder herbeoordeling. |
+| Defensieve ballast | Neutraal | Hedge- en cashachtige rollen blijven onder opportunity-cost-review. |
 | Industrie / defensie | Overwogen | Structurele thesis is valide; ETF-implementatie onder herbeoordeling. |
 | Niet-USD activa | Volglijst | Nulallocatie is een expliciete inzet op Amerikaanse uitzonderingskracht. |
 

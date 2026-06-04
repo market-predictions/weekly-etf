@@ -7,7 +7,7 @@
 - **Primair regime:** Risk-on met smal marktleiderschap.
 - **Geopolitiek regime:** Gemengd / nog niet doorslaggevend.
 - **Wat is er deze week veranderd:** Macro-, beleids- en regime-input worden meegenomen in de beoordeling, maar alleen de belangrijkste beslissignalen worden getoond.
-- **Algemeen portefeuilleoordeel:** Laat de huidige portefeuille voorlopig intact, maar behandel SPY, PPA, PAVE en GLD als posities onder actieve herbeoordeling.
+- **Algemeen portefeuilleoordeel:** Laat de huidige portefeuille voorlopig intact, maar behandel SPY, PPA, PAVE en de hedgefunctie als posities onder actieve herbeoordeling.
 - **Belangrijkste conclusie:** SMH blijft de best onderbouwde kernpositie, maar nieuw kapitaal en vervangingsbeslissingen moeten koersbevestiging, relatieve sterkte en macrosteun doorstaan.
 
 ## 2. Portefeuille-acties
@@ -32,7 +32,7 @@
 
 ### Wat veranderde
 - AI- en semiconductorleiderschap blijft de dominante aandelenimpuls.
-- Het gedrag van goud als hedge blijft onder herbeoordeling en is geen automatische stabilisator.
+- De grondstoffenbrede hedgefunctie blijft onder herbeoordeling en is geen automatische stabilisator.
 
 ### Portefeuille-implicaties
 - [SMH](https://www.tradingview.com/chart/?symbol=SMH) blijft de best onderbouwde kernpositie, maar smal marktleiderschap mag niet worden verward met brede portefeuillediversificatie.
@@ -162,7 +162,7 @@ Rendement wordt berekend op de huidige ETF-posities op basis van de meest recent
 | Small-cap | Onderwogen | Rentes en herfinanciering blijven lastig. |
 | Groei | Neutraal | Selectieve groei onder leiding van [SMH](https://www.tradingview.com/chart/?symbol=SMH) blijft aantrekkelijk. |
 | Kwaliteit | Overwogen | Winstbestendigheid blijft waardevol. |
-| Goud | Neutraal | Hedgerol onder herbeoordeling. |
+| Defensieve ballast | Neutraal | Hedge- en cashachtige rollen blijven onder opportunity-cost-review. |
 | Industrie / defensie | Overwogen | Structurele thesis is valide; ETF-implementatie onder herbeoordeling. |
 | Niet-USD activa | Volglijst | Nulallocatie is een expliciete inzet op Amerikaanse uitzonderingskracht. |
 
