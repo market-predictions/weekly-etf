@@ -1,19 +1,39 @@
 {
-  "schema_version": "1.1",
-  "portfolio_mode": "client_long_only_thematic",
-  "base_currency": "EUR",
-  "valuation_source": "runtime_pricing_lineage_official_shares_v1",
-  "pricing_audit_file": "output/pricing/price_audit_2026-06-04_20260605_074816.json",
-  "trade_ledger_file": "etf_trade_ledger.csv",
-  "recommendation_scorecard_file": null,
-  "inception_date": "2026-03-28",
-  "starting_capital_eur": 100000.0,
-  "cash_eur": 1936.52,
-  "invested_market_value_eur": 109168.95,
-  "nav_eur": 111105.47,
-  "peak_nav_eur": 112376.1,
-  "max_drawdown_pct": -2.5105,
-  "positions": [
+  "schema_version": "1.0",
+  "created_at_utc": "2026-06-05T07:49:54.517577+00:00",
+  "execution_mode": "guarded_auto",
+  "execution_status": "already_executed",
+  "run_id": "20260605_074816",
+  "report_date": "2026-06-04",
+  "requested_close_date": "2026-06-04",
+  "source_files": {
+    "runtime_state": "output/runtime/etf_report_state_20260604_20260605_074816.json",
+    "portfolio_state": "output/etf_portfolio_state.json",
+    "trade_ledger": "output/etf_trade_ledger.csv",
+    "pricing_audit": "output/pricing/price_audit_2026-06-04_20260605_074816.json",
+    "rotation_plan": "output/runtime/etf_rotation_plan_260604_20260605_074816.json"
+  },
+  "policy_checks": {
+    "passed": true,
+    "errors": [],
+    "warnings": [
+      "guarded_rotation_already_executed_for_trade_date_and_pair"
+    ],
+    "mode_note": "No portfolio-state or trade-ledger write was performed because the same guarded model rotation already exists for the trade date and source/destination pair."
+  },
+  "pre_trade_portfolio": {
+    "cash_eur": 1936.52,
+    "total_portfolio_value_eur": 111105.47,
+    "base_currency": "EUR"
+  },
+  "post_trade_shadow_portfolio": {
+    "cash_eur": 1936.52,
+    "invested_market_value_eur": 109168.95,
+    "nav_eur": 111105.47,
+    "nav_drift_eur": 0.0
+  },
+  "proposed_ledger_rows": [],
+  "shadow_positions": [
     {
       "shares_delta_this_run": 0.0,
       "weight_change_pct": 0.0,
@@ -495,31 +515,17 @@
       "score_source": "semantic_fallback_until_position_score"
     }
   ],
-  "last_report": {
-    "date": "2026-06-04",
-    "source_report": "weekly_analysis_pro_260604_09.md",
-    "position_count": 9
+  "guarded_auto_result": {
+    "official_ledger_rows": [],
+    "portfolio_state_written": false,
+    "trade_ledger_written": false,
+    "idempotency_status": "already_executed",
+    "matched_pairs": [
+      "2026-06-04:SPY->IEFA"
+    ],
+    "post_trade_nav_eur": 111105.47,
+    "post_trade_invested_market_value_eur": 109168.95,
+    "post_trade_cash_eur": 1936.52
   },
-  "last_valuation": {
-    "date": "2026-06-04",
-    "nav_eur": 111105.47,
-    "invested_market_value_eur": 109168.95,
-    "cash_eur": 1936.52,
-    "since_inception_return_pct": 11.1055,
-    "daily_return_pct": -0.4404,
-    "drawdown_pct": -1.1307,
-    "eurusd_used": 1.1611,
-    "equity_curve_state": "Below prior high",
-    "valuation_notes": "Runtime valuation repriced from official portfolio-state shares"
-  },
-  "last_successful_runtime_state_file": "output/runtime/etf_report_state_20260604_20260605_074816.json",
-  "last_state_persisted_at_utc": "2026-06-05T07:49:54.340728+00:00",
-  "last_model_execution": {
-    "date": "2026-06-04",
-    "run_id": "20260604_221223",
-    "runtime_state": "output/runtime/etf_report_state_20260604_20260604_221223.json",
-    "mode": "guarded_auto",
-    "trade_count": 1,
-    "executed_at_utc": "2026-06-04T22:19:25.926063+00:00"
-  }
+  "artifact_path": "output/runtime/etf_model_execution_20260604_20260605_074816_already_executed.json"
 }
