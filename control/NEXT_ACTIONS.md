@@ -28,7 +28,7 @@
 
 - Owner: `[JOINT]`
 - Status: active baseline
-- Latest evidence:
+- Latest fully recorded production evidence:
   ```text
   workflow: Send weekly ETF Pro report
   run_number: 205
@@ -44,35 +44,21 @@
   dutch_report_path: output/weekly_analysis_pro_nl_260603.md
   total_portfolio_value_eur: 111596.96
   ```
-- Current baseline:
+- Latest report-surface cleanup evidence:
   ```text
-  pricing audit
-  → historical relative strength
-  → macro policy pack, with macro audit shadow-only
-  → first-pass lane discovery
-  → targeted challenger pricing
-  → final lane discovery
-  → challenger fundability validation
-  → portfolio rotation plan
-  → runtime state
-  → EN/NL native markdown render
-  → pricing-basis disclosure
-  → polish/linkify/localization
-  → run manifest
-  → persisted valuation state
-  → guarded model execution
-  → post-execution official portfolio state
-  → delivery HTML/PDF validation
-  → pricing-lineage pre-send gate
-  → PDF/email delivery workflow step
-  → redaction-safe delivery manifest summary
-  → final run manifest with delivery_manifest_path
+  workflow: Send weekly ETF Pro report
+  run_number: 216
+  trigger_commit: ce86dce050a75c2b21481162ad3b6952ebbdb1e7
+  workflow_conclusion: success
+  user-visible cleanup status: score completeness fixed, stale GLD current wording fixed, Dutch enum leakage fixed
+  inspected artifacts: weekly_analysis_pro_260604_10.pdf, weekly_analysis_pro_nl_260604_10.pdf
   ```
 - Action:
   - preserve the split between runtime provenance and post-execution official portfolio state
   - do not repair strict branded sections through markdown post-processing
+  - keep delivery-runtime localization for strict PDF/HTML panels
   - do not let new macro/thesis content bypass runtime-state, bilingual parity, delivery HTML, or compliance validation
-  - keep workflow success, pricing-lineage success, SMTP-send evidence, and inbox receipt distinct
+  - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, and inbox receipt distinct
 
 ### 2. ETF pricing-lineage and delivery-evidence contract
 
@@ -104,37 +90,29 @@
 
 - Owner: `[ASSISTANT]`
 - Status: closed for this stage / SMTP-send evidence green
-- Latest evidence:
-  ```text
-  workflow: Send weekly ETF Pro report
-  run_number: 205
-  run_id: 20260604_190001
-  requested_close_date: 2026-06-03
-  delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-03_20260604_190001.json
-  delivery_status: smtp_sendmail_returned_no_exception
-  language_count: 2
-  recipient_data_policy: redacted_hash_only
-  ```
-- Completed:
-  - delivery summary writer added after successful send step
-  - final run manifest receives `--delivery-manifest`
-  - `output/delivery/*.json` and `output/delivery/*.txt` are committed
-  - latest manifest has non-null `delivery_manifest_path`
 - Remaining boundary:
-  - this is SMTP-send evidence only, not inbox placement / end-recipient receipt
+  - delivery evidence is SMTP-send evidence only, not inbox placement / end-recipient receipt
+  - report-generation or visual PDF evidence does not equal inbox receipt
 
-### 4. Direct visual PDF inspection
+### 4. Direct visual PDF inspection / report-surface cleanup
 
 - Owner: `[JOINT]`
-- Status: pending only because binary artifacts are not sandbox-renderable through the current GitHub connector
-- Boundary:
-  - repo evidence confirms latest PDFs and chart assets exist and validations passed
-  - the GitHub connector exposes binary files as base64 text resources rather than sandbox-renderable files
-- Action:
-  - upload the latest English and Dutch PDFs here for visual inspection; or
-  - expose/download the Actions artifact ZIP so the PDFs can be rendered with the PDF skill
-- Done when:
-  - latest English and Dutch PDFs are visually inspected for layout, chart labels, table rendering, and Dutch client-clean wording
+- Status: closed for the current `_10` surface-cleanup loop
+- Completed evidence:
+  ```text
+  uploaded English PDF: weekly_analysis_pro_260604_10.pdf
+  uploaded Dutch PDF: weekly_analysis_pro_nl_260604_10.pdf
+  workflow run observed: Send weekly ETF Pro report #216 success
+  trigger_commit: ce86dce050a75c2b21481162ad3b6952ebbdb1e7
+  ```
+- Completed findings:
+  - all active positions have numeric scores in Current Position Review / Review huidige posities
+  - stale GLD current-surface wording is removed from the Dutch conclusion
+  - `No / under review` no longer leaks into the final Dutch report view after the delivery enum patch
+  - unwanted `Nee / onder herbeoordeling` surface wording is gone from the report where it should not appear
+- Future action:
+  - repeat visual inspection only when a new PDF/layout/localization defect is reported or after major delivery HTML changes
+  - when inspecting, use user-uploaded PDFs or a renderable Actions artifact because GitHub binary files may only expose base64 text through the connector
 
 ### 5. Remaining pricing-related enhancement: independent verification
 
@@ -173,22 +151,29 @@
   - keep native Dutch reports protected from broad translation-style mutation
   - only use narrow structured runtime-state display-label normalization where needed
   - keep Dutch chart labels localized in runtime delivery
+  - keep strict branded report sections localized at delivery HTML/runtime layer when those panels are regenerated after markdown
 
 ### 7. Consolidate bilingual alias handling
 
 - Owner: `[ASSISTANT]`
-- Status: useful cleanup after the production baseline is green
+- Status: useful cleanup; not a blocker for the current production surface
+- Current reason:
+  - the latest Dutch enum leak proved that markdown scrub and native Dutch validation are not enough for strict branded PDF/HTML panels rebuilt from runtime state
+  - delivery-runtime alias maps must share the same terminology source as native render and validators
 - Target files:
   - `runtime/nl_terminology.py`
   - `runtime/nl_localization.py`
   - `runtime/apply_nl_localization.py`
   - `runtime/scrub_nl_client_language.py`
+  - `runtime/delivery_html_overrides.py`
+  - `runtime/client_facing_sanitizer.py`
+  - `sitecustomize.py`
   - `send_report_runtime_html.py`
   - `tools/validate_etf_delivery_html_contract.py`
   - `tools/validate_etf_dutch_language_quality.py`
 - Action:
   - keep Dutch terminology and aliases in one source of truth
-  - reuse that source from native render, markdown validation, send-time parity checks, Dutch quality validation, and delivery HTML validation
+  - reuse that source from native render, markdown validation, send-time parity checks, Dutch quality validation, delivery HTML validation, and startup/delivery patches
   - avoid one-off text fixes spread across validators
 
 ---
@@ -199,37 +184,11 @@
 
 - Owner: `[ASSISTANT]`
 - Status: fixture replay wired / shadow-only baseline green
-- Current files:
-  - `config/macro_data_sources.yml`
-  - `config/cb_calendar.yml`
-  - `macro_sources/build_macro_data_audit.py`
-  - `tools/validate_macro_data_audit.py`
-  - `schemas/macro_data_audit.schema.json`
-  - `runtime/build_macro_policy_pack.py`
-  - `fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json`
-  - `tools/replay_macro_data_audit_shadow_fixture.py`
-  - `.github/workflows/validate-macro-regime-shadow.yml`
-  - `output/macro/validation/latest_macro_audit_axis_shadow_validation.json`
 - Current rule:
   - macro audit may build internal provenance artifacts
   - macro audit values must not change regime, confidence, lane scoring, fundability, portfolio actions, or client-facing wording yet
   - macro audit unavailability is non-blocking while the layer remains shadow-only
   - macro-audit-derived axes may be validated as shadow evidence only
-- Latest evidence:
-  ```text
-  workflow: Validate ETF macro regime shadow
-  run_number: 27
-  workflow_run_id: 26918418953
-  trigger_commit: 1c84de597cef54c17babb38389c0094cfc8e5c10
-  status: passed
-  validated_artifact: output/macro/validation/latest_macro_regime_shadow_validation.json
-  ```
-- Completed in this stage:
-  - no-network macro-data-audit fixture replay is wired into CI
-  - fixture validates required groups: `fred`, `ecb`, `treasury_fiscaldata`, `volatility`
-  - shadow policy-pack builder consumes the fixture
-  - `deterministic_regime_shadow.macro_axes` is populated and validated
-  - repo-visible evidence is written under `output/macro/validation/`
 - Remaining action:
   - document which official/market sources are authoritative enough for later Phase 3 promotion
   - keep all macro-audit-derived axes out of client reports and portfolio authority until methodology/compliance/promotion gates pass
@@ -238,22 +197,11 @@
 
 - Owner: `[ASSISTANT]`
 - Status: closed for this stage / active promotion firewall
-- Current files:
-  - `schemas/macro_policy_pack.schema.json`
-  - `runtime/build_macro_policy_pack.py`
-  - `runtime/build_macro_policy_pack_shadow.py`
-  - `tools/validate_macro_policy_pack.py`
-  - `control/MACRO_POLICY_PACK_CONTRACT_STATUS.md`
 - Current rule:
   - current macro policy pack remains a legacy compatibility pack
   - `lane_adjustments` remain legacy-compatible only
   - `deterministic_regime_shadow`, `macro_axes`, `macro_axis_scores`, confidence decomposition, and active drivers remain shadow/internal unless explicitly promoted
   - promotion gates remain `not_promoted`
-- Completed in this stage:
-  - policy pack schema requires authority, field authority, and promotion gates
-  - policy pack builder emits explicit authority contract
-  - validator enforces the promotion firewall
-  - isolated policy-pack contract workflow was validated from UI evidence
 - Remaining action:
   - keep this contract active as a firewall for later deterministic regime/thesis work
   - do not expand authority without explicit control-layer promotion
@@ -266,22 +214,6 @@
 
 - Owner: `[ASSISTANT]`
 - Status: shadow implementation/calibration closed for this stage; not promoted
-- Target files:
-  - `macro_regime/classify.py`
-  - `macro_regime/confidence.py`
-  - `config/regime_thresholds.yml`
-  - `runtime/build_macro_policy_pack_shadow.py`
-  - `tools/replay_macro_regime_shadow_fixtures.py`
-  - `tools/replay_macro_data_audit_shadow_fixture.py`
-  - `output/macro/validation/latest_macro_regime_shadow_comparison.json`
-- Current evidence:
-  - deterministic market-proxy regime fixtures replay successfully
-  - macro-audit-derived axes replay successfully via no-network fixture
-  - split legacy-vs-shadow comparison flags are validated
-  - macro-conflict confidence cap is documented and fixture-tested
-  - broader macro-conflict replay coverage is green
-  - output remains under `deterministic_regime_shadow`
-  - authority flags remain shadow-only and non-client-facing
 - Current rule:
   - shadow confidence measures descriptive cross-axis agreement, not forecast probability
   - risk-on shadow confidence can be capped when audited macro axes materially disagree
@@ -290,10 +222,6 @@
   - review old-versus-new pack differences before any promotion discussion
   - keep output descriptive, not predictive
   - preserve current production decisions during shadow comparison
-- Done when:
-  - fixture inputs produce deterministic regime/confidence outputs across both market-proxy and macro-audit inputs
-  - old versus new pack differences can be reviewed before promotion
-  - methodology/compliance/bilingual gates are ready for any client-surface test
 
 ---
 
@@ -303,40 +231,15 @@
 
 - Owner: `[ASSISTANT]`
 - Status: closed for current shadow-compliance stage / active regression guard
-- Current files:
-  - `MACRO_METHODOLOGY.md`
-  - `control/MACRO_CONFLICT_CAP_METHODOLOGY.md`
-  - `control/MACRO_CONFLICT_CAP_STATUS_20260604.md`
-  - `tools/validate_macro_compliance.py`
-  - `.github/workflows/validate-macro-compliance.yml`
-  - `fixtures/macro_compliance/**`
 - Current coverage:
   - predictive macro/market/central-bank phrasing blocks
   - uncited overlay claims block
   - orphan macro figures block
   - Stage-1 candidate leakage blocks
   - shadow/internal label leakage blocks
-  - macro-conflict cap methodology is validated
-  - macro pack report surface is validated when `output/macro/latest.json` exists
-  - latest committed English/Dutch report macro sections are validated
-- Latest evidence:
-  ```text
-  workflow: Validate ETF macro compliance
-  run_number: 15
-  trigger_commit: 28b6ddda28bd7f287bef7e0622ef8e9c70e726eb
-  status: passed
-  branch: main
-  duration: 18s
-  observed_at: 2026-06-04
-  source: user-provided GitHub Actions UI screenshot
-  ```
-- Completed in this stage:
-  - planted forecast/predictive sentences fail validation
-  - shadow label leakage fixture fails validation
-  - orphan macro figure fixture fails validation
-  - safe macro fixture passes
-  - macro-conflict cap methodology validates
-  - latest committed EN/NL report macro sections validate
+  - macro-conflict cap methodology validation
+  - macro pack report surface validation when `output/macro/latest.json` exists
+  - latest committed English/Dutch report macro sections validation
 - Remaining action:
   - keep this as an active regression guard
   - add further planted-failure fixtures only if a new macro/thesis surface risk appears
@@ -350,36 +253,11 @@
 
 - Owner: `[ASSISTANT]`
 - Status: closed for this stage / shadow-only evidence green
-- Current files:
-  - `config/driver_catalog.yml`
-  - `config/driver_beneficiary_map.yml`
-  - `runtime/build_thesis_candidates.py`
-  - `tools/write_thesis_candidates_validation_evidence.py`
-  - `.github/workflows/validate-thesis-candidates-shadow.yml`
-  - `output/macro/validation/latest_thesis_candidates_validation.json`
-  - `control/THESIS_CANDIDATES_SHADOW_STATUS_20260604.md`
-- Latest evidence:
-  ```text
-  workflow: Validate ETF thesis candidates shadow
-  run_number: 2
-  workflow_run_id: 26969716983
-  trigger_commit: b0579f1f30134b4fdd1b277025867e9db87961da
-  status: passed
-  active_driver_count: 9
-  candidate_count: 29
-  source: user-provided GitHub Actions UI screenshot and repo-visible evidence file
-  ```
 - Current rule:
   - Stage-1 thesis candidates are internal only
   - candidates are not fundable without Stage-2 confirmation, valuation-grade pricing, and portfolio discipline gates
   - candidates must not appear in English or Dutch reports
   - candidates must not feed lane scoring, fundability, portfolio actions, or recommendations until explicitly promoted
-- Completed in this stage:
-  - closed driver IDs exist
-  - beneficiary mappings exist and resolve to ETF discovery universe lanes
-  - fixture packs replay deterministically
-  - current shadow thesis candidates build successfully
-  - repo-visible validation evidence is committed under `output/macro/validation/`
 - Remaining action:
   - keep as an active shadow evidence guard
   - do not consume `output/macro/latest_thesis_candidates.json` in production runtime paths without explicit promotion
@@ -392,43 +270,10 @@
 
 - Owner: `[ASSISTANT]`
 - Status: contract baseline green / not promoted
-- Current files:
-  - `control/STAGE2_THESIS_PROMOTION_CONTRACT.md`
-  - `control/STAGE2_THESIS_PROMOTION_CONTRACT_STATUS_20260604.md`
-  - `tools/validate_stage2_thesis_promotion_contract.py`
-  - `fixtures/thesis_promotion/stage2_ready_not_promoted.json`
-  - `fixtures/thesis_promotion/stage2_bad_promoted.json`
-  - `.github/workflows/validate-stage2-thesis-promotion-contract.yml`
-- Latest evidence:
-  ```text
-  workflow: Validate ETF stage 2 thesis promotion contract
-  run_number: 1
-  trigger_commit: 09c175276a243593908660332a101778845dbc9f
-  status: passed
-  branch: main
-  duration: 12s
-  observed_at: 2026-06-04
-  source: user-provided GitHub Actions UI screenshot
-  ```
-- Current contract chain:
-  ```text
-  active thesis driver
-  + mapped beneficiary lane
-  + documented driver-to-beneficiary rationale
-  + relative-strength confirmation
-  + valuation-grade pricing
-  + portfolio-discipline clearance
-  + explicit control-layer promotion decision
-  ```
 - Current rule:
   - `ready_for_promotion_review_not_promoted` is the maximum allowed status before explicit promotion
   - `fundable`, `recommended`, `portfolio_action_ready`, and `client_facing` are blocked by contract validation
   - authority flags for client surface, lane scoring, fundability, portfolio actions, report surface, and production report path must remain false
-- Completed in this stage:
-  - Stage-2 promotion contract added
-  - safe ready-for-review-not-promoted fixture passes
-  - illegal promoted fixture fails as expected
-  - dedicated workflow is green
 - Remaining action:
   - do not integrate Stage-2 output into `runtime/score_etf_lanes.py`, `runtime/discover_etf_lanes.py`, reports, or execution until a later explicit promotion review
   - if promotion is later requested, first design non-authoritative Stage-2 chain artifacts and compare them against lane discovery without changing fundability
