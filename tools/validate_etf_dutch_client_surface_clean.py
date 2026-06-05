@@ -8,6 +8,13 @@ NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 SNAKE_CASE_RE = re.compile(r"\b[a-z]+(?:_[a-z0-9]+){1,}\b")
 DOUBLE_NEGATIVE_RE = re.compile(r"\bverlaag\s+[A-Z][A-Z0-9.-]*\s+met\s+-\d+(?:\.\d+)?%", re.IGNORECASE)
 FORBIDDEN_LABELS = ["Redencodes", "Reason codes"]
+FORBIDDEN_STALE_GLD_SURFACE = [
+    "GLD moet zijn hedgefunctie bewijzen",
+    "Houd GLD onder herbeoordeling",
+    "GLD blijft een hedgepositie onder herbeoordeling",
+    "Herbeoordeling goudhedge",
+    "GLD: hedge-validiteitstest vereist",
+]
 
 
 def latest_nl_report(output_dir: Path) -> Path:
@@ -17,10 +24,16 @@ def latest_nl_report(output_dir: Path) -> Path:
     return reports[-1]
 
 
+def _plain_ticker_text(md_text: str) -> str:
+    return re.sub(r"\[([A-Z][A-Z0-9.-]*)\]\([^\)]*\)", r"\1", md_text)
+
+
 def validate(path: Path) -> None:
     text = path.read_text(encoding="utf-8", errors="ignore")
+    plain_text = _plain_ticker_text(text)
     failures = sorted(set(match.group(0) for match in SNAKE_CASE_RE.finditer(text)))
     failures.extend(label for label in FORBIDDEN_LABELS if label in text)
+    failures.extend(label for label in FORBIDDEN_STALE_GLD_SURFACE if label in text or label in plain_text)
     if DOUBLE_NEGATIVE_RE.search(text):
         failures.append("double-negative reduction wording")
     if failures:
