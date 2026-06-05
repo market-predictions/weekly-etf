@@ -62,13 +62,22 @@
   reported artifact validation: MACRO_REGIME_SHADOW_NARRATIVE_OK
   authority: client_facing=false, production_report=false, portfolio_action_authority=false, lane_scoring_authority=false, fundability_authority=false
   ```
+- Latest macro client-surface/parity evidence:
+  ```text
+  Work Package 2 — Macro narrative compliance and bilingual parity gate
+  status: implemented on main as output-contract validator/test/fixture package
+  files: tools/validate_macro_narrative_client_surface.py, fixtures/macro_narrative/*.json, tests/test_macro_narrative_client_surface.py
+  reported focused test: python -m pytest tests/test_macro_narrative_client_surface.py -q = 4 passed
+  authority: output-contract safety gate only; no production, delivery, lane-scoring, fundability, or portfolio-action authority
+  ```
 - Action:
   - preserve the split between runtime provenance and post-execution official portfolio state
   - do not repair strict branded sections through markdown post-processing
   - keep delivery-runtime localization for strict PDF/HTML panels
   - do not let new macro/thesis content bypass runtime-state, bilingual parity, delivery HTML, or compliance validation
   - keep WP1 macro shadow narrative as comparison/review evidence only
-  - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, and inbox receipt distinct
+  - keep WP2 macro client-surface/parity validation as a safety gate only, not promotion authority
+  - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, macro client-surface validation evidence, and inbox receipt distinct
 
 ### 2. ETF pricing-lineage and delivery-evidence contract
 
@@ -285,27 +294,53 @@
 ### 11A. Work Package 2 — Macro narrative compliance and bilingual parity gate
 
 - Owner: `[ASSISTANT]`
-- Status: next recommended macro roadmap package
-- Goal:
-  - validate that deterministic macro narrative candidates are safe for English/Dutch client wording before any client-surface pilot
-- Required boundaries:
-  - block predictive wording
-  - block uncited macro claims
-  - block shadow/internal labels
-  - block `macro_axes` leakage
-  - block `confidence_decomposition` leakage
-  - block English leakage in Dutch report
-  - block Dutch/English meaning drift
-- Done when:
-  ```bash
-  python -m pytest tests/test_macro_narrative_client_surface.py -q
+- Status: completed as output-contract safety gate / not promoted
+- Files:
+  - `tools/validate_macro_narrative_client_surface.py`
+  - `fixtures/macro_narrative/safe_shadow_candidate_en_nl.json`
+  - `fixtures/macro_narrative/bad_predictive_language.json`
+  - `fixtures/macro_narrative/bad_shadow_label_leakage.json`
+  - `fixtures/macro_narrative/bad_dutch_parity.json`
+  - `tests/test_macro_narrative_client_surface.py`
+- Evidence:
+  ```text
+  reported focused test: python -m pytest tests/test_macro_narrative_client_surface.py -q = 4 passed
+  safe fixture passes; bad fixtures fail as intended
   ```
-  passes with safe fixtures passing and bad fixtures failing
+- Blocks:
+  - predictive wording
+  - uncited macro claims
+  - shadow/internal labels
+  - `macro_axes` leakage
+  - `confidence_decomposition` leakage
+  - English leakage in Dutch report text
+  - citation parity mismatch
+  - Dutch/English meaning drift
+- Authority boundaries:
+  ```text
+  output_contract_gate_only=true
+  production_report_authority=false
+  portfolio_action_authority=false
+  lane_scoring_authority=false
+  fundability_authority=false
+  delivery_authority=false
+  ```
+- Remaining action:
+  - keep as an active regression gate for any future macro narrative candidate
+  - do not interpret a WP2 pass as promotion authority
+  - require WP3 promotion contract before any deterministic macro regime client-surface authority is granted
 
 ### 11B. Work Package 3 — Macro promotion decision contract
 
 - Owner: `[ASSISTANT]`
-- Status: next recommended macro roadmap package
+- Status: branch implemented but not merged / refresh required before PR
+- Branch:
+  ```text
+  workstream/macro-promotion-decision-contract
+  ahead_by=5
+  behind_by=17
+  status=diverged from current main
+  ```
 - Goal:
   - define exactly what must be true before deterministic macro regime can move from shadow to report narrative authority
 - Required contract:
@@ -316,11 +351,15 @@
   - no portfolio-action authority
   - no lane-scoring authority
   - explicit control-layer promotion decision
+- Next action:
+  - refresh/rebase branch onto current `main`
+  - rerun focused tests
+  - then open PR if clean
 - Done when:
   ```bash
   python -m pytest tests/test_macro_regime_promotion_contract.py -q
   ```
-  passes
+  passes on the refreshed branch and the PR is merged
 
 ---
 
