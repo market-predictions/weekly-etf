@@ -1,0 +1,1734 @@
+<html>
+      <head>
+        <meta charset="utf-8" />
+        <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #F6F2EC;
+      color: #2B3742;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .report-shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 0 18px 0;
+    }
+    .hero {
+      background: #607887;
+      color: #FBFAF7;
+      padding: 20px 24px 18px 24px;
+      border-radius: 14px 14px 0 0;
+    }
+    .hero-secondary {
+      margin-top: 26px;
+    }
+    .hero-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .hero-table td {
+      vertical-align: middle;
+    }
+    .hero-left {
+      text-align: left;
+    }
+    .hero-right {
+      text-align: right;
+      white-space: nowrap;
+      padding-left: 24px;
+    }
+    .masthead {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 700;
+      font-size: 30px;
+      letter-spacing: 1px;
+      margin: 0 0 8px 0;
+      text-transform: uppercase;
+    }
+    .hero-sub {
+      font-size: 14px;
+      color: #EFF4F6;
+      margin: 0;
+    }
+    .hero-side-label {
+      font-size: 16px;
+      line-height: 1.2;
+      font-weight: 700;
+      color: #FBFAF7;
+      letter-spacing: .03em;
+    }
+    .hero-rule {
+      height: 5px;
+      background: #D4B483;
+      margin: 8px 0 18px 0;
+      border-radius: 999px;
+    }
+    .notice {
+      background: #F8F4EE;
+      border: 1px solid #D9D3CB;
+      color: #6B7882;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 12px;
+      margin: 0 0 18px 0;
+    }
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 14px;
+      margin: 0 0 18px 0;
+    }
+    .mini-card {
+      background: #FCFAF7;
+      border: 1px solid #D9D3CB;
+      border-radius: 16px;
+      padding: 14px 18px;
+    }
+    .mini-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #6B7882;
+      margin: 0 0 8px 0;
+    }
+    .mini-value {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: #2B3742;
+      line-height: 1.22;
+    }
+    .client-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 18px;
+      align-items: start;
+      margin: 0 0 18px 0;
+    }
+    .panel {
+      background: #FCFAF7;
+      border: 1px solid #D9D3CB;
+      border-radius: 18px;
+      padding: 16px 18px;
+      margin: 0 0 18px 0;
+    }
+    .panel-compact,
+    .panel-exec,
+    .panel-snapshot,
+    .panel-risks {
+      page-break-inside: avoid;
+      break-inside: avoid-page;
+    }
+    .section-kicker {
+      width: auto;
+      border-collapse: collapse;
+      margin: 0 0 18px 0;
+    }
+    .section-kicker td {
+      vertical-align: middle;
+    }
+    .section-badge-cell {
+      width: 64px;
+      padding: 0 16px 0 0;
+      vertical-align: middle;
+    }
+    .section-label-cell {
+      padding: 0;
+      vertical-align: middle;
+    }
+    .section-badge {
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      background: #2A5384;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 17px;
+      display: block;
+      text-align: center;
+      line-height: 46px;
+      mso-line-height-rule: exactly;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .section-label {
+      display: block;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #6B7882;
+      line-height: 1.12;
+      mso-line-height-rule: exactly;
+    }
+    .summary-line {
+      margin: 0 0 12px 0;
+      padding: 0 0 12px 0;
+      border-bottom: 1px solid #D9D3CB;
+    }
+    .summary-key {
+      color: #6B7882;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin: 0 0 6px 0;
+    }
+    .summary-value {
+      color: #2B3742;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .takeaway {
+      margin: 18px 0 0 0;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #F4EEE4;
+      border: 1px solid #E7D7BB;
+    }
+    .takeaway-label {
+      color: #6B7882;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin: 0 0 6px 0;
+    }
+    .takeaway-text {
+      color: #2B3742;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.42;
+    }
+    .snapshot-table,
+    .rotation-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 16px 0;
+      border: 1px solid #D9D3CB;
+      table-layout: fixed;
+    }
+    .snapshot-table th,
+    .rotation-table th {
+      background: #F2EBDD;
+      color: #2B3742;
+      text-align: left;
+      padding: 9px 10px;
+      border-bottom: 1px solid #D9D3CB;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .snapshot-table td,
+    .rotation-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid #ECE6DE;
+      vertical-align: top;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .snapshot-table tbody tr:nth-child(even) td,
+    .rotation-table tbody tr:nth-child(even) td {
+      background: #FEFCF9;
+    }
+    .rotation-table ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .subgrid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .subblock {
+      margin: 0 0 14px 0;
+      padding: 12px 14px;
+      background: #FBF7F0;
+      border: 1px solid #D9D3CB;
+      border-radius: 12px;
+    }
+    .subblock-title {
+      color: #6B7882;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin: 0 0 8px 0;
+    }
+    .subblock ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .panel p, .panel li {
+      font-size: 14px;
+      line-height: 1.58;
+      margin-top: 0;
+      font-weight: 400;
+    }
+    .panel strong {
+      font-weight: 700;
+    }
+    .panel ul, .panel ol {
+      margin-top: 0;
+      padding-left: 22px;
+    }
+    .panel h3 {
+      color: #2B3742;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin: 18px 0 10px 0;
+    }
+    .panel h4 {
+      color: #6B7882;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 700;
+      margin: 18px 0 8px 0;
+    }
+    .panel h5 {
+      color: #6B7882;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .10em;
+      font-weight: 700;
+      margin: 12px 0 16px 0;
+    }
+    .panel blockquote {
+      margin: 12px 0;
+      padding: 10px 12px;
+      border-left: 4px solid #D4B483;
+      background: #F8F3EB;
+      color: #6B7882;
+    }
+    .panel table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin: 12px 0 14px 0;
+      border: 1px solid #D9D3CB;
+      font-size: 12px;
+    }
+    .panel thead {
+      display: table-header-group;
+    }
+    .panel th {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid #D9D3CB;
+      background: #F2EBDD;
+      color: #2B3742;
+      vertical-align: middle;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .panel td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #ECE6DE;
+      vertical-align: top;
+      word-wrap: break-word;
+    }
+    .panel tr:nth-child(even) td {
+      background: #FEFCF9;
+    }
+    .panel img {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid #D9D3CB;
+      border-radius: 10px;
+      margin: 10px 0 4px 0;
+      display: block;
+    }
+    .panel-positions h3 {
+      margin-top: 22px;
+      padding: 10px 12px;
+      background: #F7F1E8;
+      border: 1px solid #D9D3CB;
+      border-radius: 10px;
+      font-size: 17px;
+    }
+    .panel-opportunities h3 {
+      margin: 0 0 8px 0;
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.28;
+      color: #2B3742;
+    }
+    .panel-opportunities h4 {
+      margin: 16px 0 8px 0;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #6B7882;
+    }
+    .panel-opportunities h5 {
+      margin: 8px 0 18px 0;
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #6B7882;
+      font-weight: 700;
+      text-align: right;
+    }
+    .panel-opportunities h5 + h3 {
+      margin-top: 0;
+    }
+    .panel-opportunities a {
+      display: inline-block;
+      margin: 0 0 16px 0;
+      font-size: 14px;
+    }
+    .panel-carry > p:first-of-type {
+      padding: 12px 14px;
+      background: #F8F4EE;
+      border: 1px solid #D9D3CB;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+    .empty-cell {
+      color: #6B7882;
+      font-style: italic;
+    }
+    .analyst-divider {
+      display: none;
+    }
+    a {
+      color: #315F8B;
+      text-decoration: underline;
+    }
+    
+    .report-stack {
+      margin-top: 0;
+    }
+    @media screen and (max-width: 1100px) {
+      .summary-strip, .client-grid, .subgrid {
+        display: block;
+      }
+      .hero-table, .hero-table tbody, .hero-table tr, .hero-table td {
+        display: block;
+        width: 100%;
+      }
+      .hero-right {
+        text-align: left;
+        padding-left: 0;
+        padding-top: 10px;
+      }
+      .mini-card, .panel {
+        margin-bottom: 16px;
+      }
+      .rotation-table, .snapshot-table, .panel table {
+        table-layout: auto;
+      }
+    }
+    </style>
+      
+<style id="etf-table-pagination-guard">
+  @media print {
+    table { page-break-inside: auto; break-inside: auto; border-collapse: collapse; }
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    tr, th, td { page-break-inside: avoid; break-inside: avoid; }
+    .panel table tr, .panel table th, .panel table td,
+    .data-table tr, .action-table tr, .rotation-plan-table tr,
+    .position-review-table tr, .replacement-duel-v2-table tr {
+      page-break-inside: avoid; break-inside: avoid;
+    }
+  }
+</style>
+
+
+<style id="etf-hero-layout-guard">
+  .summary-strip .mini-card {
+    overflow: hidden;
+  }
+  .summary-strip .mini-value {
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: auto;
+  }
+  .summary-strip .mini-card:nth-child(3) .mini-value {
+    font-size: 19px;
+    line-height: 1.22;
+  }
+  @media screen and (max-width: 1100px) {
+    .summary-strip .mini-card:nth-child(3) .mini-value {
+      font-size: 18px;
+      line-height: 1.24;
+    }
+  }
+</style>
+
+</head>
+      <body>
+        <div class="report-shell">
+          <div class="hero">
+            <table class="hero-table" role="presentation" cellpadding="0" cellspacing="0"><tr>
+              <td class="hero-left"><div class="masthead">WEKELIJKSE ETF-REVIEW</div><p class="hero-sub">Donderdag 4 juni 2026</p></td>
+              <td class="hero-right"><div class="hero-side-label">Beleggersrapport</div></td>
+            </tr></table>
+          </div>
+          <div class="hero-rule"></div>
+          <div class="notice">Dit rapport wordt uitsluitend verstrekt voor informatieve en educatieve doeleinden; zie de disclaimer aan het einde.</div>
+          <div class="summary-strip"><div class='mini-card'><div class='mini-label'>Primair regime</div><div class='mini-value'>Risk-on groei</div></div><div class='mini-card'><div class='mini-label'>Geopolitiek regime</div><div class='mini-value'>Verhoogd maar gelokaliseerd</div></div><div class='mini-card'><div class='mini-label'>Kernconclusie</div><div class='mini-value'>SMH blijft de best onderbouwde kernpositie, maar nieuw kapitaal en vervangingsbeslissingen moeten prijs, relatieve sterkte en portefeuillediscipline doorstaan.</div></div></div>
+          <div class="client-grid"><div class='exec-summary-render-marker' style='display:none'>Executive Summary / Kernsamenvatting</div><div class='panel panel-action-snapshot'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>2</span></td><td class='section-label-cell'><span class='section-label'>Portefeuille-acties</span></td></tr></table><table class='action-table'><thead><tr><th>Advies</th><th>Tickers / toelichting</th></tr></thead><tbody><tr><th>Toevoegen / bestemming</th><td>Geen</td></tr><tr><th>Aanhouden</th><td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a>, <a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a>, <a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a>, <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a>, <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>, <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a>, <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a>, <a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a>, <a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td></tr><tr><th>Aanhouden met override</th><td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>, <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a> blijven expliciet onder herbeoordeling.</td></tr><tr><th>Verwerkte vervanging / verlaging</th><td>Geen</td></tr><tr><th>Sluiten</th><td>Geen</td></tr></tbody></table><div class='note-box'><h4>Status rotatie-uitvoering</h4><ul><li>De bewaakte modelrotatie is al verwerkt in de officiële portefeuillestaat en het handelslogboek; deze run heeft geen dubbele staat- of handelslogboekmutatie uitgevoerd.</li></ul></div><div class='note-box'><h4>Beste alternatieven om te financieren</h4><ul><li>De bewaakte GLD → GSG-modelrotatie is al verwerkt in de officiële portefeuillestaat en het handelslogboek; deze run heeft geen dubbele staat- of handelslogboekmutatie uitgevoerd.</li></ul></div></div><div class='panel panel-regime'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>3</span></td><td class='section-label-cell'><span class='section-label'>Regime-dashboard</span></td></tr></table><h3>Regimesamenvatting</h3>
+<ul>
+<li>Huidig regime: Risk-on groei.</li>
+<li>Vertrouwen: 66%.</li>
+<li>Regimegeheugen: Risk-on growth has persisted for 6 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed.</li>
+<li>Beslisregel: Roteer niet agressief tenzij een regimeverschuiving minstens twee runs aanhoudt of cross-asset bevestiging breed wordt.</li>
+</ul>
+<h3>Beleids- en geopolitieke status</h3>
+<ul>
+<li>Status: Verhoogd maar gelokaliseerd.</li>
+<li>Fed-houding: Restrictief / datagedreven. Portefeuillelezing: Geef voorkeur aan kwaliteit, winstgevende groei en kasdiscipline boven zwakke balans-bèta.</li>
+<li>ECB-houding: Neutraal / overgangsfase. Portefeuillelezing: Blootstelling aan ontwikkelde markten buiten de VS blijft op de volglijst en is geen automatische toevoeging.</li>
+</ul>
+<h3>Wat veranderde</h3>
+<ul>
+<li>AI- en semiconductorleiderschap blijft de dominante aandelenimpuls.</li>
+<li>De grondstoffenbrede hedgefunctie blijft onder herbeoordeling en is geen automatische stabilisator.</li>
+</ul>
+<h3>Portefeuille-implicaties</h3>
+<ul>
+<li>De risicobereidheid blijft ondersteunend, maar aanvullende allocaties vragen nog ruimte binnen de positielimiet en koersbevestiging.</li>
+<li>Groei- en infrastructuurthema’s kunnen worden overwogen zolang ze de concentratie niet vergroten.</li>
+<li>Defensieve hedgeposities moeten worden getoetst op opportuniteitskosten.</li>
+</ul>
+<h3>Beleidscatalysatoren in dit rapport</h3>
+<ul>
+<li>AI-infrastructuur en semiconductor-toeleveringsketens: Kapitaaluitgaven en strategisch toeleveringsbeleid blijven semiconductor- en infrastructuurthema’s ondersteunen.</li>
+<li>Defensie en strategische weerbaarheid: De duurzaamheid van defensiebudgetten blijft een structurele steun, maar de ETF-keuze blijft belangrijk.</li>
+</ul>
+</div><div class='panel panel-radar'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>4</span></td><td class='section-label-cell'><span class='section-label'>Structurele kansenradar</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Thema</th>
+  <th>Primaire ETF</th>
+  <th>Alternatieve ETF</th>
+  <th>Waarom relevant</th>
+  <th style="text-align:right">Structurele aansluiting</th>
+  <th style="text-align:right">Macro-timing</th>
+  <th>Status</th>
+  <th>Benodigde bevestiging</th>
+  <th>Tijdshorizon</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>AI-rekenkrachtinfrastructuur</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SOXX" target="_blank" rel="noopener noreferrer">SOXX</a></td>
+  <td>AI-rekenkracht en semiconductor-capex blijven de sterkste structurele groeibronnen.</td>
+  <td style="text-align:right">5</td>
+  <td style="text-align:right">5</td>
+  <td>Actiegericht</td>
+  <td>Aanhoudend leiderschap, maar met positiegrootte- en concentratiediscipline.</td>
+  <td>3-12 maanden</td>
+</tr>
+<tr>
+  <td>Cybersecurityweerbaarheid</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=BUG" target="_blank" rel="noopener noreferrer">BUG</a></td>
+  <td>Cybersecurity-uitgaven profiteren van AI, cloud, datacenters en geopolitieke weerbaarheid.</td>
+  <td style="text-align:right">4</td>
+  <td style="text-align:right">4</td>
+  <td>Actiegericht</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+  <td>3-12 maanden</td>
+</tr>
+<tr>
+  <td>Netuitbreiding / elektrificatie</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a></td>
+  <td>Stroomvraag, netcongestie en reshoring ondersteunen infrastructuurinvesteringen.</td>
+  <td style="text-align:right">5</td>
+  <td style="text-align:right">4</td>
+  <td>Actiegericht</td>
+  <td>Bevestiging dat <a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a> structureel beter past dan <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>.</td>
+  <td>3-12 maanden</td>
+</tr>
+<tr>
+  <td>Koper en elektrificatiematerialen</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=COPX" target="_blank" rel="noopener noreferrer">COPX</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PICK" target="_blank" rel="noopener noreferrer">PICK</a></td>
+  <td>Koper en elektrificatiematerialen blijft relevant, maar vraagt om bevestiging in prijs, timing en portefeuillefit.</td>
+  <td style="text-align:right">4</td>
+  <td style="text-align:right">3</td>
+  <td>Actiegericht</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+  <td>3-12 maanden</td>
+</tr>
+<tr>
+  <td>Industriële automatisering en fabriekssoftware</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=ROBO" target="_blank" rel="noopener noreferrer">ROBO</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IRBO" target="_blank" rel="noopener noreferrer">IRBO</a></td>
+  <td>Industriële automatisering en fabriekssoftware blijft relevant, maar vraagt om bevestiging in prijs, timing en portefeuillefit.</td>
+  <td style="text-align:right">4</td>
+  <td style="text-align:right">3</td>
+  <td>Volglijst / onder herbeoordeling</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+  <td>3-12 maanden</td>
+</tr>
+<tr>
+  <td>Kritieke mineralen / koper / raffinage</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=REMX" target="_blank" rel="noopener noreferrer">REMX</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PICK" target="_blank" rel="noopener noreferrer">PICK</a></td>
+  <td>Kritieke mineralen / koper / raffinage blijft relevant, maar vraagt om bevestiging in prijs, timing en portefeuillefit.</td>
+  <td style="text-align:right">4</td>
+  <td style="text-align:right">3</td>
+  <td>Volglijst / onder herbeoordeling</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+  <td>3-12 maanden</td>
+</tr>
+</tbody>
+</table>
+<h3>Beste structurele kansen die nog niet actiegericht zijn</h3>
+<ul>
+<li>Voedselzekerheid / landbouwinputs</li>
+<li>Waterinfrastructuur / waterbehandeling</li>
+<li>Kritieke mineralen / koper / raffinage</li>
+</ul>
+<h3>Opvallende thema’s beoordeeld, maar deze week niet gepromoveerd</h3>
+<table>
+<thead>
+<tr>
+  <th>Thema</th>
+  <th>Primaire ETF</th>
+  <th>Waarom niet gepromoveerd</th>
+  <th>Wat dat zou veranderen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Defensie-innovatie / strategische weerbaarheid</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a></td>
+  <td>Scoorde lager dan sterkere gefinancierde posities en alternatieven.</td>
+  <td>Duidelijkere ETF-implementatie en relatieve sterkte tegenover defensiealternatieven.</td>
+</tr>
+<tr>
+  <td>Healthcarekwaliteit en defensieve groei</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLV" target="_blank" rel="noopener noreferrer">XLV</a></td>
+  <td>Scoorde lager dan sterkere gefinancierde posities en alternatieven.</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+</tr>
+<tr>
+  <td>Nucleaire nutsbedrijven en schone basislast</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=NLR" target="_blank" rel="noopener noreferrer">NLR</a></td>
+  <td>Relatieve sterkte tegenover de relevante huidige positie is nog onvoldoende overtuigend.</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+</tr>
+<tr>
+  <td>Ontwikkelde markten buiten de VS</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td>Relatieve sterkte tegenover de relevante huidige positie is nog onvoldoende overtuigend.</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+</tr>
+<tr>
+  <td>Brede grondstoffen-inflatiehedge</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td>Relatieve sterkte tegenover de relevante huidige positie is nog onvoldoende overtuigend.</td>
+  <td>Bredere grondstoffenbevestiging voordat kapitaal wordt toegewezen.</td>
+</tr>
+<tr>
+  <td>Robotica / automatisering</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=BOTZ" target="_blank" rel="noopener noreferrer">BOTZ</a></td>
+  <td>Relatieve sterkte tegenover de relevante huidige positie is nog onvoldoende overtuigend.</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+</tr>
+</tbody>
+</table>
+<h2>4A. Shortkansenradar</h2>
+<table>
+<thead>
+<tr>
+  <th>Shortthema</th>
+  <th>Kandidaat-ETF</th>
+  <th>Shortthese</th>
+  <th>Trigger</th>
+  <th>Invalidering</th>
+  <th>Tijdshorizon</th>
+  <th>Vertrouwen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Rentegevoelige small-caps</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IWM" target="_blank" rel="noopener noreferrer">IWM</a></td>
+  <td>Restrictieve reële rentes zetten zwakkere balansen onder druk.</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IWM" target="_blank" rel="noopener noreferrer">IWM</a> verzwakt verder tegenover <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a> terwijl rentes stevig blijven.</td>
+  <td>Duidelijke renteontspanning en betere kredietbreedte.</td>
+  <td>1-3 maanden</td>
+  <td>Gemiddeld</td>
+</tr>
+<tr>
+  <td>Chinese platformbeta</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=KWEB" target="_blank" rel="noopener noreferrer">KWEB</a></td>
+  <td>Beleidsvertrouwen blijft kwetsbaar.</td>
+  <td>Mislukte rally of hernieuwde valuta-/beleidsstress.</td>
+  <td>Duurzame stimulans en winstherstel.</td>
+  <td>1-3 maanden</td>
+  <td>Gemiddeld</td>
+</tr>
+<tr>
+  <td>Langlopende obligaties</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=TLT" target="_blank" rel="noopener noreferrer">TLT</a></td>
+  <td>Hardnekkige inflatie en reëlerenterisico blijven tegenwind.</td>
+  <td>Reële rentes stijgen opnieuw.</td>
+  <td>Groeischrik en duidelijke neerwaartse rente-uitbraak.</td>
+  <td>1-3 maanden</td>
+  <td>Gemiddeld</td>
+</tr>
+<tr>
+  <td>Speculatieve cleantechbeta</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=ICLN" target="_blank" rel="noopener noreferrer">ICLN</a></td>
+  <td>Financieringsdruk en zwakke winstgevendheid blijven knelpunten.</td>
+  <td>Geen herstel in een brede risk-on-markt.</td>
+  <td>Scherpe rentedaling of grote beleidsverrassing.</td>
+  <td>3-12 maanden</td>
+  <td>Gemiddeld</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel panel-risks panel-compact'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>5</span></td><td class='section-label-cell'><span class='section-label'>Belangrijkste risico’s / invalidaties</span></td></tr></table><ul>
+<li><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a> plus <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> creëert hoge Amerikaanse tech-/AI-factoroverlap.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=GLD" target="_blank" rel="noopener noreferrer">GLD</a> blijft een hedgepositie onder herbeoordeling en is geen vanzelfsprekende stabilisator.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a> en <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a> blijven vervangbaar totdat de kwaliteit van de ETF-implementatie is bewezen.</li>
+<li>Niet-Amerikaanse aandelenblootstelling blijft een diversificatiekloof.</li>
+</ul>
+</div><div class='panel panel-bottomline panel-compact'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>6</span></td><td class='section-label-cell'><span class='section-label'>Conclusie</span></td></tr></table><ul>
+<li><strong>Portefeuillehouding:</strong> <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft de best onderbouwde kernpositie, maar smal marktleiderschap mag niet worden verward met brede portefeuillediversificatie.</li>
+<li><strong>Best onderbouwde blootstelling:</strong> <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft de sterkste bijdrage in de portefeuille en de zuiverste structurele groeiblootstelling.</li>
+<li><strong>Belangrijkste disciplinepunt:</strong> Voordat nieuw kapitaal naar alternatieven gaat, moeten <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a>, <a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a> en <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a> expliciet worden getoetst aan hun belangrijkste vervangingskandidaten.</li>
+<li><strong>Zwakste implementatievragen:</strong> <a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a> moet zich bewijzen tegenover <a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a>, <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a> tegenover <a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a>, en <a href="https://www.tradingview.com/chart/?symbol=GLD" target="_blank" rel="noopener noreferrer">GLD</a> moet bewijzen dat het nog steeds een stabiliserende hedgefunctie heeft.</li>
+</ul>
+</div><div class='panel panel-equity'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>7</span></td><td class='section-label-cell'><span class='section-label'>Portefeuillecurve en portefeuilleontwikkeling</span></td></tr></table><ul>
+<li>Startkapitaal (EUR): 100000.00</li>
+<li>Huidige portefeuillewaarde (EUR): 111105.47</li>
+<li>Rendement sinds start (%): 11.11</li>
+<li>Status portefeuillecurve: aangesloten op sectie 15 met volledige waarderingshistorie</li>
+<li>EUR/USD gebruikt: 1.1611</li>
+<li>Toelichting: Sectie 7 gebruikt de volledige waarderingshistorie plus de actuele portefeuillewaarde; sectie 15 wordt uit dezelfde genormaliseerde portefeuillestaat opgebouwd.</li>
+</ul>
+<table>
+<thead>
+<tr>
+  <th>Datum</th>
+  <th style="text-align:right">Portefeuillewaarde EUR</th>
+  <th>Opmerking</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>2026-03-28</td>
+  <td style="text-align:right">100000.00</td>
+  <td>Initiële modelportefeuille vastgesteld</td>
+</tr>
+<tr>
+  <td>2026-04-16</td>
+  <td style="text-align:right">100671.75</td>
+  <td>Verse herprijzing per ticker op basis van de meest recente volledige slotkoersset</td>
+</tr>
+<tr>
+  <td>2026-04-20</td>
+  <td style="text-align:right">102026.08</td>
+  <td>Verse herprijzing voor zes van zes posities op basis van de volledige slotkoersset van 20 april</td>
+</tr>
+<tr>
+  <td>2026-04-24</td>
+  <td style="text-align:right">104477.54</td>
+  <td>Verse herprijzing voor vijf van zes posities; <a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a> doorgeschoven</td>
+</tr>
+<tr>
+  <td>2026-04-29</td>
+  <td style="text-align:right">101854.68</td>
+  <td>Verse herprijzing voor zes van zes posities op basis van de vastgelegde prijsaudit van 2026-04-29</td>
+</tr>
+<tr>
+  <td>2026-05-04</td>
+  <td style="text-align:right">102636.85</td>
+  <td>Prijsherstel voor vijf van zes posities; <a href="https://www.tradingview.com/chart/?symbol=GLD" target="_blank" rel="noopener noreferrer">GLD</a> doorgeschoven</td>
+</tr>
+<tr>
+  <td>2026-05-05</td>
+  <td style="text-align:right">103536.96</td>
+  <td>Laatste slotkoersbasis van 4 mei; +8 <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> vanuit cash</td>
+</tr>
+<tr>
+  <td>2026-05-27</td>
+  <td style="text-align:right">109387.17</td>
+  <td>Waardering uit onveranderlijke prijsaudit en expliciete portefeuillestaat</td>
+</tr>
+<tr>
+  <td>2026-05-28</td>
+  <td style="text-align:right">110032.93</td>
+  <td>Waardering uit onveranderlijke prijsaudit en expliciete portefeuillestaat</td>
+</tr>
+<tr>
+  <td>2026-05-29</td>
+  <td style="text-align:right">109964.97</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-01</td>
+  <td style="text-align:right">110321.58</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-02</td>
+  <td style="text-align:right">112376.10</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-03</td>
+  <td style="text-align:right">111596.95</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-04</td>
+  <td style="text-align:right">111105.47</td>
+  <td>Doorgeschoven waardering uit prijsaudit en expliciete portefeuillestaat</td>
+</tr>
+</tbody>
+</table>
+<h3>Gebruikte slotkoersen in dit rapport</h3>
+<p>De bovenstaande portefeuillewaardering is gebaseerd op de slotkoersen per positie in deze tabel. Gevraagde slotdatum: <strong>2026-06-04</strong>. De bronkolom toont de marktdata-laag die de slotkoers leverde, niet interne resolvernamen.</p>
+<table>
+<thead>
+<tr>
+  <th>Positie</th>
+  <th>Gevraagde slotdatum</th>
+  <th>Gebruikte slotdatum</th>
+  <th style="text-align:right">Gebruikte slotkoers</th>
+  <th>Valuta</th>
+  <th>Marktdata-bron</th>
+  <th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td>2026-06-04</td>
+  <td>2026-06-04</td>
+  <td style="text-align:right">90.70</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td>2026-06-04</td>
+  <td>2026-06-04</td>
+  <td style="text-align:right">70.97</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td>2026-06-04</td>
+  <td>2026-06-04</td>
+  <td style="text-align:right">32.39</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td>2026-06-04</td>
+  <td>2026-06-04</td>
+  <td style="text-align:right">98.11</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td>2026-06-04</td>
+  <td>2026-06-04</td>
+  <td style="text-align:right">57.61</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td>2026-06-04</td>
+  <td>2026-06-04</td>
+  <td style="text-align:right">627.53</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td>2026-06-04</td>
+  <td>2026-06-04</td>
+  <td style="text-align:right">757.09</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td>2026-06-04</td>
+  <td>2026-06-04</td>
+  <td style="text-align:right">61.05</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td>2026-06-04</td>
+  <td>2026-06-04</td>
+  <td style="text-align:right">43.94</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+  <th>FX-basis</th>
+  <th>Gevraagde datum</th>
+  <th>Gebruikte datum</th>
+  <th style="text-align:right">Koers</th>
+  <th>Bron</th>
+  <th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>EUR/USD</td>
+  <td>2026-06-04</td>
+  <td>2026-06-04</td>
+  <td style="text-align:right">1.1611</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+</tbody>
+</table>
+<p><img src="cid:equitycurve" alt="Equity curve" /></p>
+<h2>7A. Rendement huidige ETF-posities</h2>
+<p>Rendement wordt berekend op de huidige ETF-posities op basis van de meest recente gevalideerde slotkoers-audit en beschikbare markthistorie.</p>
+<table>
+<thead>
+<tr>
+  <th>Portefeuillesegment</th>
+  <th>Beleggingsthese</th>
+  <th>ETF</th>
+  <th style="text-align:right">Gewicht %</th>
+  <th style="text-align:right">1w rendement</th>
+  <th style="text-align:right">1m rendement</th>
+  <th style="text-align:right">3m rendement</th>
+  <th style="text-align:right">Sinds instap</th>
+  <th style="text-align:right">P/L EUR</th>
+  <th style="text-align:right">Bijdrage %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Rotatiebestemming</td>
+  <td>Cybersecurityweerbaarheid</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td style="text-align:right">17.85%</td>
+  <td style="text-align:right">+8.39%</td>
+  <td style="text-align:right">+27.98%</td>
+  <td style="text-align:right">+38.10%</td>
+  <td style="text-align:right">n.v.t.</td>
+  <td style="text-align:right">n.v.t.</td>
+  <td style="text-align:right">n.v.t.</td>
+</tr>
+<tr>
+  <td>Rotatiebestemming</td>
+  <td>Defensie-innovatie / tactische defensiebèta</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td style="text-align:right">5.05%</td>
+  <td style="text-align:right">-5.41%</td>
+  <td style="text-align:right">+20.99%</td>
+  <td style="text-align:right">-17.05%</td>
+  <td style="text-align:right">n.v.t.</td>
+  <td style="text-align:right">n.v.t.</td>
+  <td style="text-align:right">n.v.t.</td>
+</tr>
+<tr>
+  <td>Rotatiebestemming</td>
+  <td>Rotatiebestemming</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td style="text-align:right">9.40%</td>
+  <td style="text-align:right">+0.87%</td>
+  <td style="text-align:right">-5.32%</td>
+  <td style="text-align:right">+14.41%</td>
+  <td style="text-align:right">n.v.t.</td>
+  <td style="text-align:right">190.20</td>
+  <td style="text-align:right">+0.19%</td>
+</tr>
+<tr>
+  <td>Rotatiebestemming</td>
+  <td>Diversificatie in ontwikkelde markten buiten de VS</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td style="text-align:right">5.02%</td>
+  <td style="text-align:right">+0.16%</td>
+  <td style="text-align:right">+2.81%</td>
+  <td style="text-align:right">+5.90%</td>
+  <td style="text-align:right">n.v.t.</td>
+  <td style="text-align:right">n.v.t.</td>
+  <td style="text-align:right">n.v.t.</td>
+</tr>
+<tr>
+  <td>Reële activa / capex</td>
+  <td>Netwerk- en infrastructuurcapex</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td style="text-align:right">0.03%</td>
+  <td style="text-align:right">+2.05%</td>
+  <td style="text-align:right">+0.42%</td>
+  <td style="text-align:right">+8.65%</td>
+  <td style="text-align:right">+8.25%</td>
+  <td style="text-align:right">3.46</td>
+  <td style="text-align:right">0.00%</td>
+</tr>
+<tr>
+  <td>Groeimotor</td>
+  <td>AI-rekenkracht en semiconductorleiderschap</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td style="text-align:right">28.70%</td>
+  <td style="text-align:right">+4.62%</td>
+  <td style="text-align:right">+20.06%</td>
+  <td style="text-align:right">+58.73%</td>
+  <td style="text-align:right">+20.61%</td>
+  <td style="text-align:right">10,538.89</td>
+  <td style="text-align:right">+10.54%</td>
+</tr>
+<tr>
+  <td>Kernbeta</td>
+  <td>Amerikaanse large-cap kernblootstelling</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td style="text-align:right">19.04%</td>
+  <td style="text-align:right">+0.33%</td>
+  <td style="text-align:right">+4.60%</td>
+  <td style="text-align:right">+11.43%</td>
+  <td style="text-align:right">+6.17%</td>
+  <td style="text-align:right">2,256.55</td>
+  <td style="text-align:right">+2.26%</td>
+</tr>
+<tr>
+  <td>Strategische energie</td>
+  <td>Kernenergie- en uraniumcyclus</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td style="text-align:right">8.09%</td>
+  <td style="text-align:right">-0.49%</td>
+  <td style="text-align:right">-5.82%</td>
+  <td style="text-align:right">-8.20%</td>
+  <td style="text-align:right">-0.55%</td>
+  <td style="text-align:right">-949.93</td>
+  <td style="text-align:right">-0.95%</td>
+</tr>
+<tr>
+  <td>Rotatiebestemming</td>
+  <td>Defensieve nutsbedrijven / rentegevoelige ballast</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td style="text-align:right">5.07%</td>
+  <td style="text-align:right">-1.55%</td>
+  <td style="text-align:right">-5.24%</td>
+  <td style="text-align:right">-5.66%</td>
+  <td style="text-align:right">n.v.t.</td>
+  <td style="text-align:right">n.v.t.</td>
+  <td style="text-align:right">n.v.t.</td>
+</tr>
+</tbody>
+</table>
+</div><div class='hero hero-secondary'><table class='hero-table' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='hero-left'><div class='masthead'>WEKELIJKSE ETF-REVIEW</div><p class='hero-sub'>Donderdag 4 juni 2026</p></td><td class='hero-right'><div class='hero-side-label'>Analistenrapport</div></td></tr></table></div><div class='hero-rule'></div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>1</span></td><td class='section-label-cell'><span class='section-label'>Allocatiekaart</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Segment</th>
+  <th>Positionering</th>
+  <th>Toelichting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Amerikaanse aandelen</td>
+  <td>Neutraal</td>
+  <td>Belegbaar, maar concentratierisico is expliciet aanwezig.</td>
+</tr>
+<tr>
+  <td>Europese aandelen</td>
+  <td>Neutraal</td>
+  <td>Alleen volglijst; blootstelling buiten de VS blijft een diversificatiekloof.</td>
+</tr>
+<tr>
+  <td>Opkomende markten</td>
+  <td>Onderwogen</td>
+  <td>USD- en oliegevoeligheid blijven tegenwind.</td>
+</tr>
+<tr>
+  <td>Large-cap</td>
+  <td>Neutraal</td>
+  <td>Kwaliteitsleiderschap werkt nog steeds.</td>
+</tr>
+<tr>
+  <td>Small-cap</td>
+  <td>Onderwogen</td>
+  <td>Rentes en herfinanciering blijven lastig.</td>
+</tr>
+<tr>
+  <td>Groei</td>
+  <td>Neutraal</td>
+  <td>Selectieve groei onder leiding van <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft aantrekkelijk.</td>
+</tr>
+<tr>
+  <td>Kwaliteit</td>
+  <td>Overwogen</td>
+  <td>Winstbestendigheid blijft waardevol.</td>
+</tr>
+<tr>
+  <td>Defensieve ballast</td>
+  <td>Neutraal</td>
+  <td>Hedge- en cashachtige rollen blijven onder opportunity-cost-review.</td>
+</tr>
+<tr>
+  <td>Industrie / defensie</td>
+  <td>Overwogen</td>
+  <td>Structurele thesis is valide; ETF-implementatie onder herbeoordeling.</td>
+</tr>
+<tr>
+  <td>Niet-USD activa</td>
+  <td>Volglijst</td>
+  <td>Nulallocatie is een expliciete inzet op Amerikaanse uitzonderingskracht.</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>2</span></td><td class='section-label-cell'><span class='section-label'>Tweede-orde-effectenkaart</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Drijver</th>
+  <th>Eerste-orde-effect</th>
+  <th>Tweede-orde-effect</th>
+  <th>Waarschijnlijke winnaars</th>
+  <th>Kwetsbare segmenten</th>
+  <th>ETF-implicatie</th>
+  <th>Timing</th>
+  <th>Vertrouwen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>AI-leiderschap</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft de zuiverste groeiblootstelling</td>
+  <td>Concentratie moet worden bewaakt</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a>, <a href="https://www.tradingview.com/chart/?symbol=SOXX" target="_blank" rel="noopener noreferrer">SOXX</a></td>
+  <td>Cyclische waarden van lagere kwaliteit</td>
+  <td>Aanhouden rond maximale positiegrootte</td>
+  <td>Direct</td>
+  <td>Hoog</td>
+</tr>
+<tr>
+  <td>Factorconcentratie</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a> en <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> overlappen</td>
+  <td>De portefeuille is minder gediversifieerd dan het aantal tickers suggereert</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=QUAL" target="_blank" rel="noopener noreferrer">QUAL</a>, <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a> op de volglijst</td>
+  <td>Overlappende Amerikaanse beta</td>
+  <td>Houd <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a> onder herbeoordeling</td>
+  <td>1-3 maanden</td>
+  <td>Gemiddeld</td>
+</tr>
+<tr>
+  <td>Defensiethesis versus ETF-implementatie</td>
+  <td>Defensie blijft structureel valide</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a> moet zich bewijzen tegenover <a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a>, <a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a></td>
+  <td>Zwakke ETF-selectie</td>
+  <td>Houd <a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a> onder herbeoordeling</td>
+  <td>Direct</td>
+  <td>Gemiddeld</td>
+</tr>
+<tr>
+  <td>Hedgedrawdown</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GLD" target="_blank" rel="noopener noreferrer">GLD</a> moet zijn hedgefunctie bewijzen</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a> en <a href="https://www.tradingview.com/chart/?symbol=BIL" target="_blank" rel="noopener noreferrer">BIL</a> blijven alternatieven</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a>, <a href="https://www.tradingview.com/chart/?symbol=BIL" target="_blank" rel="noopener noreferrer">BIL</a>, cash</td>
+  <td>Onproductieve hedgepositie</td>
+  <td>Houd <a href="https://www.tradingview.com/chart/?symbol=GLD" target="_blank" rel="noopener noreferrer">GLD</a> onder herbeoordeling</td>
+  <td>Direct</td>
+  <td>Gemiddeld</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel panel-position-review'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>3</span></td><td class='section-label-cell'><span class='section-label'>Review huidige posities</span></td></tr></table><table class='data-table position-review-table'><thead><tr><th>Ticker</th><th>Actie</th><th>Score</th><th>Vers kapitaal</th><th>Rol</th><th>Volgende toets</th></tr></thead><tbody><tr><td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td><td>Aanhouden</td><td class='num'>n/a</td><td>Onder herbeoordeling</td><td>Rotatiebestemming</td><td>Aanhouden en opnieuw toetsen in de volgende run.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td><td>Aanhouden</td><td class='num'>n/a</td><td>Onder herbeoordeling</td><td>Rotatiebestemming</td><td>Aanhouden en opnieuw toetsen in de volgende run.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td><td>Aanhouden</td><td class='num'>n/a</td><td>Aanhouden / monitoren</td><td>Rotatiebestemming</td><td>Monitor commodity-breedte en bijdrage aan de hedgefunctie.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td><td>Aanhouden</td><td class='num'>n/a</td><td>Onder herbeoordeling</td><td>Rotatiebestemming</td><td>Aanhouden en opnieuw toetsen in de volgende run.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td><td>Aanhouden, onder herbeoordeling</td><td class='num'>3.68</td><td>Kleiner / onder herbeoordeling</td><td>Reële activa / capex</td><td>Voer de vervangingsanalyse tegenover GRID opnieuw uit.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td><td>Aanhouden / geen nieuw kapitaal boven 25%-limiet</td><td class='num'>4.28</td><td>Kleiner / onder herbeoordeling</td><td>Groeimotor</td><td>Aanhouden binnen de maximale positiegrootte en opnieuw toetsen op concentratie.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td><td>Aanhouden</td><td class='num'>3.53</td><td>Kleiner / onder herbeoordeling</td><td>Kernbeta</td><td>Toets overlap met SMH voordat extra kapitaal wordt toegewezen.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td><td>Aanhouden</td><td class='num'>3.70</td><td>Aanhouden</td><td>Strategische energie</td><td>Aanhouden en vergelijken met URA/NLR als uraniumbreedte verbetert.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td><td>Aanhouden</td><td class='num'>n/a</td><td>Onder herbeoordeling</td><td>Rotatiebestemming</td><td>Aanhouden en opnieuw toetsen in de volgende run.</td></tr></tbody></table></div><div class='panel panel-opportunities'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>4</span></td><td class='section-label-cell'><span class='section-label'>Beste nieuwe kansen</span></td></tr></table><ul>
+<li><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft de leidende gefinancierde groeiblootstelling, begrensd door de maximale positiegrootte.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a> / <a href="https://www.tradingview.com/chart/?symbol=BUG" target="_blank" rel="noopener noreferrer">BUG</a>: Cybersecurity-uitgaven profiteren van AI, cloud, datacenters en geopolitieke weerbaarheid.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a> / <a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a>: Stroomvraag, netcongestie en reshoring ondersteunen infrastructuurinvesteringen.</li>
+<li>Vervangingskandidaten blijven afhankelijk van bewijs: prijsbasis, relatieve sterkte en aansluiting op de beleggingscase moeten zichtbaar zijn vóór allocatie.</li>
+</ul>
+<h3>Vervangingsanalyse</h3>
+<p>&lt;!--  --&gt;</p>
+<table>
+<thead>
+<tr>
+  <th>Huidige positie</th>
+  <th>Alternatief</th>
+  <th style="text-align:right">1m relatieve sterkte</th>
+  <th style="text-align:right">3m relatieve sterkte</th>
+  <th>Prijsbasis</th>
+  <th>Beoordeling</th>
+  <th>Benodigde bevestiging</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IWM" target="_blank" rel="noopener noreferrer">IWM</a></td>
+  <td style="text-align:right">-1.26%</td>
+  <td style="text-align:right">+2.50%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-04.</td>
+  <td>Het alternatief verbetert; houd de vervangingsanalyse actief.</td>
+  <td>Vereist herhaalde 3-maands voorsprong en duidelijke financieringsbron.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=QUAL" target="_blank" rel="noopener noreferrer">QUAL</a></td>
+  <td style="text-align:right">+0.14%</td>
+  <td style="text-align:right">-3.44%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-04.</td>
+  <td>Alleen vroege 1-maands verbetering; wacht op 3-maands bevestiging.</td>
+  <td>Vereist 3-maands bevestiging.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td style="text-align:right">-1.79%</td>
+  <td style="text-align:right">-5.53%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-04.</td>
+  <td>Huidige positie blijft sterker; geen vervanging.</td>
+  <td>Vereist aanhoudende relatieve outperformance.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=EFA" target="_blank" rel="noopener noreferrer">EFA</a></td>
+  <td style="text-align:right">-1.75%</td>
+  <td style="text-align:right">-5.59%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-04.</td>
+  <td>Huidige positie blijft sterker; geen vervanging.</td>
+  <td>Vereist aanhoudende relatieve outperformance.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a></td>
+  <td style="text-align:right">+1.39%</td>
+  <td style="text-align:right">+8.60%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-04.</td>
+  <td>Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden.</td>
+  <td>Bevestig aansluiting op de beleggingscase, liquiditeit en financieringsbron.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URA" target="_blank" rel="noopener noreferrer">URA</a></td>
+  <td style="text-align:right">-1.41%</td>
+  <td style="text-align:right">+8.64%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-04.</td>
+  <td>Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden.</td>
+  <td>Bevestig aansluiting op de beleggingscase, liquiditeit en financieringsbron.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SOXX" target="_blank" rel="noopener noreferrer">SOXX</a></td>
+  <td style="text-align:right">+4.80%</td>
+  <td style="text-align:right">+19.83%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-04.</td>
+  <td>Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden.</td>
+  <td>Bevestig aansluiting op de beleggingscase, liquiditeit en financieringsbron.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=VPU" target="_blank" rel="noopener noreferrer">VPU</a></td>
+  <td style="text-align:right">-5.25%</td>
+  <td style="text-align:right">-13.77%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-04.</td>
+  <td>Huidige positie blijft sterker; geen vervanging.</td>
+  <td>Vereist aanhoudende relatieve outperformance.</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel panel-rotation-plan'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>5</span></td><td class='section-label-cell'><span class='section-label'>Rotatieplan portefeuille</span></td></tr></table><table class='data-table rotation-plan-table'><thead><tr><th>Sluiten</th><th>Verlagen</th><th>Aanhouden</th><th>Toevoegen</th><th>Vervangen</th></tr></thead><tbody><tr><td>Geen</td><td>Geen</td><td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a>, <a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a>, <a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a>, <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a>, <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>, <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a>, <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a>, <a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a>, <a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td><td>Geen</td><td>Geen</td></tr></tbody></table><div class='note-box'><ul><li>De bewaakte modelrotatie is al verwerkt in de officiële portefeuillestaat en het handelslogboek; deze run heeft geen dubbele staat- of handelslogboekmutatie uitgevoerd.</li></ul></div></div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>6</span></td><td class='section-label-cell'><span class='section-label'>Definitieve actietabel</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Ticker</th>
+  <th>ETF</th>
+  <th>Bestaand/nieuw</th>
+  <th style="text-align:right">Vorig gewicht</th>
+  <th style="text-align:right">Doelgewicht</th>
+  <th>Advies</th>
+  <th>Convictieniveau</th>
+  <th style="text-align:right">Totaalscore</th>
+  <th>Portefeuillerol</th>
+  <th>Sterker alternatief?</th>
+  <th>Korte toelichting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td>Bestaand</td>
+  <td style="text-align:right">17.85</td>
+  <td style="text-align:right">17.98</td>
+  <td>Aanhouden</td>
+  <td></td>
+  <td style="text-align:right"></td>
+  <td>Rotatiebestemming</td>
+  <td>Nee</td>
+  <td>Geen materiële wijziging deze run.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td>Bestaand</td>
+  <td style="text-align:right">5.05</td>
+  <td style="text-align:right">5.00</td>
+  <td>Aanhouden</td>
+  <td></td>
+  <td style="text-align:right"></td>
+  <td>Rotatiebestemming</td>
+  <td>Nee</td>
+  <td>Geen materiële wijziging deze run.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td>Bestaand</td>
+  <td style="text-align:right">9.40</td>
+  <td style="text-align:right">9.47</td>
+  <td>Aanhouden</td>
+  <td>Niveau 2</td>
+  <td style="text-align:right"></td>
+  <td>Rotatiebestemming</td>
+  <td>Nee</td>
+  <td>Geen materiële wijziging deze run.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td>Bestaand</td>
+  <td style="text-align:right">5.02</td>
+  <td style="text-align:right">5.02</td>
+  <td>Aanhouden</td>
+  <td></td>
+  <td style="text-align:right"></td>
+  <td>Rotatiebestemming</td>
+  <td>Nee</td>
+  <td>Geen materiële wijziging deze run.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td>Global X U.S. Infrastructure Development ETF</td>
+  <td>Bestaand</td>
+  <td style="text-align:right">0.03</td>
+  <td style="text-align:right">0.03</td>
+  <td>Aanhouden, onder herbeoordeling</td>
+  <td>Niveau 2</td>
+  <td style="text-align:right">3.68</td>
+  <td>Reële activa / capex</td>
+  <td>Ja</td>
+  <td>Infrastructuurcase blijft valide, maar <a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a> is de scherpste vervangingskandidaat.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td>VanEck Semiconductor ETF</td>
+  <td>Bestaand</td>
+  <td style="text-align:right">28.70</td>
+  <td style="text-align:right">27.56</td>
+  <td>Aanhouden / geen nieuw kapitaal boven 25%-limiet</td>
+  <td>Niveau 1</td>
+  <td style="text-align:right">4.28</td>
+  <td>Groeimotor</td>
+  <td>Nee</td>
+  <td>Best onderbouwde groeiblootstelling; uitbreiding blijft begrensd door de maximale positiegrootte.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td>SPDR S&amp;P 500 ETF Trust</td>
+  <td>Bestaand</td>
+  <td style="text-align:right">19.04</td>
+  <td style="text-align:right">19.03</td>
+  <td>Aanhouden</td>
+  <td>Niveau 2</td>
+  <td style="text-align:right">3.53</td>
+  <td>Kernbeta</td>
+  <td>Ja</td>
+  <td>Nuttig als kernblootstelling, maar de overlap met <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft expliciet onder herbeoordeling.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td>Sprott Uranium Miners ETF</td>
+  <td>Bestaand</td>
+  <td style="text-align:right">8.09</td>
+  <td style="text-align:right">8.17</td>
+  <td>Aanhouden</td>
+  <td>Niveau 2</td>
+  <td style="text-align:right">3.70</td>
+  <td>Strategische energie</td>
+  <td>Nee</td>
+  <td>Strategische energiecase blijft valide, maar krijgt deze run geen extra kapitaal boven <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a>.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td>Bestaand</td>
+  <td style="text-align:right">5.07</td>
+  <td style="text-align:right">5.00</td>
+  <td>Aanhouden</td>
+  <td></td>
+  <td style="text-align:right"></td>
+  <td>Rotatiebestemming</td>
+  <td>Nee</td>
+  <td>Geen materiële wijziging deze run.</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>7</span></td><td class='section-label-cell'><span class='section-label'>Positiewijzigingen verwerkt in de officiële portefeuillestaat</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Ticker</th>
+  <th style="text-align:right">Vorig gewicht %</th>
+  <th style="text-align:right">Nieuw gewicht %</th>
+  <th style="text-align:right">Gewichtswijziging %</th>
+  <th style="text-align:right">Wijziging aantal stukken</th>
+  <th>Verwerkte actie</th>
+  <th>Financieringsbron / toelichting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Portefeuille</td>
+  <td style="text-align:right">-</td>
+  <td style="text-align:right">-</td>
+  <td style="text-align:right">-</td>
+  <td style="text-align:right">0.00</td>
+  <td>Al verwerkt</td>
+  <td>De eerdere bewaakte modelrotatie is al verwerkt in de officiële portefeuillestaat; deze run heeft geen nieuwe staat- of handelslogboekmutatie uitgevoerd.</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>8</span></td><td class='section-label-cell'><span class='section-label'>Huidige posities en cash</span></td></tr></table><ul>
+<li>Startkapitaal (EUR): 100000.00</li>
+<li>Belegde marktwaarde (EUR): 109168.95</li>
+<li>Cash (EUR): 1936.52</li>
+<li>Totale portefeuillewaarde (EUR): 111105.47</li>
+<li>Rendement sinds start (%): 11.11</li>
+<li>EUR/USD gebruikt: 1.1611</li>
+</ul>
+<table>
+<thead>
+<tr>
+  <th>Ticker</th>
+  <th style="text-align:right">Aantal aandelen</th>
+  <th style="text-align:right">Prijs lokaal</th>
+  <th>Valuta</th>
+  <th style="text-align:right">Marktwaarde lokaal</th>
+  <th style="text-align:right">Marktwaarde EUR</th>
+  <th style="text-align:right">Gewicht %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td style="text-align:right">253.94</td>
+  <td style="text-align:right">90.70</td>
+  <td>USD</td>
+  <td style="text-align:right">23032.04</td>
+  <td style="text-align:right">19836.57</td>
+  <td style="text-align:right">17.85</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td style="text-align:right">91.77</td>
+  <td style="text-align:right">70.97</td>
+  <td>USD</td>
+  <td style="text-align:right">6512.77</td>
+  <td style="text-align:right">5609.19</td>
+  <td style="text-align:right">5.05</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td style="text-align:right">374.29</td>
+  <td style="text-align:right">32.39</td>
+  <td>USD</td>
+  <td style="text-align:right">12123.36</td>
+  <td style="text-align:right">10441.36</td>
+  <td style="text-align:right">9.40</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td style="text-align:right">66.04</td>
+  <td style="text-align:right">98.11</td>
+  <td>USD</td>
+  <td style="text-align:right">6478.71</td>
+  <td style="text-align:right">5579.85</td>
+  <td style="text-align:right">5.02</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td style="text-align:right">0.71</td>
+  <td style="text-align:right">57.61</td>
+  <td>USD</td>
+  <td style="text-align:right">41.15</td>
+  <td style="text-align:right">35.44</td>
+  <td style="text-align:right">0.03</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td style="text-align:right">59.00</td>
+  <td style="text-align:right">627.53</td>
+  <td>USD</td>
+  <td style="text-align:right">37024.27</td>
+  <td style="text-align:right">31887.51</td>
+  <td style="text-align:right">28.70</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td style="text-align:right">32.44</td>
+  <td style="text-align:right">757.09</td>
+  <td>USD</td>
+  <td style="text-align:right">24561.98</td>
+  <td style="text-align:right">21154.24</td>
+  <td style="text-align:right">19.04</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td style="text-align:right">171.00</td>
+  <td style="text-align:right">61.05</td>
+  <td>USD</td>
+  <td style="text-align:right">10439.55</td>
+  <td style="text-align:right">8991.16</td>
+  <td style="text-align:right">8.09</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td style="text-align:right">148.87</td>
+  <td style="text-align:right">43.94</td>
+  <td>USD</td>
+  <td style="text-align:right">6541.15</td>
+  <td style="text-align:right">5633.63</td>
+  <td style="text-align:right">5.07</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CASH" target="_blank" rel="noopener noreferrer">CASH</a></td>
+  <td style="text-align:right">-</td>
+  <td style="text-align:right">1.00</td>
+  <td>EUR</td>
+  <td style="text-align:right">1936.52</td>
+  <td style="text-align:right">1936.52</td>
+  <td style="text-align:right">1.74</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel panel-carry'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>9</span></td><td class='section-label-cell'><span class='section-label'>Input voor de volgende run</span></td></tr></table><p><strong>Deze sectie is de canonieke standaardinput voor de volgende run tenzij de gebruiker expliciet iets anders opgeeft. Vraag de gebruiker niet opnieuw om portefeuille-input zolang deze sectie beschikbaar is.</strong></p>
+<h3>Portefeuilletabel</h3>
+<table>
+<thead>
+<tr>
+  <th>Ticker</th>
+  <th>ETF-naam</th>
+  <th>Richting</th>
+  <th style="text-align:right">Gewicht %</th>
+  <th style="text-align:right">Gem. instap</th>
+  <th style="text-align:right">Huidige prijs</th>
+  <th style="text-align:right">P/L %</th>
+  <th>Oorspronkelijke thesis</th>
+  <th>Rol</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td>Longpositie</td>
+  <td style="text-align:right">17.85</td>
+  <td style="text-align:right"></td>
+  <td style="text-align:right">90.70</td>
+  <td style="text-align:right"></td>
+  <td>Portefeuilleblootstelling</td>
+  <td>Rotatiebestemming</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td>Longpositie</td>
+  <td style="text-align:right">5.05</td>
+  <td style="text-align:right"></td>
+  <td style="text-align:right">70.97</td>
+  <td style="text-align:right"></td>
+  <td>Portefeuilleblootstelling</td>
+  <td>Rotatiebestemming</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td>Longpositie</td>
+  <td style="text-align:right">9.40</td>
+  <td style="text-align:right">31.80</td>
+  <td style="text-align:right">32.39</td>
+  <td style="text-align:right"></td>
+  <td>Rotatiebestemming</td>
+  <td>Rotatiebestemming</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td>Longpositie</td>
+  <td style="text-align:right">5.02</td>
+  <td style="text-align:right"></td>
+  <td style="text-align:right">98.11</td>
+  <td style="text-align:right"></td>
+  <td>Portefeuilleblootstelling</td>
+  <td>Rotatiebestemming</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td>Global X U.S. Infrastructure Development ETF</td>
+  <td>Longpositie</td>
+  <td style="text-align:right">0.03</td>
+  <td style="text-align:right">51.98</td>
+  <td style="text-align:right">57.61</td>
+  <td style="text-align:right">8.25</td>
+  <td>Netwerk- en infrastructuurcapex</td>
+  <td>Reële activa / capex</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td>VanEck Semiconductor ETF</td>
+  <td>Longpositie</td>
+  <td style="text-align:right">28.70</td>
+  <td style="text-align:right">420.13</td>
+  <td style="text-align:right">627.53</td>
+  <td style="text-align:right">20.61</td>
+  <td>AI-rekenkracht en semiconductorleiderschap</td>
+  <td>Groeimotor</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td>SPDR S&amp;P 500 ETF Trust</td>
+  <td>Longpositie</td>
+  <td style="text-align:right">19.04</td>
+  <td style="text-align:right">676.33</td>
+  <td style="text-align:right">757.09</td>
+  <td style="text-align:right">6.17</td>
+  <td>Amerikaanse large-cap kernblootstelling</td>
+  <td>Kernbeta</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td>Sprott Uranium Miners ETF</td>
+  <td>Longpositie</td>
+  <td style="text-align:right">8.09</td>
+  <td style="text-align:right">67.50</td>
+  <td style="text-align:right">61.05</td>
+  <td style="text-align:right">-0.55</td>
+  <td>Kernenergie- en uraniumcyclus</td>
+  <td>Strategische energie</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td>Longpositie</td>
+  <td style="text-align:right">5.07</td>
+  <td style="text-align:right"></td>
+  <td style="text-align:right">43.94</td>
+  <td style="text-align:right"></td>
+  <td>Portefeuilleblootstelling</td>
+  <td>Rotatiebestemming</td>
+</tr>
+</tbody>
+</table>
+<h3>Beschikbare cash</h3>
+<ul>
+<li>Cash %: 1.74</li>
+<li>Margegebruik %: 0.00</li>
+<li>Leverage toegestaan: Nee</li>
+</ul>
+<h3>Volglijst / dynamisch radargeheugen</h3>
+<table>
+<thead>
+<tr>
+  <th>Thema</th>
+  <th>Primaire ETF</th>
+  <th>Alternatieve ETF</th>
+  <th>Waarom op de radar</th>
+  <th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>AI-rekenkrachtinfrastructuur</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SOXX" target="_blank" rel="noopener noreferrer">SOXX</a></td>
+  <td>Sterkste structurele groeiblootstelling.</td>
+  <td>Actief / begrensd</td>
+</tr>
+<tr>
+  <td>Defensie-innovatie / strategische weerbaarheid</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a></td>
+  <td>Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling.</td>
+  <td>Vervangingsanalyse vereist</td>
+</tr>
+<tr>
+  <td>Netuitbreiding / elektrificatie</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a></td>
+  <td>Infrastructuurcapex blijft valide.</td>
+  <td>Vervangingsanalyse vereist</td>
+</tr>
+<tr>
+  <td>Herbeoordeling goudhedge</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GLD" target="_blank" rel="noopener noreferrer">GLD</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a> / <a href="https://www.tradingview.com/chart/?symbol=BIL" target="_blank" rel="noopener noreferrer">BIL</a></td>
+  <td>Hedgefunctie moet worden bewezen.</td>
+  <td>Onder herbeoordeling</td>
+</tr>
+<tr>
+  <td>Ontwikkelde markten buiten de VS</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=EFA" target="_blank" rel="noopener noreferrer">EFA</a></td>
+  <td>De portefeuille heeft geen blootstelling aan ontwikkelde markten buiten de VS.</td>
+  <td>Volglijst</td>
+</tr>
+</tbody>
+</table>
+<h3>Continuïteit in aanbevelingsdiscipline</h3>
+<ul>
+<li><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a>: overlapreview tegenover <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft actief.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a>: directe vervangingsanalyse tegenover <a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a> vereist.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>: directe vervangingsanalyse tegenover <a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a> vereist.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=GLD" target="_blank" rel="noopener noreferrer">GLD</a>: hedge-validiteitstest vereist.</li>
+<li>Vervangingskandidaten: niet geschikt voor allocatie zonder afgeronde vervangingsanalyse.</li>
+</ul>
+<h3>Randvoorwaarden</h3>
+<ul>
+<li>Maximale positiegrootte: 25%</li>
+<li>Maximaal aantal posities: 8</li>
+<li>Alleen UCITS: Nee</li>
+<li>Leveraged ETF’s toegestaan: Nee</li>
+<li>Drawdown-tolerantie: Gemiddeld</li>
+<li>Voorkeur inkomen versus groei: gebalanceerde groei met nadruk op weerbaarheid</li>
+</ul>
+<h3>Wijzigingen sinds de vorige review</h3>
+<ul>
+<li>Toegevoegd: een gevalideerd productiepad op basis van expliciete portefeuillestaat, prijsaudit en macro-/beleidsregime-input.</li>
+<li>Verlaagd: Geen, tenzij de expliciete portefeuillestaat anders aangeeft.</li>
+<li>Gesloten: Geen.</li>
+<li>Thesiswijzigingen: Geen structurele thesis is losgelaten; implementatie- en macroregimediscipline zijn duidelijk aangescherpt.</li>
+</ul>
+</div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>10</span></td><td class='section-label-cell'><span class='section-label'>Disclaimer</span></td></tr></table><p>Dit rapport wordt uitsluitend verstrekt voor informatieve en educatieve doeleinden. Het is geen beleggingsadvies, juridisch advies, fiscaal advies of financieel advies, en vormt geen aanbeveling om effecten te kopen, te verkopen of aan te houden. Het rapport houdt geen rekening met individuele beleggingsdoelen, financiële situatie of specifieke behoeften van de ontvanger. Beleggen brengt risico’s met zich mee, waaronder het risico op verlies van inleg.</p>
+</div></div>
+        </div>
+      </body>
+    </html>
