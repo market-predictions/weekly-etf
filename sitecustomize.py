@@ -4,6 +4,7 @@ Python imports ``sitecustomize`` automatically at interpreter start when the
 repository root is on ``sys.path``. Keep these patches narrow and defensive:
 - localize the known Dutch ETF equity-curve labels for the Dutch companion PNG
 - add missing Dutch replacement-duel phrase variants created by the runtime
+- harden Dutch delivery enum localization for fresh-cash labels
 """
 from __future__ import annotations
 
@@ -73,5 +74,25 @@ def _install_replacement_duel_localization_patch() -> None:
     nl.TRIGGER_TRANSLATIONS.update(trigger_updates)
 
 
+def _install_dutch_delivery_enum_patch() -> None:
+    try:
+        from runtime import delivery_html_overrides as delivery
+
+        delivery.FRESH_CASH_NL.setdefault("no / under review", "Nee / onder herbeoordeling")
+        delivery.FRESH_CASH_NL.setdefault("no", "Nee")
+    except Exception:
+        pass
+
+    try:
+        from runtime import client_facing_sanitizer as sanitizer
+
+        sanitizer.DUTCH_HTML_TOKEN_REPLACEMENTS.setdefault("No / under review", "Nee / onder herbeoordeling")
+        if "No / under review" not in sanitizer.DUTCH_DELIVERY_FORBIDDEN_TOKENS:
+            sanitizer.DUTCH_DELIVERY_FORBIDDEN_TOKENS.append("No / under review")
+    except Exception:
+        pass
+
+
 _install_dutch_equity_curve_label_patch()
 _install_replacement_duel_localization_patch()
+_install_dutch_delivery_enum_patch()
