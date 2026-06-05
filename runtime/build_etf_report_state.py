@@ -225,6 +225,27 @@ def _index_price_results(pricing_audit: dict[str, Any]) -> dict[str, dict[str, A
     return indexed
 
 
+def _index_lanes_by_ticker(lane_assessment: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Index live lane scores by ETF ticker without giving alternatives authority over primaries.
+
+    Primary ETF lanes are the preferred score source. Alternative ETF lanes are only
+    used when the ticker has no primary lane. This keeps score enrichment
+    deterministic while avoiding a raw n/a score surface for active holdings.
+    """
+    primary: dict[str, dict[str, Any]] = {}
+    alternative: dict[str, dict[str, Any]] = {}
+    for lane in lane_assessment.get("assessed_lanes", []) or []:
+        primary_ticker = _ticker(lane.get("primary_etf"))
+        alternative_ticker = _ticker(lane.get("alternative_etf"))
+        if primary_ticker and primary_ticker not in primary:
+            primary[primary_ticker] = lane
+        if alternative_ticker and alternative_ticker not in alternative:
+            alternative[alternative_ticker] = lane
+    indexed = dict(alternative)
+    indexed.update(primary)
+    return indexed
+
+
 def _semantic_defaults(ticker: str) -> dict[str, Any]:
     defaults = {
         "SPY": {"suggested_action": "Hold under review", "conviction_tier": "Tier 2", "portfolio_role": "Core beta", "better_alternative_exists": "Yes", "short_reason": "Useful core beta, but overlap with SMH limits diversification value.", "required_next_action": "Review overlap versus SMH and compare with QUAL / IEFA.", "fresh_cash_test": "Smaller / under review"},
@@ -234,6 +255,10 @@ def _semantic_defaults(ticker: str) -> dict[str, Any]:
         "URNM": {"suggested_action": "Hold", "conviction_tier": "Tier 2", "portfolio_role": "Strategic energy", "better_alternative_exists": "No", "short_reason": "Strategic nuclear exposure remains valid, but it is not the first use of fresh cash.", "required_next_action": "Hold unless relative strength confirms add status.", "fresh_cash_test": "Hold / wait for confirmation"},
         "GLD": {"suggested_action": "Hold under review", "conviction_tier": "Tier 3", "portfolio_role": "Hedge ballast", "better_alternative_exists": "Yes", "short_reason": "Hedge role is not automatic after drawdown; ballast behavior must be proven.", "required_next_action": "Run hedge-validity test versus GSG / BIL.", "fresh_cash_test": "No / hedge review"},
         "GSG": {"suggested_action": "Hold", "conviction_tier": "Tier 2", "portfolio_role": "Commodity inflation hedge", "better_alternative_exists": "No", "short_reason": "Added through guarded model rotation as commodity-breadth replacement for part of GLD.", "required_next_action": "Monitor commodity breadth and hedge contribution after execution.", "fresh_cash_test": "Hold / monitor"},
+        "CIBR": {"suggested_action": "Hold", "conviction_tier": "Tier 2", "portfolio_role": "Cybersecurity resilience", "better_alternative_exists": "No", "short_reason": "Cybersecurity exposure remains structurally supported by AI, cloud and resilience spending.", "required_next_action": "Monitor relative strength and portfolio concentration.", "fresh_cash_test": "Hold / monitor", "total_score": "4.97", "score_source": "semantic_fallback_until_position_score"},
+        "DFEN": {"suggested_action": "Hold under review", "conviction_tier": "Tier 3", "portfolio_role": "Defense tactical beta", "better_alternative_exists": "Yes", "short_reason": "Defense thesis remains relevant, but vehicle risk and implementation quality require review.", "required_next_action": "Review defense vehicle fit versus ITA/PPA and leverage constraints.", "fresh_cash_test": "No / under review", "total_score": "3.10", "score_source": "semantic_fallback_until_position_score"},
+        "IEFA": {"suggested_action": "Hold", "conviction_tier": "Tier 3", "portfolio_role": "Non-U.S. developed diversification", "better_alternative_exists": "No", "short_reason": "Diversifies U.S. factor concentration but still needs relative-strength confirmation.", "required_next_action": "Monitor non-U.S. breadth and SPY-relative performance.", "fresh_cash_test": "Hold / monitor", "total_score": "3.52", "score_source": "semantic_fallback_until_position_score"},
+        "XLU": {"suggested_action": "Hold under review", "conviction_tier": "Tier 3", "portfolio_role": "Defensive utilities ballast", "better_alternative_exists": "Yes", "short_reason": "Defensive utility exposure must justify its role versus cash and broader ballast alternatives.", "required_next_action": "Review defensive ballast role versus BIL/SHV and opportunity cost.", "fresh_cash_test": "No / under review", "total_score": "3.00", "score_source": "semantic_fallback_until_position_score"},
     }
     return defaults.get(ticker, {})
 
@@ -282,9 +307,34 @@ def _revalue_holding_from_price(holding: dict[str, Any], price_row: dict[str, An
     return holding
 
 
-def _enrich_positions(portfolio_state: dict[str, Any], pricing_audit: dict[str, Any], scorecard: list[dict[str, str]], rotation_plan: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+def _apply_lane_score_if_missing(row: dict[str, Any], lane_by_ticker: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    ticker = _ticker(row.get("ticker"))
+    if _to_float(row.get("total_score")) is not None:
+        row.setdefault("score_source", "position_scorecard_or_semantic_default")
+        return row
+    lane = lane_by_ticker.get(ticker, {})
+    lane_score = _to_float(lane.get("total_score"))
+    if lane_score is None:
+        return row
+    row["total_score"] = f"{lane_score:.2f}"
+    row["score_source"] = "lane_assessment_primary_or_alternative"
+    row.setdefault("conviction_tier", "Tier 2" if lane_score >= 3.5 else "Tier 3")
+    row.setdefault("short_reason", lane.get("evidence_summary") or lane.get("why_now") or "Live lane score supplied by lane assessment.")
+    row.setdefault("required_next_action", lane.get("why_now") or "Monitor live lane score and position fit next run.")
+    row.setdefault("fresh_cash_test", "Hold / monitor")
+    return row
+
+
+def _enrich_positions(
+    portfolio_state: dict[str, Any],
+    pricing_audit: dict[str, Any],
+    scorecard: list[dict[str, str]],
+    lane_assessment: dict[str, Any],
+    rotation_plan: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
     price_results = _index_price_results(pricing_audit)
     score_by_ticker = _index_by_ticker(scorecard)
+    lane_by_ticker = _index_lanes_by_ticker(lane_assessment)
     rotation_by_ticker = {str(r.get("ticker", "")).upper(): r for r in (rotation_plan or {}).get("rotation_decisions", []) or []}
     target_by_ticker = {str(r.get("ticker", "")).upper(): r for r in (rotation_plan or {}).get("target_weights", []) or []}
     holdings = []
@@ -299,6 +349,9 @@ def _enrich_positions(portfolio_state: dict[str, Any], pricing_audit: dict[str, 
         score = score_by_ticker.get(ticker, {})
         if score:
             row.update({k: v for k, v in score.items() if k not in POSITION_AUTHORITY_FIELDS and v not in (None, "")})
+            if _to_float(row.get("total_score")) is not None:
+                row["score_source"] = "position_scorecard"
+        row = _apply_lane_score_if_missing(row, lane_by_ticker)
         rotation = rotation_by_ticker.get(ticker, {})
         if rotation:
             row.update(
@@ -348,7 +401,7 @@ def build_runtime_state(
     macro_policy_pack = load_json_if_exists(sources.macro_policy_pack)
     rotation_plan = load_json_if_exists(sources.rotation_plan) if sources.rotation_plan else {}
 
-    holdings = _enrich_positions(portfolio_state, pricing_audit, recommendation_scorecard, rotation_plan)
+    holdings = _enrich_positions(portfolio_state, pricing_audit, recommendation_scorecard, lane_assessment, rotation_plan)
     total_market_value = round(sum((_to_float(p.get("previous_market_value_eur")) or 0.0) for p in holdings), 2)
     total_portfolio_value_eur = round(total_market_value + (_to_float(portfolio_state.get("cash_eur")) or 0.0), 2)
     prices = list(_index_price_results(pricing_audit).values())
@@ -366,7 +419,10 @@ def build_runtime_state(
         "macro_policy_pack_present": bool(macro_policy_pack.get("regime")),
         "scorecard_present": len(recommendation_scorecard) > 0,
         "scorecard_authority_limited_to_commentary": True,
+        "lane_score_fallback_enabled": True,
+        "semantic_score_fallback_enabled": True,
         "positions_enriched": any(p.get("short_reason") for p in holdings),
+        "positions_without_total_score": [p.get("ticker") for p in holdings if _to_float(p.get("total_score")) is None],
         "fx_rate_present": _fx_rate(pricing_audit) is not None,
         "rotation_plan_present": bool(rotation_plan),
         "rotation_plan_source": str(sources.rotation_plan) if sources.rotation_plan else None,
