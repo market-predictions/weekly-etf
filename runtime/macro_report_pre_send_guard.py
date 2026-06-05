@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from tools.validate_etf_macro_thesis_surface_leakage import scan_text
-from tools.validate_macro_compliance import validate_text
+from tools.validate_macro_compliance import _extract_report_macro_sections, validate_text
 from tools.validate_macro_report_surface import validate_pack
 
 DEFAULT_MACRO_PACK = Path("output/macro/latest.json")
@@ -20,8 +20,20 @@ def _load_macro_pack(path: Path) -> dict[str, Any]:
     return payload
 
 
+def _compliance_scope(path: Path, text: str) -> str:
+    """Limit macro-compliance figure checks to macro-sensitive report sections.
+
+    Full-report leakage scanning remains active below. The macro-compliance
+    orphan-figure rule is intentionally macro-specific, so it must not scan
+    ordinary portfolio-performance sections such as Section 7A.
+    """
+    if path.suffix.lower() == ".md":
+        return _extract_report_macro_sections(text)
+    return text
+
+
 def _validate_client_text(path: Path, text: str) -> tuple[int, int]:
-    compliance = validate_text(text)
+    compliance = validate_text(_compliance_scope(path, text))
     leakage = scan_text(text, path)
     if compliance:
         for finding in compliance[:40]:
