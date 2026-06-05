@@ -49,7 +49,7 @@ EXACT_REPLACEMENTS = {
     "Actiebias": "Beslissingsrichting",
     "Status portefeuillecurve: Aangesloten op sectie 15 with full valuation history": "Status portefeuillecurve: aangesloten op sectie 15 met volledige waarderingshistorie",
     "with full valuation history": "met volledige waarderingshistorie",
-    "GLD remains a hedge review, not an unquestioned ballast position.": "GLD blijft een hedgepositie onder herbeoordeling en is geen vanzelfsprekende stabilisator.",
+    "GLD remains a hedge review, not an unquestioned ballast position.": "De hedgefunctie blijft onder herbeoordeling en is geen vanzelfsprekende stabilisator.",
     "PPA en PAVE remain replaceable until their ETF implementation quality is proven.": "PPA en PAVE blijven vervangbaar totdat de kwaliteit van de ETF-implementatie is bewezen.",
     "Neen-U.S. equity exposure remains a diversification gap.": "Niet-Amerikaanse aandelenblootstelling blijft een diversificatiekloof.",
     "Neen-U.S.": "Niet-Amerikaanse",
@@ -60,6 +60,7 @@ EXACT_REPLACEMENTS = {
     "SPDR Gold Aantal aandelen": "SPDR Gold Shares",
     "Vers kapitaal": "Nieuw kapitaal",
     "Smaller / under review": "Kleiner / onder herbeoordeling",
+    "No / under review": "Nee / onder herbeoordeling",
     "Force alternative duel; upgrade, reduce, replace, or close": "Vervangingsanalyse vereist; verhoog, verlaag, vervang of sluit",
     "Run hedge validity test and compare with alternatives": "Voer een hedge-validiteitstest uit en vergelijk met alternatieven",
     "Nieuw weight": "Nieuw gewicht",
@@ -88,8 +89,33 @@ NATIVE_STATE_LABEL_REPLACEMENTS = {
     "Runtime valuation from immutable pricing audit and explicit portfolio state": "Waardering uit onveranderlijke prijsaudit en expliciete portefeuillestaat",
     "Runtime valuation repriced from official portfolio-state shares": "Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen",
     "Rotation destination": "Rotatiebestemming",
+    "No / under review": "Nee / onder herbeoordeling",
+    "Smaller / under review": "Kleiner / onder herbeoordeling",
     "| Long |": "| Longpositie |",
 }
+
+NATIVE_REGEX_REPLACEMENTS = [
+    (
+        re.compile(r"\[GLD\]\([^\)]*\)\s+moet bewijzen dat het nog steeds een stabiliserende hedgefunctie heeft", re.I),
+        "de hedgefunctie moet bewijzen dat zij nog steeds stabiliseert",
+    ),
+    (
+        re.compile(r"\bGLD\s+moet bewijzen dat het nog steeds een stabiliserende hedgefunctie heeft", re.I),
+        "de hedgefunctie moet bewijzen dat zij nog steeds stabiliseert",
+    ),
+    (
+        re.compile(r"\[GLD\]\([^\)]*\)\s+blijft een hedgepositie onder herbeoordeling en is geen vanzelfsprekende stabilisator", re.I),
+        "De hedgefunctie blijft onder herbeoordeling en is geen vanzelfsprekende stabilisator",
+    ),
+    (
+        re.compile(r"\bGLD\s+blijft een hedgepositie onder herbeoordeling en is geen vanzelfsprekende stabilisator", re.I),
+        "De hedgefunctie blijft onder herbeoordeling en is geen vanzelfsprekende stabilisator",
+    ),
+    (
+        re.compile(r"\|\s*Herbeoordeling goudhedge\s*\|\s*(?:\[GLD\]\([^\)]*\)|GLD)\s*\|\s*(?:\[GSG\]\([^\)]*\)|GSG)\s*/\s*(?:\[BIL\]\([^\)]*\)|BIL)\s*\|\s*Hedgefunctie moet worden bewezen\.\s*\|\s*Onder herbeoordeling\s*\|", re.I),
+        "| Herbeoordeling grondstoffenhedge | GSG | DBC / BIL | De huidige grondstoffenbrede hedgefunctie moet worden bewezen tegenover cash en alternatieven. | Onder herbeoordeling |",
+    ),
+]
 
 REGEX_REPLACEMENTS = [
     *[(re.compile(pattern, re.I), replacement) for pattern, replacement in term.REGEX_CLIENT_LANGUAGE_REPLACEMENTS],
@@ -143,6 +169,10 @@ FORBIDDEN_AFTER_SCRUB = sorted(set(term.FORBIDDEN_AFTER_SCRUB + [
     "not promoted this week",
     "SPY plus SMH creates",
     "GLD remains",
+    "GLD blijft een hedgepositie onder herbeoordeling",
+    "GLD moet bewijzen dat het nog steeds een stabiliserende hedgefunctie heeft",
+    "Herbeoordeling goudhedge",
+    "No / under review",
     "Neen-U.S.",
     "Best verdiende",
     "Actiebias",
@@ -178,6 +208,8 @@ def latest_nl_report(output_dir: Path) -> Path:
 def _normalize_native_state_labels(text: str) -> str:
     for source, target in sorted(NATIVE_STATE_LABEL_REPLACEMENTS.items(), key=lambda item: len(item[0]), reverse=True):
         text = text.replace(source, target)
+    for pattern, target in NATIVE_REGEX_REPLACEMENTS:
+        text = pattern.sub(target, text)
     return text
 
 
