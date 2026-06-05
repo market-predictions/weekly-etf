@@ -52,6 +52,18 @@ THESIS_FALLBACK_NL = {
     "XLU": "Defensieve nutsbedrijven / rentegevoelige ballast",
 }
 
+GENERIC_THESIS_LABELS = {
+    "",
+    "none",
+    "n/a",
+    "na",
+    "position",
+    "portfolio exposure",
+    "portefeuilleblootstelling",
+    "rotation destination",
+    "rotatiebestemming",
+}
+
 
 def _latest_report(output_dir: Path, language: str) -> Path:
     env_key = "MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL" if language == "nl" else "MRKT_RPRTS_EXPLICIT_REPORT_PATH"
@@ -141,9 +153,20 @@ def _contribution_pct(pl_eur: float | None, state: dict[str, Any]) -> float | No
     return round(pl_eur / starting * 100.0, 2)
 
 
+def _is_generic_thesis(raw: str, ticker: str) -> bool:
+    normalized = raw.strip().lower()
+    if normalized in GENERIC_THESIS_LABELS:
+        return True
+    if normalized == ticker.lower():
+        return True
+    if normalized == ETF_NAMES.get(ticker, "").lower():
+        return True
+    return False
+
+
 def _source_thesis(position: dict[str, Any], ticker: str) -> tuple[str, bool]:
     raw = str(position.get("original_thesis") or "").strip()
-    if raw:
+    if raw and not _is_generic_thesis(raw, ticker):
         return raw, True
     return THESIS_FALLBACK_EN.get(ticker, ETF_NAMES.get(ticker, ticker)), False
 
