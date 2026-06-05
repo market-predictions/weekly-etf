@@ -1,0 +1,51 @@
+{
+  "schema_version": "macro_narrative_client_surface_v1",
+  "artifact_type": "macro_narrative_client_surface",
+  "client_facing": false,
+  "production_report": false,
+  "meaning_contract": {
+    "macro_regime": "cautious_neutral",
+    "risk_tone": "cautious",
+    "portfolio_action": "none",
+    "funding_authority": false,
+    "confidence_language": "evidence_based_observation"
+  },
+  "client_surface": {
+    "en": {
+      "title": "Macro regime context",
+      "body": "The macro backdrop remains cautious-neutral. Inflation, rates and growth data are used as context for risk review, not as a standalone portfolio signal. [M1] No portfolio action or allocation change follows from this macro note.",
+      "citations": [
+        {
+          "id": "M1",
+          "source": "macro_regime_evidence_pack",
+          "supports": "inflation, rates and growth context"
+        }
+      ],
+      "meaning_claims": {
+        "macro_regime": "cautious_neutral",
+        "risk_tone": "cautious",
+        "portfolio_action": "none",
+        "funding_authority": false,
+        "confidence_language": "evidence_based_observation"
+      }
+    },
+    "nl": {
+      "title": "Macroregime-context",
+      "body": "De macro-omgeving blijft voorzichtig-neutraal. Inflatie, rente en groeicijfers worden gebruikt als context voor risicobeoordeling, niet als zelfstandig portefeuillesignaal. [M1] Uit deze macronotitie volgt geen portefeuilleactie of allocatiewijziging.",
+      "citations": [
+        {
+          "id": "M1",
+          "source": "macro_regime_evidence_pack",
+          "supports": "inflatie, rente en groeicontext"
+        }
+      ],
+      "meaning_claims": {
+        "macro_regime": "risk_on",
+        "risk_tone": "constructive",
+        "portfolio_action": "none",
+        "funding_authority": false,
+        "confidence_language": "evidence_based_observation"
+      }
+    }
+  }
+}
