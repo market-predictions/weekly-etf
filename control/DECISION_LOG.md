@@ -133,7 +133,6 @@ The new discipline layer forces the model to ask whether each holding would be b
 
 ### Consequence
 - Weak or replaceable holdings now need a named next action, alternative comparison, or explicit override.
-- The next live ETF report should force clear review of SPY, PPA, PAVE, GLD, and cash policy.
 - ETF state now includes portfolio state, valuation history, trade ledger, lane artifacts, pricing audits, and recommendation discipline memory.
 
 ---
@@ -160,8 +159,6 @@ This path has produced received bilingual reports and resolves the prior archite
 - Markdown reports are presentation output, not primary state authority.
 - Future changes should preserve the runtime flow and avoid manual markdown patching.
 - Renderer changes should be limited to concrete output defects or validated improvements.
-- The next discovery-maturity phase is historical relative-strength scoring.
-- The next pricing-maturity phase is two-pass challenger pricing.
 
 ---
 
@@ -184,18 +181,12 @@ pricing audit
 ```
 
 ### Reason
-The workflow successfully passed after adding:
-
-- `runtime/fetch_etf_relative_strength.py`
-- historical 1m/3m return, trend, drawdown, volatility and relative-strength inputs
-- `pricing/augment_challenger_pricing.py`
-- targeted challenger pricing between first-pass and final discovery
+The workflow successfully passed after adding historical market-strength inputs and targeted challenger pricing between first-pass and final discovery.
 
 ### Consequence
-- The Structural Opportunity Radar is now less dependent on configured priors.
+- The Structural Opportunity Radar is less dependent on configured priors.
 - Top discovery challengers can receive targeted pricing before final scoring.
 - Priced challengers are not automatically fundable; they only enable a fairer comparison.
-- The next maturity steps are liquidity/tradability filtering, relative strength versus current holdings, and macro/fundamental freshness inputs.
 
 ---
 
@@ -226,7 +217,6 @@ Repeated markdown-level fixes could not reliably guarantee clickable ticker form
 - `runtime/delivery_html_overrides.py` owns the final HTML for strict branded sections.
 - `send_report_runtime_html.py` is the workflow delivery entrypoint.
 - `tools/validate_etf_delivery_html_contract.py` dynamically reads holdings from runtime state and validates rendered delivery HTML before email send.
-- The validator checks for real TradingView anchors, prevents raw markdown links, and ensures Current Position Review is a real HTML table.
 - Future PDF layout defects in these sections should be fixed in the delivery HTML layer, not by more markdown post-processing.
 
 ---
@@ -247,28 +237,8 @@ runtime state
 → PDF/email delivery
 ```
 
-### Scope
-This applies to:
-
-- Dutch section titles
-- Dutch table labels
-- Dutch decision/status strings
-- Dutch trigger phrases
-- Dutch disclaimer wording
-- allowed English financial terminology
-- internal source labels that must never appear in client-facing Dutch text
-- Dutch aliases used by validators and delivery checks
-
 ### Reason
-The production debugging cycle showed that one-failure-at-a-time phrase fixes are fragile. The real issue was validator drift between:
-
-- `runtime/nl_localization.py`
-- `runtime/apply_nl_localization.py`
-- `tools/validate_etf_dutch_language_quality.py`
-- `send_report.py`
-- `tools/validate_etf_delivery_html_contract.py`
-
-Dutch output quality must be handled as an explicit contract across render, markdown validation, send-time parity validation, delivery HTML validation, and final email/PDF delivery.
+The production debugging cycle showed that one-failure-at-a-time phrase fixes are fragile. Dutch output quality must be handled as an explicit contract across render, markdown validation, send-time parity validation, delivery HTML validation, and final email/PDF delivery.
 
 ### Consequence
 - English remains the canonical analytical report.
@@ -295,23 +265,13 @@ output/etf_valuation_history.csv
 → ETF_EQUITY_CURVE_HISTORY_OK
 ```
 
-### Scope
-This applies to:
-
-- Section 7 table rows
-- embedded equity-curve chart
-- latest NAV reconciliation with Section 15
-- future regression protection before delivery
-
 ### Reason
-A production report showed the equity curve with only two dots: the initial start date and the latest report date. The intermediate valuation dates existed in `output/etf_valuation_history.csv`, but the renderer ignored that file and hardcoded only start/latest. Because the chart generator uses Section 7 as its primary source, the chart also collapsed to two points.
+A production report showed the equity curve with only two dots. The intermediate valuation dates existed in `output/etf_valuation_history.csv`, but the renderer ignored that file and hardcoded only start/latest.
 
 ### Consequence
-- `runtime/render_etf_report_from_state.py` now reads `output/etf_valuation_history.csv` and adds or replaces the current runtime NAV for the report date.
 - Section 7 now shows the full valuation history plus current NAV.
 - The embedded chart now shows intermediate valuation dates.
 - `tools/validate_etf_equity_curve_history.py` is wired into the send workflow.
-- Fresh delivery fails before email if Section 7 has too few points, duplicate dates, or latest NAV does not reconcile with Section 15 total NAV.
 
 ---
 
@@ -334,28 +294,12 @@ pricing lineage first
 ### Authority rule
 Macro/regime modernization is approved as a post-pricing-lineage enhancement. Until validated in fixtures and shadow runs, the new macro engine may produce internal artifacts but must not change client-facing fundable decisions.
 
-### Scope
-This decision covers the roadmap parked at:
-
-```text
-docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md
-```
-
-It also governs future implementation of the uploaded macro/regime work packages and WP-9 thesis selection pipeline.
-
-### Reason
-The current macro pack is useful but still too static: regime classification relies on ETF proxies, confidence is hardcoded, central-bank stance is partly static, and macro/fundamental freshness inputs are not yet authoritative. The approved roadmap upgrades that layer while preserving determinism, provenance, compliance discipline, and the existing runtime-driven production baseline.
-
 ### Consequence
 - Pricing lineage remains the active Priority A and must not be displaced.
-- Macro and thesis implementation starts only after Phase 0 control-layer recording.
-- WP-1 to WP-4 must run in fixture/shadow mode before they influence production decisions.
-- WP-7 compliance gates are mandatory before expanded macro/thesis content reaches the client report.
-- WP-9 Stage-1 thesis candidates are internal artifacts and must not appear as client-facing actions.
+- Macro and thesis implementation starts only after control-layer recording.
+- Thesis candidates are internal artifacts and must not appear as client-facing actions until promoted.
 - A lane becomes fundable only after thesis, market confirmation, valuation-grade pricing, and portfolio discipline gates all pass.
 - Institutional overlay may cap confidence but may never set the regime or portfolio action.
-- Schema corrections are required before WP-9 implementation, especially `active_drivers` and difficult central-bank source coverage.
-- Dutch output must be protected through native terminology and validator coverage before client-surface integration.
 
 ---
 
@@ -371,12 +315,6 @@ config/macro_data_sources.yml
 → tools/validate_macro_data_audit.py
 → runtime/build_macro_policy_pack.py records audit summary only
 ```
-
-### Scope
-This decision covers WP-1 / Phase 2 only.
-
-### Reason
-The approved roadmap requires provenance-backed macro data before deterministic regime and confidence logic. Pulling the data directly into production decisions before schema, methodology, compliance, and bilingual gates exist would recreate the same uncontrolled patch-cycle risk the repo is trying to avoid.
 
 ### Consequence
 - Macro audit values are run-scoped and validated.
@@ -402,32 +340,6 @@ fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json
 → output/macro/validation/latest_macro_regime_shadow_validation.json
 ```
 
-The same isolated workflow also continues to replay the older deterministic market-proxy regime fixtures.
-
-### Evidence
-```text
-workflow: Validate ETF macro regime shadow
-run_number: 14
-workflow_run_id: 26877273381
-trigger_commit: 3a7d87323a0a83bdaab5a81bb8a037f3babf9fff
-status: passed
-validated_markers:
-  - ETF_MACRO_REGIME_FIXTURE_REPLAY_OK
-  - ETF_MACRO_DATA_AUDIT_VALID_OK
-  - ETF_MACRO_AUDIT_AXIS_SHADOW_OK
-  - ETF_MACRO_REGIME_SHADOW_OK
-```
-
-The validated fixture produced shadow macro axes:
-
-```text
-volatility: calm
-real_rates: restrictive
-yield_curve: inverted
-inflation_expectations: neutral
-policy_rate: restrictive
-```
-
 ### Authority rule
 The validated fields remain internal shadow evidence only:
 
@@ -451,7 +363,45 @@ report recommendations
 
 until a future control-layer decision promotes the layer after methodology, compliance, bilingual, and production-output gates pass.
 
+---
+
+## 2026-06-05 — Enforce Dutch delivery-surface localization at delivery runtime
+### Decision
+Dutch delivery-surface localization for strict branded PDF/HTML panels must be enforced in the layer that generates the final delivery HTML, not only in native markdown renderers or markdown scrubbers.
+
+### Chosen architecture
+```text
+runtime state
+→ native EN/NL markdown render
+→ polish/linkify/localization
+→ delivery HTML overrides regenerate strict branded panels from runtime state
+→ delivery-runtime Dutch enum localization
+→ delivery HTML/PDF validation
+→ PDF/email delivery
+```
+
+### Reason
+The June 5 cleanup cycle showed that `Current Position Review` / `Review huidige posities` is rebuilt from runtime state by the delivery HTML override layer. Markdown-level scrub fixes correctly cleaned the markdown report, but the final PDF still leaked the English enum `No / under review` until the delivery-runtime enum map was patched.
+
+### Evidence
+```text
+workflow: Send weekly ETF Pro report
+run_number: 216
+trigger_commit: ce86dce050a75c2b21481162ad3b6952ebbdb1e7
+workflow_conclusion: success
+observed_result: `No / under review` and unwanted `Nee / onder herbeoordeling` wording gone from the final report surface
+```
+
+The same cleanup cycle also confirmed:
+
+```text
+Current Position Review score completeness: fixed
+stale GLD current-surface wording: fixed
+Dutch delivery enum leakage: fixed
+```
+
 ### Consequence
-- The no-network macro-audit fixture replay requirement is complete for this stage.
-- Future macro/regime work can review old-versus-new pack differences using repo-visible evidence.
-- The next promotion blockers are macro policy pack schema hardening, methodology documentation, compliance validation, bilingual/client-surface checks, and explicit authority promotion.
+- Strict branded panel defects must be fixed in `runtime/delivery_html_overrides.py`, `runtime/client_facing_sanitizer.py`, shared localization maps, or the delivery startup/runtime layer as appropriate.
+- Markdown-only fixes are insufficient for strict panels regenerated during HTML/PDF delivery.
+- Dutch aliases should be consolidated so native render, markdown validation, Dutch quality validation, delivery HTML validation, and delivery runtime share one terminology source.
+- Delivery success remains SMTP-send/report-generation evidence unless a delivery manifest or true inbox receipt is separately verified.
