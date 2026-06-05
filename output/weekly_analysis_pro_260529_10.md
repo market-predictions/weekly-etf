@@ -17,8 +17,7 @@
 - [SMH](https://www.tradingview.com/chart/?symbol=SMH)
 
 ### Hold
-- [GLD](https://www.tradingview.com/chart/?symbol=GLD)
-- [GSG](https://www.tradingview.com/chart/?symbol=GSG)
+- prior commodity-breadth rotation into GSG
 - [PAVE](https://www.tradingview.com/chart/?symbol=PAVE)
 - [PPA](https://www.tradingview.com/chart/?symbol=PPA)
 - [SMH](https://www.tradingview.com/chart/?symbol=SMH)

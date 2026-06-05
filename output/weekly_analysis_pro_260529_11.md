@@ -22,7 +22,7 @@
 - PPA, PAVE, SPY
 
 ### Proposed replace / reduce
-- GLD→GSG
+- prior commodity-breadth rotation into GSG
 
 ### Close
 - None
@@ -239,7 +239,7 @@ Role: Strategic energy. Required next action: Hold.
 
 | Close | Reduce | Hold | Add | Replace | Override |
 |---|---|---|---|---|---|
-| None | None | SMH, GSG, URNM | None | GLD→GSG | PPA, PAVE, SPY |
+| None | None | SMH, GSG, URNM | None | prior commodity-breadth rotation into GSG | PPA, PAVE, SPY |
 
 ## 13. Final Action Table
 

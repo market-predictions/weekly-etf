@@ -7,7 +7,7 @@
   "discovery_inputs": {
     "config": "config/etf_discovery_universe.yml",
     "portfolio_state": "output/etf_portfolio_state.json",
-    "pricing_audit": "output/pricing/price_audit_2026-06-04_20260605_065724.json",
+    "pricing_audit": "output/pricing/price_audit_2026-06-04_20260605_071255.json",
     "relative_strength": "output/market_history/etf_relative_strength.json",
     "macro_policy_pack": "output/macro/latest.json",
     "prior_lane_artifact": "latest_available",

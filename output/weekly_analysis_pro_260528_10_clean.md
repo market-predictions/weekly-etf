@@ -22,7 +22,7 @@
 - [PPA](https://www.tradingview.com/chart/?symbol=PPA), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [SPY](https://www.tradingview.com/chart/?symbol=SPY)
 
 ### Proposed replace / reduce
-- [GLD](https://www.tradingview.com/chart/?symbol=GLD)→[GSG](https://www.tradingview.com/chart/?symbol=GSG)
+- prior commodity-breadth rotation into GSG
 
 ### Close
 - None
@@ -233,7 +233,7 @@ Role: Hedge ballast. Required next action: Run hedge validity test and compare w
 
 | Close | Reduce | Hold | Add | Replace | Override |
 |---|---|---|---|---|---|
-| None | None | [SMH](https://www.tradingview.com/chart/?symbol=SMH), [URNM](https://www.tradingview.com/chart/?symbol=URNM) | None | [GLD](https://www.tradingview.com/chart/?symbol=GLD)→[GSG](https://www.tradingview.com/chart/?symbol=GSG) | [PPA](https://www.tradingview.com/chart/?symbol=PPA), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [SPY](https://www.tradingview.com/chart/?symbol=SPY) |
+| None | None | [SMH](https://www.tradingview.com/chart/?symbol=SMH), [URNM](https://www.tradingview.com/chart/?symbol=URNM) | None | prior commodity-breadth rotation into GSG | [PPA](https://www.tradingview.com/chart/?symbol=PPA), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [SPY](https://www.tradingview.com/chart/?symbol=SPY) |
 
 ## 13. Final Action Table
 

@@ -194,7 +194,7 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 
 | Sluiten | Verlagen | Aanhouden | Toevoegen | Vervangen | Override |
 |---|---|---|---|---|---|
-| Geen | Geen | SMH, URNM | Geen | GLD→GSG | PPA, PAVE, SPY |
+| Geen | Geen | SMH, URNM | Geen | prior commodity-breadth rotation into GSG | PPA, PAVE, SPY |
 
 ## 13. Definitieve actietabel
 

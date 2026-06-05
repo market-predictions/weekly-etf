@@ -258,7 +258,7 @@ Role: Strategic energy. Required next action: Hold.
 |---|---|---|---:|---:|---|---|---:|---|---|---|
 | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Existing | 5.00 | 5.00 | hold | | | Rotation destination | No | |
 | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | Existing | 5.00 | 5.00 | hold | | | Rotation destination | No | |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Existing | 9.47 | 9.47 | hold | Tier 2 | | Rotation destination | No | Added as commodity-breadth replacement for part of [GLD](https://www.tradingview.com/chart/?symbol=GLD). |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Existing | 9.47 | 9.47 | hold | Tier 2 | | Rotation destination | No | Added as current commodity-breadth hedge exposure after the prior gold-sleeve exit. |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Existing | 13.57 | 13.66 | Hold under review | Tier 2 | 3.68 | Real-asset capex | Yes | Valid but [GRID](https://www.tradingview.com/chart/?symbol=GRID) is the named challenger |
 | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | Existing | 4.88 | 4.88 | Hold under review | Tier 3 | 3.45 | Resilience | Yes | Valid thesis but must prove itself versus [ITA](https://www.tradingview.com/chart/?symbol=ITA) |
 | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Existing | 27.94 | 27.56 | Add | Tier 1 | 4.28 | Growth engine | No | Best earned exposure, but no fresh cash while above the 25% cap |
@@ -335,7 +335,7 @@ Role: Strategic energy. Required next action: Hold.
 - Income vs growth preference: Balanced growth with resilience bias
 
 ### Changes since last review
-- Added: a guarded model rotation state in which [GLD](https://www.tradingview.com/chart/?symbol=GLD) → [GSG](https://www.tradingview.com/chart/?symbol=GSG) is already reflected; no duplicate execution was performed.
+- Added: a guarded model rotation state in which prior commodity-breadth rotation into GSG is already reflected; no duplicate execution was performed.
 - Reduced: None unless explicit state says otherwise.
 - Closed: None.
 - Thesis changes: No structural thesis was abandoned; implementation, macro-regime and rotation discipline are materially tighter.

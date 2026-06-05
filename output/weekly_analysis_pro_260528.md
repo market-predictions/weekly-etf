@@ -215,7 +215,7 @@ The position review separates three questions: is the thesis still valid, is the
 
 | Close | Reduce | Hold | Add | Replace | Override |
 |---|---|---|---|---|---|
-| None | None | SMH, URNM | None | GLD→GSG | PPA, PAVE, SPY |
+| None | None | SMH, URNM | None | prior commodity-breadth rotation into GSG | PPA, PAVE, SPY |
 
 ## 13. Final Action Table
 

@@ -16,8 +16,7 @@
 - None
 
 ### Hold
-- [GLD](https://www.tradingview.com/chart/?symbol=GLD)
-- [GSG](https://www.tradingview.com/chart/?symbol=GSG)
+- prior commodity-breadth rotation into GSG
 - [PAVE](https://www.tradingview.com/chart/?symbol=PAVE)
 - [PPA](https://www.tradingview.com/chart/?symbol=PPA)
 - [SMH](https://www.tradingview.com/chart/?symbol=SMH)
@@ -250,7 +249,7 @@ Role: Strategic energy. Required next action: Hold.
 | Ticker | ETF | Existing/New | Weight Inherited | Target Weight | Suggested Action | Conviction Tier | Total Score | Portfolio Role | Better Alternative Exists? | Short Reason |
 |---|---|---|---:|---:|---|---|---:|---|---|---|
 | [GLD](https://www.tradingview.com/chart/?symbol=GLD) | SPDR Gold Shares | Existing | 4.43 | 4.43 | Hold under review | Tier 3 | 3.00 | Hedge ballast | Yes | Hedge validity must be proven after drawdown |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Existing | 5.00 | 5.00 | hold | Tier 2 | | Rotation destination | No | Added as commodity-breadth replacement for part of [GLD](https://www.tradingview.com/chart/?symbol=GLD). |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Existing | 5.00 | 5.00 | hold | Tier 2 | | Rotation destination | No | Added as current commodity-breadth hedge exposure after the prior gold-sleeve exit. |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Existing | 13.66 | 13.66 | Hold under review | Tier 2 | 3.68 | Real-asset capex | Yes | Valid but [GRID](https://www.tradingview.com/chart/?symbol=GRID) is the named challenger |
 | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Invesco Aerospace & Defense ETF | Existing | 15.23 | 15.23 | Hold under review | Tier 3 | 3.45 | Resilience | Yes | Valid thesis but must prove itself versus [ITA](https://www.tradingview.com/chart/?symbol=ITA) |
 | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Existing | 27.56 | 27.56 | Add | Tier 1 | 4.28 | Growth engine | No | Best earned exposure, but no fresh cash while above the 25% cap |

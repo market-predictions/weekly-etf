@@ -82,7 +82,7 @@
 ## 5. Belangrijkste risico’s / invalidaties
 
 - [SPY](https://www.tradingview.com/chart/?symbol=SPY) plus [SMH](https://www.tradingview.com/chart/?symbol=SMH) creëert hoge Amerikaanse tech-/AI-factoroverlap.
-- [GLD](https://www.tradingview.com/chart/?symbol=GLD) blijft een hedgepositie onder herbeoordeling en is geen vanzelfsprekende stabilisator.
+- De hedgefunctie blijft onder herbeoordeling en is geen vanzelfsprekende stabilisator.
 - [PPA](https://www.tradingview.com/chart/?symbol=PPA) en [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) blijven vervangbaar totdat de kwaliteit van de ETF-implementatie is bewezen.
 - Niet-Amerikaanse aandelenblootstelling blijft een diversificatiekloof.
 
@@ -175,7 +175,7 @@ Rendement wordt berekend op de huidige ETF-posities op basis van de meest recent
 | AI-leiderschap | [SMH](https://www.tradingview.com/chart/?symbol=SMH) blijft de zuiverste groeiblootstelling | Concentratie moet worden bewaakt | [SMH](https://www.tradingview.com/chart/?symbol=SMH), [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Cyclische waarden van lagere kwaliteit | Aanhouden rond maximale positiegrootte | Direct | Hoog |
 | Factorconcentratie | [SPY](https://www.tradingview.com/chart/?symbol=SPY) en [SMH](https://www.tradingview.com/chart/?symbol=SMH) overlappen | De portefeuille is minder gediversifieerd dan het aantal tickers suggereert | [QUAL](https://www.tradingview.com/chart/?symbol=QUAL), [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) op de volglijst | Overlappende Amerikaanse beta | Houd [SPY](https://www.tradingview.com/chart/?symbol=SPY) onder herbeoordeling | 1-3 maanden | Gemiddeld |
 | Defensiethesis versus ETF-implementatie | Defensie blijft structureel valide | [PPA](https://www.tradingview.com/chart/?symbol=PPA) moet zich bewijzen tegenover [ITA](https://www.tradingview.com/chart/?symbol=ITA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA), [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Zwakke ETF-selectie | Houd [PPA](https://www.tradingview.com/chart/?symbol=PPA) onder herbeoordeling | Direct | Gemiddeld |
-| Hedgedrawdown | [GLD](https://www.tradingview.com/chart/?symbol=GLD) moet zijn hedgefunctie bewijzen | [GSG](https://www.tradingview.com/chart/?symbol=GSG) en [BIL](https://www.tradingview.com/chart/?symbol=BIL) blijven alternatieven | [GSG](https://www.tradingview.com/chart/?symbol=GSG), [BIL](https://www.tradingview.com/chart/?symbol=BIL), cash | Onproductieve hedgepositie | Houd [GLD](https://www.tradingview.com/chart/?symbol=GLD) onder herbeoordeling | Direct | Gemiddeld |
+| Hedgedrawdown | De hedgefunctie moet zichzelf bewijzen | GSG, BIL en cash blijven alternatieven | GSG, BIL, cash | Onproductieve hedgepositie | Houd de huidige hedgefunctie onder herbeoordeling | Direct | Gemiddeld |
 
 ## 10. Review huidige posities
 
@@ -288,14 +288,13 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 | AI-rekenkrachtinfrastructuur | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Sterkste structurele groeiblootstelling. | Actief / begrensd |
 | Defensie-innovatie / strategische weerbaarheid | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling. | Vervangingsanalyse vereist |
 | Netuitbreiding / elektrificatie | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructuurcapex blijft valide. | Vervangingsanalyse vereist |
-| Herbeoordeling goudhedge | [GLD](https://www.tradingview.com/chart/?symbol=GLD) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Hedgefunctie moet worden bewezen. | Onder herbeoordeling |
+| Herbeoordeling grondstoffenhedge | GSG | DBC / BIL | De huidige grondstoffenbrede hedgefunctie moet worden bewezen tegenover cash en alternatieven. | Onder herbeoordeling |
 | Ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | De portefeuille heeft geen blootstelling aan ontwikkelde markten buiten de VS. | Volglijst |
 
 ### Continuïteit in aanbevelingsdiscipline
 - [SPY](https://www.tradingview.com/chart/?symbol=SPY): overlapreview tegenover [SMH](https://www.tradingview.com/chart/?symbol=SMH) blijft actief.
 - [PPA](https://www.tradingview.com/chart/?symbol=PPA): directe vervangingsanalyse tegenover [ITA](https://www.tradingview.com/chart/?symbol=ITA) vereist.
 - [PAVE](https://www.tradingview.com/chart/?symbol=PAVE): directe vervangingsanalyse tegenover [GRID](https://www.tradingview.com/chart/?symbol=GRID) vereist.
-- [GLD](https://www.tradingview.com/chart/?symbol=GLD): hedge-validiteitstest vereist.
 - Vervangingskandidaten: niet geschikt voor allocatie zonder afgeronde vervangingsanalyse.
 
 ### Randvoorwaarden
