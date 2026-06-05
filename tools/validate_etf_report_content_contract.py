@@ -76,6 +76,11 @@ INACTIVE_HOLDING_CURRENT_SURFACE_BLOCKS = {
         "GLD -> GSG",
         "Gold hedge review",
         "Added as commodity-breadth replacement for part of GLD",
+        "GLD must prove its hedge function",
+        "GLD moet zijn hedgefunctie bewijzen",
+        "Houd GLD onder herbeoordeling",
+        "GLD blijft een hedgepositie onder herbeoordeling",
+        "Herbeoordeling goudhedge",
     ]
 }
 
@@ -118,6 +123,10 @@ def latest_canonical_report(output_dir: Path) -> Path:
 
 def normalize(md_text: str) -> str:
     return report_module.strip_citations(report_module.normalize_markdown_text(md_text))
+
+
+def _plain_ticker_text(md_text: str) -> str:
+    return re.sub(r"\[([A-Z][A-Z0-9.-]*)\]\([^\)]*\)", r"\1", md_text)
 
 
 def section_lines(md_text: str, section_number: int) -> list[str]:
@@ -168,10 +177,11 @@ def validate_no_forbidden_tokens(md_text: str, report_path: Path) -> None:
 
 def validate_no_stale_inactive_holding_surface(md_text: str, report_path: Path) -> None:
     active = active_portfolio_tickers()
+    plain_text = _plain_ticker_text(md_text)
     for ticker, blocked_phrases in INACTIVE_HOLDING_CURRENT_SURFACE_BLOCKS.items():
         if ticker in active:
             continue
-        found = [phrase for phrase in blocked_phrases if phrase in md_text]
+        found = [phrase for phrase in blocked_phrases if phrase in md_text or phrase in plain_text]
         if found:
             raise RuntimeError(
                 f"ETF content contract failed for {report_path.name}: exited holding {ticker} leaks into current-state report surface: "
