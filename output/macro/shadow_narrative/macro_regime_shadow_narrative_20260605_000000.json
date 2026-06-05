@@ -1,0 +1,52 @@
+{
+  "artifact_type": "macro_regime_shadow_narrative_comparison",
+  "authority": {
+    "client_facing": false,
+    "fundability_authority": false,
+    "lane_scoring_authority": false,
+    "portfolio_action_authority": false,
+    "production_report": false
+  },
+  "blockers": [
+    "shadow-only comparison artifact",
+    "client_facing=false",
+    "production_report=false",
+    "portfolio_action_authority=false",
+    "lane_scoring_authority=false",
+    "fundability_authority=false",
+    "no production report mutation"
+  ],
+  "client_facing": false,
+  "comparison_markdown": "# Macro regime shadow narrative comparison\n\n> **SHADOW-ONLY / NOT FOR PRODUCTION / NIET VOOR PRODUCTIE:** This artifact compares current report wording with a deterministic macro regime narrative candidate. It does not modify the production report.\n\n## Authority flags\n\n- client_facing=false\n- production_report=false\n- portfolio_action_authority=false\n- lane_scoring_authority=false\n- fundability_authority=false\n\n## Current macro narrative — English\n\nStatus: found\n\n## 1. Executive Summary\n- **Primary regime:** Risk-on growth\n- **What changed this week:** AI / semiconductor leadership remains the dominant equity impulse.\n\n## 3. Regime Dashboard\n- Current regime: Risk-on growth.\n- Confidence: 66%.\n\n## Deterministic regime shadow narrative candidate — English\n\n## Deterministic macro regime — shadow candidate\n\n> **SHADOW-ONLY:** This text is not client-facing report text, not production output, not a portfolio action, not a lane score and not a fundability decision.\n\nThe deterministic shadow candidate classifies the regime as **Risk-on narrow leadership** with confidence **72%**. The current legacy regime basis is **Risk-on growth** with confidence **66%**. Method: **deterministic_axis_classifier_v1_shadow**. Differs from legacy: **True**. This text may only be used for comparison and review, not as production narrative.\n\n### Shadow evidence rows\n\n- axes: breadth=narrow; equity=risk_on\n- macro_axes: policy_rate=restrictive; volatility=calm\n- macro_axis_scores: fed_funds_effective=5.33; vix_close=14.8\n- Semiconductor leadership is strong, but breadth remains narrow.\n\n### Authority boundary\n\nclient_facing=false; production_report=false; portfolio_action_authority=false; lane_scoring_authority=false; fundability_authority=false.\n\n## Current macro narrative — Dutch\n\nStatus: found\n\n## 1. Kernsamenvatting\n- **Primair regime:** Risk-on groei\n- **Wat is er deze week veranderd:** AI- en semiconductorleiderschap blijft de dominante aandelenimpuls.\n\n## 3. Regime-dashboard\n- Huidig regime: Risk-on groei.\n- Vertrouwen: 66%.\n\n## Deterministisch regime shadow-narratief kandidaat — Nederlands\n\n## Deterministisch macroregime — shadow-kandidaat\n\n> **SHADOW-ONLY:** Deze tekst is geen client-facing rapporttekst, geen productieoutput, geen portefeuille-actie, geen lane-score en geen fundability-beslissing.\n\nDe deterministische shadow-kandidaat classificeert het regime als **Risk-on narrow leadership** met vertrouwen **72%**. De huidige legacy-regimebasis is **Risk-on growth** met vertrouwen **66%**. Methode: **deterministic_axis_classifier_v1_shadow**. Verschilt van legacy: **True**. Deze tekst mag alleen worden gebruikt voor vergelijking en review, niet als productie-narratief.\n\n### Shadow-bewijsregels\n\n- axes: breadth=narrow; equity=risk_on\n- macro_axes: policy_rate=restrictive; volatility=calm\n- macro_axis_scores: fed_funds_effective=5.33; vix_close=14.8\n- Semiconductor leadership is strong, but breadth remains narrow.\n\n### Autoriteitsgrens\n\nclient_facing=false; production_report=false; portfolio_action_authority=false; lane_scoring_authority=false; fundability_authority=false.\n",
+  "created_at_utc": "2026-06-05T00:00:00Z",
+  "current_macro_narrative": {
+    "en": {
+      "language": "en",
+      "status": "found",
+      "text": "## 1. Executive Summary\n- **Primary regime:** Risk-on growth\n- **What changed this week:** AI / semiconductor leadership remains the dominant equity impulse.\n\n## 3. Regime Dashboard\n- Current regime: Risk-on growth.\n- Confidence: 66%."
+    },
+    "nl": {
+      "language": "nl",
+      "status": "found",
+      "text": "## 1. Kernsamenvatting\n- **Primair regime:** Risk-on groei\n- **Wat is er deze week veranderd:** AI- en semiconductorleiderschap blijft de dominante aandelenimpuls.\n\n## 3. Regime-dashboard\n- Huidig regime: Risk-on groei.\n- Vertrouwen: 66%."
+    }
+  },
+  "deterministic_regime_shadow_narrative_candidate": {
+    "en": "## Deterministic macro regime — shadow candidate\n\n> **SHADOW-ONLY:** This text is not client-facing report text, not production output, not a portfolio action, not a lane score and not a fundability decision.\n\nThe deterministic shadow candidate classifies the regime as **Risk-on narrow leadership** with confidence **72%**. The current legacy regime basis is **Risk-on growth** with confidence **66%**. Method: **deterministic_axis_classifier_v1_shadow**. Differs from legacy: **True**. This text may only be used for comparison and review, not as production narrative.\n\n### Shadow evidence rows\n\n- axes: breadth=narrow; equity=risk_on\n- macro_axes: policy_rate=restrictive; volatility=calm\n- macro_axis_scores: fed_funds_effective=5.33; vix_close=14.8\n- Semiconductor leadership is strong, but breadth remains narrow.\n\n### Authority boundary\n\nclient_facing=false; production_report=false; portfolio_action_authority=false; lane_scoring_authority=false; fundability_authority=false.",
+    "nl": "## Deterministisch macroregime — shadow-kandidaat\n\n> **SHADOW-ONLY:** Deze tekst is geen client-facing rapporttekst, geen productieoutput, geen portefeuille-actie, geen lane-score en geen fundability-beslissing.\n\nDe deterministische shadow-kandidaat classificeert het regime als **Risk-on narrow leadership** met vertrouwen **72%**. De huidige legacy-regimebasis is **Risk-on growth** met vertrouwen **66%**. Methode: **deterministic_axis_classifier_v1_shadow**. Verschilt van legacy: **True**. Deze tekst mag alleen worden gebruikt voor vergelijking en review, niet als productie-narratief.\n\n### Shadow-bewijsregels\n\n- axes: breadth=narrow; equity=risk_on\n- macro_axes: policy_rate=restrictive; volatility=calm\n- macro_axis_scores: fed_funds_effective=5.33; vix_close=14.8\n- Semiconductor leadership is strong, but breadth remains narrow.\n\n### Autoriteitsgrens\n\nclient_facing=false; production_report=false; portfolio_action_authority=false; lane_scoring_authority=false; fundability_authority=false."
+  },
+  "fundability_authority": false,
+  "inputs": {
+    "current_report_en_path": "output/weekly_analysis_pro_260604_10.md",
+    "current_report_nl_path": "output/weekly_analysis_pro_nl_260604_10.md",
+    "macro_regime_artifact_path": "output/macro/validation/latest_macro_regime_shadow_validation.json"
+  },
+  "lane_scoring_authority": false,
+  "portfolio_action_authority": false,
+  "production_report": false,
+  "report_date": "2026-06-05",
+  "run_id": "20260605_000000",
+  "schema_version": "macro_regime_shadow_narrative_v1",
+  "shadow_only": true,
+  "status": "shadow_candidate_only"
+}
