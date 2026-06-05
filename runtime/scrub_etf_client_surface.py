@@ -106,8 +106,49 @@ def _scrub_exited_holding_references(text: str) -> str:
     active = _active_tickers_from_portfolio_state()
     if "GLD" in active:
         return text
+    gld = _ticker_md_pattern("GLD")
+    gsg = _ticker_md_pattern("GSG")
+    bil = _ticker_md_pattern("BIL")
     for source, target in EXITED_GLD_REPLACEMENTS.items():
         text = text.replace(source, target)
+    text = re.sub(rf"{gld}\s*[→-]>?\s*{gsg}", "prior commodity-breadth rotation into GSG", text, flags=re.IGNORECASE)
+    text = re.sub(
+        rf"Added as commodity-breadth replacement for part of {gld}\.?",
+        "Added as current commodity-breadth hedge exposure after the prior gold-sleeve exit.",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(
+        rf"Laat de huidige portefeuille voorlopig intact, maar behandel SPY, PPA, PAVE en {gld} als posities onder actieve herbeoordeling\.",
+        "Laat de huidige portefeuille voorlopig intact, maar behandel SPY, PPA, PAVE en de hedgefunctie als posities onder actieve herbeoordeling.",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(
+        rf"{gld} blijft een hedgepositie onder herbeoordeling en is geen vanzelfsprekende stabilisator\.",
+        "De hedgefunctie blijft onder herbeoordeling en is geen vanzelfsprekende stabilisator.",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(
+        rf"PPA moet zich bewijzen tegenover ITA, PAVE tegenover GRID, en {gld} moet bewijzen dat het nog steeds een stabiliserende hedgefunctie heeft\.",
+        "PPA moet zich bewijzen tegenover ITA, PAVE tegenover GRID, en de hedgefunctie moet bewijzen dat zij nog steeds stabiliseert.",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(
+        rf"\|\s*Herbeoordeling goudhedge\s*\|\s*{gld}\s*\|\s*{gsg}\s*/\s*{bil}\s*\|\s*Hedgefunctie moet worden bewezen\.\s*\|\s*Onder herbeoordeling\s*\|",
+        "| Herbeoordeling grondstoffenhedge | GSG | DBC / BIL | De huidige grondstoffenbrede hedgefunctie moet worden bewezen tegenover cash en alternatieven. | Onder herbeoordeling |",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(
+        rf"\|\s*Hedgedrawdown\s*\|\s*{gld} moet zijn hedgefunctie bewijzen\s*\|\s*{gsg} en {bil} blijven alternatieven\s*\|\s*{gsg}, {bil}, cash\s*\|\s*Onproductieve hedgepositie\s*\|\s*Houd {gld} onder herbeoordeling\s*\|\s*Direct\s*\|\s*Gemiddeld\s*\|",
+        "| Hedgedrawdown | De hedgefunctie moet zichzelf bewijzen | GSG, BIL en cash blijven alternatieven | GSG, BIL, cash | Onproductieve hedgepositie | Houd de huidige hedgefunctie onder herbeoordeling | Direct | Gemiddeld |",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(rf"-\s*{gld}: hedge-validiteitstest vereist\.\n", "", text, flags=re.IGNORECASE)
     return text
 
 
