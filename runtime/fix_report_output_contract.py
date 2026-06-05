@@ -97,6 +97,33 @@ def _decision_by_ticker(state: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {_ticker(row.get("ticker")): row for row in _rotation_decisions(state) if _ticker(row.get("ticker"))}
 
 
+def _lanes_by_ticker(state: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    lanes = state.get("lane_assessment", {}).get("assessed_lanes", []) or []
+    primary: dict[str, dict[str, Any]] = {}
+    secondary: dict[str, dict[str, Any]] = {}
+    for lane in lanes:
+        primary_ticker = _ticker(lane.get("primary_etf"))
+        alternative_ticker = _ticker(lane.get("alternative_etf"))
+        if primary_ticker and primary_ticker not in primary:
+            primary[primary_ticker] = lane
+        if alternative_ticker and alternative_ticker not in secondary:
+            secondary[alternative_ticker] = lane
+    indexed = dict(secondary)
+    indexed.update(primary)
+    return indexed
+
+
+def _score_label(position: dict[str, Any], ticker: str, lanes_by_ticker: dict[str, dict[str, Any]]) -> str:
+    position_score = f2(position.get("total_score"))
+    if position_score:
+        return position_score
+    lane = lanes_by_ticker.get(ticker, {})
+    lane_score = f2(lane.get("total_score")) if lane else ""
+    if lane_score:
+        return f"{lane_score} lane score"
+    return "current score pending"
+
+
 def _f2(value: Any) -> str:
     try:
         return f"{float(value):.2f}"
@@ -263,15 +290,16 @@ def action_snapshot_section(state: dict[str, Any]) -> str:
 
 def current_position_cards(state: dict[str, Any]) -> str:
     decision_by_ticker = _decision_by_ticker(state)
+    lanes_by_ticker = _lanes_by_ticker(state)
     parts = [
-        "The position review separates thesis quality, ETF implementation quality, fresh-cash test and rotation-engine decision. Existing holdings are not treated as automatic default holds."
+        "The position review separates thesis quality, ETF implementation quality, fresh-cash test and rotation-engine decision. Existing holdings are not treated as automatic default holds. Where a position-discipline score is not yet available after a rotation, the report shows the live lane score if available; otherwise it flags that the current score is pending."
     ]
     for p in position_rows(state):
         ticker = str(p.get("ticker", "")).upper()
         decision = decision_by_ticker.get(ticker, {})
         action = action_label(decision.get("action_code")) if decision else clean_action(p.get("rotation_action_code") or p.get("suggested_action"))
         destination = clean_optional(decision.get("destination_ticker")) if decision else clean_optional(p.get("rotation_destination_ticker"))
-        score = f2(p.get("total_score")) or "n/a"
+        score = _score_label(p, ticker, lanes_by_ticker)
         fresh_cash = clean_action(p.get("fresh_cash_test"))
         role = compact(p.get("portfolio_role"), 70)
         next_action = compact(p.get("required_next_action"), 95)
