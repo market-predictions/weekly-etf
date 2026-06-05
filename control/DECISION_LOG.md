@@ -452,3 +452,61 @@ The deterministic macro regime can now be reviewed against the current client-fa
 - The candidate narrative must not be inserted into reports without later compliance and bilingual parity gates.
 - The candidate narrative must not influence portfolio actions, lane scoring, fundability, report recommendations, execution, or delivery.
 - WP2 macro narrative compliance/bilingual parity and WP3 macro promotion decision contract are the next gates before any promotion discussion.
+
+---
+
+## 2026-06-05 — Add macro narrative compliance and bilingual parity gate
+### Decision
+Work Package 2 — Macro narrative compliance and bilingual parity gate is completed as an output-contract safety gate in `market-predictions/weekly-etf`.
+
+The validator checks whether future deterministic macro narrative candidate surfaces are safe for English/Dutch client wording before any client-surface pilot or promotion review. A pass does not grant production report, lane-scoring, fundability, delivery, or portfolio-action authority.
+
+### Chosen architecture
+```text
+future macro narrative candidate EN/NL surface artifact
+→ tools/validate_macro_narrative_client_surface.py
+→ fixtures/macro_narrative/safe_shadow_candidate_en_nl.json
+→ planted-failure fixtures for predictive wording, shadow/internal leakage, and EN/NL meaning drift
+→ tests/test_macro_narrative_client_surface.py
+```
+
+### Evidence
+```text
+tools/validate_macro_narrative_client_surface.py
+fixtures/macro_narrative/safe_shadow_candidate_en_nl.json
+fixtures/macro_narrative/bad_predictive_language.json
+fixtures/macro_narrative/bad_shadow_label_leakage.json
+fixtures/macro_narrative/bad_dutch_parity.json
+tests/test_macro_narrative_client_surface.py
+reported focused test: python -m pytest tests/test_macro_narrative_client_surface.py -q = 4 passed
+```
+
+### Blocks
+```text
+predictive wording
+uncited macro claims
+shadow/internal labels
+macro_axes leakage
+confidence_decomposition leakage
+English leakage in Dutch report text
+citation parity mismatch
+Dutch/English meaning drift
+```
+
+### Stable authority rules
+```text
+output_contract_gate_only=true
+production_report_authority=false
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+delivery_authority=false
+```
+
+### Reason
+The deterministic macro narrative path needs a client-surface safety gate before any report-language pilot. WP2 prevents a technically valid shadow narrative from leaking predictive wording, unsupported macro claims, internal fields, or Dutch/English meaning drift into client-facing report text.
+
+### Consequence
+- WP2 is an active regression gate for future macro narrative candidates.
+- A WP2 pass means wording/parity safety only; it is not promotion authority.
+- WP3 macro promotion decision contract is still required before deterministic macro regime narrative authority can be granted.
