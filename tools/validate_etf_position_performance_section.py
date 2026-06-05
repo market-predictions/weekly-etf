@@ -13,6 +13,7 @@ if str(REPO_ROOT) not in sys.path:
 from runtime.build_etf_report_state import build_runtime_state
 
 EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
+SECTION_7A_RE = re.compile(r"## 7A\. ETF Position Performance\n(?P<section>.*?)(?=\n## 8\. )", re.DOTALL)
 
 REQUIRED_HEADERS = [
     "Portfolio sleeve",
@@ -26,6 +27,22 @@ REQUIRED_HEADERS = [
     "P/L EUR",
     "Contribution %",
 ]
+
+REQUIRED_SEMANTIC_THESES = {
+    "CIBR": "Cybersecurity resilience",
+    "DFEN": "Defense innovation / tactical defense beta",
+    "GSG": "Commodity-breadth hedge exposure",
+    "IEFA": "Non-U.S. developed-market diversification",
+    "XLU": "Defensive utilities / rate-sensitive ballast",
+}
+
+GENERIC_THESIS_CELLS = {
+    "",
+    "Position",
+    "Portfolio exposure",
+    "Rotation destination",
+    "Portefeuilleblootstelling",
+}
 
 
 def _latest_report(output_dir: Path) -> Path:
@@ -50,21 +67,74 @@ def _current_tickers() -> list[str]:
     return out
 
 
+def _ticker_link_cell_pattern(ticker: str) -> re.Pattern[str]:
+    return re.compile(rf"^\s*(?:\[{re.escape(ticker)}\]\([^\)]*\)|{re.escape(ticker)})\s*$")
+
+
+def _section_7a(text: str, report_name: str) -> str:
+    match = SECTION_7A_RE.search(text)
+    if not match:
+        raise RuntimeError(f"ETF position performance validation failed for {report_name}: section 7A missing.")
+    return match.group("section")
+
+
+def _rows_by_ticker(section: str) -> dict[str, list[str]]:
+    rows: dict[str, list[str]] = {}
+    for line in section.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|") or "---" in stripped or "Tradable ETF" in stripped:
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if len(cells) < 3:
+            continue
+        for ticker in _current_tickers():
+            if _ticker_link_cell_pattern(ticker).match(cells[2]):
+                rows[ticker] = cells
+    return rows
+
+
 def validate(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
-    if "## 7A. ETF Position Performance" not in text:
-        raise RuntimeError(f"ETF position performance validation failed for {path.name}: section 7A missing.")
+    section = _section_7a(text, path.name)
     for header in REQUIRED_HEADERS:
-        if header not in text:
+        if header not in section:
             raise RuntimeError(f"ETF position performance validation failed for {path.name}: missing header {header!r}.")
-    missing = [ticker for ticker in _current_tickers() if f"| {ticker} |" not in text and f"| {ticker} |" not in text.replace("[", "").replace("]", "")]
-    # After linkification, ticker cells may become markdown links. Keep a regex fallback.
-    for ticker in list(missing):
-        if re.search(rf"\|\s*\[{re.escape(ticker)}\]\([^\)]*\)\s*\|", text):
-            missing.remove(ticker)
+
+    rows = _rows_by_ticker(section)
+    current = _current_tickers()
+    missing = [ticker for ticker in current if ticker not in rows]
     if missing:
         raise RuntimeError(f"ETF position performance validation failed for {path.name}: missing ticker rows: {', '.join(missing)}")
-    print(f"ETF_POSITION_PERFORMANCE_OK | report={path.name} | rows={len(_current_tickers())}")
+
+    for ticker, required_thesis in REQUIRED_SEMANTIC_THESES.items():
+        if ticker not in rows:
+            continue
+        thesis = rows[ticker][1]
+        if thesis != required_thesis:
+            raise RuntimeError(
+                f"ETF position performance validation failed for {path.name}: {ticker} thesis must be {required_thesis!r}, found {thesis!r}."
+            )
+
+    generic_failures = []
+    ticker_only_failures = []
+    for ticker, cells in rows.items():
+        thesis = cells[1]
+        if thesis in GENERIC_THESIS_CELLS:
+            generic_failures.append(f"{ticker}={thesis!r}")
+        if thesis.upper() == ticker:
+            ticker_only_failures.append(ticker)
+    if generic_failures:
+        raise RuntimeError(
+            f"ETF position performance validation failed for {path.name}: generic thesis cells remain: "
+            + ", ".join(generic_failures)
+        )
+    if ticker_only_failures:
+        raise RuntimeError(
+            f"ETF position performance validation failed for {path.name}: ticker-only thesis cells remain: "
+            + ", ".join(ticker_only_failures)
+        )
+
+    print(f"ETF_POSITION_PERFORMANCE_OK | report={path.name} | rows={len(current)}")
 
 
 def main() -> None:
