@@ -5,143 +5,111 @@ Use this file to capture stable architecture decisions so future sessions do not
 ---
 
 ## 2026-03-28 — Adopt Project + GitHub + Actions architecture
+
 ### Decision
-The ETF flow will no longer be treated conceptually as one giant prompt-centered system.
 
-### Chosen architecture
-- **ChatGPT Project** = working memory and recurring workspace
-- **GitHub repo** = explicit source of truth for prompts, scripts, outputs, and control docs
-- **GitHub Actions + scripts** = real execution and delivery layer
-- **Optional Custom GPT** = architect/reviewer only, not the primary runtime container
+The ETF flow uses the ChatGPT Project as working memory, GitHub as source of truth, and GitHub Actions/scripts as the real execution and delivery layer.
 
-### Reason
-This separates thinking/work context, system state/audit trail, and production execution.
+### Consequence
+
+Do not treat chat memory as authoritative repo state. For meaningful repo work, read the control files first and then inspect the minimum relevant execution files.
 
 ---
 
 ## 2026-04-17 — Replace fixed structural-lane gating with open discovery and compact executive publication
+
 ### Decision
+
 The production ETF prompt should no longer use a small fixed structural lane list as the front-end discovery gate.
 
 ### Chosen architecture
+
 - open internal discovery across broad investable domains each run
 - dynamic candidate-lane construction before publication
 - persistent taxonomy as a back-end memory layer, not a front-end gate
 - compact executive publication of only the best-ranked lanes
 - continuity memory for retained lanes, new entrants, dropped lanes, and near-miss challengers
 
-### Reason
-This reduces omission risk while preserving premium executive selectivity.
-
 ---
 
 ## 2026-04-18 — Add starter pricing subsystem on main
+
 ### Decision
+
 ETF has a starter explicit pricing subsystem rather than leaving pricing entirely as ad hoc retrieval inside the prompt.
 
-### Chosen architecture
-- `pricing/`
-- `output/pricing/`
-- pricing clients and audit writer
-- pricing pass CLI
+### Consequence
 
-### Reason
-This creates a machine-readable input/state layer for fresh ETF closes.
+Pricing lives as a machine-readable input/state layer under `pricing/` and `output/pricing/`.
 
 ---
 
 ## 2026-04-21 — Make breadth assessment explicit through lane artifacts
+
 ### Decision
+
 Broader discovery should be auditable through a matching machine-readable lane artifact and a compact visible omitted-lane block.
-
-### Chosen architecture
-- mandatory breadth assessment universe
-- matching lane artifact in `output/lane_reviews/`
-- compact omitted-lane proof in the published report
-- helper validator in `validate_lane_breadth.py`
-
-### Reason
-Open discovery should not remain only a prompt intention.
 
 ---
 
 ## 2026-04-23 — Adopt English-canonical plus Dutch-companion bilingual delivery pattern
+
 ### Decision
-ETF bilingual publication should use one canonical English pro report and one Dutch companion report derived from the completed English report.
 
-### Chosen architecture
-- English pro report remains canonical
-- Dutch companion is a faithful language render
-- one lane artifact remains tied to the English report
-- paired filenames share date/version
-- workflow can validate, render, and send both language versions
-
-### Reason
-This preserves analytical determinism while enabling bilingual delivery.
+ETF bilingual publication uses one canonical English pro report and one Dutch companion report derived from the same runtime/report state.
 
 ---
 
 ## 2026-04-27 — Introduce and enrich minimum explicit ETF state
+
 ### Decision
+
 ETF should have explicit implementation state files instead of relying only on prior-report parsing and prompt continuity.
 
-### Chosen architecture
-- `tools/write_etf_minimum_state.py`
-- `tools/write_etf_trade_ledger.py`
-- `output/etf_portfolio_state.json`
-- `output/etf_valuation_history.csv`
-- `output/etf_trade_ledger.csv`
-- dedicated state refresh workflow
-- pre-send state derivation checks
+### Consequence
 
-### Reason
-This moves ETF toward the FX-style state model while staying honest that ETF state is still report-derived.
+ETF state includes:
+
+```text
+output/etf_portfolio_state.json
+output/etf_valuation_history.csv
+output/etf_trade_ledger.csv
+```
 
 ---
 
 ## 2026-04-27 — Add lab-only ETF optimization layer
+
 ### Decision
+
 ETF includes a lab-only optimization workbench using PyPortfolioOpt and yfinance-fetched history.
 
-### Chosen architecture
-- `tools/generate_pyportfolioopt_optimization_lab.py`
-- `tools/fetch_etf_optimizer_prices_yfinance.py`
-- `.github/workflows/lab-pyportfolioopt-optimization.yml`
-- `lab_inputs/`
-- `lab_outputs/`
+### Consequence
 
-### Reason
-Optimization may be useful as QA/research, but must not become production authority without explicit review.
+Optimization may support QA/research but must not become production authority without explicit review.
 
 ---
 
 ## 2026-05-05 — Add capital re-underwriting discipline and recommendation scorecard
+
 ### Decision
-ETF now has an explicit capital re-underwriting discipline layer and a machine-readable recommendation scorecard.
 
-### Chosen architecture
-- `control/CAPITAL_REUNDERWRITING_RULES.md`
-- `tools/write_etf_recommendation_scorecard.py`
-- `output/etf_recommendation_scorecard.csv`
-- pre-send scorecard derivation validation in `.github/workflows/send-weekly-report.yml`
-- state-refresh support in `.github/workflows/refresh-etf-state-from-report.yml`
-
-### Reason
-The first-principles review identified a real process weakness: a holding can be described as replaceable, weakening, or difficult to reprice while still remaining unchanged for repeated runs.
-
-The new discipline layer forces the model to ask whether each holding would be bought today with fresh cash, separates thesis validity from implementation quality, requires alternative duels for weak or replaceable holdings, flags factor overlap, tests hedge validity, classifies cash, and prevents indefinite `Hold but replaceable` inertia.
+ETF has an explicit capital re-underwriting discipline layer and a machine-readable recommendation scorecard.
 
 ### Consequence
-- Weak or replaceable holdings now need a named next action, alternative comparison, or explicit override.
-- ETF state now includes portfolio state, valuation history, trade ledger, lane artifacts, pricing audits, and recommendation discipline memory.
+
+Weak or replaceable holdings need a named next action, alternative comparison, or explicit override. This prevents indefinite `Hold but replaceable` inertia.
 
 ---
 
 ## 2026-05-07 — Lock runtime-driven bilingual production baseline
+
 ### Decision
-ETF now treats the runtime-driven pipeline as the stable production baseline.
+
+ETF treats the runtime-driven pipeline as the stable production baseline.
 
 ### Chosen architecture
+
 ```text
 pricing audit
 → lane discovery
@@ -152,134 +120,69 @@ pricing audit
 → PDF/email delivery
 ```
 
-### Reason
-This path has produced received bilingual reports and resolves the prior architecture problem where markdown reports acted as hidden state, pricing source, continuity memory, and delivery artifact all at once.
-
 ### Consequence
-- Markdown reports are presentation output, not primary state authority.
-- Future changes should preserve the runtime flow and avoid manual markdown patching.
-- Renderer changes should be limited to concrete output defects or validated improvements.
+
+Markdown reports are presentation output, not primary state authority.
 
 ---
 
 ## 2026-05-07 — Validate historical relative-strength and two-pass challenger pricing baseline
+
 ### Decision
-ETF now treats historical relative-strength scoring and two-pass challenger pricing as part of the validated production baseline.
 
-### Chosen architecture
-```text
-pricing audit
-→ historical relative strength
-→ first-pass lane discovery
-→ targeted challenger pricing
-→ final lane discovery
-→ runtime state
-→ EN/NL report render
-→ polish/linkify
-→ validation
-→ PDF/email delivery
-```
-
-### Reason
-The workflow successfully passed after adding historical market-strength inputs and targeted challenger pricing between first-pass and final discovery.
+ETF treats historical relative-strength scoring and two-pass challenger pricing as part of the validated production baseline.
 
 ### Consequence
-- The Structural Opportunity Radar is less dependent on configured priors.
-- Top discovery challengers can receive targeted pricing before final scoring.
-- Priced challengers are not automatically fundable; they only enable a fairer comparison.
+
+Priced challengers are not automatically fundable; they only enable fairer comparison.
 
 ---
 
 ## 2026-05-08 — Move strict branded sections to delivery HTML and validate rendered contract
+
 ### Decision
+
 Sections with strict layout or clickable behavior are delivery-HTML responsibilities, not markdown-polish responsibilities.
 
-### Chosen architecture
-```text
-runtime state
-→ EN/NL markdown render
-→ polish/linkify
-→ delivery HTML overrides for strict sections
-→ dynamic delivery HTML contract validator
-→ PDF/email delivery
-```
-
 ### Scope
-This applies specifically to:
 
 - Portfolio Action Snapshot
 - Current Position Review
 
-### Reason
-Repeated markdown-level fixes could not reliably guarantee clickable ticker formatting or a stable Current Position Review table because the branded PDF renderer uses special panel logic. The stable solution is to render these strict sections directly from runtime state at the delivery HTML layer.
-
 ### Consequence
-- `runtime/delivery_html_overrides.py` owns the final HTML for strict branded sections.
-- `send_report_runtime_html.py` is the workflow delivery entrypoint.
-- `tools/validate_etf_delivery_html_contract.py` dynamically reads holdings from runtime state and validates rendered delivery HTML before email send.
-- Future PDF layout defects in these sections should be fixed in the delivery HTML layer, not by more markdown post-processing.
+
+Future PDF layout defects in these sections should be fixed in the delivery HTML layer, not by markdown post-processing.
 
 ---
 
 ## 2026-05-10 — Treat Dutch localization as a language-contract layer
+
 ### Decision
+
 The Dutch ETF companion report is governed by a language-contract layer, not by ad-hoc markdown replacements or a separate research pass.
 
-### Chosen architecture
-```text
-runtime state
-→ English canonical report
-→ Dutch companion render
-→ Dutch localization contract pass
-→ Dutch language quality validation
-→ bilingual numeric parity validation
-→ bilingual delivery HTML validation
-→ PDF/email delivery
-```
-
-### Reason
-The production debugging cycle showed that one-failure-at-a-time phrase fixes are fragile. Dutch output quality must be handled as an explicit contract across render, markdown validation, send-time parity validation, delivery HTML validation, and final email/PDF delivery.
-
 ### Consequence
-- English remains the canonical analytical report.
-- Dutch remains a derived companion, not an independent research pass.
-- Dutch client-facing text should read as premium Dutch, not translated English with system artifacts.
-- Validators must support both English canonical titles and Dutch companion titles.
-- Numeric parity between English and Dutch must remain strict.
-- Strict branded sections remain delivery HTML responsibilities.
-- The next cleanup is to consolidate bilingual aliases so one Dutch label change does not require patches across several validators.
+
+English remains canonical analytical report. Dutch remains native companion from the same runtime state/key figures. Strict bilingual numeric parity remains required.
 
 ---
 
 ## 2026-05-11 — Render Section 7 equity curve from full valuation history
+
 ### Decision
+
 Section 7 equity curve rendering must use the full machine-readable valuation history, not a hardcoded start/latest pair.
-
-### Chosen architecture
-```text
-output/etf_valuation_history.csv
-→ runtime/render_etf_report_from_state.py
-→ Section 7 valuation table
-→ embedded equity-curve chart
-→ tools/validate_etf_equity_curve_history.py
-→ ETF_EQUITY_CURVE_HISTORY_OK
-```
-
-### Reason
-A production report showed the equity curve with only two dots. The intermediate valuation dates existed in `output/etf_valuation_history.csv`, but the renderer ignored that file and hardcoded only start/latest.
-
-### Consequence
-- Section 7 now shows the full valuation history plus current NAV.
-- The embedded chart now shows intermediate valuation dates.
-- `tools/validate_etf_equity_curve_history.py` is wired into the send workflow.
 
 ---
 
 ## 2026-05-31 — Approve macro/thesis roadmap with phased shadow-first sequencing
+
 ### Decision
-The team approved the Weekly ETF Macro & Thesis Engine roadmap as the next major model-quality track for `weekly-etf`, but only under strict phased sequencing and shadow-first controls.
+
+The Weekly ETF Macro & Thesis Engine roadmap is approved as the next major model-quality track, but only under strict phased sequencing and shadow-first controls.
 
 ### Chosen architecture
+
 ```text
 pricing lineage first
 → macro audit foundation
@@ -292,56 +195,32 @@ pricing lineage first
 ```
 
 ### Authority rule
-Macro/regime modernization is approved as a post-pricing-lineage enhancement. Until validated in fixtures and shadow runs, the new macro engine may produce internal artifacts but must not change client-facing fundable decisions.
 
-### Consequence
-- Pricing lineage remains the active Priority A and must not be displaced.
-- Macro and thesis implementation starts only after control-layer recording.
-- Thesis candidates are internal artifacts and must not appear as client-facing actions until promoted.
-- A lane becomes fundable only after thesis, market confirmation, valuation-grade pricing, and portfolio discipline gates all pass.
-- Institutional overlay may cap confidence but may never set the regime or portfolio action.
+Macro/regime modernization may produce internal artifacts while shadow-only. It must not change client-facing fundable decisions until explicit promotion gates pass.
 
 ---
 
 ## 2026-05-31 — Keep Phase 2 macro audit foundation shadow-only
-### Decision
-The Phase 2 macro audit foundation is an input/provenance layer only. It may fetch and validate FRED, ECB, Treasury, and volatility observations, but it must not yet set regime, confidence, lane scoring, fundability, portfolio actions, or client-facing report wording.
 
-### Chosen architecture
-```text
-config/macro_data_sources.yml
-→ macro_sources/* clients
-→ output/macro/macro_data_audit_<reference_date>_<run_id>.json
-→ tools/validate_macro_data_audit.py
-→ runtime/build_macro_policy_pack.py records audit summary only
-```
+### Decision
+
+The Phase 2 macro audit foundation is an input/provenance layer only.
 
 ### Consequence
-- Macro audit values are run-scoped and validated.
-- The macro policy pack records the audit path and summary.
-- Existing regime classification remains unchanged for now.
-- Client-facing macro claims must still come from the existing validated report path until later phases promote the new macro engine.
-- Fixture replay is required to support deterministic no-network validation.
+
+It may fetch and validate macro observations but must not yet set regime, confidence, lane scoring, fundability, portfolio actions, or client-facing report wording.
 
 ---
 
 ## 2026-06-03 — Validate macro-audit-derived regime axes in shadow CI only
-### Decision
-Macro-audit-derived axes are now validated in the isolated macro-regime shadow workflow, but they remain non-authoritative for production reports, lane scoring, fundability, portfolio actions, and client-facing recommendations.
 
-### Chosen architecture
-```text
-fixtures/macro_data_audit/macro_audit_fixture_2026-06-02.json
-→ tools/replay_macro_data_audit_shadow_fixture.py
-→ runtime/build_macro_policy_pack_shadow.py
-→ deterministic_regime_shadow.macro_axes / macro_axis_scores
-→ tools/validate_macro_regime_shadow.py
-→ output/macro/validation/latest_macro_audit_axis_shadow_validation.json
-→ output/macro/validation/latest_macro_regime_shadow_validation.json
-```
+### Decision
+
+Macro-audit-derived axes are validated in isolated macro-regime shadow CI only.
 
 ### Authority rule
-The validated fields remain internal shadow evidence only:
+
+The following remain internal shadow evidence only:
 
 ```text
 deterministic_regime_shadow
@@ -351,70 +230,34 @@ macro_evidence
 confidence_decomposition
 ```
 
-They must not be used for:
-
-```text
-client-facing regime labels
-lane scoring
-fundability decisions
-portfolio trades
-report recommendations
-```
-
-until a future control-layer decision promotes the layer after methodology, compliance, bilingual, and production-output gates pass.
+They must not be used for client-facing regime labels, lane scoring, fundability decisions, portfolio trades, or report recommendations until future methodology, compliance, bilingual, and production-output gates pass.
 
 ---
 
 ## 2026-06-05 — Enforce Dutch delivery-surface localization at delivery runtime
-### Decision
-Dutch delivery-surface localization for strict branded PDF/HTML panels must be enforced in the layer that generates the final delivery HTML, not only in native markdown renderers or markdown scrubbers.
 
-### Chosen architecture
-```text
-runtime state
-→ native EN/NL markdown render
-→ polish/linkify/localization
-→ delivery HTML overrides regenerate strict branded panels from runtime state
-→ delivery-runtime Dutch enum localization
-→ delivery HTML/PDF validation
-→ PDF/email delivery
-```
+### Decision
+
+Dutch delivery-surface localization for strict branded PDF/HTML panels must be enforced in the layer that generates final delivery HTML, not only in native markdown renderers or markdown scrubbers.
 
 ### Reason
-The June 5 cleanup cycle showed that `Current Position Review` / `Review huidige posities` is rebuilt from runtime state by the delivery HTML override layer. Markdown-level scrub fixes correctly cleaned the markdown report, but the final PDF still leaked the English enum `No / under review` until the delivery-runtime enum map was patched.
 
-### Evidence
-```text
-workflow: Send weekly ETF Pro report
-run_number: 216
-trigger_commit: ce86dce050a75c2b21481162ad3b6952ebbdb1e7
-workflow_conclusion: success
-observed_result: `No / under review` and unwanted `Nee / onder herbeoordeling` wording gone from the final report surface
-```
-
-The same cleanup cycle also confirmed:
-
-```text
-Current Position Review score completeness: fixed
-stale GLD current-surface wording: fixed
-Dutch delivery enum leakage: fixed
-```
+The June 5 cleanup showed that `Current Position Review` / `Review huidige posities` is rebuilt from runtime state by the delivery HTML override layer. Markdown-level scrub fixes were insufficient for the final PDF.
 
 ### Consequence
-- Strict branded panel defects must be fixed in `runtime/delivery_html_overrides.py`, `runtime/client_facing_sanitizer.py`, shared localization maps, or the delivery startup/runtime layer as appropriate.
-- Markdown-only fixes are insufficient for strict panels regenerated during HTML/PDF delivery.
-- Dutch aliases should be consolidated so native render, markdown validation, Dutch quality validation, delivery HTML validation, and delivery runtime share one terminology source.
-- Delivery success remains SMTP-send/report-generation evidence unless a delivery manifest or true inbox receipt is separately verified.
+
+Strict branded panel defects must be fixed in `runtime/delivery_html_overrides.py`, `runtime/client_facing_sanitizer.py`, shared localization maps, or the delivery startup/runtime layer as appropriate.
 
 ---
 
 ## 2026-06-05 — Add deterministic macro narrative shadow candidate comparison path
+
 ### Decision
+
 Work Package 1 — Deterministic macro narrative shadow candidate is completed as a shadow-only comparison path in `market-predictions/weekly-etf`.
 
-The artifact compares current English/Dutch macro report wording with a deterministic macro regime shadow narrative candidate, but it does not promote the deterministic regime into report narrative authority.
-
 ### Chosen architecture
+
 ```text
 current English report markdown
 + current Dutch report markdown
@@ -424,17 +267,8 @@ current English report markdown
 → tools/validate_macro_regime_shadow_narrative.py
 ```
 
-### Evidence
-```text
-runtime/render_macro_regime_shadow_narrative.py
-tools/validate_macro_regime_shadow_narrative.py
-tests/test_macro_regime_shadow_narrative.py
-output/macro/shadow_narrative/macro_regime_shadow_narrative_20260605_000000.json
-reported focused test: python -m pytest tests/test_macro_regime_shadow_narrative.py -q = 4 passed
-reported artifact validation: MACRO_REGIME_SHADOW_NARRATIVE_OK
-```
+### Authority rules
 
-### Stable authority rules
 ```text
 client_facing=false
 production_report=false
@@ -444,44 +278,16 @@ fundability_authority=false
 no production report mutation
 ```
 
-### Reason
-The deterministic macro regime can now be reviewed against the current client-facing macro narrative without changing production report text or portfolio logic. This enables controlled old-vs-new review before any future client-surface pilot or promotion decision.
-
-### Consequence
-- WP1 output is review/comparison evidence only.
-- The candidate narrative must not be inserted into reports without later compliance and bilingual parity gates.
-- The candidate narrative must not influence portfolio actions, lane scoring, fundability, report recommendations, execution, or delivery.
-- WP2 macro narrative compliance/bilingual parity and WP3 macro promotion decision contract are the next gates before any promotion discussion.
-
 ---
 
 ## 2026-06-05 — Add macro narrative compliance and bilingual parity gate
+
 ### Decision
+
 Work Package 2 — Macro narrative compliance and bilingual parity gate is completed as an output-contract safety gate in `market-predictions/weekly-etf`.
 
-The validator checks whether future deterministic macro narrative candidate surfaces are safe for English/Dutch client wording before any client-surface pilot or promotion review. A pass does not grant production report, lane-scoring, fundability, delivery, or portfolio-action authority.
-
-### Chosen architecture
-```text
-future macro narrative candidate EN/NL surface artifact
-→ tools/validate_macro_narrative_client_surface.py
-→ fixtures/macro_narrative/safe_shadow_candidate_en_nl.json
-→ planted-failure fixtures for predictive wording, shadow/internal leakage, and EN/NL meaning drift
-→ tests/test_macro_narrative_client_surface.py
-```
-
-### Evidence
-```text
-tools/validate_macro_narrative_client_surface.py
-fixtures/macro_narrative/safe_shadow_candidate_en_nl.json
-fixtures/macro_narrative/bad_predictive_language.json
-fixtures/macro_narrative/bad_shadow_label_leakage.json
-fixtures/macro_narrative/bad_dutch_parity.json
-tests/test_macro_narrative_client_surface.py
-reported focused test: python -m pytest tests/test_macro_narrative_client_surface.py -q = 4 passed
-```
-
 ### Blocks
+
 ```text
 predictive wording
 uncited macro claims
@@ -493,7 +299,8 @@ citation parity mismatch
 Dutch/English meaning drift
 ```
 
-### Stable authority rules
+### Authority rules
+
 ```text
 output_contract_gate_only=true
 production_report_authority=false
@@ -503,10 +310,58 @@ fundability_authority=false
 delivery_authority=false
 ```
 
-### Reason
-The deterministic macro narrative path needs a client-surface safety gate before any report-language pilot. WP2 prevents a technically valid shadow narrative from leaking predictive wording, unsupported macro claims, internal fields, or Dutch/English meaning drift into client-facing report text.
+---
+
+## 2026-06-05 — Add macro promotion decision contract
+
+### Decision
+
+Work Package 3 — Macro promotion decision contract is completed and merged via PR #51.
+
+```text
+merge_commit: 7b7fe1db0b04dd3b1d377463ad59e06927037993
+```
+
+The contract defines what must be true before deterministic macro regime output may move from shadow-only evidence into report narrative authority.
+
+### Chosen architecture
+
+```text
+control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
+tools/validate_macro_regime_promotion_contract.py
+fixtures/macro_promotion/not_promoted_valid.json
+fixtures/macro_promotion/bad_promoted_without_approval.json
+tests/test_macro_regime_promotion_contract.py
+```
+
+### Promotion prerequisites
+
+```text
+methodology_approved=true
+bilingual_parity_approved=true
+compliance_validator_passed=true
+old_vs_new_comparison_reviewed=true
+explicit_control_layer_promotion_decision=true
+control_layer_decision=promote_to_report_narrative_authority
+client_facing_narrative_authority=true
+production_report_narrative_authority=true
+blockers=[]
+```
+
+### Permanent authority boundaries
+
+The contract does not grant:
+
+```text
+portfolio_action_authority
+lane_scoring_authority
+fundability_authority
+funding_authority
+portfolio_mutation
+```
+
+Those remain false unless a separate future contract explicitly promotes them.
 
 ### Consequence
-- WP2 is an active regression gate for future macro narrative candidates.
-- A WP2 pass means wording/parity safety only; it is not promotion authority.
-- WP3 macro promotion decision contract is still required before deterministic macro regime narrative authority can be granted.
+
+WP1, WP2 and WP3 together permit controlled review of deterministic macro narrative candidates, but do not yet integrate deterministic macro regime into production narrative authority. A future client-surface pilot or production promotion still requires an explicit control-layer decision.
