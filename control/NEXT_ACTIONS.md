@@ -53,12 +53,22 @@
   user-visible cleanup status: score completeness fixed, stale GLD current wording fixed, Dutch enum leakage fixed
   inspected artifacts: weekly_analysis_pro_260604_10.pdf, weekly_analysis_pro_nl_260604_10.pdf
   ```
+- Latest macro shadow-narrative evidence:
+  ```text
+  Work Package 1 — Deterministic macro narrative shadow candidate
+  status: implemented as shadow-only comparison path
+  artifact: output/macro/shadow_narrative/macro_regime_shadow_narrative_20260605_000000.json
+  reported focused test: python -m pytest tests/test_macro_regime_shadow_narrative.py -q = 4 passed
+  reported artifact validation: MACRO_REGIME_SHADOW_NARRATIVE_OK
+  authority: client_facing=false, production_report=false, portfolio_action_authority=false, lane_scoring_authority=false, fundability_authority=false
+  ```
 - Action:
   - preserve the split between runtime provenance and post-execution official portfolio state
   - do not repair strict branded sections through markdown post-processing
   - keep delivery-runtime localization for strict PDF/HTML panels
   - do not let new macro/thesis content bypass runtime-state, bilingual parity, delivery HTML, or compliance validation
-  - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, and inbox receipt distinct
+  - keep WP1 macro shadow narrative as comparison/review evidence only
+  - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, and inbox receipt distinct
 
 ### 2. ETF pricing-lineage and delivery-evidence contract
 
@@ -223,6 +233,33 @@
   - keep output descriptive, not predictive
   - preserve current production decisions during shadow comparison
 
+### 10A. Work Package 1 — Deterministic macro narrative shadow candidate
+
+- Owner: `[ASSISTANT]`
+- Status: completed as shadow-only comparison path / not promoted
+- Files:
+  - `runtime/render_macro_regime_shadow_narrative.py`
+  - `tools/validate_macro_regime_shadow_narrative.py`
+  - `tests/test_macro_regime_shadow_narrative.py`
+  - `output/macro/shadow_narrative/macro_regime_shadow_narrative_20260605_000000.json`
+- Evidence:
+  ```text
+  reported focused test: python -m pytest tests/test_macro_regime_shadow_narrative.py -q = 4 passed
+  reported artifact validation: MACRO_REGIME_SHADOW_NARRATIVE_OK
+  ```
+- Authority boundaries:
+  ```text
+  client_facing=false
+  production_report=false
+  portfolio_action_authority=false
+  lane_scoring_authority=false
+  fundability_authority=false
+  ```
+- Remaining action:
+  - keep the artifact as review/comparison evidence only
+  - do not insert candidate wording into the report without WP2 compliance/parity and WP3 promotion-contract gates
+  - do not feed it into portfolio actions, lane scoring, fundability, or delivery logic
+
 ---
 
 ## Phase 5 — compliance and methodology gates
@@ -244,6 +281,46 @@
   - keep this as an active regression guard
   - add further planted-failure fixtures only if a new macro/thesis surface risk appears
   - do not interpret green compliance as promotion authority
+
+### 11A. Work Package 2 — Macro narrative compliance and bilingual parity gate
+
+- Owner: `[ASSISTANT]`
+- Status: next recommended macro roadmap package
+- Goal:
+  - validate that deterministic macro narrative candidates are safe for English/Dutch client wording before any client-surface pilot
+- Required boundaries:
+  - block predictive wording
+  - block uncited macro claims
+  - block shadow/internal labels
+  - block `macro_axes` leakage
+  - block `confidence_decomposition` leakage
+  - block English leakage in Dutch report
+  - block Dutch/English meaning drift
+- Done when:
+  ```bash
+  python -m pytest tests/test_macro_narrative_client_surface.py -q
+  ```
+  passes with safe fixtures passing and bad fixtures failing
+
+### 11B. Work Package 3 — Macro promotion decision contract
+
+- Owner: `[ASSISTANT]`
+- Status: next recommended macro roadmap package
+- Goal:
+  - define exactly what must be true before deterministic macro regime can move from shadow to report narrative authority
+- Required contract:
+  - methodology approved
+  - bilingual parity approved
+  - compliance validator passed
+  - old-vs-new comparison reviewed
+  - no portfolio-action authority
+  - no lane-scoring authority
+  - explicit control-layer promotion decision
+- Done when:
+  ```bash
+  python -m pytest tests/test_macro_regime_promotion_contract.py -q
+  ```
+  passes
 
 ---
 
