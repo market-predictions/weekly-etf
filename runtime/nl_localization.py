@@ -13,8 +13,26 @@ LABELS = term.REPORT_LABELS
 TABLE_LABELS = term.TABLE_LABELS
 ACTION_REPLACEMENTS = term.ACTION_REPLACEMENTS
 PHRASE_REPLACEMENTS = term.PHRASE_REPLACEMENTS
-DECISION_TRANSLATIONS = term.DECISION_TRANSLATIONS
-TRIGGER_TRANSLATIONS = term.TRIGGER_TRANSLATIONS
+DECISION_TRANSLATIONS = {
+    **term.DECISION_TRANSLATIONS,
+    # WP4 migration aliases formerly injected from sitecustomize.py.
+    # Keep them here until the base central terminology file is next rewritten;
+    # startup code must not own client-surface Dutch wording.
+    "Not fundable - close proof incomplete.": "Niet geschikt voor allocatie — sluitkoersbevestiging is onvolledig.",
+    "Not fundable - close proof incomplete": "Niet geschikt voor allocatie — sluitkoersbevestiging is onvolledig",
+    "Not fundable - valuation-grade challenger pricing required.": "Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist.",
+    "Not fundable - valuation-grade challenger pricing required": "Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist",
+    "Priced valuation-grade, but direct RS duel incomplete.": "Waarderingswaardig geprijsd, maar de directe relatieve-sterkteanalyse is onvolledig.",
+    "Priced valuation-grade, but direct RS duel incomplete": "Waarderingswaardig geprijsd, maar de directe relatieve-sterkteanalyse is onvolledig",
+    "Replacement trigger watch - challenger leading over 3m.": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden.",
+    "Replacement trigger watch - challenger leading over 3m": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden",
+}
+TRIGGER_TRANSLATIONS = {
+    **term.TRIGGER_TRANSLATIONS,
+    # WP4 migration aliases formerly injected from sitecustomize.py.
+    "Upgrade challenger to valuation-grade pricing before any funding decision.": "Verbeter de prijsbevestiging van het alternatief tot waarderingskwaliteit vóór een allocatiebesluit.",
+    "Upgrade challenger to valuation-grade pricing before any funding decision": "Verbeter de prijsbevestiging van het alternatief tot waarderingskwaliteit vóór een allocatiebesluit",
+}
 FORBIDDEN_NL_STRINGS = term.FORBIDDEN_NL_STRINGS
 
 # Legacy-only phrases that are still accepted in older non-native Dutch renders.
@@ -82,7 +100,7 @@ def _replace_word_boundary(text: str, src: str, dst: str) -> str:
 
 
 def _central_replacements() -> dict[str, str]:
-    return {**term.combined_text_replacements(), **LEGACY_ONLY_PHRASE_REPLACEMENTS}
+    return {**term.combined_text_replacements(), **DECISION_TRANSLATIONS, **TRIGGER_TRANSLATIONS, **LEGACY_ONLY_PHRASE_REPLACEMENTS}
 
 
 def localize_text(value: Any, language: str = "nl") -> str:
