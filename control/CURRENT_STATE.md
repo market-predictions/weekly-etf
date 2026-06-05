@@ -1,29 +1,28 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-06-04
+2026-06-05
 
 ## What this repository currently is
 
-`market-predictions/weekly-etf` is now a runtime-driven production-style weekly ETF review system with:
+`market-predictions/weekly-etf` is a runtime-driven production-style weekly ETF review system with:
 
 - explicit pricing audits in `output/pricing/`
 - explicit run manifests in `output/run_manifests/`
 - redaction-safe delivery manifests in `output/delivery/`
 - runtime report-state artifacts in `output/runtime/`
-- persisted portfolio state and valuation history
-- guarded model execution and trade-ledger idempotency checks
+- persisted portfolio state, valuation history, and trade ledger
+- guarded model execution with trade-ledger idempotency checks
 - English canonical and Dutch native companion report generation
 - delivery HTML overrides for strict branded sections
-- a hard pricing-lineage validator before send
+- hard pricing-lineage validation before send
 - delivery-manifest evidence linked from the final run manifest
-- an approved, shadow-first macro/thesis roadmap
-- no-network macro-audit fixture replay wired into the isolated macro-regime shadow workflow
-- macro compliance validation covering methodology, planted failures, macro pack surface, and latest committed EN/NL report macro sections
-- Stage-1 thesis candidate shadow validation evidence
-- a green Stage-2 thesis promotion discipline contract, still contract-only and not promoted
+- shadow-first macro/thesis roadmap controls
+- macro compliance, Stage-1 thesis candidate, and Stage-2 thesis promotion-contract gates that are green but still non-authoritative for production decisions
 
-The latest confirmed production validation run is:
+## Latest production and report-surface evidence
+
+### Latest fully recorded production validation baseline
 
 ```text
 workflow: Send weekly ETF Pro report
@@ -45,98 +44,34 @@ delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-03_
 total_portfolio_value_eur: 111596.96
 ```
 
-This proves workflow success, pricing-lineage success, post-execution report authority, and repo-visible SMTP-send evidence. The delivery evidence means `smtplib.sendmail()` returned without raising and per-language delivery manifests were written. It is **not** an end-recipient inbox receipt.
+This proves workflow success, pricing-lineage success, post-execution report authority, and repo-visible SMTP-send evidence for that baseline. The delivery evidence means `smtplib.sendmail()` returned without raising and per-language delivery manifests were written. It is **not** an end-recipient inbox receipt.
 
-The latest delivery summary is recorded at:
-
-```text
-output/delivery/weekly_etf_delivery_manifest_2026-06-03_20260604_190001.json
-```
-
-It records:
+### Latest report-surface cleanup verification
 
 ```text
-artifact_type: weekly_etf_delivery_manifest_summary
-delivery_status: smtp_sendmail_returned_no_exception
-language_count: 2
-recipient_data_policy: redacted_hash_only
-english_pdf: weekly_analysis_pro_260603.pdf
-dutch_pdf: weekly_analysis_pro_nl_260603.pdf
-```
-
-The latest confirmed isolated macro-regime shadow validation run is:
-
-```text
-workflow: Validate ETF macro regime shadow
-run_number: 27
-workflow_run_id: 26918418953
-trigger_commit: 1c84de597cef54c17babb38389c0094cfc8e5c10
-status: passed
-validated_artifact: output/macro/validation/latest_macro_regime_shadow_validation.json
-```
-
-This proves that no-network macro-regime and macro-audit fixtures validate, that the shadow policy-pack builder consumes macro audit input, and that `deterministic_regime_shadow.macro_axes` is populated. It does **not** promote macro/regime output to client-facing, lane-scoring, fundability, or portfolio-action authority.
-
-The latest confirmed isolated macro compliance validation run is:
-
-```text
-workflow: Validate ETF macro compliance
-run_number: 15
-trigger_commit: 28b6ddda28bd7f287bef7e0622ef8e9c70e726eb
-status: passed
+workflow: Send weekly ETF Pro report
+run_number: 216
+trigger_commit: ce86dce050a75c2b21481162ad3b6952ebbdb1e7
 branch: main
-duration: 18s
-observed_at: 2026-06-04
-source: user-provided GitHub Actions UI screenshot
+workflow_conclusion: success
+observed_at: 2026-06-05
+source: user-provided GitHub Actions UI screenshot plus visual inspection of generated report artifacts
+english_pdf: weekly_analysis_pro_260604_10.pdf
+dutch_pdf: weekly_analysis_pro_nl_260604_10.pdf
 ```
 
-The macro compliance workflow now validates:
+The `_10` report-surface cleanup cycle is closed for the issues under review:
 
 ```text
-macro compliance self-test
-macro conflict cap methodology
-macro report surface self-test
-current macro report surface if pack exists
-latest committed English/Dutch report macro sections
-safe macro fixture passes
-combined blocked macro fixture fails as expected
-shadow label leakage fixture fails as expected
-orphan macro figure fixture fails as expected
+Current Position Review score completeness: fixed
+English/Dutch active-position score completeness: fixed
+stale GLD current-surface wording: fixed
+Dutch delivery enum leakage `No / under review`: fixed
+unwanted `Nee / onder herbeoordeling` surface wording: removed from the final report view
+workflow_status: success
 ```
 
-This is a compliance/output-surface gate only. It does **not** promote deterministic macro/regime output to client-facing, lane-scoring, fundability, or portfolio-action authority.
-
-The latest confirmed Stage-1 thesis candidate shadow validation run is:
-
-```text
-workflow: Validate ETF thesis candidates shadow
-run_number: 2
-workflow_run_id: 26969716983
-trigger_commit: b0579f1f30134b4fdd1b277025867e9db87961da
-status: passed
-validated_artifact: output/macro/validation/latest_thesis_candidates_validation.json
-active_driver_count: 9
-candidate_count: 29
-observed_at: 2026-06-04
-source: user-provided GitHub Actions UI screenshot and repo-visible evidence file
-```
-
-This proves the Stage-1 thesis candidate builder and fixtures validate and that repo-visible evidence is written. It does **not** make any candidate client-facing, fundable, lane-scoring-authoritative, or actionable.
-
-The latest confirmed Stage-2 thesis promotion contract validation run is:
-
-```text
-workflow: Validate ETF stage 2 thesis promotion contract
-run_number: 1
-trigger_commit: 09c175276a243593908660332a101778845dbc9f
-status: passed
-branch: main
-duration: 12s
-observed_at: 2026-06-04
-source: user-provided GitHub Actions UI screenshot
-```
-
-This proves the promotion-readiness contract and fixtures validate. It is still contract-only. It does **not** promote thesis candidates into production runtime behavior, lane scoring, fundability, report wording, recommendations, or portfolio actions.
+This is report-generation / visual report-surface evidence. It does **not** by itself replace the full delivery manifest baseline above unless the corresponding delivery manifest and final run manifest are separately inspected.
 
 ## Four-layer operating status
 
@@ -150,13 +85,13 @@ The current decision framework remains:
 - guarded model execution with trade-ledger idempotency
 - no indefinite `Hold but replaceable` inertia
 - explicit separation between workflow success, pricing-lineage success, SMTP-send evidence, and final inbox receipt
-- macro/thesis modernization approved only as a future phased enhancement
+- macro/thesis modernization approved only as future phased enhancement
 - deterministic macro/regime classification remains shadow-only until later promotion gates pass
 - Stage-1 thesis candidates remain internal-only shadow artifacts
 - Stage-2 thesis promotion discipline is a contract gate only, not production authority
 - macro compliance gates may validate wording/surface safety, but they do not grant decision authority by themselves
 
-Post-execution authority is explicit:
+Post-execution authority remains:
 
 ```text
 runtime state = pre-execution pricing/report-state provenance
@@ -166,7 +101,7 @@ client report Section 7 / Section 15 = post-execution official portfolio state w
 
 ### 2. Input/state contract
 
-Current authoritative state inputs are:
+Authoritative production inputs remain:
 
 - `output/pricing/price_audit_<requested_close_date>_<run_id>.json`
 - `output/run_manifests/weekly_etf_run_manifest_<requested_close_date>_<run_id>.json`
@@ -186,108 +121,27 @@ Delivery evidence is recorded at:
 - `output/delivery/weekly_etf_delivery_manifest_<requested_close_date>_<run_id>.json`
 - `control/DELIVERY_MANIFEST_STATUS_20260604.md`
 
-Shadow-only macro/regime validation evidence is recorded at:
-
-- `output/macro/validation/latest_macro_regime_shadow_validation.json`
-- `output/macro/validation/latest_macro_audit_axis_shadow_validation.json`
-- `output/macro/validation/latest_macro_regime_shadow_comparison.json`
-
-Stage-1 thesis candidate shadow validation evidence is recorded at:
-
-- `output/macro/validation/latest_thesis_candidates_validation.json`
-- `control/THESIS_CANDIDATES_SHADOW_STATUS_20260604.md`
-
-Stage-2 thesis promotion contract status is recorded at:
-
-- `control/STAGE2_THESIS_PROMOTION_CONTRACT.md`
-- `control/STAGE2_THESIS_PROMOTION_CONTRACT_STATUS_20260604.md`
-- `tools/validate_stage2_thesis_promotion_contract.py`
-- `.github/workflows/validate-stage2-thesis-promotion-contract.yml`
-- `fixtures/thesis_promotion/**`
-
-Macro compliance/methodology status is recorded at:
-
-- `control/MACRO_CONFLICT_CAP_METHODOLOGY.md`
-- `control/MACRO_CONFLICT_CAP_STATUS_20260604.md`
-- `.github/workflows/validate-macro-compliance.yml`
-- `tools/validate_macro_compliance.py`
-
-Macro/thesis validation evidence files and control files are review/audit artifacts only. They are not production report, lane-scoring, fundability, or portfolio-action inputs.
-
-The latest confirmed production run proves the chain:
-
-```text
-pricing audit
-→ runtime state
-→ guarded model execution
-→ post-execution portfolio state
-→ EN/NL report artifacts
-→ valuation history
-→ run manifest
-→ delivery HTML/PDF validation
-→ pricing-lineage validator using post-execution report authority
-→ SMTP-send evidence summary
-→ final run manifest with non-null delivery_manifest_path
-```
-
-The latest isolated macro shadow run proves the separate chain:
-
-```text
-macro-regime fixture replay
-→ macro-data-audit fixture validation
-→ shadow macro policy-pack build with fixture input
-→ deterministic_regime_shadow.macro_axes assertion
-→ macro-regime shadow payload validation
-→ repo-visible validation evidence
-```
-
-The latest isolated macro compliance run proves the separate output-surface safety chain:
-
-```text
-macro compliance self-test
-→ macro conflict cap methodology validation
-→ macro report surface self-test
-→ macro pack surface validation when output/macro/latest.json exists
-→ latest committed EN/NL report macro-section validation
-→ safe fixture pass
-→ planted failure fixtures fail as expected
-```
-
-The latest isolated thesis candidate shadow run proves the separate internal-candidate chain:
-
-```text
-Stage-1 driver catalog and beneficiary map validation
-→ thesis candidate fixture replay
-→ current shadow thesis candidate artifact build
-→ thesis candidate validation evidence
-→ repo-visible evidence under output/macro/validation/
-```
-
-The latest isolated Stage-2 contract run proves the separate promotion-readiness contract chain:
-
-```text
-contract text validation
-→ safe ready-for-review-not-promoted fixture passes
-→ illegally promoted fixture fails as expected
-```
+Macro/thesis validation artifacts and control files remain review/audit artifacts only. They are not production report, lane-scoring, fundability, or portfolio-action authority unless a future control-layer decision explicitly promotes them.
 
 ### 3. Output contract
 
 The report output contract is now:
 
 - English is the canonical analytical report.
-- Dutch is a native companion render from the same runtime state/key figures, not a broad translation of the English markdown and not a second research pass.
+- Dutch is a native companion render from the same runtime state/key figures, not broad-translated markdown and not a second research pass.
 - Native Dutch localization/scrub layers are guard-only except for narrow structured runtime-state display-label normalization.
 - Section 7 equity curve and Section 15 holdings reconcile to the post-execution official portfolio state when guarded execution occurred in the same run.
 - Pricing-basis disclosure dynamically derives required rows from current active holdings, not stale hardcoded ticker sets.
 - Pricing-basis disclosure must show requested close, close date used, source, status, and close used for all active holdings.
 - Strict branded sections are rendered from runtime state at delivery HTML level, not fixed through markdown-only patches.
+- Current Position Review / Review huidige posities must show numeric scores for every active ETF position.
+- Dutch delivery-surface enum localization must be enforced at the delivery HTML/runtime layer, not only in markdown scrubbers.
+- Stale exited-holding wording, especially GLD as a current active hedge/review item when not active, must be blocked from current report surfaces.
 - Dutch PDF chart labels are generated in Dutch in the runtime delivery path.
 - Client-facing reports must not leak internal plumbing labels.
 - Delivery evidence must be repo-visible and linked from the final run manifest after successful send.
 - Macro-audit-derived `macro_axes`, `macro_axis_scores`, and `deterministic_regime_shadow` must not appear in client-facing reports until future methodology, compliance, bilingual gates, and explicit promotion gates approve them.
 - Stage-1 thesis candidates and Stage-2 promotion-chain artifacts must not appear in client-facing reports until explicit promotion gates approve them.
-- The isolated macro compliance workflow validates the actual committed EN/NL macro-sensitive report sections, but only as a surface-safety check.
 
 ### 4. Operational runbook
 
@@ -320,54 +174,20 @@ run-queue request or manual dispatch
 → final manifest update with delivery_manifest_path
 ```
 
-The isolated macro-regime shadow validation path is:
+Strict branded or PDF-visible report-surface defects must be fixed in the layer that actually generates the final PDF/HTML:
 
 ```text
-workflow_dispatch or qualifying push
-→ replay deterministic regime fixtures
-→ replay no-network macro-data-audit fixture through shadow regime stack
-→ validate macro policy pack schema
-→ validate deterministic_regime_shadow payload and macro_axes presence
-→ write macro-regime shadow validation evidence
-→ commit evidence under output/macro/validation/
-```
-
-The isolated macro compliance validation path is:
-
-```text
-workflow_dispatch or qualifying push
-→ run macro compliance self-test
-→ validate macro conflict cap methodology
-→ run macro report surface self-test
-→ validate current macro report surface if output/macro/latest.json exists
-→ validate latest committed EN/NL report macro sections
-→ validate safe macro fixture
-→ validate planted failure fixtures with --expect-fail
-```
-
-The isolated thesis candidate shadow validation path is:
-
-```text
-workflow_dispatch or qualifying push
-→ validate Stage-1 thesis candidate fixtures
-→ build current shadow thesis candidate artifact
-→ write thesis candidate validation evidence
-→ commit thesis candidate validation evidence under output/macro/validation/
-```
-
-The isolated Stage-2 thesis promotion contract validation path is:
-
-```text
-workflow_dispatch or qualifying push
-→ validate Stage-2 contract text
-→ validate ready-for-review-not-promoted fixture
-→ validate illegally promoted fixture fails
+runtime state defect → fix runtime state builder
+markdown-only defect → fix native renderer / polish / linkifier
+strict branded panel defect → fix delivery HTML overrides
+send-time enum/localization defect → fix delivery runtime / shared localization map
+validator gap → add or tighten the relevant pre-send gate
 ```
 
 ## Current strengths
 
 - Pricing retrieval and report reconciliation are validated at artifact level.
-- Pricing-lineage validation is a hard pre-send gate and passed in a fresh run.
+- Pricing-lineage validation is a hard pre-send gate and passed in the recorded production baseline.
 - Post-execution portfolio-state authority is explicit and validated.
 - Runtime pipeline produces bilingual report artifacts from the same state/key figures.
 - Dutch report generation is native and guard-only, not broad translated markdown.
@@ -375,12 +195,14 @@ workflow_dispatch or qualifying push
 - Guarded model execution handles fully exited zero-share positions correctly.
 - Pricing-basis disclosure derives required tickers dynamically from active Section 15 holdings.
 - Challenger pricing/fundability discipline is active.
-- Delivery manifest evidence is now repo-visible and linked from the final run manifest.
+- Delivery manifest evidence is repo-visible and linked from the final run manifest for the recorded production baseline.
+- Current Position Review score completeness is fixed for the latest inspected report-surface cycle.
+- Stale GLD current-surface wording is fixed for the latest inspected report-surface cycle.
+- Dutch delivery enum leakage for `No / under review` is fixed in the latest successful run #216 visual check.
 - Shadow macro audit remains non-authoritative and non-blocking.
-- No-network macro-audit fixture replay is wired into the isolated macro-regime shadow workflow and has passed with repo-visible evidence.
-- Macro compliance now validates methodology, planted failures, macro pack surface, and latest committed EN/NL macro report sections.
-- Stage-1 thesis candidate validation now writes repo-visible shadow evidence.
-- Stage-2 thesis promotion discipline now has a green contract-only validator and workflow.
+- Macro compliance validates methodology, planted failures, macro pack surface, and committed EN/NL macro report sections.
+- Stage-1 thesis candidate validation writes repo-visible shadow evidence.
+- Stage-2 thesis promotion discipline has a green contract-only validator and workflow.
 
 ## Current weaknesses / watch items
 
@@ -388,9 +210,9 @@ workflow_dispatch or qualifying push
 
 The delivery manifest summary proves `smtplib.sendmail()` returned without raising and that per-language delivery manifests were written. It does not prove end-recipient inbox placement or user receipt.
 
-### 2. Direct visual PDF inspection still needs a renderable artifact
+### 2. Direct visual PDF inspection depends on renderable artifacts
 
-The repo contains generated PDFs/assets, but the GitHub connector exposes binary files as base64 text resources rather than sandbox-renderable files. Visual inspection should use either user-uploaded PDFs or an Actions artifact/download path that can be rendered.
+The latest `_10` PDFs were visually inspected through user-uploaded report artifacts and the run #216 UI screenshot. For future visual inspections, use uploaded PDFs or a renderable Actions artifact/download path; the GitHub connector may expose binary files as base64 text resources rather than sandbox-renderable files.
 
 ### 3. Independent price verification is not yet upgraded
 
@@ -398,11 +220,11 @@ Rows can remain `fresh_exact_unverified` when one provider gives exact requested
 
 ### 4. Macro/thesis promotion remains blocked despite stronger compliance and contract coverage
 
-Macro/thesis controls are materially stronger, including methodology checks, planted-failure fixtures, macro pack surface validation, latest committed EN/NL macro-section validation, Stage-1 thesis candidate shadow evidence, and a Stage-2 promotion contract. That still does not complete promotion. Expanded deterministic macro/thesis content still requires explicit promotion decisions, bilingual parity checks, authority review, and runtime integration before any client-facing or portfolio-authority use.
+Macro/thesis controls are materially stronger, including methodology checks, planted-failure fixtures, macro pack surface validation, EN/NL macro-section validation, Stage-1 thesis candidate shadow evidence, and a Stage-2 promotion contract. That still does not complete promotion. Expanded deterministic macro/thesis content still requires explicit promotion decisions, bilingual parity checks, authority review, and runtime integration before any client-facing or portfolio-authority use.
 
 ### 5. Dutch aliases remain partially distributed
 
-Dutch terminology and validator aliases are more controlled, but some narrow runtime-state labels still live in delivery/scrub layers. Further consolidation remains useful.
+Dutch terminology and validator aliases are more controlled, and the latest delivery enum leakage is fixed. However, some narrow runtime-state labels still live in delivery/scrub/startup layers. Further consolidation remains useful so one Dutch label change does not require patches across multiple files.
 
 ### 6. Direct challenger-vs-current-holding scoring is still a model enhancement
 
@@ -429,6 +251,7 @@ Next cleanup:
 - keep Dutch terminology and aliases in one source of truth
 - reuse that source from native render, markdown validation, send-time parity checks, Dutch quality validation, and delivery HTML validation
 - keep native Dutch guard-only; do not reintroduce broad English-to-Dutch scrub passes
+- preserve the rule that delivery-surface localization for strict branded panels must happen at delivery runtime, not only markdown scrub time
 
 ### Priority C — macro/thesis roadmap remains shadow-first and promotion-gated
 
@@ -458,4 +281,4 @@ Next model enhancement:
 
 ## Current status label
 
-**ETF has a production-tested runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence passed for run `20260604_190001`. The system distinguishes pre-execution runtime provenance, post-execution official portfolio-state authority, pricing-lineage validation, SMTP-send evidence, and inbox receipt. Dutch output is native/guard-only rather than broad-translated markdown. Pricing lineage, guarded execution, Dutch quality, HTML/PDF render validation, and delivery-manifest linkage are green. Delivery evidence proves SMTP-send success, not end-recipient inbox receipt. Macro-audit-derived regime axes are validated in isolated shadow CI, macro compliance validates methodology, planted failures, macro pack surface, and latest committed EN/NL macro report sections, Stage-1 thesis candidate shadow evidence is repo-visible and green, and the Stage-2 thesis promotion contract is green but contract-only. Deterministic macro/regime/thesis outputs remain non-client-facing and non-authoritative for lane scoring, fundability, portfolio actions, and report recommendations until explicit promotion gates pass.**
+**ETF has a production-tested runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence passed for run `20260604_190001`, plus a completed report-surface cleanup cycle verified after successful workflow run #216 on commit `ce86dce050a75c2b21481162ad3b6952ebbdb1e7`. The system distinguishes pre-execution runtime provenance, post-execution official portfolio-state authority, pricing-lineage validation, SMTP-send evidence, report-surface validation, and inbox receipt. Current Position Review score completeness, stale GLD current-surface cleanup, and Dutch delivery enum leakage are fixed for the latest inspected `_10` English/Dutch reports. Delivery evidence remains SMTP-send/report-generation evidence only, not end-recipient inbox receipt. Macro-audit-derived regime axes, Stage-1 thesis candidates, and Stage-2 promotion artifacts remain non-client-facing and non-authoritative for lane scoring, fundability, portfolio actions, and report recommendations until explicit promotion gates pass.**
