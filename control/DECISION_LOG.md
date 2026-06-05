@@ -405,3 +405,50 @@ Dutch delivery enum leakage: fixed
 - Markdown-only fixes are insufficient for strict panels regenerated during HTML/PDF delivery.
 - Dutch aliases should be consolidated so native render, markdown validation, Dutch quality validation, delivery HTML validation, and delivery runtime share one terminology source.
 - Delivery success remains SMTP-send/report-generation evidence unless a delivery manifest or true inbox receipt is separately verified.
+
+---
+
+## 2026-06-05 — Add deterministic macro narrative shadow candidate comparison path
+### Decision
+Work Package 1 — Deterministic macro narrative shadow candidate is completed as a shadow-only comparison path in `market-predictions/weekly-etf`.
+
+The artifact compares current English/Dutch macro report wording with a deterministic macro regime shadow narrative candidate, but it does not promote the deterministic regime into report narrative authority.
+
+### Chosen architecture
+```text
+current English report markdown
++ current Dutch report markdown
++ output/macro/validation/latest_macro_regime_shadow_validation.json
+→ runtime/render_macro_regime_shadow_narrative.py
+→ output/macro/shadow_narrative/macro_regime_shadow_narrative_<run_id>.json
+→ tools/validate_macro_regime_shadow_narrative.py
+```
+
+### Evidence
+```text
+runtime/render_macro_regime_shadow_narrative.py
+tools/validate_macro_regime_shadow_narrative.py
+tests/test_macro_regime_shadow_narrative.py
+output/macro/shadow_narrative/macro_regime_shadow_narrative_20260605_000000.json
+reported focused test: python -m pytest tests/test_macro_regime_shadow_narrative.py -q = 4 passed
+reported artifact validation: MACRO_REGIME_SHADOW_NARRATIVE_OK
+```
+
+### Stable authority rules
+```text
+client_facing=false
+production_report=false
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+no production report mutation
+```
+
+### Reason
+The deterministic macro regime can now be reviewed against the current client-facing macro narrative without changing production report text or portfolio logic. This enables controlled old-vs-new review before any future client-surface pilot or promotion decision.
+
+### Consequence
+- WP1 output is review/comparison evidence only.
+- The candidate narrative must not be inserted into reports without later compliance and bilingual parity gates.
+- The candidate narrative must not influence portfolio actions, lane scoring, fundability, report recommendations, execution, or delivery.
+- WP2 macro narrative compliance/bilingual parity and WP3 macro promotion decision contract are the next gates before any promotion discussion.
