@@ -18,7 +18,7 @@
 - hard pricing-lineage validation before send
 - delivery-manifest evidence linked from the final run manifest
 - shadow-first macro/thesis roadmap controls
-- macro compliance, Stage-1 thesis candidate, and Stage-2 thesis promotion-contract gates that are green but still non-authoritative for production decisions
+- macro compliance, Stage-1 thesis candidate, Stage-2 thesis promotion-contract gates, and WP1 deterministic macro narrative shadow-candidate path that are green/present but still non-authoritative for production decisions
 
 ## Latest production and report-surface evidence
 
@@ -73,6 +73,46 @@ workflow_status: success
 
 This is report-generation / visual report-surface evidence. It does **not** by itself replace the full delivery manifest baseline above unless the corresponding delivery manifest and final run manifest are separately inspected.
 
+### WP1 deterministic macro narrative shadow candidate evidence
+
+```text
+Work Package 1 — Deterministic macro narrative shadow candidate
+repository: market-predictions/weekly-etf
+status: implemented as shadow-only comparison path
+reported focused test: python -m pytest tests/test_macro_regime_shadow_narrative.py -q = 4 passed
+reported artifact validation: MACRO_REGIME_SHADOW_NARRATIVE_OK
+```
+
+Repo-visible WP1 files:
+
+```text
+runtime/render_macro_regime_shadow_narrative.py
+tools/validate_macro_regime_shadow_narrative.py
+tests/test_macro_regime_shadow_narrative.py
+output/macro/shadow_narrative/macro_regime_shadow_narrative_20260605_000000.json
+```
+
+WP1 authority boundaries:
+
+```text
+client_facing=false
+production_report=false
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+no production report mutation
+```
+
+The committed sample artifact compares current English/Dutch macro report wording with a deterministic regime shadow narrative candidate. It references:
+
+```text
+current_report_en_path=output/weekly_analysis_pro_260604_10.md
+current_report_nl_path=output/weekly_analysis_pro_nl_260604_10.md
+macro_regime_artifact_path=output/macro/validation/latest_macro_regime_shadow_validation.json
+```
+
+The sample artifact remains review-only. It does not insert text into the production report, delivery workflow, portfolio state, lane scoring, fundability logic, or execution behavior.
+
 ## Four-layer operating status
 
 ### 1. Decision framework
@@ -86,7 +126,7 @@ The current decision framework remains:
 - no indefinite `Hold but replaceable` inertia
 - explicit separation between workflow success, pricing-lineage success, SMTP-send evidence, and final inbox receipt
 - macro/thesis modernization approved only as future phased enhancement
-- deterministic macro/regime classification remains shadow-only until later promotion gates pass
+- deterministic macro/regime classification and deterministic macro narrative candidates remain shadow-only until later promotion gates pass
 - Stage-1 thesis candidates remain internal-only shadow artifacts
 - Stage-2 thesis promotion discipline is a contract gate only, not production authority
 - macro compliance gates may validate wording/surface safety, but they do not grant decision authority by themselves
@@ -123,6 +163,12 @@ Delivery evidence is recorded at:
 
 Macro/thesis validation artifacts and control files remain review/audit artifacts only. They are not production report, lane-scoring, fundability, or portfolio-action authority unless a future control-layer decision explicitly promotes them.
 
+WP1 adds a macro narrative comparison artifact path at:
+
+- `output/macro/shadow_narrative/macro_regime_shadow_narrative_<run_id>.json`
+
+That artifact is explicitly shadow-only and may be used for old-vs-new narrative review only.
+
 ### 3. Output contract
 
 The report output contract is now:
@@ -141,6 +187,7 @@ The report output contract is now:
 - Client-facing reports must not leak internal plumbing labels.
 - Delivery evidence must be repo-visible and linked from the final run manifest after successful send.
 - Macro-audit-derived `macro_axes`, `macro_axis_scores`, and `deterministic_regime_shadow` must not appear in client-facing reports until future methodology, compliance, bilingual gates, and explicit promotion gates approve them.
+- WP1 deterministic macro narrative shadow candidates must not appear in client-facing reports until future compliance, bilingual parity, and explicit promotion gates approve them.
 - Stage-1 thesis candidates and Stage-2 promotion-chain artifacts must not appear in client-facing reports until explicit promotion gates approve them.
 
 ### 4. Operational runbook
@@ -184,6 +231,18 @@ send-time enum/localization defect → fix delivery runtime / shared localizatio
 validator gap → add or tighten the relevant pre-send gate
 ```
 
+WP1 shadow narrative operation is separate from production delivery:
+
+```text
+current EN/NL report markdown
++ output/macro/validation/latest_macro_regime_shadow_validation.json
+→ runtime/render_macro_regime_shadow_narrative.py
+→ output/macro/shadow_narrative/macro_regime_shadow_narrative_<run_id>.json
+→ tools/validate_macro_regime_shadow_narrative.py
+```
+
+This path is comparison/review only and must not mutate the production report.
+
 ## Current strengths
 
 - Pricing retrieval and report reconciliation are validated at artifact level.
@@ -201,6 +260,7 @@ validator gap → add or tighten the relevant pre-send gate
 - Dutch delivery enum leakage for `No / under review` is fixed in the latest successful run #216 visual check.
 - Shadow macro audit remains non-authoritative and non-blocking.
 - Macro compliance validates methodology, planted failures, macro pack surface, and committed EN/NL macro report sections.
+- WP1 deterministic macro narrative shadow comparison path is implemented as non-authoritative review evidence.
 - Stage-1 thesis candidate validation writes repo-visible shadow evidence.
 - Stage-2 thesis promotion discipline has a green contract-only validator and workflow.
 
@@ -220,7 +280,7 @@ Rows can remain `fresh_exact_unverified` when one provider gives exact requested
 
 ### 4. Macro/thesis promotion remains blocked despite stronger compliance and contract coverage
 
-Macro/thesis controls are materially stronger, including methodology checks, planted-failure fixtures, macro pack surface validation, EN/NL macro-section validation, Stage-1 thesis candidate shadow evidence, and a Stage-2 promotion contract. That still does not complete promotion. Expanded deterministic macro/thesis content still requires explicit promotion decisions, bilingual parity checks, authority review, and runtime integration before any client-facing or portfolio-authority use.
+Macro/thesis controls are materially stronger, including methodology checks, planted-failure fixtures, macro pack surface validation, EN/NL macro-section validation, WP1 shadow narrative comparison, Stage-1 thesis candidate shadow evidence, and a Stage-2 promotion contract. That still does not complete promotion. Expanded deterministic macro/thesis content still requires explicit promotion decisions, bilingual parity checks, authority review, and runtime integration before any client-facing or portfolio-authority use.
 
 ### 5. Dutch aliases remain partially distributed
 
@@ -260,6 +320,7 @@ Current status:
 - Phase 2 macro audit remains shadow-only.
 - No-network macro-audit fixture replay is wired into CI and green.
 - Deterministic regime/confidence output remains shadow-only and non-authoritative.
+- WP1 deterministic macro narrative shadow candidate path is implemented and non-authoritative.
 - Macro-conflict cap methodology is documented as a stable shadow methodology rule.
 - Macro compliance covers methodology, macro pack surface, planted failures, and latest committed EN/NL macro report sections.
 - Stage-1 thesis candidate shadow evidence is green and repo-visible.
@@ -267,8 +328,10 @@ Current status:
 
 Next architecture track:
 
+- continue with WP2 macro narrative compliance and bilingual parity gate
+- continue with WP3 macro promotion decision contract
 - keep deterministic regime/confidence promotion review separate from client-surface wording validation
-- do not promote macro axes, shadow regime payload, Stage-1 thesis candidates, Stage-2 promotion chains, lane scoring, fundability, or portfolio-action authority without explicit control-layer promotion
+- do not promote macro axes, shadow regime payload, WP1 shadow narrative candidates, Stage-1 thesis candidates, Stage-2 promotion chains, lane scoring, fundability, or portfolio-action authority without explicit control-layer promotion
 - continue only with shadow methodology, compliance, promotion-readiness contracts, and operational hardening unless a later decision changes authority
 
 ### Priority D — add direct challenger-vs-current-holding scoring
@@ -281,4 +344,4 @@ Next model enhancement:
 
 ## Current status label
 
-**ETF has a production-tested runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence passed for run `20260604_190001`, plus a completed report-surface cleanup cycle verified after successful workflow run #216 on commit `ce86dce050a75c2b21481162ad3b6952ebbdb1e7`. The system distinguishes pre-execution runtime provenance, post-execution official portfolio-state authority, pricing-lineage validation, SMTP-send evidence, report-surface validation, and inbox receipt. Current Position Review score completeness, stale GLD current-surface cleanup, and Dutch delivery enum leakage are fixed for the latest inspected `_10` English/Dutch reports. Delivery evidence remains SMTP-send/report-generation evidence only, not end-recipient inbox receipt. Macro-audit-derived regime axes, Stage-1 thesis candidates, and Stage-2 promotion artifacts remain non-client-facing and non-authoritative for lane scoring, fundability, portfolio actions, and report recommendations until explicit promotion gates pass.**
+**ETF has a production-tested runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence passed for run `20260604_190001`, plus a completed report-surface cleanup cycle verified after successful workflow run #216 on commit `ce86dce050a75c2b21481162ad3b6952ebbdb1e7`, and WP1 deterministic macro narrative shadow-candidate comparison implemented as non-authoritative review evidence. The system distinguishes pre-execution runtime provenance, post-execution official portfolio-state authority, pricing-lineage validation, SMTP-send evidence, report-surface validation, macro narrative shadow comparison, and inbox receipt. Current Position Review score completeness, stale GLD current-surface cleanup, and Dutch delivery enum leakage are fixed for the latest inspected `_10` English/Dutch reports. Delivery evidence remains SMTP-send/report-generation evidence only, not end-recipient inbox receipt. Macro-audit-derived regime axes, WP1 deterministic macro narrative candidates, Stage-1 thesis candidates, and Stage-2 promotion artifacts remain non-client-facing and non-authoritative for lane scoring, fundability, portfolio actions, and report recommendations until explicit promotion gates pass.**
