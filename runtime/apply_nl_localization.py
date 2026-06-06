@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 
 from runtime import nl_terminology as term
+from runtime import nl_terminology_contract as contract
 from runtime.nl_localization import localize_markdown_table_headers, localize_text, validate_dutch_text
 
 DUTCH_DISCLAIMER = term.DUTCH_DISCLAIMER
@@ -17,34 +18,14 @@ CLIENT_PHRASES = {
     **term.PHRASE_REPLACEMENTS,
     **term.EXACT_CLIENT_LANGUAGE_REPLACEMENTS,
 }
-ACTION_PHRASES = term.ACTION_REPLACEMENTS
+ACTION_PHRASES = contract.ACTION_REPLACEMENTS
 CLIENT_LANGUAGE_CLEANUPS = term.CLIENT_LANGUAGE_CLEANUPS
 
-# These maps are legacy safety overlays for reports that are not natively rendered
-# in Dutch. Native runtime Dutch reports must not pass through broad translation
-# style repair; they should already be constructed from runtime state in Dutch and
-# then fail validation if English/internal wording leaks.
-PARTIAL_MIXED_EXACT_CLEANUPS = {
-    "Aanhouden but replaceable": "Aanhouden, maar vervangbaar",
-    "Aanhouden maar replaceable": "Aanhouden, maar vervangbaar",
-    "Hold maar vervangbaar": "Aanhouden, maar vervangbaar",
-}
-
-REPLACEMENT_DUEL_PHRASE_CLEANUPS = {
-    **term.DECISION_TRANSLATIONS,
-    **term.TRIGGER_TRANSLATIONS,
-    "Replacement trigger watch - challenger leading over 3m.": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden.",
-    "Replacement trigger watch - challenger leading over 3m": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden",
-    "Replacement trigger watch — challenger leading over 3m": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden",
-    "Not fundable - close proof incomplete.": "Niet geschikt voor allocatie — sluitkoersbevestiging is onvolledig.",
-    "Not fundable - close proof incomplete": "Niet geschikt voor allocatie — sluitkoersbevestiging is onvolledig",
-    "Not fundable - valuation-grade challenger pricing required.": "Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist.",
-    "Not fundable - valuation-grade challenger pricing required": "Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist",
-    "Priced valuation-grade, but direct RS duel incomplete.": "Waarderingswaardig geprijsd, maar de directe relatieve-sterkteanalyse is onvolledig.",
-    "Priced valuation-grade, but direct RS duel incomplete": "Waarderingswaardig geprijsd, maar de directe relatieve-sterkteanalyse is onvolledig",
-    "Upgrade challenger to valuation-grade pricing before any funding decision.": "Verbeter de prijsbevestiging van het alternatief tot waarderingskwaliteit vóór een allocatiebesluit.",
-    "Upgrade challenger to valuation-grade pricing before any funding decision": "Verbeter de prijsbevestiging van het alternatief tot waarderingskwaliteit vóór een allocatiebesluit",
-}
+# Legacy safety overlays for reports that are not natively rendered in Dutch.
+# Native Dutch reports remain guard-only; do not broaden this path into a new
+# English-to-Dutch translation layer.
+PARTIAL_MIXED_EXACT_CLEANUPS = contract.PARTIAL_MIXED_EXACT_CLEANUPS
+REPLACEMENT_DUEL_PHRASE_CLEANUPS = contract.REPLACEMENT_DUEL_PHRASE_CLEANUPS
 
 
 def is_native_dutch_report(text: str) -> bool:
@@ -101,7 +82,7 @@ def _clean_runtime_artifacts(text: str) -> str:
 
 
 def _clean_client_language(text: str) -> str:
-    text = _replace_longest_first(text, term.EXACT_CLIENT_LANGUAGE_REPLACEMENTS)
+    text = _replace_longest_first(text, contract.CLIENT_SURFACE_EXACT_REPLACEMENTS)
     text = _replace_longest_first(text, CLIENT_LANGUAGE_CLEANUPS)
     for pattern, replacement in term.REGEX_CLIENT_LANGUAGE_REPLACEMENTS:
         text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
