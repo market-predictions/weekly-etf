@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 
 from runtime import nl_terminology as term
+from runtime import nl_terminology_contract as contract
 from runtime.apply_nl_localization import is_native_dutch_report
 from runtime.nl_table_section_mappings import apply_table_section_mappings, TABLE_SECTION_FORBIDDEN_AFTER_SCRUB
 
@@ -13,141 +14,30 @@ NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 
 # Client-facing Dutch scrub layer.
 #
-# Broad replacements are now legacy-only. Native Dutch runtime reports are
+# Broad replacements are legacy-only. Native Dutch runtime reports are
 # independently constructed from the same runtime state/key figures as the English
 # report, so this module must not broadly rewrite them. For native reports it only
 # validates/guards against leakage and malformed Dutch tokens.
 
-EXACT_REPLACEMENTS = {
-    **term.REPORT_LABELS,
-    **term.TABLE_LABELS,
-    **term.ACTION_REPLACEMENTS,
-    **term.EXACT_CLIENT_LANGUAGE_REPLACEMENTS,
-    "Wednesday, 13 May 2026": "Woensdag 13 mei 2026",
-    "PRIMARY REGIME": "PRIMAIR REGIME",
-    "Primary regime": "Primair regime",
-    "GEOPOLITICAL REGIME": "GEOPOLITIEK REGIME",
-    "Geopolitical regime": "Geopolitiek regime",
-    "MAIN TAKEAWAY": "KERNCONCLUSIE",
-    "Main takeaway": "Kernconclusie",
-    "Risk-on smal marktleiderschap\n(72% confidence)": "Risk-on met smal marktleiderschap\n(72% vertrouwen)",
-    "(72% confidence)": "(72% vertrouwen)",
-    "Mixed / not yet decisive": "Gemengd / nog niet doorslaggevend",
-    "Keep the current allocation\ndisciplined.": "Houd de huidige allocatie\ngedisciplineerd.",
-    "Keep the current allocation disciplined.": "Houd de huidige allocatie gedisciplineerd.",
-    "WAT VERANDERDE THIS WEEK": "WAT VERANDERDE DEZE WEEK",
-    "Investment Report": "Beleggersrapport",
-    "Investor Report": "Beleggersrapport",
-    "Analyst Report": "Analistenrapport",
-    "WEEKLY ETF REVIEW": "WEKELIJKSE ETF-REVIEW",
-    "Weekly ETF Review": "Wekelijkse ETF-review",
-    "WEEKLY ETF PRO REVIEW": "WEKELIJKSE ETF-REVIEW",
-    "Weekly ETF Pro Review": "Wekelijkse ETF-review",
-    "new allocation vraagt": "nieuwe allocaties vragen",
-    "macrosteun": "steun vanuit het macrobeeld",
-    "Best verdiende exposure": "Best onderbouwde blootstelling",
-    "Actiebias": "Beslissingsrichting",
-    "Status portefeuillecurve: Aangesloten op sectie 15 with full valuation history": "Status portefeuillecurve: aangesloten op sectie 15 met volledige waarderingshistorie",
-    "with full valuation history": "met volledige waarderingshistorie",
-    "GLD remains a hedge review, not an unquestioned ballast position.": "De hedgefunctie blijft onder herbeoordeling en is geen vanzelfsprekende stabilisator.",
-    "PPA en PAVE remain replaceable until their ETF implementation quality is proven.": "PPA en PAVE blijven vervangbaar totdat de kwaliteit van de ETF-implementatie is bewezen.",
-    "Neen-U.S. equity exposure remains a diversification gap.": "Niet-Amerikaanse aandelenblootstelling blijft een diversificatiekloof.",
-    "Neen-U.S.": "Niet-Amerikaanse",
-    "Non-U.S.": "Niet-Amerikaanse",
-    "non-U.S.": "niet-Amerikaanse",
-    "ETF-positieperformance": "Rendement huidige ETF-posities",
-    "Performance wordt berekend": "Rendement wordt berekend",
-    "SPDR Gold Aantal aandelen": "SPDR Gold Shares",
-    "Vers kapitaal": "Nieuw kapitaal",
-    "Smaller / under review": "Kleiner / onder herbeoordeling",
-    "No / under review": "Nee / onder herbeoordeling",
-    "Force alternative duel; upgrade, reduce, replace, or close": "Vervangingsanalyse vereist; verhoog, verlaag, vervang of sluit",
-    "Run hedge validity test and compare with alternatives": "Voer een hedge-validiteitstest uit en vergelijk met alternatieven",
-    "Nieuw weight": "Nieuw gewicht",
-    "Aanhouden under hedge-validity review": "Aanhouden, onder hedge-validiteitsreview",
-    "onder hedge-validity review": "onder hedge-validiteitsreview",
-    "Toevoegened": "Toegevoegd",
-    "Verlagend": "Verlaagd",
-    "Sluitend": "Gesloten",
-    "Neeg geen": "Geen",
-    "Neeg Geen": "Geen",
-    "Neeg": "Nee",
-    "Neene unless explicit state says otherwise.": "Geen, tenzij de expliciete portefeuillestaat anders aangeeft.",
-    "Neene": "Geen",
-    "Section 14": "sectie 14",
-}
+EXACT_REPLACEMENTS = contract.CLIENT_SURFACE_EXACT_REPLACEMENTS
 
 # Narrow structured-state labels that may still appear inside native Dutch tables
 # when the runtime state carries English enum/display names. This is not a broad
 # translation pass over prose; it is a deterministic runtime-label alias map.
-NATIVE_STATE_LABEL_REPLACEMENTS = {
-    "Healthcare quality and defensive growth": "Healthcarekwaliteit en defensieve groei",
-    "Non-U.S. developed market diversification": "Ontwikkelde markten buiten de VS",
-    "Non-U.S. developed diversification": "Ontwikkelde markten buiten de VS",
-    "Latest 4 mei close basis; +8 SMH from cash": "Laatste slotkoersbasis van 4 mei; +8 SMH vanuit cash",
-    "Latest 4 May close basis; +8 SMH from cash": "Laatste slotkoersbasis van 4 mei; +8 SMH vanuit cash",
-    "Runtime valuation from immutable pricing audit and explicit portfolio state": "Waardering uit onveranderlijke prijsaudit en expliciete portefeuillestaat",
-    "Runtime valuation repriced from official portfolio-state shares": "Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen",
-    "Rotation destination": "Rotatiebestemming",
-    "No / under review": "Nee / onder herbeoordeling",
-    "Smaller / under review": "Kleiner / onder herbeoordeling",
-    "| Long |": "| Longpositie |",
-}
+NATIVE_STATE_LABEL_REPLACEMENTS = contract.NATIVE_STATE_LABEL_REPLACEMENTS
 
-NATIVE_REGEX_REPLACEMENTS = [
-    (
-        re.compile(r"\[GLD\]\([^\)]*\)\s+moet bewijzen dat het nog steeds een stabiliserende hedgefunctie heeft", re.I),
-        "de hedgefunctie moet bewijzen dat zij nog steeds stabiliseert",
-    ),
-    (
-        re.compile(r"\bGLD\s+moet bewijzen dat het nog steeds een stabiliserende hedgefunctie heeft", re.I),
-        "de hedgefunctie moet bewijzen dat zij nog steeds stabiliseert",
-    ),
-    (
-        re.compile(r"\[GLD\]\([^\)]*\)\s+blijft een hedgepositie onder herbeoordeling en is geen vanzelfsprekende stabilisator", re.I),
-        "De hedgefunctie blijft onder herbeoordeling en is geen vanzelfsprekende stabilisator",
-    ),
-    (
-        re.compile(r"\bGLD\s+blijft een hedgepositie onder herbeoordeling en is geen vanzelfsprekende stabilisator", re.I),
-        "De hedgefunctie blijft onder herbeoordeling en is geen vanzelfsprekende stabilisator",
-    ),
-    (
-        re.compile(r"\|\s*Herbeoordeling goudhedge\s*\|\s*(?:\[GLD\]\([^\)]*\)|GLD)\s*\|\s*(?:\[GSG\]\([^\)]*\)|GSG)\s*/\s*(?:\[BIL\]\([^\)]*\)|BIL)\s*\|\s*Hedgefunctie moet worden bewezen\.\s*\|\s*Onder herbeoordeling\s*\|", re.I),
-        "| Herbeoordeling grondstoffenhedge | GSG | DBC / BIL | De huidige grondstoffenbrede hedgefunctie moet worden bewezen tegenover cash en alternatieven. | Onder herbeoordeling |",
-    ),
-]
+NATIVE_REGEX_REPLACEMENTS = contract.NATIVE_REGEX_REPLACEMENTS
 
 REGEX_REPLACEMENTS = [
-    *[(re.compile(pattern, re.I), replacement) for pattern, replacement in term.REGEX_CLIENT_LANGUAGE_REPLACEMENTS],
-    (re.compile(r"\bnot\s+fundable\b", re.I), "niet geschikt voor allocatie"),
-    (re.compile(r"\bfunding\s+source\b", re.I), "financieringsbron"),
-    (re.compile(r"\bfunding\s+note\b", re.I), "allocatietoelichting"),
-    (re.compile(r"\bfunding\s+candidates\b", re.I), "allocatiekandidaten"),
-    (re.compile(r"\bfunding\s+challengers\b", re.I), "allocatie naar alternatieven"),
-    (re.compile(r"\bbefore\s+funding\b", re.I), "vóór allocatie"),
-    (re.compile(r"\bafter\s+funding\b", re.I), "na allocatie"),
-    (re.compile(r"\bfundable\b", re.I), "geschikt voor allocatie"),
-    (re.compile(r"\bfunding\b", re.I), "allocatie"),
-    (re.compile(r"\bbut\s+treat\b", re.I), "maar behandel"),
-    (re.compile(r"\bbut\b", re.I), "maar"),
+    *[(re.compile(pattern, re.I), replacement) for pattern, replacement in contract.REGEX_CLIENT_LANGUAGE_REPLACEMENTS],
     (re.compile(r"\bas\s+(posities|positie|thema’s|themas|kandidaten|alternatieven)\b", re.I), r"als \1"),
     (re.compile(r"\band\s+(GLD|PAVE|PPA|SPY|SMH|URNM|cash|koersbevestiging|vervangingsbeslissingen)\b", re.I), r"en \1"),
     (re.compile(r"\b([A-Z]{2,6}(?:,\s*[A-Z]{2,6})+)\s+and\s+([A-Z]{2,6})\b"), lambda match: f"{match.group(1)} en {match.group(2)}"),
-    (re.compile(r"\bNe+ne\b", re.I), "Geen"),
-    (re.compile(r"\bNeeg\b", re.I), "Nee"),
-    (re.compile(r"\bNone\b"), "Geen"),
-    (re.compile(r"\bHold\b"), "Aanhouden"),
-    (re.compile(r"\bAdd\b"), "Toevoegen"),
-    (re.compile(r"\bReduce\b"), "Verlagen"),
-    (re.compile(r"\bClose\b"), "Sluiten"),
-    (re.compile(r"\bExisting\b"), "Bestaand"),
-    (re.compile(r"\bYes\b"), "Ja"),
-    (re.compile(r"\bNo\b"), "Nee"),
     (re.compile(r"###\s*Aanhouden\s+(?:but|maar)\s+replaceable", re.I), "### Aanhouden, maar vervangbaar"),
     (re.compile(r"###\s*Hold\s+but\s+replaceable", re.I), "### Aanhouden, maar vervangbaar"),
 ]
 
-FORBIDDEN_AFTER_SCRUB = sorted(set(term.FORBIDDEN_AFTER_SCRUB + [
+FORBIDDEN_AFTER_SCRUB = sorted(set(term.FORBIDDEN_AFTER_SCRUB + contract.NATIVE_STATE_LABEL_FORBIDDEN + [
     "Healthcare quality and defensive growth",
     "fundable",
     "funding",
