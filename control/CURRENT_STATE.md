@@ -11,7 +11,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, a completed report-surface cleanup cycle verified by the same run, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, WP3 macro promotion decision contract merged, and WP4 Dutch/bilingual alias consolidation started with a focused regression guard. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, or delivery authority.**
+**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, a completed report-surface cleanup cycle verified by the same run, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, WP3 macro promotion decision contract merged, WP4 Dutch/bilingual alias consolidation started with a focused regression guard, and WP5 direct challenger-vs-current-holding scoring implemented as diagnostic-only evidence. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, or delivery authority. WP5 replacement-edge scoring is also non-authoritative and does not grant portfolio-action, lane-scoring, fundability, funding, portfolio-mutation, or production-recommendation authority.**
 
 ## What this repository currently is
 
@@ -30,6 +30,7 @@ market-predictions/weekly-etf
 - shadow-first macro/thesis roadmap controls
 - WP1, WP2 and WP3 deterministic macro regime promotion-preparation gates implemented, while production authority remains blocked
 - WP4 Dutch terminology consolidation started with a regression guard; full alias consolidation remains open
+- WP5 replacement-edge scoring implemented as a diagnostic-only decision-framework/input-state artifact path
 
 ## Latest production and report-surface evidence
 
@@ -260,6 +261,54 @@ production_delivery_authority_unchanged=true
 inbox_receipt_claims_unchanged=true
 ```
 
+## Replacement-edge / challenger-vs-current status
+
+### WP5 — Direct challenger-vs-current-holding scoring
+
+```text
+status: implemented as diagnostic-only scoring package
+files:
+  runtime/map_challenger_to_current_holding.py
+  runtime/score_replacement_edge.py
+  tools/validate_replacement_edge_scoring.py
+  tests/test_replacement_edge_scoring.py
+  output/replacement_edges/replacement_edge_20260606_000000.json
+reported focused test: python -m pytest tests/test_replacement_edge_scoring.py -q = 4 passed
+reported artifact validation: REPLACEMENT_EDGE_SCORING_OK
+```
+
+WP5 maps challenger lanes to plausible current holdings, computes direct 1m and 3m relative-strength edge, computes drawdown and volatility edge where data exists, writes a diagnostic-only replacement-edge artifact, and validates that artifact.
+
+Required artifact fields include:
+
+```text
+current_holding
+challenger
+1m_relative_strength_edge
+3m_relative_strength_edge
+drawdown_edge
+volatility_edge
+replacement_edge_score
+diagnostic_only=true
+portfolio_action_authority=false
+fundability_authority=false
+lane_scoring_authority=false
+```
+
+Top-level authority boundaries:
+
+```text
+diagnostic_only=true
+portfolio_action_authority=false
+fundability_authority=false
+lane_scoring_authority=false
+funding_authority=false
+portfolio_mutation=false
+production_recommendation_authority=false
+```
+
+The sample artifact is review evidence only. It does not create automatic trades, mutate portfolio state, grant funding authority, grant fundability authority, grant lane-scoring authority, grant production recommendation authority, promote deterministic macro logic, or feed into live trade decisions.
+
 ## Four-layer operating status
 
 ### 1. Decision framework
@@ -269,7 +318,8 @@ inbox_receipt_claims_unchanged=true
 - Valuation-grade challenger discipline remains active.
 - Guarded model execution with trade-ledger idempotency remains active.
 - Deterministic macro regime, macro axes, WP1 candidate narrative, WP2-passing surfaces, and WP3 promotion artifacts remain non-client-facing and non-authoritative unless explicit future promotion gates pass.
-- Green compliance/validator status never equals production promotion by itself.
+- WP5 replacement-edge scoring is diagnostic-only and does not create portfolio-action, lane-scoring, fundability, funding, mutation, or production-recommendation authority.
+- Green compliance/validator status never equals production promotion or trade authority by itself.
 
 ### 2. Input/state contract
 
@@ -298,6 +348,14 @@ fixtures/macro_promotion/*.json
 control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
 ```
 
+Replacement-edge artifacts are diagnostic-only input/state artifacts:
+
+```text
+output/replacement_edges/replacement_edge_<run_id>.json
+```
+
+They may support future review of replacement-duel notes, but they are not fundability, lane-scoring, trade, funding, or recommendation authority.
+
 ### 3. Output contract
 
 - English is the canonical analytical report.
@@ -310,6 +368,7 @@ control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
 - WP1 deterministic macro narrative candidates must not appear in client-facing reports until WP2 and WP3 gates plus explicit future promotion pass.
 - WP2 validates wording/parity safety only.
 - WP3 defines the decision contract for narrative authority only; it does not grant portfolio, lane, fundability, funding, mutation or delivery authority.
+- WP5 diagnostic replacement-edge output must not appear as a production recommendation unless a later explicit integration and authority decision permits it.
 
 ### 4. Operational runbook
 
@@ -352,6 +411,20 @@ send-time enum/localization defect → fix delivery runtime / shared localizatio
 validator gap → add or tighten relevant pre-send gate
 ```
 
+WP5 operation is separate from production execution:
+
+```text
+output/lane_reviews/etf_lane_assessment_<date>.json
++ output/market_history/etf_relative_strength.json
++ output/etf_portfolio_state.json
+→ runtime/map_challenger_to_current_holding.py
+→ runtime/score_replacement_edge.py
+→ output/replacement_edges/replacement_edge_<run_id>.json
+→ tools/validate_replacement_edge_scoring.py
+```
+
+This path is diagnostic/review-only and must not mutate the production report or portfolio.
+
 ## Immediate priorities
 
 ### Priority A — preserve pricing-lineage and delivery-evidence discipline
@@ -366,13 +439,6 @@ The regression guard is in place. The remaining cleanup is to move repeated/migr
 
 WP1, WP2 and WP3 are now complete. Deterministic macro regime still remains shadow-only. The next macro step may be a controlled client-surface pilot only if it remains non-portfolio-authoritative and explicitly respects WP2/WP3.
 
-### Priority D — direct challenger-vs-current-holding scoring
+### Priority D — decide how to consume WP5 diagnostics
 
-Add diagnostic replacement-edge scoring as a future model enhancement:
-
-```text
-map challenger lanes to current holdings
-compute direct 1m/3m relative strength edge
-include drawdown/volatility edge
-feed diagnostic result into replacement-duel notes
-```
+WP5 diagnostic replacement-edge scoring is implemented. A future package may integrate it into replacement-duel notes or the current-position review surface, but only as diagnostic evidence unless a separate authority decision grants lane-scoring, fundability, or recommendation use.
