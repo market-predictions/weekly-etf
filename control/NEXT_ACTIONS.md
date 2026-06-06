@@ -56,68 +56,23 @@
   WP5 — Direct challenger-vs-current-holding scoring: completed / diagnostic-only
   WP6 — Latest-run manifest / delivery evidence reconciliation: completed
   WP7 — Deterministic macro regime client-surface pilot: completed / non-authoritative / not promoted
-  WP8 — Macro old-vs-new review evidence package: implementation present / validation pending
+  WP8 — Macro old-vs-new review evidence package: completed / ready_for_narrative_promotion_review / not promoted
   ```
 - Action:
   - preserve the split between runtime provenance and post-execution official portfolio state
-  - do not repair strict branded sections through markdown post-processing
-  - keep delivery-runtime localization for strict PDF/HTML panels
   - keep WP1 macro shadow narrative as comparison/review evidence only
   - keep WP2 macro client-surface/parity validation as a safety gate only, not promotion authority
   - keep WP3 as narrative-promotion decision contract only, not portfolio/lane/fundability authority
-  - keep WP4 as output-contract/runtime cleanup only; it does not grant macro, delivery, portfolio, lane-scoring, fundability, funding, mutation, or receipt authority
-  - keep WP5 replacement-edge scoring diagnostic-only until an explicit future authority/integration decision changes that
   - keep WP7 macro client-surface pilot preview-only until an explicit future WP3-compliant promotion decision changes that
-  - keep WP8 old-vs-new review as evidence only until validation passes and a separate WP9 promotion artifact is explicitly requested
+  - keep WP8 old-vs-new review as evidence only; it is not promotion and does not mutate production reports
+  - keep WP5 replacement-edge scoring diagnostic-only until an explicit future authority/integration decision changes that
   - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, macro client-surface validation evidence, macro-promotion decision evidence, Dutch terminology validation evidence, replacement-edge evidence, pilot-preview evidence, old-vs-new review evidence, and inbox receipt distinct
 
 ---
 
-## Phase 2 — Dutch quality and alias cleanup
+## Phase 2 — macro roadmap gates
 
-### 2. WP4 — Dutch / bilingual alias consolidation
-
-- Owner: `[JOINT]`
-- Status: completed / validated
-- Evidence:
-  ```text
-  runtime/nl_terminology_contract.py
-  runtime/nl_localization.py
-  runtime/apply_nl_localization.py
-  runtime/scrub_nl_client_language.py
-  runtime/client_facing_sanitizer.py
-  tools/validate_etf_dutch_language_quality.py
-  tests/test_dutch_terminology_contract.py
-  final worker commit: 0ac46cfde1b57299e5523b60d92b415c161d5a28
-  follow-up fix commit: 661764692127f03af21e6fc961dfabddaf6a9ab5
-  ```
-- Validation evidence from Codespaces on main after `git pull` to `6617646`:
-  ```bash
-  python -m pytest tests/test_dutch_terminology_contract.py -q
-  # 5 passed in 0.04s
-
-  python tools/validate_etf_dutch_language_quality.py
-  # ETF_DUTCH_LANGUAGE_QUALITY_OK | report=weekly_analysis_pro_nl_260604_11.md | terminology=central
-
-  python tools/validate_etf_delivery_html_contract.py
-  # ETF_DELIVERY_HTML_CONTRACT_OK | report=weekly_analysis_pro_260604_11.md | dynamic_holdings=CIBR,DFEN,GSG,IEFA,PAVE,SMH,SPY,URNM,XLU | post_execution=True
-  # ETF_DELIVERY_HTML_CONTRACT_OK | report=weekly_analysis_pro_nl_260604_11.md | dynamic_holdings=CIBR,DFEN,GSG,IEFA,PAVE,SMH,SPY,URNM,XLU | post_execution=True
-  ```
-- Boundary:
-  - no pricing change
-  - no portfolio-state change
-  - no trade-ledger or valuation-history change
-  - no lane-scoring change
-  - no fundability change
-  - no deterministic macro promotion
-  - no production delivery authority change
-  - no inbox receipt claim
-
----
-
-## Phase 3 — macro roadmap gates
-
-### 3. WP1 — Deterministic macro narrative shadow candidate
+### 2. WP1 — Deterministic macro narrative shadow candidate
 
 - Status: completed as shadow-only comparison path / not promoted
 - Remaining action:
@@ -125,14 +80,14 @@
   - do not insert candidate wording into the report without WP2/WP3 and explicit promotion
   - do not feed it into portfolio actions, lane scoring, fundability, or delivery logic
 
-### 4. WP2 — Macro narrative compliance and bilingual parity gate
+### 3. WP2 — Macro narrative compliance and bilingual parity gate
 
 - Status: completed as output-contract safety gate / not promoted
 - Remaining action:
   - keep as an active regression gate for any future macro narrative candidate
   - do not interpret a WP2 pass as promotion authority
 
-### 5. WP3 — Macro promotion decision contract
+### 4. WP3 — Macro promotion decision contract
 
 - Status: completed / merged / not promoted
 - Evidence:
@@ -151,11 +106,9 @@
 - Remaining action:
   - keep deterministic macro regime shadow-only unless a future artifact satisfies the promotion contract
   - do not interpret WP3 merge as report narrative promotion
-  - do not grant portfolio-action, lane-scoring, fundability, funding, mutation or delivery authority through WP3
 
-### 6. WP7 — Deterministic macro regime client-surface pilot
+### 5. WP7 — Deterministic macro regime client-surface pilot
 
-- Owner: `[ASSISTANT]`
 - Status: completed as controlled non-authoritative pilot / not promoted
 - Evidence:
   ```text
@@ -170,9 +123,6 @@
 - Authority boundaries:
   ```text
   wp3_promotion_status=not_promoted
-  client_surface_pilot=true
-  client_facing=false
-  production_report=false
   production_report_narrative_authority=false
   portfolio_action_authority=false
   lane_scoring_authority=false
@@ -181,15 +131,10 @@
   portfolio_mutation=false
   production_report_mutation=false
   ```
-- Remaining action:
-  - review pilot artifact as preview evidence only
-  - do not treat WP7 as production report narrative integration
-  - do not mutate report or delivery workflow without explicit future promotion/integration decision
 
-### 7. WP8 — Macro old-vs-new review evidence package
+### 6. WP8 — Macro old-vs-new review evidence package
 
-- Owner: `[JOINT]`
-- Status: implementation present / validation pending
+- Status: completed / validated / not promoted
 - Evidence:
   ```text
   runtime/build_macro_old_vs_new_review_package.py
@@ -198,10 +143,13 @@
   output/macro/review/macro_old_vs_new_review_20260605_000000.json
   review_status: ready_for_narrative_promotion_review
   ```
-- Required validation:
+- Validation evidence from Codespaces on `main` after `git pull` to `e301c26`:
   ```bash
   python -m pytest tests/test_macro_old_vs_new_review_package.py -q
+  # 5 passed in 0.08s
+
   python tools/validate_macro_old_vs_new_review_package.py output/macro/review/macro_old_vs_new_review_20260605_000000.json
+  # MACRO_OLD_VS_NEW_REVIEW_OK | artifact=output/macro/review/macro_old_vs_new_review_20260605_000000.json | review_status=ready_for_narrative_promotion_review | production_report_narrative_authority=false | portfolio_action_authority=false | lane_scoring_authority=false | fundability_authority=false | funding_authority=false | portfolio_mutation=false
   ```
 - Boundary:
   - review evidence only
@@ -215,13 +163,47 @@
   - portfolio_mutation=false
   - delivery_authority=false
 
-### 8. WP9 — Controlled narrative promotion artifact
+### 7. WP9 — Controlled narrative promotion artifact
 
 - Owner: `[JOINT]`
-- Status: blocked until WP8 validation passes and explicit promotion-artifact work is requested
+- Status: next possible macro package, blocked until explicitly requested
+- Goal:
+  - create a WP3-compatible promotion decision artifact using WP7 pilot and WP8 old-vs-new review evidence
+  - artifact may still be `not_promoted`; do not assume promotion
 - Boundary:
-  - use WP3 contract
-  - even if narrative authority is promoted later, portfolio-action, lane-scoring, fundability, funding and mutation authority remain false unless separately promoted
+  - even if narrative authority is promoted later, portfolio-action, lane-scoring, fundability, funding, and mutation authority remain false unless separately promoted
+  - no production report mutation unless explicitly requested after a valid promotion decision artifact exists
+
+---
+
+## Phase 3 — Dutch quality and alias cleanup
+
+### 8. WP4 — Dutch / bilingual alias consolidation
+
+- Status: completed / validated
+- Evidence:
+  ```text
+  runtime/nl_terminology_contract.py
+  runtime/nl_localization.py
+  runtime/apply_nl_localization.py
+  runtime/scrub_nl_client_language.py
+  runtime/client_facing_sanitizer.py
+  tools/validate_etf_dutch_language_quality.py
+  tests/test_dutch_terminology_contract.py
+  final worker commit: 0ac46cfde1b57299e5523b60d92b415c161d5a28
+  follow-up fix commit: 661764692127f03af21e6fc961dfabddaf6a9ab5
+  ```
+- Validation evidence from Codespaces:
+  ```bash
+  python -m pytest tests/test_dutch_terminology_contract.py -q
+  # 5 passed in 0.04s
+
+  python tools/validate_etf_dutch_language_quality.py
+  # ETF_DUTCH_LANGUAGE_QUALITY_OK | report=weekly_analysis_pro_nl_260604_11.md | terminology=central
+
+  python tools/validate_etf_delivery_html_contract.py
+  # ETF_DELIVERY_HTML_CONTRACT_OK ... EN and NL
+  ```
 
 ---
 
@@ -229,7 +211,6 @@
 
 ### 9. WP5 — Direct challenger-vs-current-holding scoring
 
-- Owner: `[ASSISTANT]`
 - Status: completed as diagnostic-only scoring package
 - Evidence:
   ```text
@@ -261,10 +242,7 @@
 
 ### 10. Integrate replacement-edge diagnostics into notes, non-authoritative
 
-- Owner: `[JOINT]`
 - Status: possible follow-up, not started
-- Goal:
-  - consume WP5 replacement-edge artifact in replacement-duel notes or review commentary as diagnostic evidence only
 - Boundary:
   - no lane-scoring authority
   - no fundability authority
@@ -273,7 +251,6 @@
 
 ### 11. Use safe report request queue for ChatGPT-initiated fresh reports
 
-- Owner: `[ASSISTANT]`
 - Status: active baseline
 - Action: when the user asks ChatGPT to generate a fresh Weekly ETF Review, create a request file under:
   ```text
