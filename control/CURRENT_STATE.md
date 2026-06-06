@@ -11,7 +11,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, a completed report-surface cleanup cycle verified by the same run, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, and WP3 macro promotion decision contract merged. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, or delivery authority.**
+**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, a completed report-surface cleanup cycle verified by the same run, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, WP3 macro promotion decision contract merged, and WP4 Dutch/bilingual alias consolidation started with a focused regression guard. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, or delivery authority.**
 
 ## What this repository currently is
 
@@ -29,6 +29,7 @@ market-predictions/weekly-etf
 - delivery-manifest evidence linked from the final run manifest
 - shadow-first macro/thesis roadmap controls
 - WP1, WP2 and WP3 deterministic macro regime promotion-preparation gates implemented, while production authority remains blocked
+- WP4 Dutch terminology consolidation started with a regression guard; full alias consolidation remains open
 
 ## Latest production and report-surface evidence
 
@@ -201,6 +202,64 @@ funding_authority=false
 portfolio_mutation=false
 ```
 
+## Dutch / bilingual output-contract status
+
+### WP4 — Dutch / bilingual alias consolidation
+
+```text
+status: partially implemented / regression guard added
+commit: 25dbd2c12167b20c771e3a98188f4f0125470421
+file added:
+  tests/test_dutch_terminology_contract.py
+validation status: broader validation not yet run in this environment
+```
+
+The WP4 regression test protects the current Dutch terminology contract for:
+
+```text
+No / under review → Nee / onder herbeoordeling
+Smaller / under review → Kleiner / onder herbeoordeling
+Hold but replaceable → Aanhouden, maar vervangbaar
+```
+
+It also checks that:
+
+```text
+runtime.nl_terminology remains the shared source for required markers and forbidden client labels
+native Dutch scrub stays guard-only / narrow-alias based
+sitecustomize.py does not own client-facing Dutch enum/status aliases
+```
+
+Full WP4 consolidation is still pending. Known remaining spread-out alias/migration surfaces include:
+
+```text
+runtime/nl_localization.py
+runtime/apply_nl_localization.py
+runtime/scrub_nl_client_language.py
+runtime/delivery_html_overrides.py
+runtime/client_facing_sanitizer.py
+```
+
+Expected validation for the follow-up pass:
+
+```bash
+python tools/validate_etf_dutch_language_quality.py
+python tools/validate_etf_delivery_html_contract.py
+python -m pytest tests/test_dutch_terminology_contract.py -q
+```
+
+Authority boundaries preserved:
+
+```text
+portfolio_state_unchanged=true
+pricing_unchanged=true
+lane_scoring_unchanged=true
+fundability_unchanged=true
+deterministic_macro_promotion_unchanged=true
+production_delivery_authority_unchanged=true
+inbox_receipt_claims_unchanged=true
+```
+
 ## Four-layer operating status
 
 ### 1. Decision framework
@@ -247,6 +306,7 @@ control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
 - Current Position Review / Review huidige posities must show numeric scores for every active ETF position.
 - Dutch delivery-surface enum localization must be enforced at delivery runtime, not only markdown scrub time.
 - Exited-holding wording, especially stale GLD current-surface wording when GLD is not active, must be blocked.
+- WP4 regression guard protects known Dutch enum/localization regressions, but full alias consolidation remains open.
 - WP1 deterministic macro narrative candidates must not appear in client-facing reports until WP2 and WP3 gates plus explicit future promotion pass.
 - WP2 validates wording/parity safety only.
 - WP3 defines the decision contract for narrative authority only; it does not grant portfolio, lane, fundability, funding, mutation or delivery authority.
@@ -298,9 +358,9 @@ validator gap → add or tighten relevant pre-send gate
 
 Do not weaken pricing lineage, manifest, official portfolio-state, or delivery-evidence boundaries. Delivery evidence remains SMTP-send/report-generation evidence unless a real receipt exists.
 
-### Priority B — consolidate Dutch aliases
+### Priority B — complete Dutch alias consolidation
 
-Next cleanup should centralize Dutch terminology/enum aliases so native render, markdown validation, Dutch quality validation, delivery HTML validation, and delivery runtime share one terminology source.
+The regression guard is in place. The remaining cleanup is to move repeated/migration aliases into one shared source so native render, markdown validation, Dutch quality validation, delivery HTML validation, and delivery runtime all use the same terminology contract.
 
 ### Priority C — macro roadmap remains shadow-first and promotion-gated
 
