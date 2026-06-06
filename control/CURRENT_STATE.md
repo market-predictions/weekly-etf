@@ -1,7 +1,7 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-06-05
+2026-06-06
 
 ## Repository
 
@@ -11,7 +11,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**ETF has a production-tested runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for run `20260604_190001`, a completed report-surface cleanup cycle verified after workflow run #216, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, and WP3 macro promotion decision contract merged. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, or delivery authority.**
+**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, a completed report-surface cleanup cycle verified by the same run, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, and WP3 macro promotion decision contract merged. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, or delivery authority.**
 
 ## What this repository currently is
 
@@ -32,7 +32,28 @@ market-predictions/weekly-etf
 
 ## Latest production and report-surface evidence
 
-### Fully recorded production validation baseline
+### Latest fully recorded pricing-lineage + delivery-manifest baseline
+
+```text
+workflow: Send weekly ETF Pro report
+run_number: 216
+trigger_commit: ce86dce050a75c2b21481162ad3b6952ebbdb1e7
+run_id: 20260605_081216
+requested_close_date: 2026-06-04
+workflow_status: workflow_success
+workflow_conclusion: success
+pricing_lineage_status: passed
+report_authority_source: runtime_state
+english_report_path: output/weekly_analysis_pro_260604_10.md
+dutch_report_path: output/weekly_analysis_pro_nl_260604_10.md
+delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-04_20260605_081216.json
+final_run_manifest_path: output/run_manifests/weekly_etf_run_manifest_2026-06-04_20260605_081216.json
+total_portfolio_value_eur: 111105.47
+```
+
+This proves workflow success, pricing-lineage success, final run-manifest linkage to the redaction-safe delivery manifest, and repo-visible SMTP-send evidence for that baseline. It is **not** an end-recipient inbox receipt.
+
+### Previous fully recorded production validation baseline
 
 ```text
 workflow: Send weekly ETF Pro report
@@ -50,9 +71,9 @@ delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-03_
 total_portfolio_value_eur: 111596.96
 ```
 
-This proves workflow success, pricing-lineage success, post-execution report authority, and repo-visible SMTP-send evidence for that baseline. It is **not** an end-recipient inbox receipt.
+This remains a valid earlier production validation baseline and repo-visible SMTP-send evidence. It is **not** an end-recipient inbox receipt.
 
-### Latest visual report-surface cleanup evidence
+### Report-surface cleanup evidence in run #216
 
 ```text
 workflow: Send weekly ETF Pro report
@@ -73,7 +94,7 @@ Dutch delivery enum leakage `No / under review`: fixed
 unwanted `Nee / onder herbeoordeling` surface wording: removed from final report view
 ```
 
-This is report-generation / visual report-surface evidence. It does not replace delivery-manifest or inbox-receipt evidence.
+This cleanup evidence is now reconciled with matching delivery and final run manifests, so run #216 is evidence type B: full pricing-lineage + delivery-manifest baseline. It remains **not** inbox-receipt evidence.
 
 ## Macro roadmap implementation status
 
