@@ -3,53 +3,15 @@ from __future__ import annotations
 import re
 from html import escape
 
+from runtime import nl_terminology_contract as contract
 from runtime.nl_dates import localize_english_report_dates
 
-CLIENT_FACING_TOKEN_REPLACEMENTS = {
-    "Pending classification": "Mixed / not yet decisive",
-    "Placeholder for runtime replacement": "Latest available classified input",
-    "runtime rebuild required": "Latest available classified input",
-    "fresh_cash_smaller_or_review": "Fresh capital only after review or at smaller size",
-    "failed_fresh_cash_test": "Position does not pass the fresh-capital test",
-    "replaceable_status": "Position is under replacement review",
-    "review_age_ge_2": "Review has persisted for multiple report cycles",
-    "review_age_ge_3": "Review has persisted for several report cycles",
-    "role_impaired": "Portfolio role is impaired",
-    "destination from trade_intents": "Proposed destination from the rotation plan",
-    "trade_intents": "proposed trade intents",
-    "target_weights": "target allocations",
-    "rotation_decisions": "rotation decisions",
-    "churn_budget_used": "rotation budget already used",
-    "Reason codes": "Decision rationale",
-    "Redencodes": "Toelichting",
-}
-
-DUTCH_HTML_TOKEN_REPLACEMENTS = {
-    "WEEKLY ETF PRO REVIEW": "WEKELIJKSE ETF-REVIEW",
-    "Weekly ETF Pro Review": "Wekelijkse ETF-review",
-    "WEEKLY ETF REVIEW": "WEKELIJKSE ETF-REVIEW",
-    "Weekly ETF Review": "Wekelijkse ETF-review",
-    "Investor Report": "Beleggersrapport",
-    "Investment Report": "Beleggersrapport",
-    "Analyst Report": "Analistenrapport",
-    "PRIMARY REGIME": "PRIMAIR REGIME",
-    "Primary Regime": "Primair regime",
-    "GEOPOLITICAL REGIME": "GEOPOLITIEK REGIME",
-    "Geopolitical Regime": "Geopolitiek regime",
-    "MAIN TAKEAWAY": "KERNCONCLUSIE",
-    "Main Takeaway": "Kernconclusie",
+CLIENT_FACING_TOKEN_REPLACEMENTS = contract.CLIENT_FACING_TOKEN_REPLACEMENTS
+DUTCH_HTML_TOKEN_REPLACEMENTS = contract.CLIENT_SURFACE_EXACT_REPLACEMENTS | {
     "Risk-on narrow US mega-cap leadership": "Risk-on met smal Amerikaans mega-capleiderschap",
     "Risk-on narrow U.S. mega-cap leadership": "Risk-on met smal Amerikaans mega-capleiderschap",
     "Risk-on narrow leadership": "Risk-on met smal marktleiderschap",
     "Risk-on smal marktleiderschap": "Risk-on met smal marktleiderschap",
-    "confidence": "vertrouwen",
-    "Mixed / not yet decisive": "Gemengd / nog niet doorslaggevend",
-    "Keep the current allocation disciplined.": "Houd de huidige allocatie gedisciplineerd.",
-    "Keep the current allocation": "Houd de huidige allocatie",
-    "This report is for informational and educational purposes only; please see the disclaimer at the end.": "Dit rapport wordt uitsluitend verstrekt voor informatieve en educatieve doeleinden; zie de disclaimer aan het einde.",
-    "Equity Curve (EUR)": "Portefeuillecurve (EUR)",
-    "Portfolio value (EUR)": "Portefeuillewaarde (EUR)",
-    "Date": "Datum",
     "Fresh capital only after review or at smaller size": "Nieuw kapitaal alleen kleiner of na herbeoordeling inzetten",
     "Position does not pass the fresh-capital test": "Positie voldoet niet aan de vers-kapitaaltoets",
     "Position is under replacement review": "Positie staat onder vervangingsreview",
@@ -61,73 +23,9 @@ DUTCH_HTML_TOKEN_REPLACEMENTS = {
     "rotation budget already used": "rotatiebudget is al gebruikt",
     "Decision rationale": "Toelichting",
 }
-
-DUTCH_MD_MARKERS = [
-    "kernsamenvatting",
-    "portefeuille-acties",
-    "huidige posities",
-    "beleggersrapport",
-    "wekelijks",
-    "wekelijkse etf-review",
-    "primair regime",
-    "geopolitiek regime",
-    "kernconclusie",
-    "dit rapport wordt uitsluitend verstrekt",
-]
-
-ENGLISH_MD_MARKERS = [
-    "executive summary",
-    "portfolio action snapshot",
-    "current portfolio holdings and cash",
-    "weekly etf review",
-    "weekly etf pro review",
-    "investor report",
-    "primary regime",
-    "main takeaway",
-    "this report is for informational",
-]
-
-DUTCH_DELIVERY_FORBIDDEN_TOKENS = [
-    "Wednesday,",
-    "Thursday,",
-    "Friday,",
-    "Saturday,",
-    "Sunday,",
-    "Monday,",
-    "Tuesday,",
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-    "PRIMARY REGIME",
-    "GEOPOLITICAL REGIME",
-    "MAIN TAKEAWAY",
-    "Investor Report",
-    "Investment Report",
-    "Analyst Report",
-    "Mixed / not yet decisive",
-    "Keep the current allocation",
-    "confidence",
-    "Equity Curve (EUR)",
-    "Portfolio value (EUR)",
-    "fresh_cash_smaller_or_review",
-    "failed_fresh_cash_test",
-    "replaceable_status",
-    "review_age_ge_2",
-    "review_age_ge_3",
-    "churn_budget_used",
-    "trade_intents",
-    "target_weights",
-    "rotation_decisions",
-]
+DUTCH_MD_MARKERS = contract.DUTCH_MD_MARKERS
+ENGLISH_MD_MARKERS = contract.ENGLISH_MD_MARKERS
+DUTCH_DELIVERY_FORBIDDEN_TOKENS = contract.DUTCH_DELIVERY_FORBIDDEN_TOKENS
 
 RAW_MARKDOWN_LINK_RE = re.compile(r"\[([A-Z][A-Z0-9.-]{0,14})\]\((https?://[^\s\)]+)\)")
 TICKER_REF_RE = r"(?:\[[^\]]+\]\([^\)]+\)|<a\b[^>]*>\s*[A-Z][A-Z0-9.-]*\s*</a>|[A-Z][A-Z0-9.-]*)"
