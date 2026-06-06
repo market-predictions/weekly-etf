@@ -11,7 +11,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, a completed report-surface cleanup cycle verified by the same run, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, WP3 macro promotion decision contract merged, WP4 Dutch/bilingual alias consolidation completed and validated, WP5 direct challenger-vs-current-holding scoring implemented as diagnostic-only evidence, WP7 deterministic macro regime client-surface pilot implemented as non-authoritative preview evidence, and WP8 macro old-vs-new review evidence completed with `review_status=ready_for_narrative_promotion_review`. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, or delivery authority.**
+**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, a completed report-surface cleanup cycle verified by the same run, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, WP3 macro promotion decision contract merged, WP4 Dutch/bilingual alias consolidation completed and validated, WP5 direct challenger-vs-current-holding scoring implemented as diagnostic-only evidence, WP7 deterministic macro regime client-surface pilot implemented as non-authoritative preview evidence, WP8 macro old-vs-new review evidence completed with `review_status=ready_for_narrative_promotion_review`, and WP9 controlled deterministic macro narrative promotion artifact completed with `status=not_promoted`. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, delivery authority, execution authority, or production report mutation.**
 
 ## What this repository currently is
 
@@ -28,7 +28,7 @@ market-predictions/weekly-etf
 - hard pricing-lineage validation before send
 - delivery-manifest evidence linked from the final run manifest
 - shadow-first macro/thesis roadmap controls
-- WP1, WP2, WP3, WP7, and WP8 deterministic macro regime promotion-preparation / review gates implemented, while production authority remains blocked
+- WP1, WP2, WP3, WP7, WP8, and WP9 deterministic macro regime promotion-preparation / review / decision gates implemented, while production authority remains blocked
 - WP4 Dutch terminology consolidation completed with a shared terminology contract and focused validation
 - WP5 replacement-edge scoring implemented as a diagnostic-only decision-framework/input-state artifact path
 
@@ -203,7 +203,43 @@ python tools/validate_macro_old_vs_new_review_package.py output/macro/review/mac
 # MACRO_OLD_VS_NEW_REVIEW_OK | artifact=output/macro/review/macro_old_vs_new_review_20260605_000000.json | review_status=ready_for_narrative_promotion_review | production_report_narrative_authority=false | portfolio_action_authority=false | lane_scoring_authority=false | fundability_authority=false | funding_authority=false | portfolio_mutation=false
 ```
 
-WP8 is review evidence only. It is **not** promotion and does not mutate the production report, delivery workflow, portfolio state, lane scoring, fundability, funding, or portfolio actions. WP9 remains required before any narrative promotion decision can be recorded.
+WP8 is review evidence only. It is **not** promotion and does not mutate the production report, delivery workflow, portfolio state, lane scoring, fundability, funding, or portfolio actions.
+
+### WP9 — Controlled deterministic macro narrative promotion artifact
+
+```text
+status: completed / validated / not_promoted
+files:
+  output/macro/promotion/macro_regime_promotion_decision_20260605_000000.json
+  tests/test_macro_regime_promotion_decision_artifact.py
+local artifact validation: python tools/validate_macro_regime_promotion_contract.py output/macro/promotion/macro_regime_promotion_decision_20260605_000000.json = MACRO_REGIME_PROMOTION_CONTRACT_OK
+local focused test: python -m pytest tests/test_macro_regime_promotion_decision_artifact.py -q = 4 passed
+```
+
+WP9 records the control-layer promotion decision as:
+
+```text
+status=not_promoted
+client_facing_narrative_authority=false
+production_report_narrative_authority=false
+control_layer_decision=not_promoted
+explicit_control_layer_promotion_decision=false
+```
+
+Authority boundaries:
+
+```text
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+funding_authority=false
+portfolio_mutation=false
+delivery_authority=false
+execution_authority=false
+production_report_mutation=false
+```
+
+WP9 does **not** integrate deterministic macro wording into the live production report. A separate explicit promotion decision and separate report-integration work package remain required before production report output changes.
 
 ## Dutch / bilingual output-contract status
 
@@ -248,8 +284,6 @@ reported focused test: python -m pytest tests/test_replacement_edge_scoring.py -
 reported artifact validation: REPLACEMENT_EDGE_SCORING_OK
 ```
 
-WP5 maps challenger lanes to plausible current holdings, computes direct 1m and 3m relative-strength edge, computes drawdown and volatility edge where data exists, writes a diagnostic-only replacement-edge artifact, and validates that artifact.
-
 Top-level authority boundaries:
 
 ```text
@@ -272,8 +306,9 @@ The sample artifact is review evidence only. It does not create automatic trades
 - Broad lane discovery remains active.
 - Valuation-grade challenger discipline remains active.
 - Guarded model execution with trade-ledger idempotency remains active.
-- Deterministic macro regime, macro axes, WP1 candidate narrative, WP2-passing surfaces, WP3 promotion artifacts, WP7 pilot previews, and WP8 old-vs-new review evidence remain non-client-facing and non-authoritative unless explicit future promotion gates pass.
+- Deterministic macro regime, macro axes, WP1 candidate narrative, WP2-passing surfaces, WP3 contract, WP7 pilot preview, WP8 old-vs-new review evidence, and WP9 promotion decision artifact remain non-client-facing and non-authoritative unless explicit future promotion gates pass.
 - WP8 says the pilot is `ready_for_narrative_promotion_review`, not promoted.
+- WP9 explicitly records `status=not_promoted`.
 - WP5 replacement-edge scoring is diagnostic-only and does not create portfolio-action, lane-scoring, fundability, funding, mutation, or production-recommendation authority.
 - Green compliance/validator status never equals production promotion or trade authority by itself.
 
@@ -295,12 +330,13 @@ output/market_history/etf_relative_strength.json
 output/macro/latest.json
 ```
 
-Macro promotion-preparation artifacts are review/audit/control artifacts only:
+Macro promotion-preparation / review / decision artifacts are review/audit/control artifacts only:
 
 ```text
 output/macro/shadow_narrative/macro_regime_shadow_narrative_<run_id>.json
 output/macro/pilot/macro_regime_client_surface_pilot_<run_id>.json
 output/macro/review/macro_old_vs_new_review_<run_id>.json
+output/macro/promotion/macro_regime_promotion_decision_<run_id>.json
 fixtures/macro_narrative/*.json
 fixtures/macro_promotion/*.json
 control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
@@ -323,9 +359,10 @@ output/replacement_edges/replacement_edge_<run_id>.json
 - WP4 introduced and validated a shared Dutch terminology contract.
 - WP1 deterministic macro narrative candidates must not appear in client-facing reports until WP2 and WP3 gates plus explicit future promotion pass.
 - WP7 deterministic macro client-surface pilot output is preview/review evidence only and must not be treated as production report narrative integration.
-- WP8 old-vs-new review evidence may support a future WP9 promotion artifact, but it is not promotion itself.
+- WP8 old-vs-new review evidence may support a future WP9-style promotion artifact, but it is not promotion itself.
+- WP9 records `status=not_promoted`; deterministic macro wording remains out of the production report path.
 - WP2 validates wording/parity safety only.
-- WP3 defines the decision contract for narrative authority only; it does not grant portfolio, lane, fundability, funding, mutation or delivery authority.
+- WP3 defines the decision contract for narrative authority only; it does not grant portfolio, lane, fundability, funding, mutation, or delivery authority.
 - WP5 diagnostic replacement-edge output must not appear as a production recommendation unless a later explicit integration and authority decision permits it.
 
 ### 4. Operational runbook
@@ -390,6 +427,18 @@ output/macro/pilot/macro_regime_client_surface_pilot_<run_id>.json
 
 This path is review-only and must not mutate the production report or delivery workflow.
 
+WP9 operation is separate from production report integration:
+
+```text
+output/macro/pilot/macro_regime_client_surface_pilot_<run_id>.json
++ output/macro/review/macro_old_vs_new_review_<run_id>.json
++ control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
+→ output/macro/promotion/macro_regime_promotion_decision_<run_id>.json
+→ tools/validate_macro_regime_promotion_contract.py
+```
+
+This path records a decision artifact only. The current WP9 artifact is `not_promoted` and must not mutate the production report or delivery workflow.
+
 WP5 operation is separate from production execution:
 
 ```text
@@ -410,9 +459,9 @@ This path is diagnostic/review-only and must not mutate the production report or
 
 Do not weaken pricing lineage, manifest, official portfolio-state, or delivery-evidence boundaries. Delivery evidence remains SMTP-send/report-generation evidence unless a real receipt exists.
 
-### Priority B — decide whether to create WP9 promotion artifact
+### Priority B — preserve WP9 `not_promoted` boundary
 
-WP1, WP2, WP3, WP7, and WP8 are now complete. WP8 says the deterministic macro pilot is `ready_for_narrative_promotion_review`, but it is still not promoted. The next macro step, if explicitly approved, is WP9: create a WP3-compatible promotion decision artifact.
+WP9 has created a WP3-compatible promotion decision artifact with `status=not_promoted`. Deterministic macro wording remains outside production report narrative authority. Any future production report integration requires a new explicit promotion decision and a separate report-integration work package.
 
 ### Priority C — decide how to consume WP5 diagnostics
 
