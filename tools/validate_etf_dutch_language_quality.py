@@ -10,22 +10,22 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from runtime import nl_terminology as term
+from runtime import nl_terminology_contract as contract
 from runtime.nl_localization import validate_dutch_text
 
-DUTCH_DISCLAIMER = term.DUTCH_DISCLAIMER
+DUTCH_DISCLAIMER = contract.term.DUTCH_DISCLAIMER
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 
-REQUIRED_DUTCH_MARKERS = term.REQUIRED_DUTCH_MARKERS
+REQUIRED_DUTCH_MARKERS = contract.term.REQUIRED_DUTCH_MARKERS
 
-FORBIDDEN_CLIENT_LABELS = term.FORBIDDEN_CLIENT_LABELS
+FORBIDDEN_CLIENT_LABELS = contract.term.FORBIDDEN_CLIENT_LABELS
 
-FORBIDDEN_DECISION_WORDS = term.FORBIDDEN_DECISION_WORDS
+FORBIDDEN_DECISION_WORDS = contract.term.FORBIDDEN_DECISION_WORDS
 
-PDF_AUDIT_FORBIDDEN = term.PDF_AUDIT_FORBIDDEN
+PDF_AUDIT_FORBIDDEN = contract.term.PDF_AUDIT_FORBIDDEN
 
 ALLOWED_ENGLISH_PATTERNS = [
-    rf"\b{re.escape(token)}\b" for token in sorted(term.ALLOWED_ENGLISH_TERMS)
+    rf"\b{re.escape(token)}\b" for token in sorted(contract.term.ALLOWED_ENGLISH_TERMS)
 ]
 
 
@@ -55,7 +55,7 @@ def _failures_for_text(text: str) -> list[str]:
     for label in FORBIDDEN_CLIENT_LABELS:
         if label in plain:
             failures.append(f"forbidden English client label: {label}")
-    for token in term.FORBIDDEN_NL_STRINGS:
+    for token in contract.term.FORBIDDEN_NL_STRINGS:
         if token in plain:
             failures.append(f"forbidden Dutch report token: {token}")
     for token in FORBIDDEN_DECISION_WORDS:
