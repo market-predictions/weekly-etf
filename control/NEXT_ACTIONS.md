@@ -56,6 +56,7 @@
   WP5 — Direct challenger-vs-current-holding scoring: completed / diagnostic-only
   WP6 — Latest-run manifest / delivery evidence reconciliation: completed
   WP7 — Deterministic macro regime client-surface pilot: completed / non-authoritative / not promoted
+  WP8 — Macro old-vs-new review evidence package: implementation present / validation pending
   ```
 - Action:
   - preserve the split between runtime provenance and post-execution official portfolio state
@@ -67,7 +68,8 @@
   - keep WP4 as output-contract/runtime cleanup only; it does not grant macro, delivery, portfolio, lane-scoring, fundability, funding, mutation, or receipt authority
   - keep WP5 replacement-edge scoring diagnostic-only until an explicit future authority/integration decision changes that
   - keep WP7 macro client-surface pilot preview-only until an explicit future WP3-compliant promotion decision changes that
-  - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, macro client-surface validation evidence, macro-promotion decision evidence, Dutch terminology validation evidence, replacement-edge evidence, pilot-preview evidence, and inbox receipt distinct
+  - keep WP8 old-vs-new review as evidence only until validation passes and a separate WP9 promotion artifact is explicitly requested
+  - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, macro client-surface validation evidence, macro-promotion decision evidence, Dutch terminology validation evidence, replacement-edge evidence, pilot-preview evidence, old-vs-new review evidence, and inbox receipt distinct
 
 ---
 
@@ -187,22 +189,36 @@
 ### 7. WP8 — Macro old-vs-new review evidence package
 
 - Owner: `[JOINT]`
-- Status: next macro package, not started
-- Goal:
-  - compare current production macro narrative with the WP7 deterministic macro pilot preview
-  - produce review evidence with explicit status such as `keep_shadow_only` or `ready_for_narrative_promotion_review`
+- Status: implementation present / validation pending
+- Evidence:
+  ```text
+  runtime/build_macro_old_vs_new_review_package.py
+  tools/validate_macro_old_vs_new_review_package.py
+  tests/test_macro_old_vs_new_review_package.py
+  output/macro/review/macro_old_vs_new_review_20260605_000000.json
+  review_status: ready_for_narrative_promotion_review
+  ```
+- Required validation:
+  ```bash
+  python -m pytest tests/test_macro_old_vs_new_review_package.py -q
+  python tools/validate_macro_old_vs_new_review_package.py output/macro/review/macro_old_vs_new_review_20260605_000000.json
+  ```
 - Boundary:
   - review evidence only
-  - no promotion
+  - not promotion
   - no production report mutation
-  - no portfolio-action authority
-  - no lane-scoring authority
-  - no fundability/funding/mutation/delivery authority
+  - production_report_narrative_authority=false
+  - portfolio_action_authority=false
+  - lane_scoring_authority=false
+  - fundability_authority=false
+  - funding_authority=false
+  - portfolio_mutation=false
+  - delivery_authority=false
 
 ### 8. WP9 — Controlled narrative promotion artifact
 
 - Owner: `[JOINT]`
-- Status: blocked until WP8 is complete and explicitly requested
+- Status: blocked until WP8 validation passes and explicit promotion-artifact work is requested
 - Boundary:
   - use WP3 contract
   - even if narrative authority is promoted later, portfolio-action, lane-scoring, fundability, funding and mutation authority remain false unless separately promoted
