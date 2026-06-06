@@ -52,7 +52,7 @@
   WP1 — Deterministic macro narrative shadow candidate: completed / not promoted
   WP2 — Macro narrative compliance and bilingual parity gate: completed / not promoted
   WP3 — Macro promotion decision contract: completed / merged via PR #51
-  WP4 — Dutch / bilingual alias consolidation: partial / regression guard added
+  WP4 — Dutch / bilingual alias consolidation: implementation present / validation pending
   WP5 — Direct challenger-vs-current-holding scoring: completed / diagnostic-only
   WP6 — Latest-run manifest / delivery evidence reconciliation: completed
   WP7 — Deterministic macro regime client-surface pilot: completed / non-authoritative / not promoted
@@ -64,7 +64,7 @@
   - keep WP1 macro shadow narrative as comparison/review evidence only
   - keep WP2 macro client-surface/parity validation as a safety gate only, not promotion authority
   - keep WP3 as narrative-promotion decision contract only, not portfolio/lane/fundability authority
-  - keep WP4 as output-contract regression hardening only until full alias consolidation is complete
+  - keep WP4 as validation-pending until required coordinator-side commands pass
   - keep WP5 replacement-edge scoring diagnostic-only until an explicit future authority/integration decision changes that
   - keep WP7 macro client-surface pilot preview-only until an explicit future WP3-compliant promotion decision changes that
   - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, macro client-surface validation evidence, macro-promotion decision evidence, Dutch terminology validation evidence, replacement-edge evidence, pilot-preview evidence, and inbox receipt distinct
@@ -73,36 +73,40 @@
 
 ## Phase 2 — Dutch quality and alias cleanup
 
-### 2. WP4 — Complete Dutch / bilingual alias consolidation
+### 2. WP4 — Validate Dutch / bilingual alias consolidation follow-up
 
-- Owner: `[ASSISTANT]`
-- Status: partial / regression guard added / full consolidation still open
+- Owner: `[JOINT]`
+- Status: implementation present / validation pending
 - Evidence:
   ```text
+  runtime/nl_terminology_contract.py
+  runtime/nl_localization.py
+  runtime/apply_nl_localization.py
+  runtime/scrub_nl_client_language.py
+  runtime/client_facing_sanitizer.py
+  tools/validate_etf_dutch_language_quality.py
   tests/test_dutch_terminology_contract.py
-  commit: 25dbd2c12167b20c771e3a98188f4f0125470421
+  final reported commit: 0ac46cfde1b57299e5523b60d92b415c161d5a28
+  combined GitHub status for final commit: no statuses returned
   ```
-- Remaining work:
-  - move remaining repeated/migration Dutch aliases into one shared source where safe
-  - make native render, markdown validation, Dutch quality validation, delivery HTML validation, and delivery runtime use that same source
-  - review remaining alias surfaces in:
-    ```text
-    runtime/nl_localization.py
-    runtime/apply_nl_localization.py
-    runtime/scrub_nl_client_language.py
-    runtime/delivery_html_overrides.py
-    runtime/client_facing_sanitizer.py
-    ```
-  - reduce scattered one-off mappings without reintroducing broad English-to-Dutch translation passes
-- Expected validation:
+- Implementation summary:
+  - `runtime/nl_terminology_contract.py` centralizes remaining migration/runtime aliases that were duplicated across localization, scrubbers, delivery HTML, and validators
+  - native Dutch report handling remains guard-only
+  - `sitecustomize.py` remains minimal and does not own client-facing Dutch enum/status terminology
+  - `runtime/delivery_html_overrides.py` was intentionally not changed because it is a strict branded delivery surface
+- Required coordinator-side validation:
   ```bash
+  python -m pytest tests/test_dutch_terminology_contract.py -q
   python tools/validate_etf_dutch_language_quality.py
   python tools/validate_etf_delivery_html_contract.py
-  python -m pytest tests/test_dutch_terminology_contract.py -q
   ```
+- Done when:
+  - all three validation commands pass in a real repo checkout or CI-equivalent environment
+  - only then mark WP4 complete in control files
 - Boundary:
   - no pricing change
   - no portfolio-state change
+  - no trade-ledger or valuation-history change
   - no lane-scoring change
   - no fundability change
   - no deterministic macro promotion
