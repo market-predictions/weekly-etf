@@ -75,6 +75,8 @@ CLIENT_SURFACE_EXACT_REPLACEMENTS = {
     "Investment Report": "Beleggersrapport",
     "Investor Report": "Beleggersrapport",
     "Analyst Report": "Analistenrapport",
+    "Keep the current allocation": "Houd de huidige allocatie",
+    "Keep the current allocation.": "Houd de huidige allocatie.",
     "Neeg geen": "Geen",
     "Neeg Geen": "Geen",
     "Neeg": "Nee",
@@ -106,6 +108,12 @@ NATIVE_STATE_LABEL_REPLACEMENTS = {
 }
 
 NATIVE_STATE_LABEL_FORBIDDEN = sorted(NATIVE_STATE_LABEL_REPLACEMENTS)
+
+# Regex contracts intentionally stay centralized here so consumers can import the
+# same symbols. Native Dutch runtime reports remain guard-only; no broad regex
+# prose translation is applied to native output.
+REGEX_CLIENT_LANGUAGE_REPLACEMENTS = list(term.REGEX_CLIENT_LANGUAGE_REPLACEMENTS)
+NATIVE_REGEX_REPLACEMENTS = []
 
 CLIENT_FACING_TOKEN_REPLACEMENTS = {
     "Pending classification": "Mixed / not yet decisive",
@@ -152,7 +160,7 @@ ENGLISH_MD_MARKERS = [
 ]
 
 DUTCH_DELIVERY_FORBIDDEN_TOKENS = [
-    "Wednesday,", "Thursday,", "Friday,", "Saturday,", "Sunday,", "Monday,", "Tuesday,",
+    "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Monday", "Tuesday",
     "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December",
     "PRIMARY REGIME", "GEOPOLITICAL REGIME", "MAIN TAKEAWAY",
     "Investor Report", "Investment Report", "Analyst Report",
