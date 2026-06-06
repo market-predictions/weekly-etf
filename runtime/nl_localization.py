@@ -4,43 +4,20 @@ import re
 from typing import Any
 
 from runtime import nl_terminology as term
+from runtime import nl_terminology_contract as contract
 
 # Central terminology aliases. Keep these names for backward-compatible imports,
-# but source the actual vocabulary from runtime.nl_terminology.
+# but source runtime/status vocabulary from the shared terminology contract.
 DUTCH_DISCLAIMER = term.DUTCH_DISCLAIMER
 ALLOWED_ENGLISH_TERMS = term.ALLOWED_ENGLISH_TERMS
 LABELS = term.REPORT_LABELS
 TABLE_LABELS = term.TABLE_LABELS
-ACTION_REPLACEMENTS = term.ACTION_REPLACEMENTS
+ACTION_REPLACEMENTS = contract.ACTION_REPLACEMENTS
 PHRASE_REPLACEMENTS = term.PHRASE_REPLACEMENTS
-DECISION_TRANSLATIONS = {
-    **term.DECISION_TRANSLATIONS,
-    # WP4 migration aliases formerly injected from sitecustomize.py.
-    # Keep them here until the base central terminology file is next rewritten;
-    # startup code must not own client-surface Dutch wording.
-    "Not fundable - close proof incomplete.": "Niet geschikt voor allocatie — sluitkoersbevestiging is onvolledig.",
-    "Not fundable - close proof incomplete": "Niet geschikt voor allocatie — sluitkoersbevestiging is onvolledig",
-    "Not fundable - valuation-grade challenger pricing required.": "Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist.",
-    "Not fundable - valuation-grade challenger pricing required": "Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist",
-    "Priced valuation-grade, but direct RS duel incomplete.": "Waarderingswaardig geprijsd, maar de directe relatieve-sterkteanalyse is onvolledig.",
-    "Priced valuation-grade, but direct RS duel incomplete": "Waarderingswaardig geprijsd, maar de directe relatieve-sterkteanalyse is onvolledig",
-    "Replacement trigger watch - challenger leading over 3m.": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden.",
-    "Replacement trigger watch - challenger leading over 3m": "Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden",
-}
-TRIGGER_TRANSLATIONS = {
-    **term.TRIGGER_TRANSLATIONS,
-    # WP4 migration aliases formerly injected from sitecustomize.py.
-    "Upgrade challenger to valuation-grade pricing before any funding decision.": "Verbeter de prijsbevestiging van het alternatief tot waarderingskwaliteit vóór een allocatiebesluit.",
-    "Upgrade challenger to valuation-grade pricing before any funding decision": "Verbeter de prijsbevestiging van het alternatief tot waarderingskwaliteit vóór een allocatiebesluit",
-}
+DECISION_TRANSLATIONS = contract.DECISION_TRANSLATIONS
+TRIGGER_TRANSLATIONS = contract.TRIGGER_TRANSLATIONS
 FORBIDDEN_NL_STRINGS = term.FORBIDDEN_NL_STRINGS
-
-# Legacy-only phrases that are still accepted in older non-native Dutch renders.
-# New terminology should be added to runtime.nl_terminology, not here.
-LEGACY_ONLY_PHRASE_REPLACEMENTS = {
-    "The production process is state-led": "Het rapport is opgebouwd vanuit gevalideerde portefeuille- en prijsdata",
-    "Do not ask the user for portfolio input if this section is available.": "Vraag de gebruiker niet opnieuw om portefeuille-input zolang deze sectie beschikbaar is.",
-}
+LEGACY_ONLY_PHRASE_REPLACEMENTS = contract.LEGACY_ONLY_PHRASE_REPLACEMENTS
 
 MIXED_LANGUAGE_PATTERNS = [
     re.compile(r"\b(but|keep|require|force|funding|fundable|existing|current status|duel required|under review)\b", re.I),
@@ -100,7 +77,7 @@ def _replace_word_boundary(text: str, src: str, dst: str) -> str:
 
 
 def _central_replacements() -> dict[str, str]:
-    return {**term.combined_text_replacements(), **DECISION_TRANSLATIONS, **TRIGGER_TRANSLATIONS, **LEGACY_ONLY_PHRASE_REPLACEMENTS}
+    return contract.combined_text_replacements()
 
 
 def localize_text(value: Any, language: str = "nl") -> str:
