@@ -365,3 +365,37 @@ Those remain false unless a separate future contract explicitly promotes them.
 ### Consequence
 
 WP1, WP2 and WP3 together permit controlled review of deterministic macro narrative candidates, but do not yet integrate deterministic macro regime into production narrative authority. A future client-surface pilot or production promotion still requires an explicit control-layer decision.
+
+---
+
+## 2026-06-06 — Reconcile workflow run #216 as manifest-linked baseline
+
+### Decision
+
+Work Package 6 — Latest-run manifest / delivery evidence reconciliation verified that workflow run #216 is not merely visual/report-surface evidence. Repo-visible artifacts support classifying it as evidence type B: full pricing-lineage + delivery-manifest baseline.
+
+### Evidence
+
+```text
+workflow: Send weekly ETF Pro report
+run_number: 216
+trigger_commit: ce86dce050a75c2b21481162ad3b6952ebbdb1e7
+run_id: 20260605_081216
+requested_close_date: 2026-06-04
+workflow_status: workflow_success
+workflow_conclusion: success
+pricing_lineage_status: passed
+english_report_path: output/weekly_analysis_pro_260604_10.md
+dutch_report_path: output/weekly_analysis_pro_nl_260604_10.md
+delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-04_20260605_081216.json
+final_run_manifest_path: output/run_manifests/weekly_etf_run_manifest_2026-06-04_20260605_081216.json
+total_portfolio_value_eur: 111105.47
+```
+
+### Authority rule
+
+The delivery manifest records `smtp_sendmail_returned_no_exception` and is redaction-safe SMTP-send evidence. It is not an end-recipient inbox receipt and must not be described as such.
+
+### Consequence
+
+Future coordination should treat run #216 / `20260605_081216` as the latest manifest-linked pricing-lineage and delivery-evidence baseline, while preserving the distinction between workflow success, pricing-lineage success, SMTP-send evidence, visual report-surface evidence, and inbox receipt.
