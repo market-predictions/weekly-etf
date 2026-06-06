@@ -1,0 +1,97 @@
+{
+  "artifact_type": "macro_narrative_client_surface",
+  "authority": {
+    "client_facing_narrative_authority": false,
+    "fundability_authority": false,
+    "funding_authority": false,
+    "lane_scoring_authority": false,
+    "portfolio_action_authority": false,
+    "portfolio_mutation": false,
+    "production_report_mutation": false,
+    "production_report_narrative_authority": false
+  },
+  "blockers": [
+    "macro regime remains shadow-only",
+    "wp3_promotion_status=not_promoted",
+    "production_report_narrative_authority=false",
+    "portfolio_action_authority=false",
+    "lane_scoring_authority=false",
+    "fundability_authority=false",
+    "funding_authority=false",
+    "portfolio_mutation=false",
+    "no production report mutation",
+    "no delivery workflow change"
+  ],
+  "client_facing": false,
+  "client_facing_narrative_authority": false,
+  "client_surface": {
+    "en": {
+      "body": "The deterministic macro read places the current backdrop in risk-on with narrow equity leadership. Semiconductor strength supports the risk tone, while market breadth is less broad than the headline picture. Inflation, rates, growth and volatility inputs are used as context for risk review, not as a standalone portfolio signal. [M1] No portfolio action, funding decision, lane score, or allocation change follows from this pilot.",
+      "citations": [
+        {
+          "id": "M1",
+          "source": "WP1_macro_regime_comparison_artifact",
+          "supports": "deterministic macro regime comparison and current report macro context"
+        }
+      ],
+      "meaning_claims": {
+        "confidence_language": "evidence_based_observation",
+        "funding_authority": false,
+        "macro_regime": "risk_on_narrow_leadership",
+        "portfolio_action": "none",
+        "risk_tone": "constructive_but_narrow"
+      },
+      "title": "Deterministic macro regime preview"
+    },
+    "nl": {
+      "body": "De deterministische macrolezing plaatst de huidige omgeving in een risk-on met smal aandelenleiderschap. Semiconductorsterkte ondersteunt de risicotoon, terwijl de marktbreadte minder breed is dan het kopbeeld. Inflatie, rente, groei en volatiliteitsgegevens worden gebruikt als context voor risicobeoordeling, niet als zelfstandig portefeuillesignaal. [M1] Uit deze pilot volgt geen portefeuilleactie, financieringsbesluit, lane-score of allocatiewijziging.",
+      "citations": [
+        {
+          "id": "M1",
+          "source": "WP1_macro_regime_comparison_artifact",
+          "supports": "deterministische macroregimevergelijking en huidige rapportcontext"
+        }
+      ],
+      "meaning_claims": {
+        "confidence_language": "evidence_based_observation",
+        "funding_authority": false,
+        "macro_regime": "risk_on_narrow_leadership",
+        "portfolio_action": "none",
+        "risk_tone": "constructive_but_narrow"
+      },
+      "title": "Deterministische macroregime-preview"
+    }
+  },
+  "client_surface_pilot": true,
+  "created_at_utc": "2026-06-06T10:38:02Z",
+  "current_macro_narrative_en": "## 1. Executive Summary\n- **Primary regime:** Risk-on growth\n- **What changed this week:** AI / semiconductor leadership remains the dominant equity impulse.\n\n## 3. Regime Dashboard\n- Current regime: Risk-on growth.\n- Confidence: 66%.",
+  "current_macro_narrative_nl": "## 1. Kernsamenvatting\n- **Primair regime:** Risk-on groei\n- **Wat is er deze week veranderd:** AI- en semiconductorleiderschap blijft de dominante aandelenimpuls.\n\n## 3. Regime-dashboard\n- Huidig regime: Risk-on groei.\n- Vertrouwen: 66%.",
+  "deterministic_macro_candidate_en": "The deterministic macro read places the current backdrop in risk-on with narrow equity leadership. Semiconductor strength supports the risk tone, while market breadth is less broad than the headline picture. Inflation, rates, growth and volatility inputs are used as context for risk review, not as a standalone portfolio signal. [M1] No portfolio action, funding decision, lane score, or allocation change follows from this pilot.",
+  "deterministic_macro_candidate_nl": "De deterministische macrolezing plaatst de huidige omgeving in een risk-on met smal aandelenleiderschap. Semiconductorsterkte ondersteunt de risicotoon, terwijl de marktbreadte minder breed is dan het kopbeeld. Inflatie, rente, groei en volatiliteitsgegevens worden gebruikt als context voor risicobeoordeling, niet als zelfstandig portefeuillesignaal. [M1] Uit deze pilot volgt geen portefeuilleactie, financieringsbesluit, lane-score of allocatiewijziging.",
+  "fundability_authority": false,
+  "funding_authority": false,
+  "inputs": {
+    "wp1_shadow_narrative_artifact_path": "output/macro/shadow_narrative/macro_regime_shadow_narrative_20260605_000000.json",
+    "wp2_validator": "tools/validate_macro_narrative_client_surface.py",
+    "wp3_promotion_contract": "control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md"
+  },
+  "lane_scoring_authority": false,
+  "meaning_contract": {
+    "confidence_language": "evidence_based_observation",
+    "funding_authority": false,
+    "macro_regime": "risk_on_narrow_leadership",
+    "portfolio_action": "none",
+    "risk_tone": "constructive_but_narrow"
+  },
+  "pilot_artifact_type": "deterministic_macro_regime_client_surface_pilot",
+  "portfolio_action_authority": false,
+  "portfolio_mutation": false,
+  "production_report": false,
+  "production_report_mutation": false,
+  "production_report_narrative_authority": false,
+  "report_date": "2026-06-05",
+  "run_id": "20260605_000000",
+  "schema_version": "macro_narrative_client_surface_v1",
+  "wp2_validation_status": "passed",
+  "wp3_promotion_status": "not_promoted"
+}
