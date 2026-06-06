@@ -11,7 +11,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, a completed report-surface cleanup cycle verified by the same run, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, WP3 macro promotion decision contract merged, WP4 Dutch/bilingual alias consolidation follow-up implemented with a shared terminology contract but still validation-pending, WP5 direct challenger-vs-current-holding scoring implemented as diagnostic-only evidence, and WP7 deterministic macro regime client-surface pilot implemented as non-authoritative preview evidence. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, or delivery authority.**
+**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, a completed report-surface cleanup cycle verified by the same run, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, WP3 macro promotion decision contract merged, WP4 Dutch/bilingual alias consolidation completed with a shared terminology contract and validated in Codespaces, WP5 direct challenger-vs-current-holding scoring implemented as diagnostic-only evidence, and WP7 deterministic macro regime client-surface pilot implemented as non-authoritative preview evidence. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, or delivery authority.**
 
 ## What this repository currently is
 
@@ -29,7 +29,7 @@ market-predictions/weekly-etf
 - delivery-manifest evidence linked from the final run manifest
 - shadow-first macro/thesis roadmap controls
 - WP1, WP2, WP3 and WP7 deterministic macro regime promotion-preparation / pilot gates implemented, while production authority remains blocked
-- WP4 Dutch terminology consolidation implemented as a focused shared-contract follow-up, with coordinator-side validation still required before marking fully complete
+- WP4 Dutch terminology consolidation completed with a shared terminology contract and focused validation
 - WP5 replacement-edge scoring implemented as a diagnostic-only decision-framework/input-state artifact path
 
 ## Latest production and report-surface evidence
@@ -213,13 +213,13 @@ The WP7 artifact is preview/review evidence only. It does not mutate the product
 
 ## Dutch / bilingual output-contract status
 
-### WP4 — Dutch / bilingual alias consolidation follow-up
+### WP4 — Dutch / bilingual alias consolidation
 
 ```text
-status: implemented as focused alias-consolidation follow-up / validation pending
-final reported commit: 0ac46cfde1b57299e5523b60d92b415c161d5a28
-combined GitHub status for final commit: no statuses returned
-validation status: coordinator-side execution still required
+status: completed / shared terminology contract validated
+final worker commit: 0ac46cfde1b57299e5523b60d92b415c161d5a28
+follow-up fix commit: 661764692127f03af21e6fc961dfabddaf6a9ab5
+validation environment: GitHub Codespaces on main after git pull to 6617646
 ```
 
 Files added or changed:
@@ -253,15 +253,19 @@ Smaller / under review → Kleiner / onder herbeoordeling
 Hold but replaceable → Aanhouden, maar vervangbaar
 ```
 
-Coordinator-side validation still required:
+Coordinator-side validation passed:
 
 ```bash
 python -m pytest tests/test_dutch_terminology_contract.py -q
-python tools/validate_etf_dutch_language_quality.py
-python tools/validate_etf_delivery_html_contract.py
-```
+# 5 passed in 0.04s
 
-If those pass, WP4 can be marked fully complete. Until then, treat it as implementation present / validation pending, not fully closed.
+python tools/validate_etf_dutch_language_quality.py
+# ETF_DUTCH_LANGUAGE_QUALITY_OK | report=weekly_analysis_pro_nl_260604_11.md | terminology=central
+
+python tools/validate_etf_delivery_html_contract.py
+# ETF_DELIVERY_HTML_CONTRACT_OK | report=weekly_analysis_pro_260604_11.md | dynamic_holdings=CIBR,DFEN,GSG,IEFA,PAVE,SMH,SPY,URNM,XLU | post_execution=True
+# ETF_DELIVERY_HTML_CONTRACT_OK | report=weekly_analysis_pro_nl_260604_11.md | dynamic_holdings=CIBR,DFEN,GSG,IEFA,PAVE,SMH,SPY,URNM,XLU | post_execution=True
+```
 
 Authority boundaries preserved:
 
@@ -322,7 +326,7 @@ The sample artifact is review evidence only. It does not create automatic trades
 - Guarded model execution with trade-ledger idempotency remains active.
 - Deterministic macro regime, macro axes, WP1 candidate narrative, WP2-passing surfaces, WP3 promotion artifacts, and WP7 pilot previews remain non-client-facing and non-authoritative unless explicit future promotion gates pass.
 - WP5 replacement-edge scoring is diagnostic-only and does not create portfolio-action, lane-scoring, fundability, funding, mutation, or production-recommendation authority.
-- WP4 follow-up is output-contract and operational-runbook cleanup only; validation success is still required before marking it fully closed.
+- WP4 Dutch alias consolidation is complete as an output-contract/operational-runbook cleanup and does not grant macro, delivery, portfolio, lane-scoring, fundability, funding, mutation, or receipt authority.
 - Green compliance/validator status never equals production promotion or trade authority by itself.
 
 ### 2. Input/state contract
@@ -369,7 +373,7 @@ They may support future review of replacement-duel notes, but they are not funda
 - Current Position Review / Review huidige posities must show numeric scores for every active ETF position.
 - Dutch delivery-surface enum localization must be enforced at delivery runtime, not only markdown scrub time.
 - Exited-holding wording, especially stale GLD current-surface wording when GLD is not active, must be blocked.
-- WP4 follow-up introduces a shared Dutch terminology contract; final closure depends on the required validation commands passing.
+- WP4 introduced and validated a shared Dutch terminology contract.
 - WP1 deterministic macro narrative candidates must not appear in client-facing reports until WP2 and WP3 gates plus explicit future promotion pass.
 - WP7 deterministic macro client-surface pilot output is preview/review evidence only and must not be treated as production report narrative integration.
 - WP2 validates wording/parity safety only.
@@ -443,7 +447,7 @@ output/lane_reviews/etf_lane_assessment_<date>.json
 
 This path is diagnostic/review-only and must not mutate the production report or portfolio.
 
-WP4 follow-up operation is output-contract/runtime cleanup only:
+WP4 operation is output-contract/runtime cleanup only:
 
 ```text
 runtime/nl_terminology.py
@@ -459,26 +463,14 @@ This path must not reintroduce broad translation scrub, and it must not change p
 
 ## Immediate priorities
 
-### Priority A — run WP4 coordinator-side validation
-
-WP4 follow-up implementation is present, but validation is pending. Run:
-
-```bash
-python -m pytest tests/test_dutch_terminology_contract.py -q
-python tools/validate_etf_dutch_language_quality.py
-python tools/validate_etf_delivery_html_contract.py
-```
-
-If these pass, WP4 can be marked complete. If they fail, fix the narrow validator/runtime issue without broad Dutch rewrite passes.
-
-### Priority B — preserve pricing-lineage and delivery-evidence discipline
+### Priority A — preserve pricing-lineage and delivery-evidence discipline
 
 Do not weaken pricing lineage, manifest, official portfolio-state, or delivery-evidence boundaries. Delivery evidence remains SMTP-send/report-generation evidence unless a real receipt exists.
 
-### Priority C — review WP7 pilot and build old-vs-new macro review package
+### Priority B — review WP7 pilot and build old-vs-new macro review package
 
 WP1, WP2, WP3 and WP7 are now complete. Deterministic macro regime still remains shadow-only. The next macro step is to review the WP7 pilot output and, if desired, build WP8 old-vs-new review evidence before any WP9 promotion artifact is considered.
 
-### Priority D — decide how to consume WP5 diagnostics
+### Priority C — decide how to consume WP5 diagnostics
 
 WP5 diagnostic replacement-edge scoring is implemented. A future package may integrate it into replacement-duel notes or the current-position review surface, but only as diagnostic evidence unless a separate authority decision grants lane-scoring, fundability, or recommendation use.
