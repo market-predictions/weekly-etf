@@ -11,7 +11,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, a completed report-surface cleanup cycle verified by the same run, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, WP3 macro promotion decision contract merged, WP4 Dutch/bilingual alias consolidation started with a focused regression guard, and WP5 direct challenger-vs-current-holding scoring implemented as diagnostic-only evidence. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, or delivery authority. WP5 replacement-edge scoring is also non-authoritative and does not grant portfolio-action, lane-scoring, fundability, funding, portfolio-mutation, or production-recommendation authority.**
+**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, a completed report-surface cleanup cycle verified by the same run, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, WP3 macro promotion decision contract merged, WP4 Dutch/bilingual alias consolidation started with a focused regression guard, WP5 direct challenger-vs-current-holding scoring implemented as diagnostic-only evidence, and WP7 deterministic macro regime client-surface pilot implemented as non-authoritative preview evidence. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, or delivery authority.**
 
 ## What this repository currently is
 
@@ -28,7 +28,7 @@ market-predictions/weekly-etf
 - hard pricing-lineage validation before send
 - delivery-manifest evidence linked from the final run manifest
 - shadow-first macro/thesis roadmap controls
-- WP1, WP2 and WP3 deterministic macro regime promotion-preparation gates implemented, while production authority remains blocked
+- WP1, WP2, WP3 and WP7 deterministic macro regime promotion-preparation / pilot gates implemented, while production authority remains blocked
 - WP4 Dutch terminology consolidation started with a regression guard; full alias consolidation remains open
 - WP5 replacement-edge scoring implemented as a diagnostic-only decision-framework/input-state artifact path
 
@@ -203,6 +203,39 @@ funding_authority=false
 portfolio_mutation=false
 ```
 
+### WP7 — Deterministic macro regime client-surface pilot
+
+```text
+status: implemented as controlled non-authoritative client-surface pilot / not promoted
+files:
+  runtime/render_macro_regime_client_surface_pilot.py
+  tools/validate_macro_regime_client_surface_pilot.py
+  tests/test_macro_regime_client_surface_pilot.py
+  output/macro/pilot/macro_regime_client_surface_pilot_20260605_000000.json
+reported focused test: python -m pytest tests/test_macro_regime_client_surface_pilot.py -q = 10 passed
+reported pilot validation: MACRO_REGIME_CLIENT_SURFACE_PILOT_OK
+reported WP2 validation on pilot: MACRO_NARRATIVE_CLIENT_SURFACE_OK
+```
+
+WP7 uses the WP1 shadow narrative artifact as input and produces a pilot preview with:
+
+```text
+wp2_validation_status=passed
+wp3_promotion_status=not_promoted
+client_surface_pilot=true
+client_facing=false
+production_report=false
+production_report_narrative_authority=false
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+funding_authority=false
+portfolio_mutation=false
+production_report_mutation=false
+```
+
+The WP7 artifact is preview/review evidence only. It does not mutate the production report, does not change delivery workflow, and does not promote deterministic macro regime into production report narrative authority.
+
 ## Dutch / bilingual output-contract status
 
 ### WP4 — Dutch / bilingual alias consolidation
@@ -317,7 +350,7 @@ The sample artifact is review evidence only. It does not create automatic trades
 - Broad lane discovery remains active.
 - Valuation-grade challenger discipline remains active.
 - Guarded model execution with trade-ledger idempotency remains active.
-- Deterministic macro regime, macro axes, WP1 candidate narrative, WP2-passing surfaces, and WP3 promotion artifacts remain non-client-facing and non-authoritative unless explicit future promotion gates pass.
+- Deterministic macro regime, macro axes, WP1 candidate narrative, WP2-passing surfaces, WP3 promotion artifacts, and WP7 pilot previews remain non-client-facing and non-authoritative unless explicit future promotion gates pass.
 - WP5 replacement-edge scoring is diagnostic-only and does not create portfolio-action, lane-scoring, fundability, funding, mutation, or production-recommendation authority.
 - Green compliance/validator status never equals production promotion or trade authority by itself.
 
@@ -343,6 +376,7 @@ Macro promotion-preparation artifacts are review/audit/control artifacts only:
 
 ```text
 output/macro/shadow_narrative/macro_regime_shadow_narrative_<run_id>.json
+output/macro/pilot/macro_regime_client_surface_pilot_<run_id>.json
 fixtures/macro_narrative/*.json
 fixtures/macro_promotion/*.json
 control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
@@ -366,6 +400,7 @@ They may support future review of replacement-duel notes, but they are not funda
 - Exited-holding wording, especially stale GLD current-surface wording when GLD is not active, must be blocked.
 - WP4 regression guard protects known Dutch enum/localization regressions, but full alias consolidation remains open.
 - WP1 deterministic macro narrative candidates must not appear in client-facing reports until WP2 and WP3 gates plus explicit future promotion pass.
+- WP7 deterministic macro client-surface pilot output is preview/review evidence only and must not be treated as production report narrative integration.
 - WP2 validates wording/parity safety only.
 - WP3 defines the decision contract for narrative authority only; it does not grant portfolio, lane, fundability, funding, mutation or delivery authority.
 - WP5 diagnostic replacement-edge output must not appear as a production recommendation unless a later explicit integration and authority decision permits it.
@@ -411,6 +446,18 @@ send-time enum/localization defect → fix delivery runtime / shared localizatio
 validator gap → add or tighten relevant pre-send gate
 ```
 
+WP7 operation is separate from production report integration:
+
+```text
+output/macro/shadow_narrative/macro_regime_shadow_narrative_<run_id>.json
+→ runtime/render_macro_regime_client_surface_pilot.py
+→ output/macro/pilot/macro_regime_client_surface_pilot_<run_id>.json
+→ tools/validate_macro_regime_client_surface_pilot.py
+→ tools/validate_macro_narrative_client_surface.py
+```
+
+This path is pilot/review-only and must not mutate the production report or delivery workflow.
+
 WP5 operation is separate from production execution:
 
 ```text
@@ -435,9 +482,9 @@ Do not weaken pricing lineage, manifest, official portfolio-state, or delivery-e
 
 The regression guard is in place. The remaining cleanup is to move repeated/migration aliases into one shared source so native render, markdown validation, Dutch quality validation, delivery HTML validation, and delivery runtime all use the same terminology contract.
 
-### Priority C — macro roadmap remains shadow-first and promotion-gated
+### Priority C — review WP7 pilot and build old-vs-new macro review package
 
-WP1, WP2 and WP3 are now complete. Deterministic macro regime still remains shadow-only. The next macro step may be a controlled client-surface pilot only if it remains non-portfolio-authoritative and explicitly respects WP2/WP3.
+WP1, WP2, WP3 and WP7 are now complete. Deterministic macro regime still remains shadow-only. The next macro step is to review the WP7 pilot output and, if desired, build WP8 old-vs-new review evidence before any WP9 promotion artifact is considered.
 
 ### Priority D — decide how to consume WP5 diagnostics
 
