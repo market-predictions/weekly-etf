@@ -1,0 +1,56 @@
+{
+  "schema_version": "macro_regime_promotion_decision_v1",
+  "artifact_type": "deterministic_macro_regime_promotion_decision",
+  "run_id": "20260606_000000",
+  "created_at_utc": "2026-06-06T22:10:00Z",
+  "report_date": "2026-06-05",
+  "status": "not_promoted",
+  "client_facing_narrative_authority": false,
+  "production_report_narrative_authority": false,
+  "required_approvals": {
+    "methodology_approved": false,
+    "bilingual_parity_approved": true,
+    "compliance_validator_passed": true,
+    "old_vs_new_comparison_reviewed": true
+  },
+  "promotion_decision": {
+    "control_layer_decision": "not_promoted",
+    "explicit_control_layer_promotion_decision": false,
+    "decision_record_path": "output/macro/promotion/macro_regime_promotion_decision_20260606_000000.json",
+    "reviewed_by_or_process": "WP10 explicit deterministic macro narrative authority decision"
+  },
+  "authority": {
+    "client_facing_narrative_authority": false,
+    "production_report_narrative_authority": false,
+    "portfolio_action_authority": false,
+    "lane_scoring_authority": false,
+    "fundability_authority": false,
+    "funding_authority": false,
+    "portfolio_mutation": false,
+    "delivery_authority": false,
+    "execution_authority": false,
+    "production_report_mutation": false
+  },
+  "blockers": [
+    "macro regime remains shadow-only",
+    "explicit_control_layer_promotion_decision=false",
+    "control_layer_decision=not_promoted",
+    "methodology_approved=false",
+    "production_report_narrative_authority=false",
+    "client_facing_narrative_authority=false"
+  ],
+  "inputs": {
+    "promotion_contract_path": "control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md",
+    "pilot_artifact_path": "output/macro/pilot/macro_regime_client_surface_pilot_20260605_000000.json",
+    "old_vs_new_review_artifact_path": "output/macro/review/macro_old_vs_new_review_20260605_000000.json",
+    "previous_promotion_decision_artifact_path": "output/macro/promotion/macro_regime_promotion_decision_20260605_000000.json",
+    "validator_path": "tools/validate_macro_regime_promotion_contract.py"
+  },
+  "evidence": {
+    "wp7_pilot_status": "completed_not_promoted",
+    "wp7_wp2_validation_status": "passed",
+    "wp7_wp3_promotion_status": "not_promoted",
+    "wp8_review_status": "ready_for_narrative_promotion_review",
+    "wp9_status": "not_promoted"
+  }
+}
