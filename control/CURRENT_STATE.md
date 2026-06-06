@@ -11,7 +11,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, a completed report-surface cleanup cycle verified by the same run, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, WP3 macro promotion decision contract merged, WP4 Dutch/bilingual alias consolidation started with a focused regression guard, WP5 direct challenger-vs-current-holding scoring implemented as diagnostic-only evidence, and WP7 deterministic macro regime client-surface pilot implemented as non-authoritative preview evidence. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, or delivery authority.**
+**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, a completed report-surface cleanup cycle verified by the same run, WP1 deterministic macro narrative shadow comparison implemented, WP2 macro narrative compliance/bilingual parity implemented, WP3 macro promotion decision contract merged, WP4 Dutch/bilingual alias consolidation follow-up implemented with a shared terminology contract but still validation-pending, WP5 direct challenger-vs-current-holding scoring implemented as diagnostic-only evidence, and WP7 deterministic macro regime client-surface pilot implemented as non-authoritative preview evidence. Deterministic macro regime remains shadow-only and not promoted into production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, or delivery authority.**
 
 ## What this repository currently is
 
@@ -29,7 +29,7 @@ market-predictions/weekly-etf
 - delivery-manifest evidence linked from the final run manifest
 - shadow-first macro/thesis roadmap controls
 - WP1, WP2, WP3 and WP7 deterministic macro regime promotion-preparation / pilot gates implemented, while production authority remains blocked
-- WP4 Dutch terminology consolidation started with a regression guard; full alias consolidation remains open
+- WP4 Dutch terminology consolidation implemented as a focused shared-contract follow-up, with coordinator-side validation still required before marking fully complete
 - WP5 replacement-edge scoring implemented as a diagnostic-only decision-framework/input-state artifact path
 
 ## Latest production and report-surface evidence
@@ -138,18 +138,7 @@ files:
 reported focused test: python -m pytest tests/test_macro_narrative_client_surface.py -q = 4 passed
 ```
 
-WP2 blocks:
-
-```text
-predictive wording
-uncited macro claims
-shadow/internal labels
-macro_axes leakage
-confidence_decomposition leakage
-English leakage in Dutch report text
-citation parity mismatch
-Dutch/English meaning drift
-```
+WP2 blocks predictive wording, uncited macro claims, shadow/internal labels, `macro_axes` leakage, `confidence_decomposition` leakage, English leakage in Dutch report text, citation parity mismatch, and Dutch/English meaning drift.
 
 Authority boundaries:
 
@@ -179,20 +168,6 @@ reported focused test from staged harness: python -m pytest tests/test_macro_reg
 
 WP3 defines the promotion gate required before deterministic macro regime output may move from shadow-only evidence to report narrative authority.
 
-Required promotion gates:
-
-```text
-methodology_approved=true
-bilingual_parity_approved=true
-compliance_validator_passed=true
-old_vs_new_comparison_reviewed=true
-explicit_control_layer_promotion_decision=true
-control_layer_decision=promote_to_report_narrative_authority
-client_facing_narrative_authority=true
-production_report_narrative_authority=true
-blockers=[]
-```
-
 Permanent authority boundaries remain false even after narrative promotion unless a separate future contract grants them:
 
 ```text
@@ -217,7 +192,7 @@ reported pilot validation: MACRO_REGIME_CLIENT_SURFACE_PILOT_OK
 reported WP2 validation on pilot: MACRO_NARRATIVE_CLIENT_SURFACE_OK
 ```
 
-WP7 uses the WP1 shadow narrative artifact as input and produces a pilot preview with:
+WP7 produces a pilot preview with:
 
 ```text
 wp2_validation_status=passed
@@ -238,17 +213,39 @@ The WP7 artifact is preview/review evidence only. It does not mutate the product
 
 ## Dutch / bilingual output-contract status
 
-### WP4 — Dutch / bilingual alias consolidation
+### WP4 — Dutch / bilingual alias consolidation follow-up
 
 ```text
-status: partially implemented / regression guard added
-commit: 25dbd2c12167b20c771e3a98188f4f0125470421
-file added:
-  tests/test_dutch_terminology_contract.py
-validation status: broader validation not yet run in this environment
+status: implemented as focused alias-consolidation follow-up / validation pending
+final reported commit: 0ac46cfde1b57299e5523b60d92b415c161d5a28
+combined GitHub status for final commit: no statuses returned
+validation status: coordinator-side execution still required
 ```
 
-The WP4 regression test protects the current Dutch terminology contract for:
+Files added or changed:
+
+```text
+runtime/nl_terminology_contract.py
+runtime/nl_localization.py
+runtime/apply_nl_localization.py
+runtime/scrub_nl_client_language.py
+runtime/client_facing_sanitizer.py
+tools/validate_etf_dutch_language_quality.py
+tests/test_dutch_terminology_contract.py
+```
+
+Files intentionally not changed:
+
+```text
+sitecustomize.py
+runtime/delivery_html_overrides.py
+tools/validate_etf_delivery_html_contract.py
+send_report_runtime_html.py
+```
+
+The shared terminology contract centralizes remaining migration/runtime aliases formerly duplicated across localization, scrubbers, delivery HTML, and validators, while preserving native Dutch guard-only behavior.
+
+Protected Dutch alias examples:
 
 ```text
 No / under review → Nee / onder herbeoordeling
@@ -256,39 +253,28 @@ Smaller / under review → Kleiner / onder herbeoordeling
 Hold but replaceable → Aanhouden, maar vervangbaar
 ```
 
-It also checks that:
-
-```text
-runtime.nl_terminology remains the shared source for required markers and forbidden client labels
-native Dutch scrub stays guard-only / narrow-alias based
-sitecustomize.py does not own client-facing Dutch enum/status aliases
-```
-
-Full WP4 consolidation is still pending. Known remaining spread-out alias/migration surfaces include:
-
-```text
-runtime/nl_localization.py
-runtime/apply_nl_localization.py
-runtime/scrub_nl_client_language.py
-runtime/delivery_html_overrides.py
-runtime/client_facing_sanitizer.py
-```
-
-Expected validation for the follow-up pass:
+Coordinator-side validation still required:
 
 ```bash
+python -m pytest tests/test_dutch_terminology_contract.py -q
 python tools/validate_etf_dutch_language_quality.py
 python tools/validate_etf_delivery_html_contract.py
-python -m pytest tests/test_dutch_terminology_contract.py -q
 ```
+
+If those pass, WP4 can be marked fully complete. Until then, treat it as implementation present / validation pending, not fully closed.
 
 Authority boundaries preserved:
 
 ```text
 portfolio_state_unchanged=true
 pricing_unchanged=true
+trade_ledger_unchanged=true
+valuation_history_unchanged=true
 lane_scoring_unchanged=true
 fundability_unchanged=true
+portfolio_action_authority_unchanged=true
+funding_authority_unchanged=true
+portfolio_mutation_unchanged=true
 deterministic_macro_promotion_unchanged=true
 production_delivery_authority_unchanged=true
 inbox_receipt_claims_unchanged=true
@@ -311,22 +297,6 @@ reported artifact validation: REPLACEMENT_EDGE_SCORING_OK
 ```
 
 WP5 maps challenger lanes to plausible current holdings, computes direct 1m and 3m relative-strength edge, computes drawdown and volatility edge where data exists, writes a diagnostic-only replacement-edge artifact, and validates that artifact.
-
-Required artifact fields include:
-
-```text
-current_holding
-challenger
-1m_relative_strength_edge
-3m_relative_strength_edge
-drawdown_edge
-volatility_edge
-replacement_edge_score
-diagnostic_only=true
-portfolio_action_authority=false
-fundability_authority=false
-lane_scoring_authority=false
-```
 
 Top-level authority boundaries:
 
@@ -352,6 +322,7 @@ The sample artifact is review evidence only. It does not create automatic trades
 - Guarded model execution with trade-ledger idempotency remains active.
 - Deterministic macro regime, macro axes, WP1 candidate narrative, WP2-passing surfaces, WP3 promotion artifacts, and WP7 pilot previews remain non-client-facing and non-authoritative unless explicit future promotion gates pass.
 - WP5 replacement-edge scoring is diagnostic-only and does not create portfolio-action, lane-scoring, fundability, funding, mutation, or production-recommendation authority.
+- WP4 follow-up is output-contract and operational-runbook cleanup only; validation success is still required before marking it fully closed.
 - Green compliance/validator status never equals production promotion or trade authority by itself.
 
 ### 2. Input/state contract
@@ -398,7 +369,7 @@ They may support future review of replacement-duel notes, but they are not funda
 - Current Position Review / Review huidige posities must show numeric scores for every active ETF position.
 - Dutch delivery-surface enum localization must be enforced at delivery runtime, not only markdown scrub time.
 - Exited-holding wording, especially stale GLD current-surface wording when GLD is not active, must be blocked.
-- WP4 regression guard protects known Dutch enum/localization regressions, but full alias consolidation remains open.
+- WP4 follow-up introduces a shared Dutch terminology contract; final closure depends on the required validation commands passing.
 - WP1 deterministic macro narrative candidates must not appear in client-facing reports until WP2 and WP3 gates plus explicit future promotion pass.
 - WP7 deterministic macro client-surface pilot output is preview/review evidence only and must not be treated as production report narrative integration.
 - WP2 validates wording/parity safety only.
@@ -472,15 +443,37 @@ output/lane_reviews/etf_lane_assessment_<date>.json
 
 This path is diagnostic/review-only and must not mutate the production report or portfolio.
 
+WP4 follow-up operation is output-contract/runtime cleanup only:
+
+```text
+runtime/nl_terminology.py
++ runtime/nl_terminology_contract.py
+→ runtime/nl_localization.py
+→ runtime/scrub_nl_client_language.py
+→ runtime/client_facing_sanitizer.py
+→ tools/validate_etf_dutch_language_quality.py
+→ tests/test_dutch_terminology_contract.py
+```
+
+This path must not reintroduce broad translation scrub, and it must not change portfolio, pricing, lane scoring, fundability, delivery authority, or macro promotion.
+
 ## Immediate priorities
 
-### Priority A — preserve pricing-lineage and delivery-evidence discipline
+### Priority A — run WP4 coordinator-side validation
+
+WP4 follow-up implementation is present, but validation is pending. Run:
+
+```bash
+python -m pytest tests/test_dutch_terminology_contract.py -q
+python tools/validate_etf_dutch_language_quality.py
+python tools/validate_etf_delivery_html_contract.py
+```
+
+If these pass, WP4 can be marked complete. If they fail, fix the narrow validator/runtime issue without broad Dutch rewrite passes.
+
+### Priority B — preserve pricing-lineage and delivery-evidence discipline
 
 Do not weaken pricing lineage, manifest, official portfolio-state, or delivery-evidence boundaries. Delivery evidence remains SMTP-send/report-generation evidence unless a real receipt exists.
-
-### Priority B — complete Dutch alias consolidation
-
-The regression guard is in place. The remaining cleanup is to move repeated/migration aliases into one shared source so native render, markdown validation, Dutch quality validation, delivery HTML validation, and delivery runtime all use the same terminology contract.
 
 ### Priority C — review WP7 pilot and build old-vs-new macro review package
 
