@@ -55,6 +55,7 @@
   WP4 — Dutch / bilingual alias consolidation: partial / regression guard added
   WP5 — Direct challenger-vs-current-holding scoring: completed / diagnostic-only
   WP6 — Latest-run manifest / delivery evidence reconciliation: completed
+  WP7 — Deterministic macro regime client-surface pilot: completed / non-authoritative / not promoted
   ```
 - Action:
   - preserve the split between runtime provenance and post-execution official portfolio state
@@ -65,7 +66,8 @@
   - keep WP3 as narrative-promotion decision contract only, not portfolio/lane/fundability authority
   - keep WP4 as output-contract regression hardening only until full alias consolidation is complete
   - keep WP5 replacement-edge scoring diagnostic-only until an explicit future authority/integration decision changes that
-  - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, macro client-surface validation evidence, macro-promotion decision evidence, Dutch terminology validation evidence, replacement-edge evidence, and inbox receipt distinct
+  - keep WP7 macro client-surface pilot preview-only until an explicit future WP3-compliant promotion decision changes that
+  - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, macro client-surface validation evidence, macro-promotion decision evidence, Dutch terminology validation evidence, replacement-edge evidence, pilot-preview evidence, and inbox receipt distinct
 
 ---
 
@@ -147,24 +149,67 @@
   - do not interpret WP3 merge as report narrative promotion
   - do not grant portfolio-action, lane-scoring, fundability, funding, mutation or delivery authority through WP3
 
-### 6. WP7 — Future macro client-surface pilot
+### 6. WP7 — Deterministic macro regime client-surface pilot
+
+- Owner: `[ASSISTANT]`
+- Status: completed as controlled non-authoritative pilot / not promoted
+- Evidence:
+  ```text
+  runtime/render_macro_regime_client_surface_pilot.py
+  tools/validate_macro_regime_client_surface_pilot.py
+  tests/test_macro_regime_client_surface_pilot.py
+  output/macro/pilot/macro_regime_client_surface_pilot_20260605_000000.json
+  reported focused test: python -m pytest tests/test_macro_regime_client_surface_pilot.py -q = 10 passed
+  reported pilot validation: MACRO_REGIME_CLIENT_SURFACE_PILOT_OK
+  reported WP2 validation on pilot: MACRO_NARRATIVE_CLIENT_SURFACE_OK
+  ```
+- Authority boundaries:
+  ```text
+  wp3_promotion_status=not_promoted
+  client_surface_pilot=true
+  client_facing=false
+  production_report=false
+  production_report_narrative_authority=false
+  portfolio_action_authority=false
+  lane_scoring_authority=false
+  fundability_authority=false
+  funding_authority=false
+  portfolio_mutation=false
+  production_report_mutation=false
+  ```
+- Remaining action:
+  - review pilot artifact as preview evidence only
+  - do not treat WP7 as production report narrative integration
+  - do not mutate report or delivery workflow without explicit future promotion/integration decision
+
+### 7. WP8 — Macro old-vs-new review evidence package
 
 - Owner: `[JOINT]`
-- Status: possible next macro package, not started
-- Preconditions:
-  - WP1 completed
-  - WP2 completed
-  - WP3 completed
-  - explicit decision to run a non-authoritative pilot
+- Status: next macro package, not started
+- Goal:
+  - compare current production macro narrative with the WP7 deterministic macro pilot preview
+  - produce review evidence with explicit status such as `keep_shadow_only` or `ready_for_narrative_promotion_review`
 - Boundary:
-  - pilot may show a controlled report-side preview only if explicitly approved
-  - pilot must not affect portfolio actions, lane scoring, fundability, funding, execution, or delivery authority
+  - review evidence only
+  - no promotion
+  - no production report mutation
+  - no portfolio-action authority
+  - no lane-scoring authority
+  - no fundability/funding/mutation/delivery authority
+
+### 8. WP9 — Controlled narrative promotion artifact
+
+- Owner: `[JOINT]`
+- Status: blocked until WP8 is complete and explicitly requested
+- Boundary:
+  - use WP3 contract
+  - even if narrative authority is promoted later, portfolio-action, lane-scoring, fundability, funding and mutation authority remain false unless separately promoted
 
 ---
 
 ## Phase 4 — replacement-edge scoring
 
-### 7. WP5 — Direct challenger-vs-current-holding scoring
+### 9. WP5 — Direct challenger-vs-current-holding scoring
 
 - Owner: `[ASSISTANT]`
 - Status: completed as diagnostic-only scoring package
@@ -196,7 +241,7 @@
 
 ## Phase 5 — possible follow-up packages
 
-### 8. Integrate replacement-edge diagnostics into notes, non-authoritative
+### 10. Integrate replacement-edge diagnostics into notes, non-authoritative
 
 - Owner: `[JOINT]`
 - Status: possible follow-up, not started
@@ -208,7 +253,7 @@
   - no trade authority
   - no production recommendation authority unless separately approved
 
-### 9. Use safe report request queue for ChatGPT-initiated fresh reports
+### 11. Use safe report request queue for ChatGPT-initiated fresh reports
 
 - Owner: `[ASSISTANT]`
 - Status: active baseline
