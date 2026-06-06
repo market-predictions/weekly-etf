@@ -52,7 +52,7 @@
   WP1 — Deterministic macro narrative shadow candidate: completed / not promoted
   WP2 — Macro narrative compliance and bilingual parity gate: completed / not promoted
   WP3 — Macro promotion decision contract: completed / merged via PR #51
-  WP4 — Dutch / bilingual alias consolidation: implementation present / validation pending
+  WP4 — Dutch / bilingual alias consolidation: completed / validated
   WP5 — Direct challenger-vs-current-holding scoring: completed / diagnostic-only
   WP6 — Latest-run manifest / delivery evidence reconciliation: completed
   WP7 — Deterministic macro regime client-surface pilot: completed / non-authoritative / not promoted
@@ -64,7 +64,7 @@
   - keep WP1 macro shadow narrative as comparison/review evidence only
   - keep WP2 macro client-surface/parity validation as a safety gate only, not promotion authority
   - keep WP3 as narrative-promotion decision contract only, not portfolio/lane/fundability authority
-  - keep WP4 as validation-pending until required coordinator-side commands pass
+  - keep WP4 as output-contract/runtime cleanup only; it does not grant macro, delivery, portfolio, lane-scoring, fundability, funding, mutation, or receipt authority
   - keep WP5 replacement-edge scoring diagnostic-only until an explicit future authority/integration decision changes that
   - keep WP7 macro client-surface pilot preview-only until an explicit future WP3-compliant promotion decision changes that
   - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, macro client-surface validation evidence, macro-promotion decision evidence, Dutch terminology validation evidence, replacement-edge evidence, pilot-preview evidence, and inbox receipt distinct
@@ -73,10 +73,10 @@
 
 ## Phase 2 — Dutch quality and alias cleanup
 
-### 2. WP4 — Validate Dutch / bilingual alias consolidation follow-up
+### 2. WP4 — Dutch / bilingual alias consolidation
 
 - Owner: `[JOINT]`
-- Status: implementation present / validation pending
+- Status: completed / validated
 - Evidence:
   ```text
   runtime/nl_terminology_contract.py
@@ -86,23 +86,21 @@
   runtime/client_facing_sanitizer.py
   tools/validate_etf_dutch_language_quality.py
   tests/test_dutch_terminology_contract.py
-  final reported commit: 0ac46cfde1b57299e5523b60d92b415c161d5a28
-  combined GitHub status for final commit: no statuses returned
+  final worker commit: 0ac46cfde1b57299e5523b60d92b415c161d5a28
+  follow-up fix commit: 661764692127f03af21e6fc961dfabddaf6a9ab5
   ```
-- Implementation summary:
-  - `runtime/nl_terminology_contract.py` centralizes remaining migration/runtime aliases that were duplicated across localization, scrubbers, delivery HTML, and validators
-  - native Dutch report handling remains guard-only
-  - `sitecustomize.py` remains minimal and does not own client-facing Dutch enum/status terminology
-  - `runtime/delivery_html_overrides.py` was intentionally not changed because it is a strict branded delivery surface
-- Required coordinator-side validation:
+- Validation evidence from Codespaces on main after `git pull` to `6617646`:
   ```bash
   python -m pytest tests/test_dutch_terminology_contract.py -q
+  # 5 passed in 0.04s
+
   python tools/validate_etf_dutch_language_quality.py
+  # ETF_DUTCH_LANGUAGE_QUALITY_OK | report=weekly_analysis_pro_nl_260604_11.md | terminology=central
+
   python tools/validate_etf_delivery_html_contract.py
+  # ETF_DELIVERY_HTML_CONTRACT_OK | report=weekly_analysis_pro_260604_11.md | dynamic_holdings=CIBR,DFEN,GSG,IEFA,PAVE,SMH,SPY,URNM,XLU | post_execution=True
+  # ETF_DELIVERY_HTML_CONTRACT_OK | report=weekly_analysis_pro_nl_260604_11.md | dynamic_holdings=CIBR,DFEN,GSG,IEFA,PAVE,SMH,SPY,URNM,XLU | post_execution=True
   ```
-- Done when:
-  - all three validation commands pass in a real repo checkout or CI-equivalent environment
-  - only then mark WP4 complete in control files
 - Boundary:
   - no pricing change
   - no portfolio-state change
