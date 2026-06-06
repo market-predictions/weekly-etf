@@ -24,11 +24,30 @@
 
 ## Phase 1 — production baseline and pricing-lineage protection
 
-### 1. Treat runtime + post-execution official state as production baseline
+### 1. Treat runtime + manifest-linked delivery evidence as latest production baseline
 
 - Owner: `[JOINT]`
 - Status: active baseline
 - Latest fully recorded production evidence:
+  ```text
+  workflow: Send weekly ETF Pro report
+  run_number: 216
+  trigger_commit: ce86dce050a75c2b21481162ad3b6952ebbdb1e7
+  run_id: 20260605_081216
+  requested_close_date: 2026-06-04
+  workflow_status: workflow_success
+  workflow_conclusion: success
+  pricing_lineage_status: passed
+  delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-04_20260605_081216.json
+  final_run_manifest_path: output/run_manifests/weekly_etf_run_manifest_2026-06-04_20260605_081216.json
+  report_authority_source: runtime_state
+  english_report_path: output/weekly_analysis_pro_260604_10.md
+  dutch_report_path: output/weekly_analysis_pro_nl_260604_10.md
+  total_portfolio_value_eur: 111105.47
+  evidence_type: full pricing-lineage + delivery-manifest baseline
+  inbox_receipt: not_proven
+  ```
+- Previous fully recorded production evidence:
   ```text
   workflow: Send weekly ETF Pro report
   run_number: 205
@@ -52,6 +71,7 @@
   workflow_conclusion: success
   user-visible cleanup status: score completeness fixed, stale GLD current wording fixed, Dutch enum leakage fixed
   inspected artifacts: weekly_analysis_pro_260604_10.pdf, weekly_analysis_pro_nl_260604_10.pdf
+  manifest reconciliation: completed; not visual-only
   ```
 - Latest macro roadmap gate evidence:
   ```text
@@ -75,9 +95,10 @@
 - Status: completed / active regression guard
 - Current rules:
   ```text
-  runtime state = pre-execution pricing/report-state provenance
-  official portfolio state = post-execution active holdings after guarded execution
-  client report Section 7 / Section 15 = post-execution official portfolio state when execution occurred in the same run
+  runtime state = pricing/report-state provenance for run #216 / run 20260605_081216
+  official portfolio state = post-execution active holdings when guarded execution occurs
+  client report Section 7 / Section 15 = authoritative report values from the validated run state/official state path
+  final run manifest = must link delivery_manifest_path when delivery evidence exists
   delivery manifest = redaction-safe SMTP-send evidence, not inbox receipt
   ```
 - Action going forward:
