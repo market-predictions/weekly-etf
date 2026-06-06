@@ -47,38 +47,14 @@
   evidence_type: full pricing-lineage + delivery-manifest baseline
   inbox_receipt: not_proven
   ```
-- Previous fully recorded production evidence:
-  ```text
-  workflow: Send weekly ETF Pro report
-  run_number: 205
-  trigger_commit: 3bd07f7ff31af77adbd23359d66a8c5ab7ab3343
-  run_id: 20260604_190001
-  requested_close_date: 2026-06-03
-  workflow_status: workflow_success
-  workflow_conclusion: success
-  pricing_lineage_status: passed
-  delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-03_20260604_190001.json
-  report_authority_source: portfolio_state_post_execution
-  english_report_path: output/weekly_analysis_pro_260603.md
-  dutch_report_path: output/weekly_analysis_pro_nl_260603.md
-  total_portfolio_value_eur: 111596.96
-  ```
-- Latest report-surface cleanup evidence:
-  ```text
-  workflow: Send weekly ETF Pro report
-  run_number: 216
-  trigger_commit: ce86dce050a75c2b21481162ad3b6952ebbdb1e7
-  workflow_conclusion: success
-  user-visible cleanup status: score completeness fixed, stale GLD current wording fixed, Dutch enum leakage fixed
-  inspected artifacts: weekly_analysis_pro_260604_10.pdf, weekly_analysis_pro_nl_260604_10.pdf
-  manifest reconciliation: completed; not visual-only
-  ```
 - Latest macro roadmap gate evidence:
   ```text
   WP1 — Deterministic macro narrative shadow candidate: completed / not promoted
   WP2 — Macro narrative compliance and bilingual parity gate: completed / not promoted
   WP3 — Macro promotion decision contract: completed / merged via PR #51
   WP3 merge_commit: 7b7fe1db0b04dd3b1d377463ad59e06927037993
+  WP4 — Dutch / bilingual alias consolidation: partial / regression guard added
+  WP4 commit: 25dbd2c12167b20c771e3a98188f4f0125470421
   ```
 - Action:
   - preserve the split between runtime provenance and post-execution official portfolio state
@@ -87,7 +63,8 @@
   - keep WP1 macro shadow narrative as comparison/review evidence only
   - keep WP2 macro client-surface/parity validation as a safety gate only, not promotion authority
   - keep WP3 as narrative-promotion decision contract only, not portfolio/lane/fundability authority
-  - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, macro client-surface validation evidence, macro-promotion decision evidence, and inbox receipt distinct
+  - keep WP4 as output-contract regression hardening only until full alias consolidation is complete
+  - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, macro client-surface validation evidence, macro-promotion decision evidence, Dutch terminology validation evidence, and inbox receipt distinct
 
 ### 2. ETF pricing-lineage and delivery-evidence contract
 
@@ -109,54 +86,60 @@
   - keep delivery summary redaction-safe
   - do not describe delivery as end-recipient receipt unless user confirms receipt or a true receipt artifact exists
 
-### 3. Direct visual PDF inspection / report-surface cleanup
-
-- Owner: `[JOINT]`
-- Status: closed for the current `_10` surface-cleanup loop
-- Future action:
-  - repeat visual inspection only when a new PDF/layout/localization defect is reported or after major delivery HTML changes
-  - when inspecting, use user-uploaded PDFs or a renderable Actions artifact because GitHub binary files may only expose base64 text through the connector
-
-### 4. Remaining pricing-related enhancement: independent verification
-
-- Owner: `[ASSISTANT]`
-- Status: optional future enhancement, not a blocker
-- Action:
-  - add cross-provider verification where feasible
-  - upgrade rows from `fresh_exact_unverified` to `fresh_exact_close` only when independent providers agree on requested-date close
-
 ---
 
 ## Phase 2 — Dutch quality and alias cleanup
 
-### 5. Consolidate bilingual alias handling
+### 3. WP4 — Complete Dutch / bilingual alias consolidation
 
 - Owner: `[ASSISTANT]`
-- Status: next recommended cleanup / not a blocker for current production surface
-- Current reason:
-  - the latest Dutch enum leak proved that markdown scrub and native Dutch validation are not enough for strict branded PDF/HTML panels rebuilt from runtime state
-  - delivery-runtime alias maps must share the same terminology source as native render and validators
-- Target files:
-  - `runtime/nl_terminology.py`
-  - `runtime/nl_localization.py`
-  - `runtime/apply_nl_localization.py`
-  - `runtime/scrub_nl_client_language.py`
-  - `runtime/delivery_html_overrides.py`
-  - `runtime/client_facing_sanitizer.py`
-  - `sitecustomize.py`
-  - `send_report_runtime_html.py`
-  - `tools/validate_etf_delivery_html_contract.py`
-  - `tools/validate_etf_dutch_language_quality.py`
-- Action:
-  - keep Dutch terminology and aliases in one source of truth
-  - reuse that source from native render, markdown validation, send-time parity checks, Dutch quality validation, delivery HTML validation, and startup/delivery patches
-  - avoid one-off text fixes spread across validators
+- Status: partial / regression guard added / full consolidation still open
+- Evidence:
+  ```text
+  tests/test_dutch_terminology_contract.py
+  commit: 25dbd2c12167b20c771e3a98188f4f0125470421
+  ```
+- Current guard covers:
+  ```text
+  No / under review → Nee / onder herbeoordeling
+  Smaller / under review → Kleiner / onder herbeoordeling
+  Hold but replaceable → Aanhouden, maar vervangbaar
+  runtime.nl_terminology as shared marker/forbidden-label source
+  native Dutch scrub as guard-only / narrow-alias based
+  sitecustomize.py must not own client-facing Dutch enum/status aliases
+  ```
+- Remaining work:
+  - move remaining repeated/migration Dutch aliases into one shared source where safe
+  - make native render, markdown validation, Dutch quality validation, delivery HTML validation, and delivery runtime use that same source
+  - review remaining alias surfaces in:
+    ```text
+    runtime/nl_localization.py
+    runtime/apply_nl_localization.py
+    runtime/scrub_nl_client_language.py
+    runtime/delivery_html_overrides.py
+    runtime/client_facing_sanitizer.py
+    ```
+  - reduce scattered one-off mappings without reintroducing broad English-to-Dutch translation passes
+- Expected validation:
+  ```bash
+  python tools/validate_etf_dutch_language_quality.py
+  python tools/validate_etf_delivery_html_contract.py
+  python -m pytest tests/test_dutch_terminology_contract.py -q
+  ```
+- Boundary:
+  - no pricing change
+  - no portfolio-state change
+  - no lane-scoring change
+  - no fundability change
+  - no deterministic macro promotion
+  - no production delivery authority change
+  - no inbox receipt claim
 
 ---
 
 ## Phase 3 — macro roadmap gates
 
-### 6. WP1 — Deterministic macro narrative shadow candidate
+### 4. WP1 — Deterministic macro narrative shadow candidate
 
 - Owner: `[ASSISTANT]`
 - Status: completed as shadow-only comparison path / not promoted
@@ -165,7 +148,7 @@
   - do not insert candidate wording into the report without WP2/WP3 and explicit promotion
   - do not feed it into portfolio actions, lane scoring, fundability, or delivery logic
 
-### 7. WP2 — Macro narrative compliance and bilingual parity gate
+### 5. WP2 — Macro narrative compliance and bilingual parity gate
 
 - Owner: `[ASSISTANT]`
 - Status: completed as output-contract safety gate / not promoted
@@ -173,7 +156,7 @@
   - keep as an active regression gate for any future macro narrative candidate
   - do not interpret a WP2 pass as promotion authority
 
-### 8. WP3 — Macro promotion decision contract
+### 6. WP3 — Macro promotion decision contract
 
 - Owner: `[ASSISTANT]`
 - Status: completed / merged / not promoted
@@ -181,12 +164,6 @@
   ```text
   PR #51 — WP3: Add macro promotion decision contract
   merge_commit: 7b7fe1db0b04dd3b1d377463ad59e06927037993
-  files:
-    control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
-    tools/validate_macro_regime_promotion_contract.py
-    fixtures/macro_promotion/not_promoted_valid.json
-    fixtures/macro_promotion/bad_promoted_without_approval.json
-    tests/test_macro_regime_promotion_contract.py
   ```
 - Authority boundaries:
   ```text
@@ -201,7 +178,7 @@
   - do not interpret WP3 merge as report narrative promotion
   - do not grant portfolio-action, lane-scoring, fundability, funding, mutation or delivery authority through WP3
 
-### 9. Future macro client-surface pilot
+### 7. WP7 — Future macro client-surface pilot
 
 - Owner: `[JOINT]`
 - Status: possible next macro package, not started
@@ -218,7 +195,7 @@
 
 ## Phase 4 — direct challenger-vs-current-holding scoring
 
-### 10. Add direct replacement-edge scoring
+### 8. WP5 — Add direct replacement-edge scoring
 
 - Owner: `[ASSISTANT]`
 - Status: future model enhancement
@@ -235,7 +212,7 @@
 
 ## Phase 5 — ChatGPT-triggerable report generation
 
-### 11. Use safe report request queue for ChatGPT-initiated fresh reports
+### 9. Use safe report request queue for ChatGPT-initiated fresh reports
 
 - Owner: `[ASSISTANT]`
 - Status: active baseline
