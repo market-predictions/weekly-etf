@@ -57,6 +57,7 @@
   WP6 — Latest-run manifest / delivery evidence reconciliation: completed
   WP7 — Deterministic macro regime client-surface pilot: completed / non-authoritative / not promoted
   WP8 — Macro old-vs-new review evidence package: completed / ready_for_narrative_promotion_review / not promoted
+  WP9 — Controlled deterministic macro narrative promotion artifact: completed / status=not_promoted
   ```
 - Action:
   - preserve the split between runtime provenance and post-execution official portfolio state
@@ -65,6 +66,7 @@
   - keep WP3 as narrative-promotion decision contract only, not portfolio/lane/fundability authority
   - keep WP7 macro client-surface pilot preview-only until an explicit future WP3-compliant promotion decision changes that
   - keep WP8 old-vs-new review as evidence only; it is not promotion and does not mutate production reports
+  - keep WP9 promotion decision artifact as `not_promoted`; it records no production report narrative authority and no production report mutation
   - keep WP5 replacement-edge scoring diagnostic-only until an explicit future authority/integration decision changes that
   - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, macro client-surface validation evidence, macro-promotion decision evidence, Dutch terminology validation evidence, replacement-edge evidence, pilot-preview evidence, old-vs-new review evidence, and inbox receipt distinct
 
@@ -143,14 +145,6 @@
   output/macro/review/macro_old_vs_new_review_20260605_000000.json
   review_status: ready_for_narrative_promotion_review
   ```
-- Validation evidence from Codespaces on `main` after `git pull` to `e301c26`:
-  ```bash
-  python -m pytest tests/test_macro_old_vs_new_review_package.py -q
-  # 5 passed in 0.08s
-
-  python tools/validate_macro_old_vs_new_review_package.py output/macro/review/macro_old_vs_new_review_20260605_000000.json
-  # MACRO_OLD_VS_NEW_REVIEW_OK | artifact=output/macro/review/macro_old_vs_new_review_20260605_000000.json | review_status=ready_for_narrative_promotion_review | production_report_narrative_authority=false | portfolio_action_authority=false | lane_scoring_authority=false | fundability_authority=false | funding_authority=false | portfolio_mutation=false
-  ```
 - Boundary:
   - review evidence only
   - not promotion
@@ -163,16 +157,35 @@
   - portfolio_mutation=false
   - delivery_authority=false
 
-### 7. WP9 — Controlled narrative promotion artifact
+### 7. WP9 — Controlled deterministic macro narrative promotion artifact
 
-- Owner: `[JOINT]`
-- Status: next possible macro package, blocked until explicitly requested
-- Goal:
-  - create a WP3-compatible promotion decision artifact using WP7 pilot and WP8 old-vs-new review evidence
-  - artifact may still be `not_promoted`; do not assume promotion
-- Boundary:
-  - even if narrative authority is promoted later, portfolio-action, lane-scoring, fundability, funding, and mutation authority remain false unless separately promoted
-  - no production report mutation unless explicitly requested after a valid promotion decision artifact exists
+- Owner: `[ASSISTANT]`
+- Status: completed / validated / `status=not_promoted`
+- Evidence:
+  ```text
+  output/macro/promotion/macro_regime_promotion_decision_20260605_000000.json
+  tests/test_macro_regime_promotion_decision_artifact.py
+  local validation: python tools/validate_macro_regime_promotion_contract.py output/macro/promotion/macro_regime_promotion_decision_20260605_000000.json = MACRO_REGIME_PROMOTION_CONTRACT_OK
+  local focused test: python -m pytest tests/test_macro_regime_promotion_decision_artifact.py -q = 4 passed
+  ```
+- Decision:
+  - WP9 records `not_promoted` because no explicit control-layer instruction to promote was present.
+  - WP8 `ready_for_narrative_promotion_review` remains review eligibility only, not promotion.
+- Authority boundaries:
+  ```text
+  client_facing_narrative_authority=false
+  production_report_narrative_authority=false
+  portfolio_action_authority=false
+  lane_scoring_authority=false
+  fundability_authority=false
+  funding_authority=false
+  portfolio_mutation=false
+  delivery_authority=false
+  execution_authority=false
+  production_report_mutation=false
+  ```
+- Remaining action:
+  - do not integrate deterministic macro wording into production reports unless a future explicit control-layer decision promotes narrative authority and a separate report-integration work package changes the production report path
 
 ---
 
@@ -181,29 +194,8 @@
 ### 8. WP4 — Dutch / bilingual alias consolidation
 
 - Status: completed / validated
-- Evidence:
-  ```text
-  runtime/nl_terminology_contract.py
-  runtime/nl_localization.py
-  runtime/apply_nl_localization.py
-  runtime/scrub_nl_client_language.py
-  runtime/client_facing_sanitizer.py
-  tools/validate_etf_dutch_language_quality.py
-  tests/test_dutch_terminology_contract.py
-  final worker commit: 0ac46cfde1b57299e5523b60d92b415c161d5a28
-  follow-up fix commit: 661764692127f03af21e6fc961dfabddaf6a9ab5
-  ```
-- Validation evidence from Codespaces:
-  ```bash
-  python -m pytest tests/test_dutch_terminology_contract.py -q
-  # 5 passed in 0.04s
-
-  python tools/validate_etf_dutch_language_quality.py
-  # ETF_DUTCH_LANGUAGE_QUALITY_OK | report=weekly_analysis_pro_nl_260604_11.md | terminology=central
-
-  python tools/validate_etf_delivery_html_contract.py
-  # ETF_DELIVERY_HTML_CONTRACT_OK ... EN and NL
-  ```
+- Remaining action:
+  - keep shared Dutch terminology contract active as a regression surface
 
 ---
 
@@ -212,16 +204,6 @@
 ### 9. WP5 — Direct challenger-vs-current-holding scoring
 
 - Status: completed as diagnostic-only scoring package
-- Evidence:
-  ```text
-  runtime/map_challenger_to_current_holding.py
-  runtime/score_replacement_edge.py
-  tools/validate_replacement_edge_scoring.py
-  tests/test_replacement_edge_scoring.py
-  output/replacement_edges/replacement_edge_20260606_000000.json
-  reported focused test: python -m pytest tests/test_replacement_edge_scoring.py -q = 4 passed
-  reported artifact validation: REPLACEMENT_EDGE_SCORING_OK
-  ```
 - Authority boundaries:
   ```text
   diagnostic_only=true
@@ -257,3 +239,11 @@
   control/run_queue/weekly_etf_report_request_YYYYMMDD_HHMMSS.md
   ```
 - Then verify the workflow outcome and repo artifacts directly where possible instead of asking the user to inspect Actions manually.
+
+### 12. Future deterministic macro report integration, only after explicit promotion
+
+- Status: not started / blocked
+- Boundary:
+  - WP9 did not promote narrative authority
+  - no production report mutation has occurred
+  - a future package must explicitly promote narrative authority first, then separately integrate report output
