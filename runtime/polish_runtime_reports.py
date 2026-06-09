@@ -8,6 +8,11 @@ from pathlib import Path
 from typing import Any
 
 from runtime.macro_report_surface import dashboard_en, dashboard_nl, executive_lines_en, executive_lines_nl
+from runtime.replacement_edge_report_notes import (
+    MARKER as REPLACEMENT_EDGE_NOTES_MARKER,
+    build_notes_payload_from_paths,
+    replacement_edge_notes_markdown,
+)
 
 EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
@@ -110,6 +115,33 @@ def _macro_state(runtime_state: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(pack, dict) or not pack:
         state["macro_policy_pack"] = load_macro_pack()
     return state
+
+
+def _replacement_edge_payload(state: dict[str, Any]) -> dict[str, Any]:
+    source_files = state.get("source_files") if isinstance(state.get("source_files"), dict) else {}
+    lane_path = source_files.get("lane_assessment") or (state.get("validation_flags") or {}).get("lane_assessment_source")
+    if not lane_path:
+        return {"edges": []}
+    try:
+        return build_notes_payload_from_paths(lane_path, run_id=str(state.get("run_id") or "report_notes"))
+    except Exception:
+        return {"edges": []}
+
+
+def _inject_replacement_edge_notes(text: str, state: dict[str, Any], *, language: str) -> str:
+    if REPLACEMENT_EDGE_NOTES_MARKER in text:
+        return text
+    notes = replacement_edge_notes_markdown(_replacement_edge_payload(state), language=language)
+    headings = ["### Replacement Duel Table", "### Replacement Duel Table v2"] if language == "en" else ["### Vervangingsanalyse"]
+    for heading in headings:
+        start = text.rfind(heading)
+        if start == -1:
+            continue
+        next_section = text.find("\n\n## ", start + len(heading))
+        if next_section == -1:
+            return text.rstrip() + "\n\n" + notes + "\n"
+        return text[:next_section].rstrip() + "\n\n" + notes + "\n" + text[next_section:]
+    return text
 
 
 def _macro_reason_for_lane(lane_name: Any, pack: dict[str, Any]) -> str:
@@ -267,6 +299,7 @@ def polish_english(text: str, runtime_state: dict[str, Any] | None = None) -> st
         text = replace_between(text, "## 3. Regime Dashboard", "## 4. Structural Opportunity Radar", dashboard_en(state))
         text = _inject_macro_radar_reasons(text, state)
     text = replace_between(text, "## 6. Bottom Line", "## 7. Equity Curve and Portfolio Development", _bottom_line_en(state))
+    text = _inject_replacement_edge_notes(text, state, language="en")
     return _patch_rotation_intent_language_en(text, state)
 
 
@@ -277,7 +310,7 @@ def polish_dutch(text: str, runtime_state: dict[str, Any] | None = None) -> str:
         text = replace_between(text, "## 1. Kernsamenvatting", "## 2. Portefeuille-acties", _executive_nl(state))
         text = replace_between(text, "## 3. Regime-dashboard", "## 4. Structurele kansenradar", dashboard_nl(state))
         print("ETF_RUNTIME_POLISH_NL_MACRO_OK | reason=native_dutch_macro_surface_applied")
-    return text
+    return _inject_replacement_edge_notes(text, state, language="nl")
 
 
 def main() -> None:
