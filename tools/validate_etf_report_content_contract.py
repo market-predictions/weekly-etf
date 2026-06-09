@@ -12,6 +12,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 import send_report as report_module
+from runtime.replacement_edge_report_notes import EN_AUTHORITY_DISCLAIMER, MARKER as REPLACEMENT_EDGE_NOTES_MARKER
 from runtime.scrub_etf_client_surface import scrub_text
 
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
@@ -166,6 +167,8 @@ def validate_no_forbidden_tokens(md_text: str, report_path: Path) -> None:
         if token.lower() in lower:
             raise RuntimeError(f"ETF content contract failed for {report_path.name}: forbidden client-surface token found: {token!r}")
     snake_tokens = sorted(set(match.group(0) for match in SNAKE_CASE_RE.finditer(md_text)))
+    allowed_snake_tokens = {REPLACEMENT_EDGE_NOTES_MARKER}
+    snake_tokens = [token for token in snake_tokens if token not in allowed_snake_tokens]
     if snake_tokens:
         raise RuntimeError(
             f"ETF content contract failed for {report_path.name}: internal snake-case tokens remain: "
@@ -259,6 +262,25 @@ def validate_section15(md_text: str, report_path: Path) -> None:
     report_module.validate_equity_curve_alignment(md_text)
 
 
+def validate_replacement_edge_notes(md_text: str, report_path: Path) -> None:
+    required = [
+        REPLACEMENT_EDGE_NOTES_MARKER,
+        EN_AUTHORITY_DISCLAIMER,
+        "allocation authority",
+        "fundability authority",
+        "lane-scoring authority",
+        "production recommendation authority",
+        "execution authority",
+        "portfolio mutation authority",
+    ]
+    missing = _missing(required, md_text)
+    if missing:
+        raise RuntimeError(
+            f"ETF content contract failed for {report_path.name}: replacement-edge diagnostic notes missing/incomplete: "
+            + ", ".join(missing)
+        )
+
+
 def validate_report(report_path: Path) -> None:
     original = report_path.read_text(encoding="utf-8")
     scrubbed = scrub_text(original)
@@ -273,6 +295,7 @@ def validate_report(report_path: Path) -> None:
     validate_equity_curve(md_text, report_path)
     validate_final_action_table(md_text, report_path)
     validate_section15(md_text, report_path)
+    validate_replacement_edge_notes(md_text, report_path)
     print(f"ETF_REPORT_CONTENT_CONTRACT_OK | report={report_path.name}")
 
 
