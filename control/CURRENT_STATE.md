@@ -1,7 +1,7 @@
 # ETF Review OS — Current State
 
 ## Snapshot date
-2026-06-06
+2026-06-10
 
 ## Repository
 
@@ -11,7 +11,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, completed macro promotion-preparation packages WP1, WP2, WP3, WP7, WP8, WP9, and WP10, and completed supporting Dutch terminology and replacement-edge diagnostic packages. WP10 created an explicit deterministic macro narrative authority promotion decision artifact with `status=not_promoted`. Deterministic macro regime remains outside production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, delivery authority, execution authority, and production report mutation.**
+**ETF has a latest fully recorded runtime-driven bilingual baseline with pricing-lineage proof and delivery-manifest evidence for workflow run #216 / run `20260605_081216`, completed macro promotion-preparation packages WP1, WP2, WP3, WP7, WP8, WP9, and WP10, completed supporting Dutch terminology and replacement-edge diagnostic packages, and completed WP11A-FIX render-path wiring for replacement-edge diagnostic notes. WP10 created an explicit deterministic macro narrative authority promotion decision artifact with `status=not_promoted`. Deterministic macro regime remains outside production report narrative authority, lane scoring, fundability, portfolio action, funding authority, portfolio mutation, delivery authority, execution authority, and production report mutation. Replacement-edge notes are now wired into the polished report surface as diagnostic-only evidence and do not grant lane-scoring, fundability, recommendation, execution, or portfolio mutation authority.**
 
 ## Latest production and report-surface evidence
 
@@ -149,6 +149,40 @@ production_report_mutation=false
 
 Reason: the current control files did not contain an explicit control-layer instruction to promote narrative authority. WP8 readiness remains eligibility for promotion review, not automatic promotion.
 
+### WP11A-FIX — Replacement-edge diagnostic notes render integration
+
+```text
+status: completed / render-path-wired / validator-added / awaiting CI confirmation
+helper: runtime/replacement_edge_report_notes.py
+render path: runtime/polish_runtime_reports.py
+validator: tools/validate_etf_report_content_contract.py
+test: tests/test_replacement_edge_report_notes.py
+marker: ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
+```
+
+WP11A-FIX wires replacement-edge diagnostic notes into the polished English and Dutch report surfaces below the replacement-duel / vervangingsanalyse section.
+
+Authority boundaries preserved:
+
+```text
+diagnostic_only=true
+portfolio_action_authority=false
+fundability_authority=false
+lane_scoring_authority=false
+funding_authority=false
+production_recommendation_authority=false
+execution_authority=false
+portfolio_mutation=false
+```
+
+Validation still required by CI/local worker:
+
+```bash
+python -m pytest tests/test_replacement_edge_report_notes.py -q
+```
+
+A fresh report run should confirm the updated content validator passes against a newly polished English report.
+
 ## Four-layer operating status
 
 ### 1. Decision framework
@@ -157,6 +191,7 @@ Reason: the current control files did not contain an explicit control-layer inst
 - WP10 explicitly records `status=not_promoted`.
 - Green compliance or review status does not equal production promotion or trade authority.
 - WP5 replacement-edge scoring remains diagnostic-only.
+- WP11A-FIX exposes replacement-edge diagnostics as report notes only, not as allocation, scoring, fundability, recommendation, execution, or mutation authority.
 
 ### 2. Input/state contract
 
@@ -170,6 +205,8 @@ output/macro/promotion/macro_regime_promotion_decision_<run_id>.json
 control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
 ```
 
+Replacement-edge notes are rendered from diagnostic artifacts/helper logic and remain non-authoritative.
+
 ### 3. Output contract
 
 - WP7 pilot output is preview/review evidence only.
@@ -177,6 +214,7 @@ control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
 - WP9 and WP10 both record `status=not_promoted`.
 - Deterministic macro wording remains outside the production report path.
 - No production report output was changed by WP10.
+- WP11A-FIX adds replacement-edge diagnostic notes to the polished English/Dutch report surface with explicit diagnostic-only wording.
 
 ### 4. Operational runbook
 
@@ -193,6 +231,8 @@ control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
 
 This path records a decision artifact only. The current WP10 artifact is `not_promoted` and must not mutate the production report or delivery workflow.
 
+WP11A-FIX operation is report-surface only. It does not change pricing, lane scoring, rotation, execution, trade intent, or portfolio-state mutation logic.
+
 ## Immediate priorities
 
 ### Priority A — preserve pricing-lineage and delivery-evidence discipline
@@ -203,6 +243,6 @@ Do not weaken pricing lineage, manifest, official portfolio-state, or delivery-e
 
 WP10 has created a WP3-compatible explicit promotion decision artifact with `status=not_promoted`. Deterministic macro wording remains outside production report narrative authority. Any future production report integration requires a future explicit promotion decision and a separate report-integration work package.
 
-### Priority C — decide how to consume WP5 diagnostics
+### Priority C — validate WP11A-FIX in CI/fresh report run
 
-WP5 diagnostic replacement-edge scoring is implemented. A future package may integrate it into replacement-duel notes or the current-position review surface, but only as diagnostic evidence unless a separate authority decision grants lane-scoring, fundability, or recommendation use.
+WP11A-FIX has wired replacement-edge diagnostic notes into the polished report surface and content validator. The next validation step is to run focused tests and a fresh report/content-validation pass, then record the resulting evidence.
