@@ -58,6 +58,7 @@
   WP8 — Macro old-vs-new review evidence package: completed / ready_for_narrative_promotion_review / not promoted
   WP9 — Controlled deterministic macro narrative promotion artifact: completed / status=not_promoted
   WP10 — Explicit deterministic macro narrative authority promotion decision: completed / status=not_promoted
+  WP11A-FIX — Replacement-edge diagnostic notes render integration: completed / render-path-wired / awaiting CI confirmation
   ```
 - Action:
   - keep WP10 promotion decision artifact as `not_promoted`; it records no production report narrative authority and no production report mutation
@@ -170,29 +171,56 @@
 
 ---
 
-## Phase 4 — replacement-edge scoring
+## Phase 4 — replacement-edge scoring and report notes
 
 ### 10. WP5 — Direct challenger-vs-current-holding scoring
 
 - Status: completed as diagnostic-only scoring package
 - Remaining action:
-  - decide in a future package whether and how to consume replacement-edge diagnostics in replacement-duel notes or current-position review
   - keep diagnostic-only unless a separate authority decision grants lane-scoring, fundability, recommendation, or portfolio-action use
+
+### 11. WP11A-FIX — Replacement-edge diagnostic notes render integration
+
+- Owner: `[ASSISTANT]`
+- Status: completed / render-path-wired / validator-added / awaiting CI confirmation
+- Evidence:
+  ```text
+  runtime/replacement_edge_report_notes.py
+  runtime/polish_runtime_reports.py
+  tests/test_replacement_edge_report_notes.py
+  tools/validate_etf_report_content_contract.py
+  control/REPLACEMENT_EDGE_REPORT_NOTES_STATUS.md
+  handover/workpackages/20260610_0000_wp11a_fix_replacement_edge_render_integration.md
+  marker: ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
+  ```
+- Boundary:
+  ```text
+  diagnostic_only=true
+  no lane-scoring authority
+  no fundability authority
+  no trade authority
+  no production recommendation authority
+  no execution authority
+  no portfolio mutation authority
+  ```
+- Remaining action:
+  - run focused pytest and a fresh report/content-validation pass
+  - record CI/fresh-run evidence after validation
 
 ---
 
 ## Phase 5 — possible follow-up packages
 
-### 11. Integrate replacement-edge diagnostics into notes, non-authoritative
+### 12. Validate WP11A-FIX with focused tests and fresh report run
 
-- Status: possible follow-up, not started
-- Boundary:
-  - no lane-scoring authority
-  - no fundability authority
-  - no trade authority
-  - no production recommendation authority unless separately approved
+- Status: next validation package / not yet confirmed by this chat
+- Action:
+  ```bash
+  python -m pytest tests/test_replacement_edge_report_notes.py -q
+  ```
+- Then run or trigger a fresh report/content-validation pass so the updated `tools/validate_etf_report_content_contract.py` proves the marker and diagnostic-only disclaimer on the newly rendered English report.
 
-### 12. Use safe report request queue for ChatGPT-initiated fresh reports
+### 13. Use safe report request queue for ChatGPT-initiated fresh reports
 
 - Status: active baseline
 - Action: when the user asks ChatGPT to generate a fresh Weekly ETF Review, create a request file under:
@@ -201,7 +229,7 @@
   ```
 - Then verify the workflow outcome and repo artifacts directly where possible instead of asking the user to inspect Actions manually.
 
-### 13. Future deterministic macro report integration, only after explicit promotion
+### 14. Future deterministic macro report integration, only after explicit promotion
 
 - Status: not started / blocked
 - Boundary:
