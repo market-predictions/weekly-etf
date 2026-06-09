@@ -11,6 +11,16 @@ from runtime.score_replacement_edge import (
 
 MARKER = "ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED"
 DEFAULT_LIMIT = 5
+EN_AUTHORITY_DISCLAIMER = (
+    "Diagnostic-only: these notes grant no allocation authority, fundability authority, "
+    "lane-scoring authority, production recommendation authority, execution authority or "
+    "portfolio mutation authority."
+)
+NL_AUTHORITY_DISCLAIMER = (
+    "Diagnostisch-only: deze notities geven geen allocatiebevoegdheid, fundability-bevoegdheid, "
+    "lane-scoring-bevoegdheid, productie-aanbevelingsbevoegdheid, uitvoeringsbevoegdheid of "
+    "portefeuillemutatiebevoegdheid."
+)
 
 
 def _num(value: Any) -> float | None:
@@ -44,7 +54,7 @@ def _note(score: Any, language: str = "en") -> str:
         if value is None:
             return "Diagnostische score ontbreekt; reguliere prijs- en relatieve-sterktepoorten blijven leidend."
         if value >= 0.20:
-            return "Diagnostisch voordeel zichtbaar; dit geeft geen allocatie-, fundability-, score-, aanbevelings- of uitvoeringsbevoegdheid."
+            return "Diagnostisch voordeel zichtbaar; dit is geen allocatie-, fundability-, score-, aanbevelings-, uitvoerings- of portefeuillemutatiesignaal."
         if value > 0:
             return "Bescheiden diagnostisch voordeel; herhaalbevestiging blijft nodig."
         if value < 0:
@@ -54,7 +64,7 @@ def _note(score: Any, language: str = "en") -> str:
     if value is None:
         return "Diagnostic score unavailable; standard pricing and relative-strength gates remain authoritative."
     if value >= 0.20:
-        return "Diagnostic edge visible; this grants no allocation, fundability, scoring, recommendation or execution authority."
+        return "Diagnostic edge visible; this is not an allocation, fundability, scoring, recommendation, execution or portfolio-mutation signal."
     if value > 0:
         return "Modest diagnostic edge; repeat confirmation remains required."
     if value < 0:
@@ -81,7 +91,9 @@ def build_notes_payload_from_paths(
         "portfolio_action_authority": False,
         "fundability_authority": False,
         "lane_scoring_authority": False,
+        "funding_authority": False,
         "production_recommendation_authority": False,
+        "execution_authority": False,
         "portfolio_mutation": False,
     }
     return payload
@@ -92,7 +104,7 @@ def replacement_edge_notes_markdown(payload: dict[str, Any], language: str = "en
     if language == "nl":
         lines = [
             f"<!-- {MARKER} -->",
-            "> Diagnostisch-only: deze notities geven geen allocatie-, fundability-, score-, aanbevelings- of uitvoeringsbevoegdheid.",
+            f"> {NL_AUTHORITY_DISCLAIMER}",
             "",
             "| Huidige positie | Alternatief | Diagnostische score | 1m-edge | 3m-edge | Drawdown-edge | Volatiliteitsedge | Niet-autoritatieve notitie |",
             "|---|---|---:|---:|---:|---:|---:|---|",
@@ -101,7 +113,7 @@ def replacement_edge_notes_markdown(payload: dict[str, Any], language: str = "en
     else:
         lines = [
             f"<!-- {MARKER} -->",
-            "> Diagnostic-only: these notes grant no allocation, fundability, scoring, recommendation or execution authority.",
+            f"> {EN_AUTHORITY_DISCLAIMER}",
             "",
             "| Current holding | Challenger | Diagnostic score | 1m edge | 3m edge | Drawdown edge | Volatility edge | Non-authoritative note |",
             "|---|---|---:|---:|---:|---:|---:|---|",
