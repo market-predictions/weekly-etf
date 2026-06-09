@@ -3,7 +3,7 @@
 ## Workpackage
 
 ```text
-WP11A — Integrate WP5 replacement-edge diagnostics into report notes, non-authoritative
+WP11A-FIX — Wire replacement-edge diagnostic notes into report render path
 ```
 
 ## Repository
@@ -15,12 +15,12 @@ market-predictions/weekly-etf
 ## Status
 
 ```text
-status: started / helper-and-tests-added / not-yet-wired-into-production-render
+status: completed / render-path-wired / validator-added / awaiting CI confirmation
 ```
 
 ## Purpose
 
-WP5 added direct challenger-vs-current-holding replacement-edge diagnostics. WP11A starts the safe client-surface integration path by rendering those diagnostics as clearly non-authoritative report notes.
+WP5 added direct challenger-vs-current-holding replacement-edge diagnostics. WP11A created the safe helper and tests. WP11A-FIX wires those diagnostics into the report-output path as clearly non-authoritative notes.
 
 ## Authority boundary
 
@@ -38,17 +38,21 @@ production_recommendation_authority=false
 execution_authority=false
 ```
 
-## Files added
+The notes must not influence ranking, fundability, recommendation, target weights, trade intents, execution, or portfolio mutation.
+
+## Files changed
 
 ```text
 runtime/replacement_edge_report_notes.py
+runtime/polish_runtime_reports.py
 tests/test_replacement_edge_report_notes.py
+tools/validate_etf_report_content_contract.py
 control/REPLACEMENT_EDGE_REPORT_NOTES_STATUS.md
 ```
 
 ## Implementation summary
 
-The new helper:
+The helper:
 
 ```text
 runtime/replacement_edge_report_notes.py
@@ -62,10 +66,35 @@ runtime/replacement_edge_report_notes.py
 ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
 ```
 
-- explicitly states that the notes do not create allocation, fundability, scoring, recommendation or execution authority
+- explicitly states that the notes do not create allocation authority, fundability authority, lane-scoring authority, production recommendation authority, execution authority, or portfolio mutation authority
 - preserves the existing WP5 diagnostic-only boundary
 
-## Test coverage added
+The runtime polish layer:
+
+```text
+runtime/polish_runtime_reports.py
+```
+
+- injects the replacement-edge notes after the final Replacement Duel / Vervangingsanalyse section
+- applies the insertion to both English and Dutch report text
+- uses a safe empty-state fallback when a lane-assessment source cannot be resolved
+- does not alter pricing, lane scoring, rotation, trade-intent, execution, or portfolio-state logic
+
+The content validator:
+
+```text
+tools/validate_etf_report_content_contract.py
+```
+
+now requires the English rendered report to contain:
+
+```text
+ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
+```
+
+and the English diagnostic-only authority disclaimer.
+
+## Test coverage updated
 
 ```text
 tests/test_replacement_edge_report_notes.py
@@ -73,41 +102,40 @@ tests/test_replacement_edge_report_notes.py
 
 The tests assert:
 
-- English output includes the diagnostic-only marker and authority disclaimer
-- Dutch output includes the diagnostic-only marker and authority disclaimer
+- English output includes the diagnostic-only marker and full authority disclaimer
+- Dutch output includes the diagnostic-only marker and full authority disclaimer
 - empty diagnostics render a safe fallback rather than implying a signal
+- English polish output inserts the notes below the replacement-duel section
+- Dutch polish output inserts the notes below the vervangingsanalyse section
+- diagnostic payload fields remain non-authoritative
 
-## Not done yet
-
-The helper is not yet wired into:
+## Commits
 
 ```text
-runtime/render_etf_report_from_state.py
-runtime/render_etf_report_nl_from_state.py
-runtime/delivery_html_overrides.py
-.github/workflows/send-weekly-report.yml
+11c9a00a57204fb226f077b52c18377d6f7fa04a — Clarify replacement-edge diagnostic authority boundary
+4ee42122aca1ceaccf7ba9a5eda3506ef637f3c4 — Wire replacement-edge diagnostic notes into runtime polish
+3ca18c9adee77c148291a2b1cfbaa6513c0735c1 — Test replacement-edge notes render integration
+d6b8cee7a5b4eb99d536a0bae199bd639edd3459 — Validate replacement-edge diagnostic report notes
 ```
 
-Reason: an attempted large overwrite of the existing render module was blocked by the connector/safety layer. To avoid risking production output, WP11A was narrowed to a safe helper/test/status increment first.
+## Validation still required
 
-## Next safe step
+The required focused tests should be run by CI or a local worker:
 
-A follow-up worker should integrate the helper in a small patch:
-
-1. import `replacement_edge_notes_markdown`
-2. insert the note block immediately below the existing Replacement Duel Table / Vervangingsanalyse section
-3. optionally add an output-contract validator that checks the marker and diagnostic-only disclaimer
-4. only then wire it into the workflow if needed
-
-## Validation evidence available in repo
-
-```text
-helper added: runtime/replacement_edge_report_notes.py
-tests added: tests/test_replacement_edge_report_notes.py
-```
-
-Local or CI execution still needs to confirm:
-
-```text
+```bash
 python -m pytest tests/test_replacement_edge_report_notes.py -q
+```
+
+A fresh workflow/report run should also confirm that the updated content validator passes against the newly polished English report.
+
+## Remaining work
+
+No further WP11A-FIX implementation work is currently known.
+
+The remaining open item is validation evidence:
+
+```text
+run focused pytest
+run fresh report/content validator
+record resulting workflow/test status in CURRENT_STATE and ETF_SESSION_CHANGELOG
 ```
