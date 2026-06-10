@@ -1,4 +1,5 @@
 from runtime.polish_runtime_reports import polish_dutch, polish_english
+from runtime.fix_report_output_contract import action_snapshot_section
 from runtime.replacement_edge_report_notes import (
     EN_AUTHORITY_DISCLAIMER,
     MARKER,
@@ -123,6 +124,14 @@ def test_replacement_edge_notes_are_inserted_into_dutch_polish_output():
     assert MARKER in out
     assert NL_AUTHORITY_DISCLAIMER in out
     assert out.index("### Vervangingsanalyse") < out.index(MARKER) < out.index("## 12. Rotatieplan portefeuille")
+
+
+def test_output_contract_fix_keeps_english_replacement_edge_notes():
+    out = action_snapshot_section({"positions": []})
+
+    assert MARKER in out
+    assert EN_AUTHORITY_DISCLAIMER in out
+    assert out.index("### Replacement pricing and duel status") < out.index(MARKER)
 
 
 def test_replacement_edge_notes_do_not_promote_authority_fields():
