@@ -3,7 +3,7 @@
 ## Workpackage
 
 ```text
-WP11A-FIX — Wire replacement-edge diagnostic notes into report render path
+WP11A-VERIFY — Validate replacement-edge diagnostic notes in CI/fresh report output
 ```
 
 ## Repository
@@ -15,12 +15,12 @@ market-predictions/weekly-etf
 ## Status
 
 ```text
-status: completed / render-path-wired / validator-added / awaiting CI confirmation
+status: validation-requested / fresh-report-run-queued / awaiting-workflow-evidence
 ```
 
 ## Purpose
 
-WP5 added direct challenger-vs-current-holding replacement-edge diagnostics. WP11A created the safe helper and tests. WP11A-FIX wires those diagnostics into the report-output path as clearly non-authoritative notes.
+WP5 added direct challenger-vs-current-holding replacement-edge diagnostics. WP11A created the safe helper and tests. WP11A-FIX wired those diagnostics into the report-output path as clearly non-authoritative notes. WP11A-VERIFY requests and tracks validation evidence for that report-output contract.
 
 ## Authority boundary
 
@@ -40,7 +40,7 @@ execution_authority=false
 
 The notes must not influence ranking, fundability, recommendation, target weights, trade intents, execution, or portfolio mutation.
 
-## Files changed
+## Files changed by WP11A-FIX
 
 ```text
 runtime/replacement_edge_report_notes.py
@@ -50,7 +50,7 @@ tools/validate_etf_report_content_contract.py
 control/REPLACEMENT_EDGE_REPORT_NOTES_STATUS.md
 ```
 
-## Implementation summary
+## WP11A-FIX implementation summary
 
 The helper:
 
@@ -86,7 +86,7 @@ The content validator:
 tools/validate_etf_report_content_contract.py
 ```
 
-now requires the English rendered report to contain:
+requires the English rendered report to contain:
 
 ```text
 ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
@@ -94,48 +94,53 @@ ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
 
 and the English diagnostic-only authority disclaimer.
 
-## Test coverage updated
+## WP11A-VERIFY action taken
+
+Created validation run-queue request:
 
 ```text
-tests/test_replacement_edge_report_notes.py
+control/run_queue/weekly_etf_report_request_20260610_0015_wp11a_verify.md
 ```
 
-The tests assert:
-
-- English output includes the diagnostic-only marker and full authority disclaimer
-- Dutch output includes the diagnostic-only marker and full authority disclaimer
-- empty diagnostics render a safe fallback rather than implying a signal
-- English polish output inserts the notes below the replacement-duel section
-- Dutch polish output inserts the notes below the vervangingsanalyse section
-- diagnostic payload fields remain non-authoritative
-
-## Commits
+Commit:
 
 ```text
-11c9a00a57204fb226f077b52c18377d6f7fa04a — Clarify replacement-edge diagnostic authority boundary
-4ee42122aca1ceaccf7ba9a5eda3506ef637f3c4 — Wire replacement-edge diagnostic notes into runtime polish
-3ca18c9adee77c148291a2b1cfbaa6513c0735c1 — Test replacement-edge notes render integration
-d6b8cee7a5b4eb99d536a0bae199bd639edd3459 — Validate replacement-edge diagnostic report notes
+31328c2e5d2a2c16c642914f1538808fe56f77ac — Request WP11A-VERIFY fresh report validation run
 ```
 
-## Validation still required
+## Validation evidence status
 
-The required focused tests should be run by CI or a local worker:
+At the time this file was updated, the GitHub connector returned no workflow-run metadata for commit:
+
+```text
+31328c2e5d2a2c16c642914f1538808fe56f77ac
+```
+
+So WP11A-VERIFY is not yet closed.
+
+## Required validation evidence still needed
+
+Focused test:
 
 ```bash
 python -m pytest tests/test_replacement_edge_report_notes.py -q
 ```
 
-A fresh workflow/report run should also confirm that the updated content validator passes against the newly polished English report.
+Fresh report/content validation should prove:
+
+```text
+English report contains ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
+Dutch report contains ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
+python tools/validate_etf_report_content_contract.py --output-dir output passes
+```
 
 ## Remaining work
 
-No further WP11A-FIX implementation work is currently known.
-
-The remaining open item is validation evidence:
-
 ```text
-run focused pytest
-run fresh report/content validator
-record resulting workflow/test status in CURRENT_STATE and ETF_SESSION_CHANGELOG
+wait for / inspect GitHub Actions workflow result
+confirm latest fresh English report path
+confirm latest fresh Dutch report path
+confirm marker in both reports
+confirm content validator result
+record completed verification status in CURRENT_STATE, NEXT_ACTIONS, ETF_SESSION_CHANGELOG and a follow-up handover
 ```
