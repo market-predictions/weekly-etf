@@ -206,3 +206,53 @@ confirm marker in both reports
 confirm content validator result
 record completed verification status in CURRENT_STATE, NEXT_ACTIONS, ETF_SESSION_CHANGELOG and a follow-up closeout handover
 ```
+
+## WP11A-CONTENT-FIX action taken
+
+The policy-cap retry moved past model execution and failed later in the English report content contract:
+
+```text
+ETF content contract failed for weekly_analysis_pro_260609_04.md: replacement-edge diagnostic notes missing/incomplete: ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED, Diagnostic-only: these notes grant no allocation authority, fundability authority, lane-scoring authority, production recommendation authority, execution authority or portfolio mutation authority., allocation authority, fundability authority, lane-scoring authority, production recommendation authority, execution authority, portfolio mutation authority
+```
+
+Root cause:
+
+```text
+runtime.polish_runtime_reports inserted replacement-edge diagnostic notes early, but runtime.fix_report_output_contract rebuilt the English replacement pricing/duel surface afterward and did not re-emit the diagnostic notes.
+```
+
+Fix commits:
+
+```text
+eb312232d86e2f9ffac5133695b2cf69f71ea64f — Preserve replacement-edge notes in output contract fix
+0229ede09541aa9b61b6ff8136d7610a426853b1 — Test output contract replacement-edge notes
+```
+
+Change summary:
+
+- `runtime.fix_report_output_contract` now appends English replacement-edge diagnostic notes to the replacement pricing/duel block it renders.
+- The content validator remains strict.
+- No policy, scoring, fundability, recommendation, execution, target-weight or portfolio-mutation authority changed.
+
+Local validation on the failed fresh output after applying the fix showed:
+
+```text
+ETF_OUTPUT_CONTRACT_FIX_PATCHED | report=weekly_analysis_pro_260609_04.md | rotation_plan=True
+ETF_OUTPUT_CONTRACT_FIX_SKIPPED | report=weekly_analysis_pro_nl_260609_04.md | reason=native_dutch_renderer
+ETF_OUTPUT_CONTRACT_FIX_OK
+ETF_REPORT_CONTENT_CONTRACT_OK | report=weekly_analysis_pro_260609_04.md
+```
+
+The local validation environment lacked optional render/test packages, so the focused smoke path used temporary import stubs for unused PDF/render imports. The CI environment already has the normal workflow dependencies.
+
+## Prepared content-fix retry request
+
+```text
+control/run_queue/weekly_etf_report_request_20260610_191044_wp11a_content_fix_retry.md
+```
+
+Purpose:
+
+```text
+Retry WP11A-VERIFY after preserving English replacement-edge diagnostic notes through runtime.fix_report_output_contract.
+```
