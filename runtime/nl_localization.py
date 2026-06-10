@@ -7,15 +7,15 @@ from runtime import nl_terminology as term
 from runtime import nl_terminology_contract as contract
 
 # Central terminology aliases. Keep these names for backward-compatible imports,
-# but source runtime/status vocabulary from the shared terminology contract.
+# but source identity-checked alias maps directly from runtime.nl_terminology.
 DUTCH_DISCLAIMER = term.DUTCH_DISCLAIMER
 ALLOWED_ENGLISH_TERMS = term.ALLOWED_ENGLISH_TERMS
 LABELS = term.REPORT_LABELS
 TABLE_LABELS = term.TABLE_LABELS
-ACTION_REPLACEMENTS = contract.ACTION_REPLACEMENTS
 PHRASE_REPLACEMENTS = term.PHRASE_REPLACEMENTS
-DECISION_TRANSLATIONS = contract.DECISION_TRANSLATIONS
-TRIGGER_TRANSLATIONS = contract.TRIGGER_TRANSLATIONS
+ACTION_REPLACEMENTS = term.ACTION_REPLACEMENTS
+DECISION_TRANSLATIONS = term.DECISION_TRANSLATIONS
+TRIGGER_TRANSLATIONS = term.TRIGGER_TRANSLATIONS
 FORBIDDEN_NL_STRINGS = term.FORBIDDEN_NL_STRINGS
 LEGACY_ONLY_PHRASE_REPLACEMENTS = contract.LEGACY_ONLY_PHRASE_REPLACEMENTS
 
