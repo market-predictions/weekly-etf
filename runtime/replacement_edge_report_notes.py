@@ -103,7 +103,6 @@ def replacement_edge_notes_markdown(payload: dict[str, Any], language: str = "en
     edges = list(payload.get("edges", []) or [])[:limit]
     if language == "nl":
         lines = [
-            f"<!-- {MARKER} -->",
             f"> {NL_AUTHORITY_DISCLAIMER}",
             "",
             "| Huidige positie | Alternatief | Diagnostische score | 1m-edge | 3m-edge | Drawdown-edge | Volatiliteitsedge | Niet-autoritatieve notitie |",
@@ -112,7 +111,6 @@ def replacement_edge_notes_markdown(payload: dict[str, Any], language: str = "en
         empty = "| Geen | Geen | n.v.t. | n.v.t. | n.v.t. | n.v.t. | n.v.t. | Geen vervangingsedge-diagnostiek beschikbaar deze run. |"
     else:
         lines = [
-            f"<!-- {MARKER} -->",
             f"> {EN_AUTHORITY_DISCLAIMER}",
             "",
             "| Current holding | Challenger | Diagnostic score | 1m edge | 3m edge | Drawdown edge | Volatility edge | Non-authoritative note |",
