@@ -14,6 +14,7 @@ ETF_NAMES = {
     "PAVE": "Global X U.S. Infrastructure Development ETF",
     "URNM": "Sprott Uranium Miners ETF",
     "GLD": "SPDR Gold Shares",
+    "GSG": "iShares S&P GSCI Commodity-Indexed Trust",
 }
 
 VALUATION_HISTORY_PATH = Path("output/etf_valuation_history.csv")
@@ -75,7 +76,7 @@ LANE_NL = {
     "Biotech innovation / therapeutic platforms": "Biotechinnovatie / therapeutische platforms",
     "Nuclear utilities and clean baseload": "Nucleaire nutsbedrijven en schone basislast",
     "Defense innovation / sovereign resilience": "Defensie-innovatie / strategische weerbaarheid",
-    "Gold hedge review": "Herbeoordeling goudhedge",
+    "Gold hedge review": "Hedge- en grondstoffenreview",
     "Non-U.S. developed diversification": "Ontwikkelde markten buiten de VS",
     "India Industrialization": "Industrialisatie India",
     "Uranium and Nuclear": "Uranium en kernenergie",
@@ -90,6 +91,7 @@ POSITION_SHORT_REASON_NL = {
     "PAVE": "Infrastructuurcase blijft valide, maar GRID is de scherpste vervangingskandidaat.",
     "URNM": "Strategische energiecase blijft valide, maar krijgt deze run geen extra kapitaal boven SMH.",
     "GLD": "Hedgefunctie staat onder herbeoordeling na de forse drawdown.",
+    "GSG": "Brede grondstoffenblootstelling blijft onder rolvalidatie als hedge- en inflatiesensitieve positie.",
 }
 
 POSITION_NEXT_ACTION_NL = {
@@ -99,6 +101,7 @@ POSITION_NEXT_ACTION_NL = {
     "PAVE": "Voer de vervangingsanalyse tegenover GRID opnieuw uit.",
     "URNM": "Aanhouden en vergelijken met URA/NLR als uraniumbreedte verbetert.",
     "GLD": "Voer de hedge-validiteitstest opnieuw uit tegenover GSG en BIL.",
+    "GSG": "Monitor commodity-breedte en bijdrage aan de hedgefunctie.",
 }
 
 
@@ -143,6 +146,27 @@ def position_rows(state: dict[str, Any]) -> list[dict[str, Any]]:
     return list(state.get("positions", []) or [])
 
 
+def active_tickers(state: dict[str, Any]) -> set[str]:
+    return {ticker(p.get("ticker")) for p in position_rows(state) if ticker(p.get("ticker"))}
+
+
+def is_active(state: dict[str, Any], symbol: str) -> bool:
+    return ticker(symbol) in active_tickers(state)
+
+
+def review_tickers(state: dict[str, Any]) -> str:
+    tickers = action_tickers(state, lambda action, p: nl_yes_no(p.get("better_alternative_exists")) == "Ja" or "review" in action.lower())
+    return tickers if tickers != "Geen" else "SPY, PPA en PAVE"
+
+
+def hedge_review_label(state: dict[str, Any]) -> str:
+    if is_active(state, "GLD"):
+        return "goudhedge"
+    if is_active(state, "GSG"):
+        return "brede grondstoffenhedge"
+    return "hedgerol"
+
+
 def cash_eur(state: dict[str, Any]) -> float:
     return float((state.get("portfolio") or {}).get("cash_eur") or 0.0)
 
@@ -182,6 +206,7 @@ def nl_thesis(value: Any, ticker_value: str = "") -> str:
         "PAVE": "Netwerk- en infrastructuurcapex",
         "URNM": "Kernenergie- en uraniumcyclus",
         "GLD": "Reële activa / geopolitieke en inflatiehedge",
+        "GSG": "Brede grondstoffen- en inflatiegevoelige hedgepositie",
     }.get(ticker_value)
     return fallback or raw or "Portefeuilleblootstelling"
 
@@ -357,7 +382,7 @@ def nl_history_comment(value: Any) -> str:
         "Fresh six-of-six repricing using completed 20 April close set": "Verse herprijzing voor zes van zes posities op basis van de volledige slotkoersset van 20 april",
         "Fresh five-of-six repricing; PPA carried forward": "Verse herprijzing voor vijf van zes posities; PPA doorgeschoven",
         "Fresh six-of-six repricing using persisted 2026-04-29 audit": "Verse herprijzing voor zes van zes posities op basis van de vastgelegde prijsaudit van 2026-04-29",
-        "Fresh five-of-six pricing recovery; GLD carried forward": "Prijsherstel voor vijf van zes posities; GLD doorgeschoven",
+        "Fresh five-of-six pricing recovery; GLD carried forward": "Prijsherstel voor vijf van zes posities; goudpositie doorgeschoven",
         "Latest 4 May close basis; +8 SMH executed from cash": "Laatste slotkoersbasis van 4 mei; +8 SMH uitgevoerd vanuit cash",
     }
     return mapping.get(raw, raw or "Historisch waarderingspunt")
@@ -416,6 +441,7 @@ def position_changes_table_nl(state: dict[str, Any]) -> str:
             "PAVE": "Aanhouden, onder herbeoordeling; volgende run vergelijken met GRID.",
             "URNM": "Aanhouden; deze run niet beter dan SMH voor cash.",
             "GLD": "Aanhouden, onder hedge-validiteitsreview.",
+            "GSG": "Aanhouden; huidige brede grondstoffenblootstelling blijft onder rolvalidatie.",
         }.get(t, "Geen materiële wijziging.")
         lines.append(f"| {t} | {prev:.2f} | {new:.2f} | {new - prev:.2f} | {f2(p.get('shares_delta_this_run'))} | {executed} | {note} |")
     cash_pct = cash_eur(state) / (total_nav(state) or 1.0) * 100.0
@@ -445,19 +471,23 @@ def continuity_table_nl(state: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def watchlist_table_nl() -> str:
+def watchlist_table_nl(state: dict[str, Any]) -> str:
+    hedge_primary = "GLD" if is_active(state, "GLD") else "GSG"
+    hedge_alternative = "GSG / BIL" if hedge_primary == "GLD" else "BIL / DBC"
+    hedge_theme = "Goudhedge" if hedge_primary == "GLD" else "Hedge- en grondstoffenbreedte"
     return "\n".join([
         "| Thema | Primaire ETF | Alternatieve ETF | Waarom op de radar | Status |",
         "|---|---|---|---|---|",
         "| AI-rekenkrachtinfrastructuur | SMH | SOXX | Sterkste structurele groeiblootstelling. | Actief |",
         "| Defensie-innovatie / strategische weerbaarheid | PPA | ITA | Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling. | Vervangingsanalyse vereist |",
         "| Netuitbreiding / elektrificatie | PAVE | GRID | Infrastructuurcapex blijft valide. | Vervangingsanalyse vereist |",
-        "| Herbeoordeling goudhedge | GLD | GSG / BIL | Hedgefunctie moet worden bewezen. | Onder herbeoordeling |",
+        f"| {hedge_theme} | {hedge_primary} | {hedge_alternative} | Hedgefunctie en grondstoffenbreedte moeten periodiek worden bevestigd. | Onder herbeoordeling |",
         "| Ontwikkelde markten buiten de VS | IEFA | EFA | De portefeuille heeft geen blootstelling aan ontwikkelde markten buiten de VS. | Volglijst |",
     ])
 
 
-def asset_allocation_map_nl() -> str:
+def asset_allocation_map_nl(state: dict[str, Any]) -> str:
+    hedge_segment = "Goud" if is_active(state, "GLD") else "Grondstoffen / hedge"
     return "\n".join([
         "| Segment | Positionering | Toelichting |",
         "|---|---|---|",
@@ -468,20 +498,23 @@ def asset_allocation_map_nl() -> str:
         "| Small-cap | Onderwogen | Rentes en herfinanciering blijven lastig. |",
         "| Groei | Neutraal | Selectieve groei onder leiding van SMH blijft aantrekkelijk. |",
         "| Kwaliteit | Overwogen | Winstbestendigheid blijft waardevol. |",
-        "| Goud | Neutraal | Hedgerol onder herbeoordeling. |",
+        f"| {hedge_segment} | Neutraal | Hedgerol blijft onder periodieke rolvalidatie. |",
         "| Industrie / defensie | Overwogen | Structurele thesis is valide; ETF-implementatie onder herbeoordeling. |",
         "| Niet-USD activa | Volglijst | Nulallocatie is een expliciete inzet op Amerikaanse uitzonderingskracht. |",
     ])
 
 
-def second_order_map_nl() -> str:
+def second_order_map_nl(state: dict[str, Any]) -> str:
+    hedge_driver = "Goudhedge" if is_active(state, "GLD") else "Grondstoffenhedge"
+    hedge_winners = "GLD, GSG, BIL" if is_active(state, "GLD") else "GSG, BIL, DBC"
+    hedge_implication = "Houd goud-/hedgerol onder herbeoordeling" if is_active(state, "GLD") else "Houd brede hedge- en grondstoffenrol onder herbeoordeling"
     return "\n".join([
         "| Drijver | Eerste-orde-effect | Tweede-orde-effect | Waarschijnlijke winnaars | Kwetsbare segmenten | ETF-implicatie | Timing | Vertrouwen |",
         "|---|---|---|---|---|---|---|---|",
         "| AI-leiderschap | SMH blijft de zuiverste groeiblootstelling | Concentratie moet worden bewaakt | SMH, SOXX | Cyclische waarden van lagere kwaliteit | Aanhouden rond maximale positiegrootte | Direct | Hoog |",
         "| Factorconcentratie | SPY en SMH overlappen | De portefeuille is minder gediversifieerd dan het aantal tickers suggereert | QUAL, IEFA op de volglijst | Overlappende Amerikaanse beta | Houd SPY onder herbeoordeling | 1-3 maanden | Gemiddeld |",
         "| Defensiethesis versus ETF-implementatie | Defensie blijft structureel valide | PPA moet zich bewijzen tegenover ITA | ITA, PPA | Zwakke ETF-selectie | Houd PPA onder herbeoordeling | Direct | Gemiddeld |",
-        "| Hedgedrawdown | GLD moet zijn hedgefunctie bewijzen | GSG en BIL blijven alternatieven | GSG, BIL, cash | Onproductieve hedgepositie | Houd GLD onder herbeoordeling | Direct | Gemiddeld |",
+        f"| {hedge_driver} | Hedgefunctie moet periodiek worden bewezen | {hedge_winners} blijven relevante vergelijkingspunten | {hedge_winners} | Onproductieve hedgepositie | {hedge_implication} | Direct | Gemiddeld |",
     ])
 
 
@@ -507,7 +540,8 @@ def render_nl_native(state: dict[str, Any]) -> str:
     eurusd = eurusd_used(state)
     holdings = ", ".join(ticker(p.get("ticker")) for p in position_rows(state))
     add = action_tickers(state, lambda action, p: "add" in action.lower() or "buy" in text(p.get("action_executed_this_run")).lower())
-    review = action_tickers(state, lambda action, p: nl_yes_no(p.get("better_alternative_exists")) == "Ja" or "review" in action.lower())
+    review = review_tickers(state)
+    hedge_label = hedge_review_label(state)
     return f"""# Wekelijkse ETF-review {format_dutch_report_date(report_date) if report_date != 'unknown' else report_date}
 
 > *Dit rapport wordt uitsluitend verstrekt voor informatieve en educatieve doeleinden; zie de disclaimer aan het einde.*
@@ -517,7 +551,7 @@ def render_nl_native(state: dict[str, Any]) -> str:
 - **Primair regime:** Risk-on met smal marktleiderschap.
 - **Geopolitiek regime:** Gemengd / nog niet doorslaggevend.
 - **Wat is er deze week veranderd:** Macro-, beleids- en regime-input worden meegenomen in de beoordeling, maar alleen de belangrijkste beslissignalen worden getoond.
-- **Algemeen portefeuilleoordeel:** Laat de huidige portefeuille voorlopig intact, maar behandel SPY, PPA, PAVE en GLD als posities onder actieve herbeoordeling.
+- **Algemeen portefeuilleoordeel:** Laat de huidige portefeuille voorlopig intact, maar behandel {review} als posities onder actieve herbeoordeling.
 - **Belangrijkste conclusie:** SMH blijft de best onderbouwde kernpositie, maar nieuw kapitaal en vervangingsbeslissingen moeten koersbevestiging, relatieve sterkte en macrosteun doorstaan.
 
 ## 2. Portefeuille-acties
@@ -542,7 +576,7 @@ def render_nl_native(state: dict[str, Any]) -> str:
 
 ### Wat veranderde
 - AI- en semiconductorleiderschap blijft de dominante aandelenimpuls.
-- Het gedrag van goud als hedge blijft onder herbeoordeling en is geen automatische stabilisator.
+- Het gedrag van de {hedge_label} blijft onder herbeoordeling en is geen automatische stabilisator.
 
 ### Portefeuille-implicaties
 - SMH blijft de best onderbouwde kernpositie, maar smal marktleiderschap mag niet worden verward met brede portefeuillediversificatie.
@@ -573,7 +607,7 @@ def render_nl_native(state: dict[str, Any]) -> str:
 ## 5. Belangrijkste risico’s / invalidaties
 
 - SPY plus SMH creëert hoge Amerikaanse tech-/AI-factoroverlap.
-- GLD blijft een hedgepositie onder herbeoordeling en is geen vanzelfsprekende stabilisator.
+- De {hedge_label} blijft een rol die periodiek moet worden bewezen en is geen vanzelfsprekende stabilisator.
 - PPA en PAVE blijven vervangbaar totdat de kwaliteit van de ETF-implementatie is bewezen.
 - Niet-Amerikaanse aandelenblootstelling blijft een diversificatiekloof.
 
@@ -582,7 +616,7 @@ def render_nl_native(state: dict[str, Any]) -> str:
 - **Portefeuillehouding:** SMH blijft de best onderbouwde kernpositie, maar smal marktleiderschap mag niet worden verward met brede portefeuillediversificatie.
 - **Best onderbouwde blootstelling:** SMH blijft de sterkste bijdrage in de portefeuille en de zuiverste structurele groeiblootstelling.
 - **Belangrijkste disciplinepunt:** Voordat nieuw kapitaal naar alternatieven gaat, moeten SPY, PPA en PAVE expliciet worden getoetst aan hun belangrijkste vervangingskandidaten.
-- **Zwakste implementatievragen:** PPA moet zich bewijzen tegenover ITA, PAVE tegenover GRID, en GLD moet bewijzen dat het nog steeds een stabiliserende hedgefunctie heeft.
+- **Zwakste implementatievragen:** PPA moet zich bewijzen tegenover ITA, PAVE tegenover GRID, en de {hedge_label} moet aantonen dat de rol nog steeds stabiliserend is.
 
 ## 7. Portefeuillecurve en portefeuilleontwikkeling
 
@@ -599,11 +633,11 @@ def render_nl_native(state: dict[str, Any]) -> str:
 
 ## 8. Allocatiekaart
 
-{asset_allocation_map_nl()}
+{asset_allocation_map_nl(state)}
 
 ## 9. Tweede-orde-effectenkaart
 
-{second_order_map_nl()}
+{second_order_map_nl(state)}
 
 ## 10. Review huidige posities
 
@@ -655,13 +689,13 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 - Leverage toegestaan: Nee
 
 ### Volglijst / dynamisch radargeheugen
-{watchlist_table_nl()}
+{watchlist_table_nl(state)}
 
 ### Continuïteit in aanbevelingsdiscipline
 - SPY: overlapreview tegenover SMH blijft actief.
 - PPA: directe vervangingsanalyse tegenover ITA vereist.
 - PAVE: directe vervangingsanalyse tegenover GRID vereist.
-- GLD: hedge-validiteitstest vereist.
+- {hedge_label.capitalize()}: rolvalidatie blijft vereist.
 - Vervangingskandidaten: niet geschikt voor allocatie zonder afgeronde vervangingsanalyse.
 
 ### Randvoorwaarden
