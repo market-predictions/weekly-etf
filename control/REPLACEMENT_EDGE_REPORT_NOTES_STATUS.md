@@ -15,7 +15,7 @@ market-predictions/weekly-etf
 ## Status
 
 ```text
-status: verified-success / WP11A replacement-edge report notes accepted in fresh CI output
+status: marker-hidden-fix-pending-rerender / WP11A replacement-edge report notes remain diagnostic-only, marker must not appear in client output
 ```
 
 ## Purpose
@@ -62,12 +62,13 @@ runtime/replacement_edge_report_notes.py
 
 - builds a notes payload from the existing WP5 replacement-edge artifact builder
 - renders English and Dutch markdown tables
-- embeds a stable marker:
+- previously embedded a stable marker:
 
 ```text
 ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
 ```
 
+- the marker is no longer rendered into client-facing Markdown/HTML/PDF output
 - explicitly states that the notes do not create allocation authority, fundability authority, lane-scoring authority, production recommendation authority, execution authority, or portfolio mutation authority
 - preserves the existing WP5 diagnostic-only boundary
 
@@ -88,13 +89,11 @@ The content validator:
 tools/validate_etf_report_content_contract.py
 ```
 
-requires the English rendered report to contain:
+requires the English rendered report to contain the English diagnostic-only authority disclaimer and now treats the old marker as forbidden client-surface text:
 
 ```text
 ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
 ```
-
-and the English diagnostic-only authority disclaimer.
 
 ## WP11A-VERIFY action taken
 
