@@ -9,6 +9,10 @@ from typing import Any
 
 from runtime.build_etf_report_state import build_runtime_state
 from runtime.render_etf_report_from_state import f2, position_rows
+from runtime.replacement_edge_report_notes import (
+    build_notes_payload_from_paths,
+    replacement_edge_notes_markdown,
+)
 from runtime.replacement_duel_v2 import replacement_duel_v2_markdown
 from runtime.rotation_render_tables import (
     has_rotation_plan,
@@ -145,6 +149,21 @@ def _trade_summary(state: dict[str, Any]) -> str:
     return "; ".join(parts) + ", pending execution and portfolio-state persistence."
 
 
+def _replacement_edge_payload(state: dict[str, Any]) -> dict[str, Any]:
+    source_files = state.get("source_files") if isinstance(state.get("source_files"), dict) else {}
+    lane_path = source_files.get("lane_assessment") or (state.get("validation_flags") or {}).get("lane_assessment_source")
+    if not lane_path:
+        return {"edges": []}
+    try:
+        return build_notes_payload_from_paths(lane_path, run_id=str(state.get("run_id") or "report_notes"))
+    except Exception:
+        return {"edges": []}
+
+
+def _replacement_edge_notes(state: dict[str, Any]) -> str:
+    return replacement_edge_notes_markdown(_replacement_edge_payload(state), language="en")
+
+
 def action_label(action_code: Any) -> str:
     mapping = {
         "hold": "Hold",
@@ -252,6 +271,8 @@ def action_snapshot_section(state: dict[str, Any]) -> str:
             "### Replacement pricing and duel status",
             "",
             replacement_duel_v2_markdown(state),
+            "",
+            _replacement_edge_notes(state),
         ])
 
     positions = position_rows(state)
@@ -285,6 +306,8 @@ def action_snapshot_section(state: dict[str, Any]) -> str:
         "### Replacement pricing and duel status",
         "",
         replacement_duel_v2_markdown(state),
+        "",
+        _replacement_edge_notes(state),
     ])
 
 
