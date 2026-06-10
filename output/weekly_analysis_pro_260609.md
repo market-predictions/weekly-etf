@@ -29,11 +29,11 @@
 - None
 
 ### Rotation engine status
-- Rotation plan artifact is active; Sections 12-14 are rendered from rotation_decisions, target_weights and trade_intents.
+- Rotation plan artifact is active; Sections 12-14 are rendered from the portfolio rotation plan, target allocations and proposed trade intents.
 - Trade intents are proposed rotation output while the engine is in warning mode; they are not executed trades until the ledger and portfolio state record execution.
 
 ### Best replacements to fund
-- reduce SPY by -5.00% NAV and allocate 5.00% NAV to IEFA, pending execution and portfolio-state persistence.
+- reduce SPY by 5.00% NAV and allocate 5.00% NAV to IEFA, pending execution and portfolio-state persistence.
 
 ### Replacement pricing and duel status
 
@@ -64,7 +64,7 @@
 
 ### What changed
 - AI / semiconductor leadership remains the dominant equity impulse.
-- Gold hedge behavior remains under review rather than automatic ballast.
+- Commodity-breadth hedge behavior remains under review rather than automatic ballast.
 
 ### Portfolio implications
 - Risk appetite is supportive, but fresh adds still need position-size room and pricing confirmation.
@@ -79,7 +79,7 @@
 
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
-| AI compute infrastructure | SMH | SOXX | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Actionable now | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
+| AI compute infrastructure | SMH | SOXX | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
 | Cybersecurity resilience | CIBR | BUG | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure exposure with less direct semiconductor cyclicality. | 3-12 months |
 | Grid buildout / electrification | PAVE | GRID | Power demand, grid bottlenecks and reshoring capex support infrastructure spend. Macro filter: AI power demand and infrastructure policy support the grid lane; funding still depends on PAVE-vs-GRID duel evidence. | 5 | 4 | Actionable now | PAVE remains useful, but GRID is the cleaner thematic challenger. | 3-12 months |
 | Healthcare quality and defensive growth | XLV | VHT | Healthcare quality can provide defensive growth without speculative biotech beta. | 3 | 3 | Watchlist / under review | More useful if broad equity leadership narrows further. | 3-12 months |
@@ -131,7 +131,7 @@
 - Since inception return (%): 6.25
 - Equity-curve state: Reconciled to Section 15 with full valuation history
 - EUR/USD used: 1.1544
-- Notes: Section 7 uses `output/etf_valuation_history.csv` plus the current runtime NAV; Section 15 is rendered from the same normalized runtime state.
+- Notes: Section 7 uses the validated valuation history plus the current portfolio NAV; Section 15 is rendered from the same reconciled portfolio state.
 
 | Date | Portfolio value (EUR) | Comment |
 |---|---:|---|
@@ -228,7 +228,7 @@ Role: Rotation destination. Required next action: Monitor commodity breadth and 
 ### IEFA — Hold — Score 3.52 — Fresh cash: Hold / monitor — release score 10
 Role: Rotation destination. Required next action: Monitor non-U.S. breadth and SPY-relative performance..
 
-### PAVE — Hold with override — Score 3.68 — Fresh cash: Smaller / under review — release score 85; override min_trade_size_not_met
+### PAVE — Hold with override — Score 3.68 — Fresh cash: Smaller / under review — release score 85; override min trade size not met
 Role: Real-asset capex. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
 ### SMH — Hold — Score 4.28 — Fresh cash: Smaller / under review — release score 60
@@ -245,8 +245,8 @@ Role: Rotation destination. Required next action: Review defensive ballast role 
 
 ## 11. Best New Opportunities
 
-- SMH remains the leading funded growth exposure, subject to the max-position rule.
-- Proposed rotation: reduce SPY by -5.00% NAV and allocate 5.00% NAV to IEFA, pending execution and portfolio-state persistence.
+- SMH remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap.
+- Proposed rotation: reduce SPY by 5.00% NAV and allocate 5.00% NAV to IEFA, pending execution and portfolio-state persistence.
 - XLV / VHT: Healthcare quality can provide defensive growth without speculative biotech beta.
 - NLR / NUCL: Baseload scarcity and AI power demand can broaden nuclear exposure beyond miners.
 - PPA / ITA: Defense spending remains structurally durable, but vehicle selection must be proven.
@@ -325,7 +325,7 @@ Role: Rotation destination. Required next action: Review defensive ballast role 
 ### Watchlist / dynamic radar memory
 | Theme | Primary ETF | Alternative ETF | Why I’m considering it | Current status |
 |---|---|---|---|---|
-| AI compute infrastructure | SMH | SOXX | Strongest secular growth exposure. | Active |
+| AI compute infrastructure | SMH | SOXX | Strongest secular growth exposure. | Active / capped |
 | Defense innovation / sovereign resilience | PPA | ITA | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | PAVE | GRID | Infrastructure capex remains valid. | Duel required |
 | Commodity-breadth hedge review | GSG | DBC / BIL | Current commodity-breadth hedge role must be proven against cash and broad commodity alternatives. | Under review |
@@ -345,7 +345,7 @@ Role: Rotation destination. Required next action: Review defensive ballast role 
 
 ### Changes since last review
 - Added: runtime-rendered markdown generation layer.
-- Proposed rotation: reduce SPY by -5.00% NAV and allocate 5.00% NAV to IEFA, pending execution and portfolio-state persistence.
+- Proposed rotation: reduce SPY by 5.00% NAV and allocate 5.00% NAV to IEFA, pending execution and portfolio-state persistence.
 - Executed reductions/closures: none unless separately recorded in the trade ledger and persisted portfolio state.
 - Thesis changes: No structural thesis was abandoned; implementation, macro-regime and rotation discipline are materially tighter.
 

@@ -38,7 +38,7 @@
 
 ### Wat veranderde
 - AI- en semiconductorleiderschap blijft de dominante aandelenimpuls.
-- Het gedrag van goud als hedge blijft onder herbeoordeling en is geen automatische stabilisator.
+- De grondstoffenbrede hedgefunctie blijft onder herbeoordeling en is geen automatische stabilisator.
 
 ### Portefeuille-implicaties
 - De risicobereidheid blijft ondersteunend, maar aanvullende allocaties vragen nog ruimte binnen de positielimiet en koersbevestiging.
@@ -306,7 +306,7 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 ### Volglijst / dynamisch radargeheugen
 | Thema | Primaire ETF | Alternatieve ETF | Waarom op de radar | Status |
 |---|---|---|---|---|
-| AI-rekenkrachtinfrastructuur | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Sterkste structurele groeiblootstelling. | Actief |
+| AI-rekenkrachtinfrastructuur | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Sterkste structurele groeiblootstelling. | Actief / begrensd |
 | Defensie-innovatie / strategische weerbaarheid | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling. | Vervangingsanalyse vereist |
 | Netuitbreiding / elektrificatie | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructuurcapex blijft valide. | Vervangingsanalyse vereist |
 | Hedge- en grondstoffenbreedte | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [BIL](https://www.tradingview.com/chart/?symbol=BIL) / [DBC](https://www.tradingview.com/chart/?symbol=DBC) | Hedgefunctie en grondstoffenbreedte moeten periodiek worden bevestigd. | Onder herbeoordeling |

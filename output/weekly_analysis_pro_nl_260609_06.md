@@ -14,7 +14,7 @@
 
 | Advies | Tickers / toelichting |
 |---|---|
-| Toevoegen | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) |
+| Toevoegen | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA), [SMH](https://www.tradingview.com/chart/?symbol=SMH) |
 | Aanhouden | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR), [DFEN](https://www.tradingview.com/chart/?symbol=DFEN), [GSG](https://www.tradingview.com/chart/?symbol=GSG), [IEFA](https://www.tradingview.com/chart/?symbol=IEFA), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [SMH](https://www.tradingview.com/chart/?symbol=SMH), [SPY](https://www.tradingview.com/chart/?symbol=SPY), [URNM](https://www.tradingview.com/chart/?symbol=URNM), [XLU](https://www.tradingview.com/chart/?symbol=XLU) |
 | Aanhouden, maar vervangbaar | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [SPY](https://www.tradingview.com/chart/?symbol=SPY), [XLU](https://www.tradingview.com/chart/?symbol=XLU) blijven expliciet onder herbeoordeling. |
 | Verlagen | Geen |
@@ -28,7 +28,7 @@
 ### Regimesamenvatting
 - Huidig regime: Risk-on groei.
 - Vertrouwen: 66%.
-- Regimegeheugen: Risk-on growth has persisted for 14 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed.
+- Regimegeheugen: Risk-on growth has persisted for 18 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed.
 - Beslisregel: Roteer niet agressief tenzij een regimeverschuiving minstens twee runs aanhoudt of cross-asset bevestiging breed wordt.
 
 ### Beleids- en geopolitieke status
@@ -55,10 +55,10 @@
 |---|---|---|---|---:|---:|---|---|---|
 | AI-rekenkrachtinfrastructuur | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | AI-rekenkracht en semiconductor-capex blijven de sterkste structurele groeibronnen. | 5 | 5 | Actiegericht | Aanhoudend leiderschap, maar met positiegrootte- en concentratiediscipline. | 3-12 maanden |
 | Cybersecurityweerbaarheid | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [BUG](https://www.tradingview.com/chart/?symbol=BUG) | Cybersecurity-uitgaven profiteren van AI, cloud, datacenters en geopolitieke weerbaarheid. | 4 | 4 | Actiegericht | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. | 3-12 maanden |
-| Netuitbreiding / elektrificatie | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Stroomvraag, netcongestie en reshoring ondersteunen infrastructuurinvesteringen. | 5 | 4 | Actiegericht | Bevestiging dat [GRID](https://www.tradingview.com/chart/?symbol=GRID) structureel beter past dan [PAVE](https://www.tradingview.com/chart/?symbol=PAVE). | 3-12 maanden |
+| Netuitbreiding / elektrificatie | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Stroomvraag, netcongestie en reshoring ondersteunen infrastructuurinvesteringen. | 5 | 4 | Volglijst / onder herbeoordeling | Bevestiging dat [GRID](https://www.tradingview.com/chart/?symbol=GRID) structureel beter past dan [PAVE](https://www.tradingview.com/chart/?symbol=PAVE). | 3-12 maanden |
 | Healthcarekwaliteit en defensieve groei | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [VHT](https://www.tradingview.com/chart/?symbol=VHT) | Healthcarekwaliteit en defensieve groei blijft relevant, maar vraagt om bevestiging in prijs, timing en portefeuillefit. | 3 | 3 | Volglijst / onder herbeoordeling | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. | 3-12 maanden |
-| Nucleaire nutsbedrijven en schone basislast | [NLR](https://www.tradingview.com/chart/?symbol=NLR) | [NUCL](https://www.tradingview.com/chart/?symbol=NUCL) | Energiezekerheid en nucleaire basislast blijven strategisch relevant. | 4 | 3 | Volglijst / onder herbeoordeling | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. | 3-12 maanden |
 | Defensie-innovatie / strategische weerbaarheid | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defensie-uitgaven blijven structureel ondersteund, maar ETF-keuze blijft belangrijk. | 5 | 3 | Volglijst / onder herbeoordeling | Duidelijkere ETF-implementatie en relatieve sterkte tegenover defensiealternatieven. | 3-12 maanden |
+| Industriële automatisering en fabriekssoftware | [ROBO](https://www.tradingview.com/chart/?symbol=ROBO) | [IRBO](https://www.tradingview.com/chart/?symbol=IRBO) | Industriële automatisering en fabriekssoftware blijft relevant, maar vraagt om bevestiging in prijs, timing en portefeuillefit. | 4 | 3 | Volglijst / onder herbeoordeling | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. | 3-12 maanden |
 
 ### Beste structurele kansen die nog niet actiegericht zijn
 - Voedselzekerheid / landbouwinputs
@@ -69,12 +69,12 @@
 
 | Thema | Primaire ETF | Waarom niet gepromoveerd | Wat dat zou veranderen |
 |---|---|---|---|
+| Nucleaire nutsbedrijven en schone basislast | [NLR](https://www.tradingview.com/chart/?symbol=NLR) | Relatieve sterkte tegenover de relevante huidige positie is nog onvoldoende overtuigend. | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. |
 | Brede grondstoffen-inflatiehedge | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Relatieve sterkte tegenover de relevante huidige positie is nog onvoldoende overtuigend. | Bredere grondstoffenbevestiging voordat kapitaal wordt toegewezen. |
-| Industriële automatisering en fabriekssoftware | [ROBO](https://www.tradingview.com/chart/?symbol=ROBO) | Relatieve sterkte tegenover de relevante huidige positie is nog onvoldoende overtuigend. | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. |
-| Koper en elektrificatiematerialen | [COPX](https://www.tradingview.com/chart/?symbol=COPX) | Scoorde lager dan sterkere gefinancierde posities en alternatieven. | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. |
-| Ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Relatieve sterkte tegenover de relevante huidige positie is nog onvoldoende overtuigend. | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. |
-| Robotica / automatisering | [BOTZ](https://www.tradingview.com/chart/?symbol=BOTZ) | Relatieve sterkte tegenover de relevante huidige positie is nog onvoldoende overtuigend. | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. |
 | Financial infrastructure and market plumbing | [KCE](https://www.tradingview.com/chart/?symbol=KCE) | Scoorde lager dan sterkere gefinancierde posities en alternatieven. | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. |
+| Ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Relatieve sterkte tegenover de relevante huidige positie is nog onvoldoende overtuigend. | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. |
+| Waterinfrastructuur / waterbehandeling | [FIW](https://www.tradingview.com/chart/?symbol=FIW) | Scoorde lager dan sterkere gefinancierde posities en alternatieven. | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. |
+| Koper en elektrificatiematerialen | [COPX](https://www.tradingview.com/chart/?symbol=COPX) | Scoorde lager dan sterkere gefinancierde posities en alternatieven. | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. |
 
 ## 4A. Shortkansenradar
 
@@ -154,15 +154,15 @@ Rendement wordt berekend op de huidige ETF-posities op basis van de meest recent
 
 | Portefeuillesegment | Beleggingsthese | ETF | Gewicht % | 1w rendement | 1m rendement | 3m rendement | Sinds instap | P/L EUR | Bijdrage % |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|
-| Rotatiebestemming | Cybersecurityweerbaarheid | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 17.46% | -8.52% | +17.76% | +30.17% | n.v.t. | n.v.t. | n.v.t. |
-| Rotatiebestemming | Defensie-innovatie / tactische defensiebèta | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 5.21% | -4.40% | +3.82% | -23.44% | n.v.t. | n.v.t. | n.v.t. |
-| Rotatiebestemming | Grondstoffenbrede hedge-blootstelling | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 9.53% | -2.22% | -3.47% | +9.37% | n.v.t. | -181.56 | -0.18% |
-| Rotatiebestemming | Diversificatie in ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 5.18% | -1.51% | -0.12% | +4.02% | n.v.t. | n.v.t. | n.v.t. |
-| Reële activa / capex | Netwerk- en infrastructuurcapex | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 0.03% | +0.95% | -0.53% | +8.26% | +8.25% | 3.22 | 0.00% |
-| Groeimotor | AI-rekenkracht en semiconductorleiderschap | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 28.43% | -1.59% | +10.75% | +51.67% | +20.61% | 8,733.32 | +8.73% |
-| Kernbeta | Amerikaanse large-cap kernblootstelling | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 19.50% | -2.55% | +1.04% | +9.28% | +6.17% | 1,706.41 | +1.71% |
-| Strategische energie | Kernenergie- en uraniumcyclus | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 7.49% | -8.77% | -16.76% | -16.37% | -0.55% | -2,036.74 | -2.04% |
-| Rotatiebestemming | Defensieve nutsbedrijven / rentegevoelige ballast | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 5.34% | +0.97% | -3.55% | -6.46% | n.v.t. | n.v.t. | n.v.t. |
+| Rotatiebestemming | Cybersecurityweerbaarheid | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 17.46% | -9.12% | +10.45% | +26.91% | n.v.t. | n.v.t. | n.v.t. |
+| Rotatiebestemming | Defensie-innovatie / tactische defensiebèta | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 5.21% | -0.35% | -3.35% | -22.62% | n.v.t. | n.v.t. | n.v.t. |
+| Rotatiebestemming | Grondstoffenbrede hedge-blootstelling | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 9.53% | -4.20% | -6.50% | +5.39% | n.v.t. | -181.56 | -0.18% |
+| Rotatiebestemming | Diversificatie in ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 10.18% | -2.57% | -2.28% | +2.72% | n.v.t. | n.v.t. | n.v.t. |
+| Reële activa / capex | Netwerk- en infrastructuurcapex | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 0.03% | -3.24% | -2.81% | +6.65% | +8.25% | 3.22 | 0.00% |
+| Groeimotor | AI-rekenkracht en semiconductorleiderschap | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 28.43% | -10.64% | -1.09% | +42.13% | +20.61% | 8,733.32 | +8.73% |
+| Kernbeta | Amerikaanse large-cap kernblootstelling | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 14.50% | -3.72% | -1.78% | +7.66% | +6.17% | 1,268.76 | +1.27% |
+| Strategische energie | Kernenergie- en uraniumcyclus | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 7.49% | -16.37% | -24.63% | -23.86% | -0.55% | -2,036.74 | -2.04% |
+| Rotatiebestemming | Defensieve nutsbedrijven / rentegevoelige ballast | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 5.34% | +0.85% | -2.35% | -3.86% | n.v.t. | n.v.t. | n.v.t. |
 
 ## 8. Allocatiekaart
 
@@ -197,9 +197,9 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Aanhouden | 4.97 | Aanhouden | Rotatiebestemming | Aanhouden en opnieuw toetsen in de volgende run. |
 | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | Aanhouden | 3.10 | Kleiner / onder herbeoordeling | Rotatiebestemming | Aanhouden en opnieuw toetsen in de volgende run. |
 | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Aanhouden | 3.59 | Aanhouden | Rotatiebestemming | Monitor commodity-breedte en bijdrage aan de hedgefunctie. |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Aanhouden | 3.52 | Aanhouden | Rotatiebestemming | Aanhouden en opnieuw toetsen in de volgende run. |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Aanhouden | 3.68 | Kleiner / onder herbeoordeling | Reële activa / capex | Voer de vervangingsanalyse tegenover [GRID](https://www.tradingview.com/chart/?symbol=GRID) opnieuw uit. |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | Aanhouden | 4.28 | Kleiner / onder herbeoordeling | Groeimotor | Aanhouden binnen de maximale positiegrootte en opnieuw toetsen op concentratie. |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Toevoegen | 3.52 | Aanhouden | Rotatiebestemming | Aanhouden en opnieuw toetsen in de volgende run. |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Aanhouden, onder herbeoordeling | 3.68 | Kleiner / onder herbeoordeling | Reële activa / capex | Voer de vervangingsanalyse tegenover [GRID](https://www.tradingview.com/chart/?symbol=GRID) opnieuw uit. |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | Toevoegen | 4.28 | Kleiner / onder herbeoordeling | Groeimotor | Aanhouden binnen de maximale positiegrootte en opnieuw toetsen op concentratie. |
 | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | Aanhouden | 3.53 | Kleiner / onder herbeoordeling | Kernbeta | Toets overlap met [SMH](https://www.tradingview.com/chart/?symbol=SMH) voordat extra kapitaal wordt toegewezen. |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Aanhouden | 3.70 | Aanhouden | Strategische energie | Aanhouden en vergelijken met [URA](https://www.tradingview.com/chart/?symbol=URA)/[NLR](https://www.tradingview.com/chart/?symbol=NLR) als uraniumbreedte verbetert. |
 | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Aanhouden | 3.00 | Kleiner / onder herbeoordeling | Rotatiebestemming | Aanhouden en opnieuw toetsen in de volgende run. |
@@ -216,48 +216,50 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 <!-- ETF_REPLACEMENT_DUEL_V2_EMBEDDED -->
 | Huidige positie | Alternatief | 1m relatieve sterkte | 3m relatieve sterkte | Prijsbasis | Beoordeling | Benodigde bevestiging |
 |---|---|---:|---:|---|---|---|
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | [IWM](https://www.tradingview.com/chart/?symbol=IWM) | -0.38% | +2.94% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Het alternatief verbetert; houd de vervangingsanalyse actief. | Vereist herhaalde 3-maands voorsprong en duidelijke financieringsbron. |
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | [QUAL](https://www.tradingview.com/chart/?symbol=QUAL) | +1.05% | -2.52% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Alleen vroege 1-maands verbetering; wacht op 3-maands bevestiging. | Vereist 3-maands bevestiging. |
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | -1.16% | -5.26% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Huidige positie blijft sterker; geen vervanging. | Vereist aanhoudende relatieve outperformance. |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [URA](https://www.tradingview.com/chart/?symbol=URA) | -1.62% | +6.29% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden. | Bevestig aansluiting op de beleggingscase, liquiditeit en financieringsbron. |
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | -1.05% | -5.35% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist. | Verbeter de prijsbevestiging van het alternatief tot waarderingskwaliteit vóór een allocatiebesluit. |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | -1.31% | +4.73% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist. | Verbeter de prijsbevestiging van het alternatief tot waarderingskwaliteit vóór een allocatiebesluit. |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | +5.31% | +18.32% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Niet geschikt voor allocatie — waarderingswaardige prijsbevestiging voor het alternatief is vereist. | Verbeter de prijsbevestiging van het alternatief tot waarderingskwaliteit vóór een allocatiebesluit. |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [VPU](https://www.tradingview.com/chart/?symbol=VPU) | -2.89% | -14.25% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Huidige positie blijft sterker; geen vervanging. | Vereist aanhoudende relatieve outperformance. |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | [IWM](https://www.tradingview.com/chart/?symbol=IWM) | +0.64% | +4.10% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Het alternatief verbetert; houd de vervangingsanalyse actief. | Vereist herhaalde 3-maands voorsprong en duidelijke financieringsbron. |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | [QUAL](https://www.tradingview.com/chart/?symbol=QUAL) | +2.67% | -0.95% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Alleen vroege 1-maands verbetering; wacht op 3-maands bevestiging. | Vereist 3-maands bevestiging. |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | -0.50% | -4.94% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Huidige positie blijft sterker; geen vervanging. | Vereist aanhoudende relatieve outperformance. |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | -0.29% | -5.05% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Huidige positie blijft sterker; geen vervanging. | Vereist aanhoudende relatieve outperformance. |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | -6.33% | +0.78% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Het alternatief verbetert; houd de vervangingsanalyse actief. | Vereist herhaalde 3-maands voorsprong en duidelijke financieringsbron. |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [URA](https://www.tradingview.com/chart/?symbol=URA) | -1.41% | +6.28% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden. | Bevestig aansluiting op de beleggingscase, liquiditeit en financieringsbron. |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | +2.67% | +16.16% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden. | Bevestig aansluiting op de beleggingscase, liquiditeit en financieringsbron. |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [VPU](https://www.tradingview.com/chart/?symbol=VPU) | +0.43% | -10.20% | Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-06-09. | Alleen vroege 1-maands verbetering; wacht op 3-maands bevestiging. | Vereist 3-maands bevestiging. |
 
 <!-- ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED -->
 > Diagnostisch-only: deze notities geven geen allocatiebevoegdheid, fundability-bevoegdheid, lane-scoring-bevoegdheid, productie-aanbevelingsbevoegdheid, uitvoeringsbevoegdheid of portefeuillemutatiebevoegdheid.
 
 | Huidige positie | Alternatief | Diagnostische score | 1m-edge | 3m-edge | Drawdown-edge | Volatiliteitsedge | Niet-autoritatieve notitie |
 |---|---|---:|---:|---:|---:|---:|---|
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [INDA](https://www.tradingview.com/chart/?symbol=INDA) | -0.45 | -4.71% | -13.80% | -1.18% | +2.46% | Huidige positie blijft diagnostisch sterker; geen vervangingssignaal. |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [INDA](https://www.tradingview.com/chart/?symbol=INDA) | -0.21 | +0.55% | -10.60% | -0.09% | +3.45% | Huidige positie blijft diagnostisch sterker; geen vervangingssignaal. |
 
 
 ## 12. Rotatieplan portefeuille
 
-| Sluiten | Verlagen | Aanhouden | Toevoegen | Vervangen | Override |
-|---|---|---|---|---|---|
-| Geen | Geen | [SMH](https://www.tradingview.com/chart/?symbol=SMH), [DFEN](https://www.tradingview.com/chart/?symbol=DFEN), [XLU](https://www.tradingview.com/chart/?symbol=XLU), [CIBR](https://www.tradingview.com/chart/?symbol=CIBR), [GSG](https://www.tradingview.com/chart/?symbol=GSG), [IEFA](https://www.tradingview.com/chart/?symbol=IEFA), [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Geen | [SPY](https://www.tradingview.com/chart/?symbol=SPY)→[IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) |
+| Sluiten | Verlagen | Aanhouden | Toevoegen | Vervangen |
+|---|---|---|---|---|
+| Geen | Geen | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR), [DFEN](https://www.tradingview.com/chart/?symbol=DFEN), [GSG](https://www.tradingview.com/chart/?symbol=GSG), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [SPY](https://www.tradingview.com/chart/?symbol=SPY), [URNM](https://www.tradingview.com/chart/?symbol=URNM), [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA), [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [SPY](https://www.tradingview.com/chart/?symbol=SPY), [XLU](https://www.tradingview.com/chart/?symbol=XLU) |
 
 ## 13. Definitieve actietabel
 
-| Ticker | ETF | Huidig gewicht | Doelgewicht | Delta gewicht | Actie | Kapitaalbestemming | Vrijmaakscore | Toelichting | Override-status |
-|---|---|---:|---:|---:|---|---|---:|---|---|
-| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 17.85 | 17.85 | 0.00 | Aanhouden | - | 10.00 | Portefeuillerol is verzwakt | Nee |
-| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 5.05 | 5.05 | 0.00 | Aanhouden | - | 50.00 | Positie voldoet niet aan de vers-kapitaaltoets; Sterker alternatief is beschikbaar voor vergelijking; Portefeuillerol is verzwakt | Nee |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 9.40 | 9.40 | 0.00 | Aanhouden | - | 10.00 | Portefeuillerol is verzwakt | Nee |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 5.02 | 10.02 | 5.00 | Aanhouden | - | 10.00 | Portefeuillerol is verzwakt | Nee |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | 0.03 | 0.03 | 0.00 | Aanhouden met onderbouwde override | - | 85.00 | Vers kapitaal alleen kleiner of na herbeoordeling inzetten; Positie staat onder vervangingsreview; Review loopt al meerdere rapportcycli; Review loopt al meerdere rapportcycli | Systeemoverride: Minimale transactiegrootte is niet gehaald |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | 28.70 | 28.70 | 0.00 | Aanhouden | - | 60.00 | Vers kapitaal alleen kleiner of na herbeoordeling inzetten; Positie staat onder vervangingsreview; Review loopt al meerdere rapportcycli; Portefeuillerol is verzwakt | Nee |
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | 19.04 | 14.04 | -5.00 | Gedeeltelijk vervangen | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 85.00 | Vers kapitaal alleen kleiner of na herbeoordeling inzetten; Positie staat onder vervangingsreview; Review loopt al meerdere rapportcycli; Review loopt al meerdere rapportcycli | Nee |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | 8.09 | 8.09 | 0.00 | Aanhouden | - | 0.00 | - | Nee |
-| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 5.07 | 5.07 | 0.00 | Aanhouden | - | 50.00 | Positie voldoet niet aan de vers-kapitaaltoets; Sterker alternatief is beschikbaar voor vergelijking; Portefeuillerol is verzwakt | Nee |
+| Ticker | ETF | Bestaand/nieuw | Vorig gewicht | Doelgewicht | Advies | Convictieniveau | Totaalscore | Portefeuillerol | Sterker alternatief? | Korte toelichting |
+|---|---|---|---:|---:|---|---|---:|---|---|---|
+| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Bestaand | 17.46 | 17.98 | Aanhouden | Niveau 2 | 4.97 | Rotatiebestemming | Nee | Geen materiële wijziging deze run. |
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | Bestaand | 5.21 | 5.00 | Aanhouden | Niveau 3 | 3.10 | Rotatiebestemming | Ja | Geen materiële wijziging deze run. |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | iShares S&P GSCI Commodity-Indexed Trust | Bestaand | 9.53 | 9.47 | Aanhouden | Niveau 2 | 3.59 | Rotatiebestemming | Nee | Brede grondstoffenblootstelling blijft onder rolvalidatie als hedge- en inflatiesensitieve positie. |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Bestaand | 5.18 | 10.18 | Toevoegen | Niveau 3 | 3.52 | Rotatiebestemming | Nee | Geen materiële wijziging deze run. |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Bestaand | 0.03 | 0.03 | Aanhouden, onder herbeoordeling | Niveau 2 | 3.68 | Reële activa / capex | Ja | Infrastructuurcase blijft valide, maar [GRID](https://www.tradingview.com/chart/?symbol=GRID) is de scherpste vervangingskandidaat. |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Bestaand | 28.43 | 27.56 | Toevoegen | Niveau 1 | 4.28 | Groeimotor | Nee | Best onderbouwde groeiblootstelling; uitbreiding blijft begrensd door de maximale positiegrootte. |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | Bestaand | 19.50 | 14.50 | Aanhouden | Niveau 2 | 3.53 | Kernbeta | Ja | Nuttig als kernblootstelling, maar de overlap met [SMH](https://www.tradingview.com/chart/?symbol=SMH) blijft expliciet onder herbeoordeling. |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Bestaand | 7.49 | 8.17 | Aanhouden | Niveau 2 | 3.70 | Strategische energie | Nee | Strategische energiecase blijft valide, maar krijgt deze run geen extra kapitaal boven [SMH](https://www.tradingview.com/chart/?symbol=SMH). |
+| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Bestaand | 5.34 | 5.00 | Aanhouden | Niveau 3 | 3.00 | Rotatiebestemming | Ja | Geen materiële wijziging deze run. |
 
-## 14. Voorgestelde positiewijzigingen / rotatie-intenties
+## 14. Positiewijzigingen verwerkt in de officiële portefeuillestaat
 
-| Bron | Bestemming | Delta bron % | Delta bestemming % | Geschatte waarde EUR | Intentiestatus | Toelichting |
-|---|---|---:|---:|---:|---|---|
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | -5.00 | 5.00 | 5555.27 | Gedeeltelijk vervangen | Vers kapitaal alleen kleiner of na herbeoordeling inzetten; Positie staat onder vervangingsreview; Review loopt al meerdere rapportcycli; Review loopt al meerdere rapportcycli |
+| Ticker | Vorig gewicht % | Nieuw gewicht % | Gewichtswijziging % | Wijziging aantal stukken | Verwerkte actie | Financieringsbron / toelichting |
+|---|---:|---:|---:|---:|---|---|
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 19.50 | 14.50 | -5.00 | -8.32 | Verkopen | Bewaakte modeluitvoering: [SPY](https://www.tradingview.com/chart/?symbol=SPY) verlaagd om [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) te financieren. |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 5.18 | 10.18 | 5.00 | 63.77 | Kopen | Bewaakte modeluitvoering: [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) gekocht, gefinancierd uit [SPY](https://www.tradingview.com/chart/?symbol=SPY). |
+| CASH | - | 1.82 | - | 0.00 | Geen | Resterende cash |
 
 ## 15. Huidige posities en cash
 
@@ -273,10 +275,10 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 253.94 | 84.34 | USD | 21417.00 | 18552.17 | 17.46 |
 | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 91.77 | 69.70 | USD | 6396.23 | 5540.64 | 5.21 |
 | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 374.29 | 31.24 | USD | 11692.92 | 10128.83 | 9.53 |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 66.04 | 96.17 | USD | 6350.60 | 5501.12 | 5.18 |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 129.80 | 96.17 | USD | 12483.25 | 10813.44 | 10.18 |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 0.71 | 57.17 | USD | 40.84 | 35.38 | 0.03 |
 | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 59.00 | 591.01 | USD | 34869.59 | 30205.29 | 28.43 |
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 32.44 | 737.05 | USD | 23911.83 | 20713.28 | 19.50 |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 24.12 | 737.05 | USD | 17779.18 | 15400.96 | 14.50 |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 171.00 | 53.75 | USD | 9191.25 | 7961.79 | 7.49 |
 | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 148.87 | 43.98 | USD | 6547.11 | 5671.34 | 5.34 |
 | CASH | - | 1.00 | EUR | 1936.52 | 1936.52 | 1.82 |
@@ -291,10 +293,10 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Longpositie | 17.46 |  | 84.34 |  | Portefeuilleblootstelling | Rotatiebestemming |
 | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | Longpositie | 5.21 |  | 69.70 |  | Portefeuilleblootstelling | Rotatiebestemming |
 | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | iShares S&P GSCI Commodity-Indexed Trust | Longpositie | 9.53 | 31.80 | 31.24 |  | Brede grondstoffen- en inflatiegevoelige hedgepositie | Rotatiebestemming |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Longpositie | 5.18 |  | 96.17 |  | Portefeuilleblootstelling | Rotatiebestemming |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Longpositie | 10.18 |  | 96.17 |  | Portefeuilleblootstelling | Rotatiebestemming |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Longpositie | 0.03 | 51.98 | 57.17 | 8.25 | Netwerk- en infrastructuurcapex | Reële activa / capex |
 | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Longpositie | 28.43 | 420.13 | 591.01 | 20.61 | AI-rekenkracht en semiconductorleiderschap | Groeimotor |
-| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | Longpositie | 19.50 | 676.33 | 737.05 | 6.17 | Amerikaanse large-cap kernblootstelling | Kernbeta |
+| [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | Longpositie | 14.50 | 676.33 | 737.05 | 6.17 | Amerikaanse large-cap kernblootstelling | Kernbeta |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Longpositie | 7.49 | 67.50 | 53.75 | -0.55 | Kernenergie- en uraniumcyclus | Strategische energie |
 | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Longpositie | 5.34 |  | 43.98 |  | Portefeuilleblootstelling | Rotatiebestemming |
 
