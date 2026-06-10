@@ -74,7 +74,7 @@ LABELS = {
         "replaceable_note": "remain under explicit review.",
         "best_replacements": "Best replacements to fund",
         "best_replacements_note": "No challenger is promoted to a fundable replacement yet. Each named replacement must first clear the same close-date pricing basis and relative-strength duel.",
-        "post_execution_best_replacements_note": "The GLD → GSG guarded model rotation is already reflected in the official portfolio state and trade ledger; no new state or ledger mutation was performed this run.",
+        "post_execution_best_replacements_note": "The guarded model rotation is already reflected in the official portfolio state and trade ledger; no duplicate state or ledger mutation was performed by this report render.",
         "ticker": "Ticker",
         "action": "Action",
         "score": "Score",
@@ -107,7 +107,7 @@ LABELS = {
         "replaceable_note": "blijven expliciet onder herbeoordeling.",
         "best_replacements": "Beste alternatieven om te financieren",
         "best_replacements_note": "Nog geen alternatief is sterk genoeg om direct te financieren. Elk genoemd alternatief moet eerst dezelfde prijsbasis en relatieve-sterkteanalyse doorstaan.",
-        "post_execution_best_replacements_note": "De bewaakte GLD → GSG-modelrotatie is al verwerkt in de officiële portefeuillestaat en het handelslogboek; deze run heeft geen dubbele staat- of handelslogboekmutatie uitgevoerd.",
+        "post_execution_best_replacements_note": "De bewaakte modelrotatie is al verwerkt in de officiële portefeuillestaat en het handelslogboek; deze rapport-render heeft geen dubbele staat- of handelslogboekmutatie uitgevoerd.",
         "ticker": "Ticker",
         "action": "Actie",
         "score": "Score",
@@ -480,16 +480,71 @@ def _rotation_bucket_summary(state: dict[str, Any]) -> dict[str, list[str]]:
 
 
 def _post_execution_pairs(state: dict[str, Any]) -> list[str]:
-    positions = {_ticker(p.get("ticker")) for p in position_rows(state)}
-    if "GLD" in positions and "GSG" in positions:
-        return ["GLD→GSG"]
-    return []
+    pairs: list[str] = []
+    buys: dict[str, str] = {}
+    sells: dict[str, str] = {}
+    for position in position_rows(state):
+        ticker = _ticker(position.get("ticker"))
+        action = _clean(position.get("action_executed_this_run")).lower()
+        note = _clean(position.get("funding_source_note"))
+        if not ticker or action in {"", "none"}:
+            continue
+        if "buy" in action:
+            match = re.search(r"\bfunded by\s+([A-Z][A-Z0-9.]*)\b", note, flags=re.IGNORECASE)
+            if match:
+                buys[ticker] = _ticker(match.group(1))
+        if "sell" in action or "reduce" in action:
+            match = re.search(r"\bfund\s+([A-Z][A-Z0-9.]*)\b", note, flags=re.IGNORECASE)
+            if match:
+                sells[ticker] = _ticker(match.group(1))
+
+    for destination, source in buys.items():
+        if source:
+            pair = f"{source}→{destination}"
+            if pair not in pairs:
+                pairs.append(pair)
+    for source, destination in sells.items():
+        if destination:
+            pair = f"{source}→{destination}"
+            if pair not in pairs:
+                pairs.append(pair)
+
+    if pairs:
+        return pairs
+
+    for trade in _trade_intents(state):
+        source = _ticker(trade.get("source_ticker"))
+        destination = _ticker(trade.get("destination_ticker"))
+        if source and destination:
+            pair = f"{source}→{destination}"
+            if pair not in pairs:
+                pairs.append(pair)
+    return pairs
+
+
+def _post_execution_best_replacements_note_html(base: Any, state: dict[str, Any], language: str) -> str:
+    pairs = _post_execution_pairs(state)
+    if not pairs:
+        return escape(_labels(language)["post_execution_best_replacements_note"])
+    pair_html = _ticker_expr_join(base, pairs, language)
+    if language == "nl":
+        return (
+            "De bewaakte modelrotatie "
+            + pair_html
+            + " is al verwerkt in de officiële portefeuillestaat en het handelslogboek; "
+            + "deze rapport-render heeft geen dubbele staat- of handelslogboekmutatie uitgevoerd."
+        )
+    return (
+        "The guarded model rotation "
+        + pair_html
+        + " is already reflected in the official portfolio state and trade ledger; "
+        + "no duplicate state or ledger mutation was performed by this report render."
+    )
 
 
 def _trade_summary_html(base: Any, state: dict[str, Any], language: str) -> str:
     if _is_post_execution_state(state):
-        note = _labels(language)["post_execution_best_replacements_note"]
-        return escape(note)
+        return _post_execution_best_replacements_note_html(base, state, language)
     intents = _trade_intents(state)
     if not intents:
         return escape(_labels(language)["best_replacements_note"])
