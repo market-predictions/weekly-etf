@@ -9,7 +9,9 @@ from typing import Any
 
 from runtime.macro_report_surface import dashboard_en, dashboard_nl, executive_lines_en, executive_lines_nl
 from runtime.replacement_edge_report_notes import (
+    EN_AUTHORITY_DISCLAIMER,
     MARKER as REPLACEMENT_EDGE_NOTES_MARKER,
+    NL_AUTHORITY_DISCLAIMER,
     build_notes_payload_from_paths,
     replacement_edge_notes_markdown,
 )
@@ -129,7 +131,7 @@ def _replacement_edge_payload(state: dict[str, Any]) -> dict[str, Any]:
 
 
 def _inject_replacement_edge_notes(text: str, state: dict[str, Any], *, language: str) -> str:
-    if REPLACEMENT_EDGE_NOTES_MARKER in text:
+    if REPLACEMENT_EDGE_NOTES_MARKER in text or EN_AUTHORITY_DISCLAIMER in text or NL_AUTHORITY_DISCLAIMER in text:
         return text
     notes = replacement_edge_notes_markdown(_replacement_edge_payload(state), language=language)
     headings = ["### Replacement Duel Table", "### Replacement Duel Table v2"] if language == "en" else ["### Vervangingsanalyse"]
