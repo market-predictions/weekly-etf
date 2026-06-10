@@ -3,7 +3,7 @@
 ## Workpackage
 
 ```text
-WP11A-VERIFY / WP11A-VERIFY-OBSERVE — Validate replacement-edge diagnostic notes and expose model-execution policy failures
+WP11A-VERIFY / WP11A-VERIFY-OBSERVE / WP11A-POLICY-CAP — Validate replacement-edge diagnostic notes and keep model execution inside policy caps
 ```
 
 ## Repository
@@ -15,14 +15,14 @@ market-predictions/weekly-etf
 ## Status
 
 ```text
-status: observability-fix-committed / retry-request-prepared / awaiting-workflow-evidence
+status: policy-cap-fix-committed / retry-request-prepared / awaiting-workflow-evidence
 ```
 
 ## Purpose
 
 WP5 added direct challenger-vs-current-holding replacement-edge diagnostics. WP11A created the safe helper and tests. WP11A-FIX wired those diagnostics into the report-output path as clearly non-authoritative notes. WP11A-VERIFY requests and tracks validation evidence for that report-output contract.
 
-WP11A-VERIFY reached the report-build step and passed the Dutch client-language scrub, date localization, ticker linkification, and macro-thesis surface leakage validation. The remaining blocker was hidden because `runtime.model_execution_engine` output was captured by the workflow before the failing exit code stopped the step.
+WP11A-VERIFY reached the report-build step and passed the Dutch client-language scrub, date localization, ticker linkification, and macro-thesis surface leakage validation. WP11A-VERIFY-OBSERVE made hidden model-execution policy/input failures visible in CI logs.
 
 ## Authority boundary
 
@@ -119,8 +119,6 @@ ETF_LINKIFY_OK
 ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK
 ```
 
-The next failure appeared to be inside model execution, but the precise `ETF_MODEL_EXECUTION_BLOCKED` policy error was hidden by workflow stdout capture.
-
 ## WP11A-VERIFY-OBSERVE action taken
 
 Committed observability-only stderr output in:
@@ -135,50 +133,59 @@ Commit:
 887722cc638778ee44809b6556aa54c7ca72f569 — Expose model execution policy failures on stderr
 ```
 
+The observe retry exposed the real blocker:
+
+```text
+ETF_MODEL_EXECUTION_BLOCKED | artifact=output/runtime/etf_model_execution_20260609_20260610_181023.json | errors=source_reduction_exceeds_policy:SPY:5.23>5.00
+```
+
+## WP11A-POLICY-CAP action taken
+
+After explicit user approval, committed a bounded execution-engine fix:
+
+```text
+951a72c4492cfc72ab46289def755606d35a309c — Cap model execution source reductions to policy
+```
+
 Change summary:
 
-- added `import sys`
-- preserved the existing blocked exit behavior
-- preserved the existing stdout message
-- additionally prints the same `ETF_MODEL_EXECUTION_BLOCKED` line to stderr before `SystemExit(1)`
+- `_execution_notional` now caps executable notional to the existing `max_single_source_reduction_pct_nav` value.
+- The policy remains unchanged at 5% unless the runtime policy says otherwise.
+- The previous SPY intent can now be reduced from 5.23% requested to 5.00% executable.
+- Policy-cap events are recorded as warnings, for example:
 
-No policy rule was relaxed. No pricing, lane scoring, fundability, recommendation, target-weight, trade-intent, execution, or portfolio-state mutation logic was changed.
+```text
+source_notional_capped_to_policy:SPY:5555.27->5312.32
+```
+
+Local reproduction before committing showed:
+
+```text
+ETF_MODEL_EXECUTION_OK | artifact=/tmp/weekly-etf-model-exec-test-2/etf_model_execution_20260609_20260610_181023.json | mode=shadow | trades=1 | status=shadow_ready
+policy_checks.passed=true
+policy_checks.errors=[]
+source_delta_weight_pct=-5.0
+destination_delta_weight_pct=5.0
+notional_cap_reason=policy
+```
+
+This is an execution behavior change, but it is a policy-enforcement change, not a policy relaxation.
 
 ## Prepared retry request
 
 A new retry request is prepared as the final trigger commit for this sequence:
 
 ```text
-control/run_queue/weekly_etf_report_request_20260610_180729_wp11a_verify_observe.md
+control/run_queue/weekly_etf_report_request_20260610_190101_wp11a_policy_cap_retry.md
 ```
 
 Purpose:
 
 ```text
-Retry WP11A-VERIFY after model-execution observability fix.
-```
-
-## Validation evidence status
-
-WP11A-VERIFY is not yet closed.
-
-The next workflow run should now expose the exact model-execution policy/input error if the step still fails, for example:
-
-```text
-ETF_MODEL_EXECUTION_BLOCKED | artifact=... | errors=source_not_in_portfolio:...
-ETF_MODEL_EXECUTION_BLOCKED | artifact=... | errors=trade_price_invalid:...
-ETF_MODEL_EXECUTION_BLOCKED | artifact=... | errors=trade_below_min_size_after_source_cap:...
-ETF_MODEL_EXECUTION_BLOCKED | artifact=... | errors=source_has_no_executable_value:...
-ETF_MODEL_EXECUTION_BLOCKED | artifact=... | errors=major_rotation_count_exceeds_policy:...
+Retry WP11A-VERIFY after capping model execution source reductions to the existing policy limit.
 ```
 
 ## Required validation evidence still needed
-
-Focused test:
-
-```bash
-python -m pytest tests/test_replacement_edge_report_notes.py -q
-```
 
 Fresh report/content validation should prove:
 
@@ -186,19 +193,13 @@ Fresh report/content validation should prove:
 English report contains ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
 Dutch report contains ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
 python tools/validate_etf_report_content_contract.py --output-dir output passes
-```
-
-Model-execution observability should prove:
-
-```text
-failed shadow model-execution policy checks are visible in GitHub Actions logs
+shadow model execution passes or clearly reports the next policy/input blocker
 ```
 
 ## Remaining work
 
 ```text
-inspect GitHub Actions workflow result for the observe retry
-if failing, capture the visible ETF_MODEL_EXECUTION_BLOCKED errors line
+inspect GitHub Actions workflow result for the policy-cap retry
 confirm latest fresh English report path
 confirm latest fresh Dutch report path
 confirm marker in both reports
