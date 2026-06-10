@@ -240,12 +240,22 @@ def _available_source_value_eur(source_row: dict[str, Any]) -> float:
     return max(0.0, _market_value_eur(source_row))
 
 
-def _execution_notional(intent: dict[str, Any], source_row: dict[str, Any], runtime_state: dict[str, Any]) -> tuple[float, float, bool]:
+def _execution_notional(intent: dict[str, Any], source_row: dict[str, Any], runtime_state: dict[str, Any]) -> tuple[float, float, bool, str]:
     nav = _nav(runtime_state)
     requested = _requested_notional(intent, nav)
     available = _available_source_value_eur(source_row)
-    actual = max(0.0, min(requested, available))
-    return round(actual, 2), round(requested, 2), requested - actual > 1.0
+    policy = _policy(runtime_state)
+    max_source_reduction = _float(policy.get("max_single_source_reduction_pct_nav"), 5.0)
+    policy_cap = nav * max_source_reduction / 100.0 if nav > 0 and max_source_reduction > 0 else requested
+    actual = max(0.0, min(requested, available, policy_cap))
+    capped = requested - actual > 1.0
+    if capped and policy_cap <= requested and policy_cap <= available:
+        cap_reason = "policy"
+    elif capped:
+        cap_reason = "available_value"
+    else:
+        cap_reason = ""
+    return round(actual, 2), round(requested, 2), capped, cap_reason
 
 
 def _validate_inputs(runtime_state: dict[str, Any]) -> tuple[list[str], list[str]]:
@@ -295,10 +305,13 @@ def _validate_inputs(runtime_state: dict[str, Any]) -> tuple[list[str], list[str
             errors.append(f"source_delta_not_negative:{source}:{source_delta}")
         if destination_delta <= 0:
             errors.append(f"destination_delta_not_positive:{destination}:{destination_delta}")
-        actual_notional, requested_notional, capped = _execution_notional(intent, source_row, runtime_state)
+        actual_notional, requested_notional, capped, cap_reason = _execution_notional(intent, source_row, runtime_state)
         actual_pct = actual_notional / nav * 100.0 if nav else 0.0
         if capped:
-            warnings.append(f"source_notional_capped_to_available_value:{source}:{requested_notional:.2f}->{actual_notional:.2f}")
+            if cap_reason == "policy":
+                warnings.append(f"source_notional_capped_to_policy:{source}:{requested_notional:.2f}->{actual_notional:.2f}")
+            else:
+                warnings.append(f"source_notional_capped_to_available_value:{source}:{requested_notional:.2f}->{actual_notional:.2f}")
         if actual_notional <= 1.0:
             errors.append(f"source_has_no_executable_value:{source}:{actual_notional:.2f}")
         if actual_pct < min_trade:
@@ -322,7 +335,7 @@ def _build_shadow_positions(runtime_state: dict[str, Any]) -> list[dict[str, Any
         if not source or not destination or source not in positions:
             continue
         source_row = positions[source]
-        executable_notional, requested_notional, capped = _execution_notional(intent, source_row, runtime_state)
+        executable_notional, requested_notional, capped, cap_reason = _execution_notional(intent, source_row, runtime_state)
         if executable_notional <= 0:
             continue
         actual_delta_pct = round(executable_notional / nav * 100.0, 4) if nav else 0.0
@@ -336,7 +349,7 @@ def _build_shadow_positions(runtime_state: dict[str, Any]) -> list[dict[str, Any
             "shares_delta_this_run": round(source_shares_delta, 6),
             "weight_change_pct": round(-actual_delta_pct, 4),
             "action_executed_this_run": "Shadow reduce",
-            "funding_source_note": "Shadow execution capped to available source value." if capped else "Shadow execution from rotation intent.",
+            "funding_source_note": "Shadow execution capped to source-reduction policy." if cap_reason == "policy" else "Shadow execution capped to available source value." if capped else "Shadow execution from rotation intent.",
         })
         positions[source] = source_row
 
@@ -379,7 +392,7 @@ def _build_ledger_rows(runtime_state: dict[str, Any]) -> list[dict[str, Any]]:
         source = _ticker(intent.get("source_ticker"))
         destination = _ticker(intent.get("destination_ticker"))
         source_row = position_map.get(source, {})
-        actual_notional, requested_notional, capped = _execution_notional(intent, source_row, runtime_state) if source_row else (0.0, _requested_notional(intent, nav), False)
+        actual_notional, requested_notional, capped, cap_reason = _execution_notional(intent, source_row, runtime_state) if source_row else (0.0, _requested_notional(intent, nav), False, "")
         source_weight = _float(source_row.get("current_weight_pct") or source_row.get("previous_weight_pct"))
         actual_delta_pct = actual_notional / nav * 100.0 if nav else 0.0
         rows.append({
@@ -398,7 +411,9 @@ def _build_ledger_rows(runtime_state: dict[str, Any]) -> list[dict[str, Any]]:
             "destination_target_weight_pct": round(actual_delta_pct, 4),
             "source_price_status": (price_map.get(source) or {}).get("status"),
             "destination_price_status": (price_map.get(destination) or {}).get("status"),
-            "notional_capped_to_source_value": capped,
+            "notional_capped": capped,
+            "notional_capped_to_source_value": cap_reason == "available_value",
+            "notional_cap_reason": cap_reason,
             "reason_codes": intent.get("reason_codes") or [],
         })
     return rows
