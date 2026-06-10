@@ -15,7 +15,7 @@ market-predictions/weekly-etf
 ## Status
 
 ```text
-status: policy-cap-fix-committed / retry-request-prepared / awaiting-workflow-evidence
+status: verified-success / WP11A replacement-edge report notes accepted in fresh CI output
 ```
 
 ## Purpose
@@ -287,4 +287,36 @@ Local validation:
 
 ```text
 ETF_NL_TERMINOLOGY_CONTRACT_OK | source=runtime.nl_terminology
+```
+
+## WP11A final verification
+
+Final retry:
+
+```text
+27300581892 — Retry WP11A after NL terminology fix
+```
+
+Result:
+
+```text
+completed success
+```
+
+Key successful workflow steps:
+
+```text
+Build runtime ETF state and reports: success
+Validate ETF report content contract: success
+Validate Dutch language quality contract: success
+Execute guarded ETF model rotation: success
+Validate ETF delivery HTML contract: success
+Send email: success
+Commit ETF run artifacts back to main: success
+```
+
+Artifact commit:
+
+```text
+48599cab16f9b1ff6aaaf8f71da0893bc152bace
 ```
