@@ -27,6 +27,9 @@ FORBIDDEN_TOKENS = [
     "None / None:",
     "Reason codes",
     "Redencodes",
+    REPLACEMENT_EDGE_NOTES_MARKER,
+    f"<!-- {REPLACEMENT_EDGE_NOTES_MARKER} -->",
+    f"&lt;!-- {REPLACEMENT_EDGE_NOTES_MARKER} --&gt;",
 ]
 
 REQUIRED_SECTION_TITLES = {
@@ -167,8 +170,6 @@ def validate_no_forbidden_tokens(md_text: str, report_path: Path) -> None:
         if token.lower() in lower:
             raise RuntimeError(f"ETF content contract failed for {report_path.name}: forbidden client-surface token found: {token!r}")
     snake_tokens = sorted(set(match.group(0) for match in SNAKE_CASE_RE.finditer(md_text)))
-    allowed_snake_tokens = {REPLACEMENT_EDGE_NOTES_MARKER}
-    snake_tokens = [token for token in snake_tokens if token not in allowed_snake_tokens]
     if snake_tokens:
         raise RuntimeError(
             f"ETF content contract failed for {report_path.name}: internal snake-case tokens remain: "
@@ -264,7 +265,6 @@ def validate_section15(md_text: str, report_path: Path) -> None:
 
 def validate_replacement_edge_notes(md_text: str, report_path: Path) -> None:
     required = [
-        REPLACEMENT_EDGE_NOTES_MARKER,
         EN_AUTHORITY_DISCLAIMER,
         "allocation authority",
         "fundability authority",
