@@ -421,9 +421,24 @@ def trim_omitted_lanes_table(text: str, max_rows: int = 5) -> str:
     return text[:table_start] + new_block + "\n" + text[next_heading:]
 
 
+def sanitize_valuation_history_comments(text: str) -> str:
+    replacements = {
+        "Fresh five-of-six repricing; PPA carried forward": "Partial fresh repricing using latest verified marks",
+        "Fresh five-of-six pricing recovery; GLD carried forward": "Partial pricing recovery using latest verified marks",
+        "Verse herprijzing voor vijf van zes posities; PPA doorgeschoven": "Gedeeltelijke herprijzing op basis van laatst geverifieerde koersen",
+        "Prijsherstel voor vijf van zes posities; GLD doorgeschoven": "Gedeeltelijk prijsherstel op basis van laatst geverifieerde koersen",
+        "Prijsherstel voor vijf van zes posities; goudpositie doorgeschoven": "Gedeeltelijk prijsherstel op basis van laatst geverifieerde koersen",
+    }
+    for source, target in replacements.items():
+        text = text.replace(source, target)
+    return text
+
+
 def patch_report(path: Path, state: dict[str, Any]) -> None:
     text = path.read_text(encoding="utf-8")
+    text = sanitize_valuation_history_comments(text)
     if is_native_dutch_report(text):
+        path.write_text(text, encoding="utf-8")
         print(f"ETF_OUTPUT_CONTRACT_FIX_SKIPPED | report={path.name} | reason=native_dutch_renderer")
         return
     text = replace_between(text, "## 2. Portfolio Action Snapshot", "## 3. Regime Dashboard", action_snapshot_section(state))
@@ -434,6 +449,7 @@ def patch_report(path: Path, state: dict[str, Any]) -> None:
         text = replace_between(text, "## 14. Position Changes Executed This Run", "## 15. Current Portfolio Holdings and Cash", position_changes_table_from_rotation(state)) if "## 14. Position Changes Executed This Run" in text else text
         text = replace_between(text, "## 14. Proposed Position Changes / Rotation Trade Intents", "## 15. Current Portfolio Holdings and Cash", position_changes_table_from_rotation(state)) if "## 14. Proposed Position Changes / Rotation Trade Intents" in text else text
     text = trim_omitted_lanes_table(text)
+    text = sanitize_valuation_history_comments(text)
     path.write_text(text, encoding="utf-8")
     print(f"ETF_OUTPUT_CONTRACT_FIX_PATCHED | report={path.name} | rotation_plan={has_rotation_plan(state)}")
 
