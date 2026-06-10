@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -583,7 +584,9 @@ def main() -> None:
 
     artifact = build_execution_artifact(Path(args.runtime_state), Path(args.portfolio_state), Path(args.trade_ledger), args.mode, Path(args.output_dir))
     if artifact["policy_checks"]["errors"]:
-        print("ETF_MODEL_EXECUTION_BLOCKED | artifact=" + artifact["artifact_path"] + " | errors=" + ";".join(artifact["policy_checks"]["errors"]))
+        message = "ETF_MODEL_EXECUTION_BLOCKED | artifact=" + artifact["artifact_path"] + " | errors=" + ";".join(artifact["policy_checks"]["errors"])
+        print(message)
+        print(message, file=sys.stderr)
         raise SystemExit(1)
     print(
         "ETF_MODEL_EXECUTION_OK | "
