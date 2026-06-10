@@ -39,7 +39,7 @@ def _payload():
 def test_replacement_edge_notes_markdown_is_explicitly_diagnostic_only_en():
     md = replacement_edge_notes_markdown(_payload(), language="en")
 
-    assert MARKER in md
+    assert MARKER not in md
     assert "Diagnostic-only" in md
     assert EN_AUTHORITY_DISCLAIMER in md
     assert "allocation authority" in md
@@ -57,7 +57,7 @@ def test_replacement_edge_notes_markdown_is_explicitly_diagnostic_only_en():
 def test_replacement_edge_notes_markdown_is_explicitly_diagnostic_only_nl():
     md = replacement_edge_notes_markdown(_payload(), language="nl")
 
-    assert MARKER in md
+    assert MARKER not in md
     assert "Diagnostisch-only" in md
     assert NL_AUTHORITY_DISCLAIMER in md
     assert "allocatiebevoegdheid" in md
@@ -74,7 +74,7 @@ def test_replacement_edge_notes_markdown_is_explicitly_diagnostic_only_nl():
 def test_replacement_edge_notes_empty_state_has_safe_fallback():
     md = replacement_edge_notes_markdown({"edges": []}, language="en")
 
-    assert MARKER in md
+    assert MARKER not in md
     assert "No replacement-edge diagnostics available this run" in md
 
 
@@ -97,9 +97,9 @@ def test_replacement_edge_notes_are_inserted_into_english_polish_output():
 """
     out = polish_english(text, {"source_files": {}, "macro_policy_pack": {}})
 
-    assert MARKER in out
+    assert MARKER not in out
     assert EN_AUTHORITY_DISCLAIMER in out
-    assert out.index("Replacement Duel Table") < out.index(MARKER) < out.index("## 12. Portfolio Rotation Plan")
+    assert out.index("Replacement Duel Table") < out.index(EN_AUTHORITY_DISCLAIMER) < out.index("## 12. Portfolio Rotation Plan")
 
 
 def test_replacement_edge_notes_are_inserted_into_dutch_polish_output():
@@ -121,17 +121,17 @@ def test_replacement_edge_notes_are_inserted_into_dutch_polish_output():
 """
     out = polish_dutch(text, {"source_files": {}, "macro_policy_pack": {}})
 
-    assert MARKER in out
+    assert MARKER not in out
     assert NL_AUTHORITY_DISCLAIMER in out
-    assert out.index("### Vervangingsanalyse") < out.index(MARKER) < out.index("## 12. Rotatieplan portefeuille")
+    assert out.index("### Vervangingsanalyse") < out.index(NL_AUTHORITY_DISCLAIMER) < out.index("## 12. Rotatieplan portefeuille")
 
 
 def test_output_contract_fix_keeps_english_replacement_edge_notes():
     out = action_snapshot_section({"positions": []})
 
-    assert MARKER in out
+    assert MARKER not in out
     assert EN_AUTHORITY_DISCLAIMER in out
-    assert out.index("### Replacement pricing and duel status") < out.index(MARKER)
+    assert out.index("### Replacement pricing and duel status") < out.index(EN_AUTHORITY_DISCLAIMER)
 
 
 def test_replacement_edge_notes_do_not_promote_authority_fields():
