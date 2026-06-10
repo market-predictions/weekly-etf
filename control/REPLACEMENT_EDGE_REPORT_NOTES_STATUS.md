@@ -256,3 +256,35 @@ Purpose:
 ```text
 Retry WP11A-VERIFY after preserving English replacement-edge diagnostic notes through runtime.fix_report_output_contract.
 ```
+
+## WP11A-NL-TERMINOLOGY-FIX action taken
+
+The content-fix retry passed the English report content contract:
+
+```text
+ETF_REPORT_CONTENT_CONTRACT_OK | report=weekly_analysis_pro_260609_05.md
+```
+
+It then failed in the Dutch terminology contract:
+
+```text
+ContractError: ACTION_REPLACEMENTS is not sourced from runtime.nl_terminology
+```
+
+Fix commit:
+
+```text
+51998e242bb573bb6be55145fe355558b8e9f75b — Source NL localization aliases from central terminology
+```
+
+Change summary:
+
+- `runtime.nl_localization` now sources identity-checked aliases directly from `runtime.nl_terminology`.
+- `localize_text` still uses the shared contract overlay through `runtime.nl_terminology_contract.combined_text_replacements()`.
+- No report scoring, policy, trading, execution or portfolio-state behavior changed.
+
+Local validation:
+
+```text
+ETF_NL_TERMINOLOGY_CONTRACT_OK | source=runtime.nl_terminology
+```
