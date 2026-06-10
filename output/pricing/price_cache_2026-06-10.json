@@ -60,6 +60,36 @@
         "status": "not_checked"
       }
     },
+    "alpha_vantage:COM/CHART:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "No time series returned",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "COM/CHART",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "alpha_vantage",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "COM/CHART",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "alpha_vantage:DBC/BIL:2026-06-09": {
       "adjusted_close": null,
       "asset_role": "radar_alternative",
@@ -145,6 +175,36 @@
       "source_detail": null,
       "status": "unresolved",
       "symbol": "FUNDABLE",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "alpha_vantage:HTTPS:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "No time series returned",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "HTTPS",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "alpha_vantage",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "HTTPS",
       "verification": {
         "source": null,
         "status": "not_checked"
@@ -270,6 +330,36 @@
         "status": "not_checked"
       }
     },
+    "alpha_vantage:SYMBOL:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "No time series returned",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "SYMBOL",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "alpha_vantage",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "SYMBOL",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "alpha_vantage:TO:2026-06-09": {
       "adjusted_close": null,
       "asset_role": "challenger",
@@ -295,6 +385,36 @@
       "source_detail": null,
       "status": "unresolved",
       "symbol": "TO",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "alpha_vantage:WWW.:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "No time series returned",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "WWW.",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "alpha_vantage",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "WWW.",
       "verification": {
         "source": null,
         "status": "not_checked"
@@ -355,6 +475,36 @@
       "source_detail": null,
       "status": "unresolved",
       "symbol": "CHALLENGER",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "fmp:COM/CHART:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "No matching EOD result",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "COM/CHART",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "fmp",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "COM/CHART",
       "verification": {
         "source": null,
         "status": "not_checked"
@@ -445,6 +595,36 @@
       "source_detail": null,
       "status": "unresolved",
       "symbol": "FUNDABLE",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "fmp:HTTPS:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "No matching EOD result",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "HTTPS",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "fmp",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "HTTPS",
       "verification": {
         "source": null,
         "status": "not_checked"
@@ -570,6 +750,36 @@
         "status": "not_checked"
       }
     },
+    "fmp:SYMBOL:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "No matching EOD result",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "SYMBOL",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "fmp",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "SYMBOL",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "fmp:TO:2026-06-09": {
       "adjusted_close": null,
       "asset_role": "challenger",
@@ -595,6 +805,36 @@
       "source_detail": null,
       "status": "unresolved",
       "symbol": "TO",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "fmp:WWW.:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "No matching EOD result",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "WWW.",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "fmp",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "WWW.",
       "verification": {
         "source": null,
         "status": "not_checked"
@@ -787,6 +1027,36 @@
       "source_detail": "time_series",
       "status": "fresh_exact_unverified",
       "symbol": "CIBR",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "twelve_data:COM/CHART:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "HTTP Error 404: Not Found",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "COM/CHART",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "twelve_data",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "COM/CHART",
       "verification": {
         "source": null,
         "status": "not_checked"
@@ -1108,6 +1378,36 @@
       "source_detail": "time_series",
       "status": "fresh_exact_unverified",
       "symbol": "GSG",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "twelve_data:HTTPS:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "HTTP Error 404: Not Found",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "HTTPS",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "twelve_data",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "HTTPS",
       "verification": {
         "source": null,
         "status": "not_checked"
@@ -1893,6 +2193,36 @@
         "status": "not_checked"
       }
     },
+    "twelve_data:SYMBOL:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "HTTP Error 404: Not Found",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "SYMBOL",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "twelve_data",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "SYMBOL",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "twelve_data:TO:2026-06-09": {
       "adjusted_close": null,
       "asset_role": "challenger",
@@ -2088,6 +2418,36 @@
         "status": "not_checked"
       }
     },
+    "twelve_data:WWW.:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "HTTP Error 404: Not Found",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "WWW.",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "twelve_data",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "WWW.",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "twelve_data:XBI:2026-06-09": {
       "adjusted_close": null,
       "asset_role": "challenger",
@@ -2247,6 +2607,36 @@
         "status": "not_checked"
       }
     },
+    "yahoo_history:COM/CHART:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "HTTP Error 500: Cannot find server.",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "COM/CHART",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "unresolved",
+      "symbol": "COM/CHART",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "yahoo_history:DBC/BIL:2026-06-09": {
       "adjusted_close": null,
       "asset_role": "radar_alternative",
@@ -2332,6 +2722,36 @@
       "source_detail": "query1_chart_v8",
       "status": "unresolved",
       "symbol": "FUNDABLE",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "yahoo_history:HTTPS:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "HTTP Error 404: Not Found",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "HTTPS",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "unresolved",
+      "symbol": "HTTPS",
       "verification": {
         "source": null,
         "status": "not_checked"
@@ -2457,6 +2877,36 @@
         "status": "not_checked"
       }
     },
+    "yahoo_history:SYMBOL:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "HTTP Error 404: Not Found",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "SYMBOL",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "unresolved",
+      "symbol": "SYMBOL",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "yahoo_history:TO:2026-06-09": {
       "adjusted_close": null,
       "asset_role": "challenger",
@@ -2482,6 +2932,36 @@
       "source_detail": "query1_chart_v8",
       "status": "unresolved",
       "symbol": "TO",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "yahoo_history:WWW.:2026-06-09": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "HTTP Error 404: Not Found",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": null,
+      "provider_symbol": "WWW.",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-09",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "unresolved",
+      "symbol": "WWW.",
       "verification": {
         "source": null,
         "status": "not_checked"
