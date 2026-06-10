@@ -3,7 +3,7 @@
 ## Workpackage
 
 ```text
-WP11A-VERIFY — Validate replacement-edge diagnostic notes in CI/fresh report output
+WP11A-VERIFY / WP11A-VERIFY-OBSERVE — Validate replacement-edge diagnostic notes and expose model-execution policy failures
 ```
 
 ## Repository
@@ -15,12 +15,14 @@ market-predictions/weekly-etf
 ## Status
 
 ```text
-status: validation-requested / fresh-report-run-queued / awaiting-workflow-evidence
+status: observability-fix-committed / retry-request-prepared / awaiting-workflow-evidence
 ```
 
 ## Purpose
 
 WP5 added direct challenger-vs-current-holding replacement-edge diagnostics. WP11A created the safe helper and tests. WP11A-FIX wired those diagnostics into the report-output path as clearly non-authoritative notes. WP11A-VERIFY requests and tracks validation evidence for that report-output contract.
+
+WP11A-VERIFY reached the report-build step and passed the Dutch client-language scrub, date localization, ticker linkification, and macro-thesis surface leakage validation. The remaining blocker was hidden because `runtime.model_execution_engine` output was captured by the workflow before the failing exit code stopped the step.
 
 ## Authority boundary
 
@@ -108,15 +110,67 @@ Commit:
 31328c2e5d2a2c16c642914f1538808fe56f77ac — Request WP11A-VERIFY fresh report validation run
 ```
 
-## Validation evidence status
-
-At the time this file was updated, the GitHub connector returned no workflow-run metadata for commit:
+A later retry after a Dutch GLD surface fix reached further into the report-build step and showed:
 
 ```text
-31328c2e5d2a2c16c642914f1538808fe56f77ac
+ETF_NL_CLIENT_LANGUAGE_SCRUB_OK
+ETF_NL_DATE_LOCALIZATION_OK
+ETF_LINKIFY_OK
+ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK
 ```
 
-So WP11A-VERIFY is not yet closed.
+The next failure appeared to be inside model execution, but the precise `ETF_MODEL_EXECUTION_BLOCKED` policy error was hidden by workflow stdout capture.
+
+## WP11A-VERIFY-OBSERVE action taken
+
+Committed observability-only stderr output in:
+
+```text
+runtime/model_execution_engine.py
+```
+
+Commit:
+
+```text
+887722cc638778ee44809b6556aa54c7ca72f569 — Expose model execution policy failures on stderr
+```
+
+Change summary:
+
+- added `import sys`
+- preserved the existing blocked exit behavior
+- preserved the existing stdout message
+- additionally prints the same `ETF_MODEL_EXECUTION_BLOCKED` line to stderr before `SystemExit(1)`
+
+No policy rule was relaxed. No pricing, lane scoring, fundability, recommendation, target-weight, trade-intent, execution, or portfolio-state mutation logic was changed.
+
+## Prepared retry request
+
+A new retry request is prepared as the final trigger commit for this sequence:
+
+```text
+control/run_queue/weekly_etf_report_request_20260610_180729_wp11a_verify_observe.md
+```
+
+Purpose:
+
+```text
+Retry WP11A-VERIFY after model-execution observability fix.
+```
+
+## Validation evidence status
+
+WP11A-VERIFY is not yet closed.
+
+The next workflow run should now expose the exact model-execution policy/input error if the step still fails, for example:
+
+```text
+ETF_MODEL_EXECUTION_BLOCKED | artifact=... | errors=source_not_in_portfolio:...
+ETF_MODEL_EXECUTION_BLOCKED | artifact=... | errors=trade_price_invalid:...
+ETF_MODEL_EXECUTION_BLOCKED | artifact=... | errors=trade_below_min_size_after_source_cap:...
+ETF_MODEL_EXECUTION_BLOCKED | artifact=... | errors=source_has_no_executable_value:...
+ETF_MODEL_EXECUTION_BLOCKED | artifact=... | errors=major_rotation_count_exceeds_policy:...
+```
 
 ## Required validation evidence still needed
 
@@ -134,13 +188,20 @@ Dutch report contains ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
 python tools/validate_etf_report_content_contract.py --output-dir output passes
 ```
 
+Model-execution observability should prove:
+
+```text
+failed shadow model-execution policy checks are visible in GitHub Actions logs
+```
+
 ## Remaining work
 
 ```text
-wait for / inspect GitHub Actions workflow result
+inspect GitHub Actions workflow result for the observe retry
+if failing, capture the visible ETF_MODEL_EXECUTION_BLOCKED errors line
 confirm latest fresh English report path
 confirm latest fresh Dutch report path
 confirm marker in both reports
 confirm content validator result
-record completed verification status in CURRENT_STATE, NEXT_ACTIONS, ETF_SESSION_CHANGELOG and a follow-up handover
+record completed verification status in CURRENT_STATE, NEXT_ACTIONS, ETF_SESSION_CHANGELOG and a follow-up closeout handover
 ```
