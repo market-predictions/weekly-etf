@@ -19,6 +19,11 @@
   2. `control/CURRENT_STATE.md`
   3. `control/NEXT_ACTIONS.md`
   4. only then the minimum relevant execution files
+- For replacement-edge report-note work, also read:
+  ```text
+  control/REPLACEMENT_EDGE_REPORT_NOTES_STATUS.md
+  ```
+- For fresh-chat roadmap continuation, use the latest available roadmap handover as freshness authority where it conflicts with older control docs.
 
 ---
 
@@ -31,119 +36,96 @@
 - Latest fully recorded production evidence:
   ```text
   workflow: Send weekly ETF Pro report
-  run_number: 216
-  run_id: 20260605_081216
-  requested_close_date: 2026-06-04
-  workflow_status: workflow_success
+  github_actions_run: 27306857013
+  workflow_title: Retry ETF delivery after hiding replacement-edge marker
+  workflow_status: completed
   workflow_conclusion: success
+  artifact_commit: e2891ca
+  requested_close_date: 2026-06-10
+  run_id: 20260610_211606
+  report_token: 260610
+  english_report_path: output/weekly_analysis_pro_260610_02.md
+  dutch_report_path: output/weekly_analysis_pro_nl_260610_02.md
+  english_pdf_path: output/weekly_analysis_pro_260610_02.pdf
+  dutch_pdf_path: output/weekly_analysis_pro_nl_260610_02.pdf
+  english_delivery_html: output/weekly_analysis_pro_260610_02_delivery.html
+  dutch_delivery_html: output/weekly_analysis_pro_nl_260610_02_delivery.html
+  runtime_state_path: output/runtime/etf_report_state_20260610_20260610_211606.json
+  executed_runtime_state_path: output/runtime/etf_report_state_20260610_20260610_211606_already_executed.json
+  pricing_audit_path: output/pricing/price_audit_2026-06-10_20260610_211606.json
+  run_manifest_path: output/run_manifests/weekly_etf_run_manifest_2026-06-10_20260610_211606.json
+  delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-10_20260610_211606.json
   pricing_lineage_status: passed
-  delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-04_20260605_081216.json
-  final_run_manifest_path: output/run_manifests/weekly_etf_run_manifest_2026-06-04_20260605_081216.json
-  report_authority_source: runtime_state
-  english_report_path: output/weekly_analysis_pro_260604_10.md
-  dutch_report_path: output/weekly_analysis_pro_nl_260604_10.md
-  total_portfolio_value_eur: 111105.47
-  evidence_type: full pricing-lineage + delivery-manifest baseline
+  pricing_coverage_count_pct: 100.0
+  fresh_holdings_count: 9
+  carried_forward_holdings_count: 0
+  total_portfolio_value_eur: 103994.26
+  cash_eur: 1936.52
+  delivery_status: smtp_sendmail_returned_no_exception
   inbox_receipt: not_proven
   ```
-- Latest roadmap evidence:
+- Delivery wording:
+  - Delivery manifest recorded `smtp_sendmail_returned_no_exception` after `send_report.py` returned from `smtplib.sendmail` without raising.
+  - This is delivery-layer evidence, not an end-recipient inbox receipt.
+- Current holdings:
   ```text
-  WP1 — Deterministic macro narrative shadow candidate: completed / not promoted
-  WP2 — Macro narrative compliance and bilingual parity gate: completed / not promoted
-  WP3 — Macro promotion decision contract: completed / merged via PR #51
-  WP4 — Dutch / bilingual alias consolidation: completed / validated
-  WP5 — Direct challenger-vs-current-holding scoring: completed / diagnostic-only
-  WP6 — Latest-run manifest / delivery evidence reconciliation: completed
-  WP7 — Deterministic macro regime client-surface pilot: completed / non-authoritative / not promoted
-  WP8 — Macro old-vs-new review evidence package: completed / ready_for_narrative_promotion_review / not promoted
-  WP9 — Controlled deterministic macro narrative promotion artifact: completed / status=not_promoted
-  WP10 — Explicit deterministic macro narrative authority promotion decision: completed / status=not_promoted
-  WP11A-FIX — Replacement-edge diagnostic notes render integration: completed / render-path-wired / awaiting CI confirmation
+  CIBR
+  DFEN
+  GSG
+  IEFA
+  PAVE
+  SMH
+  SPY
+  URNM
+  XLU
   ```
+- Historical note:
+  - Workflow run #216 / run `20260605_081216` remains historical evidence only.
+  - Do not describe run #216 as the latest production baseline.
 - Action:
-  - keep WP10 promotion decision artifact as `not_promoted`; it records no production report narrative authority and no production report mutation
-  - keep deterministic macro wording outside production report output unless a future explicit promotion decision and separate report-integration work package are authorized
-  - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro shadow-narrative evidence, macro client-surface validation evidence, macro-promotion decision evidence, Dutch terminology validation evidence, replacement-edge evidence, pilot-preview evidence, old-vs-new review evidence, and inbox receipt distinct
+  - keep workflow success, pricing-lineage success, SMTP-send evidence, report-surface evidence, macro client-surface validation evidence, macro-promotion decision evidence, replacement-edge evidence, delivery evidence, and inbox receipt distinct
+  - do not weaken pricing-lineage, runtime-state, run-manifest, or delivery-manifest requirements
 
 ---
 
 ## Phase 2 — macro roadmap gates
 
-### 2. WP1 — Deterministic macro narrative shadow candidate
+### 2. Current macro surface status
 
-- Status: completed as shadow-only comparison path / not promoted
-- Remaining action:
-  - keep artifact as review/comparison evidence only
-
-### 3. WP2 — Macro narrative compliance and bilingual parity gate
-
-- Status: completed as output-contract safety gate / not promoted
-- Remaining action:
-  - keep as an active regression gate for any future macro narrative candidate
-  - do not interpret a WP2 pass as promotion authority
-
-### 4. WP3 — Macro promotion decision contract
-
-- Status: completed / merged / not promoted
-- Remaining action:
-  - keep deterministic macro regime shadow-only unless a future artifact satisfies the promotion contract
-  - do not interpret WP3 merge as report narrative promotion
-
-### 5. WP7 — Deterministic macro regime client-surface pilot
-
-- Status: completed as controlled non-authoritative pilot / not promoted
+- Status: client-safe macro report surface integrated
+- Current production flow:
+  ```text
+  runtime.build_macro_policy_pack
+    -> output/macro/latest.json
+    -> runtime.macro_report_surface
+    -> runtime.polish_runtime_reports / native report rendering
+    -> English/Dutch report sections
+  ```
+- Validated after marker cleanup:
+  ```text
+  ETF_MACRO_REPORT_SURFACE_OK
+  ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK
+  ```
 - Boundary:
+  - client-safe macro report surface is integrated
+  - raw deterministic macro read is not client-facing
+  - deterministic macro read is not promoted as official production regime source
+  - do not infer promotion from green validators, review readiness, macro policy pack existence, or client-safe macro surface presence
+
+### 3. Completed deterministic macro packages
+
+- Status: completed / not promoted where applicable
+- Evidence summary:
   ```text
-  wp3_promotion_status=not_promoted
-  production_report_narrative_authority=false
-  portfolio_action_authority=false
-  lane_scoring_authority=false
-  fundability_authority=false
-  funding_authority=false
-  portfolio_mutation=false
-  production_report_mutation=false
+  WP1 — Deterministic macro narrative shadow candidate: completed / not promoted
+  WP2 — Macro narrative compliance and bilingual parity gate: completed / not promoted
+  WP3 — Macro promotion decision contract: completed / merged
+  WP7 — Deterministic macro regime client-surface pilot: completed / non-authoritative / not promoted
+  WP8 — Macro old-vs-new review evidence package: completed / ready_for_narrative_promotion_review / not promoted
+  WP9 — Controlled deterministic macro narrative promotion artifact: completed / status=not_promoted
+  WP10 — Explicit deterministic macro narrative authority promotion decision: completed / status=not_promoted
   ```
-
-### 6. WP8 — Macro old-vs-new review evidence package
-
-- Status: completed / validated / ready_for_narrative_promotion_review / not promoted
-- Boundary:
-  - review evidence only
-  - not promotion
-  - no production report mutation
-  - production_report_narrative_authority=false
-  - portfolio_action_authority=false
-  - lane_scoring_authority=false
-  - fundability_authority=false
-  - funding_authority=false
-  - portfolio_mutation=false
-  - delivery_authority=false
-
-### 7. WP9 — Controlled deterministic macro narrative promotion artifact
-
-- Status: completed / validated / `status=not_promoted`
-- Evidence:
-  ```text
-  output/macro/promotion/macro_regime_promotion_decision_20260605_000000.json
-  ```
-- Decision:
-  - WP9 records `not_promoted` because no explicit control-layer instruction to promote was present.
-
-### 8. WP10 — Explicit deterministic macro narrative authority promotion decision
-
-- Owner: `[ASSISTANT]`
-- Status: completed / validated / `status=not_promoted`
-- Evidence:
-  ```text
-  output/macro/promotion/macro_regime_promotion_decision_20260606_000000.json
-  tests/test_macro_regime_promotion_decision_artifact.py
-  local validation: python tools/validate_macro_regime_promotion_contract.py output/macro/promotion/macro_regime_promotion_decision_20260606_000000.json = MACRO_REGIME_PROMOTION_CONTRACT_OK
-  local focused test: python -m pytest tests/test_macro_regime_promotion_decision_artifact.py -q = 4 passed
-  ```
-- Decision:
-  - WP10 records `not_promoted` because the current control files did not contain an explicit control-layer instruction to promote narrative authority.
-  - WP8 `ready_for_narrative_promotion_review` remains review eligibility only, not promotion.
-- Authority boundaries:
+- Standing authority boundary:
   ```text
   client_facing_narrative_authority=false
   production_report_narrative_authority=false
@@ -157,82 +139,220 @@
   production_report_mutation=false
   ```
 - Remaining action:
-  - do not integrate deterministic macro wording into production reports unless a future explicit control-layer decision promotes narrative authority and a separate report-integration work package changes the production report path
+  - future deterministic macro work must be framed as one of:
+    1. shadow-quality improvement only
+    2. promotion-decision preparation only
+    3. explicit control-layer promotion decision
+    4. separate production report integration after promotion
+  - do not collapse these into one implicit change
 
 ---
 
-## Phase 3 — Dutch quality and alias cleanup
+## Phase 3 — replacement-edge scoring and report notes
 
-### 9. WP4 — Dutch / bilingual alias consolidation
+### 4. Replacement-edge diagnostic notes status
 
-- Status: completed / validated
-- Remaining action:
-  - keep shared Dutch terminology contract active as a regression surface
-
----
-
-## Phase 4 — replacement-edge scoring and report notes
-
-### 10. WP5 — Direct challenger-vs-current-holding scoring
-
-- Status: completed as diagnostic-only scoring package
-- Remaining action:
-  - keep diagnostic-only unless a separate authority decision grants lane-scoring, fundability, recommendation, or portfolio-action use
-
-### 11. WP11A-FIX — Replacement-edge diagnostic notes render integration
-
-- Owner: `[ASSISTANT]`
-- Status: completed / render-path-wired / validator-added / awaiting CI confirmation
-- Evidence:
+- Status: marker cleanup verified successful in current `260610_02` baseline
+- Required current wording:
   ```text
-  runtime/replacement_edge_report_notes.py
-  runtime/polish_runtime_reports.py
-  tests/test_replacement_edge_report_notes.py
-  tools/validate_etf_report_content_contract.py
-  control/REPLACEMENT_EDGE_REPORT_NOTES_STATUS.md
-  handover/workpackages/20260610_0000_wp11a_fix_replacement_edge_render_integration.md
-  marker: ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED
+  The visible marker ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED is absent from the current 260610_02 Markdown / clean Markdown / HTML / PDF surfaces.
   ```
 - Boundary:
   ```text
   diagnostic_only=true
-  no lane-scoring authority
-  no fundability authority
-  no trade authority
-  no production recommendation authority
-  no execution authority
-  no portfolio mutation authority
+  portfolio_action_authority=false
+  fundability_authority=false
+  lane_scoring_authority=false
+  funding_authority=false
+  production_recommendation_authority=false
+  execution_authority=false
+  portfolio_mutation=false
   ```
-- Remaining action:
-  - run focused pytest and a fresh report/content-validation pass
-  - record CI/fresh-run evidence after validation
+- The notes must not influence:
+  ```text
+  ranking
+  lane scoring
+  fundability
+  recommendation
+  target weights
+  trade intents
+  execution
+  portfolio mutation
+  ```
+- Historical note:
+  - Older historical artifacts such as `260609_06`, `260609_07`, and early `260610` outputs may still contain the old marker.
+  - Current delivery output is the fresh `260610_02` set.
+  - Do not bulk-edit old historical outputs unless explicitly requested.
 
 ---
 
-## Phase 5 — possible follow-up packages
+## Phase 4 — Dutch quality and output-contract guardrails
 
-### 12. Validate WP11A-FIX with focused tests and fresh report run
+### 5. Keep output-contract validators active
 
-- Status: next validation package / not yet confirmed by this chat
-- Action:
-  ```bash
-  python -m pytest tests/test_replacement_edge_report_notes.py -q
-  ```
-- Then run or trigger a fresh report/content-validation pass so the updated `tools/validate_etf_report_content_contract.py` proves the marker and diagnostic-only disclaimer on the newly rendered English report.
-
-### 13. Use safe report request queue for ChatGPT-initiated fresh reports
-
-- Status: active baseline
-- Action: when the user asks ChatGPT to generate a fresh Weekly ETF Review, create a request file under:
+- Status: active standing requirement
+- Protect:
   ```text
-  control/run_queue/weekly_etf_report_request_YYYYMMDD_HHMMSS.md
+  pricing lineage
+  runtime-state authority
+  bilingual English/Dutch output
+  Dutch terminology contract
+  ticker linkification
+  client-surface scrub
+  macro/thesis leakage guard
+  replacement-edge diagnostic-only boundary
+  delivery HTML contract
+  delivery manifest summary
+  run manifest summary
   ```
-- Then verify the workflow outcome and repo artifacts directly where possible instead of asking the user to inspect Actions manually.
+- Key validators:
+  ```text
+  tools/validate_etf_report_content_contract.py
+  tools/validate_etf_macro_thesis_surface_leakage.py
+  tools/validate_macro_report_surface.py
+  tools/validate_macro_compliance.py
+  tools/validate_etf_delivery_html_contract.py
+  tools/validate_etf_client_surface_clean.py
+  tools/validate_etf_model_execution.py
+  tools/validate_etf_trade_ledger_idempotency.py
+  ```
 
-### 14. Future deterministic macro report integration, only after explicit promotion
+---
 
-- Status: not started / blocked
+## Phase 5 — next roadmap packages
+
+### 6. WP12 — Refresh control docs to current baseline
+
+- Owner: `[ASSISTANT]`
+- Status: completed / control-doc refresh only
+- Files updated:
+  ```text
+  control/CURRENT_STATE.md
+  control/NEXT_ACTIONS.md
+  ```
+- Completion criteria recorded:
+  ```text
+  latest production baseline = run_id 20260610_211606
+  latest report set = 260610_02
+  marker cleanup = verified success
+  macro surface = integrated as client-safe only
+  deterministic macro = not promoted
+  old run #216 = retained only as historical evidence
+  ```
 - Boundary:
-  - WP10 did not promote narrative authority
-  - no production report mutation has occurred
-  - a future package must explicitly promote narrative authority first, then separately integrate report output
+  - no report generation logic changed
+  - no scoring changed
+  - no portfolio state changed
+  - no macro authority changed
+  - no replacement-edge authority changed
+  - no historical output artifacts rewritten
+
+### 7. WP13 — Deterministic macro read promotion review, not implementation
+
+- Owner: `[ASSISTANT]`
+- Status: next recommended package / not started
+- Goal:
+  ```text
+  Produce a concise promotion-review checklist for the deterministic macro read.
+  ```
+- Must answer:
+  ```text
+  What exact deterministic fields would become production narrative source?
+  What bilingual surface would be allowed?
+  What would remain forbidden?
+  What validators must pass?
+  What explicit control-layer phrase/flag authorizes promotion?
+  What rollback path exists if client output regresses?
+  ```
+- Boundary:
+  - do not mutate production report behavior
+  - do not grant portfolio-action, lane-scoring, fundability, funding, execution, delivery, or portfolio-mutation authority
+  - do not promote deterministic macro read by implication
+
+### 8. WP14 — Deterministic macro read shadow replay evidence
+
+- Owner: `[ASSISTANT]`
+- Status: recommended after or alongside WP13 / not started
+- Goal:
+  ```text
+  Run or prepare fixture replay evidence for deterministic macro read versus legacy macro pack over recent reports.
+  ```
+- Output:
+  - review artifact only
+  - not client-facing report content
+- Boundary:
+  - no production report mutation
+  - no recommendation, fundability, execution, or portfolio-state mutation
+
+### 9. WP15 — Historical artifact cleanup policy
+
+- Owner: `[ASSISTANT]`
+- Status: recommended after WP13/WP14 or when historical-output grep noise becomes operationally blocking / not started
+- Goal:
+  ```text
+  Decide whether old generated outputs should remain immutable historical artifacts or whether the repo wants a controlled cleanup/archive policy.
+  ```
+- Rationale:
+  ```text
+  Old reports may still contain prior client-surface issues, including the old replacement-edge marker.
+  Current generated outputs are clean, but repo-wide grep can still find old artifacts.
+  ```
+- Boundary:
+  - do not bulk-delete or rewrite historical output files without explicit user approval
+  - policy first, cleanup second
+
+---
+
+## Do-not-do list
+
+Do not:
+
+```text
+reintroduce ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED into report output
+treat old historical artifacts as current delivery output
+promote deterministic macro read by inference
+let macro/thesis shadow fields leak into client output
+use replacement-edge diagnostics for scoring/fundability/trades
+rewrite historical output files without explicit approval
+commit while a delivery workflow is running unless the commit is intentionally the trigger/fix
+collapse state authority back into Markdown reports
+```
+
+---
+
+## Useful verification commands
+
+Check latest Actions run:
+
+```bash
+python - <<'PY'
+import json, urllib.request
+url='https://api.github.com/repos/market-predictions/weekly-etf/actions/runs?per_page=5'
+with urllib.request.urlopen(url, timeout=20) as r:
+    data=json.load(r)
+for run in data.get('workflow_runs', []):
+    print(run.get('id'), run.get('display_title'), run.get('status'), run.get('conclusion'), run.get('head_sha')[:12])
+PY
+```
+
+Check current report marker absence:
+
+```bash
+git grep -n "ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED" origin/main -- \
+  output/weekly_analysis_pro_260610_02* \
+  output/weekly_analysis_pro_nl_260610_02* || true
+```
+
+Check macro surface:
+
+```bash
+python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json
+python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+```
+
+Check latest manifests:
+
+```bash
+cat output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+cat output/delivery/latest_weekly_etf_delivery_manifest_path.txt
+```
