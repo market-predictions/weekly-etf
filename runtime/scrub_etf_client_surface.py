@@ -17,7 +17,7 @@ from runtime.max_position_action_contract import over_cap_tickers
 SNAKE_CASE_RE = re.compile(r"\b[a-z]+(?:_[a-z0-9]+){1,}\b")
 EN_NEGATIVE_RE = re.compile(r"(\breduce\s+(?:\[[^\]]+\]\([^\)]+\)|[A-Z][A-Z0-9.-]*)\s+(?:by)\s+)-(\d+(?:\.\d+)?%)", re.IGNORECASE)
 NL_NEGATIVE_RE = re.compile(r"(\bverlaag\s+(?:\[[^\]]+\]\([^\)]+\)|[A-Z][A-Z0-9.-]*)\s+met\s+)-(\d+(?:\.\d+)?%)", re.IGNORECASE)
-EMPTY_HTML_COMMENT_RE = re.compile(r"(?m)^\s*<!--\s*-->\s*\n?")
+EMPTY_COMMENT_ARTIFACT_RE = re.compile(r"(?im)^\s*(?:&lt;!|<!)\s*--\s*--\s*(?:&gt;|>)\s*\n?")
 PORTFOLIO_STATE_PATH = Path("output/etf_portfolio_state.json")
 
 EXACT_REPLACEMENTS = {
@@ -64,6 +64,13 @@ EXITED_GLD_REPLACEMENTS = {
     "| Goud | Neutraal | Hedgerol onder herbeoordeling. |": "| Defensieve ballast | Neutraal | Hedge- en cashachtige rollen blijven onder opportunity-cost-review. |",
     "| Hedgedrawdown | GLD moet zijn hedgefunctie bewijzen | GSG en BIL blijven alternatieven | GSG, BIL, cash | Onproductieve hedgepositie | Houd GLD onder herbeoordeling | Direct | Gemiddeld |": "| Hedgedrawdown | De hedgefunctie moet zichzelf bewijzen | GSG, BIL en cash blijven alternatieven | GSG, BIL, cash | Onproductieve hedgepositie | Houd de huidige hedgefunctie onder herbeoordeling | Direct | Gemiddeld |",
     "- GLD: hedge-validiteitstest vereist.\n": "",
+}
+
+CANONICAL_CONSTRAINT_LINES = {
+    "en_position_size": "Max position size: 25% soft cap; current inherited overweights require no-fresh-cash and review/trim discipline",
+    "en_position_count": "Max number of positions: 8 soft target; current inherited count may exceed this until guarded rotation reduces it",
+    "nl_position_size": "Maximale positiegrootte: 25% zachte bovengrens; bestaande overwegingen krijgen geen nieuw kapitaal en blijven onder verklein-/reviewdiscipline",
+    "nl_position_count": "Maximaal aantal posities: 8 zachte doelstelling; het huidige geërfde aantal kan tijdelijk hoger zijn totdat bewaakte rotatie dit verlaagt",
 }
 
 
@@ -123,7 +130,10 @@ def _strip_ticker_from_list(value: str, ticker: str, none_label: str = "None") -
 
 
 def _scrub_empty_html_comments(text: str) -> str:
-    return EMPTY_HTML_COMMENT_RE.sub("", text).replace("<!-- -->", "")
+    text = EMPTY_COMMENT_ARTIFACT_RE.sub("", text)
+    text = text.replace("<!-- -->", "")
+    text = text.replace("&lt;!-- --&gt;", "")
+    return text
 
 
 def _scrub_non_us_exposure_references(text: str) -> str:
@@ -143,22 +153,30 @@ def _scrub_non_us_exposure_references(text: str) -> str:
     return text
 
 
+def _replace_constraint_line(pattern: str, replacement: str, text: str) -> str:
+    return re.sub(pattern, lambda m: f"{m.group('prefix')}{replacement}", text, flags=re.IGNORECASE | re.MULTILINE)
+
+
 def _scrub_constraint_copy(text: str) -> str:
-    text = text.replace(
-        "Max position size: 25%",
-        "Max position size: 25% soft cap; current inherited overweights require no-fresh-cash and review/trim discipline",
+    text = _replace_constraint_line(
+        r"^(?P<prefix>\s*(?:[-*]\s*)?)Max position size:\s*25%.*$",
+        CANONICAL_CONSTRAINT_LINES["en_position_size"],
+        text,
     )
-    text = text.replace(
-        "Max number of positions: 8",
-        "Max number of positions: 8 soft target; current inherited count may exceed this until guarded rotation reduces it",
+    text = _replace_constraint_line(
+        r"^(?P<prefix>\s*(?:[-*]\s*)?)Max number of positions:\s*8.*$",
+        CANONICAL_CONSTRAINT_LINES["en_position_count"],
+        text,
     )
-    text = text.replace(
-        "Maximale positiegrootte: 25%",
-        "Maximale positiegrootte: 25% zachte bovengrens; bestaande overwegingen krijgen geen nieuw kapitaal en blijven onder verklein-/reviewdiscipline",
+    text = _replace_constraint_line(
+        r"^(?P<prefix>\s*(?:[-*]\s*)?)Maximale positiegrootte:\s*25%.*$",
+        CANONICAL_CONSTRAINT_LINES["nl_position_size"],
+        text,
     )
-    text = text.replace(
-        "Maximaal aantal posities: 8",
-        "Maximaal aantal posities: 8 zachte doelstelling; het huidige geërfde aantal kan tijdelijk hoger zijn totdat bewaakte rotatie dit verlaagt",
+    text = _replace_constraint_line(
+        r"^(?P<prefix>\s*(?:[-*]\s*)?)Maximaal aantal posities:\s*8.*$",
+        CANONICAL_CONSTRAINT_LINES["nl_position_count"],
+        text,
     )
     return text
 
