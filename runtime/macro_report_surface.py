@@ -9,6 +9,7 @@ REGIME_NL = {
     "Risk-on growth": "Risk-on groei",
     "Risk-on narrow leadership": "Risk-on met smal marktleiderschap",
     "Policy Transition / Mixed Regime": "Beleidstransitie / gemengd regime",
+    "Policy transition / mixed regime": "Beleidstransitie / gemengd regime",
     "Unknown": "Onbekend",
 }
 
@@ -20,6 +21,7 @@ GEOPOLITICAL_NL = {
 STANCE_NL = {
     "Restrictive / data-dependent": "Restrictief / datagedreven",
     "Neutral / transition": "Neutraal / overgangsfase",
+    "Tightening / inflation-sensitive": "Verkrappend / inflatiegevoelig",
     "Gradual normalization risk": "Geleidelijke normalisatierisico's",
     "Supportive but credibility-sensitive": "Ondersteunend maar geloofwaardigheidsgevoelig",
 }
@@ -27,6 +29,7 @@ STANCE_NL = {
 POLICY_AREA_NL = {
     "AI infrastructure and semiconductor supply chains": "AI-infrastructuur en semiconductor-toeleveringsketens",
     "Defense and sovereign resilience": "Defensie en strategische weerbaarheid",
+    "ECB rate-policy tightening": "ECB-renteverkrapping",
     "Energy security and nuclear policy": "Energiezekerheid en nucleair beleid",
     "China stimulus and platform regulation": "Chinese stimulering en platformregulering",
 }
@@ -66,8 +69,10 @@ NL_TEXT_REPLACEMENTS = {
     "No direct portfolio action from policy stance alone.": "Geen directe portefeuilleactie op basis van beleid alleen.",
     "Prefer quality, profitable growth and cash discipline over weak balance-sheet beta.": "Geef voorkeur aan kwaliteit, winstgevende groei en kasdiscipline boven zwakke balans-bèta.",
     "Non-U.S. developed exposure remains watchlist, not automatic add.": "Blootstelling aan ontwikkelde markten buiten de VS blijft op de volglijst en is geen automatische toevoeging.",
+    "IEFA exposure is now present, but further non-U.S. developed allocations still require relative-strength, pricing and portfolio-discipline confirmation.": "IEFA-blootstelling is nu aanwezig, maar verdere allocaties naar ontwikkelde markten buiten de VS vragen nog bevestiging in relatieve sterkte, prijsbasis en portefeuillediscipline.",
     "Capital spending and strategic supply-chain policy continue to support semiconductor and infrastructure lanes.": "Kapitaaluitgaven en strategisch toeleveringsbeleid blijven semiconductor- en infrastructuurthema’s ondersteunen.",
     "Defense-budget durability remains a structural support, but ETF vehicle choice still matters.": "De duurzaamheid van defensiebudgetten blijft een structurele steun, maar de ETF-keuze blijft belangrijk.",
+    "The ECB raised rates this week in response to renewed inflation pressure; this raises the hurdle for rate-sensitive and non-U.S. developed-market exposure but does not override pricing, relative-strength or portfolio-discipline gates.": "De ECB verhoogde deze week de rente vanwege hernieuwde inflatiedruk; dit verhoogt de toetsingsdrempel voor rentegevoelige en niet-Amerikaanse ontwikkelde-marktenblootstelling, maar vervangt geen koers-, relatieve-sterkte- of portefeuillediscipline.",
 }
 
 NL_REGEX_REPLACEMENTS = [
@@ -172,7 +177,12 @@ def _transfer_catalysts(pack: dict[str, Any]) -> list[dict[str, Any]]:
     for item in catalysts:
         if isinstance(item, dict) and item.get("transfer_to_report") is True:
             selected.append(item)
-    return selected[:2]
+    transfer = pack.get("report_transfer") if isinstance(pack.get("report_transfer"), dict) else {}
+    try:
+        limit = int(transfer.get("max_policy_catalysts") or 3)
+    except (TypeError, ValueError):
+        limit = 3
+    return selected[: max(1, min(limit, 5))]
 
 
 def _list_values(value: Any, limit: int = MAX_BULLETS) -> list[str]:
@@ -236,7 +246,7 @@ def _what_changed_nl(pack: dict[str, Any]) -> list[str]:
 def _geopolitical_status(pack: dict[str, Any]) -> str:
     catalysts = _transfer_catalysts(pack)
     text = " ".join(_text(item.get("policy_area")) + " " + _text(item.get("latest_signal")) for item in catalysts)
-    if re.search(r"defense|sovereign|china|supply-chain|security|shipping|geopolitical", text, flags=re.IGNORECASE):
+    if re.search(r"defense|sovereign|china|supply-chain|security|shipping|geopolitical|ECB|rate|inflation", text, flags=re.IGNORECASE):
         return "Elevated but localized"
     return "Mixed / policy-sensitive"
 
@@ -291,7 +301,7 @@ def _central_bank_lines_en(pack: dict[str, Any]) -> list[str]:
     for key, label in (("fed", "Fed"), ("ecb", "ECB")):
         bank = _central_bank(pack, key)
         stance = _short(bank.get("stance"), "not classified", max_len=80)
-        implication = _short(bank.get("etf_implication"), "No direct portfolio action from policy stance alone.", max_len=160)
+        implication = _short(bank.get("etf_implication"), "No direct portfolio action from policy stance alone.", max_len=190)
         lines.append(f"- {label} stance: {stance}. Portfolio read-through: {implication}")
     return lines
 
@@ -301,7 +311,7 @@ def _central_bank_lines_nl(pack: dict[str, Any]) -> list[str]:
     for key, label in (("fed", "Fed"), ("ecb", "ECB")):
         bank = _central_bank(pack, key)
         stance = STANCE_NL.get(_text(bank.get("stance")), _short_nl(bank.get("stance"), "niet geclassificeerd", max_len=80))
-        implication = _short_nl(bank.get("etf_implication"), "Geen directe portefeuilleactie op basis van beleid alleen.", max_len=160)
+        implication = _short_nl(bank.get("etf_implication"), "Geen directe portefeuilleactie op basis van beleid alleen.", max_len=190)
         lines.append(f"- {label}-houding: {stance}. Portefeuillelezing: {implication}")
     return lines
 
@@ -310,7 +320,7 @@ def _policy_catalyst_lines_en(pack: dict[str, Any]) -> list[str]:
     lines = []
     for item in _transfer_catalysts(pack):
         area = _short(item.get("policy_area"), "Policy catalyst", max_len=80)
-        signal = _short(item.get("latest_signal"), "Current policy signal remains relevant but not decisive.", max_len=180)
+        signal = _short(item.get("latest_signal"), "Current policy signal remains relevant but not decisive.", max_len=260)
         lines.append(f"- {area}: {signal}")
     return lines or ["- No report-transfer policy catalyst was selected in the macro pack."]
 
@@ -319,7 +329,7 @@ def _policy_catalyst_lines_nl(pack: dict[str, Any]) -> list[str]:
     lines = []
     for item in _transfer_catalysts(pack):
         area = POLICY_AREA_NL.get(_text(item.get("policy_area")), _short_nl(item.get("policy_area"), "Beleidscatalysator", max_len=80))
-        signal = _short_nl(item.get("latest_signal"), "Het beleidssignaal blijft relevant maar niet beslissend.", max_len=180)
+        signal = _short_nl(item.get("latest_signal"), "Het beleidssignaal blijft relevant maar niet beslissend.", max_len=260)
         lines.append(f"- {area}: {signal}")
     return lines or ["- Er is geen beleidscatalysator geselecteerd voor rapportage."]
 
