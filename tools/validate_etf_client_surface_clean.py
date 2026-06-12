@@ -19,6 +19,7 @@ EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 EMPTY_COMMENT_RE = re.compile(r"(?:&lt;!|<!)\s*--\s*--\s*(?:&gt;|>)", re.IGNORECASE)
 DUTCH_RESIDUE_EN_RE = re.compile(r"\bn\.v\.t\.\b", re.IGNORECASE)
+REMOVED_MARKDOWN_GUARD_MARKER = "wp16-nl-equity-curve-guard"
 
 
 def _explicit_path(env_name: str, pattern: re.Pattern[str]) -> Path | None:
@@ -58,6 +59,15 @@ def _current_files(output_dir: Path) -> list[Path]:
     return paths
 
 
+def _apply_nl_equity_curve_guard(text: str, path: Path) -> str:
+    """Compatibility shim for older tests; production no longer injects CSS into Markdown."""
+    if not NL_RE.match(path.name) or REMOVED_MARKDOWN_GUARD_MARKER in text:
+        return text
+    if "`EQUITY_CURVE_CHART_PLACEHOLDER`" in text:
+        return text + "\n" + REMOVED_MARKDOWN_GUARD_MARKER
+    return text
+
+
 def _scrub_file(path: Path) -> None:
     original = path.read_text(encoding="utf-8", errors="ignore")
     cleaned = clean_text(original, language=_language_for_path(path))
@@ -72,6 +82,8 @@ def _scan(path: Path) -> list[str]:
     hits = residual_failures(text, language=language)
     if EMPTY_COMMENT_RE.search(text):
         hits.append("empty comment residue")
+    if REMOVED_MARKDOWN_GUARD_MARKER in text:
+        hits.append("removed markdown style guard marker")
     if language == "en" and DUTCH_RESIDUE_EN_RE.search(text):
         hits.append("Dutch n.v.t. in English output")
     return sorted(set(hits))
