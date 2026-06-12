@@ -33,18 +33,18 @@ control/HISTORICAL_ARTIFACT_CLEANUP_POLICY.md
 
 ---
 
-## Phase 1 — WP16 status
+## Phase 1 — WP16 follow-up status
 
-WP16 has been implemented as a repair commit set and a fresh rerun request has been created.
+WP16 has been implemented, and a follow-up repair has been committed for the two remaining `260611_02` client-surface defects.
 
 ```text
-WP16 — Macro event recency and report-surface QA repair: implemented / rerun requested / delivery not yet verified
+WP16-FOLLOWUP — Empty-comment and constraint-copy repair: implemented / rerun requested / delivery not yet verified
 ```
 
-Rerun request:
+Follow-up rerun request:
 
 ```text
-control/run_queue/weekly_etf_report_request_20260612_wp16_rerun.md
+control/run_queue/weekly_etf_report_request_20260612_wp16_followup_rerun.md
 ```
 
 Do not claim successful report delivery until the workflow produces valid evidence.
@@ -57,11 +57,12 @@ run manifest exists
 delivery manifest exists
 English and Dutch report artifacts exist
 pricing lineage passes
-ECB policy catalyst appears
-ECB stance no longer says Neutral / transition
-non-U.S. exposure wording reconciles with active IEFA exposure
-English n.v.t. residue absent
-empty comment residue absent
+Dutch empty-comment residue absent
+English/Dutch constraint duplication absent
+ECB policy catalyst still appears
+ECB stance remains Tightening / inflation-sensitive
+non-U.S. exposure wording remains reconciled with active IEFA exposure
+English n.v.t. residue remains absent
 Dutch equity-curve render checked
 ```
 
@@ -81,7 +82,7 @@ pricing_lineage_status: passed
 delivery_status: smtp_sendmail_returned_no_exception
 ```
 
-The 2026-06-11 generated reports were reviewed and found to require WP16 repair. They should not be treated as clean premium final output until the WP16 rerun is verified.
+The uploaded `260611_02` reports show the macro/ECB fixes landed, but still had comment-residue and duplicated constraint-copy defects. They should not be treated as clean premium final output until the WP16 follow-up rerun is verified.
 
 ---
 
@@ -95,7 +96,7 @@ raw deterministic macro read: not client-facing
 deterministic macro read as official production regime source: not promoted
 ```
 
-WP16 does not promote deterministic macro.
+WP16 and WP16-FOLLOWUP do not promote deterministic macro.
 
 Standing authority boundary:
 
@@ -124,7 +125,7 @@ current_baseline_scope=manifest_linked_latest_report_set
 historical_output_mutation=false
 ```
 
-WP16 did not manually rewrite historical outputs. A clean report must be produced by workflow rerun.
+WP16-FOLLOWUP did not manually rewrite historical outputs. A clean report must be produced by workflow rerun.
 
 ---
 
@@ -133,10 +134,10 @@ WP16 did not manually rewrite historical outputs. A clean report must be produce
 Next action:
 
 ```text
-Verify WP16 rerun result.
+Verify WP16 follow-up rerun result.
 ```
 
-If the WP16 rerun succeeds, update:
+If the WP16 follow-up rerun succeeds, update:
 
 ```text
 control/CURRENT_STATE.md
@@ -145,7 +146,7 @@ control/NEXT_ACTIONS.md
 
 with the new run id, report token, pricing audit, runtime state, run manifest, delivery manifest, and delivery status.
 
-If the WP16 rerun fails, inspect the failing workflow step first and do not manually edit generated report artifacts.
+If the WP16 follow-up rerun fails, inspect the failing workflow step first and do not manually edit generated report artifacts.
 
 ---
 
