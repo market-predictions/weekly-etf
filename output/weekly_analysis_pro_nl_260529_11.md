@@ -84,7 +84,7 @@
 - SPY plus SMH creëert hoge Amerikaanse tech-/AI-factoroverlap.
 - De hedgefunctie blijft onder herbeoordeling en is geen vanzelfsprekende stabilisator.
 - PPA en PAVE blijven vervangbaar totdat de kwaliteit van de ETF-implementatie is bewezen.
-- Niet-Amerikaanse aandelenblootstelling blijft een diversificatiekloof.
+- Blootstelling aan ontwikkelde markten buiten de VS is via IEFA verhoogd, maar blijft onder bevestiging in relatieve sterkte.
 
 ## 6. Conclusie
 
@@ -162,7 +162,7 @@ Rendement wordt berekend op de huidige ETF-posities op basis van de meest recent
 | Kwaliteit | Overwogen | Winstbestendigheid blijft waardevol. |
 | Defensieve ballast | Neutraal | Hedge- en cashachtige rollen blijven onder opportunity-cost-review. |
 | Industrie / defensie | Overwogen | Structurele thesis is valide; ETF-implementatie onder herbeoordeling. |
-| Niet-USD activa | Volglijst | Nulallocatie is een expliciete inzet op Amerikaanse uitzonderingskracht. |
+| Niet-USD activa | Volglijst | IEFA biedt nu blootstelling aan ontwikkelde markten buiten de VS; verdere allocatie vraagt nog bevestiging. |
 
 ## 9. Tweede-orde-effectenkaart
 
@@ -278,7 +278,7 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 | Defensie-innovatie / strategische weerbaarheid | PPA | ITA | Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling. | Vervangingsanalyse vereist |
 | Netuitbreiding / elektrificatie | PAVE | GRID | Infrastructuurcapex blijft valide. | Vervangingsanalyse vereist |
 | Herbeoordeling grondstoffenhedge | GSG | DBC / BIL | De huidige grondstoffenbrede hedgefunctie moet worden bewezen tegenover cash en alternatieven. | Onder herbeoordeling |
-| Ontwikkelde markten buiten de VS | IEFA | EFA | De portefeuille heeft geen blootstelling aan ontwikkelde markten buiten de VS. | Volglijst |
+| Ontwikkelde markten buiten de VS | IEFA | EFA | De portefeuille heeft via IEFA blootstelling aan ontwikkelde markten buiten de VS, maar verdere allocatie vraagt bevestiging in relatieve sterkte. | Volglijst |
 
 ### Continuïteit in aanbevelingsdiscipline
 - SPY: overlapreview tegenover SMH blijft actief.
@@ -287,8 +287,8 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 - Vervangingskandidaten: niet geschikt voor allocatie zonder afgeronde vervangingsanalyse.
 
 ### Randvoorwaarden
-- Maximale positiegrootte: 25%
-- Maximaal aantal posities: 8
+- Maximale positiegrootte: 25% zachte bovengrens; bestaande overwegingen krijgen geen nieuw kapitaal en blijven onder verklein-/reviewdiscipline
+- Maximaal aantal posities: 8 zachte doelstelling; het huidige geërfde aantal kan tijdelijk hoger zijn totdat bewaakte rotatie dit verlaagt
 - Alleen UCITS: Nee
 - Leveraged ETF’s toegestaan: Nee
 - Drawdown-tolerantie: Gemiddeld

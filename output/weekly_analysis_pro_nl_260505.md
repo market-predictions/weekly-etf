@@ -466,8 +466,8 @@ SMH is de enige duidelijke `Actionable now` lane. Defense, grid en uranium blijv
 - Cash: no longer passive; reduced to 1.87% after SMH add.
 
 ### Constraints
-- Max position size: 25%
-- Max number of positions: 8
+- Max position size: 25% soft cap; current inherited overweights require no-fresh-cash and review/trim discipline
+- Max number of positions: 8 soft target; current inherited count may exceed this until guarded rotation reduces it
 - UCITS only: No
 - Leverage ETFs allowed: No
 - Regions to avoid: None explicitly

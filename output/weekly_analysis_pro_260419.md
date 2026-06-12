@@ -290,8 +290,8 @@ The live radar is unchanged. AI infrastructure and defense remain the clearest a
 - What would most likely change the radar next run: A cleaner cyber relative-strength breakout, renewed energy-security stress, or a sharper rates reversal that materially changes timing leadership
 
 ### Constraints
-- Max position size: 25%
-- Max number of positions: 8
+- Max position size: 25% soft cap; current inherited overweights require no-fresh-cash and review/trim discipline
+- Max number of positions: 8 soft target; current inherited count may exceed this until guarded rotation reduces it
 - UCITS only: No
 - Leverage ETFs allowed: No
 - Regions to avoid: None explicitly

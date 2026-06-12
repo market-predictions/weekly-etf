@@ -443,8 +443,8 @@ Er is deze week geen gefinancierde rotatie. De kansenset blijft nuttig, maar is 
 - What would most likely change the radar next run: sterkere water- of India-relatieve-krachtbevestiging, scherper agriculture-leiderschap, of een grotere olie-en-renteschok die timing-leiderschap breed verandert
 
 ### Constraints
-- Max position size: 25%
-- Max number of positions: 8
+- Max position size: 25% soft cap; current inherited overweights require no-fresh-cash and review/trim discipline
+- Max number of positions: 8 soft target; current inherited count may exceed this until guarded rotation reduces it
 - UCITS only: No
 - Leverage ETFs allowed: No
 - Regions to avoid: None explicitly

@@ -305,8 +305,8 @@ There is no ranking change this week, but the opportunity set remains clear.
 | Cyber / digital infrastructure resilience | CIBR | HACK | Security and resilience spending remains a credible challenger theme. | Watchlist |
 
 ### Constraints
-- Max position size: 25%
-- Max number of positions: 8
+- Max position size: 25% soft cap; current inherited overweights require no-fresh-cash and review/trim discipline
+- Max number of positions: 8 soft target; current inherited count may exceed this until guarded rotation reduces it
 - UCITS only: No
 - Leverage ETFs allowed: No
 - Regions to avoid: None explicitly

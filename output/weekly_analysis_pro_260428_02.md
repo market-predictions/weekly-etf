@@ -437,8 +437,8 @@ There is no funded switch this week. SMH remains the top macro-derived add-on-pu
 - What would most likely change the radar next run: clearer India or water relative-strength confirmation, sharper agriculture leadership, or a larger oil-and-rates shock that changes timing leadership across the board
 
 ### Constraints
-- Max position size: 25%
-- Max number of positions: 8
+- Max position size: 25% soft cap; current inherited overweights require no-fresh-cash and review/trim discipline
+- Max number of positions: 8 soft target; current inherited count may exceed this until guarded rotation reduces it
 - UCITS only: No
 - Leverage ETFs allowed: No
 - Regions to avoid: None explicitly

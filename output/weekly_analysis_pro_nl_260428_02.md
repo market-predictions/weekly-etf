@@ -437,8 +437,8 @@ Er is deze week geen gefinancierde rotatie. SMH blijft de belangrijkste macro-de
 - What would most likely change the radar next run: duidelijkere India- of water-relatieve-krachtbevestiging, scherper agriculture-leiderschap, of een grotere olie-en-renteschok die timing-leiderschap breed verandert
 
 ### Constraints
-- Max position size: 25%
-- Max number of positions: 8
+- Max position size: 25% soft cap; current inherited overweights require no-fresh-cash and review/trim discipline
+- Max number of positions: 8 soft target; current inherited count may exceed this until guarded rotation reduces it
 - UCITS only: No
 - Leverage ETFs allowed: No
 - Regions to avoid: None explicitly

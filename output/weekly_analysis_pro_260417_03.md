@@ -500,8 +500,8 @@ There is still no funded switch this week, but the broader rerun produces a clea
 - What would most likely change the radar next run: a renewed energy shock would strengthen hard-asset and food-security lanes, while cleaner de-escalation plus continued breadth would raise the odds of funded cyber or broader cyclical rotation.
 
 ### Constraints
-- Max position size: 25%
-- Max number of positions: 8
+- Max position size: 25% soft cap; current inherited overweights require no-fresh-cash and review/trim discipline
+- Max number of positions: 8 soft target; current inherited count may exceed this until guarded rotation reduces it
 - UCITS only: No
 - Leverage ETFs allowed: No
 - Regions to avoid: None explicitly

@@ -130,7 +130,7 @@
 - [SPY](https://www.tradingview.com/chart/?symbol=SPY) plus [SMH](https://www.tradingview.com/chart/?symbol=SMH) creates high U.S. tech / AI factor overlap.
 - Hedge and defensive sleeves must justify their capital allocation through role validity, pricing and relative-strength evidence.
 - [PPA](https://www.tradingview.com/chart/?symbol=PPA) and [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) remain replaceable until their ETF implementation quality is proven.
-- Non-U.S. equity exposure remains a diversification gap.
+- Non-U.S. developed exposure has been increased through IEFA, but breadth and relative-strength confirmation remain required.
 
 ## 6. Bottom Line
 
@@ -217,7 +217,7 @@ Performance is calculated on the current ETF holdings using the latest validated
 | quality | Overweight | Earnings durability remains valuable. |
 | defensive ballast | Neutral | Hedge and cash-like roles remain under opportunity-cost review. |
 | industrials / defense | Overweight | Structural thesis valid; vehicle under review. |
-| non-USD assets | Watchlist | Zero allocation is an explicit U.S. exceptionalism bet. |
+| non-USD assets | Watchlist | IEFA now provides non-U.S. developed-market exposure, but broader allocation still requires relative-strength confirmation. |
 
 ## 9. Second-Order Effects Map
 
@@ -345,15 +345,15 @@ Role: Rotation destination. Required next action: Review defensive ballast role 
 | Defense innovation / sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructure capex remains valid. | Duel required |
 | Commodity-breadth hedge review | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [DBC](https://www.tradingview.com/chart/?symbol=DBC) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Current commodity-breadth hedge role must be proven against cash and broad commodity alternatives. | Under review |
-| Non-U.S. developed diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | Portfolio has limited non-U.S. exposure. | Watchlist |
+| Non-U.S. developed diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | IEFA now provides non-U.S. developed-market exposure, with broader allocation still under confirmation. | Watchlist |
 
 ### Recommendation discipline continuity
 - Rotation execution: completed and persisted in the official portfolio state and trade ledger.
 - Replacement challengers: not fundable without completed duel.
 
 ### Constraints
-- Max position size: 25%
-- Max number of positions: 8
+- Max position size: 25% soft cap; current inherited overweights require no-fresh-cash and review/trim discipline
+- Max number of positions: 8 soft target; current inherited count may exceed this until guarded rotation reduces it
 - UCITS only: No
 - Leverage ETFs allowed: No
 - Drawdown tolerance: Moderate

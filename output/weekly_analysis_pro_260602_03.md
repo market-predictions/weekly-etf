@@ -115,7 +115,7 @@
 - SPY plus SMH creates high U.S. tech / AI factor overlap.
 - Hedge and defensive sleeves must justify their capital allocation through role validity, pricing and relative-strength evidence.
 - PPA and PAVE remain replaceable until their ETF implementation quality is proven.
-- Non-U.S. equity exposure remains a diversification gap.
+- Non-U.S. developed exposure has been increased through IEFA, but breadth and relative-strength confirmation remain required.
 
 ## 6. Bottom Line
 
@@ -197,7 +197,7 @@ Performance is calculated on the current ETF holdings using the latest validated
 | quality | Overweight | Earnings durability remains valuable. |
 | gold | Neutral | Hedge role under review. |
 | industrials / defense | Overweight | Structural thesis valid; vehicle under review. |
-| non-USD assets | Watchlist | Zero allocation is an explicit U.S. exceptionalism bet. |
+| non-USD assets | Watchlist | IEFA now provides non-U.S. developed-market exposure, but broader allocation still requires relative-strength confirmation. |
 
 ## 9. Second-Order Effects Map
 
@@ -325,8 +325,8 @@ Role: Rotation destination. Required next action: None.
 - Replacement challengers: not fundable without completed duel.
 
 ### Constraints
-- Max position size: 25%
-- Max number of positions: 8
+- Max position size: 25% soft cap; current inherited overweights require no-fresh-cash and review/trim discipline
+- Max number of positions: 8 soft target; current inherited count may exceed this until guarded rotation reduces it
 - UCITS only: No
 - Leverage ETFs allowed: No
 - Drawdown tolerance: Moderate
