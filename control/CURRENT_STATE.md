@@ -11,7 +11,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**ETF has a latest successful runtime-driven bilingual production baseline for run `20260610_211606` / report set `260610_02`, with pricing-lineage proof, 100.0% fresh holdings coverage, run-manifest evidence, delivery-manifest evidence, and marker-free replacement-edge diagnostic notes. The prior workflow run #216 / run `20260605_081216` remains historical evidence only and is no longer the current production baseline. The client-safe macro report surface is integrated through the macro policy pack, but the raw deterministic macro read remains non-client-facing and is not promoted as the official production regime source. Replacement-edge notes remain diagnostic-only and do not grant lane-scoring, fundability, recommendation, execution, or portfolio-mutation authority.**
+**ETF has a latest successful runtime-driven bilingual production baseline for run `20260610_211606` / report set `260610_02`, with pricing-lineage proof, 100.0% fresh holdings coverage, run-manifest evidence, delivery-manifest evidence, and marker-free replacement-edge diagnostic notes. The prior workflow run #216 / run `20260605_081216` remains historical evidence only and is no longer the current production baseline. The client-safe macro report surface is integrated through the macro policy pack, but the raw deterministic macro read remains non-client-facing and is not promoted as the official production regime source. WP13 added a deterministic macro promotion-review checklist only; it did not promote deterministic macro and did not mutate report behavior. Replacement-edge notes remain diagnostic-only and do not grant lane-scoring, fundability, recommendation, execution, or portfolio-mutation authority.**
 
 ## Latest production and report-surface evidence
 
@@ -152,7 +152,7 @@ macro_axis_scores
 macro_evidence
 ```
 
-Do not infer deterministic macro promotion from green validators, old-vs-new review readiness, client-safe macro surface presence, or macro policy pack existence.
+Do not infer deterministic macro promotion from green validators, old-vs-new review readiness, client-safe macro surface presence, macro policy pack existence, prior pilot output, or prior review artifacts.
 
 ### Completed or established deterministic macro packages
 
@@ -164,7 +164,16 @@ WP7 — deterministic macro regime client-surface pilot: completed / non-authori
 WP8 — old-vs-new macro review evidence: completed / ready_for_narrative_promotion_review / not promoted
 WP9 — controlled promotion artifact: completed / status=not_promoted
 WP10 — explicit promotion decision artifact: completed / status=not_promoted
+WP13 — deterministic macro read promotion review: completed / review-only / not promoted
 ```
+
+WP13 artifact:
+
+```text
+control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
+```
+
+WP13 answers the required six promotion-review questions but does not grant narrative authority and does not mutate production report behavior.
 
 Standing deterministic macro authority boundary:
 
@@ -227,7 +236,8 @@ portfolio mutation
 
 - Deterministic macro remains review/control evidence only and is not promoted.
 - WP10 explicitly records `status=not_promoted`.
-- Green compliance, review readiness, macro policy pack existence, or client-safe macro surface presence does not equal production deterministic macro promotion.
+- WP13 records promotion-review criteria only.
+- Green compliance, review readiness, macro policy pack existence, client-safe macro surface presence, prior pilot output, or prior review artifact does not equal production deterministic macro promotion.
 - WP5 replacement-edge scoring remains diagnostic-only.
 - Replacement-edge notes are client-visible diagnostics only and do not create allocation, scoring, fundability, recommendation, execution, or mutation authority.
 
@@ -254,6 +264,7 @@ output/macro/shadow_narrative/macro_regime_shadow_narrative_<run_id>.json
 output/macro/pilot/macro_regime_client_surface_pilot_<run_id>.json
 output/macro/review/macro_old_vs_new_review_<run_id>.json
 output/macro/promotion/macro_regime_promotion_decision_<run_id>.json
+control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
 control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
 ```
 
@@ -281,7 +292,7 @@ The current `260610_02` client output is the latest report set. Old historical o
 
 Current production delivery evidence is the `20260610_211606` run-manifest and delivery-manifest pair. Delivery evidence remains delivery-layer evidence only unless a real end-recipient inbox receipt exists.
 
-WP12 refreshed this control-state baseline only. It did not change report generation logic, scoring, portfolio state, macro authority, replacement-edge authority, historical output artifacts, delivery behavior, or execution behavior.
+WP13 created a control-layer review artifact only. It did not change report generation logic, scoring, portfolio state, macro authority, replacement-edge authority, historical output artifacts, delivery behavior, or execution behavior.
 
 ## Immediate priorities
 
@@ -293,12 +304,16 @@ Do not weaken pricing lineage, manifest, official portfolio-state, or delivery-e
 
 The client-safe macro report surface is integrated, but deterministic macro read remains outside official production regime authority. Any future production deterministic macro integration requires a future explicit control-layer promotion decision and a separate report-integration work package.
 
-### Priority C — proceed to the next roadmap packages
+### Priority C — proceed to the next roadmap package
 
-Next roadmap work should proceed in this order unless reprioritized:
+Next roadmap work should proceed as:
 
 ```text
-WP13 — Deterministic macro read promotion review, not implementation
 WP14 — Deterministic macro read shadow replay evidence
+```
+
+After WP14, the likely next package remains:
+
+```text
 WP15 — Historical artifact cleanup policy
 ```
