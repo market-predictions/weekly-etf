@@ -28,7 +28,7 @@
 ### Regimesamenvatting
 - Huidig regime: Risk-on groei.
 - Vertrouwen: 66%.
-- Regimegeheugen: Risk-on growth has persisted for 33 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed.
+- Regimegeheugen: Risk-on growth has persisted for 35 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed.
 - Beslisregel: Roteer niet agressief tenzij een regimeverschuiving minstens twee runs aanhoudt of cross-asset bevestiging breed wordt.
 
 ### Beleids- en geopolitieke status
@@ -91,7 +91,7 @@
 - [SPY](https://www.tradingview.com/chart/?symbol=SPY) plus [SMH](https://www.tradingview.com/chart/?symbol=SMH) creëert hoge Amerikaanse tech-/AI-factoroverlap.
 - De brede grondstoffenhedge blijft een rol die periodiek moet worden bewezen en is geen vanzelfsprekende stabilisator.
 - [PPA](https://www.tradingview.com/chart/?symbol=PPA) en [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) blijven vervangbaar totdat de kwaliteit van de ETF-implementatie is bewezen.
-- Blootstelling aan ontwikkelde markten buiten de VS is via IEFA verhoogd, maar blijft onder bevestiging in relatieve sterkte.
+- Blootstelling aan ontwikkelde markten buiten de VS is via [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) verhoogd, maar blijft onder bevestiging in relatieve sterkte.
 
 ## 6. Conclusie
 
@@ -181,7 +181,7 @@ Rendement wordt berekend op de huidige ETF-posities op basis van de meest recent
 | Kwaliteit | Overwogen | Winstbestendigheid blijft waardevol. |
 | Grondstoffen / hedge | Neutraal | Hedgerol blijft onder periodieke rolvalidatie. |
 | Industrie / defensie | Overwogen | Structurele thesis is valide; ETF-implementatie onder herbeoordeling. |
-| Niet-USD activa | Volglijst | IEFA biedt nu blootstelling aan ontwikkelde markten buiten de VS; verdere allocatie vraagt nog bevestiging. |
+| Niet-USD activa | Volglijst | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) biedt nu blootstelling aan ontwikkelde markten buiten de VS; verdere allocatie vraagt nog bevestiging. |
 
 ## 9. Tweede-orde-effectenkaart
 
@@ -234,7 +234,6 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 | Huidige positie | Alternatief | Diagnostische score | 1m-edge | 3m-edge | Drawdown-edge | Volatiliteitsedge | Niet-autoritatieve notitie |
 |---|---|---:|---:|---:|---:|---:|---|
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [INDA](https://www.tradingview.com/chart/?symbol=INDA) | -0.36 | -1.55% | -14.57% | -0.09% | +3.76% | Huidige positie blijft diagnostisch sterker; geen vervangingssignaal. |
-
 
 ## 12. Rotatieplan portefeuille
 
@@ -291,15 +290,15 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 ### Portefeuilletabel
 | Ticker | ETF-naam | Richting | Gewicht % | Gem. instap | Huidige prijs | P/L % | Oorspronkelijke thesis | Rol |
 |---|---|---|---:|---:|---:|---:|---|---|
-| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Longpositie | 17.32 |  | 85.39 |  | Portefeuilleblootstelling | Rotatiebestemming |
-| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | Longpositie | 5.29 |  | 72.25 |  | Portefeuilleblootstelling | Rotatiebestemming |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | iShares S&P GSCI Commodity-Indexed Trust | Longpositie | 9.14 | 31.80 | 30.59 |  | Brede grondstoffen- en inflatiegevoelige hedgepositie | Rotatiebestemming |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Longpositie | 24.46 |  | 98.01 |  | Portefeuilleblootstelling | Rotatiebestemming |
+| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Longpositie | 17.32 | | 85.39 | | Portefeuilleblootstelling | Rotatiebestemming |
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | Longpositie | 5.29 | | 72.25 | | Portefeuilleblootstelling | Rotatiebestemming |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | iShares S&P GSCI Commodity-Indexed Trust | Longpositie | 9.14 | 31.80 | 30.59 | | Brede grondstoffen- en inflatiegevoelige hedgepositie | Rotatiebestemming |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Longpositie | 24.46 | | 98.01 | | Portefeuilleblootstelling | Rotatiebestemming |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Longpositie | 0.03 | 51.98 | 57.74 | 8.25 | Netwerk- en infrastructuurcapex | Reële activa / capex |
 | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Longpositie | 29.19 | 420.13 | 619.53 | 20.61 | AI-rekenkracht en semiconductorleiderschap | Groeimotor |
 | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | Longpositie | 0.03 | 676.33 | 741.66 | 6.17 | Amerikaanse large-cap kernblootstelling | Kernbeta |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Longpositie | 7.45 | 67.50 | 54.59 | -0.55 | Kernenergie- en uraniumcyclus | Strategische energie |
-| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Longpositie | 5.29 |  | 44.52 |  | Portefeuilleblootstelling | Rotatiebestemming |
+| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Longpositie | 5.29 | | 44.52 | | Portefeuilleblootstelling | Rotatiebestemming |
 
 ### Beschikbare cash
 - Cash %: 1.79
@@ -313,7 +312,7 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 | Defensie-innovatie / strategische weerbaarheid | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling. | Vervangingsanalyse vereist |
 | Netuitbreiding / elektrificatie | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructuurcapex blijft valide. | Vervangingsanalyse vereist |
 | Hedge- en grondstoffenbreedte | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [BIL](https://www.tradingview.com/chart/?symbol=BIL) / [DBC](https://www.tradingview.com/chart/?symbol=DBC) | Hedgefunctie en grondstoffenbreedte moeten periodiek worden bevestigd. | Onder herbeoordeling |
-| Ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | De portefeuille heeft via IEFA blootstelling aan ontwikkelde markten buiten de VS, maar verdere allocatie vraagt bevestiging in relatieve sterkte. | Volglijst |
+| Ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | De portefeuille heeft via [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) blootstelling aan ontwikkelde markten buiten de VS, maar verdere allocatie vraagt bevestiging in relatieve sterkte. | Volglijst |
 
 ### Continuïteit in aanbevelingsdiscipline
 - [SPY](https://www.tradingview.com/chart/?symbol=SPY): overlapreview tegenover [SMH](https://www.tradingview.com/chart/?symbol=SMH) blijft actief.

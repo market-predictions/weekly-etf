@@ -60,7 +60,7 @@
 ### Macro regime
 - Current regime: Risk-on growth.
 - Confidence: 66%.
-- Regime memory: Risk-on growth has persisted for 34 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed.
+- Regime memory: Risk-on growth has persisted for 35 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed.
 - Decision rule: Do not rotate aggressively unless a regime shift persists for at least two runs or cross-asset confirmation becomes broad.
 
 ### Policy and geopolitical status
@@ -91,7 +91,7 @@
 | Cybersecurity resilience | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [BUG](https://www.tradingview.com/chart/?symbol=BUG) | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure exposure with less direct semiconductor cyclicality. | 3-12 months |
 | Defense innovation / sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defense spending remains structurally durable, but vehicle selection must be proven. Macro filter: Policy support is durable, but implementation quality remains the main decision bottleneck. | 5 | 3 | Watchlist / under review | The lane remains relevant, but [PPA](https://www.tradingview.com/chart/?symbol=PPA) must justify itself versus [ITA](https://www.tradingview.com/chart/?symbol=ITA). | 3-12 months |
 | Healthcare quality and defensive growth | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [VHT](https://www.tradingview.com/chart/?symbol=VHT) | Healthcare quality can provide defensive growth without speculative biotech beta. | 3 | 3 | Watchlist / under review | More useful if broad equity leadership narrows further. | 3-12 months |
-| Non-U.S. developed market diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | Non-U.S. developed exposure has been increased through IEFA, but still requires relative-strength confirmation before becoming a broader allocation theme. | 3 | 3 | Watchlist / under review | Becomes fundable if U.S. factor concentration rises or non-U.S. breadth improves. | 3-12 months |
+| Non-U.S. developed market diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | Non-U.S. developed exposure has been increased through [IEFA](https://www.tradingview.com/chart/?symbol=IEFA), but still requires relative-strength confirmation before becoming a broader allocation theme. | 3 | 3 | Watchlist / under review | Becomes fundable if U.S. factor concentration rises or non-U.S. breadth improves. | 3-12 months |
 
 ### Best structural opportunities not yet actionable
 - Food security / agriculture inputs
@@ -122,7 +122,7 @@
 - [SPY](https://www.tradingview.com/chart/?symbol=SPY) plus [SMH](https://www.tradingview.com/chart/?symbol=SMH) creates high U.S. tech / AI factor overlap.
 - Hedge and defensive sleeves must justify their capital allocation through role validity, pricing and relative-strength evidence.
 - [PPA](https://www.tradingview.com/chart/?symbol=PPA) and [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) remain replaceable until their ETF implementation quality is proven.
-- Non-U.S. developed exposure has been increased through IEFA, but breadth and relative-strength confirmation remain required.
+- Non-U.S. developed exposure has been increased through [IEFA](https://www.tradingview.com/chart/?symbol=IEFA), but breadth and relative-strength confirmation remain required.
 
 ## 6. Bottom Line
 
@@ -212,7 +212,7 @@ Performance is calculated on the current ETF holdings using the latest validated
 | quality | Overweight | Earnings durability remains valuable. |
 | defensive ballast | Neutral | Hedge and cash-like roles remain under opportunity-cost review. |
 | industrials / defense | Overweight | Structural thesis valid; vehicle under review. |
-| non-USD assets | Watchlist | IEFA now provides non-U.S. developed-market exposure, but broader allocation still requires relative-strength confirmation. |
+| non-USD assets | Watchlist | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) now provides non-U.S. developed-market exposure, but broader allocation still requires relative-strength confirmation. |
 
 ## 9. Second-Order Effects Map
 
@@ -258,7 +258,7 @@ Role: Rotation destination. Required next action: Review defensive ballast role 
 - [SMH](https://www.tradingview.com/chart/?symbol=SMH) remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap.
 - [PPA](https://www.tradingview.com/chart/?symbol=PPA) / [ITA](https://www.tradingview.com/chart/?symbol=ITA): Defense spending remains structurally durable, but vehicle selection must be proven.
 - [XLV](https://www.tradingview.com/chart/?symbol=XLV) / [VHT](https://www.tradingview.com/chart/?symbol=VHT): Healthcare quality can provide defensive growth without speculative biotech beta.
-- [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) / [EFA](https://www.tradingview.com/chart/?symbol=EFA): Non-U.S. developed exposure has been increased through IEFA, but still requires relative-strength confirmation before becoming a broader allocation theme.
+- [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) / [EFA](https://www.tradingview.com/chart/?symbol=EFA): Non-U.S. developed exposure has been increased through [IEFA](https://www.tradingview.com/chart/?symbol=IEFA), but still requires relative-strength confirmation before becoming a broader allocation theme.
 - Replacement candidates remain evidence-gated: pricing basis and duel status must be visible before funding.
 
 ## 12. Portfolio Rotation Plan
@@ -338,7 +338,7 @@ Role: Rotation destination. Required next action: Review defensive ballast role 
 | Defense innovation / sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructure capex remains valid. | Duel required |
 | Commodity-breadth hedge review | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [DBC](https://www.tradingview.com/chart/?symbol=DBC) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Current commodity-breadth hedge role must be proven against cash and broad commodity alternatives. | Under review |
-| Non-U.S. developed diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | IEFA now provides non-U.S. developed-market exposure, with broader allocation still under confirmation. | Watchlist |
+| Non-U.S. developed diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) now provides non-U.S. developed-market exposure, with broader allocation still under confirmation. | Watchlist |
 
 ### Recommendation discipline continuity
 - Rotation execution: active.
