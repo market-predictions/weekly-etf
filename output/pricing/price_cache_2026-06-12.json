@@ -618,6 +618,39 @@
         "status": "not_checked"
       }
     },
+    "twelve_data:FIW:2026-06-11": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "high",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "is_final_eod_bar": true,
+      "metadata": {
+        "endpoint": "time_series",
+        "provider": "twelve_data"
+      },
+      "price": 104.72,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": "NYSE",
+      "provider_symbol": "FIW",
+      "provider_timestamp": null,
+      "provider_timezone": "provider_daily_bar",
+      "raw_close": 104.72,
+      "requested_close_date": "2026-06-11",
+      "returned_close_date": "2026-06-11",
+      "selected_close": 104.72,
+      "selected_close_type": "raw_close",
+      "source": "twelve_data",
+      "source_detail": "time_series",
+      "status": "fresh_exact_unverified",
+      "symbol": "FIW",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "twelve_data:FUNDABLE:2026-06-11": {
       "adjusted_close": null,
       "asset_role": "challenger",
