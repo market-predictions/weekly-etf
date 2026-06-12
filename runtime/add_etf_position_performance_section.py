@@ -65,6 +65,10 @@ GENERIC_THESIS_LABELS = {
 }
 
 
+def _na(language: str = "en") -> str:
+    return "n.v.t." if language == "nl" else "n/a"
+
+
 def _latest_report(output_dir: Path, language: str) -> Path:
     env_key = "MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL" if language == "nl" else "MRKT_RPRTS_EXPLICIT_REPORT_PATH"
     explicit = os.environ.get(env_key, "").strip()
@@ -96,18 +100,18 @@ def _float(value: Any) -> float | None:
         return None
 
 
-def _fmt_pct(value: Any, signed: bool = True) -> str:
+def _fmt_pct(value: Any, signed: bool = True, language: str = "en") -> str:
     number = _float(value)
     if number is None:
-        return "n.v.t."
+        return _na(language)
     sign = "+" if signed and number > 0 else ""
     return f"{sign}{number:.2f}%"
 
 
-def _fmt_eur(value: Any) -> str:
+def _fmt_eur(value: Any, language: str = "en") -> str:
     number = _float(value)
     if number is None:
-        return "n.v.t."
+        return _na(language)
     sign = "-" if number < 0 else ""
     return f"{sign}{abs(number):,.2f}"
 
@@ -235,9 +239,9 @@ def _table(state: dict[str, Any], language: str = "en") -> str:
     for row in rows:
         lines.append(
             f"| {row['portfolio_sleeve']} | {row['investment_thesis']} | {row['ticker']} | "
-            f"{_fmt_pct(row['weight_pct'], signed=False)} | {_fmt_pct(row['return_1w_pct'])} | "
-            f"{_fmt_pct(row['return_1m_pct'])} | {_fmt_pct(row['return_3m_pct'])} | "
-            f"{_fmt_pct(row['since_entry_pct'])} | {_fmt_eur(row['pl_eur'])} | {_fmt_pct(row['contribution_pct'])} |"
+            f"{_fmt_pct(row['weight_pct'], signed=False, language=language)} | {_fmt_pct(row['return_1w_pct'], language=language)} | "
+            f"{_fmt_pct(row['return_1m_pct'], language=language)} | {_fmt_pct(row['return_3m_pct'], language=language)} | "
+            f"{_fmt_pct(row['since_entry_pct'], language=language)} | {_fmt_eur(row['pl_eur'], language=language)} | {_fmt_pct(row['contribution_pct'], language=language)} |"
         )
     return "\n".join(lines)
 
