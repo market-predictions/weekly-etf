@@ -10,7 +10,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from runtime.wp16_followup2_cleanup import clean_residual_text, residual_failures
+from runtime.wp16_followup3_cleanup import clean_text, failures as residual_failures
 from tools.validate_etf_pdf_polish_contract import latest_delivery_html, validate_en, validate_nl
 from tools.validate_etf_pricing_lineage_contract import _manifest_path as _pricing_lineage_manifest_path
 from tools.validate_etf_pricing_lineage_contract import validate_manifest_path as validate_pricing_lineage_manifest
@@ -19,16 +19,6 @@ EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 EMPTY_COMMENT_RE = re.compile(r"(?:&lt;!|<!)\s*--\s*--\s*(?:&gt;|>)", re.IGNORECASE)
 DUTCH_RESIDUE_EN_RE = re.compile(r"\bn\.v\.t\.\b", re.IGNORECASE)
-NL_EQUITY_CURVE_GUARD = """<style id="wp16-nl-equity-curve-guard">
-@media print {
-  .panel-equity img {
-    max-height: 78mm;
-    width: 100%;
-    object-fit: cover;
-    object-position: top center;
-  }
-}
-</style>"""
 
 
 def _explicit_path(env_name: str, pattern: re.Pattern[str]) -> Path | None:
@@ -53,6 +43,10 @@ def _matching_delivery_html(report_path: Path) -> Path | None:
     return candidate if candidate.exists() else None
 
 
+def _language_for_path(path: Path) -> str:
+    return "nl" if NL_RE.match(path.name) else "en"
+
+
 def _current_files(output_dir: Path) -> list[Path]:
     en = _explicit_path("MRKT_RPRTS_EXPLICIT_REPORT_PATH", EN_RE) or _latest(output_dir, EN_RE)
     nl = _explicit_path("MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL", NL_RE) or _latest(output_dir, NL_RE)
@@ -64,24 +58,9 @@ def _current_files(output_dir: Path) -> list[Path]:
     return paths
 
 
-def _is_nl_report(path: Path) -> bool:
-    return bool(NL_RE.match(path.name))
-
-
-def _apply_nl_equity_curve_guard(text: str, path: Path) -> str:
-    if not _is_nl_report(path):
-        return text
-    if "wp16-nl-equity-curve-guard" in text:
-        return text
-    if "`EQUITY_CURVE_CHART_PLACEHOLDER`" in text:
-        return text.replace("`EQUITY_CURVE_CHART_PLACEHOLDER`", NL_EQUITY_CURVE_GUARD + "\n\n`EQUITY_CURVE_CHART_PLACEHOLDER`", 1)
-    return text
-
-
 def _scrub_file(path: Path) -> None:
     original = path.read_text(encoding="utf-8", errors="ignore")
-    cleaned = clean_residual_text(original)
-    cleaned = _apply_nl_equity_curve_guard(cleaned, path)
+    cleaned = clean_text(original, language=_language_for_path(path))
     if cleaned != original:
         path.write_text(cleaned, encoding="utf-8")
         print(f"ETF_CLIENT_SURFACE_RESIDUAL_SCRUBBED | file={path.name}")
@@ -89,10 +68,11 @@ def _scrub_file(path: Path) -> None:
 
 def _scan(path: Path) -> list[str]:
     text = path.read_text(encoding="utf-8", errors="ignore")
-    hits = residual_failures(text)
+    language = _language_for_path(path)
+    hits = residual_failures(text, language=language)
     if EMPTY_COMMENT_RE.search(text):
         hits.append("empty comment residue")
-    if path.name.startswith("weekly_analysis_pro_") and not path.name.startswith("weekly_analysis_pro_nl_") and DUTCH_RESIDUE_EN_RE.search(text):
+    if language == "en" and DUTCH_RESIDUE_EN_RE.search(text):
         hits.append("Dutch n.v.t. in English output")
     return sorted(set(hits))
 
