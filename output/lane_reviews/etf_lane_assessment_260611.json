@@ -7,7 +7,7 @@
   "discovery_inputs": {
     "config": "config/etf_discovery_universe.yml",
     "portfolio_state": "output/etf_portfolio_state.json",
-    "pricing_audit": "output/pricing/price_audit_2026-06-11_20260612_200315.json",
+    "pricing_audit": "output/pricing/price_audit_2026-06-11_20260612_200913.json",
     "relative_strength": "output/market_history/etf_relative_strength.json",
     "macro_policy_pack": "output/macro/latest.json",
     "prior_lane_artifact": "latest_available",
@@ -640,7 +640,7 @@
       "timing_confirmation": 2,
       "valuation_crowding": 3,
       "portfolio_differentiation": 5,
-      "total_score": 3.47,
+      "total_score": 3.44,
       "prior_run_status": "rotating_challenger",
       "challenger": true,
       "portfolio_gap_score": 2,
