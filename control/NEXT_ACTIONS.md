@@ -23,7 +23,12 @@
   ```text
   control/REPLACEMENT_EDGE_REPORT_NOTES_STATUS.md
   ```
-- For fresh-chat roadmap continuation, use the latest available roadmap handover as freshness authority where it conflicts with older control docs.
+- For deterministic macro promotion review/integration work, also read:
+  ```text
+  control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
+  control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
+  control/MACRO_REPORT_SURFACE_STATUS.md
+  ```
 
 ---
 
@@ -110,7 +115,7 @@
   - client-safe macro report surface is integrated
   - raw deterministic macro read is not client-facing
   - deterministic macro read is not promoted as official production regime source
-  - do not infer promotion from green validators, review readiness, macro policy pack existence, or client-safe macro surface presence
+  - do not infer promotion from green validators, review readiness, macro policy pack existence, client-safe macro surface presence, prior pilot output, or prior review artifact
 
 ### 3. Completed deterministic macro packages
 
@@ -124,6 +129,11 @@
   WP8 — Macro old-vs-new review evidence package: completed / ready_for_narrative_promotion_review / not promoted
   WP9 — Controlled deterministic macro narrative promotion artifact: completed / status=not_promoted
   WP10 — Explicit deterministic macro narrative authority promotion decision: completed / status=not_promoted
+  WP13 — Deterministic macro read promotion review: completed / review-only / not promoted
+  ```
+- WP13 review artifact:
+  ```text
+  control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
   ```
 - Standing authority boundary:
   ```text
@@ -146,11 +156,34 @@
     4. separate production report integration after promotion
   - do not collapse these into one implicit change
 
+### 4. WP13 — Deterministic macro read promotion review, not implementation
+
+- Owner: `[ASSISTANT]`
+- Status: completed / review-only / not promoted
+- Artifact:
+  ```text
+  control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
+  ```
+- Six checklist questions answered:
+  ```text
+  What exact deterministic fields would become production narrative source?
+  What bilingual surface would be allowed?
+  What would remain forbidden?
+  What validators must pass?
+  What explicit control-layer phrase/flag authorizes promotion?
+  What rollback path exists if client output regresses?
+  ```
+- Boundary:
+  - deterministic macro was not promoted
+  - production report behavior did not change
+  - no scoring, fundability, execution, delivery, or portfolio state changed
+  - no runtime/output/pricing/workflow files were changed
+
 ---
 
 ## Phase 3 — replacement-edge scoring and report notes
 
-### 4. Replacement-edge diagnostic notes status
+### 5. Replacement-edge diagnostic notes status
 
 - Status: marker cleanup verified successful in current `260610_02` baseline
 - Required current wording:
@@ -188,7 +221,7 @@
 
 ## Phase 4 — Dutch quality and output-contract guardrails
 
-### 5. Keep output-contract validators active
+### 6. Keep output-contract validators active
 
 - Status: active standing requirement
 - Protect:
@@ -221,73 +254,30 @@
 
 ## Phase 5 — next roadmap packages
 
-### 6. WP12 — Refresh control docs to current baseline
-
-- Owner: `[ASSISTANT]`
-- Status: completed / control-doc refresh only
-- Files updated:
-  ```text
-  control/CURRENT_STATE.md
-  control/NEXT_ACTIONS.md
-  ```
-- Completion criteria recorded:
-  ```text
-  latest production baseline = run_id 20260610_211606
-  latest report set = 260610_02
-  marker cleanup = verified success
-  macro surface = integrated as client-safe only
-  deterministic macro = not promoted
-  old run #216 = retained only as historical evidence
-  ```
-- Boundary:
-  - no report generation logic changed
-  - no scoring changed
-  - no portfolio state changed
-  - no macro authority changed
-  - no replacement-edge authority changed
-  - no historical output artifacts rewritten
-
-### 7. WP13 — Deterministic macro read promotion review, not implementation
+### 7. WP14 — Deterministic macro read shadow replay evidence
 
 - Owner: `[ASSISTANT]`
 - Status: next recommended package / not started
 - Goal:
   ```text
-  Produce a concise promotion-review checklist for the deterministic macro read.
-  ```
-- Must answer:
-  ```text
-  What exact deterministic fields would become production narrative source?
-  What bilingual surface would be allowed?
-  What would remain forbidden?
-  What validators must pass?
-  What explicit control-layer phrase/flag authorizes promotion?
-  What rollback path exists if client output regresses?
-  ```
-- Boundary:
-  - do not mutate production report behavior
-  - do not grant portfolio-action, lane-scoring, fundability, funding, execution, delivery, or portfolio-mutation authority
-  - do not promote deterministic macro read by implication
-
-### 8. WP14 — Deterministic macro read shadow replay evidence
-
-- Owner: `[ASSISTANT]`
-- Status: recommended after or alongside WP13 / not started
-- Goal:
-  ```text
   Run or prepare fixture replay evidence for deterministic macro read versus legacy macro pack over recent reports.
   ```
-- Output:
+- Required output:
   - review artifact only
   - not client-facing report content
+- Suggested artifact path:
+  ```text
+  output/macro/replay/deterministic_macro_shadow_replay_<run_id>.json
+  ```
 - Boundary:
   - no production report mutation
   - no recommendation, fundability, execution, or portfolio-state mutation
+  - no deterministic macro promotion by implication
 
-### 9. WP15 — Historical artifact cleanup policy
+### 8. WP15 — Historical artifact cleanup policy
 
 - Owner: `[ASSISTANT]`
-- Status: recommended after WP13/WP14 or when historical-output grep noise becomes operationally blocking / not started
+- Status: recommended after WP14 or when historical-output grep noise becomes operationally blocking / not started
 - Goal:
   ```text
   Decide whether old generated outputs should remain immutable historical artifacts or whether the repo wants a controlled cleanup/archive policy.
