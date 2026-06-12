@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from runtime.add_etf_position_performance_section import _fmt_eur, _fmt_pct
 from runtime.build_macro_policy_pack import central_banks_for_regime, policy_catalysts
+from runtime.client_facing_sanitizer import sanitize_client_facing_html
 from runtime.macro_report_surface import dashboard_en, dashboard_nl
-from runtime.scrub_etf_client_surface import scrub_text
+from runtime.scrub_etf_client_surface import CANONICAL_CONSTRAINT_LINES, scrub_text
 
 
 def test_wp16_ecb_hike_is_surfaced_after_20260611() -> None:
@@ -38,10 +39,32 @@ def test_wp16_macro_surface_renders_ecb_policy_event_bilingually() -> None:
 
 def test_wp16_scrub_removes_empty_comment_and_stale_non_us_wording() -> None:
     marker = "<!" + "-- --" + ">"
-    text = marker + "\nZero non-U.S. equity exposure is an implicit U.S.-exceptionalism bet.\n"
+    escaped_marker = "&lt;!" + "-- --" + "&gt;"
+    text = marker + "\n" + escaped_marker + "\nZero non-U.S. equity exposure is an implicit U.S.-exceptionalism bet.\n"
     cleaned = scrub_text(text)
     assert marker not in cleaned
+    assert escaped_marker not in cleaned
     assert "Zero non-U.S. equity exposure" not in cleaned
+
+
+def test_wp16_delivery_html_sanitizer_removes_escaped_empty_comment() -> None:
+    escaped_marker = "&lt;!" + "-- --" + "&gt;"
+    html = f"<div><h3>Vervangingsanalyse</h3><p>{escaped_marker}</p></div>"
+    cleaned = sanitize_client_facing_html(html, md_text="## 4. Beste nieuwe kansen\nVervangingsanalyse", language="nl")
+    assert escaped_marker not in cleaned
+    assert "<p></p>" not in cleaned
+
+
+def test_wp16_constraint_copy_scrub_is_idempotent() -> None:
+    english = "- " + CANONICAL_CONSTRAINT_LINES["en_position_size"] + " soft cap; current inherited overweights require no-fresh-cash and review/trim discipline"
+    dutch = "- " + CANONICAL_CONSTRAINT_LINES["nl_position_size"] + " zachte bovengrens; bestaande overwegingen krijgen geen nieuw kapitaal en blijven onder verklein-/reviewdiscipline"
+
+    cleaned = scrub_text("\n".join([english, dutch]))
+
+    assert cleaned.count("soft cap") == 1
+    assert cleaned.count("zachte bovengrens") == 1
+    assert CANONICAL_CONSTRAINT_LINES["en_position_size"] in cleaned
+    assert CANONICAL_CONSTRAINT_LINES["nl_position_size"] in cleaned
 
 
 def test_wp16_english_performance_uses_english_na_label() -> None:
