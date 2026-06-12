@@ -86,15 +86,6 @@ def _weight(row: dict[str, Any]) -> float:
 
 
 def _is_zero_exited_position(row: dict[str, Any]) -> bool:
-    """Return true for a sold-out artifact row omitted from active official state.
-
-    Official portfolio state is an active-holdings file. After guarded execution,
-    a fully sold position can be absent from `output/etf_portfolio_state.json`
-    while still appearing in the execution artifact with zero shares/value as
-    proof of the sell-down. That absence is valid only when shares, EUR/local
-    value and weight are all effectively zero.
-    """
-
     return (
         abs(_float(row.get("shares"))) <= SHARE_TOL
         and abs(_local(row)) <= VALUE_TOL
@@ -219,6 +210,9 @@ def validate_execution_artifact(artifact_path: Path, *, expected_mode: str | Non
                 errors.append("artifact_guarded_auto:missing_already_executed_status")
             if result.get("portfolio_state_written") is True or result.get("trade_ledger_written") is True:
                 errors.append("artifact_guarded_auto:already_executed_must_not_write")
+        elif status == "no_trade_intents":
+            if result.get("portfolio_state_written") is True or result.get("trade_ledger_written") is True:
+                errors.append("artifact_guarded_auto:no_trade_intents_must_not_write")
         else:
             errors.append(f"artifact_guarded_auto:unexpected_status:{status}")
     if errors and raise_on_error:
