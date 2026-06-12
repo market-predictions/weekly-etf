@@ -19,6 +19,16 @@ EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 EMPTY_COMMENT_RE = re.compile(r"(?:&lt;!|<!)\s*--\s*--\s*(?:&gt;|>)", re.IGNORECASE)
 DUTCH_RESIDUE_EN_RE = re.compile(r"\bn\.v\.t\.\b", re.IGNORECASE)
+NL_EQUITY_CURVE_GUARD = """<style id="wp16-nl-equity-curve-guard">
+@media print {
+  .panel-equity img {
+    max-height: 78mm;
+    width: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+}
+</style>"""
 
 
 def _explicit_path(env_name: str, pattern: re.Pattern[str]) -> Path | None:
@@ -54,9 +64,24 @@ def _current_files(output_dir: Path) -> list[Path]:
     return paths
 
 
+def _is_nl_report(path: Path) -> bool:
+    return bool(NL_RE.match(path.name))
+
+
+def _apply_nl_equity_curve_guard(text: str, path: Path) -> str:
+    if not _is_nl_report(path):
+        return text
+    if "wp16-nl-equity-curve-guard" in text:
+        return text
+    if "`EQUITY_CURVE_CHART_PLACEHOLDER`" in text:
+        return text.replace("`EQUITY_CURVE_CHART_PLACEHOLDER`", NL_EQUITY_CURVE_GUARD + "\n\n`EQUITY_CURVE_CHART_PLACEHOLDER`", 1)
+    return text
+
+
 def _scrub_file(path: Path) -> None:
     original = path.read_text(encoding="utf-8", errors="ignore")
     cleaned = clean_residual_text(original)
+    cleaned = _apply_nl_equity_curve_guard(cleaned, path)
     if cleaned != original:
         path.write_text(cleaned, encoding="utf-8")
         print(f"ETF_CLIENT_SURFACE_RESIDUAL_SCRUBBED | file={path.name}")
