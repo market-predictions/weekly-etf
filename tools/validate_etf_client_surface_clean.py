@@ -10,19 +10,15 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from runtime.scrub_etf_client_surface import scrub_text
+from runtime.wp16_followup2_cleanup import clean_residual_text, residual_failures
 from tools.validate_etf_pdf_polish_contract import latest_delivery_html, validate_en, validate_nl
 from tools.validate_etf_pricing_lineage_contract import _manifest_path as _pricing_lineage_manifest_path
 from tools.validate_etf_pricing_lineage_contract import validate_manifest_path as validate_pricing_lineage_manifest
 
 EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
-SNAKE_CASE_RE = re.compile(r"\b[a-z]+(?:_[a-z0-9]+){1,}\b")
-DOUBLE_NEGATIVE_RE = [
-    re.compile(r"\breduce\s+(?:\[[^\]]+\]\([^\)]+\)|[A-Z][A-Z0-9.-]*)\s+by\s+-\d+(?:\.\d+)?%", re.IGNORECASE),
-    re.compile(r"\bverlaag\s+(?:\[[^\]]+\]\([^\)]+\)|[A-Z][A-Z0-9.-]*)\s+met\s+-\d+(?:\.\d+)?%", re.IGNORECASE),
-]
-ALLOWLIST = {"https"}
+EMPTY_COMMENT_RE = re.compile(r"(?:&lt;!|<!)\s*--\s*--\s*(?:&gt;|>)", re.IGNORECASE)
+DUTCH_RESIDUE_EN_RE = re.compile(r"\bn\.v\.t\.\b", re.IGNORECASE)
 
 
 def _explicit_path(env_name: str, pattern: re.Pattern[str]) -> Path | None:
@@ -60,22 +56,19 @@ def _current_files(output_dir: Path) -> list[Path]:
 
 def _scrub_file(path: Path) -> None:
     original = path.read_text(encoding="utf-8", errors="ignore")
-    cleaned = scrub_text(original)
+    cleaned = clean_residual_text(original)
     if cleaned != original:
         path.write_text(cleaned, encoding="utf-8")
-        print(f"ETF_CLIENT_SURFACE_SCRUBBED | file={path.name}")
+        print(f"ETF_CLIENT_SURFACE_RESIDUAL_SCRUBBED | file={path.name}")
 
 
 def _scan(path: Path) -> list[str]:
     text = path.read_text(encoding="utf-8", errors="ignore")
-    hits: list[str] = []
-    for match in SNAKE_CASE_RE.finditer(text):
-        token = match.group(0)
-        if token not in ALLOWLIST:
-            hits.append(token)
-    for regex in DOUBLE_NEGATIVE_RE:
-        if regex.search(text):
-            hits.append(regex.pattern)
+    hits = residual_failures(text)
+    if EMPTY_COMMENT_RE.search(text):
+        hits.append("empty comment residue")
+    if path.name.startswith("weekly_analysis_pro_") and not path.name.startswith("weekly_analysis_pro_nl_") and DUTCH_RESIDUE_EN_RE.search(text):
+        hits.append("Dutch n.v.t. in English output")
     return sorted(set(hits))
 
 
@@ -106,7 +99,7 @@ def validate(output_dir: Path) -> None:
         if hits:
             failures.append(f"{path.name}: {', '.join(hits[:12])}")
     if failures:
-        raise RuntimeError("ETF client-facing surface contains internal labels in current report pair: " + " | ".join(failures))
+        raise RuntimeError("ETF client-surface clean gate failed: " + " | ".join(failures))
     _validate_pdf_polish_contract(output_dir)
     _validate_pricing_lineage_before_send()
     print("ETF_CLIENT_SURFACE_CLEAN_OK | files=" + ",".join(path.name for path in paths))
