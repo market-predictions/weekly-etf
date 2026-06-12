@@ -306,7 +306,7 @@ def create_equity_curve_png_runtime(output_dir: Path, chart_path: Path, mode: st
 
 def _with_macro_pre_send_guard(generate_assets_for_run: Callable[..., dict]) -> Callable[..., dict]:
     def _wrapped(output_dir: Path, report_path_en: Path, mode: str = "standard") -> dict:
-        bundle = generate_delivery_assets_for_run(output_dir, report_path_en, mode=mode)
+        bundle = generate_assets_for_run(output_dir, report_path_en, mode=mode)
         validate_macro_report_pre_send(bundle)
         return bundle
 
