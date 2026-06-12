@@ -8,6 +8,7 @@ import send_report as report_module
 from runtime.build_etf_report_state import build_runtime_state
 from runtime.client_facing_sanitizer import sanitize_client_facing_html, looks_dutch_markdown
 from runtime.delivery_html_overrides import build_report_html_with_state
+from runtime.equity_curve_png_contract import render_equity_curve_png
 from runtime.macro_report_pre_send_guard import validate_macro_report_pre_send
 from runtime.max_position_action_contract import sanitize_over_cap_add_html
 from runtime.render_etf_report_from_state import cash_eur, invested_eur, total_nav
@@ -92,7 +93,6 @@ def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..
             state = build_runtime_state()
             html = sanitize_over_cap_add_html(html, state, language=language)
         except Exception:
-            # Do not make delivery dependent on a second state rebuild; validators catch regressions when state is available.
             pass
         return html
 
@@ -184,8 +184,6 @@ def validate_nl_email_body_runtime(html_body: str, md_text: str) -> None:
     if len(plain_html) < 0.72 * len(plain_md):
         raise RuntimeError("Dutch HTML body appears too short relative to the full report.")
 
-    # Normal HTML may contain line breaks. Keep this check focused on raw markdown
-    # and escaped formatting artifacts that should not survive HTML rendering.
     for bad_token in ["#### ", "|---|", "\t"]:
         if bad_token in html_body:
             raise RuntimeError(f"Dutch HTML body still contains raw markdown / escaped formatting token: {bad_token!r}")
@@ -302,24 +300,13 @@ def create_equity_curve_png_runtime(output_dir: Path, chart_path: Path, mode: st
     if not points:
         return None
 
-    is_dutch = bool(md_text and looks_dutch_markdown(md_text))
-    dates = [report_module.datetime.strptime(d, "%Y-%m-%d") for d, _ in points]
-    values = [v for _, v in points]
-    report_module.plt.figure(figsize=(8.8, 3.7))
-    report_module.plt.plot(dates, values, marker="o", linewidth=2.2)
-    report_module.plt.title("Portefeuillecurve (EUR)" if is_dutch else "Equity Curve (EUR)")
-    report_module.plt.xlabel("Datum" if is_dutch else "Date")
-    report_module.plt.ylabel("Portefeuillewaarde (EUR)" if is_dutch else "Portfolio value (EUR)")
-    report_module.plt.grid(True, alpha=0.28)
-    report_module.plt.tight_layout()
-    report_module.plt.savefig(chart_path, dpi=180)
-    report_module.plt.close()
-    return chart_path
+    language = "nl" if md_text and looks_dutch_markdown(md_text) else "en"
+    return render_equity_curve_png(points, chart_path, language=language)
 
 
 def _with_macro_pre_send_guard(generate_assets_for_run: Callable[..., dict]) -> Callable[..., dict]:
     def _wrapped(output_dir: Path, report_path_en: Path, mode: str = "standard") -> dict:
-        bundle = generate_assets_for_run(output_dir, report_path_en, mode=mode)
+        bundle = generate_delivery_assets_for_run(output_dir, report_path_en, mode=mode)
         validate_macro_report_pre_send(bundle)
         return bundle
 
