@@ -62,6 +62,10 @@ def _is_already_executed(payload: dict[str, Any]) -> bool:
     return payload.get("execution_mode") == "guarded_auto" and payload.get("execution_status") == "already_executed"
 
 
+def _is_shadow_no_trade(payload: dict[str, Any], expected_mode: str) -> bool:
+    return expected_mode == "shadow" and payload.get("execution_mode") == "shadow" and payload.get("execution_status") == "no_trade_intents"
+
+
 def validate(path: Path, *, expected_mode: str, finalize_report: bool = True) -> None:
     payload = _read_json(path)
     errors: list[str] = []
@@ -74,7 +78,7 @@ def validate(path: Path, *, expected_mode: str, finalize_report: bool = True) ->
         errors.append("policy_checks_not_passed:" + ";".join(policy.get("errors") or []))
     rows = payload.get("proposed_ledger_rows") or []
     shadow_positions = payload.get("shadow_positions") or []
-    if not _is_already_executed(payload) and not rows:
+    if not _is_already_executed(payload) and not _is_shadow_no_trade(payload, expected_mode) and not rows:
         errors.append("no_proposed_ledger_rows")
     if not shadow_positions:
         errors.append("no_shadow_positions")
