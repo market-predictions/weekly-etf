@@ -1,0 +1,1673 @@
+<html>
+      <head>
+        <meta charset="utf-8" />
+        <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #F6F2EC;
+      color: #2B3742;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .report-shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 0 18px 0;
+    }
+    .hero {
+      background: #607887;
+      color: #FBFAF7;
+      padding: 20px 24px 18px 24px;
+      border-radius: 14px 14px 0 0;
+    }
+    .hero-secondary {
+      margin-top: 26px;
+    }
+    .hero-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .hero-table td {
+      vertical-align: middle;
+    }
+    .hero-left {
+      text-align: left;
+    }
+    .hero-right {
+      text-align: right;
+      white-space: nowrap;
+      padding-left: 24px;
+    }
+    .masthead {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 700;
+      font-size: 30px;
+      letter-spacing: 1px;
+      margin: 0 0 8px 0;
+      text-transform: uppercase;
+    }
+    .hero-sub {
+      font-size: 14px;
+      color: #EFF4F6;
+      margin: 0;
+    }
+    .hero-side-label {
+      font-size: 16px;
+      line-height: 1.2;
+      font-weight: 700;
+      color: #FBFAF7;
+      letter-spacing: .03em;
+    }
+    .hero-rule {
+      height: 5px;
+      background: #D4B483;
+      margin: 8px 0 18px 0;
+      border-radius: 999px;
+    }
+    .notice {
+      background: #F8F4EE;
+      border: 1px solid #D9D3CB;
+      color: #6B7882;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 12px;
+      margin: 0 0 18px 0;
+    }
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 14px;
+      margin: 0 0 18px 0;
+    }
+    .mini-card {
+      background: #FCFAF7;
+      border: 1px solid #D9D3CB;
+      border-radius: 16px;
+      padding: 14px 18px;
+    }
+    .mini-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #6B7882;
+      margin: 0 0 8px 0;
+    }
+    .mini-value {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: #2B3742;
+      line-height: 1.22;
+    }
+    .client-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 18px;
+      align-items: start;
+      margin: 0 0 18px 0;
+    }
+    .panel {
+      background: #FCFAF7;
+      border: 1px solid #D9D3CB;
+      border-radius: 18px;
+      padding: 16px 18px;
+      margin: 0 0 18px 0;
+    }
+    .panel-compact,
+    .panel-exec,
+    .panel-snapshot,
+    .panel-risks {
+      page-break-inside: avoid;
+      break-inside: avoid-page;
+    }
+    .section-kicker {
+      width: auto;
+      border-collapse: collapse;
+      margin: 0 0 18px 0;
+    }
+    .section-kicker td {
+      vertical-align: middle;
+    }
+    .section-badge-cell {
+      width: 64px;
+      padding: 0 16px 0 0;
+      vertical-align: middle;
+    }
+    .section-label-cell {
+      padding: 0;
+      vertical-align: middle;
+    }
+    .section-badge {
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      background: #2A5384;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 17px;
+      display: block;
+      text-align: center;
+      line-height: 46px;
+      mso-line-height-rule: exactly;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .section-label {
+      display: block;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #6B7882;
+      line-height: 1.12;
+      mso-line-height-rule: exactly;
+    }
+    .summary-line {
+      margin: 0 0 12px 0;
+      padding: 0 0 12px 0;
+      border-bottom: 1px solid #D9D3CB;
+    }
+    .summary-key {
+      color: #6B7882;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin: 0 0 6px 0;
+    }
+    .summary-value {
+      color: #2B3742;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .takeaway {
+      margin: 18px 0 0 0;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #F4EEE4;
+      border: 1px solid #E7D7BB;
+    }
+    .takeaway-label {
+      color: #6B7882;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin: 0 0 6px 0;
+    }
+    .takeaway-text {
+      color: #2B3742;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.42;
+    }
+    .snapshot-table,
+    .rotation-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 16px 0;
+      border: 1px solid #D9D3CB;
+      table-layout: fixed;
+    }
+    .snapshot-table th,
+    .rotation-table th {
+      background: #F2EBDD;
+      color: #2B3742;
+      text-align: left;
+      padding: 9px 10px;
+      border-bottom: 1px solid #D9D3CB;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .snapshot-table td,
+    .rotation-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid #ECE6DE;
+      vertical-align: top;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .snapshot-table tbody tr:nth-child(even) td,
+    .rotation-table tbody tr:nth-child(even) td {
+      background: #FEFCF9;
+    }
+    .rotation-table ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .subgrid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .subblock {
+      margin: 0 0 14px 0;
+      padding: 12px 14px;
+      background: #FBF7F0;
+      border: 1px solid #D9D3CB;
+      border-radius: 12px;
+    }
+    .subblock-title {
+      color: #6B7882;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin: 0 0 8px 0;
+    }
+    .subblock ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .panel p, .panel li {
+      font-size: 14px;
+      line-height: 1.58;
+      margin-top: 0;
+      font-weight: 400;
+    }
+    .panel strong {
+      font-weight: 700;
+    }
+    .panel ul, .panel ol {
+      margin-top: 0;
+      padding-left: 22px;
+    }
+    .panel h3 {
+      color: #2B3742;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin: 18px 0 10px 0;
+    }
+    .panel h4 {
+      color: #6B7882;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 700;
+      margin: 18px 0 8px 0;
+    }
+    .panel h5 {
+      color: #6B7882;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .10em;
+      font-weight: 700;
+      margin: 12px 0 16px 0;
+    }
+    .panel blockquote {
+      margin: 12px 0;
+      padding: 10px 12px;
+      border-left: 4px solid #D4B483;
+      background: #F8F3EB;
+      color: #6B7882;
+    }
+    .panel table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin: 12px 0 14px 0;
+      border: 1px solid #D9D3CB;
+      font-size: 12px;
+    }
+    .panel thead {
+      display: table-header-group;
+    }
+    .panel th {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid #D9D3CB;
+      background: #F2EBDD;
+      color: #2B3742;
+      vertical-align: middle;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .panel td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #ECE6DE;
+      vertical-align: top;
+      word-wrap: break-word;
+    }
+    .panel tr:nth-child(even) td {
+      background: #FEFCF9;
+    }
+    .panel img {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid #D9D3CB;
+      border-radius: 10px;
+      margin: 10px 0 4px 0;
+      display: block;
+    }
+    .panel-positions h3 {
+      margin-top: 22px;
+      padding: 10px 12px;
+      background: #F7F1E8;
+      border: 1px solid #D9D3CB;
+      border-radius: 10px;
+      font-size: 17px;
+    }
+    .panel-opportunities h3 {
+      margin: 0 0 8px 0;
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.28;
+      color: #2B3742;
+    }
+    .panel-opportunities h4 {
+      margin: 16px 0 8px 0;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #6B7882;
+    }
+    .panel-opportunities h5 {
+      margin: 8px 0 18px 0;
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #6B7882;
+      font-weight: 700;
+      text-align: right;
+    }
+    .panel-opportunities h5 + h3 {
+      margin-top: 0;
+    }
+    .panel-opportunities a {
+      display: inline-block;
+      margin: 0 0 16px 0;
+      font-size: 14px;
+    }
+    .panel-carry > p:first-of-type {
+      padding: 12px 14px;
+      background: #F8F4EE;
+      border: 1px solid #D9D3CB;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+    .empty-cell {
+      color: #6B7882;
+      font-style: italic;
+    }
+    .analyst-divider {
+      display: none;
+    }
+    a {
+      color: #315F8B;
+      text-decoration: underline;
+    }
+    
+    .report-stack {
+      margin-top: 0;
+    }
+    @media screen and (max-width: 1100px) {
+      .summary-strip, .client-grid, .subgrid {
+        display: block;
+      }
+      .hero-table, .hero-table tbody, .hero-table tr, .hero-table td {
+        display: block;
+        width: 100%;
+      }
+      .hero-right {
+        text-align: left;
+        padding-left: 0;
+        padding-top: 10px;
+      }
+      .mini-card, .panel {
+        margin-bottom: 16px;
+      }
+      .rotation-table, .snapshot-table, .panel table {
+        table-layout: auto;
+      }
+    }
+    </style>
+      
+<style id="etf-table-pagination-guard">
+  @media print {
+    table { page-break-inside: auto; break-inside: auto; border-collapse: collapse; }
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    tr, th, td { page-break-inside: avoid; break-inside: avoid; }
+    .panel table tr, .panel table th, .panel table td,
+    .data-table tr, .action-table tr, .rotation-plan-table tr,
+    .position-review-table tr, .replacement-duel-v2-table tr {
+      page-break-inside: avoid; break-inside: avoid;
+    }
+  }
+</style>
+
+
+<style id="etf-hero-layout-guard">
+  .summary-strip .mini-card {
+    overflow: hidden;
+  }
+  .summary-strip .mini-value {
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: auto;
+  }
+  .summary-strip .mini-card:nth-child(3) .mini-value {
+    font-size: 19px;
+    line-height: 1.22;
+  }
+  .panel-equity,
+  .equity-curve-panel,
+  .equity-curve {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    overflow: visible;
+  }
+  .panel-equity img,
+  .equity-curve-panel img,
+  .equity-curve img,
+  img[src*="equity"],
+  img[alt*="Equity"],
+  img[alt*="Portefeuillecurve"] {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+    object-fit: contain;
+    object-position: center center;
+  }
+  @media screen and (max-width: 1100px) {
+    .summary-strip .mini-card:nth-child(3) .mini-value {
+      font-size: 18px;
+      line-height: 1.24;
+    }
+  }
+</style>
+
+</head>
+      <body>
+        <div class="report-shell">
+          <div class="hero">
+            <table class="hero-table" role="presentation" cellpadding="0" cellspacing="0"><tr>
+              <td class="hero-left"><div class="masthead">WEEKLY ETF REVIEW</div><p class="hero-sub">Thursday, 11 June 2026</p></td>
+              <td class="hero-right"><div class="hero-side-label">Investor Report</div></td>
+            </tr></table>
+          </div>
+          <div class="hero-rule"></div>
+          <div class="notice">This report is for informational and educational purposes only; please see the disclaimer at the end.</div>
+          <div class="summary-strip"><div class='mini-card'><div class='mini-label'>Primary regime</div><div class='mini-value'>Risk-on growth</div></div><div class='mini-card'><div class='mini-label'>Geopolitical regime</div><div class='mini-value'>Elevated but localized</div></div><div class='mini-card'><div class='mini-label'>Main takeaway</div><div class='mini-value'>SMH remains the earned leader, but portfolio rotation is governed by source/destination evidence rather than static review labels.</div></div></div>
+          <div class="client-grid"><div class='exec-summary-render-marker' style='display:none'>Executive Summary / Kernsamenvatting</div><div class='panel panel-action-snapshot'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>2</span></td><td class='section-label-cell'><span class='section-label'>Portfolio Action Snapshot</span></td></tr></table><table class='action-table'><thead><tr><th>Recommendation</th><th>Tickers / notes</th></tr></thead><tbody><tr><th>Add / destination</th><td>None</td></tr><tr><th>Hold</th><td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a>, <a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a>, <a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a>, <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a>, <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>, <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a>, <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a>, <a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a>, <a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td></tr><tr><th>Hold with override</th><td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a>, <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>, <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a>, <a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a> remain under explicit review.</td></tr><tr><th>Reflected replace / reduce</th><td>None</td></tr><tr><th>Close</th><td>None</td></tr></tbody></table><div class='note-box'><h4>Rotation execution status</h4><ul><li>Guarded model rotation is already reflected in the official portfolio state and trade ledger; this run performed no duplicate state or ledger mutation.</li></ul></div><div class='note-box'><h4>Best replacements to fund</h4><ul><li>The guarded model rotation is already reflected in the official portfolio state and trade ledger; no duplicate state or ledger mutation was performed by this report render.</li></ul></div></div><div class='panel panel-regime'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>3</span></td><td class='section-label-cell'><span class='section-label'>Regime Dashboard</span></td></tr></table><h3>Macro regime</h3>
+<ul>
+<li>Current regime: Risk-on growth.</li>
+<li>Confidence: 66%.</li>
+<li>Regime memory: Risk-on growth has persisted for 28 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed.</li>
+<li>Decision rule: Do not rotate aggressively unless a regime shift persists for at least two runs or cross-asset confirmation becomes broad.</li>
+</ul>
+<h3>Policy and geopolitical status</h3>
+<ul>
+<li>Status: Elevated but localized.</li>
+<li>Fed stance: Restrictive / data-dependent. Portfolio read-through: Prefer quality, profitable growth and cash discipline over weak balance-sheet beta.</li>
+<li>ECB stance: Tightening / inflation-sensitive. Portfolio read-through: <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a> exposure is now present, but further non-U.S. developed allocations still require relative-strength, pricing and portfolio-discipline confirmation.</li>
+</ul>
+<h3>What changed</h3>
+<ul>
+<li>AI / semiconductor leadership remains the dominant equity impulse.</li>
+<li>Commodity-breadth hedge behavior remains under review rather than automatic ballast.</li>
+</ul>
+<h3>Portfolio implications</h3>
+<ul>
+<li>Risk appetite is supportive, but fresh adds still need position-size room and pricing confirmation.</li>
+<li>Growth and infrastructure lanes can be considered if they do not worsen concentration.</li>
+<li>Defensive hedges should be reviewed for opportunity cost.</li>
+</ul>
+<h3>Policy catalysts included in this report</h3>
+<ul>
+<li>ECB rate-policy tightening: The ECB raised rates this week in response to renewed inflation pressure; this raises the hurdle for rate-sensitive and non-U.S. developed-market exposure but does not override pricing, relative-strength or portfolio-discipline gates.</li>
+<li>AI infrastructure and semiconductor supply chains: Capital spending and strategic supply-chain policy continue to support semiconductor and infrastructure lanes.</li>
+<li>Defense and sovereign resilience: Defense-budget durability remains a structural support, but ETF vehicle choice still matters.</li>
+</ul>
+</div><div class='panel panel-radar'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>4</span></td><td class='section-label-cell'><span class='section-label'>Structural Opportunity Radar</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Theme</th>
+  <th>Primary ETF</th>
+  <th>Alternative ETF</th>
+  <th>Why it matters</th>
+  <th style="text-align:right">Structural fit</th>
+  <th style="text-align:right">Macro timing</th>
+  <th>Status</th>
+  <th>What needs to happen</th>
+  <th>Time horizon</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>AI compute infrastructure</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SOXX" target="_blank" rel="noopener noreferrer">SOXX</a></td>
+  <td>Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies.</td>
+  <td style="text-align:right">5</td>
+  <td style="text-align:right">5</td>
+  <td>Structurally actionable, but no fresh capital while above cap</td>
+  <td>AI infrastructure leadership remains persistent, but position-size discipline matters.</td>
+  <td>3-12 months</td>
+</tr>
+<tr>
+  <td>Grid buildout / electrification</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a></td>
+  <td>Power demand, grid bottlenecks and reshoring capex support infrastructure spend. Macro filter: AI power demand and infrastructure policy support the grid lane; funding still depends on <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>-vs-<a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a> duel evidence.</td>
+  <td style="text-align:right">5</td>
+  <td style="text-align:right">4</td>
+  <td>Actionable now</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a> remains useful, but <a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a> is the cleaner thematic challenger.</td>
+  <td>3-12 months</td>
+</tr>
+<tr>
+  <td>Cybersecurity resilience</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=BUG" target="_blank" rel="noopener noreferrer">BUG</a></td>
+  <td>Cyber spend is linked to AI, cloud, data-center and geopolitical resilience.</td>
+  <td style="text-align:right">4</td>
+  <td style="text-align:right">4</td>
+  <td>Actionable now</td>
+  <td>Offers digital-infrastructure exposure with less direct semiconductor cyclicality.</td>
+  <td>3-12 months</td>
+</tr>
+<tr>
+  <td>Defense innovation / sovereign resilience</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a></td>
+  <td>Defense spending remains structurally durable, but vehicle selection must be proven. Macro filter: Policy support is durable, but implementation quality remains the main decision bottleneck.</td>
+  <td style="text-align:right">5</td>
+  <td style="text-align:right">3</td>
+  <td>Watchlist / under review</td>
+  <td>The lane remains relevant, but <a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a> must justify itself versus <a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a>.</td>
+  <td>3-12 months</td>
+</tr>
+<tr>
+  <td>Healthcare quality and defensive growth</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLV" target="_blank" rel="noopener noreferrer">XLV</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=VHT" target="_blank" rel="noopener noreferrer">VHT</a></td>
+  <td>Healthcare quality can provide defensive growth without speculative biotech beta.</td>
+  <td style="text-align:right">3</td>
+  <td style="text-align:right">3</td>
+  <td>Watchlist / under review</td>
+  <td>More useful if broad equity leadership narrows further.</td>
+  <td>3-12 months</td>
+</tr>
+<tr>
+  <td>Non-U.S. developed market diversification</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=EFA" target="_blank" rel="noopener noreferrer">EFA</a></td>
+  <td>Non-U.S. developed exposure has been increased through <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a>, but still requires relative-strength confirmation before becoming a broader allocation theme.</td>
+  <td style="text-align:right">3</td>
+  <td style="text-align:right">3</td>
+  <td>Watchlist / under review</td>
+  <td>Becomes fundable if U.S. factor concentration rises or non-U.S. breadth improves.</td>
+  <td>3-12 months</td>
+</tr>
+</tbody>
+</table>
+<h3>Best structural opportunities not yet actionable</h3>
+<ul>
+<li>Food security / agriculture inputs</li>
+<li>Water infrastructure / treatment</li>
+<li>Critical minerals / copper / refining</li>
+</ul>
+<h3>Notable lanes assessed but not promoted this week</h3>
+<table>
+<thead>
+<tr>
+  <th>Theme</th>
+  <th>Primary ETF</th>
+  <th>Why not promoted</th>
+  <th>What would change that</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Copper and electrification materials</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=COPX" target="_blank" rel="noopener noreferrer">COPX</a></td>
+  <td>Scored below the live radar cutoff versus stronger funded and challenger lanes.</td>
+  <td>Becomes more fundable if copper momentum and China demand confirm.</td>
+</tr>
+<tr>
+  <td>Financial infrastructure and market plumbing</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=KCE" target="_blank" rel="noopener noreferrer">KCE</a></td>
+  <td>Scored below the live radar cutoff versus stronger funded and challenger lanes.</td>
+  <td>Useful diversifier if financial infrastructure earnings broaden.</td>
+</tr>
+<tr>
+  <td>Water infrastructure / treatment</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=FIW" target="_blank" rel="noopener noreferrer">FIW</a></td>
+  <td>Scored below the live radar cutoff versus stronger funded and challenger lanes.</td>
+  <td>Moves up if relative strength improves versus <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>/<a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a>.</td>
+</tr>
+<tr>
+  <td>Critical minerals / copper / refining</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=REMX" target="_blank" rel="noopener noreferrer">REMX</a></td>
+  <td>Scored below the live radar cutoff versus stronger funded and challenger lanes.</td>
+  <td>Needs supply-chain policy plus price momentum.</td>
+</tr>
+<tr>
+  <td>Industrial automation and factory software</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=ROBO" target="_blank" rel="noopener noreferrer">ROBO</a></td>
+  <td>Scored below the live radar cutoff versus stronger funded and challenger lanes.</td>
+  <td>Needs clearer industrial order momentum.</td>
+</tr>
+</tbody>
+</table>
+<h2>4A. Short Opportunity Radar</h2>
+<table>
+<thead>
+<tr>
+  <th>Short theme</th>
+  <th>Candidate ETF</th>
+  <th>Short thesis</th>
+  <th>Trigger</th>
+  <th>Invalidation</th>
+  <th>Time horizon</th>
+  <th>Confidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Rate-sensitive small caps</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IWM" target="_blank" rel="noopener noreferrer">IWM</a></td>
+  <td>Restrictive real rates pressure weaker balance sheets.</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IWM" target="_blank" rel="noopener noreferrer">IWM</a> breaks down versus <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a> while yields firm.</td>
+  <td>Clear easing impulse and better credit breadth.</td>
+  <td>1-3 months</td>
+  <td>Medium</td>
+</tr>
+<tr>
+  <td>China platform beta</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=KWEB" target="_blank" rel="noopener noreferrer">KWEB</a></td>
+  <td>Policy confidence remains fragile.</td>
+  <td>Failed rally or renewed FX/policy stress.</td>
+  <td>Durable stimulus and earnings recovery.</td>
+  <td>1-3 months</td>
+  <td>Medium</td>
+</tr>
+<tr>
+  <td>Long-duration bonds</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=TLT" target="_blank" rel="noopener noreferrer">TLT</a></td>
+  <td>Sticky inflation and real-rate risk remain headwinds.</td>
+  <td>Real yields rise again.</td>
+  <td>Growth scare and decisive lower-yield breakout.</td>
+  <td>1-3 months</td>
+  <td>Medium</td>
+</tr>
+<tr>
+  <td>Speculative clean-tech beta</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=ICLN" target="_blank" rel="noopener noreferrer">ICLN</a></td>
+  <td>Financing pressure and weak profitability remain issues.</td>
+  <td>Failure to recover in broad risk-on tape.</td>
+  <td>Sharp rate relief or major policy surprise.</td>
+  <td>3-12 months</td>
+  <td>Medium</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel panel-risks panel-compact'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>5</span></td><td class='section-label-cell'><span class='section-label'>Key Risks / Invalidators</span></td></tr></table><ul>
+<li><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a> plus <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> creates high U.S. tech / AI factor overlap.</li>
+<li>Hedge and defensive sleeves must justify their capital allocation through role validity, pricing and relative-strength evidence.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a> and <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a> remain replaceable until their ETF implementation quality is proven.</li>
+<li>Non-U.S. developed exposure has been increased through <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a>, but breadth and relative-strength confirmation remain required.</li>
+</ul>
+</div><div class='panel panel-bottomline panel-compact'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>6</span></td><td class='section-label-cell'><span class='section-label'>Bottom Line</span></td></tr></table><ul>
+<li><strong>What should be exited first:</strong> Determined by the rotation plan when active; otherwise no close is executed by legacy state.</li>
+<li><strong>What deserves additional capital first:</strong> <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> remains the best-ranked funded lane, subject to the max-position rule.</li>
+<li><strong>What is acceptable but replaceable:</strong> Holdings with high release scores require reduce/replace/override discipline.</li>
+<li><strong>Single best portfolio upgrade this week:</strong> Use the rotation artifact as the bridge between evidence and target weights.</li>
+</ul>
+</div><div class='panel panel-equity'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>7</span></td><td class='section-label-cell'><span class='section-label'>Equity Curve and Portfolio Development</span></td></tr></table><ul>
+<li>Starting capital (EUR): 100000.00</li>
+<li>Current portfolio value (EUR): 107747.59</li>
+<li>Since inception return (%): 7.75</li>
+<li>Equity-curve state: Reconciled to Section 15 with full valuation history</li>
+<li>EUR/USD used: 1.1579</li>
+<li>Notes: Section 7 uses the validated valuation history plus the current portfolio NAV; Section 15 is rendered from the same reconciled portfolio state.</li>
+</ul>
+<table>
+<thead>
+<tr>
+  <th>Date</th>
+  <th style="text-align:right">Portfolio value (EUR)</th>
+  <th>Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>2026-03-28</td>
+  <td style="text-align:right">100000.00</td>
+  <td>Inaugural model portfolio established</td>
+</tr>
+<tr>
+  <td>2026-04-16</td>
+  <td style="text-align:right">100671.75</td>
+  <td>Fresh per-ticker repricing using latest completed close set</td>
+</tr>
+<tr>
+  <td>2026-04-20</td>
+  <td style="text-align:right">102026.08</td>
+  <td>Fresh six-of-six repricing using completed 20 April close set</td>
+</tr>
+<tr>
+  <td>2026-04-24</td>
+  <td style="text-align:right">104477.54</td>
+  <td>Partial fresh repricing using latest verified marks</td>
+</tr>
+<tr>
+  <td>2026-04-29</td>
+  <td style="text-align:right">101854.68</td>
+  <td>Fresh six-of-six repricing using persisted 2026-04-29 audit</td>
+</tr>
+<tr>
+  <td>2026-05-04</td>
+  <td style="text-align:right">102636.85</td>
+  <td>Partial pricing recovery using latest verified marks</td>
+</tr>
+<tr>
+  <td>2026-05-05</td>
+  <td style="text-align:right">103536.96</td>
+  <td>Latest 4 May close basis; +8 <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> from cash</td>
+</tr>
+<tr>
+  <td>2026-05-27</td>
+  <td style="text-align:right">109387.17</td>
+  <td>Runtime valuation from immutable pricing audit and explicit portfolio state</td>
+</tr>
+<tr>
+  <td>2026-05-28</td>
+  <td style="text-align:right">110032.93</td>
+  <td>Runtime valuation from immutable pricing audit and explicit portfolio state</td>
+</tr>
+<tr>
+  <td>2026-05-29</td>
+  <td style="text-align:right">109964.97</td>
+  <td>Runtime valuation repriced from official portfolio-state shares</td>
+</tr>
+<tr>
+  <td>2026-06-01</td>
+  <td style="text-align:right">110321.58</td>
+  <td>Runtime valuation repriced from official portfolio-state shares</td>
+</tr>
+<tr>
+  <td>2026-06-02</td>
+  <td style="text-align:right">112376.10</td>
+  <td>Runtime valuation repriced from official portfolio-state shares</td>
+</tr>
+<tr>
+  <td>2026-06-03</td>
+  <td style="text-align:right">111596.95</td>
+  <td>Runtime valuation repriced from official portfolio-state shares</td>
+</tr>
+<tr>
+  <td>2026-06-04</td>
+  <td style="text-align:right">111105.47</td>
+  <td>Runtime valuation repriced from official portfolio-state shares</td>
+</tr>
+<tr>
+  <td>2026-06-09</td>
+  <td style="text-align:right">106246.36</td>
+  <td>Runtime valuation repriced from official portfolio-state shares</td>
+</tr>
+<tr>
+  <td>2026-06-10</td>
+  <td style="text-align:right">103994.26</td>
+  <td>Runtime valuation repriced from official portfolio-state shares</td>
+</tr>
+<tr>
+  <td>2026-06-11</td>
+  <td style="text-align:right">107747.59</td>
+  <td>Latest portfolio valuation based on confirmed closing prices and current holdings</td>
+</tr>
+</tbody>
+</table>
+<p><img src="cid:equitycurve" alt="Equity curve" /></p>
+<h3>Closing prices used in this report</h3>
+<p>The portfolio valuation above is based on the per-position closes shown here. Requested close date: <strong>2026-06-11</strong>. The source column shows the market-data layer that supplied the close, not internal resolver names.</p>
+<table>
+<thead>
+<tr>
+  <th>Holding</th>
+  <th>Requested close</th>
+  <th>Close date used</th>
+  <th style="text-align:right">Close used</th>
+  <th>Currency</th>
+  <th>Market-data source</th>
+  <th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td>2026-06-11</td>
+  <td>2026-06-11</td>
+  <td style="text-align:right">85.47</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Fresh exact close, unverified</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td>2026-06-11</td>
+  <td>2026-06-11</td>
+  <td style="text-align:right">74.23</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Fresh exact close, unverified</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td>2026-06-11</td>
+  <td>2026-06-11</td>
+  <td style="text-align:right">30.96</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Fresh exact close, unverified</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td>2026-06-11</td>
+  <td>2026-06-11</td>
+  <td style="text-align:right">97.79</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Fresh exact close, unverified</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td>2026-06-11</td>
+  <td>2026-06-11</td>
+  <td style="text-align:right">57.18</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Fresh exact close, unverified</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td>2026-06-11</td>
+  <td>2026-06-11</td>
+  <td style="text-align:right">609.45</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Fresh exact close, unverified</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td>2026-06-11</td>
+  <td>2026-06-11</td>
+  <td style="text-align:right">737.76</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Fresh exact close, unverified</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td>2026-06-11</td>
+  <td>2026-06-11</td>
+  <td style="text-align:right">54.29</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Fresh exact close, unverified</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td>2026-06-11</td>
+  <td>2026-06-11</td>
+  <td style="text-align:right">44.05</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Fresh exact close, unverified</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+  <th>FX basis</th>
+  <th>Requested date</th>
+  <th>Date used</th>
+  <th style="text-align:right">Rate</th>
+  <th>Source</th>
+  <th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>EUR/USD</td>
+  <td>2026-06-11</td>
+  <td>2026-06-11</td>
+  <td style="text-align:right">1.1579</td>
+  <td>Twelve Data</td>
+  <td>Fresh exact close, unverified</td>
+</tr>
+</tbody>
+</table>
+<h2>7A. ETF Position Performance</h2>
+<p>Performance is calculated on the current ETF holdings using the latest validated close-price audit and available market-history inputs.</p>
+<table>
+<thead>
+<tr>
+  <th>Portfolio sleeve</th>
+  <th>Investment thesis</th>
+  <th>Tradable ETF</th>
+  <th style="text-align:right">Weight %</th>
+  <th style="text-align:right">1w return</th>
+  <th style="text-align:right">1m return</th>
+  <th style="text-align:right">3m return</th>
+  <th style="text-align:right">Since-entry</th>
+  <th style="text-align:right">P/L EUR</th>
+  <th style="text-align:right">Contribution %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Rotation destination</td>
+  <td>Cybersecurity resilience</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td style="text-align:right">17.40%</td>
+  <td style="text-align:right">-1.74%</td>
+  <td style="text-align:right">+12.32%</td>
+  <td style="text-align:right">+30.99%</td>
+  <td style="text-align:right">n/a</td>
+  <td style="text-align:right">n/a</td>
+  <td style="text-align:right">n/a</td>
+</tr>
+<tr>
+  <td>Rotation destination</td>
+  <td>Defense innovation / tactical defense beta</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td style="text-align:right">5.46%</td>
+  <td style="text-align:right">+5.62%</td>
+  <td style="text-align:right">+8.59%</td>
+  <td style="text-align:right">-1.70%</td>
+  <td style="text-align:right">n/a</td>
+  <td style="text-align:right">n/a</td>
+  <td style="text-align:right">n/a</td>
+</tr>
+<tr>
+  <td>Rotation destination</td>
+  <td>Commodity-breadth hedge exposure</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td style="text-align:right">9.29%</td>
+  <td style="text-align:right">-3.09%</td>
+  <td style="text-align:right">-10.30%</td>
+  <td style="text-align:right">-1.62%</td>
+  <td style="text-align:right">n/a</td>
+  <td style="text-align:right">-271.53</td>
+  <td style="text-align:right">-0.27%</td>
+</tr>
+<tr>
+  <td>Rotation destination</td>
+  <td>Non-U.S. developed-market diversification</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td style="text-align:right">19.96%</td>
+  <td style="text-align:right">+2.50%</td>
+  <td style="text-align:right">+0.83%</td>
+  <td style="text-align:right">+9.10%</td>
+  <td style="text-align:right">n/a</td>
+  <td style="text-align:right">n/a</td>
+  <td style="text-align:right">n/a</td>
+</tr>
+<tr>
+  <td>Real-asset capex</td>
+  <td>Grid and infrastructure capex</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td style="text-align:right">0.03%</td>
+  <td style="text-align:right">+1.68%</td>
+  <td style="text-align:right">+2.06%</td>
+  <td style="text-align:right">+14.88%</td>
+  <td style="text-align:right">+8.25%</td>
+  <td style="text-align:right">3.20</td>
+  <td style="text-align:right">0.00%</td>
+</tr>
+<tr>
+  <td>Growth engine</td>
+  <td>AI compute / semiconductor leadership</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td style="text-align:right">28.82%</td>
+  <td style="text-align:right">+8.67%</td>
+  <td style="text-align:right">+8.15%</td>
+  <td style="text-align:right">+59.84%</td>
+  <td style="text-align:right">+20.61%</td>
+  <td style="text-align:right">9,646.67</td>
+  <td style="text-align:right">+9.65%</td>
+</tr>
+<tr>
+  <td>Core beta</td>
+  <td>Core U.S. large-cap exposure</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td style="text-align:right">4.55%</td>
+  <td style="text-align:right">+0.41%</td>
+  <td style="text-align:right">-0.23%</td>
+  <td style="text-align:right">+12.13%</td>
+  <td style="text-align:right">+6.17%</td>
+  <td style="text-align:right">408.11</td>
+  <td style="text-align:right">+0.41%</td>
+</tr>
+<tr>
+  <td>Strategic energy</td>
+  <td>Nuclear and uranium cycle exposure</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td style="text-align:right">7.44%</td>
+  <td style="text-align:right">-0.82%</td>
+  <td style="text-align:right">-14.18%</td>
+  <td style="text-align:right">-14.09%</td>
+  <td style="text-align:right">-0.55%</td>
+  <td style="text-align:right">-1,950.87</td>
+  <td style="text-align:right">-1.95%</td>
+</tr>
+<tr>
+  <td>Rotation destination</td>
+  <td>Defensive utilities / rate-sensitive ballast</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td style="text-align:right">5.26%</td>
+  <td style="text-align:right">+0.28%</td>
+  <td style="text-align:right">-0.44%</td>
+  <td style="text-align:right">-4.63%</td>
+  <td style="text-align:right">n/a</td>
+  <td style="text-align:right">n/a</td>
+  <td style="text-align:right">n/a</td>
+</tr>
+</tbody>
+</table>
+</div><div class='hero hero-secondary'><table class='hero-table' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='hero-left'><div class='masthead'>WEEKLY ETF REVIEW</div><p class='hero-sub'>Thursday, 11 June 2026</p></td><td class='hero-right'><div class='hero-side-label'>Analyst Report</div></td></tr></table></div><div class='hero-rule'></div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>1</span></td><td class='section-label-cell'><span class='section-label'>Asset Allocation Map</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Bucket</th>
+  <th>Stance</th>
+  <th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>US equities</td>
+  <td>Neutral</td>
+  <td>Investable but concentration risk is explicit.</td>
+</tr>
+<tr>
+  <td>Europe equities</td>
+  <td>Neutral</td>
+  <td>IEFA now provides non-U.S. developed-market exposure, but broader allocation still requires relative-strength confirmation.</td>
+</tr>
+<tr>
+  <td>EM equities</td>
+  <td>Underweight</td>
+  <td>USD and oil sensitivity remain headwinds.</td>
+</tr>
+<tr>
+  <td>large cap</td>
+  <td>Neutral</td>
+  <td>Quality leadership still works.</td>
+</tr>
+<tr>
+  <td>small cap</td>
+  <td>Underweight</td>
+  <td>Rates and refinancing remain difficult.</td>
+</tr>
+<tr>
+  <td>growth</td>
+  <td>Neutral</td>
+  <td>Selective growth led by <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> remains attractive.</td>
+</tr>
+<tr>
+  <td>quality</td>
+  <td>Overweight</td>
+  <td>Earnings durability remains valuable.</td>
+</tr>
+<tr>
+  <td>defensive ballast</td>
+  <td>Neutral</td>
+  <td>Hedge and cash-like roles remain under opportunity-cost review.</td>
+</tr>
+<tr>
+  <td>industrials / defense</td>
+  <td>Overweight</td>
+  <td>Structural thesis valid; vehicle under review.</td>
+</tr>
+<tr>
+  <td>non-USD assets</td>
+  <td>Watchlist</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a> now provides non-U.S. developed-market exposure, but broader allocation still requires relative-strength confirmation.</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>2</span></td><td class='section-label-cell'><span class='section-label'>Second-Order Effects Map</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Driver</th>
+  <th>First-order effect</th>
+  <th>Second-order effect</th>
+  <th>Likely beneficiaries</th>
+  <th>Likely losers</th>
+  <th>ETF implication</th>
+  <th>Timing</th>
+  <th>Confidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>AI leadership</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> remains the cleanest growth expression</td>
+  <td>Concentration must be watched</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a>, <a href="https://www.tradingview.com/chart/?symbol=SOXX" target="_blank" rel="noopener noreferrer">SOXX</a></td>
+  <td>Lower-quality cyclicals</td>
+  <td>Hold near max size</td>
+  <td>Immediate</td>
+  <td>High</td>
+</tr>
+<tr>
+  <td>Factor concentration</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a> and <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> overlap</td>
+  <td>Portfolio is less diversified than ticker count suggests</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=QUAL" target="_blank" rel="noopener noreferrer">QUAL</a>, <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a> watchlist</td>
+  <td>Overlapping U.S. beta</td>
+  <td>Keep <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a> under review</td>
+  <td>1-3 months</td>
+  <td>Medium</td>
+</tr>
+<tr>
+  <td>Defense thesis vs ETF implementation</td>
+  <td>Defense remains structurally valid</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a> must justify itself versus <a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a>, <a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a></td>
+  <td>Weak vehicle selection</td>
+  <td>Hold <a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a> under review</td>
+  <td>Immediate</td>
+  <td>Medium</td>
+</tr>
+<tr>
+  <td>Hedge drawdown</td>
+  <td>Hedge role must be proven</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a>/<a href="https://www.tradingview.com/chart/?symbol=BIL" target="_blank" rel="noopener noreferrer">BIL</a> remain challengers</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a>, <a href="https://www.tradingview.com/chart/?symbol=BIL" target="_blank" rel="noopener noreferrer">BIL</a>, cash</td>
+  <td>Unproductive hedge</td>
+  <td>Hold hedge sleeve under review</td>
+  <td>Immediate</td>
+  <td>Medium</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel panel-position-review'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>3</span></td><td class='section-label-cell'><span class='section-label'>Current Position Review</span></td></tr></table><table class='data-table position-review-table'><thead><tr><th>Ticker</th><th>Action</th><th>Score</th><th>Fresh cash</th><th>Role</th><th>Required next action</th></tr></thead><tbody><tr><td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td><td>hold</td><td class='num'>4.97</td><td>Hold / monitor</td><td>Rotation destination</td><td>Monitor relative strength and portfolio concentration.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td><td>hold</td><td class='num'>3.10</td><td>No / under review</td><td>Rotation destination</td><td>Review defense vehicle fit versus ITA/PPA and leverage constraints.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td><td>hold</td><td class='num'>3.59</td><td>Hold / monitor</td><td>Rotation destination</td><td>Monitor commodity breadth and hedge contribution after execution.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td><td>hold</td><td class='num'>3.52</td><td>Hold / monitor</td><td>Rotation destination</td><td>Monitor non-U.S. breadth and SPY-relative performance.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td><td>Hold under review</td><td class='num'>3.68</td><td>Smaller / under review</td><td>Real-asset capex</td><td>Force alternative duel; upgrade, reduce, replace, or close</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td><td>Hold / no fresh cash while above 25% cap</td><td class='num'>4.28</td><td>Smaller / under review</td><td>Growth engine</td><td>Force alternative duel; upgrade, reduce, replace, or close</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td><td>Hold</td><td class='num'>3.53</td><td>Smaller / under review</td><td>Core beta</td><td>Force alternative duel; upgrade, reduce, replace, or close</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td><td>Hold</td><td class='num'>3.70</td><td>Hold</td><td>Strategic energy</td><td>Hold</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td><td>hold</td><td class='num'>3.00</td><td>No / under review</td><td>Rotation destination</td><td>Review defensive ballast role versus BIL/SHV and opportunity cost.</td></tr></tbody></table></div><div class='panel panel-opportunities'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>4</span></td><td class='section-label-cell'><span class='section-label'>Best New Opportunities</span></td></tr></table><ul>
+<li><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a> / <a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a>: Defense spending remains structurally durable, but vehicle selection must be proven.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=XLV" target="_blank" rel="noopener noreferrer">XLV</a> / <a href="https://www.tradingview.com/chart/?symbol=VHT" target="_blank" rel="noopener noreferrer">VHT</a>: Healthcare quality can provide defensive growth without speculative biotech beta.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a> / <a href="https://www.tradingview.com/chart/?symbol=EFA" target="_blank" rel="noopener noreferrer">EFA</a>: Non-U.S. developed exposure has been increased through <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a>, but still requires relative-strength confirmation before becoming a broader allocation theme.</li>
+<li>Replacement candidates remain evidence-gated: pricing basis and duel status must be visible before funding.</li>
+</ul>
+</div><div class='panel panel-replacement-duel'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>4B</span></td><td class='section-label-cell'><span class='section-label'>Replacement Duel Table</span></td></tr></table><table class='data-table replacement-duel-v2-table'><thead><tr><th>Current holding</th><th>Challenger</th><th>1m edge</th><th>3m edge</th><th>Pricing basis</th><th>Decision</th><th>Required trigger</th></tr></thead><tbody><tr class='priority-duel'><td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td><td><a href="https://www.tradingview.com/chart/?symbol=IWM" target="_blank" rel="noopener noreferrer">IWM</a></td><td class='num'>+3.91%</td><td class='num'>+6.93%</td><td>Current and challenger closes validated on 2026-06-11 / 2026-06-11.</td><td>Replacement trigger watch - challenger leading over 3m.</td><td>Confirm thesis fit, liquidity and funding source.</td></tr><tr class='priority-duel'><td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td><td><a href="https://www.tradingview.com/chart/?symbol=QUAL" target="_blank" rel="noopener noreferrer">QUAL</a></td><td class='num'>+2.89%</td><td class='num'>-0.91%</td><td>Current and challenger closes validated on 2026-06-11 / 2026-06-11.</td><td>Early 1m improvement only; wait for 3m confirmation.</td><td>Needs 3m confirmation.</td></tr><tr class='priority-duel'><td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td><td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td><td class='num'>+1.06%</td><td class='num'>-3.03%</td><td>Current and challenger closes validated on 2026-06-11 / 2026-06-11.</td><td>Early 1m improvement only; wait for 3m confirmation.</td><td>Needs 3m confirmation.</td></tr><tr class='priority-duel'><td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td><td><a href="https://www.tradingview.com/chart/?symbol=EFA" target="_blank" rel="noopener noreferrer">EFA</a></td><td class='num'>+1.36%</td><td class='num'>-3.09%</td><td>Current and challenger closes validated on 2026-06-11 / 2026-06-11.</td><td>Early 1m improvement only; wait for 3m confirmation.</td><td>Needs 3m confirmation.</td></tr><tr class='priority-duel'><td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td><td><a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a></td><td class='num'>-6.38%</td><td class='num'>-0.59%</td><td>Current and challenger closes validated on 2026-06-11 / 2026-06-11.</td><td>Current holding still leads; no replacement.</td><td>Needs sustained relative outperformance.</td></tr><tr class='priority-duel'><td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td><td><a href="https://www.tradingview.com/chart/?symbol=URA" target="_blank" rel="noopener noreferrer">URA</a></td><td class='num'>-0.55%</td><td class='num'>+6.32%</td><td>Current and challenger closes validated on 2026-06-11 / 2026-06-11.</td><td>Replacement trigger watch - challenger leading over 3m.</td><td>Confirm thesis fit, liquidity and funding source.</td></tr><tr class='priority-duel'><td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td><td><a href="https://www.tradingview.com/chart/?symbol=SOXX" target="_blank" rel="noopener noreferrer">SOXX</a></td><td class='num'>+4.75%</td><td class='num'>+20.28%</td><td>Current and challenger closes validated on 2026-06-11 / 2026-06-11.</td><td>Replacement trigger watch - challenger leading over 3m.</td><td>Confirm thesis fit, liquidity and funding source.</td></tr><tr class=''><td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td><td><a href="https://www.tradingview.com/chart/?symbol=VPU" target="_blank" rel="noopener noreferrer">VPU</a></td><td class='num'>-2.48%</td><td class='num'>-19.13%</td><td>Current and challenger closes validated on 2026-06-11 / 2026-06-11.</td><td>Current holding still leads; no replacement.</td><td>Needs sustained relative outperformance.</td></tr></tbody></table></div><div class='panel panel-rotation-plan'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>5</span></td><td class='section-label-cell'><span class='section-label'>Portfolio Rotation Plan</span></td></tr></table><table class='data-table rotation-plan-table'><thead><tr><th>Close</th><th>Reduce</th><th>Hold</th><th>Add</th><th>Replace</th></tr></thead><tbody><tr><td>None</td><td>None</td><td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a>, <a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a>, <a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a>, <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a>, <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>, <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a>, <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a>, <a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a>, <a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td><td>None</td><td>None</td></tr></tbody></table><div class='note-box'><ul><li>Guarded model rotation is already reflected in the official portfolio state and trade ledger; this run performed no duplicate state or ledger mutation.</li></ul></div></div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>6</span></td><td class='section-label-cell'><span class='section-label'>Final Action Table</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Ticker</th>
+  <th>ETF</th>
+  <th>Existing/New</th>
+  <th style="text-align:right">Weight Inherited</th>
+  <th style="text-align:right">Target Weight</th>
+  <th>Suggested Action</th>
+  <th>Conviction Tier</th>
+  <th style="text-align:right">Total Score</th>
+  <th>Portfolio Role</th>
+  <th>Better Alternative Exists?</th>
+  <th>Short Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td>Existing</td>
+  <td style="text-align:right">17.40</td>
+  <td style="text-align:right">17.98</td>
+  <td>hold</td>
+  <td>Tier 2</td>
+  <td style="text-align:right">4.97</td>
+  <td>Rotation destination</td>
+  <td>No</td>
+  <td>Cybersecurity exposure remains structurally supported by AI, cloud and resilience spending.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td>Existing</td>
+  <td style="text-align:right">5.46</td>
+  <td style="text-align:right">5.00</td>
+  <td>hold</td>
+  <td>Tier 3</td>
+  <td style="text-align:right">3.10</td>
+  <td>Rotation destination</td>
+  <td>Yes</td>
+  <td>Defense thesis remains relevant, but vehicle risk and implementation quality require review.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td>Existing</td>
+  <td style="text-align:right">9.29</td>
+  <td style="text-align:right">9.47</td>
+  <td>hold</td>
+  <td>Tier 2</td>
+  <td style="text-align:right">3.59</td>
+  <td>Rotation destination</td>
+  <td>No</td>
+  <td>Added as current commodity-breadth hedge exposure after the prior gold-sleeve exit.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td>Existing</td>
+  <td style="text-align:right">19.96</td>
+  <td style="text-align:right">19.96</td>
+  <td>hold</td>
+  <td>Tier 3</td>
+  <td style="text-align:right">3.52</td>
+  <td>Rotation destination</td>
+  <td>No</td>
+  <td>Diversifies U.S. factor concentration but still needs relative-strength confirmation.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td>Global X U.S. Infrastructure Development ETF</td>
+  <td>Existing</td>
+  <td style="text-align:right">0.03</td>
+  <td style="text-align:right">0.03</td>
+  <td>Hold under review</td>
+  <td>Tier 2</td>
+  <td style="text-align:right">3.68</td>
+  <td>Real-asset capex</td>
+  <td>Yes</td>
+  <td>Valid but <a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a> is the named challenger</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td>VanEck Semiconductor ETF</td>
+  <td>Existing</td>
+  <td style="text-align:right">28.82</td>
+  <td style="text-align:right">27.56</td>
+  <td>Hold / no fresh cash while above 25% cap</td>
+  <td>Tier 1</td>
+  <td style="text-align:right">4.28</td>
+  <td>Growth engine</td>
+  <td>No</td>
+  <td>Best earned exposure, but no fresh cash while above the 25% cap</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td>SPDR S&amp;P 500 ETF Trust</td>
+  <td>Existing</td>
+  <td style="text-align:right">4.55</td>
+  <td style="text-align:right">4.55</td>
+  <td>Hold</td>
+  <td>Tier 2</td>
+  <td style="text-align:right">3.53</td>
+  <td>Core beta</td>
+  <td>Yes</td>
+  <td>Useful but overlaps with <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a>; no fresh cash add</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td>Sprott Uranium Miners ETF</td>
+  <td>Existing</td>
+  <td style="text-align:right">7.44</td>
+  <td style="text-align:right">8.17</td>
+  <td>Hold</td>
+  <td>Tier 2</td>
+  <td style="text-align:right">3.70</td>
+  <td>Strategic energy</td>
+  <td>No</td>
+  <td>Valid, but not better than <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> for new cash today</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td>Existing</td>
+  <td style="text-align:right">5.26</td>
+  <td style="text-align:right">5.00</td>
+  <td>hold</td>
+  <td>Tier 3</td>
+  <td style="text-align:right">3.00</td>
+  <td>Rotation destination</td>
+  <td>Yes</td>
+  <td>Defensive utility exposure must justify its role versus cash and broader ballast alternatives.</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>7</span></td><td class='section-label-cell'><span class='section-label'>Position Changes Reflected in Official State</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Ticker</th>
+  <th style="text-align:right">Previous weight %</th>
+  <th style="text-align:right">New weight %</th>
+  <th style="text-align:right">Weight change %</th>
+  <th style="text-align:right">Shares delta</th>
+  <th>Action reflected</th>
+  <th>Funding source / note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Portfolio</td>
+  <td style="text-align:right">-</td>
+  <td style="text-align:right">-</td>
+  <td style="text-align:right">-</td>
+  <td style="text-align:right">0.00</td>
+  <td>Already reflected</td>
+  <td>The prior guarded model rotation is already reflected in the official portfolio state; no new state or ledger mutation was performed this run.</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>8</span></td><td class='section-label-cell'><span class='section-label'>Current Portfolio Holdings and Cash</span></td></tr></table><ul>
+<li>Starting capital (EUR): 100000.00</li>
+<li>Invested market value (EUR): 105811.07</li>
+<li>Cash (EUR): 1936.52</li>
+<li>Total portfolio value (EUR): 107747.59</li>
+<li>Since inception return (%): 7.75</li>
+<li>EUR/USD used: 1.1579</li>
+</ul>
+<table>
+<thead>
+<tr>
+  <th>Ticker</th>
+  <th style="text-align:right">Shares</th>
+  <th style="text-align:right">Price (local)</th>
+  <th>Currency</th>
+  <th style="text-align:right">Market value (local)</th>
+  <th style="text-align:right">Market value (EUR)</th>
+  <th style="text-align:right">Weight %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td style="text-align:right">253.94</td>
+  <td style="text-align:right">85.47</td>
+  <td>USD</td>
+  <td style="text-align:right">21703.95</td>
+  <td style="text-align:right">18744.24</td>
+  <td style="text-align:right">17.40</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td style="text-align:right">91.77</td>
+  <td style="text-align:right">74.23</td>
+  <td>USD</td>
+  <td style="text-align:right">6811.93</td>
+  <td style="text-align:right">5883.00</td>
+  <td style="text-align:right">5.46</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td style="text-align:right">374.29</td>
+  <td style="text-align:right">30.96</td>
+  <td>USD</td>
+  <td style="text-align:right">11588.12</td>
+  <td style="text-align:right">10007.88</td>
+  <td style="text-align:right">9.29</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td style="text-align:right">254.63</td>
+  <td style="text-align:right">97.79</td>
+  <td>USD</td>
+  <td style="text-align:right">24899.95</td>
+  <td style="text-align:right">21504.40</td>
+  <td style="text-align:right">19.96</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td style="text-align:right">0.71</td>
+  <td style="text-align:right">57.18</td>
+  <td>USD</td>
+  <td style="text-align:right">40.84</td>
+  <td style="text-align:right">35.27</td>
+  <td style="text-align:right">0.03</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td style="text-align:right">59.00</td>
+  <td style="text-align:right">609.45</td>
+  <td>USD</td>
+  <td style="text-align:right">35957.55</td>
+  <td style="text-align:right">31054.11</td>
+  <td style="text-align:right">28.82</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td style="text-align:right">7.69</td>
+  <td style="text-align:right">737.76</td>
+  <td>USD</td>
+  <td style="text-align:right">5675.17</td>
+  <td style="text-align:right">4901.26</td>
+  <td style="text-align:right">4.55</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td style="text-align:right">171.00</td>
+  <td style="text-align:right">54.29</td>
+  <td>USD</td>
+  <td style="text-align:right">9283.59</td>
+  <td style="text-align:right">8017.61</td>
+  <td style="text-align:right">7.44</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td style="text-align:right">148.87</td>
+  <td style="text-align:right">44.05</td>
+  <td>USD</td>
+  <td style="text-align:right">6557.53</td>
+  <td style="text-align:right">5663.30</td>
+  <td style="text-align:right">5.26</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CASH" target="_blank" rel="noopener noreferrer">CASH</a></td>
+  <td style="text-align:right">-</td>
+  <td style="text-align:right">1.00</td>
+  <td>EUR</td>
+  <td style="text-align:right">1936.52</td>
+  <td style="text-align:right">1936.52</td>
+  <td style="text-align:right">1.80</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel panel-carry'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>9</span></td><td class='section-label-cell'><span class='section-label'>Continuity Input for Next Run</span></td></tr></table><h3>Portfolio table</h3>
+<table>
+<thead>
+<tr>
+  <th>Ticker</th>
+  <th>ETF Name</th>
+  <th style="text-align:right">Direction</th>
+  <th style="text-align:right">Weight %</th>
+  <th style="text-align:right">Avg Entry</th>
+  <th style="text-align:right">Current Price</th>
+  <th style="text-align:right">P/L %</th>
+  <th>Original Thesis</th>
+  <th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td style="text-align:right">Long</td>
+  <td style="text-align:right">17.40</td>
+  <td style="text-align:right"></td>
+  <td style="text-align:right">85.47</td>
+  <td style="text-align:right"></td>
+  <td></td>
+  <td>Rotation destination</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td style="text-align:right">Long</td>
+  <td style="text-align:right">5.46</td>
+  <td style="text-align:right"></td>
+  <td style="text-align:right">74.23</td>
+  <td style="text-align:right"></td>
+  <td></td>
+  <td>Rotation destination</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td style="text-align:right">Long</td>
+  <td style="text-align:right">9.29</td>
+  <td style="text-align:right">31.80</td>
+  <td style="text-align:right">30.96</td>
+  <td style="text-align:right"></td>
+  <td>Rotation destination</td>
+  <td>Rotation destination</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td style="text-align:right">Long</td>
+  <td style="text-align:right">19.96</td>
+  <td style="text-align:right"></td>
+  <td style="text-align:right">97.79</td>
+  <td style="text-align:right"></td>
+  <td></td>
+  <td>Rotation destination</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td>Global X U.S. Infrastructure Development ETF</td>
+  <td style="text-align:right">Long</td>
+  <td style="text-align:right">0.03</td>
+  <td style="text-align:right">51.98</td>
+  <td style="text-align:right">57.18</td>
+  <td style="text-align:right">8.25</td>
+  <td>Grid and infrastructure capex</td>
+  <td>Real-asset capex</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td>VanEck Semiconductor ETF</td>
+  <td style="text-align:right">Long</td>
+  <td style="text-align:right">28.82</td>
+  <td style="text-align:right">420.13</td>
+  <td style="text-align:right">609.45</td>
+  <td style="text-align:right">20.61</td>
+  <td>AI compute / semiconductor leadership</td>
+  <td>Growth engine</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td>SPDR S&amp;P 500 ETF Trust</td>
+  <td style="text-align:right">Long</td>
+  <td style="text-align:right">4.55</td>
+  <td style="text-align:right">676.33</td>
+  <td style="text-align:right">737.76</td>
+  <td style="text-align:right">6.17</td>
+  <td>Core U.S. large-cap exposure</td>
+  <td>Core beta</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td>Sprott Uranium Miners ETF</td>
+  <td style="text-align:right">Long</td>
+  <td style="text-align:right">7.44</td>
+  <td style="text-align:right">67.50</td>
+  <td style="text-align:right">54.29</td>
+  <td style="text-align:right">-0.55</td>
+  <td>Nuclear and uranium cycle exposure</td>
+  <td>Strategic energy</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td style="text-align:right">Long</td>
+  <td style="text-align:right">5.26</td>
+  <td style="text-align:right"></td>
+  <td style="text-align:right">44.05</td>
+  <td style="text-align:right"></td>
+  <td></td>
+  <td>Rotation destination</td>
+</tr>
+</tbody>
+</table>
+<h3>Available cash</h3>
+<ul>
+<li>Cash %: 1.80</li>
+<li>Margin usage %: 0.00</li>
+<li>Leverage allowed: No</li>
+</ul>
+<h3>Watchlist / dynamic radar memory</h3>
+<table>
+<thead>
+<tr>
+  <th>Theme</th>
+  <th>Primary ETF</th>
+  <th>Alternative ETF</th>
+  <th>Why I’m considering it</th>
+  <th>Current status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>AI compute infrastructure</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SOXX" target="_blank" rel="noopener noreferrer">SOXX</a></td>
+  <td>Strongest secular growth exposure.</td>
+  <td>Active / capped</td>
+</tr>
+<tr>
+  <td>Defense innovation / sovereign resilience</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a></td>
+  <td>Defense thesis valid but vehicle under review.</td>
+  <td>Duel required</td>
+</tr>
+<tr>
+  <td>Grid buildout / electrification</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a></td>
+  <td>Infrastructure capex remains valid.</td>
+  <td>Duel required</td>
+</tr>
+<tr>
+  <td>Commodity-breadth hedge review</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DBC" target="_blank" rel="noopener noreferrer">DBC</a> / <a href="https://www.tradingview.com/chart/?symbol=BIL" target="_blank" rel="noopener noreferrer">BIL</a></td>
+  <td>Current commodity-breadth hedge role must be proven against cash and broad commodity alternatives.</td>
+  <td>Under review</td>
+</tr>
+<tr>
+  <td>Non-U.S. developed diversification</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=EFA" target="_blank" rel="noopener noreferrer">EFA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a> now provides non-U.S. developed-market exposure, with broader allocation still under confirmation.</td>
+  <td>Watchlist</td>
+</tr>
+</tbody>
+</table>
+<h3>Recommendation discipline continuity</h3>
+<ul>
+<li>Rotation execution: completed and persisted in the official portfolio state and trade ledger.</li>
+<li>Replacement challengers: not fundable without completed duel.</li>
+</ul>
+<h3>Constraints</h3>
+<ul>
+<li>Max position size: 25% soft cap; current inherited overweights require no-fresh-cash and review/trim discipline</li>
+<li>Max number of positions: 8 soft target; current inherited count may exceed this until guarded rotation reduces it</li>
+<li>UCITS only: No</li>
+<li>Leverage ETFs allowed: No</li>
+<li>Drawdown tolerance: Moderate</li>
+<li>Income vs growth preference: Balanced growth with resilience bias</li>
+</ul>
+<h3>Changes since last review</h3>
+<ul>
+<li>Added: the latest guarded model rotation is already reflected in the official portfolio state; no duplicate execution was performed.</li>
+<li>Reduced: None unless explicit state says otherwise.</li>
+<li>Closed: None.</li>
+<li>Thesis changes: No structural thesis was abandoned; implementation, macro-regime and rotation discipline are materially tighter.</li>
+</ul>
+</div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>10</span></td><td class='section-label-cell'><span class='section-label'>Disclaimer</span></td></tr></table><p>This report is provided for informational and educational purposes only. It is not investment, legal, tax, or financial advice, and it is not a recommendation to buy, sell, or hold any security. It does not take into account the specific investment objectives, financial situation, or particular needs of any recipient. Views are general in nature, may change without notice, and may not be suitable for every investor. Investing involves risk, including possible loss of principal.</p>
+</div></div>
+        </div>
+      </body>
+    </html>
