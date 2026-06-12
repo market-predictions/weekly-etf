@@ -45,7 +45,10 @@ def _matching_delivery_html(report_path: Path) -> Path | None:
 
 
 def _language_for_path(path: Path) -> str:
-    return "nl" if NL_RE.match(path.name) else "en"
+    name = path.name
+    if name.startswith("weekly_analysis_pro_nl_"):
+        return "nl"
+    return "en"
 
 
 def _current_files(output_dir: Path) -> list[Path]:
@@ -60,11 +63,7 @@ def _current_files(output_dir: Path) -> list[Path]:
 
 
 def _apply_nl_equity_curve_guard(text: str, path: Path) -> str:
-    """Compatibility shim for older tests; production no longer injects CSS into Markdown."""
-    if not NL_RE.match(path.name) or REMOVED_MARKDOWN_GUARD_MARKER in text:
-        return text
-    if "`EQUITY_CURVE_CHART_PLACEHOLDER`" in text:
-        return text + "\n" + REMOVED_MARKDOWN_GUARD_MARKER
+    """Compatibility shim only; production must not inject CSS or markers into Markdown."""
     return text
 
 
