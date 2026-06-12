@@ -11,109 +11,85 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**ETF has a latest successful runtime-driven bilingual production baseline for run `20260610_211606` / report set `260610_02`, with pricing-lineage proof, 100.0% fresh holdings coverage, run-manifest evidence, delivery-manifest evidence, and marker-free replacement-edge diagnostic notes. The prior workflow run #216 / run `20260605_081216` remains historical evidence only and is no longer the current production baseline. The client-safe macro report surface is integrated through the macro policy pack, but the raw deterministic macro read remains non-client-facing and is not promoted as the official production regime source. WP13, WP14, and WP15 are review/policy packages only; they did not promote deterministic macro, mutate report behavior, or rewrite historical outputs. Historical output artifacts are immutable by default under WP15. Replacement-edge notes remain diagnostic-only and do not grant lane-scoring, fundability, recommendation, execution, or portfolio-mutation authority.**
+**WP16 macro event recency and report-surface QA repair has been implemented as pipeline/source changes and a rerun request has been created. The 2026-06-11 generated reports exposed client-surface defects: stale ECB stance, missing ECB policy catalyst, stale non-U.S. exposure wording, English `n.v.t.` residue, empty comment residue, and constraint wording that needed soft-cap/override clarity. WP16 fixed source logic and added regression tests, but successful clean delivery is not yet proven until the rerun produces valid GitHub Actions, run-manifest and delivery-manifest evidence. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default.**
 
-## Latest production and report-surface evidence
+## Latest fully verified clean baseline before WP16 rerun
 
 ```text
 workflow: Send weekly ETF Pro report
-github_actions_run: 27306857013
-workflow_title: Retry ETF delivery after hiding replacement-edge marker
-workflow_status: completed
-workflow_conclusion: success
-artifact_commit: e2891ca
 requested_close_date: 2026-06-10
 run_id: 20260610_211606
 report_token: 260610
 english_report_path: output/weekly_analysis_pro_260610_02.md
 dutch_report_path: output/weekly_analysis_pro_nl_260610_02.md
-english_pdf_path: output/weekly_analysis_pro_260610_02.pdf
-dutch_pdf_path: output/weekly_analysis_pro_nl_260610_02.pdf
-english_delivery_html: output/weekly_analysis_pro_260610_02_delivery.html
-dutch_delivery_html: output/weekly_analysis_pro_nl_260610_02_delivery.html
-runtime_state_path: output/runtime/etf_report_state_20260610_20260610_211606.json
-executed_runtime_state_path: output/runtime/etf_report_state_20260610_20260610_211606_already_executed.json
-pricing_audit_path: output/pricing/price_audit_2026-06-10_20260610_211606.json
-run_manifest_path: output/run_manifests/weekly_etf_run_manifest_2026-06-10_20260610_211606.json
-delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-10_20260610_211606.json
 pricing_lineage_status: passed
-pricing_coverage_count_pct: 100.0
-fresh_holdings_count: 9
-carried_forward_holdings_count: 0
-total_portfolio_value_eur: 103994.26
-cash_eur: 1936.52
 delivery_status: smtp_sendmail_returned_no_exception
 ```
 
-Delivery manifest recorded `smtp_sendmail_returned_no_exception` after `send_report.py` returned from `smtplib.sendmail` without raising. This is delivery-layer evidence, not an end-recipient inbox receipt.
+Delivery evidence remains delivery-layer evidence only. It is not an end-recipient inbox receipt.
 
-Current holdings validated in the run manifest:
+## 2026-06-11 report QA finding
 
-```text
-CIBR
-DFEN
-GSG
-IEFA
-PAVE
-SMH
-SPY
-URNM
-XLU
-```
+The 2026-06-11 reports were generated and uploaded for review, but should not be treated as clean premium final output without repair/rerun verification.
 
-## Current output and historical-artifact status
-
-The current report set is:
+Confirmed defects:
 
 ```text
-260610_02
+ECB stance remained Neutral / transition after a same-day ECB rate hike.
+ECB rate-policy event was absent from the policy catalyst surface.
+Non-U.S. exposure wording still implied zero/non-existent exposure although IEFA was a material position.
+English position-performance output contained Dutch n.v.t. residue.
+Dutch replacement-analysis surface exposed an empty comment residue.
+Position constraint wording needed soft-cap / inherited-overweight / no-fresh-cash clarification.
+Dutch equity-curve PDF clipping was observed in the uploaded PDF and requires rerun/render verification.
 ```
 
-The visible marker `ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED` is absent from the current `260610_02` Markdown / clean Markdown / HTML / PDF surfaces.
-
-Older historical artifacts such as `260609_06`, `260609_07`, and early `260610` outputs may still contain prior client-surface issues. They are historical artifacts and should not be treated as current delivery output.
-
-WP15 policy artifact:
+## WP16 repair status
 
 ```text
-control/HISTORICAL_ARTIFACT_CLEANUP_POLICY.md
+WP16 — Macro event recency and report-surface QA repair: implemented / rerun requested / delivery not yet verified
 ```
 
-WP15 policy status:
+Files changed by WP16:
 
 ```text
-policy_status=cleanup_policy_defined_no_artifact_mutation
-historical_output_artifacts_are_immutable_by_default=true
-current_baseline_scope=manifest_linked_latest_report_set
-historical_output_mutation=false
-production_report_behavior_changed=false
-scoring_changed=false
-fundability_changed=false
-execution_changed=false
-delivery_changed=false
-portfolio_state_changed=false
-macro_authority_changed=false
+runtime/build_macro_policy_pack.py
+runtime/macro_report_surface.py
+runtime/add_etf_position_performance_section.py
+runtime/scrub_etf_client_surface.py
+tests/test_wp16_report_surface_qa_contract.py
+control/run_queue/weekly_etf_report_request_20260612_wp16_rerun.md
+control/CURRENT_STATE.md
+control/NEXT_ACTIONS.md
 ```
 
-Operational rule:
+WP16 source changes:
 
 ```text
-Repo-wide grep can identify historical residue, but current production truth must be determined from CURRENT_STATE plus the latest manifest-linked report/runtime/pricing/delivery artifacts.
+ECB same-week hike is surfaced as Tightening / inflation-sensitive for report dates >= 2026-06-11.
+ECB rate-policy tightening is added as a report-transfer policy catalyst.
+Macro surface can render up to three policy catalysts when the pack allows it.
+English performance tables use n/a while Dutch keeps n.v.t.
+Client-surface scrub removes empty comment residue.
+Client-surface scrub replaces stale zero/non-U.S. exposure wording when IEFA/EFA/VEA is active.
+Constraint copy is reframed as soft-cap / soft-target with inherited-state discipline.
 ```
 
-## Macro roadmap implementation status
-
-The production report is integrated with the macro policy pack through a client-safe report surface:
+WP16 regression tests:
 
 ```text
-runtime.build_macro_policy_pack
-  -> output/macro/latest.json
-  -> runtime.macro_report_surface
-  -> runtime.polish_runtime_reports / native report rendering
-  -> English/Dutch report sections
+tests/test_wp16_report_surface_qa_contract.py
 ```
 
-Current deterministic macro state:
+Rerun request:
+
+```text
+control/run_queue/weekly_etf_report_request_20260612_wp16_rerun.md
+```
+
+## Deterministic macro boundary
+
+Current deterministic macro state remains:
 
 ```text
 macro report surface: integrated as client-safe only
@@ -121,30 +97,7 @@ deterministic macro read as raw/shadow object: not client-facing
 deterministic macro read as official decision/regime source: not promoted
 ```
 
-Do not infer deterministic macro promotion from green validators, old-vs-new review readiness, client-safe macro surface presence, macro policy pack existence, prior pilot output, prior review artifacts, WP13 review checklist, WP14 replay evidence, or WP15 historical-artifact policy.
-
-Completed or established deterministic macro packages:
-
-```text
-WP1 — deterministic macro narrative shadow candidate: completed / not promoted
-WP2 — macro narrative compliance and bilingual parity gate: completed / not promoted
-WP3 — macro promotion decision contract: completed / merged
-WP7 — deterministic macro regime client-surface pilot: completed / non-authoritative / not promoted
-WP8 — old-vs-new macro review evidence: completed / ready_for_narrative_promotion_review / not promoted
-WP9 — controlled promotion artifact: completed / status=not_promoted
-WP10 — explicit promotion decision artifact: completed / status=not_promoted
-WP13 — deterministic macro read promotion review: completed / review-only / not promoted
-WP14 — deterministic macro read shadow replay evidence: completed / replay-only / not promoted
-WP15 — historical artifact cleanup policy: completed / policy-only / no artifact mutation
-```
-
-Review and policy artifacts:
-
-```text
-control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
-output/macro/replay/deterministic_macro_shadow_replay_20260612_000000.json
-control/HISTORICAL_ARTIFACT_CLEANUP_POLICY.md
-```
+Do not infer deterministic macro promotion from WP16. The ECB repair is a client-safe legacy macro policy-pack/report-surface repair, not deterministic macro promotion.
 
 Standing deterministic macro authority boundary:
 
@@ -161,85 +114,63 @@ execution_authority=false
 production_report_mutation=false
 ```
 
-## Replacement-edge authority boundary
+## Historical artifact policy
 
-Replacement-edge notes are visible as diagnostics only.
-
-They do not grant:
+WP15 remains active:
 
 ```text
-portfolio_action_authority=false
-fundability_authority=false
-lane_scoring_authority=false
-funding_authority=false
-production_recommendation_authority=false
-execution_authority=false
-portfolio_mutation=false
+historical_output_artifacts_are_immutable_by_default=true
+current_baseline_scope=manifest_linked_latest_report_set
+historical_output_mutation=false
 ```
 
-Replacement-edge diagnostics must not be promoted into ranking, lane scoring, fundability, recommendation, target weights, trade intents, execution, or portfolio mutation.
+WP16 did not manually rewrite historical report artifacts. A clean report must be produced by rerunning the workflow.
 
 ## Four-layer operating status
 
 ### 1. Decision framework
 
-- Deterministic macro remains review/control evidence only and is not promoted.
-- WP10 explicitly records `status=not_promoted`.
-- WP13 records promotion-review criteria only.
-- WP14 records shadow replay evidence only.
-- WP15 records historical-artifact cleanup policy only.
-- Historical output artifacts are immutable by default unless a future explicit cleanup/archive work package authorizes a scoped change.
+- WP16 repairs report-surface QA only.
+- It does not alter scoring, fundability, execution, delivery authority, or portfolio authority.
+- It does not promote deterministic macro.
 
 ### 2. Input/state contract
 
-Authoritative production inputs remain runtime/pricing/manifest/state artifacts:
-
-```text
-output/etf_portfolio_state.json
-output/etf_valuation_history.csv
-output/etf_trade_ledger.csv
-output/runtime/etf_report_state_20260610_20260610_211606.json
-output/runtime/etf_report_state_20260610_20260610_211606_already_executed.json
-output/pricing/price_audit_2026-06-10_20260610_211606.json
-output/run_manifests/weekly_etf_run_manifest_2026-06-10_20260610_211606.json
-output/delivery/weekly_etf_delivery_manifest_2026-06-10_20260610_211606.json
-output/macro/latest.json
-```
-
-Review, replay, policy, and promotion artifacts remain control/review artifacts only unless explicitly promoted through a later contract.
+- ECB same-week hike is represented inside the macro policy-pack path as client-safe descriptive policy context.
+- Current production truth remains tied to manifest-linked runtime/pricing/delivery artifacts.
 
 ### 3. Output contract
 
-The report pipeline must continue to protect pricing lineage, runtime-state authority, bilingual output, Dutch terminology, ticker linkification, client-surface scrub, macro/thesis leakage guard, replacement-edge diagnostic-only boundary, delivery HTML contract, delivery manifest summary, and run manifest summary.
-
-The current `260610_02` client output is the latest report set. Old historical outputs are not current production truth.
+- Future reports should not show stale ECB Neutral / transition wording when the 2026-06-11 ECB event applies.
+- Future reports should not imply zero non-U.S. developed exposure when IEFA/EFA/VEA is active.
+- English output should not contain Dutch `n.v.t.`.
+- Empty comment residue should not surface in client reports.
 
 ### 4. Operational runbook
 
-Current production delivery evidence is the `20260610_211606` run-manifest and delivery-manifest pair. Delivery evidence remains delivery-layer evidence only unless a real end-recipient inbox receipt exists.
+- The rerun request has been created.
+- Do not claim successful report delivery until GitHub Actions, run manifest, delivery manifest, pricing lineage and persisted EN/NL artifacts are verified.
 
-WP15 created a policy artifact only. It did not rewrite historical outputs, change report generation logic, scoring, portfolio state, macro authority, replacement-edge authority, delivery behavior, or execution behavior.
+## Immediate next action
 
-## Immediate priorities
-
-### Priority A — preserve pricing-lineage and delivery-evidence discipline
-
-Do not weaken pricing lineage, manifest, official portfolio-state, or delivery-evidence boundaries.
-
-### Priority B — preserve deterministic macro `not_promoted` boundary
-
-Any future production deterministic macro integration requires a future explicit control-layer promotion decision and a separate report-integration work package.
-
-### Priority C — preserve historical-output immutability by default
-
-Do not rewrite or delete historical generated outputs unless a future explicit cleanup/archive work package defines exact scope, traceability, rollback, and current-baseline verification.
-
-### Priority D — next action
-
-There is no automatic cleanup or promotion task after WP15. The next step is a coordinator/user decision:
+Verify the WP16 rerun:
 
 ```text
-Option 1 — stop and observe the clean current production baseline
-Option 2 — prepare an explicit deterministic macro promotion decision package
-Option 3 — define a scoped historical archive execution package, if grep noise becomes operationally blocking
+control/run_queue/weekly_etf_report_request_20260612_wp16_rerun.md
+```
+
+Required verification:
+
+```text
+GitHub Actions run success
+run manifest exists
+delivery manifest exists
+English/Dutch reports exist
+pricing lineage passes
+ECB policy catalyst appears
+ECB stance no longer says Neutral / transition
+non-U.S. exposure wording reconciles with IEFA
+English n.v.t. residue absent
+empty comment residue absent
+Dutch equity-curve render checked
 ```
