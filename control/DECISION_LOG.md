@@ -131,3 +131,23 @@ WP9 creates `output/macro/promotion/macro_regime_promotion_decision_20260605_000
 ### Consequence
 
 The deterministic macro pilot remains review evidence only. It has no client-facing narrative authority, production report narrative authority, portfolio-action authority, lane-scoring authority, fundability authority, funding authority, portfolio mutation, delivery authority, execution authority, or production report mutation authority. A separate explicit control-layer promotion decision and separate report-integration work package remain required before production report output changes.
+
+---
+
+## 2026-06-12 — Historical output artifacts are immutable by default
+
+### Decision
+
+WP15 defines `control/HISTORICAL_ARTIFACT_CLEANUP_POLICY.md` and records:
+
+```text
+historical_output_artifacts_are_immutable_by_default=true
+current_baseline_scope=manifest_linked_latest_report_set
+cleanup_policy_defined_no_artifact_mutation
+```
+
+### Consequence
+
+Older generated outputs may contain stale wording or old markers, but they remain historical evidence by default. Current production truth must be determined from `control/CURRENT_STATE.md` plus the latest manifest-linked report/runtime/pricing/delivery artifacts, not from repo-wide historical grep alone.
+
+Do not bulk-edit, rewrite, delete, squash, or silently regenerate historical output files unless a future explicit cleanup/archive work package defines exact scope, traceability, rollback, and current-baseline verification.
