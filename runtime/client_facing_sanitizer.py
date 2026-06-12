@@ -5,6 +5,7 @@ from html import escape
 
 from runtime import nl_terminology_contract as contract
 from runtime.nl_dates import localize_english_report_dates
+from runtime.wp16_followup3_cleanup import clean_text
 
 CLIENT_FACING_TOKEN_REPLACEMENTS = contract.CLIENT_FACING_TOKEN_REPLACEMENTS
 DUTCH_HTML_TOKEN_REPLACEMENTS = contract.CLIENT_SURFACE_EXACT_REPLACEMENTS | {
@@ -72,6 +73,27 @@ HERO_LAYOUT_GUARD_CSS = """
   .summary-strip .mini-card:nth-child(3) .mini-value {
     font-size: 19px;
     line-height: 1.22;
+  }
+  .panel-equity,
+  .equity-curve-panel,
+  .equity-curve {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    overflow: visible;
+  }
+  .panel-equity img,
+  .equity-curve-panel img,
+  .equity-curve img,
+  img[src*="equity"],
+  img[alt*="Equity"],
+  img[alt*="Portefeuillecurve"] {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+    object-fit: contain;
+    object-position: center center;
   }
   @media screen and (max-width: 1100px) {
     .summary-strip .mini-card:nth-child(3) .mini-value {
@@ -170,7 +192,6 @@ def localize_dutch_delivery_html(html: str) -> str:
 
 
 def convert_residual_markdown_links(html: str) -> str:
-    """Convert markdown links that survived custom HTML rendering into anchors."""
     def repl(match: re.Match[str]) -> str:
         label = escape(match.group(1))
         url = escape(match.group(2), quote=True)
@@ -179,9 +200,10 @@ def convert_residual_markdown_links(html: str) -> str:
     return RAW_MARKDOWN_LINK_RE.sub(repl, html)
 
 
-def _apply_global_client_token_replacements(html: str) -> str:
+def _apply_global_client_token_replacements(html: str, *, language: str) -> str:
     for forbidden, replacement in CLIENT_FACING_TOKEN_REPLACEMENTS.items():
         html = html.replace(forbidden, replacement)
+    html = clean_text(html, language=language)
     html = EN_DOUBLE_NEGATIVE_RE.sub(r"\1", html)
     html = NL_DOUBLE_NEGATIVE_RE.sub(r"\1", html)
     return html
@@ -236,13 +258,6 @@ def _remove_panel_blocks_by_depth(html: str, pattern: re.Pattern[str], replaceme
 
 
 def suppress_duplicate_executive_panel(html: str, *, language: str = "en") -> str:
-    """Replace the duplicate Section 1 panel with a compact visible marker.
-
-    The hero cards already carry the executive-summary content, but a fully hidden
-    section made the first visible report panel start at 2. We keep a lightweight
-    Section 1 marker so the PDF reads sequentially without duplicating the full
-    executive summary text.
-    """
     marker = _visible_exec_summary_marker(language)
     updated, count = _remove_panel_blocks_by_depth(html, PANEL_EXEC_OPEN_RE, marker)
     if count:
@@ -252,15 +267,6 @@ def suppress_duplicate_executive_panel(html: str, *, language: str = "en") -> st
 
 
 def _has_embedded_replacement_duel(html: str) -> bool:
-    """Detect a markdown-rendered replacement-duel table before the branded panel.
-
-    Mistune may strip HTML comments, so do not rely only on the explicit marker.
-    Dutch currently embeds the duel table under Best New Opportunities; English
-    currently relies on the appended delivery panel. The checks below detect the
-    embedded table header/labels without treating the appended branded HTML table
-    itself as embedded.
-    """
-
     if "ETF_REPLACEMENT_DUEL_V2_EMBEDDED" in html:
         return True
     panel_pos = html.find("panel-replacement-duel")
@@ -271,19 +277,10 @@ def _has_embedded_replacement_duel(html: str) -> bool:
 
 
 def _de_stale_replacement_duel_badge(html: str) -> str:
-    """Keep the English appended duel panel but remove the stale Section 11 badge.
-
-    In the compact PDF analyst surface, the appended replacement-duel panel is a
-    subsection under the opportunity radar, not the original markdown Section 11.
-    A `4B` badge keeps it visible without creating the old 4→11→5 jump.
-    """
-
     return SECTION_BADGE_REPLACEMENT_DUEL_RE.sub(r"\g<1>4B\g<2>", html)
 
 
 def remove_duplicate_replacement_duel_panel(html: str) -> str:
-    """Avoid rendering replacement duels twice and remove stale numbering."""
-
     has_embedded = _has_embedded_replacement_duel(html)
     if has_embedded:
         html, _ = _remove_panel_blocks_by_depth(html, PANEL_REPLACEMENT_DUEL_OPEN_RE, "")
@@ -296,26 +293,25 @@ def remove_duplicate_replacement_duel_panel(html: str) -> str:
 
 
 def sanitize_client_facing_html(html: str, *, md_text: str | None = None, language: str | None = None) -> str:
-    """Remove internal/runtime placeholder language from final client-facing HTML."""
     resolved_language = language or ("nl" if looks_dutch_markdown(md_text) else "en")
-    html = remove_empty_comment_artifacts(html)
+    html = clean_text(remove_empty_comment_artifacts(html), language=resolved_language)
     html = remove_duplicate_replacement_duel_panel(html)
     html = suppress_duplicate_executive_panel(html, language=resolved_language)
     html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
-    html = _apply_global_client_token_replacements(html)
+    html = _apply_global_client_token_replacements(html, language=resolved_language)
     html = convert_residual_markdown_links(html)
     if resolved_language == "nl":
         html = localize_dutch_delivery_html(html)
-    html = remove_empty_comment_artifacts(html)
+    html = clean_text(remove_empty_comment_artifacts(html), language=resolved_language)
     html = remove_duplicate_replacement_duel_panel(html)
     html = suppress_duplicate_executive_panel(html, language=resolved_language)
     html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
     html = suppress_duplicate_executive_panel(html, language=resolved_language)
     html = inject_hero_layout_guard(html)
-    html = _apply_global_client_token_replacements(html)
+    html = _apply_global_client_token_replacements(html, language=resolved_language)
     html = convert_residual_markdown_links(html)
     html = remove_duplicate_replacement_duel_panel(html)
-    return remove_empty_comment_artifacts(html)
+    return clean_text(remove_empty_comment_artifacts(html), language=resolved_language)
 
 
 def validate_dutch_delivery_language(html: str, report_name: str) -> None:
