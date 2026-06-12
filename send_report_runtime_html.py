@@ -9,6 +9,7 @@ from runtime.build_etf_report_state import build_runtime_state
 from runtime.client_facing_sanitizer import sanitize_client_facing_html, looks_dutch_markdown
 from runtime.delivery_html_overrides import build_report_html_with_state
 from runtime.equity_curve_png_contract import render_equity_curve_png
+from runtime.equity_curve_svg_contract import replace_pdf_equity_png_with_svg
 from runtime.macro_report_pre_send_guard import validate_macro_report_pre_send
 from runtime.max_position_action_contract import sanitize_over_cap_add_html
 from runtime.render_etf_report_from_state import cash_eur, invested_eur, total_nav
@@ -94,6 +95,9 @@ def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..
             html = sanitize_over_cap_add_html(html, state, language=language)
         except Exception:
             pass
+        if language == "nl" and render_mode.startswith("pdf"):
+            points = report_module.parse_section7_equity_points_generic(md_text)
+            html = replace_pdf_equity_png_with_svg(html, points, language=language)
         return html
 
     return _wrapped
