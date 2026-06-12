@@ -23,6 +23,8 @@ REMOVED_MARKDOWN_GUARD_MARKER = "wp16-nl-equity-curve-guard"
 CHART_PLACEHOLDER = "`EQUITY_CURVE_CHART_PLACEHOLDER`"
 NL_PRICING_HEADING = "### Gebruikte slotkoersen in dit rapport"
 EN_PRICING_HEADING = "### Closing prices used in this report"
+NL_SECTION7_TITLE = "## 7. Portefeuillecurve en portefeuilleontwikkeling"
+EN_SECTION7_TITLE = "## 7. Equity Curve and Portfolio Development"
 
 
 def _explicit_path(env_name: str, pattern: re.Pattern[str]) -> Path | None:
@@ -67,11 +69,25 @@ def _current_files(output_dir: Path) -> list[Path]:
 
 def _move_chart_before_pricing_disclosure(text: str, language: str) -> str:
     heading = NL_PRICING_HEADING if language == "nl" else EN_PRICING_HEADING
+    section_title = NL_SECTION7_TITLE if language == "nl" else EN_SECTION7_TITLE
     chart_pos = text.find(CHART_PLACEHOLDER)
     heading_pos = text.find(heading)
-    if chart_pos == -1 or heading_pos == -1 or chart_pos < heading_pos:
+    if chart_pos == -1:
         return text
     without_chart = text[:chart_pos].rstrip() + "\n\n" + text[chart_pos + len(CHART_PLACEHOLDER):].lstrip()
+
+    # Dutch PDFs were clipping the image after the long valuation-history table.
+    # Move the chart to the top of Section 7, before that table, so it gets a
+    # clean block and cannot be masked by a split table/page-break boundary.
+    if language == "nl":
+        section_pos = without_chart.find(section_title)
+        if section_pos != -1:
+            insert_pos = without_chart.find("\n\n", section_pos + len(section_title))
+            if insert_pos != -1:
+                return without_chart[:insert_pos].rstrip() + "\n\n" + CHART_PLACEHOLDER + "\n\n" + without_chart[insert_pos:].lstrip()
+
+    if heading_pos == -1:
+        return without_chart + "\n\n" + CHART_PLACEHOLDER + "\n"
     heading_pos = without_chart.find(heading)
     if heading_pos == -1:
         return without_chart + "\n\n" + CHART_PLACEHOLDER + "\n"
