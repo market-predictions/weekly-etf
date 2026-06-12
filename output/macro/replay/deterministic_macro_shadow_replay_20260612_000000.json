@@ -1,0 +1,153 @@
+{
+  "schema_version": "deterministic_macro_shadow_replay_v1",
+  "artifact_type": "deterministic_macro_read_shadow_replay_evidence",
+  "run_id": "20260612_000000",
+  "created_at_utc": "2026-06-12T00:00:00Z",
+  "baseline_report_set": "260610_02",
+  "current_production_baseline": {
+    "run_id": "20260610_211606",
+    "github_actions_run": "27306857013",
+    "artifact_commit": "e2891ca",
+    "pricing_lineage_status": "passed",
+    "delivery_status": "smtp_sendmail_returned_no_exception"
+  },
+  "authority": {
+    "client_facing_narrative_authority": false,
+    "production_report_narrative_authority": false,
+    "portfolio_action_authority": false,
+    "lane_scoring_authority": false,
+    "fundability_authority": false,
+    "funding_authority": false,
+    "portfolio_mutation": false,
+    "delivery_authority": false,
+    "execution_authority": false,
+    "production_report_mutation": false
+  },
+  "inputs": {
+    "current_macro_policy_pack": "output/macro/latest.json",
+    "deterministic_client_surface_pilot": "output/macro/pilot/macro_regime_client_surface_pilot_20260605_000000.json",
+    "old_vs_new_review": "output/macro/review/macro_old_vs_new_review_20260605_000000.json",
+    "promotion_decision": "output/macro/promotion/macro_regime_promotion_decision_20260606_000000.json",
+    "promotion_review": "control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md"
+  },
+  "replay_scope": {
+    "mode": "fixture_and_committed_artifact_review",
+    "baseline_report_date": "2026-06-10",
+    "baseline_report_files": [
+      "output/weekly_analysis_pro_260610_02.md",
+      "output/weekly_analysis_pro_nl_260610_02.md"
+    ],
+    "macro_pack_fixture": "output/macro/latest.json",
+    "deterministic_fixture_report_date": "2026-06-05",
+    "deterministic_fixture_files": [
+      "output/macro/pilot/macro_regime_client_surface_pilot_20260605_000000.json",
+      "output/macro/review/macro_old_vs_new_review_20260605_000000.json"
+    ],
+    "replay_limitation": "This WP14 artifact compares committed macro pack and deterministic review artifacts only. It does not re-render production reports and does not execute a live report workflow."
+  },
+  "comparison_dimensions": {
+    "regime_label_descriptive_classification": {
+      "current_legacy_surface": "Risk-on growth, confidence 66%, legacy descriptive regime surface.",
+      "deterministic_read": "Risk-on with narrow equity leadership / risk_on_narrow_leadership.",
+      "assessment": "materially_aligned",
+      "notes": "Both describe a constructive risk backdrop; deterministic wording adds the breadth/narrow-leadership qualifier."
+    },
+    "risk_tone": {
+      "current_legacy_surface": "Risk appetite supportive but selective; fresh adds require pricing and position-size discipline.",
+      "deterministic_read": "Constructive but narrow risk tone; macro inputs are context for risk review, not standalone signal.",
+      "assessment": "aligned_with_added_clarity"
+    },
+    "leadership_breadth": {
+      "current_legacy_surface": "AI / semiconductor leadership remains dominant; breadth improving but cross-asset confirmation mixed.",
+      "deterministic_read": "Semiconductor strength supports risk tone while market breadth is less broad than headline picture.",
+      "assessment": "aligned"
+    },
+    "confidence_language": {
+      "current_legacy_surface": "66% confidence from legacy proxy static source.",
+      "deterministic_read": "Evidence-based observation; not a forecast probability.",
+      "assessment": "acceptable_if_renderer_keeps_non_forecast_language"
+    },
+    "policy_geopolitical_context": {
+      "current_legacy_surface": "Fed and ECB stance plus AI infrastructure and defense policy catalysts are allowed as descriptive context.",
+      "deterministic_read": "Inflation, rates, growth and volatility are used as context for risk review, not standalone portfolio signal.",
+      "assessment": "compatible"
+    },
+    "portfolio_discipline_wording": {
+      "current_legacy_surface": "Portfolio actions still require pricing, relative strength and position discipline.",
+      "deterministic_read": "No portfolio action, funding decision, lane score, or allocation change follows from the pilot.",
+      "assessment": "strong_boundary_preserved"
+    },
+    "forbidden_field_leakage": {
+      "current_legacy_surface": "Field authority blocks raw deterministic_regime_shadow, macro_axes, macro_axis_scores and macro_evidence from client surface.",
+      "deterministic_read": "Pilot/review surface does not expose raw fields; raw deterministic object remains internal.",
+      "assessment": "no_replay_leakage_observed"
+    },
+    "bilingual_english_dutch_parity": {
+      "current_legacy_surface": "English/Dutch macro report surface is rendered through the shared client-safe surface and Dutch localization.",
+      "deterministic_read": "Pilot English and Dutch deterministic candidate surfaces are materially parallel and both include no-action boundaries.",
+      "assessment": "meaningfully_aligned"
+    },
+    "predictive_wording_risk": {
+      "current_legacy_surface": "Macro validators block predictive market or central-bank wording.",
+      "deterministic_read": "Pilot candidate frames macro as current context and risk review, not prediction.",
+      "assessment": "no_current_replay_risk_observed"
+    },
+    "authority_boundary_preservation": {
+      "current_legacy_surface": "Client-safe descriptive surface only; decision authority remains legacy lane adjustments only where applicable.",
+      "deterministic_read": "All narrative, portfolio, scoring, fundability, funding, delivery, execution and mutation authorities remain false.",
+      "assessment": "preserved"
+    }
+  },
+  "required_replay_questions": {
+    "1_same_macro_story": {
+      "answer": "yes_materially",
+      "summary": "Both the current legacy macro pack and deterministic pilot describe a constructive/risk-on backdrop led by AI/semiconductor strength with breadth/cross-asset caution."
+    },
+    "2_adds_useful_explanation": {
+      "answer": "yes",
+      "summary": "The deterministic read adds useful explanation by making narrow leadership, breadth caution and no-standalone-signal boundaries clearer than the concise legacy surface."
+    },
+    "3_client_surface_risk": {
+      "answer": "no_current_replay_risk_observed",
+      "summary": "The committed pilot/review artifacts do not show predictive wording, raw deterministic fields, internal labels or authority leakage; future live use still requires validators."
+    },
+    "4_bilingual_alignment": {
+      "answer": "yes",
+      "summary": "The deterministic English and Dutch surfaces are meaningfully aligned and both preserve the no-action boundary."
+    },
+    "5_no_action_boundary": {
+      "answer": "yes",
+      "summary": "The deterministic read explicitly states that no portfolio action, funding decision, lane score or allocation change follows from the pilot."
+    },
+    "6_would_change_portfolio_or_execution_if_active": {
+      "answer": "no",
+      "summary": "No. WP14 is not allowed to affect portfolio actions, scoring, fundability, execution, holdings, cash or delivery; the replay evidence shows the deterministic read remains narrative-review context only."
+    }
+  },
+  "validator_recommendations_before_future_promotion_decision": [
+    "tools/validate_macro_report_surface.py",
+    "tools/validate_etf_macro_thesis_surface_leakage.py",
+    "tools/validate_macro_compliance.py",
+    "tools/validate_etf_report_content_contract.py",
+    "tools/validate_etf_client_surface_clean.py",
+    "tools/validate_etf_delivery_html_contract.py",
+    "tools/validate_macro_regime_promotion_contract.py",
+    "tools/validate_deterministic_macro_read_promotion_review.py or equivalent coverage added to existing validators"
+  ],
+  "blockers": [],
+  "risk_notes": [
+    "This replay is based on committed artifacts and fixtures, not a new production render.",
+    "Future promotion would still require an explicit control-layer promotion decision and a separate report-integration work package.",
+    "No current evidence grants scoring, fundability, execution, delivery or portfolio-mutation authority."
+  ],
+  "conclusion": "shadow_replay_ready_for_promotion_decision_review",
+  "promotion_status_after_replay": "not_promoted",
+  "production_report_behavior_changed": false,
+  "scoring_changed": false,
+  "fundability_changed": false,
+  "execution_changed": false,
+  "delivery_changed": false,
+  "portfolio_state_changed": false,
+  "holdings_or_cash_changed": false,
+  "recommended_next_work_package": "WP15 — Historical artifact cleanup policy"
+}
