@@ -11,7 +11,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**ETF has a latest successful runtime-driven bilingual production baseline for run `20260610_211606` / report set `260610_02`, with pricing-lineage proof, 100.0% fresh holdings coverage, run-manifest evidence, delivery-manifest evidence, and marker-free replacement-edge diagnostic notes. The prior workflow run #216 / run `20260605_081216` remains historical evidence only and is no longer the current production baseline. The client-safe macro report surface is integrated through the macro policy pack, but the raw deterministic macro read remains non-client-facing and is not promoted as the official production regime source. WP13 added a deterministic macro promotion-review checklist only; it did not promote deterministic macro and did not mutate report behavior. Replacement-edge notes remain diagnostic-only and do not grant lane-scoring, fundability, recommendation, execution, or portfolio-mutation authority.**
+**ETF has a latest successful runtime-driven bilingual production baseline for run `20260610_211606` / report set `260610_02`, with pricing-lineage proof, 100.0% fresh holdings coverage, run-manifest evidence, delivery-manifest evidence, and marker-free replacement-edge diagnostic notes. The prior workflow run #216 / run `20260605_081216` remains historical evidence only and is no longer the current production baseline. The client-safe macro report surface is integrated through the macro policy pack, but the raw deterministic macro read remains non-client-facing and is not promoted as the official production regime source. WP13 added a deterministic macro promotion-review checklist only. WP14 added deterministic macro shadow replay evidence only. Neither WP13 nor WP14 promoted deterministic macro or mutated report behavior. Replacement-edge notes remain diagnostic-only and do not grant lane-scoring, fundability, recommendation, execution, or portfolio-mutation authority.**
 
 ## Latest production and report-surface evidence
 
@@ -152,7 +152,7 @@ macro_axis_scores
 macro_evidence
 ```
 
-Do not infer deterministic macro promotion from green validators, old-vs-new review readiness, client-safe macro surface presence, macro policy pack existence, prior pilot output, or prior review artifacts.
+Do not infer deterministic macro promotion from green validators, old-vs-new review readiness, client-safe macro surface presence, macro policy pack existence, prior pilot output, prior review artifacts, WP13 review checklist, or WP14 replay evidence.
 
 ### Completed or established deterministic macro packages
 
@@ -165,6 +165,7 @@ WP8 — old-vs-new macro review evidence: completed / ready_for_narrative_promot
 WP9 — controlled promotion artifact: completed / status=not_promoted
 WP10 — explicit promotion decision artifact: completed / status=not_promoted
 WP13 — deterministic macro read promotion review: completed / review-only / not promoted
+WP14 — deterministic macro read shadow replay evidence: completed / replay-only / not promoted
 ```
 
 WP13 artifact:
@@ -173,7 +174,27 @@ WP13 artifact:
 control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
 ```
 
-WP13 answers the required six promotion-review questions but does not grant narrative authority and does not mutate production report behavior.
+WP14 artifact:
+
+```text
+output/macro/replay/deterministic_macro_shadow_replay_20260612_000000.json
+```
+
+WP14 conclusion:
+
+```text
+shadow_replay_ready_for_promotion_decision_review
+promotion_status_after_replay=not_promoted
+production_report_behavior_changed=false
+scoring_changed=false
+fundability_changed=false
+execution_changed=false
+delivery_changed=false
+portfolio_state_changed=false
+holdings_or_cash_changed=false
+```
+
+WP13 and WP14 provide review evidence only. They do not grant narrative authority and do not mutate production report behavior.
 
 Standing deterministic macro authority boundary:
 
@@ -237,7 +258,8 @@ portfolio mutation
 - Deterministic macro remains review/control evidence only and is not promoted.
 - WP10 explicitly records `status=not_promoted`.
 - WP13 records promotion-review criteria only.
-- Green compliance, review readiness, macro policy pack existence, client-safe macro surface presence, prior pilot output, or prior review artifact does not equal production deterministic macro promotion.
+- WP14 records shadow replay evidence only.
+- Green compliance, review readiness, macro policy pack existence, client-safe macro surface presence, prior pilot output, prior review artifact, WP13 review criteria, or WP14 replay evidence does not equal production deterministic macro promotion.
 - WP5 replacement-edge scoring remains diagnostic-only.
 - Replacement-edge notes are client-visible diagnostics only and do not create allocation, scoring, fundability, recommendation, execution, or mutation authority.
 
@@ -257,12 +279,13 @@ output/delivery/weekly_etf_delivery_manifest_2026-06-10_20260610_211606.json
 output/macro/latest.json
 ```
 
-Macro promotion-preparation, review, and decision artifacts remain control/review artifacts only:
+Macro promotion-preparation, review, replay, and decision artifacts remain control/review artifacts only:
 
 ```text
 output/macro/shadow_narrative/macro_regime_shadow_narrative_<run_id>.json
 output/macro/pilot/macro_regime_client_surface_pilot_<run_id>.json
 output/macro/review/macro_old_vs_new_review_<run_id>.json
+output/macro/replay/deterministic_macro_shadow_replay_<run_id>.json
 output/macro/promotion/macro_regime_promotion_decision_<run_id>.json
 control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
 control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
@@ -292,7 +315,7 @@ The current `260610_02` client output is the latest report set. Old historical o
 
 Current production delivery evidence is the `20260610_211606` run-manifest and delivery-manifest pair. Delivery evidence remains delivery-layer evidence only unless a real end-recipient inbox receipt exists.
 
-WP13 created a control-layer review artifact only. It did not change report generation logic, scoring, portfolio state, macro authority, replacement-edge authority, historical output artifacts, delivery behavior, or execution behavior.
+WP14 created a replay evidence artifact only. It did not change report generation logic, scoring, portfolio state, macro authority, replacement-edge authority, historical output artifacts, delivery behavior, or execution behavior.
 
 ## Immediate priorities
 
@@ -307,12 +330,6 @@ The client-safe macro report surface is integrated, but deterministic macro read
 ### Priority C — proceed to the next roadmap package
 
 Next roadmap work should proceed as:
-
-```text
-WP14 — Deterministic macro read shadow replay evidence
-```
-
-After WP14, the likely next package remains:
 
 ```text
 WP15 — Historical artifact cleanup policy
