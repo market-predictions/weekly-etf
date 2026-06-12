@@ -62,8 +62,8 @@ def _is_already_executed(payload: dict[str, Any]) -> bool:
     return payload.get("execution_mode") == "guarded_auto" and payload.get("execution_status") == "already_executed"
 
 
-def _is_shadow_no_trade(payload: dict[str, Any], expected_mode: str) -> bool:
-    return expected_mode == "shadow" and payload.get("execution_mode") == "shadow" and payload.get("execution_status") == "no_trade_intents"
+def _is_no_trade_intents(payload: dict[str, Any], expected_mode: str) -> bool:
+    return payload.get("execution_mode") == expected_mode and payload.get("execution_status") == "no_trade_intents"
 
 
 def validate(path: Path, *, expected_mode: str, finalize_report: bool = True) -> None:
@@ -78,8 +78,11 @@ def validate(path: Path, *, expected_mode: str, finalize_report: bool = True) ->
         errors.append("policy_checks_not_passed:" + ";".join(policy.get("errors") or []))
     rows = payload.get("proposed_ledger_rows") or []
     shadow_positions = payload.get("shadow_positions") or []
-    if not _is_already_executed(payload) and not _is_shadow_no_trade(payload, expected_mode) and not rows:
+    no_trade_intents = _is_no_trade_intents(payload, expected_mode)
+    if not _is_already_executed(payload) and not no_trade_intents and not rows:
         errors.append("no_proposed_ledger_rows")
+    if no_trade_intents and rows:
+        errors.append("no_trade_intents_must_not_have_proposed_ledger_rows")
     if not shadow_positions:
         errors.append("no_shadow_positions")
     post = payload.get("post_trade_shadow_portfolio") or {}
@@ -99,7 +102,7 @@ def validate(path: Path, *, expected_mode: str, finalize_report: bool = True) ->
             errors.append("ledger_row_destination_delta_not_positive")
     if expected_mode == "guarded_auto":
         status = payload.get("execution_status")
-        if status not in {"executed", "already_executed"}:
+        if status not in {"executed", "already_executed", "no_trade_intents"}:
             errors.append(f"guarded_auto_not_executed:{status}")
         result = payload.get("guarded_auto_result") or {}
         if status == "executed":
@@ -122,6 +125,9 @@ def validate(path: Path, *, expected_mode: str, finalize_report: bool = True) ->
                 errors.append("already_executed_missing_idempotency_status")
             if result.get("portfolio_state_written") is True or result.get("trade_ledger_written") is True:
                 errors.append("already_executed_must_not_write_state_or_ledger")
+        elif status == "no_trade_intents":
+            if result.get("portfolio_state_written") is True or result.get("trade_ledger_written") is True:
+                errors.append("no_trade_intents_must_not_write_state_or_ledger")
     if errors:
         raise RuntimeError("ETF model execution validation failed for " + path.name + ": " + "; ".join(sorted(set(errors))))
     print(f"ETF_MODEL_EXECUTION_VALIDATION_OK | artifact={path.name} | mode={expected_mode} | status={payload.get('execution_status')} | trades={len(rows)} | positions={len(shadow_positions)}")
