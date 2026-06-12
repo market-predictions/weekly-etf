@@ -58,7 +58,7 @@ def render_equity_curve_svg(points: list[EquityPoint], *, language: str = "en") 
         label = f"{value:,.0f}".replace(",", "")
         y_grid.append(
             f'<line x1="{left}" y1="{y:.2f}" x2="{width-right}" y2="{y:.2f}" stroke="#d9d9d9" stroke-width="1" />'
-            f'<text x="{left-10}" y="{y+5:.2f}" text-anchor="end" class="tick">{html.escape(label)}</text>'
+            f'<text x="{left-10}" y="{y+5:.2f}" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#111">{html.escape(label)}</text>'
         )
 
     tick_indices = sorted({0, len(parsed) // 3, (2 * len(parsed)) // 3, len(parsed) - 1})
@@ -69,27 +69,22 @@ def render_equity_curve_svg(points: list[EquityPoint], *, language: str = "en") 
         label = date.strftime("%Y-%m-%d")
         x_ticks.append(
             f'<line x1="{x:.2f}" y1="{top}" x2="{x:.2f}" y2="{height-bottom}" stroke="#e5e5e5" stroke-width="1" />'
-            f'<text x="{x:.2f}" y="{height-bottom+24}" text-anchor="middle" class="tick">{html.escape(label)}</text>'
+            f'<text x="{x:.2f}" y="{height-bottom+24}" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#111">{html.escape(label)}</text>'
         )
 
     circles = "".join(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="5.2" fill="#1f77b4" />' for x, y in coords)
     return f"""
-<div class="equity-curve-svg-block" role="img" aria-label="{html.escape(title)}">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="100%" height="auto">
-<style>
-.equity-title {{ font: 700 20px Arial, sans-serif; fill: #111; }}
-.axis-label {{ font: 14px Arial, sans-serif; fill: #111; }}
-.tick {{ font: 12px Arial, sans-serif; fill: #111; }}
-</style>
+<div class="equity-curve-svg-block" style="width:100%; margin:8px 0 10px 0;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="{width}" height="{height}" preserveAspectRatio="xMidYMid meet" style="display:block; width:100%; height:auto; background:#ffffff;">
 <rect x="0" y="0" width="{width}" height="{height}" fill="#ffffff" />
-<text x="{width/2:.2f}" y="30" text-anchor="middle" class="equity-title">{html.escape(title)}</text>
+<text x="{width/2:.2f}" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#111">{html.escape(title)}</text>
 {''.join(y_grid)}
 {''.join(x_ticks)}
 <rect x="{left}" y="{top}" width="{plot_w}" height="{plot_h}" fill="none" stroke="#111" stroke-width="1.4" />
 <path d="{path_d}" fill="none" stroke="#1f77b4" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />
 {circles}
-<text x="{width/2:.2f}" y="{height-12}" text-anchor="middle" class="axis-label">{html.escape(x_label)}</text>
-<text transform="translate(18 {height/2:.2f}) rotate(-90)" text-anchor="middle" class="axis-label">{html.escape(y_label)}</text>
+<text x="{width/2:.2f}" y="{height-12}" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#111">{html.escape(x_label)}</text>
+<text transform="translate(18 {height/2:.2f}) rotate(-90)" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#111">{html.escape(y_label)}</text>
 </svg>
 </div>
 """.strip()
