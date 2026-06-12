@@ -25,6 +25,12 @@ control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
 control/MACRO_REPORT_SURFACE_STATUS.md
 ```
 
+For historical-output cleanup/archive questions, also read:
+
+```text
+control/HISTORICAL_ARTIFACT_CLEANUP_POLICY.md
+```
+
 ---
 
 ## Phase 1 — current production baseline
@@ -34,9 +40,6 @@ Latest fully recorded production evidence:
 ```text
 workflow: Send weekly ETF Pro report
 github_actions_run: 27306857013
-workflow_title: Retry ETF delivery after hiding replacement-edge marker
-workflow_status: completed
-workflow_conclusion: success
 artifact_commit: e2891ca
 requested_close_date: 2026-06-10
 run_id: 20260610_211606
@@ -75,17 +78,9 @@ Historical note: workflow run #216 / run `20260605_081216` remains historical ev
 
 ---
 
-## Phase 2 — deterministic macro roadmap status
+## Phase 2 — completed roadmap status
 
-Current macro boundary:
-
-```text
-client-safe macro report surface: integrated
-raw deterministic macro read: not client-facing
-deterministic macro read as official production regime source: not promoted
-```
-
-Completed deterministic macro packages:
+Completed deterministic macro and control-policy packages:
 
 ```text
 WP1 — Deterministic macro narrative shadow candidate: completed / not promoted
@@ -97,35 +92,26 @@ WP9 — Controlled deterministic macro narrative promotion artifact: completed /
 WP10 — Explicit deterministic macro narrative authority promotion decision: completed / status=not_promoted
 WP13 — Deterministic macro read promotion review: completed / review-only / not promoted
 WP14 — Deterministic macro read shadow replay evidence: completed / replay-only / not promoted
+WP15 — Historical artifact cleanup policy: completed / policy-only / no artifact mutation
 ```
 
-WP13 artifact:
+Key artifacts:
 
 ```text
 control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
-```
-
-WP14 replay artifact:
-
-```text
 output/macro/replay/deterministic_macro_shadow_replay_20260612_000000.json
+control/HISTORICAL_ARTIFACT_CLEANUP_POLICY.md
 ```
 
-WP14 replay conclusion:
+Current deterministic macro boundary:
 
 ```text
-shadow_replay_ready_for_promotion_decision_review
-promotion_status_after_replay=not_promoted
-production_report_behavior_changed=false
-scoring_changed=false
-fundability_changed=false
-execution_changed=false
-delivery_changed=false
-portfolio_state_changed=false
-holdings_or_cash_changed=false
+client-safe macro report surface: integrated
+raw deterministic macro read: not client-facing
+deterministic macro read as official production regime source: not promoted
 ```
 
-Do not infer deterministic macro promotion from green validators, review readiness, macro policy pack existence, client-safe macro surface presence, prior pilot output, WP13 review checklist, or WP14 replay evidence.
+Do not infer deterministic macro promotion from green validators, review readiness, macro policy pack existence, client-safe macro surface presence, prior pilot output, WP13 review checklist, WP14 replay evidence, or WP15 policy.
 
 Standing authority boundary:
 
@@ -154,30 +140,55 @@ The visible marker ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED is absent from
 
 Replacement-edge notes remain diagnostic-only and must not influence ranking, lane scoring, fundability, recommendations, target weights, trade intents, execution, or portfolio mutation.
 
-Older historical artifacts may still contain the old marker. Current delivery output is the fresh `260610_02` set. Do not rewrite historical output files without explicit approval.
+Older historical artifacts may still contain the old marker. Current delivery output is the fresh `260610_02` set.
 
 ---
 
-## Phase 4 — next roadmap package
+## Phase 4 — historical artifact policy
 
-### WP15 — Historical artifact cleanup policy
+WP15 policy status:
 
-- Owner: `[ASSISTANT]`
-- Status: next recommended package / not started
-- Goal:
-  ```text
-  Decide whether old generated outputs should remain immutable historical artifacts or whether the repo wants a controlled cleanup/archive policy.
-  ```
-- Rationale:
-  ```text
-  Old reports may still contain prior client-surface issues, including the old replacement-edge marker. Current generated outputs are clean, but repo-wide grep can still find old artifacts.
-  ```
-- Boundary:
-  - policy artifact only
-  - no bulk delete
-  - no rewrite of historical output files without explicit user approval
-  - no production report behavior change
-  - no scoring, fundability, delivery, execution, or portfolio-state change
+```text
+policy_status=cleanup_policy_defined_no_artifact_mutation
+historical_output_artifacts_are_immutable_by_default=true
+current_baseline_scope=manifest_linked_latest_report_set
+historical_output_mutation=false
+production_report_behavior_changed=false
+scoring_changed=false
+fundability_changed=false
+execution_changed=false
+delivery_changed=false
+portfolio_state_changed=false
+macro_authority_changed=false
+```
+
+Operational rule:
+
+```text
+Repo-wide grep can identify historical residue, but current production truth must be determined from CURRENT_STATE plus the latest manifest-linked report/runtime/pricing/delivery artifacts.
+```
+
+Do not rewrite, delete, or silently regenerate historical output files without a future explicit cleanup/archive work package.
+
+---
+
+## Phase 5 — next action
+
+There is no automatic cleanup or promotion task after WP15.
+
+Next step is a coordinator/user decision:
+
+```text
+Option 1 — stop and observe the clean current production baseline
+Option 2 — prepare an explicit deterministic macro promotion decision package
+Option 3 — define a scoped historical archive execution package, if grep noise becomes operationally blocking
+```
+
+Recommended default:
+
+```text
+Option 1 — stop and observe the clean current production baseline
+```
 
 ---
 
