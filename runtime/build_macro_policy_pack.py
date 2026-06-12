@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +21,7 @@ MACRO_CONTEXT_PATH = Path("config/etf_macro_fundamental_context.yml")
 MACRO_AUDIT_POINTER = Path("output/macro/latest_macro_data_audit_path.txt")
 MACRO_SOURCE_CONFIG = Path("config/macro_data_sources.yml")
 CB_CALENDAR_PATH = Path("config/cb_calendar.yml")
+ECB_JUNE_2026_HIKE_DATE = "2026-06-11"
 
 
 def latest_file(directory: Path, pattern: str) -> Path:
@@ -112,6 +113,21 @@ def _rs_3m(metrics: dict[str, Any], symbol: str) -> float:
     return _num(_metric(metrics, symbol).get("rs_vs_spy_3m_pct"), 0.0)
 
 
+def _date_or_none(value: str | None) -> date | None:
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(str(value)[:10])
+    except ValueError:
+        return None
+
+
+def _ecb_june_2026_hike_applies(report_date: str | None) -> bool:
+    report = _date_or_none(report_date)
+    hike = _date_or_none(ECB_JUNE_2026_HIKE_DATE)
+    return bool(report and hike and report >= hike)
+
+
 def classify_regime(metrics: dict[str, Any]) -> tuple[str, float, list[str]]:
     smh = _return_3m(metrics, "SMH")
     spy = _return_3m(metrics, "SPY")
@@ -138,25 +154,58 @@ def classify_regime(metrics: dict[str, Any]) -> tuple[str, float, list[str]]:
     return "Policy transition / mixed regime", 0.64, changes[:3] or ["No decisive full-regime break; allocation discipline remains more important than theme expansion."]
 
 
-def central_banks_for_regime(regime: str) -> dict[str, dict[str, Any]]:
+def central_banks_for_regime(regime: str, report_date: str | None = None) -> dict[str, dict[str, Any]]:
     restrictive_note = "Restrictive / data-dependent"
     neutral_note = "Neutral / transition"
+    ecb = {
+        "stance": neutral_note,
+        "likely_direction": "Gradual easing bias if inflation and growth allow",
+        "main_risk": "Europe may not outperform without earnings breadth and currency support.",
+        "etf_implication": "Non-U.S. developed exposure remains watchlist, not automatic add.",
+        "confidence": 0.55,
+    }
+    if _ecb_june_2026_hike_applies(report_date):
+        ecb = {
+            "stance": "Tightening / inflation-sensitive",
+            "likely_direction": "Rate hike delivered; the next step remains data- and inflation-dependent.",
+            "main_risk": "Renewed energy-led inflation pressure can raise the hurdle for rate-sensitive and non-U.S. developed-market exposure.",
+            "etf_implication": "IEFA exposure is now present, but further non-U.S. developed allocations still require relative-strength, pricing and portfolio-discipline confirmation.",
+            "confidence": 0.70,
+            "event_date": ECB_JUNE_2026_HIKE_DATE,
+            "event_status": "verified_report_week_policy_event",
+        }
     return {
         "fed": {"stance": restrictive_note if regime != "Rate-cut anticipation" else neutral_note, "likely_direction": "Hold-to-ease path, but timing remains data-dependent", "main_risk": "Real-rate repricing or delayed easing can pressure duration and speculative beta.", "etf_implication": "Prefer quality, profitable growth and cash discipline over weak balance-sheet beta.", "confidence": 0.65},
-        "ecb": {"stance": neutral_note, "likely_direction": "Gradual easing bias if inflation and growth allow", "main_risk": "Europe may not outperform without earnings breadth and currency support.", "etf_implication": "Non-U.S. developed exposure remains watchlist, not automatic add.", "confidence": 0.55},
+        "ecb": ecb,
         "boe": {"stance": neutral_note, "likely_direction": "Cautious easing bias", "main_risk": "Sticky services inflation keeps UK duration and cyclicals mixed.", "etf_implication": "No direct portfolio action unless UK exposure enters the universe.", "confidence": 0.45},
         "boj": {"stance": "Gradual normalization risk", "likely_direction": "Slow tightening / balance-sheet normalization risk", "main_risk": "A yield or yen shock can tighten global financial conditions.", "etf_implication": "Avoid treating long-duration exposure as automatically defensive.", "confidence": 0.50},
         "pboc": {"stance": "Supportive but credibility-sensitive", "likely_direction": "Targeted support rather than broad reflation unless confidence improves", "main_risk": "China stimulus disappointment can weigh on China beta and commodities.", "etf_implication": "China exposure remains tactical watchlist unless price confirmation improves.", "confidence": 0.55},
     }
 
 
-def policy_catalysts(metrics: dict[str, Any]) -> list[dict[str, Any]]:
-    return [
+def policy_catalysts(metrics: dict[str, Any], report_date: str | None = None) -> list[dict[str, Any]]:
+    catalysts = [
         {"policy_area": "AI infrastructure and semiconductor supply chains", "latest_signal": "Capital spending and strategic supply-chain policy continue to support semiconductor and infrastructure lanes.", "affected_lanes": ["AI compute infrastructure", "Grid buildout / electrification"], "direction": "supportive", "time_horizon": "3-12 months", "confidence": 0.72, "transfer_to_report": True},
         {"policy_area": "Defense and sovereign resilience", "latest_signal": "Defense-budget durability remains a structural support, but ETF vehicle choice still matters.", "affected_lanes": ["Defense innovation / sovereign resilience"], "direction": "supportive but implementation-sensitive", "time_horizon": "6-18 months", "confidence": 0.65, "transfer_to_report": True},
         {"policy_area": "Energy security and nuclear policy", "latest_signal": "Energy-security policy keeps uranium and nuclear infrastructure relevant, but timing remains price-confirmation dependent.", "affected_lanes": ["Uranium / nuclear fuel cycle"], "direction": "supportive but cyclical", "time_horizon": "6-24 months", "confidence": 0.60, "transfer_to_report": False},
         {"policy_area": "China stimulus and platform regulation", "latest_signal": "Support remains watchlist-relevant, but confidence and earnings confirmation are still required.", "affected_lanes": ["China platform beta", "EM equity beta"], "direction": "mixed", "time_horizon": "1-6 months", "confidence": 0.52, "transfer_to_report": False},
     ]
+    if _ecb_june_2026_hike_applies(report_date):
+        catalysts.insert(
+            0,
+            {
+                "policy_area": "ECB rate-policy tightening",
+                "latest_signal": "The ECB raised rates this week in response to renewed inflation pressure; this raises the hurdle for rate-sensitive and non-U.S. developed-market exposure but does not override pricing, relative-strength or portfolio-discipline gates.",
+                "affected_lanes": ["Non-U.S. developed diversification", "Rate-sensitive small caps", "Long-duration bonds"],
+                "direction": "restrictive / inflation-sensitive",
+                "time_horizon": "1-6 months",
+                "confidence": 0.70,
+                "event_date": ECB_JUNE_2026_HIKE_DATE,
+                "event_status": "verified_report_week_policy_event",
+                "transfer_to_report": True,
+            },
+        )
+    return catalysts
 
 
 def lane_adjustments(regime: str, metrics: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -165,7 +214,7 @@ def lane_adjustments(regime: str, metrics: dict[str, Any]) -> dict[str, dict[str
         "Grid buildout / electrification": {"score_adjustment": 0.10, "reason": "AI power demand and infrastructure policy support the grid lane; funding still depends on PAVE-vs-GRID duel evidence."},
         "Defense innovation / sovereign resilience": {"score_adjustment": 0.08, "reason": "Policy support is durable, but implementation quality remains the main decision bottleneck."},
         "Gold hedge review": {"score_adjustment": -0.06 if _return_3m(metrics, "GLD") < 0 else 0.04, "reason": "Gold must prove hedge behavior; macro status alone is not enough for fresh capital."},
-        "Non-U.S. developed diversification": {"score_adjustment": 0.04, "reason": "Diversification gap is real, but policy and relative-strength confirmation are not yet decisive."},
+        "Non-U.S. developed diversification": {"score_adjustment": 0.04, "reason": "Non-U.S. developed exposure is now present through IEFA, but additional allocation still needs policy, pricing and relative-strength confirmation."},
         "China platform beta": {"score_adjustment": -0.08, "reason": "Policy support is not yet enough to offset confidence and price-confirmation risk."},
         "Rate-sensitive small caps": {"score_adjustment": -0.10, "reason": "Current regime does not yet confirm broad small-cap risk appetite."},
     }
@@ -181,72 +230,17 @@ def portfolio_implications(regime: str) -> list[str]:
 
 def _field_authority_contract() -> dict[str, dict[str, Any]]:
     return {
-        "regime": {
-            "authority_class": "client_safe_descriptive_legacy",
-            "client_surface_allowed": True,
-            "decision_authority": "descriptive_only",
-            "notes": ["May be shown as current descriptive regime wording through the client-safe macro report surface.", "Does not by itself authorize lane scoring, fundability, or trades."],
-        },
-        "confidence_decomposition": {
-            "authority_class": "shadow_explanation",
-            "client_surface_allowed": False,
-            "decision_authority": "none_shadow_explanation_only",
-            "notes": ["Internal explanation of legacy confidence only; do not expose components directly in client reports."],
-        },
-        "central_banks": {
-            "authority_class": "client_safe_descriptive_policy_context",
-            "client_surface_allowed": True,
-            "decision_authority": "descriptive_only",
-            "notes": ["May be paraphrased as policy context; it cannot create portfolio action by itself."],
-        },
-        "macro_signals": {
-            "authority_class": "internal_evidence_context",
-            "client_surface_allowed": False,
-            "decision_authority": "none_internal_evidence_only",
-            "notes": ["Internal evidence layer; only sanitized summaries may transfer through report_transfer and macro_report_surface."],
-        },
-        "policy_catalysts": {
-            "authority_class": "client_safe_descriptive_catalyst_context",
-            "client_surface_allowed": True,
-            "decision_authority": "descriptive_only",
-            "notes": ["Only catalysts explicitly marked transfer_to_report=true may be surfaced."],
-        },
-        "portfolio_implications": {
-            "authority_class": "client_safe_discipline_context",
-            "client_surface_allowed": True,
-            "decision_authority": "descriptive_only",
-            "notes": ["May describe discipline and review implications; does not authorize trades without portfolio gates."],
-        },
-        "lane_adjustments": {
-            "authority_class": "legacy_compatibility_decision_input",
-            "client_surface_allowed": False,
-            "decision_authority": "legacy_lane_adjustments_only",
-            "notes": ["Maintained for backward-compatible lane discovery only; not a promotion of deterministic regime output."],
-        },
-        "macro_data_audit_summary": {
-            "authority_class": "shadow_provenance_only",
-            "client_surface_allowed": False,
-            "decision_authority": "none_phase2_audit_only",
-            "notes": ["Audit summary may support provenance review but cannot set regime or portfolio authority."],
-        },
-        "deterministic_regime_shadow": {
-            "authority_class": "shadow_comparison_only",
-            "client_surface_allowed": False,
-            "decision_authority": "none_shadow_comparison_only",
-            "notes": ["Raw macro_axes, macro_axis_scores, macro_evidence and shadow regime output must not enter client reports or decisions."],
-        },
-        "active_drivers": {
-            "authority_class": "stage1_thesis_shadow_only",
-            "client_surface_allowed": False,
-            "decision_authority": "none_wp9_not_promoted",
-            "notes": ["Stage-1 drivers are internal only until Stage-2 confirmation and explicit promotion."],
-        },
-        "report_transfer": {
-            "authority_class": "client_surface_filter",
-            "client_surface_allowed": True,
-            "decision_authority": "output_contract_only",
-            "notes": ["Limits what descriptive macro content can reach the report; does not add investment authority."],
-        },
+        "regime": {"authority_class": "client_safe_descriptive_legacy", "client_surface_allowed": True, "decision_authority": "descriptive_only", "notes": ["May be shown as current descriptive regime wording through the client-safe macro report surface.", "Does not by itself authorize lane scoring, fundability, or trades."]},
+        "confidence_decomposition": {"authority_class": "shadow_explanation", "client_surface_allowed": False, "decision_authority": "none_shadow_explanation_only", "notes": ["Internal explanation of legacy confidence only; do not expose components directly in client reports."]},
+        "central_banks": {"authority_class": "client_safe_descriptive_policy_context", "client_surface_allowed": True, "decision_authority": "descriptive_only", "notes": ["May be paraphrased as policy context; it cannot create portfolio action by itself."]},
+        "macro_signals": {"authority_class": "internal_evidence_context", "client_surface_allowed": False, "decision_authority": "none_internal_evidence_only", "notes": ["Internal evidence layer; only sanitized summaries may transfer through report_transfer and macro_report_surface."]},
+        "policy_catalysts": {"authority_class": "client_safe_descriptive_catalyst_context", "client_surface_allowed": True, "decision_authority": "descriptive_only", "notes": ["Only catalysts explicitly marked transfer_to_report=true may be surfaced."]},
+        "portfolio_implications": {"authority_class": "client_safe_discipline_context", "client_surface_allowed": True, "decision_authority": "descriptive_only", "notes": ["May describe discipline and review implications; does not authorize trades without portfolio gates."]},
+        "lane_adjustments": {"authority_class": "legacy_compatibility_decision_input", "client_surface_allowed": False, "decision_authority": "legacy_lane_adjustments_only", "notes": ["Maintained for backward-compatible lane discovery only; not a promotion of deterministic regime output."]},
+        "macro_data_audit_summary": {"authority_class": "shadow_provenance_only", "client_surface_allowed": False, "decision_authority": "none_phase2_audit_only", "notes": ["Audit summary may support provenance review but cannot set regime or portfolio authority."]},
+        "deterministic_regime_shadow": {"authority_class": "shadow_comparison_only", "client_surface_allowed": False, "decision_authority": "none_shadow_comparison_only", "notes": ["Raw macro_axes, macro_axis_scores, macro_evidence and shadow regime output must not enter client reports or decisions."]},
+        "active_drivers": {"authority_class": "stage1_thesis_shadow_only", "client_surface_allowed": False, "decision_authority": "none_wp9_not_promoted", "notes": ["Stage-1 drivers are internal only until Stage-2 confirmation and explicit promotion."]},
+        "report_transfer": {"authority_class": "client_surface_filter", "client_surface_allowed": True, "decision_authority": "output_contract_only", "notes": ["Limits what descriptive macro content can reach the report; does not add investment authority."]},
     }
 
 
@@ -278,26 +272,8 @@ def _promotion_gates_contract() -> dict[str, Any]:
 
 def _macro_audit_summary(macro_data_audit_path: Path | None, macro_data_audit: dict[str, Any]) -> dict[str, Any]:
     if macro_data_audit_path is None:
-        return {
-            "present": False,
-            "status": "shadow_unavailable",
-            "mode": "none",
-            "reference_date": None,
-            "observation_count": 0,
-            "shadow_only": True,
-            "client_facing_authority": False,
-            "decision_impact": "none_phase2_audit_only",
-        }
-    return {
-        "present": bool(macro_data_audit),
-        "status": macro_data_audit.get("status"),
-        "mode": macro_data_audit.get("mode"),
-        "reference_date": macro_data_audit.get("reference_date"),
-        "observation_count": (macro_data_audit.get("summary") or {}).get("observation_count"),
-        "shadow_only": True,
-        "client_facing_authority": False,
-        "decision_impact": "none_phase2_audit_only",
-    }
+        return {"present": False, "status": "shadow_unavailable", "mode": "none", "reference_date": None, "observation_count": 0, "shadow_only": True, "client_facing_authority": False, "decision_impact": "none_phase2_audit_only"}
+    return {"present": bool(macro_data_audit), "status": macro_data_audit.get("status"), "mode": macro_data_audit.get("mode"), "reference_date": macro_data_audit.get("reference_date"), "observation_count": (macro_data_audit.get("summary") or {}).get("observation_count"), "shadow_only": True, "client_facing_authority": False, "decision_impact": "none_phase2_audit_only"}
 
 
 def _confidence_decomposition(regime: str, confidence: float, metrics: dict[str, Any]) -> dict[str, Any]:
@@ -306,19 +282,8 @@ def _confidence_decomposition(regime: str, confidence: float, metrics: dict[str,
         "shadow_only": True,
         "client_facing_authority": False,
         "decision_impact": "none_shadow_explanation_only",
-        "components": {
-            "legacy_confidence": confidence,
-            "SMH_return_3m_pct": _return_3m(metrics, "SMH"),
-            "SPY_return_3m_pct": _return_3m(metrics, "SPY"),
-            "IWM_rs_vs_SPY_3m_pct": _rs_3m(metrics, "IWM"),
-            "GLD_return_3m_pct": _return_3m(metrics, "GLD"),
-            "TLT_return_3m_pct": _return_3m(metrics, "TLT"),
-        },
-        "notes": [
-            "This is a compatibility decomposition for the legacy proxy regime path.",
-            "Deterministic derived confidence is planned for Phase 3 and is not yet production authority.",
-            f"Current legacy regime label: {regime}",
-        ],
+        "components": {"legacy_confidence": confidence, "SMH_return_3m_pct": _return_3m(metrics, "SMH"), "SPY_return_3m_pct": _return_3m(metrics, "SPY"), "IWM_rs_vs_SPY_3m_pct": _rs_3m(metrics, "IWM"), "GLD_return_3m_pct": _return_3m(metrics, "GLD"), "TLT_return_3m_pct": _return_3m(metrics, "TLT")},
+        "notes": ["This is a compatibility decomposition for the legacy proxy regime path.", "Deterministic derived confidence is planned for Phase 3 and is not yet production authority.", f"Current legacy regime label: {regime}"],
     }
 
 
@@ -357,18 +322,18 @@ def build_pack(pricing_audit_path: Path, relative_strength_path: Path, macro_con
         "macro_data_audit_summary": _macro_audit_summary(macro_data_audit_path, macro_data_audit),
         "regime": {"current": regime, "previous": macro_context.get("previous_regime", "Unknown"), "confidence": confidence, "confidence_source": "legacy_proxy_static", "what_changed": what_changed},
         "confidence_decomposition": _confidence_decomposition(regime, confidence, metrics),
-        "central_banks": central_banks_for_regime(regime),
+        "central_banks": central_banks_for_regime(regime, report_date),
         "macro_signals": {
             "equity_leadership": {"signal": "narrow_ai_leadership" if regime == "Risk-on narrow leadership" else "mixed", "evidence": {"SMH_return_3m_pct": _return_3m(metrics, "SMH"), "SPY_return_3m_pct": _return_3m(metrics, "SPY"), "IWM_rs_vs_SPY_3m_pct": _rs_3m(metrics, "IWM")}},
             "duration": {"signal": "not_confirmed_as_tailwind" if _return_3m(metrics, "TLT") <= 0 else "supportive", "evidence": {"TLT_return_3m_pct": _return_3m(metrics, "TLT")}},
             "hedge_ballast": {"signal": "under_review" if _return_3m(metrics, "GLD") <= 0 else "supportive", "evidence": {"GLD_return_3m_pct": _return_3m(metrics, "GLD")}},
         },
-        "policy_catalysts": policy_catalysts(metrics),
+        "policy_catalysts": policy_catalysts(metrics, report_date),
         "cross_asset_confirmation": ["Semiconductor leadership supports SMH, but SPY overlap must remain explicit.", "Small-cap and duration signals are not strong enough to justify broad beta expansion.", "Gold is treated as a hedge review item unless price behavior improves."],
         "portfolio_implications": portfolio_implications(regime),
         "lane_adjustments": lane_adjustments(regime, metrics),
         "active_drivers": _active_drivers_placeholder(),
-        "report_transfer": {"max_what_changed_bullets": 3, "max_portfolio_implications": 3, "max_policy_catalysts": 2, "style_rule": "Transfer only decision-relevant macro information. Do not dump the full research pack into the report."},
+        "report_transfer": {"max_what_changed_bullets": 3, "max_portfolio_implications": 3, "max_policy_catalysts": 3, "style_rule": "Transfer only decision-relevant macro information. Do not dump the full research pack into the report."},
     }
     pack["regime_memory"] = update_regime_memory(pack)
     _validate_pack(pack)
