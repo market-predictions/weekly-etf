@@ -55,6 +55,10 @@ SECTION_BADGE_REPLACEMENT_DUEL_RE = re.compile(
     r"(<span\s+class=['\"]section-badge['\"]>)\s*11\s*(</span>\s*</td>\s*<td\s+class=['\"]section-label-cell['\"]>\s*<span\s+class=['\"]section-label['\"]>\s*Replacement Duel Table\s*</span>)",
     re.IGNORECASE,
 )
+EMPTY_COMMENT_ARTIFACT_RE = re.compile(
+    r"(?:<p[^>]*>\s*)?(?:&lt;!|<!)\s*--\s*--\s*(?:&gt;|>)(?:\s*</p>)?",
+    re.IGNORECASE,
+)
 HERO_LAYOUT_GUARD_CSS = """
 <style id="etf-hero-layout-guard">
   .summary-strip .mini-card {
@@ -183,6 +187,10 @@ def _apply_global_client_token_replacements(html: str) -> str:
     return html
 
 
+def remove_empty_comment_artifacts(html: str) -> str:
+    return EMPTY_COMMENT_ARTIFACT_RE.sub("", html).replace("&lt;!-- --&gt;", "").replace("<!-- -->", "")
+
+
 def inject_hero_layout_guard(html: str) -> str:
     if "etf-hero-layout-guard" in html:
         return html
@@ -290,6 +298,7 @@ def remove_duplicate_replacement_duel_panel(html: str) -> str:
 def sanitize_client_facing_html(html: str, *, md_text: str | None = None, language: str | None = None) -> str:
     """Remove internal/runtime placeholder language from final client-facing HTML."""
     resolved_language = language or ("nl" if looks_dutch_markdown(md_text) else "en")
+    html = remove_empty_comment_artifacts(html)
     html = remove_duplicate_replacement_duel_panel(html)
     html = suppress_duplicate_executive_panel(html, language=resolved_language)
     html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
@@ -297,6 +306,7 @@ def sanitize_client_facing_html(html: str, *, md_text: str | None = None, langua
     html = convert_residual_markdown_links(html)
     if resolved_language == "nl":
         html = localize_dutch_delivery_html(html)
+    html = remove_empty_comment_artifacts(html)
     html = remove_duplicate_replacement_duel_panel(html)
     html = suppress_duplicate_executive_panel(html, language=resolved_language)
     html = replace_hero_cards_from_markdown(html, md_text, resolved_language)
@@ -305,7 +315,7 @@ def sanitize_client_facing_html(html: str, *, md_text: str | None = None, langua
     html = _apply_global_client_token_replacements(html)
     html = convert_residual_markdown_links(html)
     html = remove_duplicate_replacement_duel_panel(html)
-    return html
+    return remove_empty_comment_artifacts(html)
 
 
 def validate_dutch_delivery_language(html: str, report_name: str) -> None:
