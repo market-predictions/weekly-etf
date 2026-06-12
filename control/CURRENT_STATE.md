@@ -11,7 +11,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**ETF has a latest successful runtime-driven bilingual production baseline for run `20260610_211606` / report set `260610_02`, with pricing-lineage proof, 100.0% fresh holdings coverage, run-manifest evidence, delivery-manifest evidence, and marker-free replacement-edge diagnostic notes. The prior workflow run #216 / run `20260605_081216` remains historical evidence only and is no longer the current production baseline. The client-safe macro report surface is integrated through the macro policy pack, but the raw deterministic macro read remains non-client-facing and is not promoted as the official production regime source. WP13 added a deterministic macro promotion-review checklist only. WP14 added deterministic macro shadow replay evidence only. Neither WP13 nor WP14 promoted deterministic macro or mutated report behavior. Replacement-edge notes remain diagnostic-only and do not grant lane-scoring, fundability, recommendation, execution, or portfolio-mutation authority.**
+**ETF has a latest successful runtime-driven bilingual production baseline for run `20260610_211606` / report set `260610_02`, with pricing-lineage proof, 100.0% fresh holdings coverage, run-manifest evidence, delivery-manifest evidence, and marker-free replacement-edge diagnostic notes. The prior workflow run #216 / run `20260605_081216` remains historical evidence only and is no longer the current production baseline. The client-safe macro report surface is integrated through the macro policy pack, but the raw deterministic macro read remains non-client-facing and is not promoted as the official production regime source. WP13, WP14, and WP15 are review/policy packages only; they did not promote deterministic macro, mutate report behavior, or rewrite historical outputs. Historical output artifacts are immutable by default under WP15. Replacement-edge notes remain diagnostic-only and do not grant lane-scoring, fundability, recommendation, execution, or portfolio-mutation authority.**
 
 ## Latest production and report-surface evidence
 
@@ -61,46 +61,47 @@ URNM
 XLU
 ```
 
-## Recent completed fixes in the current baseline
+## Current output and historical-artifact status
 
-### GLD stale surface cleanup
-
-```text
-status: completed / current output clean
-relevant files:
-- runtime/render_etf_report_nl_from_state.py
-- runtime/fix_report_output_contract.py
-- tests/test_post_execution_replacement_note.py
-```
-
-Native Dutch and post-execution surfaces now derive hedge/replacement wording from active state instead of hardcoded GLD wording. GLD is not treated as a current holding in the latest production baseline.
-
-### Valuation-history stale comment cleanup
+The current report set is:
 
 ```text
-status: completed / current output clean
-relevant files:
-- runtime/fix_report_output_contract.py
-- tests/test_valuation_history_comment_scrub.py
-```
-
-Section 7 valuation comments are sanitized before final English/Dutch output so stale comments such as GLD/PPA carried-forward wording do not surface in the current client reports.
-
-### Replacement-edge diagnostic notes marker cleanup
-
-```text
-status: completed / verified successful in current 260610_02 baseline
+260610_02
 ```
 
 The visible marker `ETF_REPLACEMENT_EDGE_DIAGNOSTIC_NOTES_EMBEDDED` is absent from the current `260610_02` Markdown / clean Markdown / HTML / PDF surfaces.
 
-The diagnostic-only authority disclaimer remains present.
+Older historical artifacts such as `260609_06`, `260609_07`, and early `260610` outputs may still contain prior client-surface issues. They are historical artifacts and should not be treated as current delivery output.
 
-Older historical artifacts such as `260609_06`, `260609_07`, and early `260610` outputs may still contain prior client-surface issues. They are historical artifacts and should not be treated as current delivery output. Do not bulk-edit or rewrite them unless explicitly authorized.
+WP15 policy artifact:
+
+```text
+control/HISTORICAL_ARTIFACT_CLEANUP_POLICY.md
+```
+
+WP15 policy status:
+
+```text
+policy_status=cleanup_policy_defined_no_artifact_mutation
+historical_output_artifacts_are_immutable_by_default=true
+current_baseline_scope=manifest_linked_latest_report_set
+historical_output_mutation=false
+production_report_behavior_changed=false
+scoring_changed=false
+fundability_changed=false
+execution_changed=false
+delivery_changed=false
+portfolio_state_changed=false
+macro_authority_changed=false
+```
+
+Operational rule:
+
+```text
+Repo-wide grep can identify historical residue, but current production truth must be determined from CURRENT_STATE plus the latest manifest-linked report/runtime/pricing/delivery artifacts.
+```
 
 ## Macro roadmap implementation status
-
-### Integrated macro surface
 
 The production report is integrated with the macro policy pack through a client-safe report surface:
 
@@ -112,30 +113,7 @@ runtime.build_macro_policy_pack
   -> English/Dutch report sections
 ```
 
-Current report content may include client-safe macro-derived content such as:
-
-```text
-Primary regime
-Secondary cross-current
-Regime Dashboard
-Fed/ECB stance
-policy/geopolitical status
-policy catalysts
-macro filters in the Structural Opportunity Radar
-```
-
-Relevant validation evidence from the latest marker-cleanup baseline:
-
-```text
-ETF_MACRO_REPORT_SURFACE_OK
-ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK
-```
-
-### Deterministic macro read boundary
-
-The raw deterministic macro read is not the official production regime source.
-
-Current state:
+Current deterministic macro state:
 
 ```text
 macro report surface: integrated as client-safe only
@@ -143,18 +121,9 @@ deterministic macro read as raw/shadow object: not client-facing
 deterministic macro read as official decision/regime source: not promoted
 ```
 
-Raw deterministic fields such as the following must not appear in client reports:
+Do not infer deterministic macro promotion from green validators, old-vs-new review readiness, client-safe macro surface presence, macro policy pack existence, prior pilot output, prior review artifacts, WP13 review checklist, WP14 replay evidence, or WP15 historical-artifact policy.
 
-```text
-deterministic_regime_shadow
-macro_axes
-macro_axis_scores
-macro_evidence
-```
-
-Do not infer deterministic macro promotion from green validators, old-vs-new review readiness, client-safe macro surface presence, macro policy pack existence, prior pilot output, prior review artifacts, WP13 review checklist, or WP14 replay evidence.
-
-### Completed or established deterministic macro packages
+Completed or established deterministic macro packages:
 
 ```text
 WP1 — deterministic macro narrative shadow candidate: completed / not promoted
@@ -166,35 +135,16 @@ WP9 — controlled promotion artifact: completed / status=not_promoted
 WP10 — explicit promotion decision artifact: completed / status=not_promoted
 WP13 — deterministic macro read promotion review: completed / review-only / not promoted
 WP14 — deterministic macro read shadow replay evidence: completed / replay-only / not promoted
+WP15 — historical artifact cleanup policy: completed / policy-only / no artifact mutation
 ```
 
-WP13 artifact:
+Review and policy artifacts:
 
 ```text
 control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
-```
-
-WP14 artifact:
-
-```text
 output/macro/replay/deterministic_macro_shadow_replay_20260612_000000.json
+control/HISTORICAL_ARTIFACT_CLEANUP_POLICY.md
 ```
-
-WP14 conclusion:
-
-```text
-shadow_replay_ready_for_promotion_decision_review
-promotion_status_after_replay=not_promoted
-production_report_behavior_changed=false
-scoring_changed=false
-fundability_changed=false
-execution_changed=false
-delivery_changed=false
-portfolio_state_changed=false
-holdings_or_cash_changed=false
-```
-
-WP13 and WP14 provide review evidence only. They do not grant narrative authority and do not mutate production report behavior.
 
 Standing deterministic macro authority boundary:
 
@@ -210,17 +160,6 @@ delivery_authority=false
 execution_authority=false
 production_report_mutation=false
 ```
-
-Future deterministic macro work must be framed as one of:
-
-```text
-1. Shadow-quality improvement only
-2. Promotion-decision preparation only
-3. Explicit control-layer promotion decision
-4. Separate production report integration after promotion
-```
-
-Do not combine those into one implicit change.
 
 ## Replacement-edge authority boundary
 
@@ -238,18 +177,7 @@ execution_authority=false
 portfolio_mutation=false
 ```
 
-Replacement-edge diagnostics must not be promoted into:
-
-```text
-ranking
-lane scoring
-fundability
-recommendation
-target weights
-trade intents
-execution
-portfolio mutation
-```
+Replacement-edge diagnostics must not be promoted into ranking, lane scoring, fundability, recommendation, target weights, trade intents, execution, or portfolio mutation.
 
 ## Four-layer operating status
 
@@ -259,9 +187,8 @@ portfolio mutation
 - WP10 explicitly records `status=not_promoted`.
 - WP13 records promotion-review criteria only.
 - WP14 records shadow replay evidence only.
-- Green compliance, review readiness, macro policy pack existence, client-safe macro surface presence, prior pilot output, prior review artifact, WP13 review criteria, or WP14 replay evidence does not equal production deterministic macro promotion.
-- WP5 replacement-edge scoring remains diagnostic-only.
-- Replacement-edge notes are client-visible diagnostics only and do not create allocation, scoring, fundability, recommendation, execution, or mutation authority.
+- WP15 records historical-artifact cleanup policy only.
+- Historical output artifacts are immutable by default unless a future explicit cleanup/archive work package authorizes a scoped change.
 
 ### 2. Input/state contract
 
@@ -279,35 +206,11 @@ output/delivery/weekly_etf_delivery_manifest_2026-06-10_20260610_211606.json
 output/macro/latest.json
 ```
 
-Macro promotion-preparation, review, replay, and decision artifacts remain control/review artifacts only:
-
-```text
-output/macro/shadow_narrative/macro_regime_shadow_narrative_<run_id>.json
-output/macro/pilot/macro_regime_client_surface_pilot_<run_id>.json
-output/macro/review/macro_old_vs_new_review_<run_id>.json
-output/macro/replay/deterministic_macro_shadow_replay_<run_id>.json
-output/macro/promotion/macro_regime_promotion_decision_<run_id>.json
-control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
-control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
-```
+Review, replay, policy, and promotion artifacts remain control/review artifacts only unless explicitly promoted through a later contract.
 
 ### 3. Output contract
 
-The report pipeline must continue to protect:
-
-```text
-pricing lineage
-runtime-state authority
-bilingual English/Dutch output
-Dutch terminology contract
-ticker linkification
-client-surface scrub
-macro/thesis leakage guard
-replacement-edge diagnostic-only boundary
-delivery HTML contract
-delivery manifest summary
-run manifest summary
-```
+The report pipeline must continue to protect pricing lineage, runtime-state authority, bilingual output, Dutch terminology, ticker linkification, client-surface scrub, macro/thesis leakage guard, replacement-edge diagnostic-only boundary, delivery HTML contract, delivery manifest summary, and run manifest summary.
 
 The current `260610_02` client output is the latest report set. Old historical outputs are not current production truth.
 
@@ -315,22 +218,28 @@ The current `260610_02` client output is the latest report set. Old historical o
 
 Current production delivery evidence is the `20260610_211606` run-manifest and delivery-manifest pair. Delivery evidence remains delivery-layer evidence only unless a real end-recipient inbox receipt exists.
 
-WP14 created a replay evidence artifact only. It did not change report generation logic, scoring, portfolio state, macro authority, replacement-edge authority, historical output artifacts, delivery behavior, or execution behavior.
+WP15 created a policy artifact only. It did not rewrite historical outputs, change report generation logic, scoring, portfolio state, macro authority, replacement-edge authority, delivery behavior, or execution behavior.
 
 ## Immediate priorities
 
 ### Priority A — preserve pricing-lineage and delivery-evidence discipline
 
-Do not weaken pricing lineage, manifest, official portfolio-state, or delivery-evidence boundaries. Delivery evidence remains SMTP-send/report-generation evidence unless a real receipt exists.
+Do not weaken pricing lineage, manifest, official portfolio-state, or delivery-evidence boundaries.
 
 ### Priority B — preserve deterministic macro `not_promoted` boundary
 
-The client-safe macro report surface is integrated, but deterministic macro read remains outside official production regime authority. Any future production deterministic macro integration requires a future explicit control-layer promotion decision and a separate report-integration work package.
+Any future production deterministic macro integration requires a future explicit control-layer promotion decision and a separate report-integration work package.
 
-### Priority C — proceed to the next roadmap package
+### Priority C — preserve historical-output immutability by default
 
-Next roadmap work should proceed as:
+Do not rewrite or delete historical generated outputs unless a future explicit cleanup/archive work package defines exact scope, traceability, rollback, and current-baseline verification.
+
+### Priority D — next action
+
+There is no automatic cleanup or promotion task after WP15. The next step is a coordinator/user decision:
 
 ```text
-WP15 — Historical artifact cleanup policy
+Option 1 — stop and observe the clean current production baseline
+Option 2 — prepare an explicit deterministic macro promotion decision package
+Option 3 — define a scoped historical archive execution package, if grep noise becomes operationally blocking
 ```
