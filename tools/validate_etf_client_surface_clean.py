@@ -20,6 +20,9 @@ NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 EMPTY_COMMENT_RE = re.compile(r"(?:&lt;!|<!)\s*--\s*--\s*(?:&gt;|>)", re.IGNORECASE)
 DUTCH_RESIDUE_EN_RE = re.compile(r"\bn\.v\.t\.\b", re.IGNORECASE)
 REMOVED_MARKDOWN_GUARD_MARKER = "wp16-nl-equity-curve-guard"
+CHART_PLACEHOLDER = "`EQUITY_CURVE_CHART_PLACEHOLDER`"
+NL_PRICING_HEADING = "### Gebruikte slotkoersen in dit rapport"
+EN_PRICING_HEADING = "### Closing prices used in this report"
 
 
 def _explicit_path(env_name: str, pattern: re.Pattern[str]) -> Path | None:
@@ -62,6 +65,19 @@ def _current_files(output_dir: Path) -> list[Path]:
     return paths
 
 
+def _move_chart_before_pricing_disclosure(text: str, language: str) -> str:
+    heading = NL_PRICING_HEADING if language == "nl" else EN_PRICING_HEADING
+    chart_pos = text.find(CHART_PLACEHOLDER)
+    heading_pos = text.find(heading)
+    if chart_pos == -1 or heading_pos == -1 or chart_pos < heading_pos:
+        return text
+    without_chart = text[:chart_pos].rstrip() + "\n\n" + text[chart_pos + len(CHART_PLACEHOLDER):].lstrip()
+    heading_pos = without_chart.find(heading)
+    if heading_pos == -1:
+        return without_chart + "\n\n" + CHART_PLACEHOLDER + "\n"
+    return without_chart[:heading_pos].rstrip() + "\n\n" + CHART_PLACEHOLDER + "\n\n" + without_chart[heading_pos:].lstrip()
+
+
 def _apply_nl_equity_curve_guard(text: str, path: Path) -> str:
     """Compatibility shim only; production must not inject CSS or markers into Markdown."""
     return text
@@ -69,7 +85,10 @@ def _apply_nl_equity_curve_guard(text: str, path: Path) -> str:
 
 def _scrub_file(path: Path) -> None:
     original = path.read_text(encoding="utf-8", errors="ignore")
-    cleaned = clean_text(original, language=_language_for_path(path))
+    language = _language_for_path(path)
+    cleaned = clean_text(original, language=language)
+    if path.suffix == ".md":
+        cleaned = _move_chart_before_pricing_disclosure(cleaned, language)
     if cleaned != original:
         path.write_text(cleaned, encoding="utf-8")
         print(f"ETF_CLIENT_SURFACE_RESIDUAL_SCRUBBED | file={path.name}")
