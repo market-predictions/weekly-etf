@@ -1,0 +1,100 @@
+{
+  "authority": {
+    "decision_framework": "macro audit foundation only; no allocation decision authority",
+    "input_state_contract": "all values carry source, series_id, as_of_date, fetched_at_utc, and staleness_days",
+    "operational_runbook": "raise an error when required source groups are missing or stale",
+    "output_contract": "internal JSON audit artifact only"
+  },
+  "central_bank_calendar": {
+    "status": "fixture"
+  },
+  "generated_at_utc": "2026-06-13T18:45:13.916444+00:00",
+  "mode": "fixture",
+  "observations": [
+    {
+      "as_of_date": "2026-05-29",
+      "category": "rates",
+      "fetched_at_utc": "2026-05-31T12:00:00+00:00",
+      "key": "us_10y_yield",
+      "label": "US 10Y Treasury constant maturity yield",
+      "max_staleness_days": 7,
+      "series_id": "DGS10",
+      "source": "fred",
+      "staleness_days": 2,
+      "status": "fresh",
+      "units": "percent",
+      "value": 4.42
+    },
+    {
+      "as_of_date": "2026-05-29",
+      "category": "fx",
+      "fetched_at_utc": "2026-05-31T12:00:00+00:00",
+      "key": "ecb_eurusd_reference",
+      "label": "ECB euro foreign exchange reference rate \u2014 USD per EUR",
+      "max_staleness_days": 7,
+      "series_id": "EXR/D.USD.EUR.SP00.A",
+      "source": "ecb",
+      "staleness_days": 2,
+      "status": "fresh",
+      "units": "USD per EUR",
+      "value": 1.1661
+    },
+    {
+      "as_of_date": "2026-05-29",
+      "category": "rates",
+      "fetched_at_utc": "2026-05-31T12:00:00+00:00",
+      "key": "treasury_10y_yield",
+      "label": "US Treasury 10-year par yield",
+      "max_staleness_days": 7,
+      "series_id": "fiscaldata.daily_treasury_rates.bc_10year",
+      "source": "treasury_fiscaldata",
+      "staleness_days": 2,
+      "status": "fresh",
+      "units": "percent",
+      "value": 4.43
+    },
+    {
+      "as_of_date": "2026-05-29",
+      "category": "volatility",
+      "fetched_at_utc": "2026-05-31T12:00:00+00:00",
+      "key": "vix_close",
+      "label": "CBOE Volatility Index close",
+      "max_staleness_days": 7,
+      "series_id": "CBOE/VIX",
+      "source": "cboe",
+      "staleness_days": 2,
+      "status": "fresh",
+      "units": "index",
+      "value": 18.5
+    }
+  ],
+  "reference_date": "2026-05-31",
+  "report_token": "260531",
+  "required_source_groups": [
+    "ecb",
+    "fred",
+    "treasury_fiscaldata",
+    "volatility"
+  ],
+  "run_id": "wp18_macro_audit_foundation_fixture",
+  "schema_version": "1.0",
+  "source_group_status": {
+    "ecb": "present",
+    "fred": "present",
+    "treasury_fiscaldata": "present",
+    "volatility": "present"
+  },
+  "status": "passed",
+  "summary": {
+    "client_facing_authority": false,
+    "max_staleness_days": 2,
+    "observation_count": 4,
+    "shadow_only": true,
+    "sources": [
+      "cboe",
+      "ecb",
+      "fred",
+      "treasury_fiscaldata"
+    ]
+  }
+}
