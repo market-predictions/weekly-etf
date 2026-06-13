@@ -19,6 +19,97 @@ It is intentionally separate from specialized logs:
 
 ---
 
+## 2026-06-13 — WP19 deterministic regime engine fixture baseline closed
+
+### Current issue
+
+WP19 needed to convert the deterministic regime engine from a working shadow replay path into a stricter fixture baseline. The existing fixtures already covered the major regime labels, but the payload and validator did not yet require every explicit no-authority field requested by the roadmap.
+
+### Root cause / architectural tension
+
+A green deterministic regime fixture replay only proves that the model can classify scenarios. It does not by itself prove that the output is safe to keep away from client-facing narrative, lane scoring, fundability, portfolio action, or historical output mutation. The fixture baseline therefore needed to validate both deterministic regime coverage and authority denial.
+
+### What changed
+
+Updated:
+
+```text
+macro_regime/classify.py
+tools/validate_macro_regime_shadow.py
+tools/replay_macro_regime_shadow_fixtures.py
+fixtures/macro_regime_shadow/regime_shadow_fixtures.json
+tools/write_macro_regime_shadow_validation_evidence.py
+.github/workflows/validate-macro-regime-shadow.yml
+control/MACRO_REGIME_SHADOW_STATUS.md
+control/CURRENT_STATE.md
+control/NEXT_ACTIONS.md
+control/ETF_SESSION_CHANGELOG.md
+```
+
+Added:
+
+```text
+tests/test_macro_regime_shadow.py
+```
+
+Implementation details:
+
+```text
+- deterministic shadow payload now emits explicit no-authority fields
+- validator requires those authority fields to be present and false
+- fixture payload now carries the same no-authority fields
+- fixture replay checks unique fixture ids and coverage of every threshold-defined regime label
+- macro-axis validation now requires macro_audit_present=true and macro evidence when macro axes/scores exist
+- evidence writer now records the full no-authority state
+- GitHub workflow now installs pytest and runs tests/test_macro_regime_shadow.py before replaying fixtures
+```
+
+### Validation evidence
+
+```text
+workflow: Validate ETF macro regime shadow
+workflow_run_id: 27480244857
+workflow_run_number: 46
+workflow_commit_sha: 1ba3f4e5a6126fd824a151525b0d9d91d42c3627
+latest evidence: output/macro/validation/latest_macro_regime_shadow_validation.json
+status: passed
+```
+
+Validated markers:
+
+```text
+ETF_MACRO_REGIME_FIXTURE_REPLAY_OK
+ETF_MACRO_DATA_AUDIT_VALID_OK
+ETF_MACRO_AUDIT_AXIS_SHADOW_OK
+ETF_MACRO_REGIME_SHADOW_OK
+```
+
+### Authority boundary preserved
+
+```text
+fixture-only=true
+shadow_only=true
+client_facing_authority=false
+production_report_narrative_authority=false
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+portfolio_mutation=false
+historical_output_mutation=false
+```
+
+### Remaining work
+
+Proceed to:
+
+```text
+WP20 — Deterministic regime engine promotion-review contract
+```
+
+WP20 must remain review-only. It may assess promotion readiness but must not by itself promote deterministic macro, change report wording, alter scoring/fundability, mutate portfolio state, or rewrite historical outputs.
+
+---
+
 ## 2026-06-13 — WP18 macro audit foundation closed and WP19 queued
 
 ### Current issue
@@ -94,13 +185,7 @@ historical_output_mutation=false
 
 ### Remaining work
 
-Proceed to:
-
-```text
-WP19 — Deterministic regime engine fixture baseline
-```
-
-WP19 must remain fixture-only and shadow-only. It may validate deterministic regime classification fixtures, but it must not promote deterministic macro, change report wording, alter scoring/fundability, mutate portfolio state, or rewrite historical outputs.
+Superseded by WP19, which is now closed. Proceed to WP20.
 
 ---
 
@@ -182,7 +267,7 @@ historical_output_mutation=false
 
 ### Remaining work
 
-Superseded by the closeout entry above. WP18 is now closed and WP19 is the next active package.
+Superseded by WP18 closeout and WP19 closeout entries above.
 
 ---
 
@@ -266,7 +351,7 @@ historical_output_mutation=false
 
 ### Remaining work
 
-Return to roadmap proper through WP18. WP18 must remain shadow/audit-only unless separately promoted.
+Superseded by WP18 and WP19 closeout. Proceed to WP20.
 
 ---
 
@@ -361,7 +446,7 @@ historical_output_mutation=false
 
 ### Remaining work
 
-WP17 closed the immediate PDF visual QA gap. Return to the macro/thesis roadmap proper via WP18.
+Superseded by WP17/WP18/WP19 closeout. Proceed to WP20.
 
 ---
 
