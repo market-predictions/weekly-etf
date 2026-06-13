@@ -1,0 +1,78 @@
+name: Validate ETF macro audit foundation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "config/macro_data_sources.yml"
+      - "config/cb_calendar.yml"
+      - "macro_sources/**"
+      - "tools/validate_macro_data_audit.py"
+      - "tools/replay_macro_audit_foundation_fixture.py"
+      - "schemas/macro_data_audit.schema.json"
+      - "tests/fixtures/macro_data_audit_fixture.json"
+      - "tests/test_wp18_macro_data_audit_validator.py"
+      - "tests/test_wp18_macro_audit_foundation_fixture.py"
+      - ".github/workflows/validate-macro-audit-foundation.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  validate-macro-audit-foundation:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml pytest matplotlib numpy
+
+      - name: Run WP18 macro audit unit tests
+        run: |
+          python -m pytest \
+            tests/test_wp18_macro_data_audit_validator.py \
+            tests/test_wp18_macro_audit_foundation_fixture.py \
+            -q
+
+      - name: Replay WP18 macro audit fixture
+        run: |
+          python tools/replay_macro_audit_foundation_fixture.py \
+            --fixture tests/fixtures/macro_data_audit_fixture.json \
+            --config config/macro_data_sources.yml \
+            --cb-calendar config/cb_calendar.yml \
+            --reference-date 2026-05-31 \
+            --run-id wp18_macro_audit_foundation_fixture \
+            --output-dir output/macro/validation \
+            --workflow-name "${{ github.workflow }}" \
+            --workflow-run-id "${{ github.run_id }}" \
+            --workflow-run-number "${{ github.run_number }}" \
+            --workflow-attempt "${{ github.run_attempt }}" \
+            --commit-sha "${{ github.sha }}" \
+            --source-ref "${{ github.ref_name }}"
+
+      - name: Commit WP18 macro audit validation evidence
+        if: github.event_name != 'pull_request'
+        run: |
+          if [ -z "$(git status --porcelain -- output/macro/validation)" ]; then
+            echo "ETF_WP18_MACRO_AUDIT_EVIDENCE_NO_CHANGE"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/macro/validation/*.json
+          git commit -m "record WP18 macro audit foundation validation evidence [skip ci]"
+          git push origin HEAD:main
