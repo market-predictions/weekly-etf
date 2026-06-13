@@ -37,7 +37,8 @@ jobs:
             shared-mime-info \
             fonts-liberation \
             fonts-dejavu-core \
-            fonts-lato
+            fonts-lato \
+            poppler-utils
 
       - name: Install Python dependencies
         run: |
@@ -154,9 +155,9 @@ jobs:
             --relative-strength output/market_history/etf_relative_strength.json \
             --macro-policy-pack output/macro/latest.json)"
           echo "$lane_log"
-          lane_path="$(printf '%s\n' "$lane_log" | sed -n 's/.* artifact=\([^ ]*\).*/\1/p' | tail -1)"
+          lane_path="$(printf '%s\n' "$lane_log" | sed -n 's/.* artifact=\([^ |]*\).*/\1/p' | tail -1)"
           if [ -z "$lane_path" ] || [ ! -f "$lane_path" ]; then
-            echo "Final lane discovery did not emit a valid artifact path." >&2
+            echo "Final lane discovery did not emit a valid lane artifact path." >&2
             exit 1
           fi
           echo "ETF_LANE_ARTIFACT_PATH=$lane_path" >> "$GITHUB_ENV"
@@ -410,6 +411,7 @@ jobs:
           else:
               print(f"RENDER_OK | mode=pro | report={bundle['en']['report_path'].name}")
           PY
+          python tools/validate_etf_pdf_visual_contract.py --output-dir output
           python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
 
       - name: Validate ETF delivery HTML contract
@@ -475,6 +477,11 @@ jobs:
             --delivery-manifest "${ETF_DELIVERY_MANIFEST_PATH:-}" \
             --status "workflow_${{ job.status }}" \
             --conclusion "${{ job.status }}"
+
+      - name: Validate ETF manifest evidence
+        if: success()
+        run: |
+          python tools/validate_etf_manifest_evidence.py
 
       - name: Commit ETF run artifacts back to main
         if: always()
