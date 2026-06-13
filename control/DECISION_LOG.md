@@ -196,3 +196,29 @@ The deterministic regime fixture baseline must also cover every regime label def
 ### Consequence
 
 A passing deterministic regime fixture replay proves only fixture coverage and shadow consistency. It does not grant report narrative authority, client-facing authority, portfolio-action authority, lane-scoring authority, fundability authority, or portfolio mutation authority. Any promotion still requires a separate explicit control-layer promotion decision and later report-integration work package.
+
+---
+
+## 2026-06-13 — WP20 deterministic regime engine remains not_promoted
+
+### Decision
+
+WP20 creates:
+
+```text
+output/macro/promotion/deterministic_regime_engine_promotion_review_20260613_000000.json
+```
+
+with:
+
+```text
+status=not_promoted
+client_facing_narrative_authority=false
+production_report_narrative_authority=false
+control_layer_decision=not_promoted
+explicit_control_layer_promotion_decision=false
+```
+
+### Consequence
+
+The deterministic regime engine may remain useful as shadow evidence, but it does not become a production report narrative source. It must not be wired into English/Dutch client reports, lane scoring, fundability, or portfolio actions until a later package satisfies methodology, bilingual, compliance, and explicit control-layer promotion gates.
