@@ -13,7 +13,7 @@ if str(REPO_ROOT) not in sys.path:
 import yaml
 
 from macro_regime.classify import classify_regime_shadow
-from tools.validate_macro_regime_shadow import validate_shadow_payload
+from tools.validate_macro_regime_shadow import EXPECTED_DECISION_IMPACT, REQUIRED_FALSE_AUTHORITY_FIELDS, validate_shadow_payload
 
 DEFAULT_FIXTURES = Path("fixtures/macro_regime_shadow/regime_shadow_fixtures.json")
 DEFAULT_THRESHOLDS = Path("config/regime_thresholds.yml")
@@ -34,6 +34,32 @@ def _load_yaml(path: Path) -> dict[str, Any]:
 def _require(condition: bool, message: str) -> None:
     if not condition:
         raise RuntimeError(message)
+
+
+def _expected_regime_labels(thresholds: dict[str, Any]) -> set[str]:
+    labels: set[str] = set()
+    for rule in (thresholds.get("regime_rules") or {}).values():
+        if isinstance(rule, dict) and rule.get("label"):
+            labels.add(str(rule["label"]))
+    return labels
+
+
+def _validate_fixture_payload(payload: dict[str, Any], thresholds: dict[str, Any]) -> list[dict[str, Any]]:
+    _require(payload.get("schema_version") == "1.0", "fixture payload schema_version must be 1.0")
+    _require(payload.get("status") == "shadow_only", "fixture payload must be shadow_only")
+    for field in REQUIRED_FALSE_AUTHORITY_FIELDS:
+        _require(field in payload, f"fixture payload missing authority field: {field}")
+        _require(payload.get(field) is False, f"fixture payload {field} must be false")
+    _require(payload.get("decision_impact") == EXPECTED_DECISION_IMPACT, "fixture payload must have no production decision impact")
+    fixtures = payload.get("fixtures") or []
+    _require(isinstance(fixtures, list) and fixtures, "fixture payload must contain fixtures")
+    ids = [str(fixture.get("id") or "") for fixture in fixtures if isinstance(fixture, dict)]
+    _require(len(ids) == len(set(ids)), "fixture ids must be unique")
+    expected_regimes = _expected_regime_labels(thresholds)
+    covered_regimes = {str(fixture.get("expected_regime")) for fixture in fixtures if isinstance(fixture, dict)}
+    missing = sorted(expected_regimes - covered_regimes)
+    _require(not missing, "fixture payload missing regime coverage: " + ", ".join(missing))
+    return fixtures
 
 
 def _validate_fixture_result(fixture: dict[str, Any], result: dict[str, Any]) -> dict[str, Any]:
@@ -77,9 +103,7 @@ def _validate_fixture_result(fixture: dict[str, Any], result: dict[str, Any]) ->
 def replay(fixtures_path: Path, thresholds_path: Path) -> list[dict[str, Any]]:
     payload = _load_json(fixtures_path)
     thresholds = _load_yaml(thresholds_path)
-    _require(payload.get("status") == "shadow_only", "fixture payload must be shadow_only")
-    _require(payload.get("client_facing_authority") is False, "fixtures must not be client-facing authority")
-    fixtures = payload.get("fixtures") or []
+    fixtures = _validate_fixture_payload(payload, thresholds)
     results: list[dict[str, Any]] = []
     for fixture in fixtures:
         macro_audit = None
