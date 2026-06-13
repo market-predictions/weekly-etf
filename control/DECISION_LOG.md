@@ -170,3 +170,29 @@ SPDR Gold Aantal aandelen
 ```
 
 ETF/product-name protection is an output-contract rule. It does not change portfolio state, pricing, scoring, fundability, funding, or execution authority.
+
+---
+
+## 2026-06-13 — Deterministic macro/regime shadow artifacts require explicit no-authority fields
+
+### Decision
+
+Deterministic macro/regime shadow payloads, fixtures, and evidence artifacts must include explicit false authority fields rather than relying only on `shadow_only=true`.
+
+Required false authority fields include:
+
+```text
+client_facing_authority=false
+production_report_narrative_authority=false
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+portfolio_mutation=false
+historical_output_mutation=false
+```
+
+The deterministic regime fixture baseline must also cover every regime label defined in `config/regime_thresholds.yml`.
+
+### Consequence
+
+A passing deterministic regime fixture replay proves only fixture coverage and shadow consistency. It does not grant report narrative authority, client-facing authority, portfolio-action authority, lane-scoring authority, fundability authority, or portfolio mutation authority. Any promotion still requires a separate explicit control-layer promotion decision and later report-integration work package.
