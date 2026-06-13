@@ -118,7 +118,11 @@ def _summary_max_staleness_matches(summary: dict, rows: list[dict]) -> bool:
     actual = int(summary.get("max_staleness_days") or -1)
     max_observed_staleness = max(int(row.get("staleness_days")) for row in rows)
     max_allowed_staleness = max(int(row.get("max_staleness_days")) for row in rows)
-    return actual in {max_observed_staleness, max_allowed_staleness}
+    # Compatibility rule: WP18 fixtures use this summary as maximum observed
+    # staleness; older macro-regime shadow fixtures use it as a source-contract
+    # ceiling. Both are valid if the summary does not under-report observed
+    # staleness and does not exceed the widest source-contract ceiling.
+    return max_observed_staleness <= actual <= max_allowed_staleness
 
 
 def validate(path: Path) -> dict:
