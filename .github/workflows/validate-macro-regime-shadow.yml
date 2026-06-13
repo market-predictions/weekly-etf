@@ -130,10 +130,25 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add output/macro/validation/*.json
-          git commit -m "record macro regime shadow validation evidence [skip ci]"
-          git reset --hard HEAD
-          git clean -fd output/macro
-          git fetch origin main
-          git rebase origin/main
-          git push origin HEAD:main
+          evidence_dir="$(mktemp -d)"
+          cp output/macro/validation/*.json "$evidence_dir"/
+          for attempt in 1 2 3; do
+            echo "ETF_MACRO_REGIME_SHADOW_EVIDENCE_PUSH_ATTEMPT_${attempt}"
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd output/macro
+            mkdir -p output/macro/validation
+            cp "$evidence_dir"/*.json output/macro/validation/
+            if [ -z "$(git status --porcelain -- output/macro/validation)" ]; then
+              echo "ETF_MACRO_REGIME_SHADOW_EVIDENCE_NO_CHANGE_AFTER_SYNC"
+              exit 0
+            fi
+            git add output/macro/validation/*.json
+            git commit -m "record macro regime shadow validation evidence [skip ci]"
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "ETF_MACRO_REGIME_SHADOW_EVIDENCE_PUSH_RETRY"
+          done
+          echo "ETF_MACRO_REGIME_SHADOW_EVIDENCE_PUSH_FAILED"
+          exit 1
