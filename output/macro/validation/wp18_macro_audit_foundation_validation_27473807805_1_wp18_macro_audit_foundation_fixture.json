@@ -1,0 +1,46 @@
+{
+  "artifact_type": "wp18_macro_audit_foundation_validation",
+  "authority": {
+    "client_facing_authority": false,
+    "decision_impact": "none_phase2_audit_only",
+    "fundability_authority": false,
+    "lane_scoring_authority": false,
+    "portfolio_action_authority": false,
+    "portfolio_mutation": false,
+    "production_report_path_changed": false,
+    "shadow_only": true
+  },
+  "generated_at_utc": "2026-06-13T17:26:15Z",
+  "macro_data_audit_summary": {
+    "groups": [
+      "ecb",
+      "fred",
+      "treasury_fiscaldata",
+      "volatility"
+    ],
+    "mode": "fixture",
+    "observations": 4,
+    "reference_date": "2026-05-31"
+  },
+  "repository": "market-predictions/weekly-etf",
+  "schema_version": "1.0",
+  "source_files": {
+    "audit_artifact": "output/macro/validation/wp18_macro_data_audit_fixture_27473807805_1_wp18_macro_audit_foundation_fixture.json",
+    "central_bank_calendar": "config/cb_calendar.yml",
+    "fixture": "tests/fixtures/macro_data_audit_fixture.json",
+    "macro_data_sources": "config/macro_data_sources.yml"
+  },
+  "status": "passed",
+  "validated_markers": [
+    "ETF_MACRO_DATA_AUDIT_VALID_OK",
+    "ETF_MACRO_AUDIT_FOUNDATION_FIXTURE_OK"
+  ],
+  "workflow": {
+    "commit_sha": "789962a598238284418483c3febae09cd83b6372",
+    "name": "Validate ETF macro audit foundation",
+    "run_attempt": "1",
+    "run_id": "27473807805",
+    "run_number": "1",
+    "source_ref": "main"
+  }
+}
