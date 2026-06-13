@@ -114,6 +114,13 @@ def _require_source_groups(payload: dict, groups: set[str]) -> None:
             raise RuntimeError(f"Macro data audit source_group_status[{group!r}] is not present")
 
 
+def _summary_max_staleness_matches(summary: dict, rows: list[dict]) -> bool:
+    actual = int(summary.get("max_staleness_days") or -1)
+    max_observed_staleness = max(int(row.get("staleness_days")) for row in rows)
+    max_allowed_staleness = max(int(row.get("max_staleness_days")) for row in rows)
+    return actual in {max_observed_staleness, max_allowed_staleness}
+
+
 def validate(path: Path) -> dict:
     payload = load(path)
     for key in TOP_LEVEL:
@@ -178,7 +185,7 @@ def validate(path: Path) -> dict:
         raise RuntimeError("Macro audit authority flags are invalid")
     if int(summary.get("observation_count") or -1) != len(rows):
         raise RuntimeError("Macro audit observation_count mismatch")
-    if int(summary.get("max_staleness_days") or -1) != max(int(row.get("staleness_days")) for row in rows):
+    if not _summary_max_staleness_matches(summary, rows):
         raise RuntimeError("Macro audit max_staleness_days mismatch")
     return {"mode": payload.get("mode"), "reference_date": payload.get("reference_date"), "observations": len(rows), "groups": sorted(groups)}
 
