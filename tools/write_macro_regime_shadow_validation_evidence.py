@@ -9,8 +9,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from tools.validate_macro_regime_shadow import EXPECTED_DECISION_IMPACT, REQUIRED_FALSE_AUTHORITY_FIELDS, validate_shadow_payload
 
-EXPECTED_DECISION_IMPACT = "none_shadow_comparison_only"
 EXPECTED_MARKERS = [
     "ETF_MACRO_REGIME_FIXTURE_REPLAY_OK",
     "ETF_MACRO_DATA_AUDIT_VALID_OK",
@@ -36,6 +36,11 @@ def _require_shadow_payload(pack: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(shadow, dict):
         raise SystemExit("deterministic_regime_shadow missing or not an object")
 
+    try:
+        validate_shadow_payload(shadow)
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
+
     macro_axes = shadow.get("macro_axes")
     macro_scores = shadow.get("macro_axis_scores")
     macro_evidence = shadow.get("macro_evidence")
@@ -44,7 +49,6 @@ def _require_shadow_payload(pack: dict[str, Any]) -> dict[str, Any]:
 
     checks = {
         "shadow_only": shadow.get("shadow_only") is True,
-        "client_facing_authority_false": shadow.get("client_facing_authority") is False,
         "decision_impact_shadow_only": shadow.get("decision_impact") == EXPECTED_DECISION_IMPACT,
         "candidate_regime_present": bool(shadow.get("candidate_regime")),
         "candidate_confidence_present": shadow.get("candidate_confidence") is not None,
@@ -55,6 +59,8 @@ def _require_shadow_payload(pack: dict[str, Any]) -> dict[str, Any]:
         "macro_evidence_present": isinstance(macro_evidence, dict) and bool(macro_evidence),
         "macro_audit_confidence_component_present": components.get("macro_audit_present") is True,
     }
+    for field in REQUIRED_FALSE_AUTHORITY_FIELDS:
+        checks[f"{field}_false"] = shadow.get(field) is False
     failed = [name for name, ok in checks.items() if not ok]
     if failed:
         raise SystemExit("Shadow payload failed evidence checks: " + ", ".join(failed))
@@ -64,6 +70,21 @@ def _require_shadow_payload(pack: dict[str, Any]) -> dict[str, Any]:
 def _safe_token(value: str) -> str:
     cleaned = "".join(ch if ch.isalnum() or ch in {"-", "_"} else "_" for ch in value.strip())
     return cleaned or "unknown"
+
+
+def _authority() -> dict[str, bool | str]:
+    return {
+        "shadow_only": True,
+        "client_facing_authority": False,
+        "production_report_narrative_authority": False,
+        "decision_impact": EXPECTED_DECISION_IMPACT,
+        "production_report_path_changed": False,
+        "lane_scoring_authority": False,
+        "fundability_authority": False,
+        "portfolio_action_authority": False,
+        "portfolio_mutation": False,
+        "historical_output_mutation": False,
+    }
 
 
 def _build_evidence(args: argparse.Namespace, pack: dict[str, Any], shadow: dict[str, Any]) -> dict[str, Any]:
@@ -91,15 +112,7 @@ def _build_evidence(args: argparse.Namespace, pack: dict[str, Any], shadow: dict
         },
         "source_pack": str(args.pack),
         "validated_markers": EXPECTED_MARKERS,
-        "authority": {
-            "shadow_only": True,
-            "client_facing_authority": False,
-            "decision_impact": EXPECTED_DECISION_IMPACT,
-            "production_report_path_changed": False,
-            "lane_scoring_authority": False,
-            "fundability_authority": False,
-            "portfolio_action_authority": False,
-        },
+        "authority": _authority(),
         "macro_data_audit_summary": pack.get("macro_data_audit_summary") or {},
         "shadow_summary": {
             "method": shadow.get("method"),
