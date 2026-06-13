@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 is closed and WP17 PDF visual QA / delivery-runbook hardening is implemented and verified on the latest manifest-linked report set `260612_08`. WP18 macro audit foundation is implemented as a shadow-only validation path and is pending fresh workflow evidence from `Validate ETF macro audit foundation`. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default.**
+**WP16 is closed, WP17 PDF visual QA / delivery-runbook hardening is closed, and WP18 macro audit foundation is closed as a verified shadow-only validation path. The latest manifest-linked production baseline remains `260612_08`. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default. The next package is WP19 — Deterministic regime engine fixture baseline.**
 
 ## Latest verified production baseline
 
@@ -72,9 +72,9 @@ Latest run #247 succeeded after these gates were wired.
 
 The PDF visual validator renders committed PDFs to images and requires a visible equity curve in English and Dutch. The manifest evidence validator checks latest run/delivery manifests, attached PDFs, EN/NL language coverage, pricing lineage, and the delivery caveat.
 
-## WP18 macro audit foundation status
+## WP18 macro audit foundation closeout status
 
-WP18 is implemented but not yet closed.
+WP18 is closed.
 
 Implemented:
 
@@ -84,7 +84,22 @@ Added tests/test_wp18_macro_data_audit_validator.py.
 Added tools/replay_macro_audit_foundation_fixture.py.
 Added tests/test_wp18_macro_audit_foundation_fixture.py.
 Added .github/workflows/validate-macro-audit-foundation.yml.
+Hardened .github/workflows/validate-macro-regime-shadow.yml evidence push path.
 Updated control/MACRO_AUDIT_FOUNDATION_STATUS.md.
+```
+
+Closeout evidence:
+
+```text
+Validate ETF macro audit foundation: green
+workflow_run_id: 27476145040
+workflow_run_number: 6
+latest_wp18_macro_audit_foundation_validation.json: committed
+
+Validate ETF macro regime shadow: green
+workflow_run_id: 27478580626
+workflow_run_number: 40
+latest_macro_regime_shadow_validation.json: committed
 ```
 
 WP18 remains:
@@ -97,14 +112,10 @@ portfolio_action_authority=false
 lane_scoring_authority=false
 fundability_authority=false
 portfolio_mutation=false
+production_report_path_changed=false
 ```
 
-Pending closeout evidence:
-
-```text
-Validate ETF macro audit foundation workflow green
-output/macro/validation/latest_wp18_macro_audit_foundation_validation.json committed
-```
+The macro-regime shadow validation evidence is also shadow-only and explicitly denies client-facing, lane-scoring, fundability, and portfolio-action authority.
 
 ## Deterministic macro boundary
 
@@ -151,7 +162,7 @@ WP16/WP17/WP18 did not manually rewrite historical report artifacts. Current pro
 
 - WP16 repaired report-surface QA and macro-event recency handling.
 - WP17 hardened visual PDF QA and delivery-runbook evidence.
-- WP18 implements a shadow-only macro audit foundation validation path.
+- WP18 closed the shadow-only macro audit foundation validation path.
 - WP16, WP17, and WP18 do not alter scoring, fundability, execution authority, or portfolio authority.
 - WP16, WP17, and WP18 do not promote deterministic macro.
 - ETF/product names are protected product terms and must not be translated by Dutch localization.
@@ -162,40 +173,43 @@ WP16/WP17/WP18 did not manually rewrite historical report artifacts. Current pro
 - Uploaded PDFs are QA evidence, not source-of-truth state.
 - Latest pricing lineage is passed for all 9 holdings.
 - Macro audit values remain provenance input evidence only and are not production decision authority.
+- WP18 proves the macro audit fixture/replay evidence path and compatibility with the shadow-regime validation stack.
 
 ### 3. Output contract
 
 - Future reports must not expose empty-comment residue, duplicated soft-cap wording, English/Dutch language leakage, Dutch equity-curve clipping, invisible charts, or product-name localization corruption such as `iAantal aandelen`.
 - PDF visual validation is now part of the pre-send gate.
 - WP18 macro audit fixture validation writes evidence only under `output/macro/validation/` and does not change client reports.
+- Macro-regime shadow validation evidence is internal/shadow-only and must not leak to client reports.
 
 ### 4. Operational runbook
 
 - Do not claim inbox delivery; the latest delivery evidence is `smtp_sendmail_returned_no_exception` plus delivery manifest.
 - Manual GitHub Actions starts may still be required when run-queue pushes do not automatically trigger the workflow.
 - Latest successful report baseline after WP17 is `260612_08`.
-- To close WP18, observe the `Validate ETF macro audit foundation` workflow and verify committed validation evidence.
+- WP18 is closed after green macro-audit foundation and macro-regime shadow validation evidence.
+- The next package is WP19.
 
 ## Immediate next action
 
-Verify WP18 workflow evidence.
-
-Expected workflow:
-
-```text
-Validate ETF macro audit foundation
-```
-
-Expected latest evidence path:
-
-```text
-output/macro/validation/latest_wp18_macro_audit_foundation_validation.json
-```
-
-After WP18 closes, the next package should be:
+Start the next package:
 
 ```text
 WP19 — Deterministic regime engine fixture baseline
 ```
 
 WP19 must remain shadow-only unless a separate promotion contract explicitly grants authority.
+
+Required WP19 boundary:
+
+```text
+fixture-only=true
+shadow_only=true
+client_facing_authority=false
+production_report_narrative_authority=false
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+portfolio_mutation=false
+historical_output_mutation=false
+```
