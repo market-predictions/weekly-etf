@@ -1,19 +1,39 @@
 {
-  "schema_version": "1.1",
-  "portfolio_mode": "client_long_only_thematic",
-  "base_currency": "EUR",
-  "valuation_source": "runtime_pricing_lineage_official_shares_v1",
-  "pricing_audit_file": "output/pricing/price_audit_2026-06-12_20260613_094305.json",
-  "trade_ledger_file": "etf_trade_ledger.csv",
-  "recommendation_scorecard_file": null,
-  "inception_date": "2026-03-28",
-  "starting_capital_eur": 100000.0,
-  "cash_eur": 1936.52,
-  "invested_market_value_eur": 106306.81,
-  "nav_eur": 108243.33,
-  "peak_nav_eur": 112376.1,
-  "max_drawdown_pct": -7.4587,
-  "positions": [
+  "schema_version": "1.0",
+  "created_at_utc": "2026-06-13T09:50:28.431266+00:00",
+  "execution_mode": "guarded_auto",
+  "execution_status": "no_trade_intents",
+  "run_id": "20260613_094305",
+  "report_date": "2026-06-12",
+  "requested_close_date": "2026-06-12",
+  "source_files": {
+    "runtime_state": "output/runtime/etf_report_state_20260612_20260613_094305.json",
+    "portfolio_state": "output/etf_portfolio_state.json",
+    "trade_ledger": "output/etf_trade_ledger.csv",
+    "pricing_audit": "output/pricing/price_audit_2026-06-12_20260613_094305.json",
+    "rotation_plan": "output/runtime/etf_rotation_plan_260612_20260613_094305.json"
+  },
+  "policy_checks": {
+    "passed": true,
+    "errors": [],
+    "warnings": [
+      "no_trade_intents"
+    ],
+    "mode_note": "Guarded auto-execution writes official model trade-ledger and portfolio-state changes when all hard gates pass."
+  },
+  "pre_trade_portfolio": {
+    "cash_eur": 1936.52,
+    "total_portfolio_value_eur": 108243.33,
+    "base_currency": "EUR"
+  },
+  "post_trade_shadow_portfolio": {
+    "cash_eur": 1936.52,
+    "invested_market_value_eur": 106306.81,
+    "nav_eur": 108243.33,
+    "nav_drift_eur": 0.0
+  },
+  "proposed_ledger_rows": [],
+  "shadow_positions": [
     {
       "suggested_action": "hold",
       "conviction_tier": "Tier 2",
@@ -159,10 +179,10 @@
       "fresh_cash_test": "Hold / monitor",
       "total_score": "3.52",
       "score_source": "semantic_fallback_until_position_score",
-      "shares_delta_this_run": 57.861841,
-      "weight_change_pct": 4.5288,
-      "action_executed_this_run": "Buy",
-      "funding_source_note": "Shadow buy funded by SPY.",
+      "shares_delta_this_run": 0.0,
+      "weight_change_pct": 0.0,
+      "action_executed_this_run": "None",
+      "funding_source_note": "No model trade executed this run.",
       "ticker": "IEFA",
       "pricing_source": "twelve_data",
       "pricing_status": "fresh_exact_unverified",
@@ -353,10 +373,10 @@
       "avg_entry_local": 676.33,
       "pnl_pct": "6.17",
       "original_thesis": "Core U.S. large-cap exposure",
-      "shares_delta_this_run": -7.646414,
-      "weight_change_pct": -4.5288,
-      "action_executed_this_run": "Sell",
-      "funding_source_note": "Shadow execution from rotation intent.",
+      "shares_delta_this_run": 0.0,
+      "weight_change_pct": 0.0,
+      "action_executed_this_run": "None",
+      "funding_source_note": "No model trade executed this run.",
       "pricing_source": "twelve_data",
       "pricing_status": "fresh_exact_unverified",
       "pricing_close_type": "raw_close",
@@ -499,31 +519,5 @@
       ]
     }
   ],
-  "last_report": {
-    "date": "2026-06-12",
-    "source_report": "weekly_analysis_pro_260612_06.md",
-    "position_count": 9
-  },
-  "last_valuation": {
-    "date": "2026-06-12",
-    "nav_eur": 108243.33,
-    "invested_market_value_eur": 106306.81,
-    "cash_eur": 1936.52,
-    "since_inception_return_pct": 8.2433,
-    "daily_return_pct": 0.4601,
-    "drawdown_pct": -3.6776,
-    "eurusd_used": 1.1568,
-    "equity_curve_state": "Below prior high",
-    "valuation_notes": "Runtime valuation repriced from official portfolio-state shares"
-  },
-  "last_successful_runtime_state_file": "output/runtime/etf_report_state_20260612_20260613_094305.json",
-  "last_state_persisted_at_utc": "2026-06-13T09:50:28.251954+00:00",
-  "last_model_execution": {
-    "date": "2026-06-12",
-    "run_id": "20260612_210139",
-    "runtime_state": "output/runtime/etf_report_state_20260612_20260612_210139.json",
-    "mode": "guarded_auto",
-    "trade_count": 1,
-    "executed_at_utc": "2026-06-12T21:08:59.098668+00:00"
-  }
+  "artifact_path": "output/runtime/etf_model_execution_20260612_20260613_094305.json"
 }

@@ -1,0 +1,64 @@
+{
+  "artifact_type": "weekly_etf_delivery_manifest_summary",
+  "delivery_status": "smtp_sendmail_returned_no_exception",
+  "delivery_status_meaning": "send_report.py returned after smtplib.sendmail without raising and wrote per-language delivery manifest(s); this is not an end-recipient inbox receipt.",
+  "generated_at_utc": "2026-06-13T09:51:12Z",
+  "language_count": 2,
+  "languages": [
+    {
+      "attachment_count": 4,
+      "attachments": [
+        "weekly_analysis_pro_260612_06.pdf",
+        "weekly_analysis_pro_260612_06_clean.md",
+        "weekly_analysis_pro_260612_06_delivery.html",
+        "weekly_analysis_pro_260612_06_equity_curve.png"
+      ],
+      "html_body": "full_report",
+      "language": "en",
+      "mode": "pro",
+      "pdf_attached": "yes",
+      "pdf_attachments": [
+        "weekly_analysis_pro_260612_06.pdf"
+      ],
+      "recipient_hash": "sha256:602badb30fe408fccf59e816bc5666ad80064d8436a7431767b7bc98b8234ad3",
+      "recipient_redacted": true,
+      "report": "weekly_analysis_pro_260612_06.md",
+      "report_path": "output/weekly_analysis_pro_260612_06.md",
+      "source_manifest_path": "output/weekly_analysis_pro_260612_06_delivery_manifest.txt",
+      "source_manifest_type": "legacy_kv_delivery_manifest",
+      "timestamp_utc": "2026-06-13T09:51:10Z"
+    },
+    {
+      "attachment_count": 4,
+      "attachments": [
+        "weekly_analysis_pro_nl_260612_06.pdf",
+        "weekly_analysis_pro_nl_260612_06_clean.md",
+        "weekly_analysis_pro_nl_260612_06_delivery.html",
+        "weekly_analysis_pro_nl_260612_06_equity_curve.png"
+      ],
+      "html_body": "full_report",
+      "language": "nl",
+      "mode": "pro",
+      "pdf_attached": "yes",
+      "pdf_attachments": [
+        "weekly_analysis_pro_nl_260612_06.pdf"
+      ],
+      "recipient_hash": "sha256:602badb30fe408fccf59e816bc5666ad80064d8436a7431767b7bc98b8234ad3",
+      "recipient_redacted": true,
+      "report": "weekly_analysis_pro_nl_260612_06.md",
+      "report_path": "output/weekly_analysis_pro_nl_260612_06.md",
+      "source_manifest_path": "output/weekly_analysis_pro_nl_260612_06_delivery_manifest.txt",
+      "source_manifest_type": "legacy_kv_delivery_manifest",
+      "timestamp_utc": "2026-06-13T09:51:12Z"
+    }
+  ],
+  "recipient_data_policy": "redacted_hash_only",
+  "report_token": "260612",
+  "requested_close_date": "2026-06-12",
+  "run_id": "20260613_094305",
+  "schema_version": "1.0",
+  "source": {
+    "basis": "per-language delivery manifest(s) written after send_email_with_attachments returned",
+    "writer": "tools/write_etf_delivery_manifest_summary.py"
+  }
+}
