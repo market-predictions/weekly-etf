@@ -2,6 +2,12 @@
   "schema_version": "1.0",
   "status": "shadow_only",
   "client_facing_authority": false,
+  "production_report_narrative_authority": false,
+  "portfolio_action_authority": false,
+  "lane_scoring_authority": false,
+  "fundability_authority": false,
+  "portfolio_mutation": false,
+  "historical_output_mutation": false,
   "decision_impact": "none_shadow_comparison_only",
   "description": "No-network fixture replay scenarios for the Weekly ETF deterministic shadow regime classifier.",
   "fixtures": [
