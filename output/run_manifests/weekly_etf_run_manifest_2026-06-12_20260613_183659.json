@@ -1,0 +1,55 @@
+{
+  "delivery_manifest_path": "output/delivery/weekly_etf_delivery_manifest_2026-06-12_20260613_183659.json",
+  "dutch_report_path": "output/weekly_analysis_pro_nl_260612_09.md",
+  "english_report_path": "output/weekly_analysis_pro_260612_09.md",
+  "notes": null,
+  "portfolio_state_path": "output/etf_portfolio_state.json",
+  "pricing_audit_path": "output/pricing/price_audit_2026-06-12_20260613_183659.json",
+  "pricing_lineage_status": "passed",
+  "pricing_lineage_validated_at_utc": "2026-06-13T18:39:08.423034+00:00",
+  "pricing_lineage_validation": {
+    "english_report_path": "output/weekly_analysis_pro_260612_09.md",
+    "holdings_validated": [
+      "CIBR",
+      "DFEN",
+      "GSG",
+      "IEFA",
+      "PAVE",
+      "SMH",
+      "SPY",
+      "URNM",
+      "XLU"
+    ],
+    "pricing_audit_path": "output/pricing/price_audit_2026-06-12_20260613_183659.json",
+    "report_authority_source": "runtime_state",
+    "requested_close_date": "2026-06-12",
+    "run_id": "20260613_183659",
+    "runtime_state_path": "output/runtime/etf_report_state_20260612_20260613_183659.json",
+    "total_portfolio_value_eur": 108243.33
+  },
+  "pricing_summary": {
+    "carried_forward_holdings_count": 0,
+    "coverage_count_pct": 100.0,
+    "decision": "update_covered_holdings_carry_unresolved",
+    "fresh_holdings_count": 9,
+    "holdings_count": 9,
+    "invested_weight_coverage_pct": 98.2,
+    "unresolved_tickers": []
+  },
+  "report_token": "260612",
+  "requested_close_date": "2026-06-12",
+  "run_id": "20260613_183659",
+  "runtime_state_path": "output/runtime/etf_report_state_20260612_20260613_183659.json",
+  "runtime_summary": {
+    "cash_eur": 1936.52,
+    "lane_assessment_source": "output/lane_reviews/etf_lane_assessment_260612.json",
+    "pricing_audit_source": "output/pricing/price_audit_2026-06-12_20260613_183659.json",
+    "report_date": "2026-06-12",
+    "total_portfolio_value_eur": 108243.33
+  },
+  "schema_version": "1.0",
+  "updated_at_utc": "2026-06-13T18:39:26.756345+00:00",
+  "valuation_history_path": "output/etf_valuation_history.csv",
+  "workflow_conclusion": "success",
+  "workflow_status": "workflow_success"
+}
