@@ -19,6 +19,91 @@ It is intentionally separate from specialized logs:
 
 ---
 
+## 2026-06-13 — WP18 macro audit foundation closed and WP19 queued
+
+### Current issue
+
+WP18 had been implemented but still needed conclusive workflow evidence before it could be closed. The dedicated macro-audit foundation workflow passed, but the related macro-regime shadow workflow initially failed in its evidence commit step because GitHub Actions runs rewrote the same `latest_*.json` files and collided during push/rebase.
+
+### Root cause / architectural tension
+
+The macro audit foundation is an input/provenance layer and must remain shadow-only. At the same time, the validation stack needs committed evidence under `output/macro/validation/`. Repeated workflow runs update stable pointer files such as `latest_macro_regime_shadow_validation.json`, so the evidence commit runbook must be robust to remote-ahead races and `latest_*.json` conflicts.
+
+### What changed
+
+Updated:
+
+```text
+control/MACRO_AUDIT_FOUNDATION_STATUS.md
+control/CURRENT_STATE.md
+control/NEXT_ACTIONS.md
+control/ETF_SESSION_CHANGELOG.md
+.github/workflows/validate-macro-regime-shadow.yml
+```
+
+Implementation / closeout details:
+
+```text
+- WP18 status moved from implemented/pending evidence to closed/verified/shadow-only.
+- Macro audit foundation validation evidence is committed and passed.
+- Macro-regime shadow validation evidence is committed and passed after run #40.
+- The macro-regime shadow evidence commit step now commits from a freshly synced origin/main working tree and retries pushes.
+- WP19 is now the active next package.
+```
+
+### Validation evidence
+
+Dedicated WP18 macro-audit foundation evidence:
+
+```text
+artifact: output/macro/validation/latest_wp18_macro_audit_foundation_validation.json
+workflow: Validate ETF macro audit foundation
+workflow_run_id: 27476145040
+workflow_run_number: 6
+status: passed
+```
+
+Related macro-regime shadow compatibility evidence:
+
+```text
+artifact: output/macro/validation/latest_macro_regime_shadow_validation.json
+workflow: Validate ETF macro regime shadow
+workflow_run_id: 27478580626
+workflow_run_number: 40
+status: passed
+validated_markers:
+  ETF_MACRO_REGIME_FIXTURE_REPLAY_OK
+  ETF_MACRO_DATA_AUDIT_VALID_OK
+  ETF_MACRO_AUDIT_AXIS_SHADOW_OK
+  ETF_MACRO_REGIME_SHADOW_OK
+```
+
+### Authority boundary preserved
+
+```text
+shadow_only=true
+client_facing_authority=false
+decision_impact=none_phase2_audit_only
+production_report_narrative_authority=false
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+portfolio_mutation=false
+historical_output_mutation=false
+```
+
+### Remaining work
+
+Proceed to:
+
+```text
+WP19 — Deterministic regime engine fixture baseline
+```
+
+WP19 must remain fixture-only and shadow-only. It may validate deterministic regime classification fixtures, but it must not promote deterministic macro, change report wording, alter scoring/fundability, mutate portfolio state, or rewrite historical outputs.
+
+---
+
 ## 2026-06-13 — WP18 macro audit foundation implemented, pending workflow evidence
 
 ### Current issue
@@ -97,20 +182,7 @@ historical_output_mutation=false
 
 ### Remaining work
 
-WP18 is not yet closed. Required closeout evidence:
-
-```text
-Validate ETF macro audit foundation workflow green
-output/macro/validation/latest_wp18_macro_audit_foundation_validation.json committed
-```
-
-After WP18 closes, the next package should be:
-
-```text
-WP19 — Deterministic regime engine fixture baseline
-```
-
-WP19 must remain shadow-only unless separately promoted.
+Superseded by the closeout entry above. WP18 is now closed and WP19 is the next active package.
 
 ---
 
