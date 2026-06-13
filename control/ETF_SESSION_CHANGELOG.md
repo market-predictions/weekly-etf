@@ -19,6 +19,101 @@ It is intentionally separate from specialized logs:
 
 ---
 
+## 2026-06-13 — WP18 macro audit foundation implemented, pending workflow evidence
+
+### Current issue
+
+The roadmap’s Phase 2 macro audit foundation existed in partial form, but the status still said fresh workflow validation was missing. The macro audit validator was also too permissive for a production-grade provenance contract, and the fixture replay path was mixed with broader macro-regime shadow validation rather than having a clean WP18-only evidence path.
+
+### Root cause / architectural tension
+
+Macro audit values are intended to become the future authoritative macro input layer, but they are not yet decision authority. This requires two things at the same time:
+
+```text
+- stronger provenance/audit validation
+- strict isolation from client-facing reports, lane scoring, fundability, and portfolio action
+```
+
+The production macro policy pack may build a live macro audit in shadow mode, but WP18 needed a deterministic fixture replay path that writes only validation evidence and does not overwrite `output/macro/latest.json` or production report artifacts.
+
+### What changed
+
+Added:
+
+```text
+tools/replay_macro_audit_foundation_fixture.py
+tests/test_wp18_macro_data_audit_validator.py
+tests/test_wp18_macro_audit_foundation_fixture.py
+.github/workflows/validate-macro-audit-foundation.yml
+```
+
+Updated:
+
+```text
+tools/validate_macro_data_audit.py
+control/MACRO_AUDIT_FOUNDATION_STATUS.md
+control/CURRENT_STATE.md
+control/NEXT_ACTIONS.md
+control/ETF_SESSION_CHANGELOG.md
+```
+
+Implementation details:
+
+```text
+- hardened macro audit validation for required_source_groups, source_group_status, report_token, run_id, summary counts, staleness summary, authority fields, and live source_url provenance
+- added a WP18 fixture replay tool that builds a macro audit from tests/fixtures/macro_data_audit_fixture.json
+- fixture replay writes shadow-only evidence under output/macro/validation/
+- added an isolated GitHub Actions workflow: Validate ETF macro audit foundation
+- workflow runs unit tests and fixture replay, then commits only output/macro/validation/*.json evidence
+- fixture replay does not change production reports, portfolio state, lane scoring, fundability, or output/macro/latest.json
+```
+
+Expected workflow markers:
+
+```text
+ETF_MACRO_DATA_AUDIT_VALID_OK
+ETF_MACRO_AUDIT_FOUNDATION_FIXTURE_OK
+```
+
+Expected latest evidence path after a green workflow run:
+
+```text
+output/macro/validation/latest_wp18_macro_audit_foundation_validation.json
+```
+
+### Authority boundary preserved
+
+```text
+shadow_only=true
+client_facing_authority=false
+decision_impact=none_phase2_audit_only
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+portfolio_mutation=false
+deterministic_macro_promotion=false
+historical_output_mutation=false
+```
+
+### Remaining work
+
+WP18 is not yet closed. Required closeout evidence:
+
+```text
+Validate ETF macro audit foundation workflow green
+output/macro/validation/latest_wp18_macro_audit_foundation_validation.json committed
+```
+
+After WP18 closes, the next package should be:
+
+```text
+WP19 — Deterministic regime engine fixture baseline
+```
+
+WP19 must remain shadow-only unless separately promoted.
+
+---
+
 ## 2026-06-13 — WP17 PDF visual QA and delivery-runbook hardening closed
 
 ### Current issue
@@ -99,13 +194,7 @@ historical_output_mutation=false
 
 ### Remaining work
 
-Return to roadmap proper:
-
-```text
-WP18 — Macro/thesis roadmap Phase 2: macro audit foundation
-```
-
-WP18 must remain shadow/audit-only unless separately promoted.
+Return to roadmap proper through WP18. WP18 must remain shadow/audit-only unless separately promoted.
 
 ---
 
