@@ -33,56 +33,53 @@ control/HISTORICAL_ARTIFACT_CLEANUP_POLICY.md
 
 ---
 
-## Phase 1 — WP16 follow-up status
+## Phase 1 — WP16 repair status
 
-WP16 has been implemented, and a follow-up repair has been committed for the two remaining `260611_02` client-surface defects.
-
-```text
-WP16-FOLLOWUP — Empty-comment and constraint-copy repair: implemented / rerun requested / delivery not yet verified
-```
-
-Follow-up rerun request:
+WP16 is closed on the latest verified report set.
 
 ```text
-control/run_queue/weekly_etf_report_request_20260612_wp16_followup_rerun.md
+requested_close_date: 2026-06-12
+run_id: 20260613_094305
+report_token: 260612
+english_report_path: output/weekly_analysis_pro_260612_06.md
+dutch_report_path: output/weekly_analysis_pro_nl_260612_06.md
+pricing_lineage_status: passed
+workflow_status: workflow_success
+delivery_status: smtp_sendmail_returned_no_exception
 ```
 
-Do not claim successful report delivery until the workflow produces valid evidence.
-
-Required verification after rerun:
+Closed WP16 defects:
 
 ```text
-GitHub Actions run conclusion=success
-run manifest exists
-delivery manifest exists
-English and Dutch report artifacts exist
-pricing lineage passes
-Dutch empty-comment residue absent
-English/Dutch constraint duplication absent
-ECB policy catalyst still appears
-ECB stance remains Tightening / inflation-sensitive
-non-U.S. exposure wording remains reconciled with active IEFA exposure
-English n.v.t. residue remains absent
-Dutch equity-curve render checked
+macro/ECB recency miss
+ECB stance stale neutral wording
+non-U.S. / IEFA wording mismatch
+English n.v.t. residue
+Dutch empty-comment residue
+soft-cap / soft-target duplicated copy
+Dutch equity-curve clipping / invisible chart
+shadow and guarded-auto no-trade validation mismatch
+Dutch product-name localization corruption, including iShares -> iAantal aandelen
 ```
+
+Do not continue patching WP16 unless a new defect is found in a later manifest-linked run.
 
 ---
 
 ## Phase 2 — current baseline rule
 
-The latest fully verified clean baseline before WP16 remains:
+Current manifest-linked baseline is `260612_06`, not older `260610_02` or `260611_*` artifacts.
+
+Use:
 
 ```text
-requested_close_date: 2026-06-10
-run_id: 20260610_211606
-report_token: 260610
-english_report_path: output/weekly_analysis_pro_260610_02.md
-dutch_report_path: output/weekly_analysis_pro_nl_260610_02.md
-pricing_lineage_status: passed
-delivery_status: smtp_sendmail_returned_no_exception
+output/run_manifests/weekly_etf_run_manifest_2026-06-12_20260613_094305.json
+output/delivery/weekly_etf_delivery_manifest_2026-06-12_20260613_094305.json
 ```
 
-The uploaded `260611_02` reports show the macro/ECB fixes landed, but still had comment-residue and duplicated constraint-copy defects. They should not be treated as clean premium final output until the WP16 follow-up rerun is verified.
+Delivery evidence remains delivery-layer evidence only and is not an inbox receipt.
+
+Historical generated outputs remain immutable by default. Do not bulk-edit old reports to remove stale wording or old markers.
 
 ---
 
@@ -96,7 +93,7 @@ raw deterministic macro read: not client-facing
 deterministic macro read as official production regime source: not promoted
 ```
 
-WP16 and WP16-FOLLOWUP do not promote deterministic macro.
+WP16 and its follow-ups do not promote deterministic macro.
 
 Standing authority boundary:
 
@@ -115,47 +112,42 @@ production_report_mutation=false
 
 ---
 
-## Phase 4 — historical artifact policy
+## Phase 4 — recommended next action
 
-WP15 remains active:
-
-```text
-historical_output_artifacts_are_immutable_by_default=true
-current_baseline_scope=manifest_linked_latest_report_set
-historical_output_mutation=false
-```
-
-WP16-FOLLOWUP did not manually rewrite historical outputs. A clean report must be produced by workflow rerun.
-
----
-
-## Phase 5 — next action
-
-Next action:
+Recommended next package:
 
 ```text
-Verify WP16 follow-up rerun result.
+WP17 — PDF visual QA and delivery-runbook hardening
 ```
 
-If the WP16 follow-up rerun succeeds, update:
+Reason:
 
 ```text
-control/CURRENT_STATE.md
-control/NEXT_ACTIONS.md
+WP16 showed that text validators can pass while PDF visuals fail. The next small package should add a deterministic visual/report-render gate before returning to larger macro/thesis roadmap work.
 ```
 
-with the new run id, report token, pricing audit, runtime state, run manifest, delivery manifest, and delivery status.
+Scope:
 
-If the WP16 follow-up rerun fails, inspect the failing workflow step first and do not manually edit generated report artifacts.
+```text
+- no macro promotion
+- no portfolio mutation
+- no scoring/fundability changes
+- no historical artifact rewrite
+- add or improve visual PDF checks for EN/NL equity curve and product-name corruption
+- make runbook evidence easier to verify from latest manifests
+```
+
+After WP17, resume the approved macro/thesis roadmap Phase 2: macro audit foundation.
 
 ---
 
 ## Do-not-do list
 
 ```text
-Do not claim successful delivery without run/delivery manifest evidence.
+Do not claim inbox delivery without receipt evidence.
 Do not promote deterministic macro by implication.
 Do not rewrite historical generated outputs.
 Do not use replacement-edge diagnostics for scoring, fundability, or trades.
 Do not weaken pricing-lineage or runtime-state authority.
+Do not localize ETF issuer/product names such as iShares, SPDR, VanEck, Sprott, or Global X.
 ```
