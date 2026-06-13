@@ -26,6 +26,7 @@ control/MACRO_REPORT_SURFACE_STATUS.md
 control/MACRO_AUDIT_FOUNDATION_STATUS.md
 control/MACRO_REGIME_SHADOW_STATUS.md
 control/DETERMINISTIC_REGIME_ENGINE_PROMOTION_REVIEW.md
+control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
 ```
 
 For historical-output cleanup/archive questions, also read:
@@ -66,7 +67,7 @@ Historical generated outputs remain immutable by default. Do not bulk-edit old r
 
 ---
 
-## Phase 2 — closed repair / foundation packages
+## Phase 2 — closed repair / foundation / design packages
 
 WP16 is closed on the latest verified report set.
 
@@ -76,20 +77,21 @@ WP18 is closed.
 
 WP19 is closed.
 
-WP20 is closed.
+WP20 is closed as review-only / not_promoted.
 
-WP20 closeout evidence:
+WP21 is closed as design-only.
+
+WP21 closeout evidence:
 
 ```text
-review artifact: output/macro/promotion/deterministic_regime_engine_promotion_review_20260613_000000.json
-status: not_promoted
-client_facing_narrative_authority=false
-production_report_narrative_authority=false
-control_layer_decision=not_promoted
-explicit_control_layer_promotion_decision=false
+design artifact: control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
+design_only=true
+specification_only=true
+not_implemented=true
+not_promoted=true
 ```
 
-Do not continue patching WP16/WP17/WP18/WP19/WP20 unless a new defect is found in a later manifest-linked run.
+Do not continue patching WP16/WP17/WP18/WP19/WP20/WP21 unless a new defect is found in a later manifest-linked run.
 
 ---
 
@@ -102,9 +104,10 @@ client-safe macro report surface: integrated
 raw deterministic macro read: not client-facing
 deterministic macro read as official production regime source: not promoted
 deterministic regime engine: not promoted
+deterministic regime client-safe surface: design-only, not implemented
 ```
 
-WP16/WP17/WP18/WP19/WP20 do not promote deterministic macro.
+WP16/WP17/WP18/WP19/WP20/WP21 do not promote deterministic macro.
 
 Standing authority boundary:
 
@@ -128,23 +131,22 @@ production_report_mutation=false
 Active package:
 
 ```text
-WP21 — Deterministic regime client-safe report surface design
+WP22 — Deterministic regime client-safe surface validator
 ```
 
-Current WP21 status:
+Current WP22 status:
 
 ```text
-not_started / ready_to_start / design-only required
+not_started / ready_to_start / validator-or-helper-only required
 ```
 
 Scope:
 
 ```text
-- output-contract design only
-- define a client-safe deterministic regime report surface
-- no raw macro axes in report
+- validator/specification only or narrow helper-only implementation
+- validate the WP21 safe-surface design against fixture-rendered text
+- no production report integration
 - no automatic production promotion
-- no implementation into production report path
 - no scoring/fundability changes
 - no portfolio mutation
 - no historical output rewrite
@@ -153,20 +155,19 @@ Scope:
 Likely start files:
 
 ```text
-control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
-control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
+control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
 control/DETERMINISTIC_REGIME_ENGINE_PROMOTION_REVIEW.md
 control/MACRO_REPORT_SURFACE_STATUS.md
-runtime/macro_report_surface.py
 tools/validate_macro_report_surface.py
 tools/validate_macro_compliance.py
-output/macro/promotion/deterministic_regime_engine_promotion_review_20260613_000000.json
+tools/validate_etf_macro_thesis_surface_leakage.py
+tests/test_macro_regime_promotion_contract.py
 ```
 
 Required boundary:
 
 ```text
-design_only=true
+validator_or_helper_only=true
 client_facing_authority=false
 production_report_narrative_authority=false
 portfolio_action_authority=false
@@ -174,24 +175,25 @@ lane_scoring_authority=false
 fundability_authority=false
 portfolio_mutation=false
 historical_output_mutation=false
+production_report_integration=false
 ```
 
 ---
 
-## Phase 5 — next package after WP21 closes
+## Phase 5 — next package after WP22 closes
 
-Do not start this until WP21 is designed and closed.
+Do not start this until WP22 is validated and closed.
 
 Likely next package:
 
 ```text
-WP22 — Deterministic regime client-safe surface validator, if WP21 produces a stable design
+WP23 — Deterministic regime safe-surface helper, if WP22 validates the contract
 ```
 
 Tentative scope:
 
 ```text
-- validator/specification only or narrow helper-only implementation
+- helper-only implementation behind tests
 - no production report integration
 - no automatic production promotion
 - no scoring/fundability changes
@@ -210,5 +212,5 @@ Do not use replacement-edge diagnostics for scoring, fundability, or trades.
 Do not weaken pricing-lineage or runtime-state authority.
 Do not localize ETF issuer/product names such as iShares, SPDR, VanEck, Sprott, or Global X.
 Do not bypass the PDF visual gate after WP17.
-Do not start WP22 before WP21 is designed and closed.
+Do not start WP23 before WP22 is validated and closed.
 ```
