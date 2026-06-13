@@ -19,6 +19,96 @@ It is intentionally separate from specialized logs:
 
 ---
 
+## 2026-06-13 — WP17 PDF visual QA and delivery-runbook hardening closed
+
+### Current issue
+
+WP16 showed that text validators and HTML/Markdown checks could pass while rendered PDFs still had client-visible defects, especially Dutch equity-curve rendering and Dutch ETF/product-name corruption.
+
+### Root cause / architectural tension
+
+The workflow had strong state, pricing, report-content, and delivery-HTML validation, but did not render committed PDFs into images before send. That meant a defect could exist only in the PDF visual layer and still pass text-level gates.
+
+### What changed
+
+Added:
+
+```text
+tools/validate_etf_pdf_visual_contract.py
+tools/validate_etf_manifest_evidence.py
+tests/test_wp17_pdf_visual_contract.py
+```
+
+Updated:
+
+```text
+.github/workflows/send-weekly-report.yml
+control/CURRENT_STATE.md
+control/NEXT_ACTIONS.md
+control/ETF_SESSION_CHANGELOG.md
+```
+
+Implementation details:
+
+```text
+- installed poppler-utils in the production workflow
+- added PDF visual validation after HTML/PDF render and before send
+- PDF visual validation renders EN/NL PDFs to images and checks visible equity-curve pixels
+- Dutch PDF validation also fails on product-name corruption such as iAantal aandelen
+- added manifest evidence validation after final run-manifest write
+- manifest evidence validation checks workflow success, pricing lineage, EN/NL report paths, EN/NL PDF attachments, delivery status, and the inbox-receipt caveat
+```
+
+### Validation / production evidence
+
+Latest verified manifest-linked baseline after WP17:
+
+```text
+requested_close_date: 2026-06-12
+run_id: 20260613_113054
+report_token: 260612
+english_report_path: output/weekly_analysis_pro_260612_08.md
+dutch_report_path: output/weekly_analysis_pro_nl_260612_08.md
+pricing_lineage_status: passed
+workflow_status: workflow_success
+delivery_status: smtp_sendmail_returned_no_exception
+total_portfolio_value_eur: 108243.33
+cash_eur: 1936.52
+```
+
+Green workflow evidence:
+
+```text
+#246 Request WP17 visual manifest gate rerun — green
+#247 Send weekly ETF Pro report — green
+```
+
+Because the workflow now runs the PDF visual contract before send and the manifest evidence validator after final manifest write, the green #247 run verifies the WP17 gates on the latest manifest-linked baseline.
+
+### Authority boundary preserved
+
+```text
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+funding_authority=false
+portfolio_mutation=false
+deterministic_macro_promotion=false
+historical_output_mutation=false
+```
+
+### Remaining work
+
+Return to roadmap proper:
+
+```text
+WP18 — Macro/thesis roadmap Phase 2: macro audit foundation
+```
+
+WP18 must remain shadow/audit-only unless separately promoted.
+
+---
+
 ## 2026-06-13 — WP16 closeout after macro recency, client-surface, render, no-trade, and product-name repairs
 
 ### Current issue
@@ -110,13 +200,7 @@ historical_output_mutation=false
 
 ### Remaining work
 
-Recommended next package:
-
-```text
-WP17 — PDF visual QA and delivery-runbook hardening
-```
-
-Reason: WP16 showed that text validators alone are not enough for premium report delivery. Add deterministic visual/render checks and clearer manifest evidence before resuming larger macro/thesis roadmap work.
+WP17 closed the immediate PDF visual QA gap. Return to the macro/thesis roadmap proper via WP18.
 
 ---
 
