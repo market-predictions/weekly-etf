@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 is closed, WP17 PDF visual QA / delivery-runbook hardening is closed, WP18 macro audit foundation is closed, WP19 deterministic regime engine fixture baseline is closed, and WP20 deterministic regime engine promotion review is closed as `not_promoted`. The latest manifest-linked production baseline remains `260612_08`. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default. The next package is WP21 — Deterministic regime client-safe report surface design.**
+**WP16 is closed, WP17 PDF visual QA / delivery-runbook hardening is closed, WP18 macro audit foundation is closed, WP19 deterministic regime engine fixture baseline is closed, WP20 deterministic regime engine promotion review is closed as `not_promoted`, and WP21 deterministic regime client-safe surface design is closed as design-only. The latest manifest-linked production baseline remains `260612_08`. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default. The next package is WP22 — Deterministic regime client-safe surface validator.**
 
 ## Latest verified production baseline
 
@@ -34,27 +34,15 @@ carried_forward_holdings_count: 0
 
 Delivery evidence remains delivery-layer evidence only. It is not an end-recipient inbox receipt.
 
-## WP16 repair closeout status
+## Closed package status
+
+### WP16 — report repair closeout
 
 WP16 and its follow-ups are closed for the latest verified client-surface baseline.
 
-Resolved WP16 issues:
+Resolved WP16 issues include ECB macro recency, ECB tightening wording, non-U.S. / IEFA wording, English/Dutch leakage, Dutch equity-curve rendering, no-trade execution validation, and Dutch ETF product-name protection.
 
-```text
-ECB macro recency miss repaired.
-ECB stance now surfaces as Tightening / inflation-sensitive / Verkrappend / inflatiegevoelig.
-ECB rate-policy tightening appears as a policy catalyst.
-Non-U.S. developed exposure wording is reconciled with active IEFA exposure.
-English performance tables no longer use Dutch n.v.t. residue.
-Dutch empty-comment residue is removed.
-Soft-cap / soft-target duplicate wording is normalized.
-Dutch equity curve renders visibly in PDF.
-No-trade model execution artifacts are accepted in shadow and guarded-auto modes when no trade intents exist.
-Dutch ETF/product names are protected from localization corruption.
-GSG continuity product name renders as iShares S&P GSCI Commodity-Indexed Trust.
-```
-
-## WP17 closeout status
+### WP17 — PDF visual QA and delivery-runbook hardening
 
 WP17 is closed on `260612_08`.
 
@@ -70,7 +58,7 @@ Manifest evidence gate runs after final run-manifest write.
 Latest run #247 succeeded after these gates were wired.
 ```
 
-## WP18 macro audit foundation closeout status
+### WP18 — macro audit foundation
 
 WP18 is closed.
 
@@ -101,7 +89,7 @@ portfolio_mutation=false
 production_report_path_changed=false
 ```
 
-## WP19 deterministic regime engine fixture baseline closeout status
+### WP19 — deterministic regime engine fixture baseline
 
 WP19 is closed.
 
@@ -142,7 +130,7 @@ portfolio_mutation=false
 historical_output_mutation=false
 ```
 
-## WP20 deterministic regime engine promotion-review closeout status
+### WP20 — deterministic regime engine promotion review
 
 WP20 is closed as review-only and not promoted.
 
@@ -162,19 +150,6 @@ control_layer_decision=not_promoted
 explicit_control_layer_promotion_decision=false
 ```
 
-Reviewed evidence:
-
-```text
-latest_shadow_evidence_path: output/macro/validation/latest_macro_regime_shadow_validation.json
-latest_shadow_comparison_path: output/macro/validation/latest_macro_regime_shadow_comparison.json
-latest_shadow_workflow_run_id: 27480244857
-latest_shadow_workflow_run_number: 46
-shadow_candidate_regime: Risk-on growth
-legacy_regime: Risk-on growth
-regime_label_differs: false
-confidence_differs: true
-```
-
 Promotion gates assessed:
 
 ```text
@@ -187,20 +162,57 @@ explicit_control_layer_promotion_decision=false
 
 Because not all gates are true, deterministic regime output remains shadow-only and not promoted.
 
-WP20 does not authorize:
+### WP21 — deterministic regime client-safe surface design
+
+WP21 is closed as design-only.
+
+Design artifact:
 
 ```text
-client_facing_narrative_authority
-production_report_narrative_authority
-portfolio_action_authority
-lane_scoring_authority
-fundability_authority
-funding_authority
-portfolio_mutation
-execution_authority
-delivery_authority
-production_report_mutation
-historical_output_mutation
+control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
+```
+
+Design status:
+
+```text
+design_only=true
+specification_only=true
+not_implemented=true
+not_promoted=true
+```
+
+WP21 defines a future safe surface contract only. It does not change runtime code, report rendering, report Markdown, report HTML/PDF, send workflow, portfolio state, lane scoring, fundability, or historical outputs.
+
+Defined future-safe concepts:
+
+```text
+sanitized regime label
+legacy-versus-shadow alignment status
+confidence band, not raw score
+short explanation of broad confirmation or conflict
+discipline disclaimer
+```
+
+Blocked direct report concepts:
+
+```text
+raw macro axes
+raw macro axis scores
+raw macro evidence
+raw confidence decomposition
+raw conflict scores
+workflow run ids
+fixture names
+source file paths in client report
+production action wording
+scoring or fundability wording
+predictive certainty
+```
+
+Next possible package after WP21:
+
+```text
+WP22 — Deterministic regime client-safe surface validator
 ```
 
 ## Deterministic macro boundary
@@ -212,9 +224,10 @@ macro report surface: integrated as client-safe only
 deterministic macro read as raw/shadow object: not client-facing
 deterministic macro read as official decision/regime source: not promoted
 deterministic regime engine: not promoted
+deterministic regime client-safe surface: design-only, not implemented
 ```
 
-Do not infer deterministic macro promotion from WP16, WP17, WP18, WP19, WP20, or their follow-ups.
+Do not infer deterministic macro promotion from WP16, WP17, WP18, WP19, WP20, WP21, or their follow-ups.
 
 Standing authority boundary:
 
@@ -241,7 +254,7 @@ current_baseline_scope=manifest_linked_latest_report_set
 historical_output_mutation=false
 ```
 
-WP16/WP17/WP18/WP19/WP20 did not manually rewrite historical report artifacts. Current production truth is tied to the latest manifest-linked report/runtime/pricing/delivery artifacts.
+WP16/WP17/WP18/WP19/WP20/WP21 did not manually rewrite historical report artifacts. Current production truth is tied to the latest manifest-linked report/runtime/pricing/delivery artifacts.
 
 ## Four-layer operating status
 
@@ -252,8 +265,9 @@ WP16/WP17/WP18/WP19/WP20 did not manually rewrite historical report artifacts. C
 - WP18 closed the shadow-only macro audit foundation validation path.
 - WP19 closed the shadow-only deterministic regime engine fixture baseline.
 - WP20 reviewed deterministic regime engine promotion readiness and kept it not promoted.
-- WP16 through WP20 do not alter scoring, fundability, execution authority, or portfolio authority.
-- WP16 through WP20 do not promote deterministic macro.
+- WP21 defined a future client-safe deterministic regime surface shape without implementation.
+- WP16 through WP21 do not alter scoring, fundability, execution authority, or portfolio authority.
+- WP16 through WP21 do not promote deterministic macro.
 
 ### 2. Input/state contract
 
@@ -264,6 +278,7 @@ WP16/WP17/WP18/WP19/WP20 did not manually rewrite historical report artifacts. C
 - WP18 proves the macro audit fixture/replay evidence path and compatibility with the shadow-regime validation stack.
 - WP19 proves deterministic regime fixture coverage and explicit no-authority payload validation.
 - WP20 records a not-promoted review artifact under the promotion contract.
+- WP21 defines the safe DTO/output shape for possible future validator work.
 
 ### 3. Output contract
 
@@ -272,6 +287,7 @@ WP16/WP17/WP18/WP19/WP20 did not manually rewrite historical report artifacts. C
 - WP18 macro audit fixture validation writes evidence only under `output/macro/validation/` and does not change client reports.
 - WP19 macro-regime shadow validation evidence is internal/shadow-only and must not leak to client reports.
 - WP20 does not change English or Dutch report output.
+- WP21 defines a client-safe surface design but does not implement it.
 
 ### 4. Operational runbook
 
@@ -281,22 +297,23 @@ WP16/WP17/WP18/WP19/WP20 did not manually rewrite historical report artifacts. C
 - WP18 is closed after green macro-audit foundation and macro-regime shadow validation evidence.
 - WP19 is closed after green deterministic regime fixture baseline evidence.
 - WP20 is closed after a valid not-promoted promotion-review artifact.
-- The next package is WP21.
+- WP21 is closed after the design artifact is committed.
+- The next package is WP22.
 
 ## Immediate next action
 
 Start the next package only if desired:
 
 ```text
-WP21 — Deterministic regime client-safe report surface design
+WP22 — Deterministic regime client-safe surface validator
 ```
 
-WP21 must remain output-contract design work unless a separate implementation package is approved.
+WP22 must remain validator/spec-only or helper-only unless a separate implementation package is approved.
 
-Required WP21 boundary:
+Required WP22 boundary:
 
 ```text
-design_only=true
+validator_or_helper_only=true
 client_facing_authority=false
 production_report_narrative_authority=false
 portfolio_action_authority=false
@@ -304,4 +321,5 @@ lane_scoring_authority=false
 fundability_authority=false
 portfolio_mutation=false
 historical_output_mutation=false
+production_report_integration=false
 ```
