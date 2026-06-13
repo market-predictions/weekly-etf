@@ -17,6 +17,7 @@ on:
       - "tools/validate_macro_regime_shadow.py"
       - "tools/write_macro_regime_shadow_validation_evidence.py"
       - "tools/write_macro_regime_shadow_comparison_evidence.py"
+      - "tests/test_macro_regime_shadow.py"
       - ".github/workflows/validate-macro-regime-shadow.yml"
 
 permissions:
@@ -42,7 +43,11 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyyaml pandas yfinance
+          pip install pyyaml pandas yfinance pytest
+
+      - name: Test deterministic regime fixture baseline
+        run: |
+          python -m pytest tests/test_macro_regime_shadow.py -q
 
       - name: Replay deterministic regime fixtures
         run: |
