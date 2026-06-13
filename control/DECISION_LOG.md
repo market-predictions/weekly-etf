@@ -151,3 +151,22 @@ cleanup_policy_defined_no_artifact_mutation
 Older generated outputs may contain stale wording or old markers, but they remain historical evidence by default. Current production truth must be determined from `control/CURRENT_STATE.md` plus the latest manifest-linked report/runtime/pricing/delivery artifacts, not from repo-wide historical grep alone.
 
 Do not bulk-edit, rewrite, delete, squash, or silently regenerate historical output files unless a future explicit cleanup/archive work package defines exact scope, traceability, rollback, and current-baseline verification.
+
+---
+
+## 2026-06-13 — Protect ETF issuer and product names from localization
+
+### Decision
+
+ETF issuer names, fund family names, and product names are protected product terms. Dutch localization may translate table labels and prose, but must not translate inside names such as `iShares`, `SPDR`, `VanEck`, `Sprott`, `Global X`, or official ETF product names.
+
+### Consequence
+
+Broad replacements such as `Shares → Aantal aandelen` must not corrupt product names. Client-surface cleanup and validators must repair or fail on product-name corruption such as:
+
+```text
+iAantal aandelen
+SPDR Gold Aantal aandelen
+```
+
+ETF/product-name protection is an output-contract rule. It does not change portfolio state, pricing, scoring, fundability, funding, or execution authority.
