@@ -23,6 +23,7 @@ For deterministic macro work, also read:
 control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
 control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
 control/MACRO_REPORT_SURFACE_STATUS.md
+control/MACRO_AUDIT_FOUNDATION_STATUS.md
 ```
 
 For historical-output cleanup/archive questions, also read:
@@ -35,7 +36,7 @@ control/HISTORICAL_ARTIFACT_CLEANUP_POLICY.md
 
 ## Phase 1 — current baseline rule
 
-Current manifest-linked baseline is `260612_08`.
+Current manifest-linked production baseline is `260612_08`.
 
 Use:
 
@@ -44,7 +45,7 @@ output/run_manifests/weekly_etf_run_manifest_2026-06-12_20260613_113054.json
 output/delivery/weekly_etf_delivery_manifest_2026-06-12_20260613_113054.json
 ```
 
-Latest verified baseline:
+Latest verified production baseline:
 
 ```text
 requested_close_date: 2026-06-12
@@ -108,7 +109,7 @@ raw deterministic macro read: not client-facing
 deterministic macro read as official production regime source: not promoted
 ```
 
-WP16 and WP17 do not promote deterministic macro.
+WP16/WP17/WP18 do not promote deterministic macro.
 
 Standing authority boundary:
 
@@ -127,18 +128,29 @@ production_report_mutation=false
 
 ---
 
-## Phase 4 — recommended next package
+## Phase 4 — active package
 
-Recommended next package:
+Active package:
 
 ```text
 WP18 — Macro/thesis roadmap Phase 2: macro audit foundation
 ```
 
-Purpose:
+Current WP18 status:
 
 ```text
-Resume the approved macro/thesis roadmap now that the report-surface and delivery visual gates are stable.
+implemented / shadow-only / validation workflow added / pending fresh workflow evidence
+```
+
+Implemented in WP18:
+
+```text
+tools/validate_macro_data_audit.py hardened
+tools/replay_macro_audit_foundation_fixture.py added
+tests/test_wp18_macro_data_audit_validator.py added
+tests/test_wp18_macro_audit_foundation_fixture.py added
+.github/workflows/validate-macro-audit-foundation.yml added
+control/MACRO_AUDIT_FOUNDATION_STATUS.md updated
 ```
 
 Required boundary:
@@ -152,20 +164,47 @@ Required boundary:
 - no historical artifact rewrite
 ```
 
+Next action to close WP18:
+
+```text
+Observe or manually run: Validate ETF macro audit foundation
+Confirm green status
+Confirm output/macro/validation/latest_wp18_macro_audit_foundation_validation.json is committed
+Then update control/CURRENT_STATE.md, control/NEXT_ACTIONS.md, and control/ETF_SESSION_CHANGELOG.md from pending to closed
+```
+
+---
+
+## Phase 5 — next package after WP18 closes
+
+Do not start this until WP18 validation evidence is observed.
+
+Recommended next package:
+
+```text
+WP19 — Deterministic regime engine fixture baseline
+```
+
+Scope:
+
+```text
+- fixture-only / shadow-only deterministic regime classification baseline
+- no production macro promotion
+- no client-facing raw macro axes
+- no portfolio mutation
+- no scoring/fundability changes
+- no historical output rewrite
+```
+
 Likely start files:
 
 ```text
-docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md
-config/macro_data_sources.yml
-macro_sources/build_macro_data_audit.py
-tools/validate_macro_data_audit.py
-schemas/macro_data_audit.schema.json
-```
-
-Recommended next action:
-
-```text
-Define and execute WP18 as a small macro-audit foundation package with one verifiable audit artifact and validator, keeping all outputs shadow-only.
+config/regime_thresholds.yml
+macro_regime/classify.py
+macro_regime/confidence.py
+runtime/build_macro_policy_pack_shadow.py
+tools/validate_macro_regime_shadow.py
+fixtures/macro_regime_shadow/regime_shadow_fixtures.json
 ```
 
 ---
@@ -180,4 +219,5 @@ Do not use replacement-edge diagnostics for scoring, fundability, or trades.
 Do not weaken pricing-lineage or runtime-state authority.
 Do not localize ETF issuer/product names such as iShares, SPDR, VanEck, Sprott, or Global X.
 Do not bypass the PDF visual gate after WP17.
+Do not start WP19 before WP18 validation evidence is observed.
 ```
