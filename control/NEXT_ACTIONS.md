@@ -25,6 +25,7 @@ control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
 control/MACRO_REPORT_SURFACE_STATUS.md
 control/MACRO_AUDIT_FOUNDATION_STATUS.md
 control/MACRO_REGIME_SHADOW_STATUS.md
+control/DETERMINISTIC_REGIME_ENGINE_PROMOTION_REVIEW.md
 ```
 
 For historical-output cleanup/archive questions, also read:
@@ -75,30 +76,20 @@ WP18 is closed.
 
 WP19 is closed.
 
-Closed WP19 work:
+WP20 is closed.
+
+WP20 closeout evidence:
 
 ```text
-macro_regime/classify.py now emits explicit no-authority fields.
-tools/validate_macro_regime_shadow.py now requires no-authority fields and macro-audit consistency.
-tools/replay_macro_regime_shadow_fixtures.py now validates fixture authority and regime-label coverage.
-fixtures/macro_regime_shadow/regime_shadow_fixtures.json now carries explicit no-authority fields.
-tools/write_macro_regime_shadow_validation_evidence.py now records full no-authority state.
-tests/test_macro_regime_shadow.py added.
-.github/workflows/validate-macro-regime-shadow.yml now runs tests/test_macro_regime_shadow.py.
-control/MACRO_REGIME_SHADOW_STATUS.md updated to closed.
+review artifact: output/macro/promotion/deterministic_regime_engine_promotion_review_20260613_000000.json
+status: not_promoted
+client_facing_narrative_authority=false
+production_report_narrative_authority=false
+control_layer_decision=not_promoted
+explicit_control_layer_promotion_decision=false
 ```
 
-WP19 closeout evidence:
-
-```text
-Validate ETF macro regime shadow: green
-workflow_run_id: 27480244857
-workflow_run_number: 46
-commit_sha: 1ba3f4e5a6126fd824a151525b0d9d91d42c3627
-latest_macro_regime_shadow_validation.json: committed
-```
-
-Do not continue patching WP16/WP17/WP18/WP19 unless a new defect is found in a later manifest-linked run.
+Do not continue patching WP16/WP17/WP18/WP19/WP20 unless a new defect is found in a later manifest-linked run.
 
 ---
 
@@ -110,9 +101,10 @@ Current deterministic macro boundary remains:
 client-safe macro report surface: integrated
 raw deterministic macro read: not client-facing
 deterministic macro read as official production regime source: not promoted
+deterministic regime engine: not promoted
 ```
 
-WP16/WP17/WP18/WP19 do not promote deterministic macro.
+WP16/WP17/WP18/WP19/WP20 do not promote deterministic macro.
 
 Standing authority boundary:
 
@@ -136,24 +128,25 @@ production_report_mutation=false
 Active package:
 
 ```text
-WP20 — Deterministic regime engine promotion-review contract
+WP21 — Deterministic regime client-safe report surface design
 ```
 
-Current WP20 status:
+Current WP21 status:
 
 ```text
-not_started / ready_to_start / review-only required
+not_started / ready_to_start / design-only required
 ```
 
 Scope:
 
 ```text
-- review-only promotion-readiness contract for deterministic regime engine
-- compare deterministic shadow output quality and safety after WP19 fixture baseline
+- output-contract design only
+- define a client-safe deterministic regime report surface
+- no raw macro axes in report
 - no automatic production promotion
-- no client-facing raw macro axes
-- no portfolio mutation
+- no implementation into production report path
 - no scoring/fundability changes
+- no portfolio mutation
 - no historical output rewrite
 ```
 
@@ -162,17 +155,18 @@ Likely start files:
 ```text
 control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
 control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
+control/DETERMINISTIC_REGIME_ENGINE_PROMOTION_REVIEW.md
 control/MACRO_REPORT_SURFACE_STATUS.md
-control/MACRO_AUDIT_FOUNDATION_STATUS.md
-control/MACRO_REGIME_SHADOW_STATUS.md
-output/macro/validation/latest_macro_regime_shadow_validation.json
-output/macro/validation/latest_macro_regime_shadow_comparison.json
+runtime/macro_report_surface.py
+tools/validate_macro_report_surface.py
+tools/validate_macro_compliance.py
+output/macro/promotion/deterministic_regime_engine_promotion_review_20260613_000000.json
 ```
 
 Required boundary:
 
 ```text
-review_only=true
+design_only=true
 client_facing_authority=false
 production_report_narrative_authority=false
 portfolio_action_authority=false
@@ -184,22 +178,21 @@ historical_output_mutation=false
 
 ---
 
-## Phase 5 — next package after WP20 closes
+## Phase 5 — next package after WP21 closes
 
-Do not start this until WP20 is reviewed and closed.
+Do not start this until WP21 is designed and closed.
 
 Likely next package:
 
 ```text
-WP21 — Deterministic regime client-safe report surface design, if WP20 keeps review path open
+WP22 — Deterministic regime client-safe surface validator, if WP21 produces a stable design
 ```
 
 Tentative scope:
 
 ```text
-- output-contract design only
-- client-safe text surface only
-- no raw macro axes in report
+- validator/specification only or narrow helper-only implementation
+- no production report integration
 - no automatic production promotion
 - no scoring/fundability changes
 - no portfolio mutation
@@ -217,5 +210,5 @@ Do not use replacement-edge diagnostics for scoring, fundability, or trades.
 Do not weaken pricing-lineage or runtime-state authority.
 Do not localize ETF issuer/product names such as iShares, SPDR, VanEck, Sprott, or Global X.
 Do not bypass the PDF visual gate after WP17.
-Do not start WP21 before WP20 is reviewed and closed.
+Do not start WP22 before WP21 is designed and closed.
 ```
