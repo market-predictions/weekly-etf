@@ -1,0 +1,60 @@
+{
+  "schema_version": "macro_regime_promotion_decision_v1",
+  "artifact_type": "deterministic_macro_regime_promotion_decision",
+  "run_id": "wp20_20260613_000000",
+  "created_at_utc": "2026-06-13T22:00:00Z",
+  "report_date": "2026-06-13",
+  "status": "not_promoted",
+  "client_facing_narrative_authority": false,
+  "production_report_narrative_authority": false,
+  "required_approvals": {
+    "methodology_approved": false,
+    "bilingual_parity_approved": false,
+    "compliance_validator_passed": false,
+    "old_vs_new_comparison_reviewed": true
+  },
+  "promotion_decision": {
+    "control_layer_decision": "not_promoted",
+    "explicit_control_layer_promotion_decision": false,
+    "decision_record_path": "control/DETERMINISTIC_REGIME_ENGINE_PROMOTION_REVIEW.md",
+    "reviewed_by_or_process": "WP20 deterministic regime engine promotion-review contract"
+  },
+  "authority": {
+    "portfolio_action_authority": false,
+    "lane_scoring_authority": false,
+    "fundability_authority": false,
+    "funding_authority": false,
+    "portfolio_mutation": false
+  },
+  "blockers": [
+    "macro regime remains shadow-only",
+    "methodology_approved=false",
+    "bilingual_parity_approved=false",
+    "compliance_validator_passed=false",
+    "explicit_control_layer_promotion_decision=false",
+    "client-safe deterministic regime report surface not designed in this package",
+    "production report integration not authorized in this package",
+    "raw macro_axes and macro_axis_scores remain blocked from client reports"
+  ],
+  "review_context": {
+    "wp18_status": "closed_verified_shadow_only",
+    "wp19_status": "closed_verified_shadow_only",
+    "latest_shadow_evidence_path": "output/macro/validation/latest_macro_regime_shadow_validation.json",
+    "latest_shadow_comparison_path": "output/macro/validation/latest_macro_regime_shadow_comparison.json",
+    "latest_shadow_workflow_run_id": "27480244857",
+    "latest_shadow_workflow_run_number": "46",
+    "latest_shadow_workflow_commit_sha": "1ba3f4e5a6126fd824a151525b0d9d91d42c3627",
+    "shadow_candidate_regime": "Risk-on growth",
+    "legacy_regime": "Risk-on growth",
+    "regime_label_differs": false,
+    "confidence_differs": true,
+    "deterministic_engine_fixture_baseline_status": "passed",
+    "macro_audit_foundation_status": "passed"
+  },
+  "review_summary": {
+    "decision": "Do not promote deterministic regime engine to production report narrative authority in WP20.",
+    "reason": "Fixture and shadow validation evidence are green, but promotion gates for methodology, bilingual parity, client-surface compliance, and explicit control-layer promotion are not complete.",
+    "allowed_next_step": "Design a client-safe deterministic regime report surface in a later output-contract package if desired.",
+    "disallowed_next_step": "Do not wire raw deterministic_regime_shadow, macro_axes, macro_axis_scores, or macro_evidence directly into English/Dutch client reports."
+  }
+}
