@@ -12,19 +12,19 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 macro event recency and report-surface QA repair is closed on the latest verified report set `260612_06`. The latest manifest-linked production run succeeded with pricing lineage passed, EN/NL artifacts generated, delivery-manifest evidence written, Dutch equity-curve rendering fixed, and Dutch ETF/product-name corruption fixed. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default.**
+**WP16 is closed and WP17 PDF visual QA / delivery-runbook hardening is implemented and verified on the latest manifest-linked report set `260612_08`. The latest production run succeeded with pricing lineage passed, EN/NL artifacts generated, PDF visual contract passed, manifest evidence validator passed, and delivery-manifest evidence written. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default.**
 
 ## Latest verified production baseline
 
 ```text
 requested_close_date: 2026-06-12
-run_id: 20260613_094305
+run_id: 20260613_113054
 report_token: 260612
-english_report_path: output/weekly_analysis_pro_260612_06.md
-dutch_report_path: output/weekly_analysis_pro_nl_260612_06.md
+english_report_path: output/weekly_analysis_pro_260612_08.md
+dutch_report_path: output/weekly_analysis_pro_nl_260612_08.md
 pricing_lineage_status: passed
 workflow_status: workflow_success
-delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-12_20260613_094305.json
+delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-12_20260613_113054.json
 delivery_status: smtp_sendmail_returned_no_exception
 total_portfolio_value_eur: 108243.33
 cash_eur: 1936.52
@@ -38,7 +38,7 @@ Delivery evidence remains delivery-layer evidence only. It is not an end-recipie
 
 WP16 and its follow-ups are closed for the latest verified client-surface baseline.
 
-Resolved issues:
+Resolved WP16 issues:
 
 ```text
 ECB macro recency miss repaired.
@@ -51,17 +51,26 @@ Soft-cap / soft-target duplicate wording is normalized.
 Dutch equity curve renders visibly in PDF.
 No-trade model execution artifacts are accepted in shadow and guarded-auto modes when no trade intents exist.
 Dutch ETF/product names are protected from localization corruption.
-GSG continuity product name now renders as iShares S&P GSCI Commodity-Indexed Trust.
+GSG continuity product name renders as iShares S&P GSCI Commodity-Indexed Trust.
 ```
 
-Latest `260612_06` uploaded PDF QA evidence confirms:
+## WP17 closeout status
+
+WP17 is closed on `260612_08`.
+
+Implemented and verified:
 
 ```text
-English equity curve visible.
-Dutch equity curve visible.
-Dutch GSG product name correct.
-No iAantal aandelen corruption observed in the Dutch continuity table.
+PDF visual contract validator added.
+Poppler rendering tools installed in the production workflow.
+EN/NL PDF equity-curve visual gate runs before send.
+Dutch PDF product-name corruption gate runs before send.
+Manifest evidence validator added.
+Manifest evidence gate runs after final run-manifest write.
+Latest run #247 succeeded after these gates were wired.
 ```
+
+The PDF visual validator renders committed PDFs to images and requires a visible equity curve in English and Dutch. The manifest evidence validator checks latest run/delivery manifests, attached PDFs, EN/NL language coverage, pricing lineage, and the delivery caveat.
 
 ## Deterministic macro boundary
 
@@ -73,7 +82,7 @@ deterministic macro read as raw/shadow object: not client-facing
 deterministic macro read as official decision/regime source: not promoted
 ```
 
-Do not infer deterministic macro promotion from WP16 or its follow-ups.
+Do not infer deterministic macro promotion from WP16, WP17, or their follow-ups.
 
 Standing authority boundary:
 
@@ -100,16 +109,17 @@ current_baseline_scope=manifest_linked_latest_report_set
 historical_output_mutation=false
 ```
 
-WP16 follow-ups did not manually rewrite historical report artifacts. Current production truth is tied to the latest manifest-linked report/runtime/pricing/delivery artifacts.
+WP16/WP17 did not manually rewrite historical report artifacts. Current production truth is tied to the latest manifest-linked report/runtime/pricing/delivery artifacts.
 
 ## Four-layer operating status
 
 ### 1. Decision framework
 
 - WP16 repaired report-surface QA and macro-event recency handling.
-- It did not alter scoring, fundability, execution authority, or portfolio authority.
-- It did not promote deterministic macro.
-- ETF/product names are now treated as protected product terms and must not be translated by Dutch localization.
+- WP17 hardened visual PDF QA and delivery-runbook evidence.
+- Neither WP16 nor WP17 altered scoring, fundability, execution authority, or portfolio authority.
+- Neither WP16 nor WP17 promoted deterministic macro.
+- ETF/product names are protected product terms and must not be translated by Dutch localization.
 
 ### 2. Input/state contract
 
@@ -119,20 +129,23 @@ WP16 follow-ups did not manually rewrite historical report artifacts. Current pr
 
 ### 3. Output contract
 
-- Future reports must not expose empty-comment residue, duplicated soft-cap wording, English/Dutch language leakage, Dutch equity-curve clipping, or product-name localization corruption such as `iAantal aandelen`.
+- Future reports must not expose empty-comment residue, duplicated soft-cap wording, English/Dutch language leakage, Dutch equity-curve clipping, invisible charts, or product-name localization corruption such as `iAantal aandelen`.
+- PDF visual validation is now part of the pre-send gate.
 
 ### 4. Operational runbook
 
 - Do not claim inbox delivery; the latest delivery evidence is `smtp_sendmail_returned_no_exception` plus delivery manifest.
 - Manual GitHub Actions starts may still be required when run-queue pushes do not automatically trigger the workflow.
+- Latest successful report baseline after WP17 is `260612_08`.
 
 ## Immediate next action
 
-Return to the roadmap proper. Recommended next choice:
+Return to the roadmap proper.
+
+Recommended next package:
 
 ```text
-Option A — resume macro/thesis roadmap Phase 2: macro audit foundation
-Option B — strengthen delivery/runbook verification and PDF visual gates
+WP18 — Macro/thesis roadmap Phase 2: macro audit foundation
 ```
 
-Recommended default: Option B for one small package first, because WP16 showed that visual PDF defects can pass text validators unless explicitly checked. Then resume macro/thesis roadmap Phase 2.
+Scope should remain shadow/audit-only unless a separate promotion contract explicitly grants authority.
