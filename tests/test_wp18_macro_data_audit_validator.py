@@ -32,6 +32,22 @@ def test_wp18_macro_data_audit_fixture_passes_hardened_validator(tmp_path) -> No
     assert result["groups"] == ["ecb", "fred", "treasury_fiscaldata", "volatility"]
 
 
+def test_wp18_macro_data_audit_accepts_observed_staleness_summary(tmp_path) -> None:
+    payload = _payload()
+    payload["summary"]["max_staleness_days"] = max(row["staleness_days"] for row in payload["observations"])
+    path = _write(tmp_path, payload)
+
+    assert validate(path)["observations"] == 4
+
+
+def test_wp18_macro_data_audit_accepts_allowed_staleness_summary(tmp_path) -> None:
+    payload = _payload()
+    payload["summary"]["max_staleness_days"] = max(row["max_staleness_days"] for row in payload["observations"])
+    path = _write(tmp_path, payload)
+
+    assert validate(path)["observations"] == 4
+
+
 def test_wp18_macro_data_audit_requires_source_group_status(tmp_path) -> None:
     payload = _payload()
     payload["source_group_status"] = {"fred": "present"}
