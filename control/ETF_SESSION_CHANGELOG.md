@@ -19,6 +19,107 @@ It is intentionally separate from specialized logs:
 
 ---
 
+## 2026-06-13 — WP16 closeout after macro recency, client-surface, render, no-trade, and product-name repairs
+
+### Current issue
+
+The `260611` and early `260612` report series exposed multiple premium-client-surface defects after the macro-event recency repair: stale/missing ECB policy context, English/Dutch language leakage, visible comment residue, Dutch equity-curve PDF rendering failures, no-trade execution validation mismatches, and Dutch product-name localization corruption.
+
+### Root cause / architectural tension
+
+The report workflow had strong text/state/pricing contracts, but several output-layer defects sat between render, localization, PDF embedding, and delivery validation:
+
+```text
+- macro event recency was not fully reflected in the client-safe macro surface
+- Dutch localization could apply broad token replacement inside protected ETF/product names
+- PDF visual defects were not caught by text validators
+- no-trade execution artifacts were valid runtime states but not accepted by validators in both shadow and guarded-auto modes
+```
+
+### What changed
+
+Implemented and verified the WP16 repair cycle and follow-ups. Key files changed during the cycle included:
+
+```text
+runtime/wp16_followup3_cleanup.py
+runtime/client_facing_sanitizer.py
+runtime/equity_curve_png_contract.py
+runtime/equity_curve_svg_contract.py
+send_report.py
+send_report_runtime_html.py
+tools/validate_etf_client_surface_clean.py
+tools/validate_etf_model_execution.py
+tools/validate_etf_execution_state_authority.py
+control/CURRENT_STATE.md
+control/NEXT_ACTIONS.md
+control/ETF_SESSION_CHANGELOG.md
+control/DECISION_LOG.md
+```
+
+Key resolved defects:
+
+```text
+ECB tightening event surfaced in EN/NL macro narrative.
+ECB stance now reads Tightening / inflation-sensitive and Verkrappend / inflatiegevoelig.
+Non-U.S. / IEFA wording reconciled with live IEFA exposure.
+English n.v.t. residue removed.
+Dutch empty-comment residue removed.
+Soft-cap / soft-target duplicated wording normalized.
+Dutch equity curve now renders visibly in PDF.
+Shadow and guarded-auto no-trade execution artifacts are valid when no trade intents exist and no state/ledger writes are claimed.
+Dutch product-name corruption repaired; iShares is protected against Shares -> Aantal aandelen localization.
+```
+
+### Validation / production evidence
+
+Latest verified manifest-linked baseline:
+
+```text
+requested_close_date: 2026-06-12
+run_id: 20260613_094305
+report_token: 260612
+english_report_path: output/weekly_analysis_pro_260612_06.md
+dutch_report_path: output/weekly_analysis_pro_nl_260612_06.md
+pricing_lineage_status: passed
+workflow_status: workflow_success
+delivery_status: smtp_sendmail_returned_no_exception
+total_portfolio_value_eur: 108243.33
+cash_eur: 1936.52
+```
+
+Uploaded `260612_06` PDF QA confirmed:
+
+```text
+English equity curve visible.
+Dutch equity curve visible.
+Dutch continuity table shows GSG product name as iShares S&P GSCI Commodity-Indexed Trust.
+No iAantal aandelen corruption observed.
+```
+
+### Authority boundary preserved
+
+```text
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+funding_authority=false
+portfolio_mutation=false
+deterministic_macro_promotion=false
+historical_output_mutation=false
+```
+
+### Remaining work
+
+Recommended next package:
+
+```text
+WP17 — PDF visual QA and delivery-runbook hardening
+```
+
+Reason: WP16 showed that text validators alone are not enough for premium report delivery. Add deterministic visual/render checks and clearer manifest evidence before resuming larger macro/thesis roadmap work.
+
+---
+
 ## 2026-06-10 — WP11A-FIX replacement-edge diagnostic notes wired into report surface
 
 ### Current issue
