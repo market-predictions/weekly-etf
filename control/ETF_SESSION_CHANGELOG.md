@@ -19,6 +19,81 @@ It is intentionally separate from specialized logs:
 
 ---
 
+## 2026-06-13 — WP21 deterministic regime client-safe surface design closed
+
+### Current issue
+
+WP20 kept the deterministic regime engine not promoted, but also identified the next safe step: define a future client-safe surface shape before any validator or implementation work.
+
+### Root cause / architectural tension
+
+The deterministic regime shadow evidence contains useful regime, confidence, comparison and macro-context information, but raw fields such as `macro_axes`, `macro_axis_scores`, `macro_evidence`, `confidence_decomposition`, workflow metadata and fixture names must not be copied directly into client reports. A safe output contract must exist before any helper, validator, or report integration package is allowed.
+
+### What changed
+
+Added:
+
+```text
+control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
+```
+
+Updated:
+
+```text
+control/CURRENT_STATE.md
+control/NEXT_ACTIONS.md
+control/ETF_SESSION_CHANGELOG.md
+```
+
+Implementation details:
+
+```text
+- defined a design-only client-safe deterministic regime surface contract
+- specified a future narrow DTO: DeterministicRegimeClientSurface
+- defined allowed English and Dutch surface shapes
+- required confidence bands instead of raw confidence precision
+- blocked raw macro axes, raw scores, macro evidence, confidence decomposition, workflow metadata, fixture names and source paths from report use
+- specified future validator expectations for WP22
+- no runtime, renderer, report, delivery, scoring, fundability, portfolio or historical-output files were changed
+```
+
+### Validation evidence
+
+WP21 is a specification-only package. Closeout evidence is the committed design artifact:
+
+```text
+control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
+```
+
+No test execution is required for WP21 because no runtime validator or helper was implemented.
+
+### Authority boundary preserved
+
+```text
+design_only=true
+client_facing_authority=false
+production_report_narrative_authority=false
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+funding_authority=false
+portfolio_mutation=false
+production_report_integration=false
+historical_output_mutation=false
+```
+
+### Remaining work
+
+Proceed only to a separate validator/helper package if desired:
+
+```text
+WP22 — Deterministic regime client-safe surface validator
+```
+
+WP22 must remain validator/spec-only or helper-only. It must not integrate deterministic regime output into production reports.
+
+---
+
 ## 2026-06-13 — WP20 deterministic regime engine promotion review closed as not_promoted
 
 ### Current issue
@@ -104,13 +179,7 @@ historical_output_mutation=false
 
 ### Remaining work
 
-Proceed only to a separate design package if desired:
-
-```text
-WP21 — Deterministic regime client-safe report surface design
-```
-
-WP21 must remain output-contract design work only. It must not promote or integrate deterministic regime output into production reports by implication.
+Superseded by WP21 design closeout. Proceed only to WP22 if desired.
 
 ---
 
@@ -195,7 +264,7 @@ historical_output_mutation=false
 
 ### Remaining work
 
-Superseded by WP20 closeout. Proceed only to WP21 if desired.
+Superseded by WP20 and WP21 closeout. Proceed only to WP22 if desired.
 
 ---
 
@@ -274,7 +343,7 @@ historical_output_mutation=false
 
 ### Remaining work
 
-Superseded by WP19 and WP20 closeout. Proceed only to WP21 if desired.
+Superseded by WP19/WP20/WP21 closeout. Proceed only to WP22 if desired.
 
 ---
 
