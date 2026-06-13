@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 is closed and WP17 PDF visual QA / delivery-runbook hardening is implemented and verified on the latest manifest-linked report set `260612_08`. The latest production run succeeded with pricing lineage passed, EN/NL artifacts generated, PDF visual contract passed, manifest evidence validator passed, and delivery-manifest evidence written. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default.**
+**WP16 is closed and WP17 PDF visual QA / delivery-runbook hardening is implemented and verified on the latest manifest-linked report set `260612_08`. WP18 macro audit foundation is implemented as a shadow-only validation path and is pending fresh workflow evidence from `Validate ETF macro audit foundation`. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default.**
 
 ## Latest verified production baseline
 
@@ -72,6 +72,40 @@ Latest run #247 succeeded after these gates were wired.
 
 The PDF visual validator renders committed PDFs to images and requires a visible equity curve in English and Dutch. The manifest evidence validator checks latest run/delivery manifests, attached PDFs, EN/NL language coverage, pricing lineage, and the delivery caveat.
 
+## WP18 macro audit foundation status
+
+WP18 is implemented but not yet closed.
+
+Implemented:
+
+```text
+Hardened tools/validate_macro_data_audit.py.
+Added tests/test_wp18_macro_data_audit_validator.py.
+Added tools/replay_macro_audit_foundation_fixture.py.
+Added tests/test_wp18_macro_audit_foundation_fixture.py.
+Added .github/workflows/validate-macro-audit-foundation.yml.
+Updated control/MACRO_AUDIT_FOUNDATION_STATUS.md.
+```
+
+WP18 remains:
+
+```text
+shadow_only=true
+client_facing_authority=false
+decision_impact=none_phase2_audit_only
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+portfolio_mutation=false
+```
+
+Pending closeout evidence:
+
+```text
+Validate ETF macro audit foundation workflow green
+output/macro/validation/latest_wp18_macro_audit_foundation_validation.json committed
+```
+
 ## Deterministic macro boundary
 
 Current deterministic macro state remains:
@@ -82,7 +116,7 @@ deterministic macro read as raw/shadow object: not client-facing
 deterministic macro read as official decision/regime source: not promoted
 ```
 
-Do not infer deterministic macro promotion from WP16, WP17, or their follow-ups.
+Do not infer deterministic macro promotion from WP16, WP17, WP18, or their follow-ups.
 
 Standing authority boundary:
 
@@ -109,7 +143,7 @@ current_baseline_scope=manifest_linked_latest_report_set
 historical_output_mutation=false
 ```
 
-WP16/WP17 did not manually rewrite historical report artifacts. Current production truth is tied to the latest manifest-linked report/runtime/pricing/delivery artifacts.
+WP16/WP17/WP18 did not manually rewrite historical report artifacts. Current production truth is tied to the latest manifest-linked report/runtime/pricing/delivery artifacts.
 
 ## Four-layer operating status
 
@@ -117,8 +151,9 @@ WP16/WP17 did not manually rewrite historical report artifacts. Current producti
 
 - WP16 repaired report-surface QA and macro-event recency handling.
 - WP17 hardened visual PDF QA and delivery-runbook evidence.
-- Neither WP16 nor WP17 altered scoring, fundability, execution authority, or portfolio authority.
-- Neither WP16 nor WP17 promoted deterministic macro.
+- WP18 implements a shadow-only macro audit foundation validation path.
+- WP16, WP17, and WP18 do not alter scoring, fundability, execution authority, or portfolio authority.
+- WP16, WP17, and WP18 do not promote deterministic macro.
 - ETF/product names are protected product terms and must not be translated by Dutch localization.
 
 ### 2. Input/state contract
@@ -126,26 +161,41 @@ WP16/WP17 did not manually rewrite historical report artifacts. Current producti
 - Current production truth remains tied to manifest-linked runtime/pricing/delivery artifacts.
 - Uploaded PDFs are QA evidence, not source-of-truth state.
 - Latest pricing lineage is passed for all 9 holdings.
+- Macro audit values remain provenance input evidence only and are not production decision authority.
 
 ### 3. Output contract
 
 - Future reports must not expose empty-comment residue, duplicated soft-cap wording, English/Dutch language leakage, Dutch equity-curve clipping, invisible charts, or product-name localization corruption such as `iAantal aandelen`.
 - PDF visual validation is now part of the pre-send gate.
+- WP18 macro audit fixture validation writes evidence only under `output/macro/validation/` and does not change client reports.
 
 ### 4. Operational runbook
 
 - Do not claim inbox delivery; the latest delivery evidence is `smtp_sendmail_returned_no_exception` plus delivery manifest.
 - Manual GitHub Actions starts may still be required when run-queue pushes do not automatically trigger the workflow.
 - Latest successful report baseline after WP17 is `260612_08`.
+- To close WP18, observe the `Validate ETF macro audit foundation` workflow and verify committed validation evidence.
 
 ## Immediate next action
 
-Return to the roadmap proper.
+Verify WP18 workflow evidence.
 
-Recommended next package:
+Expected workflow:
 
 ```text
-WP18 — Macro/thesis roadmap Phase 2: macro audit foundation
+Validate ETF macro audit foundation
 ```
 
-Scope should remain shadow/audit-only unless a separate promotion contract explicitly grants authority.
+Expected latest evidence path:
+
+```text
+output/macro/validation/latest_wp18_macro_audit_foundation_validation.json
+```
+
+After WP18 closes, the next package should be:
+
+```text
+WP19 — Deterministic regime engine fixture baseline
+```
+
+WP19 must remain shadow-only unless a separate promotion contract explicitly grants authority.
