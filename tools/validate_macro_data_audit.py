@@ -88,6 +88,14 @@ def source_group(row: dict) -> str:
     return source
 
 
+def _int_field(container: dict, key: str, *, default: int | None = None) -> int:
+    if key not in container or container.get(key) is None:
+        if default is None:
+            raise RuntimeError(f"Macro data audit integer field missing: {key}")
+        return default
+    return int(container.get(key))
+
+
 def _require_authority(payload: dict) -> None:
     authority = payload.get("authority") or {}
     for field in AUTHORITY_FIELDS:
@@ -115,9 +123,9 @@ def _require_source_groups(payload: dict, groups: set[str]) -> None:
 
 
 def _summary_max_staleness_matches(summary: dict, rows: list[dict]) -> bool:
-    actual = int(summary.get("max_staleness_days") or -1)
-    max_observed_staleness = max(int(row.get("staleness_days")) for row in rows)
-    max_allowed_staleness = max(int(row.get("max_staleness_days")) for row in rows)
+    actual = _int_field(summary, "max_staleness_days")
+    max_observed_staleness = max(_int_field(row, "staleness_days") for row in rows)
+    max_allowed_staleness = max(_int_field(row, "max_staleness_days") for row in rows)
     # Compatibility rule: WP18 fixtures use this summary as maximum observed
     # staleness; older macro-regime shadow fixtures use it as a source-contract
     # ceiling. Both are valid if the summary does not under-report observed
@@ -173,8 +181,8 @@ def validate(path: Path) -> dict:
             raise RuntimeError("Macro observation date is invalid: " + key)
         if "t" not in str(row.get("fetched_at_utc") or "").lower():
             raise RuntimeError("Macro observation fetched_at_utc is invalid: " + key)
-        staleness = int(row.get("staleness_days"))
-        max_staleness = int(row.get("max_staleness_days"))
+        staleness = _int_field(row, "staleness_days")
+        max_staleness = _int_field(row, "max_staleness_days")
         if staleness < 0 or staleness > max_staleness:
             raise RuntimeError("Macro observation stale: " + key)
         if row.get("status") != "fresh":
@@ -187,7 +195,7 @@ def validate(path: Path) -> dict:
     summary = payload.get("summary") or {}
     if summary.get("shadow_only") is not True or summary.get("client_facing_authority") is not False:
         raise RuntimeError("Macro audit authority flags are invalid")
-    if int(summary.get("observation_count") or -1) != len(rows):
+    if _int_field(summary, "observation_count", default=-1) != len(rows):
         raise RuntimeError("Macro audit observation_count mismatch")
     if not _summary_max_staleness_matches(summary, rows):
         raise RuntimeError("Macro audit max_staleness_days mismatch")
