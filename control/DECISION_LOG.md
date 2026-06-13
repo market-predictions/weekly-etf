@@ -222,3 +222,45 @@ explicit_control_layer_promotion_decision=false
 ### Consequence
 
 The deterministic regime engine may remain useful as shadow evidence, but it does not become a production report narrative source. It must not be wired into English/Dutch client reports, lane scoring, fundability, or portfolio actions until a later package satisfies methodology, bilingual, compliance, and explicit control-layer promotion gates.
+
+---
+
+## 2026-06-13 — Deterministic regime client-safe surface must use a narrow DTO
+
+### Decision
+
+WP21 defines:
+
+```text
+control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
+```
+
+A future deterministic regime client-safe surface must be derived from a narrow sanitized DTO rather than from the full shadow payload or full macro pack.
+
+The future DTO may expose only sanitized fields such as:
+
+```text
+regime_label_en / regime_label_nl
+confidence_band_en / confidence_band_nl
+comparison_status_en / comparison_status_nl
+short_explanation_en / short_explanation_nl
+discipline_note_en / discipline_note_nl
+authority_disclaimer_en / authority_disclaimer_nl
+```
+
+### Consequence
+
+Raw deterministic fields remain blocked from direct report use:
+
+```text
+deterministic_regime_shadow
+macro_axes
+macro_axis_scores
+macro_evidence
+confidence_decomposition
+raw authority fields
+workflow metadata
+fixture names
+```
+
+WP21 is design-only and does not grant client-facing authority, production report narrative authority, portfolio-action authority, lane-scoring authority, fundability authority, portfolio mutation authority, production report integration, or historical-output mutation.
