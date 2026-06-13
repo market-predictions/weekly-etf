@@ -35,6 +35,20 @@ OBS_FIELDS = [
     "status",
 ]
 AUTHORITY_FIELDS = ["decision_framework", "input_state_contract", "output_contract", "operational_runbook"]
+POSITIVE_AUTHORITY_PATTERNS = [
+    "can drive allocation",
+    "may drive allocation",
+    "drives allocation",
+    "allocation authority granted",
+    "portfolio action authority granted",
+    "lane scoring authority granted",
+    "fundability authority granted",
+    "sets regime",
+    "sets confidence",
+    "sets lane scoring",
+    "sets fundability",
+    "sets portfolio action",
+]
 
 
 def load(path: Path) -> dict:
@@ -80,11 +94,11 @@ def _require_authority(payload: dict) -> None:
         if not str(authority.get(field) or "").strip():
             raise RuntimeError("Macro data audit authority field missing: " + field)
     text = " ".join(str(authority.get(field) or "") for field in AUTHORITY_FIELDS).lower()
-    forbidden = ["allocation authority", "portfolio action authority", "fundability authority", "lane scoring authority"]
-    if not any("no allocation" in text or "no allocation decision authority" in text for _ in [0]):
+    if "no allocation" not in text and "no allocation decision authority" not in text:
         raise RuntimeError("Macro data audit authority does not explicitly deny allocation authority")
-    if any(token in text and "no " + token not in text for token in forbidden):
-        raise RuntimeError("Macro data audit authority wording may imply production authority")
+    matched = [pattern for pattern in POSITIVE_AUTHORITY_PATTERNS if pattern in text]
+    if matched:
+        raise RuntimeError("Macro data audit authority wording may imply production authority: " + ", ".join(matched))
 
 
 def _require_source_groups(payload: dict, groups: set[str]) -> None:
