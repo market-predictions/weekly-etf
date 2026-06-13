@@ -24,6 +24,7 @@ control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
 control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
 control/MACRO_REPORT_SURFACE_STATUS.md
 control/MACRO_AUDIT_FOUNDATION_STATUS.md
+control/MACRO_REGIME_SHADOW_STATUS.md
 ```
 
 For historical-output cleanup/archive questions, also read:
@@ -68,62 +69,36 @@ Historical generated outputs remain immutable by default. Do not bulk-edit old r
 
 WP16 is closed on the latest verified report set.
 
-Closed WP16 defects:
-
-```text
-macro/ECB recency miss
-ECB stance stale neutral wording
-non-U.S. / IEFA wording mismatch
-English n.v.t. residue
-Dutch empty-comment residue
-soft-cap / soft-target duplicated copy
-Dutch equity-curve clipping / invisible chart
-shadow and guarded-auto no-trade validation mismatch
-Dutch product-name localization corruption, including iShares -> iAantal aandelen
-```
-
 WP17 is closed on the latest verified report set.
-
-Closed WP17 work:
-
-```text
-PDF visual contract validator added.
-Poppler rendering tools installed in production workflow.
-EN/NL PDF equity-curve visual gate runs before send.
-Dutch PDF product-name corruption gate runs before send.
-Manifest evidence validator added.
-Manifest evidence gate runs after final run-manifest write.
-```
 
 WP18 is closed.
 
-Closed WP18 work:
+WP19 is closed.
+
+Closed WP19 work:
 
 ```text
-tools/validate_macro_data_audit.py hardened
-tools/replay_macro_audit_foundation_fixture.py added
-tests/test_wp18_macro_data_audit_validator.py added
-tests/test_wp18_macro_audit_foundation_fixture.py added
-.github/workflows/validate-macro-audit-foundation.yml added
-.github/workflows/validate-macro-regime-shadow.yml evidence push path hardened
-control/MACRO_AUDIT_FOUNDATION_STATUS.md updated to closed
+macro_regime/classify.py now emits explicit no-authority fields.
+tools/validate_macro_regime_shadow.py now requires no-authority fields and macro-audit consistency.
+tools/replay_macro_regime_shadow_fixtures.py now validates fixture authority and regime-label coverage.
+fixtures/macro_regime_shadow/regime_shadow_fixtures.json now carries explicit no-authority fields.
+tools/write_macro_regime_shadow_validation_evidence.py now records full no-authority state.
+tests/test_macro_regime_shadow.py added.
+.github/workflows/validate-macro-regime-shadow.yml now runs tests/test_macro_regime_shadow.py.
+control/MACRO_REGIME_SHADOW_STATUS.md updated to closed.
 ```
 
-WP18 closeout evidence:
+WP19 closeout evidence:
 
 ```text
-Validate ETF macro audit foundation: green
-workflow_run_id: 27476145040
-workflow_run_number: 6
-latest_wp18_macro_audit_foundation_validation.json: committed
-
 Validate ETF macro regime shadow: green
-workflow_run_id: 27478580626
-workflow_run_number: 40
+workflow_run_id: 27480244857
+workflow_run_number: 46
+commit_sha: 1ba3f4e5a6126fd824a151525b0d9d91d42c3627
 latest_macro_regime_shadow_validation.json: committed
 ```
 
-Do not continue patching WP16/WP17/WP18 unless a new defect is found in a later manifest-linked run.
+Do not continue patching WP16/WP17/WP18/WP19 unless a new defect is found in a later manifest-linked run.
 
 ---
 
@@ -137,7 +112,7 @@ raw deterministic macro read: not client-facing
 deterministic macro read as official production regime source: not promoted
 ```
 
-WP16/WP17/WP18 do not promote deterministic macro.
+WP16/WP17/WP18/WP19 do not promote deterministic macro.
 
 Standing authority boundary:
 
@@ -161,22 +136,21 @@ production_report_mutation=false
 Active package:
 
 ```text
-WP19 — Deterministic regime engine fixture baseline
+WP20 — Deterministic regime engine promotion-review contract
 ```
 
-Current WP19 status:
+Current WP20 status:
 
 ```text
-not_started / ready_to_start / shadow-only required
+not_started / ready_to_start / review-only required
 ```
 
 Scope:
 
 ```text
-- fixture-only deterministic regime engine baseline
-- validate deterministic classification outputs against committed fixtures
-- preserve macro audit as provenance input only
-- no production macro promotion
+- review-only promotion-readiness contract for deterministic regime engine
+- compare deterministic shadow output quality and safety after WP19 fixture baseline
+- no automatic production promotion
 - no client-facing raw macro axes
 - no portfolio mutation
 - no scoring/fundability changes
@@ -186,20 +160,19 @@ Scope:
 Likely start files:
 
 ```text
-config/regime_thresholds.yml
-macro_regime/classify.py
-macro_regime/confidence.py
-runtime/build_macro_policy_pack_shadow.py
-tools/validate_macro_regime_shadow.py
-fixtures/macro_regime_shadow/regime_shadow_fixtures.json
+control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
+control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
+control/MACRO_REPORT_SURFACE_STATUS.md
+control/MACRO_AUDIT_FOUNDATION_STATUS.md
+control/MACRO_REGIME_SHADOW_STATUS.md
 output/macro/validation/latest_macro_regime_shadow_validation.json
+output/macro/validation/latest_macro_regime_shadow_comparison.json
 ```
 
 Required boundary:
 
 ```text
-fixture-only=true
-shadow_only=true
+review_only=true
 client_facing_authority=false
 production_report_narrative_authority=false
 portfolio_action_authority=false
@@ -211,23 +184,23 @@ historical_output_mutation=false
 
 ---
 
-## Phase 5 — next package after WP19 closes
+## Phase 5 — next package after WP20 closes
 
-Do not start this until WP19 is implemented and verified.
+Do not start this until WP20 is reviewed and closed.
 
 Likely next package:
 
 ```text
-WP20 — Deterministic regime engine promotion-review contract
+WP21 — Deterministic regime client-safe report surface design, if WP20 keeps review path open
 ```
 
 Tentative scope:
 
 ```text
-- review-only promotion gate for deterministic regime engine
-- compare legacy-vs-shadow regime output quality
+- output-contract design only
+- client-safe text surface only
+- no raw macro axes in report
 - no automatic production promotion
-- no client-facing raw macro axes
 - no scoring/fundability changes
 - no portfolio mutation
 ```
@@ -244,5 +217,5 @@ Do not use replacement-edge diagnostics for scoring, fundability, or trades.
 Do not weaken pricing-lineage or runtime-state authority.
 Do not localize ETF issuer/product names such as iShares, SPDR, VanEck, Sprott, or Global X.
 Do not bypass the PDF visual gate after WP17.
-Do not start WP20 before WP19 is implemented and verified.
+Do not start WP21 before WP20 is reviewed and closed.
 ```
