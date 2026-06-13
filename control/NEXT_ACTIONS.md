@@ -64,7 +64,7 @@ Historical generated outputs remain immutable by default. Do not bulk-edit old r
 
 ---
 
-## Phase 2 — closed repair packages
+## Phase 2 — closed repair / foundation packages
 
 WP16 is closed on the latest verified report set.
 
@@ -95,7 +95,35 @@ Manifest evidence validator added.
 Manifest evidence gate runs after final run-manifest write.
 ```
 
-Do not continue patching WP16/WP17 unless a new defect is found in a later manifest-linked run.
+WP18 is closed.
+
+Closed WP18 work:
+
+```text
+tools/validate_macro_data_audit.py hardened
+tools/replay_macro_audit_foundation_fixture.py added
+tests/test_wp18_macro_data_audit_validator.py added
+tests/test_wp18_macro_audit_foundation_fixture.py added
+.github/workflows/validate-macro-audit-foundation.yml added
+.github/workflows/validate-macro-regime-shadow.yml evidence push path hardened
+control/MACRO_AUDIT_FOUNDATION_STATUS.md updated to closed
+```
+
+WP18 closeout evidence:
+
+```text
+Validate ETF macro audit foundation: green
+workflow_run_id: 27476145040
+workflow_run_number: 6
+latest_wp18_macro_audit_foundation_validation.json: committed
+
+Validate ETF macro regime shadow: green
+workflow_run_id: 27478580626
+workflow_run_number: 40
+latest_macro_regime_shadow_validation.json: committed
+```
+
+Do not continue patching WP16/WP17/WP18 unless a new defect is found in a later manifest-linked run.
 
 ---
 
@@ -133,62 +161,21 @@ production_report_mutation=false
 Active package:
 
 ```text
-WP18 — Macro/thesis roadmap Phase 2: macro audit foundation
-```
-
-Current WP18 status:
-
-```text
-implemented / shadow-only / validation workflow added / pending fresh workflow evidence
-```
-
-Implemented in WP18:
-
-```text
-tools/validate_macro_data_audit.py hardened
-tools/replay_macro_audit_foundation_fixture.py added
-tests/test_wp18_macro_data_audit_validator.py added
-tests/test_wp18_macro_audit_foundation_fixture.py added
-.github/workflows/validate-macro-audit-foundation.yml added
-control/MACRO_AUDIT_FOUNDATION_STATUS.md updated
-```
-
-Required boundary:
-
-```text
-- shadow/audit-only unless separately promoted
-- no deterministic macro promotion
-- no portfolio mutation
-- no scoring/fundability changes
-- no client-facing thesis candidates unless a later output contract explicitly allows them
-- no historical artifact rewrite
-```
-
-Next action to close WP18:
-
-```text
-Observe or manually run: Validate ETF macro audit foundation
-Confirm green status
-Confirm output/macro/validation/latest_wp18_macro_audit_foundation_validation.json is committed
-Then update control/CURRENT_STATE.md, control/NEXT_ACTIONS.md, and control/ETF_SESSION_CHANGELOG.md from pending to closed
-```
-
----
-
-## Phase 5 — next package after WP18 closes
-
-Do not start this until WP18 validation evidence is observed.
-
-Recommended next package:
-
-```text
 WP19 — Deterministic regime engine fixture baseline
+```
+
+Current WP19 status:
+
+```text
+not_started / ready_to_start / shadow-only required
 ```
 
 Scope:
 
 ```text
-- fixture-only / shadow-only deterministic regime classification baseline
+- fixture-only deterministic regime engine baseline
+- validate deterministic classification outputs against committed fixtures
+- preserve macro audit as provenance input only
 - no production macro promotion
 - no client-facing raw macro axes
 - no portfolio mutation
@@ -205,6 +192,44 @@ macro_regime/confidence.py
 runtime/build_macro_policy_pack_shadow.py
 tools/validate_macro_regime_shadow.py
 fixtures/macro_regime_shadow/regime_shadow_fixtures.json
+output/macro/validation/latest_macro_regime_shadow_validation.json
+```
+
+Required boundary:
+
+```text
+fixture-only=true
+shadow_only=true
+client_facing_authority=false
+production_report_narrative_authority=false
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+portfolio_mutation=false
+historical_output_mutation=false
+```
+
+---
+
+## Phase 5 — next package after WP19 closes
+
+Do not start this until WP19 is implemented and verified.
+
+Likely next package:
+
+```text
+WP20 — Deterministic regime engine promotion-review contract
+```
+
+Tentative scope:
+
+```text
+- review-only promotion gate for deterministic regime engine
+- compare legacy-vs-shadow regime output quality
+- no automatic production promotion
+- no client-facing raw macro axes
+- no scoring/fundability changes
+- no portfolio mutation
 ```
 
 ---
@@ -219,5 +244,5 @@ Do not use replacement-edge diagnostics for scoring, fundability, or trades.
 Do not weaken pricing-lineage or runtime-state authority.
 Do not localize ETF issuer/product names such as iShares, SPDR, VanEck, Sprott, or Global X.
 Do not bypass the PDF visual gate after WP17.
-Do not start WP19 before WP18 validation evidence is observed.
+Do not start WP20 before WP19 is implemented and verified.
 ```
