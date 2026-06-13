@@ -9,6 +9,12 @@ NON_US_REPLACEMENTS = {
     "Niet-Amerikaanse aandelenblootstelling blijft een diversificatiekloof.": "Blootstelling aan ontwikkelde markten buiten de VS is via IEFA verhoogd, maar blijft onder bevestiging in relatieve sterkte.",
 }
 
+PRODUCT_NAME_REPAIRS = {
+    "iAantal aandelen": "iShares",
+    "iAantal aandelen S&P GSCI Commodity-Indexed Trust": "iShares S&P GSCI Commodity-Indexed Trust",
+    "SPDR Gold Aantal aandelen": "SPDR Gold Shares",
+}
+
 DUTCH_MEMORY_PATTERNS = [
     (
         re.compile(r"Risk-on growth has persisted for (\d+) run\(s\); transition state is stable, breadth is improving, and cross-asset confirmation is mixed\.", re.IGNORECASE),
@@ -21,12 +27,19 @@ DUTCH_MEMORY_PATTERNS = [
 ]
 
 
+def _repair_product_names(text: str) -> str:
+    for source, target in PRODUCT_NAME_REPAIRS.items():
+        text = text.replace(source, target)
+    return text
+
+
 def clean_text(text: str, *, language: str) -> str:
     for source, target in NON_US_REPLACEMENTS.items():
         text = text.replace(source, target)
     if language == "nl":
         for pattern, target in DUTCH_MEMORY_PATTERNS:
             text = pattern.sub(target, text)
+        text = _repair_product_names(text)
     return text
 
 
@@ -37,6 +50,7 @@ def failures(text: str, *, language: str) -> list[str]:
         "blootstelling buiten de vs blijft een diversificatiekloof",
         "niet-amerikaanse aandelenblootstelling blijft een diversificatiekloof",
         "wp16-nl-equity-curve-guard",
+        "iaantal aandelen",
     ]
     if language == "nl":
         checks.append("risk-on growth has persisted")
