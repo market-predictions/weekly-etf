@@ -13,10 +13,41 @@ WP18 — Macro/thesis roadmap Phase 2: macro audit foundation
 ## Status
 
 ```text
-implemented / shadow-only / validation workflow added / pending fresh workflow evidence
+closed / verified / shadow-only
 ```
 
 WP18 extends the already implemented macro audit foundation with a hardened validator, deterministic fixture replay evidence path, isolated validation workflow, and explicit no-authority boundaries.
+
+WP18 is closed because both required evidence paths are now green and committed:
+
+```text
+Validate ETF macro audit foundation: green
+Validate ETF macro regime shadow: green
+latest_wp18_macro_audit_foundation_validation.json: committed
+latest_macro_regime_shadow_validation.json: committed after run #40
+```
+
+## Validation evidence
+
+WP18 dedicated audit-foundation evidence:
+
+```text
+artifact: output/macro/validation/latest_wp18_macro_audit_foundation_validation.json
+workflow: Validate ETF macro audit foundation
+workflow_run_id: 27476145040
+workflow_run_number: 6
+status: passed
+```
+
+Related macro-regime shadow evidence after the validator and workflow push hardening:
+
+```text
+artifact: output/macro/validation/latest_macro_regime_shadow_validation.json
+workflow: Validate ETF macro regime shadow
+workflow_run_id: 27478580626
+workflow_run_number: 40
+status: passed
+```
 
 ## Authority rule
 
@@ -32,6 +63,7 @@ portfolio_action_authority=false
 lane_scoring_authority=false
 fundability_authority=false
 portfolio_mutation=false
+production_report_path_changed=false
 ```
 
 ## Four-layer placement
@@ -79,6 +111,7 @@ summary.observation_count
 summary.max_staleness_days
 authority fields
 live source_url provenance
+zero-valued summary.max_staleness_days compatibility
 ```
 
 ### 3. Output contract
@@ -98,14 +131,28 @@ output/macro/validation/wp18_macro_audit_foundation_validation_<run_token>.json
 output/macro/validation/latest_wp18_macro_audit_foundation_validation.json
 ```
 
+Macro-regime shadow evidence path used to prove compatibility with the existing shadow-regime replay stack:
+
+```text
+output/macro/validation/latest_macro_regime_shadow_validation.json
+output/macro/validation/latest_macro_regime_shadow_comparison.json
+output/macro/validation/latest_macro_audit_axis_shadow_validation.json
+```
+
 The fixture replay path intentionally writes under `output/macro/validation/` so it does not overwrite `output/macro/latest.json` or production report artifacts.
 
 ### 4. Operational runbook
 
-New isolated validation workflow:
+Isolated validation workflow:
 
 ```text
 .github/workflows/validate-macro-audit-foundation.yml
+```
+
+Related compatibility workflow:
+
+```text
+.github/workflows/validate-macro-regime-shadow.yml
 ```
 
 Expected markers:
@@ -113,9 +160,14 @@ Expected markers:
 ```text
 ETF_MACRO_DATA_AUDIT_VALID_OK
 ETF_MACRO_AUDIT_FOUNDATION_FIXTURE_OK
+ETF_MACRO_REGIME_FIXTURE_REPLAY_OK
+ETF_MACRO_AUDIT_AXIS_SHADOW_OK
+ETF_MACRO_REGIME_SHADOW_OK
 ```
 
-The production weekly report workflow still builds the macro policy pack and may build a live macro audit in shadow mode. The WP18 validation workflow proves the fixture path deterministically and commits only validation evidence.
+The macro-regime shadow workflow evidence push path was hardened after repeated GitHub Actions races by committing generated evidence from a freshly synced `origin/main` working tree and retrying pushes.
+
+The production weekly report workflow still builds the macro policy pack and may build a live macro audit in shadow mode. WP18 does not change production reports, portfolio state, scoring, fundability, or client-facing wording.
 
 ## Implemented files
 
@@ -145,12 +197,12 @@ tools/replay_macro_audit_foundation_fixture.py
 tests/test_wp18_macro_data_audit_validator.py
 tests/test_wp18_macro_audit_foundation_fixture.py
 .github/workflows/validate-macro-audit-foundation.yml
+.github/workflows/validate-macro-regime-shadow.yml
 ```
 
-## Not yet done
+## Remaining work
 
 ```text
-fresh WP18 validation workflow evidence not yet observed in this chat
 production macro audit latest pointer still needs observation after the next successful weekly report run
 Deterministic regime engine remains not promoted
 Derived confidence remains not promoted
@@ -161,20 +213,22 @@ Client-facing macro output remains governed by the existing validated report pat
 
 ## Next action
 
-Run/observe the new workflow:
-
-```text
-Validate ETF macro audit foundation
-```
-
-Accept WP18 only after the workflow is green and validation evidence is committed under:
-
-```text
-output/macro/validation/latest_wp18_macro_audit_foundation_validation.json
-```
-
-After WP18 closes, proceed to Phase 3 only as a separate shadow-only package:
+Proceed to the next separate shadow-only package:
 
 ```text
 WP19 — Deterministic regime engine fixture baseline
+```
+
+WP19 must remain:
+
+```text
+fixture-only
+shadow-only
+client_facing_authority=false
+production_report_narrative_authority=false
+portfolio_action_authority=false
+lane_scoring_authority=false
+fundability_authority=false
+portfolio_mutation=false
+historical_output_mutation=false
 ```
