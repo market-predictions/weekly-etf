@@ -6,6 +6,7 @@ import pytest
 from tools.validate_macro_regime_promotion_contract import validate_macro_regime_promotion_contract
 
 FIXTURE_DIR = Path("fixtures/macro_promotion")
+WP20_REVIEW_ARTIFACT = Path("output/macro/promotion/deterministic_regime_engine_promotion_review_20260613_000000.json")
 
 
 def _payload() -> dict:
@@ -20,6 +21,10 @@ def _write(tmp_path: Path, payload: dict) -> Path:
 
 def test_not_promoted_fixture_passes():
     validate_macro_regime_promotion_contract(FIXTURE_DIR / "not_promoted_valid.json")
+
+
+def test_wp20_deterministic_regime_promotion_review_artifact_passes():
+    validate_macro_regime_promotion_contract(WP20_REVIEW_ARTIFACT)
 
 
 def test_bad_promoted_without_approval_fixture_fails():
