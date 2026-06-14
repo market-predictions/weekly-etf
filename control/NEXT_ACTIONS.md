@@ -1,13 +1,5 @@
 # ETF Review OS — Next Actions
 
-## Status legend
-
-- `[USER]` = must be done manually by you in UI or external systems
-- `[ASSISTANT]` = I can do directly in chat/repo
-- `[JOINT]` = I prepare, you apply/approve
-
----
-
 ## Current production baseline
 
 ```text
@@ -33,19 +25,6 @@ WP21: closed as design-only
 WP22: closed as manually validated
 ```
 
-WP22 evidence:
-
-```text
-output/macro/validation/deterministic_regime_client_surface_validation_20260613_codespace.json
-control/DETERMINISTIC_REGIME_CLIENT_SURFACE_VALIDATOR_STATUS.md
-```
-
----
-
-## Deterministic macro boundary
-
-Deterministic regime work remains not promoted and not production-integrated.
-
 ---
 
 ## Active package
@@ -57,27 +36,28 @@ WP23 — Deterministic regime safe-surface helper
 Current status:
 
 ```text
-not_started / ready_to_start / helper-only required
+implemented / pending validation evidence
 ```
 
-Scope:
+Implemented files:
 
 ```text
-- create a narrow helper that can build the safe DTO and render safe EN/NL text
-- use the WP21 design and WP22 validator
-- no production report integration
-- no automatic production promotion
-- no scoring/fundability changes
-- no portfolio mutation
+runtime/deterministic_regime_client_surface.py
+tests/test_deterministic_regime_client_surface_helper.py
+control/DETERMINISTIC_REGIME_SAFE_SURFACE_HELPER_STATUS.md
 ```
 
-Likely start files:
+Run these validation commands:
+
+```bash
+PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_helper.py -q
+PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py tests/test_deterministic_regime_client_surface_helper.py -q
+```
+
+Expected result:
 
 ```text
-control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
-control/DETERMINISTIC_REGIME_CLIENT_SURFACE_VALIDATOR_STATUS.md
-tools/validate_deterministic_regime_client_surface.py
-fixtures/deterministic_regime_client_surface/safe_surface_fixture.json
+all tests pass
 ```
 
 ---
