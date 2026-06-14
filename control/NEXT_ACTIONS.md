@@ -29,13 +29,6 @@ WP25: closed as proposal-only
 WP26: closed as manually validated
 ```
 
-WP26 evidence:
-
-```text
-control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_IMPLEMENTATION_STATUS.md
-output/macro/validation/deterministic_regime_report_integration_validation_20260613_codespace.json
-```
-
 ---
 
 ## Active package
@@ -47,26 +40,27 @@ WP27 — Deterministic regime report integration closeout / visual report QA
 Current status:
 
 ```text
-started / pending fresh report artifact / not closed
+started / validator green / pending fresh report artifact / not closed
 ```
 
-Status file:
+Status files:
 
 ```text
 control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_VISUAL_QA_STATUS.md
+output/macro/validation/deterministic_regime_report_visual_qa_partial_20260613_codespace.json
 ```
 
-Required next step:
-
-```text
-generate or provide a fresh EN/NL report artifact after the WP26 commits
-```
-
-Minimum local checks after fresh report generation:
+Generate fresh reports:
 
 ```bash
-rg "Deterministic regime read|Deterministische regime-inschatting" output/weekly_analysis_pro*.md
-rg "macro_axes|macro_axis_scores|macro_evidence|confidence_decomposition|workflow_run_id|commit_sha|output/macro/validation|\.json" output/weekly_analysis_pro*.md
+PYTHONPATH=. python runtime/render_etf_report_from_state.py --output-dir output
 ```
 
-Close WP27 only after fresh EN/NL report output is inspected and evidence is recorded.
+Then use the exact paths printed by the renderer:
+
+```bash
+grep -nE "Deterministic regime read|Deterministische regime-inschatting" <fresh_en_path> <fresh_nl_path>
+grep -nE "macro_axes|macro_axis_scores|macro_evidence|confidence_decomposition|workflow_run_id|commit_sha|output/macro/validation" <fresh_en_path> <fresh_nl_path>
+```
+
+Close WP27 only after the fresh EN/NL report artifacts are inspected and evidence is recorded.
