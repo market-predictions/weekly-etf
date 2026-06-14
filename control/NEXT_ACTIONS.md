@@ -28,21 +28,6 @@ WP24: closed as review-only
 WP25: closed as proposal-only
 ```
 
-WP25 proposal artifacts:
-
-```text
-control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_PROPOSAL.md
-output/macro/validation/deterministic_regime_report_integration_proposal_20260613_000000.json
-```
-
----
-
-## Deterministic macro boundary
-
-Deterministic regime work remains not promoted and not production-integrated.
-
-WP25 allows only a separately approved future implementation package.
-
 ---
 
 ## Active package
@@ -54,35 +39,34 @@ WP26 — Deterministic regime report integration implementation
 Current status:
 
 ```text
-not_started / requires_explicit_user_approval / implementation package
+implemented / pending validation evidence
 ```
 
-Scope if approved:
+Status file:
 
 ```text
-- implement the WP25 proposal with minimal report-surface changes
-- use only the narrow safe DTO
-- validate exact rendered EN/NL text with the WP22 validator
-- no automatic production promotion beyond review-only surface text
-- no scoring/fundability changes
-- no portfolio mutation
+control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_IMPLEMENTATION_STATUS.md
 ```
 
-Likely start files:
+Run these validation commands:
+
+```bash
+PYTHONPATH=. python -m pytest tests/test_deterministic_regime_report_surface_integration.py -q
+PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py tests/test_deterministic_regime_client_surface_helper.py tests/test_deterministic_regime_report_surface_integration.py -q
+PYTHONPATH=. python tools/validate_macro_report_surface.py --self-test
+PYTHONPATH=. python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json
+```
+
+Expected result:
 
 ```text
-control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_PROPOSAL.md
-runtime/macro_report_surface.py
-runtime/deterministic_regime_client_surface.py
-tools/validate_macro_report_surface.py
-tools/validate_deterministic_regime_client_surface.py
+all tests pass
+ETF_MACRO_REPORT_SURFACE_OK
 ```
 
 ---
 
 ## Next package after WP26
-
-Do not start this until WP26 is explicitly approved, implemented, and validated.
 
 ```text
 WP27 — Deterministic regime report integration closeout / visual report QA
