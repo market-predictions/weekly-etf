@@ -284,3 +284,21 @@ WP23: helper-only DTO/rendering layer
 ### Consequence
 
 A future package may propose an integration path, but production report integration remains false until a later explicit implementation package is approved. Deterministic regime output still has no production report narrative authority, portfolio-action authority, lane-scoring authority, fundability authority, portfolio mutation authority, or historical-output mutation authority.
+
+---
+
+## 2026-06-13 — WP25 proposal does not authorize implementation
+
+### Decision
+
+WP25 records only a proposed future implementation shape for the deterministic regime report surface.
+
+It allows a separate implementation package to be considered only if explicitly approved:
+
+```text
+WP26 — Deterministic regime report integration implementation
+```
+
+### Consequence
+
+WP25 does not change production report rendering and does not integrate deterministic regime output into English or Dutch reports. It does not grant production report narrative authority, client-facing authority, automatic promotion, portfolio-action authority, lane-scoring authority, fundability authority, portfolio mutation authority, or historical-output mutation authority.
