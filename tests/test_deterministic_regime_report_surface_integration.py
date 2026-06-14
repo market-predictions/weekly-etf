@@ -1,0 +1,98 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from runtime.macro_report_surface import (
+    dashboard_en,
+    dashboard_nl,
+    deterministic_regime_surface_dto,
+)
+from tools.validate_deterministic_regime_client_surface import validate_surface_payload
+
+VALIDATION = Path("output/macro/validation/latest_macro_regime_shadow_validation.json")
+COMPARISON = Path("output/macro/validation/latest_macro_regime_shadow_comparison.json")
+
+
+def _json(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _state() -> dict:
+    return {
+        "macro_policy_pack": {
+            "regime": {
+                "current": "Risk-on growth",
+                "confidence": 0.66,
+                "what_changed": ["AI and semiconductor leadership remains the dominant equity impulse."],
+            },
+            "regime_memory": {
+                "decision_rule": "Macro status informs selectivity; it does not override pricing, risk or portfolio-discipline gates.",
+                "report_transfer": {"summary": "Risk-on growth has persisted for 3 run(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed."},
+            },
+            "portfolio_implications": ["Portfolio actions still require pricing, relative strength and position discipline."],
+        },
+        "deterministic_regime_shadow_validation": _json(VALIDATION),
+        "deterministic_regime_shadow_comparison": _json(COMPARISON),
+    }
+
+
+def test_report_surface_includes_review_only_deterministic_en_and_nl() -> None:
+    state = _state()
+
+    en = dashboard_en(state)
+    nl = dashboard_nl(state)
+
+    assert "Deterministic regime read — review-only" in en
+    assert "Deterministische regime-inschatting — alleen ter review" in nl
+    assert "This does not authorize portfolio changes" in en
+    assert "Dit geeft geen autoriteit voor portefeuillewijzigingen" in nl
+
+
+def test_report_surface_dto_passes_wp22_validator() -> None:
+    dto = deterministic_regime_surface_dto(_state())
+
+    assert dto is not None
+    result = validate_surface_payload(dto)
+    assert result["status"] == "passed"
+
+
+def test_report_surface_does_not_leak_raw_shadow_fields() -> None:
+    state = _state()
+    text = dashboard_en(state) + "\n" + dashboard_nl(state)
+
+    for blocked in [
+        "macro_axes",
+        "macro_axis_scores",
+        "macro_evidence",
+        "confidence_decomposition",
+        "workflow_run_id",
+        "commit_sha",
+        "output/macro/validation",
+        ".json",
+    ]:
+        assert blocked not in text
+
+
+def test_deterministic_confidence_is_banded_not_numeric() -> None:
+    state = _state()
+    dto = deterministic_regime_surface_dto(state)
+
+    assert dto is not None
+    assert dto["confidence_band_en"] == "high but review-only"
+    assert dto["confidence_band_nl"] == "hoog maar alleen ter review"
+    assert "0.72" not in dto["safe_surface_en"]
+    assert "72%" not in dto["safe_surface_en"]
+    assert "0.72" not in dto["safe_surface_nl"]
+    assert "72%" not in dto["safe_surface_nl"]
+
+
+def test_legacy_macro_regime_remains_present_and_deterministic_surface_is_additive() -> None:
+    state = _state()
+    en = dashboard_en(state)
+    nl = dashboard_nl(state)
+
+    assert "- Current regime: Risk-on growth." in en
+    assert "- Confidence: 66%." in en
+    assert "- Huidig regime: Risk-on groei." in nl
+    assert "- Vertrouwen: 66%." in nl
