@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16, WP17, WP18, WP19, WP20, and WP21 are closed. WP22 deterministic regime client-safe surface validator is implemented but pending validation evidence. The latest manifest-linked production baseline remains `260612_08`. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default.**
+**WP16 through WP22 are closed. WP22 deterministic regime client-safe surface validator is closed based on manual GitHub Codespace validation evidence. The latest manifest-linked production baseline remains `260612_08`. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default. The next package is WP23 — Deterministic regime safe-surface helper.**
 
 ## Latest verified production baseline
 
@@ -43,6 +43,7 @@ WP18: closed — macro audit foundation, shadow-only
 WP19: closed — deterministic regime engine fixture baseline, shadow-only
 WP20: closed — deterministic regime engine promotion review, not_promoted
 WP21: closed — deterministic regime client-safe surface design, design-only
+WP22: closed — deterministic regime client-safe surface validator, manually validated
 ```
 
 WP20 review status remains:
@@ -61,42 +62,35 @@ WP21 design artifact:
 control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
 ```
 
-WP21 blocked direct report concepts:
+WP22 status artifact:
 
 ```text
-raw macro axes
-raw macro axis scores
-raw macro evidence
-raw confidence decomposition
-raw conflict scores
-workflow run ids
-fixture names
-source file paths in client report
-production action wording
-scoring or fundability wording
-predictive certainty
-```
-
-## WP22 deterministic regime client-safe surface validator status
-
-WP22 is implemented but not yet closed.
-
-Status:
-
-```text
-implemented / pending validation evidence
-```
-
-Implemented files:
-
-```text
-fixtures/deterministic_regime_client_surface/safe_surface_fixture.json
-tools/validate_deterministic_regime_client_surface.py
-tests/test_deterministic_regime_client_surface_validator.py
 control/DETERMINISTIC_REGIME_CLIENT_SURFACE_VALIDATOR_STATUS.md
 ```
 
-Implemented checks:
+WP22 validation evidence artifact:
+
+```text
+output/macro/validation/deterministic_regime_client_surface_validation_20260613_codespace.json
+```
+
+WP22 validation source:
+
+```text
+manual GitHub Codespace terminal evidence reported by user
+not GitHub Actions workflow evidence
+```
+
+Observed WP22 validation results:
+
+```text
+DETERMINISTIC_REGIME_CLIENT_SURFACE_SELF_TEST_OK
+DETERMINISTIC_REGIME_CLIENT_SURFACE_OK
+7 passed in 0.03s
+DETERMINISTIC_REGIME_CLIENT_SURFACE_OK
+```
+
+WP22 validated checks:
 
 ```text
 required DTO fields
@@ -109,27 +103,6 @@ macro compliance scan
 macro/thesis leakage scan
 ```
 
-Manual validation commands:
-
-```bash
-python tools/validate_deterministic_regime_client_surface.py --self-test
-python -m pytest tests/test_deterministic_regime_client_surface_validator.py -q
-python tools/validate_deterministic_regime_client_surface.py --surface fixtures/deterministic_regime_client_surface/safe_surface_fixture.json
-```
-
-Expected markers:
-
-```text
-DETERMINISTIC_REGIME_CLIENT_SURFACE_SELF_TEST_OK
-DETERMINISTIC_REGIME_CLIENT_SURFACE_OK
-```
-
-Workflow note:
-
-```text
-A dedicated workflow create attempt was blocked by the tool safety layer in this chat run. WP22 is therefore not workflow-proven yet.
-```
-
 ## Deterministic macro boundary
 
 Current deterministic macro state remains:
@@ -140,7 +113,7 @@ deterministic macro read as raw/shadow object: not client-facing
 deterministic macro read as official decision/regime source: not promoted
 deterministic regime engine: not promoted
 deterministic regime client-safe surface: design-only, not production-integrated
-WP22 validator: implemented, pending validation evidence
+WP22 validator: closed, manually validated, not workflow-proven
 ```
 
 Do not infer deterministic macro promotion from WP16 through WP22.
@@ -178,7 +151,7 @@ WP16 through WP22 did not manually rewrite historical report artifacts. Current 
 
 - WP20 reviewed deterministic regime engine promotion readiness and kept it not promoted.
 - WP21 defined a future client-safe deterministic regime surface shape without implementation.
-- WP22 adds a validator/helper-only layer for that design, pending validation evidence.
+- WP22 validated the safe-surface contract on fixtures.
 - WP16 through WP22 do not promote deterministic macro.
 
 ### 2. Input/state contract
@@ -190,20 +163,20 @@ WP16 through WP22 did not manually rewrite historical report artifacts. Current 
 ### 3. Output contract
 
 - WP21 defines the future safe output surface.
-- WP22 implements validation checks for fixture-rendered safe-surface text.
+- WP22 validates fixture-rendered safe-surface text.
 - WP22 does not integrate deterministic regime output into English/Dutch reports.
 
 ### 4. Operational runbook
 
 - Do not claim inbox delivery; delivery evidence remains `smtp_sendmail_returned_no_exception` plus delivery manifest.
-- Do not start WP23 until WP22 validation evidence is green and recorded.
+- WP23 may start only as helper-only work.
 
 ## Immediate next action
 
-Validate WP22 with the manual commands above or add a dedicated workflow outside this blocked tool path.
-
-After green validation evidence, close WP22 and only then consider:
+Proceed only if desired:
 
 ```text
 WP23 — Deterministic regime safe-surface helper
 ```
+
+WP23 must remain helper-only unless a separate later package authorizes production report integration.
