@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "deterministic_regime_report_visual_qa_partial_evidence",
+  "status": "partial",
+  "repository": "market-predictions/weekly-etf",
+  "work_package": "WP27 — Deterministic regime report integration closeout / visual report QA",
+  "validation_source": "user_reported_github_codespace_terminal",
+  "observed": {
+    "git_pull_ff_only": "passed",
+    "macro_report_surface_self_test": "passed",
+    "macro_report_surface_latest_pack": "passed",
+    "review_only_line_search": "no current fresh generated report found yet",
+    "blocked_term_search": "historical output hits only for pricing-audit .json references; search was too broad for all historical reports"
+  },
+  "observed_output": [
+    "ETF_MACRO_REPORT_SURFACE_OK | label=fixture | en_chars=2088 | nl_chars=2318",
+    "ETF_MACRO_REPORT_SURFACE_OK | label=output/macro/latest.json | en_chars=2455 | nl_chars=2674",
+    "bash: rg: command not found",
+    "grep search found historical pricing audit .json references in April 2026 reports"
+  ],
+  "closeout_ready": false,
+  "missing_evidence": [
+    "fresh English markdown or PDF report generated after WP26 commits",
+    "fresh Dutch markdown or PDF report generated after WP26 commits",
+    "review-only deterministic regime line present in both fresh outputs",
+    "blocked deterministic internal terms absent from the fresh outputs"
+  ],
+  "next_commands": [
+    "PYTHONPATH=. python runtime/render_etf_report_from_state.py --output-dir output",
+    "grep -nE 'Deterministic regime read|Deterministische regime-inschatting' <fresh_en_path> <fresh_nl_path>",
+    "grep -nE 'macro_axes|macro_axis_scores|macro_evidence|confidence_decomposition|workflow_run_id|commit_sha|output/macro/validation' <fresh_en_path> <fresh_nl_path>"
+  ]
+}
