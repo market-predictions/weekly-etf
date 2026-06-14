@@ -9,7 +9,7 @@ WP27 — Deterministic regime report integration closeout / visual report QA
 ## Status
 
 ```text
-started / validator green / pending fresh report artifact / not closed
+started / validator green / pending polished fresh report artifact / not closed
 ```
 
 ## Scope
@@ -49,42 +49,60 @@ Observed user-reported evidence:
 git pull --ff-only: passed
 PYTHONPATH=. python tools/validate_macro_report_surface.py --self-test: passed
 PYTHONPATH=. python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json: passed
+PYTHONPATH=. python runtime/render_etf_report_from_state.py --output-dir output: passed
 ```
 
-The report-text search was not completed because `rg` was unavailable and the fallback `grep` was run against all historical output files before a fresh report was generated.
+The raw renderer created:
+
+```text
+output/weekly_analysis_pro_260612_11.md
+output/weekly_analysis_pro_nl_260612_11.md
+```
+
+The deterministic review-only line was not present in the raw rendered markdown because the shared macro report surface is applied by the polish step.
+
+Production order:
+
+```text
+runtime/render_etf_report_from_state.py
+→ runtime/polish_runtime_reports.py
+```
 
 Historical `.json` hits in older April reports are pricing-audit references, not deterministic-regime leakage.
 
 ## Missing evidence for WP27 closeout
 
-WP27 still needs a fresh rendered report artifact, or fresh EN/NL markdown/PDF outputs, generated after the WP26 commits.
+WP27 still needs fresh polished EN/NL markdown or PDF outputs generated after the WP26 commits.
 
 Required fresh output evidence:
 
 ```text
-English markdown or PDF containing the new deterministic review-only line
-Dutch markdown or PDF containing the new deterministic review-only line
+English polished markdown or PDF containing the new deterministic review-only line
+Dutch polished markdown or PDF containing the new deterministic review-only line
 ```
 
-## Generate fresh markdown reports
+## Generate and polish fresh markdown reports
 
-Run:
+Run both commands:
 
 ```bash
 PYTHONPATH=. python runtime/render_etf_report_from_state.py --output-dir output
+PYTHONPATH=. python runtime/polish_runtime_reports.py --output-dir output
 ```
 
-The command prints:
+The first command prints:
 
 ```text
 ETF_RUNTIME_RENDER_OK | en=<fresh_en_path> | nl=<fresh_nl_path>
 ```
 
-Use those exact two fresh paths for the checks below.
+The polish step updates the latest matching EN/NL report files in place.
+
+Use the exact two fresh paths printed by the render command for the checks below.
 
 ## Visual/readability checks
 
-Check the fresh English report for:
+Check the fresh polished English report for:
 
 ```text
 Deterministic regime read — review-only
@@ -92,7 +110,7 @@ This does not authorize portfolio changes
 The normal discipline gates remain decisive
 ```
 
-Check the fresh Dutch report for:
+Check the fresh polished Dutch report for:
 
 ```text
 Deterministische regime-inschatting — alleen ter review
@@ -100,7 +118,7 @@ Dit geeft geen autoriteit voor portefeuillewijzigingen
 De normale discipline blijft leidend
 ```
 
-Check both fresh reports for absence of:
+Check both fresh polished reports for absence of:
 
 ```text
 macro_axes
@@ -114,20 +132,20 @@ output/macro/validation
 
 ## Suggested local validation commands
 
-After generating a fresh report, replace the placeholders with the exact paths printed by the renderer:
+After generating and polishing a fresh report, replace the placeholders with the exact paths printed by the renderer:
 
 ```bash
 grep -nE "Deterministic regime read|Deterministische regime-inschatting" <fresh_en_path> <fresh_nl_path>
 grep -nE "macro_axes|macro_axis_scores|macro_evidence|confidence_decomposition|workflow_run_id|commit_sha|output/macro/validation" <fresh_en_path> <fresh_nl_path>
 ```
 
-The first grep should find the safe review-only lines in the fresh reports.
+The first grep should find the safe review-only lines in the fresh polished reports.
 
-The second grep should return no matches in the fresh reports.
+The second grep should return no matches in the fresh polished reports.
 
 ## Closeout condition
 
-WP27 can close only after fresh generated EN/NL report artifacts are inspected and the output evidence is recorded.
+WP27 can close only after fresh polished EN/NL report artifacts are inspected and the output evidence is recorded.
 
 ## Next package after WP27
 
