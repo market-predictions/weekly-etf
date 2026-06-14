@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "deterministic_regime_client_surface_validation_evidence",
+  "status": "passed",
+  "validation_source": "user_reported_github_codespace_terminal",
+  "validated_at_utc": "2026-06-13T23:00:00Z",
+  "repository": "market-predictions/weekly-etf",
+  "work_package": "WP22 — Deterministic regime client-safe surface validator",
+  "commands": [
+    {
+      "command": "PYTHONPATH=. python tools/validate_deterministic_regime_client_surface.py --self-test",
+      "status": "passed",
+      "observed_marker": "DETERMINISTIC_REGIME_CLIENT_SURFACE_SELF_TEST_OK"
+    },
+    {
+      "command": "PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py -q",
+      "status": "passed",
+      "observed_result": "7 passed in 0.03s"
+    },
+    {
+      "command": "PYTHONPATH=. python tools/validate_deterministic_regime_client_surface.py --surface fixtures/deterministic_regime_client_surface/safe_surface_fixture.json",
+      "status": "passed",
+      "observed_marker": "DETERMINISTIC_REGIME_CLIENT_SURFACE_OK"
+    }
+  ],
+  "authority": {
+    "validator_or_helper_only": true,
+    "client_facing_authority": false,
+    "production_report_narrative_authority": false,
+    "portfolio_action_authority": false,
+    "lane_scoring_authority": false,
+    "fundability_authority": false,
+    "portfolio_mutation": false,
+    "historical_output_mutation": false,
+    "production_report_integration": false
+  },
+  "workflow_status": "not_workflow_proven",
+  "notes": [
+    "Validation evidence is based on user-provided GitHub Codespace terminal output.",
+    "A dedicated workflow was not committed in this chat because workflow write attempts were blocked by the tool safety layer.",
+    "No production report integration is granted by this artifact."
+  ]
+}
