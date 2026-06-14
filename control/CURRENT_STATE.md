@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP25 are closed. WP25 deterministic regime report integration proposal is closed as proposal-only and allows only a separately approved future implementation package. The latest manifest-linked production baseline remains `260612_08`. Deterministic macro remains not promoted and not production-integrated. Historical generated outputs remain immutable by default. The next package is WP26 — Deterministic regime report integration implementation, only if explicitly approved.**
+**WP16 through WP26 are closed. WP26 deterministic regime report integration implementation is closed based on manual GitHub Codespace validation evidence. The latest manifest-linked production baseline remains `260612_08`. The next package is WP27 — Deterministic regime report integration closeout / visual report QA.**
 
 ## Latest verified production baseline
 
@@ -37,142 +37,43 @@ Delivery evidence remains delivery-layer evidence only. It is not an end-recipie
 ## Closed package status
 
 ```text
-WP16: closed — report repair closeout
-WP17: closed — PDF visual QA and delivery-runbook hardening
-WP18: closed — macro audit foundation, shadow-only
-WP19: closed — deterministic regime engine fixture baseline, shadow-only
-WP20: closed — deterministic regime engine promotion review, not_promoted
-WP21: closed — deterministic regime client-safe surface design, design-only
-WP22: closed — deterministic regime client-safe surface validator, manually validated
-WP23: closed — deterministic regime safe-surface helper, manually validated
-WP24: closed — deterministic regime safe-surface integration review, review-only
-WP25: closed — deterministic regime report integration proposal, proposal-only
+WP16: closed
+WP17: closed
+WP18: closed
+WP19: closed
+WP20: closed as not_promoted
+WP21: closed as design-only
+WP22: closed as manually validated
+WP23: closed as manually validated
+WP24: closed as review-only
+WP25: closed as proposal-only
+WP26: closed as manually validated
 ```
 
-WP24 review artifacts:
+WP26 evidence:
 
 ```text
-control/DETERMINISTIC_REGIME_SAFE_SURFACE_INTEGRATION_REVIEW.md
-output/macro/validation/deterministic_regime_safe_surface_integration_review_20260613_000000.json
+control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_IMPLEMENTATION_STATUS.md
+output/macro/validation/deterministic_regime_report_integration_validation_20260613_codespace.json
 ```
 
-WP25 proposal artifacts:
+## WP26 status
 
 ```text
-control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_PROPOSAL.md
-output/macro/validation/deterministic_regime_report_integration_proposal_20260613_000000.json
+closed / manually validated in GitHub Codespace / not workflow-proven
 ```
 
-## WP25 deterministic regime report integration proposal status
-
-WP25 is closed.
-
-Status:
+Observed validation evidence:
 
 ```text
-closed / proposal-only / implementation-not-started / integration-not-authorized
+5 passed in 0.05s
+18 passed in 0.06s
+ETF_MACRO_REPORT_SURFACE_OK | label=fixture | en_chars=2088 | nl_chars=2318
+ETF_MACRO_REPORT_SURFACE_OK | label=output/macro/latest.json | en_chars=2455 | nl_chars=2674
 ```
-
-WP25 decision:
-
-```text
-future_implementation_package_allowed=true
-next_package=WP26 — Deterministic regime report integration implementation, only if explicitly approved
-production_report_integration=false
-production_report_narrative_authority=false
-client_facing_authority=false
-automatic_promotion=false
-```
-
-WP25 proposed future integration shape:
-
-```text
-latest shadow validation evidence
-+ latest shadow comparison evidence
-→ build_deterministic_regime_client_surface(...)
-→ render_deterministic_regime_surface_en/nl(dto)
-→ WP22 validator on rendered text
-→ optional insertion into macro dashboard section
-```
-
-## Deterministic macro boundary
-
-Current deterministic macro state remains:
-
-```text
-macro report surface: integrated as client-safe only
-deterministic macro read as raw/shadow object: not client-facing
-deterministic macro read as official decision/regime source: not promoted
-deterministic regime engine: not promoted
-deterministic regime client-safe surface: helper/validator chain complete but not production-integrated
-WP25 proposal: closed, future implementation package allowed only if explicitly approved
-```
-
-Do not infer deterministic macro promotion from WP16 through WP25.
-
-Standing authority boundary:
-
-```text
-client_facing_narrative_authority=false
-production_report_narrative_authority=false
-portfolio_action_authority=false
-lane_scoring_authority=false
-fundability_authority=false
-funding_authority=false
-portfolio_mutation=false
-delivery_authority=false
-execution_authority=false
-production_report_mutation=false
-```
-
-## Historical artifact policy
-
-WP15 remains active:
-
-```text
-historical_output_artifacts_are_immutable_by_default=true
-current_baseline_scope=manifest_linked_latest_report_set
-historical_output_mutation=false
-```
-
-WP16 through WP25 did not manually rewrite historical report artifacts. Current production truth is tied to the latest manifest-linked report/runtime/pricing/delivery artifacts.
-
-## Four-layer operating status
-
-### 1. Decision framework
-
-- WP20 reviewed deterministic regime engine promotion readiness and kept it not promoted.
-- WP21 defined a future client-safe deterministic regime surface shape without implementation.
-- WP22 validated the safe-surface contract on fixtures.
-- WP23 adds a helper-only DTO/rendering layer.
-- WP24 reviewed the chain and allowed only a future proposal package.
-- WP25 proposed a future implementation shape but did not implement it.
-- WP16 through WP25 do not promote deterministic macro.
-
-### 2. Input/state contract
-
-- Current production truth remains tied to manifest-linked runtime/pricing/delivery artifacts.
-- Macro audit values remain provenance input evidence only and are not production decision authority.
-- The safe-surface chain reads committed shadow/comparison evidence and emits only a narrow DTO.
-
-### 3. Output contract
-
-- WP21 defines the future safe output surface.
-- WP22 validates fixture-rendered safe-surface text.
-- WP23 creates helper-only safe text, not production report text.
-- WP24 and WP25 do not change any production report output.
-
-### 4. Operational runbook
-
-- Do not claim inbox delivery; delivery evidence remains `smtp_sendmail_returned_no_exception` plus delivery manifest.
-- WP26 may start only if explicitly approved.
 
 ## Immediate next action
 
-Proceed only if explicitly approved:
-
 ```text
-WP26 — Deterministic regime report integration implementation
+WP27 — Deterministic regime report integration closeout / visual report QA
 ```
-
-WP26 must be a separate implementation package with explicit report-surface tests and no portfolio/scoring/fundability changes.
