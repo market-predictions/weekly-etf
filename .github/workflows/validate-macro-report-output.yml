@@ -45,12 +45,12 @@ jobs:
 
       - name: Validate latest English and Dutch report macro compliance
         run: |
-          en_report="$(ls -1 output/weekly_analysis_pro_*.md 2>/dev/null | grep -v '_nl_' | sort | tail -1 || true)"
-          nl_report="$(ls -1 output/weekly_analysis_pro_nl_*.md 2>/dev/null | sort | tail -1 || true)"
+          en_report="$(find output -maxdepth 1 -type f -regextype posix-extended -regex '.*/weekly_analysis_pro_[0-9]{6}(_[0-9]{2})?\.md' | sort | tail -1 || true)"
+          nl_report="$(find output -maxdepth 1 -type f -regextype posix-extended -regex '.*/weekly_analysis_pro_nl_[0-9]{6}(_[0-9]{2})?\.md' | sort | tail -1 || true)"
           if [ -z "$en_report" ] || [ -z "$nl_report" ]; then
             echo "ETF_MACRO_REPORT_OUTPUT_SKIPPED | reason=missing_latest_report_pair | en=$en_report | nl=$nl_report"
             exit 0
           fi
-          python tools/validate_macro_compliance.py --text "$en_report" --text "$nl_report"
+          python tools/validate_macro_compliance.py --report-macro-sections "$en_report" --report-macro-sections "$nl_report"
           python tools/validate_etf_macro_thesis_surface_leakage.py --file "$en_report" --file "$nl_report"
           echo "ETF_MACRO_REPORT_OUTPUT_OK | en=$en_report | nl=$nl_report"
