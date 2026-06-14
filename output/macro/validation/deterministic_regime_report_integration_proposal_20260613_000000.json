@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "deterministic_regime_report_integration_proposal",
+  "status": "closed_proposal_only",
+  "proposal_decision": "future_implementation_package_allowed_if_explicitly_approved",
+  "repository": "market-predictions/weekly-etf",
+  "work_package": "WP25 — Deterministic regime report integration proposal",
+  "reviewed_chain": {
+    "wp21_design": "control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md",
+    "wp22_validator_status": "control/DETERMINISTIC_REGIME_CLIENT_SURFACE_VALIDATOR_STATUS.md",
+    "wp22_validation_evidence": "output/macro/validation/deterministic_regime_client_surface_validation_20260613_codespace.json",
+    "wp23_helper_status": "control/DETERMINISTIC_REGIME_SAFE_SURFACE_HELPER_STATUS.md",
+    "wp23_validation_evidence": "output/macro/validation/deterministic_regime_safe_surface_helper_validation_20260613_codespace.json",
+    "wp24_review": "control/DETERMINISTIC_REGIME_SAFE_SURFACE_INTEGRATION_REVIEW.md",
+    "wp24_review_artifact": "output/macro/validation/deterministic_regime_safe_surface_integration_review_20260613_000000.json"
+  },
+  "proposed_future_package": "WP26 — Deterministic regime report integration implementation",
+  "proposed_future_integration_files": [
+    "runtime/macro_report_surface.py",
+    "tools/validate_macro_report_surface.py",
+    "tests/test_deterministic_regime_client_surface_helper.py",
+    "tests/test_deterministic_regime_client_surface_validator.py"
+  ],
+  "required_future_validation": [
+    "rendered English and Dutch deterministic safe-surface text passes WP22 validator",
+    "review-only wording remains visible",
+    "confidence remains banded and non-numeric",
+    "raw macro fields, source paths, workflow ids and fixture names remain absent",
+    "legacy macro policy pack remains governing production macro source",
+    "no portfolio, scoring, fundability, funding, execution or historical-output mutation"
+  ],
+  "authority": {
+    "proposal_only": true,
+    "future_implementation_package_allowed": true,
+    "production_report_integration": false,
+    "production_report_narrative_authority": false,
+    "client_facing_authority": false,
+    "automatic_promotion": false,
+    "portfolio_action_authority": false,
+    "lane_scoring_authority": false,
+    "fundability_authority": false,
+    "portfolio_mutation": false,
+    "historical_output_mutation": false
+  },
+  "notes": [
+    "WP25 is proposal-only and does not modify production report rendering.",
+    "Any implementation must happen in a separate explicitly approved WP26 package.",
+    "The deterministic regime engine remains not promoted and not production-integrated."
+  ]
+}
