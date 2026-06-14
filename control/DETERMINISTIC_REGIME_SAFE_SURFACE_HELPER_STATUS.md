@@ -9,7 +9,7 @@ WP23 — Deterministic regime safe-surface helper
 ## Status
 
 ```text
-implemented / pending validation evidence
+closed / manually validated in GitHub Codespace / not workflow-proven
 ```
 
 ## Scope
@@ -49,17 +49,32 @@ drops raw axes, scores, macro evidence, workflow metadata and confidence decompo
 is validated by the WP22 client-surface validator in tests
 ```
 
-## Manual validation commands
+## Validation evidence
+
+Repo evidence artifact:
+
+```text
+output/macro/validation/deterministic_regime_safe_surface_helper_validation_20260613_codespace.json
+```
+
+Manual GitHub Codespace commands reported by the user:
 
 ```bash
 PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_helper.py -q
 PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py tests/test_deterministic_regime_client_surface_helper.py -q
 ```
 
-Expected result:
+Observed success evidence:
 
 ```text
-all tests pass
+6 passed in 0.04s
+13 passed in 0.04s
+```
+
+## Workflow status
+
+```text
+not_workflow_proven
 ```
 
 ## Authority boundary
@@ -76,12 +91,14 @@ historical_output_mutation=false
 production_report_integration=false
 ```
 
-## Next action
+## Closeout decision
 
-Run the manual validation commands in GitHub Codespace.
+WP23 is closed based on manual Codespace validation evidence.
 
-After validation is green, record evidence, close WP23, and proceed only to a review package:
+Next package may be considered only as review work:
 
 ```text
 WP24 — Deterministic regime safe-surface integration review
 ```
+
+WP24 must not integrate deterministic regime output into production reports unless a separate later integration package is explicitly approved.
