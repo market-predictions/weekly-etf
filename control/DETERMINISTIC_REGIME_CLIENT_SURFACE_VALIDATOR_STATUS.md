@@ -9,7 +9,7 @@ WP22 — Deterministic regime client-safe surface validator
 ## Status
 
 ```text
-implemented / pending workflow evidence
+closed / manually validated in GitHub Codespace / not workflow-proven
 ```
 
 ## Scope
@@ -41,26 +41,38 @@ workflow ids, fixture names and source paths do not appear in the text
 macro compliance and leakage validators pass on the rendered text
 ```
 
-## Manual validation commands
+## Validation evidence
 
-```bash
-python tools/validate_deterministic_regime_client_surface.py --self-test
-python -m pytest tests/test_deterministic_regime_client_surface_validator.py -q
-python tools/validate_deterministic_regime_client_surface.py --surface fixtures/deterministic_regime_client_surface/safe_surface_fixture.json
+Repo evidence artifact:
+
+```text
+output/macro/validation/deterministic_regime_client_surface_validation_20260613_codespace.json
 ```
 
-Expected markers:
+Manual GitHub Codespace commands reported by the user:
+
+```bash
+PYTHONPATH=. python tools/validate_deterministic_regime_client_surface.py --self-test
+PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py -q
+PYTHONPATH=. python tools/validate_deterministic_regime_client_surface.py --surface fixtures/deterministic_regime_client_surface/safe_surface_fixture.json
+```
+
+Observed success evidence:
 
 ```text
 DETERMINISTIC_REGIME_CLIENT_SURFACE_SELF_TEST_OK
+DETERMINISTIC_REGIME_CLIENT_SURFACE_OK
+7 passed in 0.03s
 DETERMINISTIC_REGIME_CLIENT_SURFACE_OK
 ```
 
 ## Workflow status
 
-A dedicated GitHub Actions workflow was attempted but not committed because the tool safety layer blocked the workflow create call.
+```text
+not_workflow_proven
+```
 
-Therefore WP22 is not closed as workflow-proven.
+A dedicated GitHub Actions workflow was attempted but not committed because the tool safety layer blocked the workflow create call.
 
 ## Authority boundary
 
@@ -76,8 +88,14 @@ historical_output_mutation=false
 production_report_integration=false
 ```
 
-## Next action
+## Closeout decision
 
-Run the manual validation commands or add the dedicated workflow in a separate environment where workflow writes are permitted.
+WP22 is closed based on manual Codespace validation evidence.
 
-After validation is green, update the control layer to close WP22 and proceed to WP23 only if desired.
+Next package may be considered only as helper-only work:
+
+```text
+WP23 — Deterministic regime safe-surface helper
+```
+
+WP23 must not integrate deterministic regime output into production reports unless a separate later integration package is explicitly approved.
