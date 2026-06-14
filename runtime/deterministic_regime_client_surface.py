@@ -81,23 +81,29 @@ def _explanation_nl(label_differs: bool, confidence_differs: bool) -> str:
     return "Het huidige bewijs is grotendeels samenhangend, maar dit blijft een intern reviewsignaal."
 
 
+def _join_sentences(first: str, second: str) -> str:
+    return f"{first.rstrip().rstrip('.')} . {second.strip()}".replace(" . ", ". ")
+
+
 def render_deterministic_regime_surface_en(dto: dict[str, Any]) -> str:
+    authority_sentence = _join_sentences(dto["authority_disclaimer_en"], dto["discipline_note_en"])
     return (
         "Deterministic regime read — review-only: "
         f"The shadow engine currently classifies the backdrop as {dto['regime_label_en']}, "
         f"{dto['comparison_status_en']}. "
         f"Confidence is {dto['confidence_band_en']}, reflecting evidence consistency rather than a forecast. "
-        f"{dto['authority_disclaimer_en']}; {dto['discipline_note_en']}"
+        f"{authority_sentence}"
     )
 
 
 def render_deterministic_regime_surface_nl(dto: dict[str, Any]) -> str:
+    authority_sentence = _join_sentences(dto["authority_disclaimer_nl"], dto["discipline_note_nl"])
     return (
         "Deterministische regime-inschatting — alleen ter review: "
         f"De shadow-engine classificeert de marktomgeving momenteel als {dto['regime_label_nl']}, "
         f"{dto['comparison_status_nl']}. "
         f"De betrouwbaarheid is {dto['confidence_band_nl']} en beschrijft samenhang in het bewijs, geen voorspelling. "
-        f"{dto['authority_disclaimer_nl']}; {dto['discipline_note_nl']}"
+        f"{authority_sentence}"
     )
 
 
