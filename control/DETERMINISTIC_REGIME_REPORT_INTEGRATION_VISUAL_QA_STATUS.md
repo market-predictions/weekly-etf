@@ -9,7 +9,7 @@ WP27 — Deterministic regime report integration closeout / visual report QA
 ## Status
 
 ```text
-started / pending fresh report artifact / not closed
+started / validator green / pending fresh report artifact / not closed
 ```
 
 ## Scope
@@ -35,6 +35,26 @@ ETF_MACRO_REPORT_SURFACE_OK | label=fixture | en_chars=2088 | nl_chars=2318
 ETF_MACRO_REPORT_SURFACE_OK | label=output/macro/latest.json | en_chars=2455 | nl_chars=2674
 ```
 
+## WP27 partial QA evidence
+
+Repo evidence artifact:
+
+```text
+output/macro/validation/deterministic_regime_report_visual_qa_partial_20260613_codespace.json
+```
+
+Observed user-reported evidence:
+
+```text
+git pull --ff-only: passed
+PYTHONPATH=. python tools/validate_macro_report_surface.py --self-test: passed
+PYTHONPATH=. python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json: passed
+```
+
+The report-text search was not completed because `rg` was unavailable and the fallback `grep` was run against all historical output files before a fresh report was generated.
+
+Historical `.json` hits in older April reports are pricing-audit references, not deterministic-regime leakage.
+
 ## Missing evidence for WP27 closeout
 
 WP27 still needs a fresh rendered report artifact, or fresh EN/NL markdown/PDF outputs, generated after the WP26 commits.
@@ -46,9 +66,25 @@ English markdown or PDF containing the new deterministic review-only line
 Dutch markdown or PDF containing the new deterministic review-only line
 ```
 
+## Generate fresh markdown reports
+
+Run:
+
+```bash
+PYTHONPATH=. python runtime/render_etf_report_from_state.py --output-dir output
+```
+
+The command prints:
+
+```text
+ETF_RUNTIME_RENDER_OK | en=<fresh_en_path> | nl=<fresh_nl_path>
+```
+
+Use those exact two fresh paths for the checks below.
+
 ## Visual/readability checks
 
-Check the English report for:
+Check the fresh English report for:
 
 ```text
 Deterministic regime read — review-only
@@ -56,7 +92,7 @@ This does not authorize portfolio changes
 The normal discipline gates remain decisive
 ```
 
-Check the Dutch report for:
+Check the fresh Dutch report for:
 
 ```text
 Deterministische regime-inschatting — alleen ter review
@@ -64,7 +100,7 @@ Dit geeft geen autoriteit voor portefeuillewijzigingen
 De normale discipline blijft leidend
 ```
 
-Check both reports for absence of:
+Check both fresh reports for absence of:
 
 ```text
 macro_axes
@@ -74,29 +110,20 @@ confidence_decomposition
 workflow_run_id
 commit_sha
 output/macro/validation
-.json
 ```
 
 ## Suggested local validation commands
 
-After pulling latest main and generating a fresh report, run the report-surface validators again:
+After generating a fresh report, replace the placeholders with the exact paths printed by the renderer:
 
 ```bash
-git pull --ff-only
-PYTHONPATH=. python tools/validate_macro_report_surface.py --self-test
-PYTHONPATH=. python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json
-```
-
-Then inspect the newly generated report files:
-
-```bash
-rg "Deterministic regime read|Deterministische regime-inschatting" output/weekly_analysis_pro*.md
-rg "macro_axes|macro_axis_scores|macro_evidence|confidence_decomposition|workflow_run_id|commit_sha|output/macro/validation|\.json" output/weekly_analysis_pro*.md
+grep -nE "Deterministic regime read|Deterministische regime-inschatting" <fresh_en_path> <fresh_nl_path>
+grep -nE "macro_axes|macro_axis_scores|macro_evidence|confidence_decomposition|workflow_run_id|commit_sha|output/macro/validation" <fresh_en_path> <fresh_nl_path>
 ```
 
 The first grep should find the safe review-only lines in the fresh reports.
 
-The second grep should not find these blocked internal terms in the fresh current report files.
+The second grep should return no matches in the fresh reports.
 
 ## Closeout condition
 
