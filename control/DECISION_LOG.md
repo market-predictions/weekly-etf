@@ -264,3 +264,23 @@ fixture names
 ```
 
 WP21 is design-only and does not grant client-facing authority, production report narrative authority, portfolio-action authority, lane-scoring authority, fundability authority, portfolio mutation authority, production report integration, or historical-output mutation.
+
+---
+
+## 2026-06-13 — Safe-surface chain may proceed only to a separate integration proposal
+
+### Decision
+
+WP24 records that the WP21/WP22/WP23 chain is ready for a separate integration-proposal package, but not for direct production integration.
+
+Reviewed chain:
+
+```text
+WP21: safe output contract
+WP22: safe-surface validator
+WP23: helper-only DTO/rendering layer
+```
+
+### Consequence
+
+A future package may propose an integration path, but production report integration remains false until a later explicit implementation package is approved. Deterministic regime output still has no production report narrative authority, portfolio-action authority, lane-scoring authority, fundability authority, portfolio mutation authority, or historical-output mutation authority.
