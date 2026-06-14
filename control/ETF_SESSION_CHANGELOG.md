@@ -9,6 +9,43 @@ This is the broad operating changelog for `market-predictions/weekly-etf` develo
 
 ---
 
+## 2026-06-13 — WP24 deterministic regime safe-surface integration review closed
+
+WP24 reviewed the WP21/WP22/WP23 chain and closed as review-only.
+
+Added:
+
+```text
+control/DETERMINISTIC_REGIME_SAFE_SURFACE_INTEGRATION_REVIEW.md
+output/macro/validation/deterministic_regime_safe_surface_integration_review_20260613_000000.json
+```
+
+Updated:
+
+```text
+control/CURRENT_STATE.md
+control/NEXT_ACTIONS.md
+control/DECISION_LOG.md
+control/ETF_SESSION_CHANGELOG.md
+```
+
+Decision:
+
+```text
+ready_for_separate_integration_proposal
+production_report_integration=false
+```
+
+Next package:
+
+```text
+WP25 — Deterministic regime report integration proposal
+```
+
+WP25 must remain proposal-only unless a later package explicitly authorizes implementation.
+
+---
+
 ## 2026-06-13 — WP23 deterministic regime safe-surface helper closed
 
 WP23 added the helper-only deterministic regime safe-surface layer.
@@ -34,14 +71,6 @@ Status:
 ```text
 closed / manually validated in GitHub Codespace / not workflow-proven
 ```
-
-Next package:
-
-```text
-WP24 — Deterministic regime safe-surface integration review
-```
-
-WP24 must remain review-only unless separately approved.
 
 ---
 
