@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "deterministic_regime_safe_surface_integration_review",
+  "status": "closed_review_only",
+  "review_decision": "ready_for_separate_integration_proposal",
+  "repository": "market-predictions/weekly-etf",
+  "work_package": "WP24 — Deterministic regime safe-surface integration review",
+  "reviewed_artifacts": {
+    "wp21_design": "control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md",
+    "wp22_validator_status": "control/DETERMINISTIC_REGIME_CLIENT_SURFACE_VALIDATOR_STATUS.md",
+    "wp22_validation_evidence": "output/macro/validation/deterministic_regime_client_surface_validation_20260613_codespace.json",
+    "wp23_helper_status": "control/DETERMINISTIC_REGIME_SAFE_SURFACE_HELPER_STATUS.md",
+    "wp23_validation_evidence": "output/macro/validation/deterministic_regime_safe_surface_helper_validation_20260613_codespace.json",
+    "wp23_helper": "runtime/deterministic_regime_client_surface.py"
+  },
+  "gate_assessment": {
+    "safe_surface_design_defined": true,
+    "safe_surface_validator_validated": true,
+    "safe_surface_helper_validated": true,
+    "workflow_proven": false,
+    "production_integration_approved": false,
+    "future_integration_proposal_allowed": true
+  },
+  "authority": {
+    "review_only": true,
+    "client_facing_authority": false,
+    "production_report_narrative_authority": false,
+    "production_report_integration": false,
+    "automatic_promotion": false,
+    "portfolio_action_authority": false,
+    "lane_scoring_authority": false,
+    "fundability_authority": false,
+    "portfolio_mutation": false,
+    "historical_output_mutation": false
+  },
+  "next_package": "WP25 — Deterministic regime report integration proposal",
+  "notes": [
+    "WP24 permits only a separate future integration proposal package.",
+    "WP24 does not integrate deterministic regime output into production reports.",
+    "Any later integration work must use only the narrow safe DTO and must run the safe-surface validator on rendered English and Dutch text."
+  ]
+}
