@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP22 are closed. WP23 deterministic regime safe-surface helper is implemented but pending validation evidence. The latest manifest-linked production baseline remains `260612_08`. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default.**
+**WP16 through WP23 are closed. WP23 deterministic regime safe-surface helper is closed based on manual GitHub Codespace validation evidence. The latest manifest-linked production baseline remains `260612_08`. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default. The next package is WP24 — Deterministic regime safe-surface integration review.**
 
 ## Latest verified production baseline
 
@@ -44,6 +44,7 @@ WP19: closed — deterministic regime engine fixture baseline, shadow-only
 WP20: closed — deterministic regime engine promotion review, not_promoted
 WP21: closed — deterministic regime client-safe surface design, design-only
 WP22: closed — deterministic regime client-safe surface validator, manually validated
+WP23: closed — deterministic regime safe-surface helper, manually validated
 ```
 
 WP22 evidence:
@@ -52,14 +53,20 @@ WP22 evidence:
 output/macro/validation/deterministic_regime_client_surface_validation_20260613_codespace.json
 ```
 
+WP23 evidence:
+
+```text
+output/macro/validation/deterministic_regime_safe_surface_helper_validation_20260613_codespace.json
+```
+
 ## WP23 deterministic regime safe-surface helper status
 
-WP23 is implemented but not yet closed.
+WP23 is closed.
 
 Status:
 
 ```text
-implemented / pending validation evidence
+closed / manually validated in GitHub Codespace / not workflow-proven
 ```
 
 Implemented files:
@@ -80,17 +87,11 @@ render_deterministic_regime_surface_en(dto)
 render_deterministic_regime_surface_nl(dto)
 ```
 
-Manual validation commands:
-
-```bash
-PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_helper.py -q
-PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py tests/test_deterministic_regime_client_surface_helper.py -q
-```
-
-Expected result:
+Manual validation evidence:
 
 ```text
-all tests pass
+6 passed in 0.04s
+13 passed in 0.04s
 ```
 
 ## Deterministic macro boundary
@@ -104,7 +105,7 @@ deterministic macro read as official decision/regime source: not promoted
 deterministic regime engine: not promoted
 deterministic regime client-safe surface: design-only, not production-integrated
 WP22 validator: closed, manually validated, not workflow-proven
-WP23 helper: implemented, pending validation evidence
+WP23 helper: closed, manually validated, not workflow-proven
 ```
 
 Do not infer deterministic macro promotion from WP16 through WP23.
@@ -143,7 +144,7 @@ WP16 through WP23 did not manually rewrite historical report artifacts. Current 
 - WP20 reviewed deterministic regime engine promotion readiness and kept it not promoted.
 - WP21 defined a future client-safe deterministic regime surface shape without implementation.
 - WP22 validated the safe-surface contract on fixtures.
-- WP23 adds a helper-only DTO/rendering layer, pending validation evidence.
+- WP23 adds a helper-only DTO/rendering layer.
 - WP16 through WP23 do not promote deterministic macro.
 
 ### 2. Input/state contract
@@ -161,12 +162,14 @@ WP16 through WP23 did not manually rewrite historical report artifacts. Current 
 ### 4. Operational runbook
 
 - Do not claim inbox delivery; delivery evidence remains `smtp_sendmail_returned_no_exception` plus delivery manifest.
-- WP23 must be validated before closing.
+- WP24 may start only as review-only work.
 
 ## Immediate next action
 
-Run the WP23 manual validation commands above. After green validation evidence, close WP23 and only then consider:
+Proceed only if desired:
 
 ```text
 WP24 — Deterministic regime safe-surface integration review
 ```
+
+WP24 must remain review-only unless a separate later package explicitly authorizes production report integration.
