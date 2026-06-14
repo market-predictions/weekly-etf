@@ -1,9 +1,16 @@
 from __future__ import annotations
 
+import json
 import re
+from pathlib import Path
 from typing import Any
 
+from runtime.deterministic_regime_client_surface import build_deterministic_regime_client_surface
+
 MAX_BULLETS = 3
+
+DEFAULT_DETERMINISTIC_VALIDATION_PATH = Path("output/macro/validation/latest_macro_regime_shadow_validation.json")
+DEFAULT_DETERMINISTIC_COMPARISON_PATH = Path("output/macro/validation/latest_macro_regime_shadow_comparison.json")
 
 REGIME_NL = {
     "Risk-on growth": "Risk-on groei",
@@ -296,6 +303,52 @@ def _memory_summary_nl(pack: dict[str, Any]) -> str:
     return _short_nl(report_transfer.get("summary"), "Regimegeheugen is beschikbaar, maar bevat geen rapportsamenvatting.", max_len=220)
 
 
+def _load_json_if_exists(path: Path) -> dict[str, Any] | None:
+    try:
+        if not path.exists():
+            return None
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def _state_dict(state: dict[str, Any], key: str) -> dict[str, Any] | None:
+    value = state.get(key)
+    return value if isinstance(value, dict) else None
+
+
+def deterministic_regime_surface_dto(state: dict[str, Any]) -> dict[str, Any] | None:
+    if state.get("include_deterministic_regime_surface") is False:
+        return None
+
+    validation = _state_dict(state, "deterministic_regime_shadow_validation") or _load_json_if_exists(DEFAULT_DETERMINISTIC_VALIDATION_PATH)
+    comparison = _state_dict(state, "deterministic_regime_shadow_comparison") or _load_json_if_exists(DEFAULT_DETERMINISTIC_COMPARISON_PATH)
+    if not validation or not comparison:
+        return None
+
+    return build_deterministic_regime_client_surface(
+        validation_evidence=validation,
+        comparison_evidence=comparison,
+        source_evidence_path=str(DEFAULT_DETERMINISTIC_VALIDATION_PATH),
+        source_comparison_path=str(DEFAULT_DETERMINISTIC_COMPARISON_PATH),
+    )
+
+
+def deterministic_regime_lines_en(state: dict[str, Any]) -> list[str]:
+    dto = deterministic_regime_surface_dto(state)
+    if not dto:
+        return []
+    return [f"- {dto['safe_surface_en']}"]
+
+
+def deterministic_regime_lines_nl(state: dict[str, Any]) -> list[str]:
+    dto = deterministic_regime_surface_dto(state)
+    if not dto:
+        return []
+    return [f"- {dto['safe_surface_nl']}"]
+
+
 def _central_bank_lines_en(pack: dict[str, Any]) -> list[str]:
     lines = []
     for key, label in (("fed", "Fed"), ("ecb", "ECB")):
@@ -362,9 +415,11 @@ def dashboard_en(state: dict[str, Any]) -> str:
     implications = "\n".join(f"- {item}" for item in _portfolio_implications(pack))
     banks = "\n".join(_central_bank_lines_en(pack))
     catalysts = "\n".join(_policy_catalyst_lines_en(pack))
+    deterministic = "\n".join(deterministic_regime_lines_en(state))
+    deterministic_block = f"\n{deterministic}" if deterministic else ""
     return f"""### Macro regime
 - Current regime: {_current_regime(pack)}.
-- Confidence: {_confidence(pack)}.
+- Confidence: {_confidence(pack)}.{deterministic_block}
 - Regime memory: {_memory_summary(pack)}
 - Decision rule: {_decision_rule(pack)}
 
@@ -390,9 +445,11 @@ def dashboard_nl(state: dict[str, Any]) -> str:
     implications = "\n".join(f"- {item}" for item in _portfolio_implications_nl(pack))
     banks = "\n".join(_central_bank_lines_nl(pack))
     catalysts = "\n".join(_policy_catalyst_lines_nl(pack))
+    deterministic = "\n".join(deterministic_regime_lines_nl(state))
+    deterministic_block = f"\n{deterministic}" if deterministic else ""
     return f"""### Regimesamenvatting
 - Huidig regime: {regime}.
-- Vertrouwen: {_confidence_nl(pack)}.
+- Vertrouwen: {_confidence_nl(pack)}.{deterministic_block}
 - Regimegeheugen: {_memory_summary_nl(pack)}
 - Beslisregel: {_decision_rule_nl(pack)}
 
