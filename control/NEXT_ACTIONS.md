@@ -25,13 +25,14 @@ WP21: closed as design-only
 WP22: closed as manually validated
 WP23: closed as manually validated
 WP24: closed as review-only
+WP25: closed as proposal-only
 ```
 
-WP24 review artifacts:
+WP25 proposal artifacts:
 
 ```text
-control/DETERMINISTIC_REGIME_SAFE_SURFACE_INTEGRATION_REVIEW.md
-output/macro/validation/deterministic_regime_safe_surface_integration_review_20260613_000000.json
+control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_PROPOSAL.md
+output/macro/validation/deterministic_regime_report_integration_proposal_20260613_000000.json
 ```
 
 ---
@@ -40,28 +41,29 @@ output/macro/validation/deterministic_regime_safe_surface_integration_review_202
 
 Deterministic regime work remains not promoted and not production-integrated.
 
-WP24 allows only a separate future proposal package.
+WP25 allows only a separately approved future implementation package.
 
 ---
 
 ## Active package
 
 ```text
-WP25 — Deterministic regime report integration proposal
+WP26 — Deterministic regime report integration implementation
 ```
 
 Current status:
 
 ```text
-not_started / ready_to_start / proposal-only required
+not_started / requires_explicit_user_approval / implementation package
 ```
 
-Scope:
+Scope if approved:
 
 ```text
-- propose how the safe-surface helper could be integrated later
-- no production report integration in WP25
-- no automatic production promotion
+- implement the WP25 proposal with minimal report-surface changes
+- use only the narrow safe DTO
+- validate exact rendered EN/NL text with the WP22 validator
+- no automatic production promotion beyond review-only surface text
 - no scoring/fundability changes
 - no portfolio mutation
 ```
@@ -69,22 +71,19 @@ Scope:
 Likely start files:
 
 ```text
-control/DETERMINISTIC_REGIME_SAFE_SURFACE_INTEGRATION_REVIEW.md
-control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
-control/DETERMINISTIC_REGIME_CLIENT_SURFACE_VALIDATOR_STATUS.md
-control/DETERMINISTIC_REGIME_SAFE_SURFACE_HELPER_STATUS.md
+control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_PROPOSAL.md
+runtime/macro_report_surface.py
 runtime/deterministic_regime_client_surface.py
+tools/validate_macro_report_surface.py
 tools/validate_deterministic_regime_client_surface.py
 ```
 
 ---
 
-## Next package after WP25
+## Next package after WP26
 
-Do not start this until WP25 proposal closes.
+Do not start this until WP26 is explicitly approved, implemented, and validated.
 
 ```text
-WP26 — Deterministic regime report integration implementation, only if explicitly approved
+WP27 — Deterministic regime report integration closeout / visual report QA
 ```
-
-WP26 must remain a separate explicit implementation package.
