@@ -9,7 +9,7 @@ WP26 — Deterministic regime report integration implementation
 ## Status
 
 ```text
-implemented / pending validation evidence
+closed / manually validated in GitHub Codespace / not workflow-proven
 ```
 
 ## Scope
@@ -41,6 +41,32 @@ keeps the legacy macro policy pack as the governing production macro source
 validates the deterministic DTO through the WP22 validator inside tools/validate_macro_report_surface.py
 ```
 
+## Validation evidence
+
+Repo evidence artifact:
+
+```text
+output/macro/validation/deterministic_regime_report_integration_validation_20260613_codespace.json
+```
+
+Manual GitHub Codespace commands reported by the user:
+
+```bash
+PYTHONPATH=. python -m pytest tests/test_deterministic_regime_report_surface_integration.py -q
+PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py tests/test_deterministic_regime_client_surface_helper.py tests/test_deterministic_regime_report_surface_integration.py -q
+PYTHONPATH=. python tools/validate_macro_report_surface.py --self-test
+PYTHONPATH=. python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json
+```
+
+Observed success evidence:
+
+```text
+5 passed in 0.05s
+18 passed in 0.06s
+ETF_MACRO_REPORT_SURFACE_OK | label=fixture | en_chars=2088 | nl_chars=2318
+ETF_MACRO_REPORT_SURFACE_OK | label=output/macro/latest.json | en_chars=2455 | nl_chars=2674
+```
+
 ## Explicitly unchanged layers
 
 ```text
@@ -54,29 +80,17 @@ delivery_authority=false
 execution_authority=false
 ```
 
-## Manual validation commands
-
-Run in GitHub Codespace from repo root:
-
-```bash
-PYTHONPATH=. python -m pytest tests/test_deterministic_regime_report_surface_integration.py -q
-PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py tests/test_deterministic_regime_client_surface_helper.py tests/test_deterministic_regime_report_surface_integration.py -q
-PYTHONPATH=. python tools/validate_macro_report_surface.py --self-test
-PYTHONPATH=. python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json
-```
-
-Expected result:
+## Workflow status
 
 ```text
-all tests pass
-ETF_MACRO_REPORT_SURFACE_OK
+not_workflow_proven
 ```
 
-## Closeout condition
+## Closeout decision
 
-WP26 is not closed until the manual validation output is recorded.
+WP26 is closed based on manual Codespace validation evidence.
 
-Next package after validation:
+Next package:
 
 ```text
 WP27 — Deterministic regime report integration closeout / visual report QA
