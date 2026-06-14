@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP26 are closed. WP26 deterministic regime report integration implementation is closed based on manual GitHub Codespace validation evidence. The latest manifest-linked production baseline remains `260612_08`. The next package is WP27 — Deterministic regime report integration closeout / visual report QA.**
+**WP16 through WP26 are closed. WP27 deterministic regime report integration visual QA is started but pending fresh report artifacts. The latest manifest-linked production baseline remains `260612_08`.**
 
 ## Latest verified production baseline
 
@@ -50,30 +50,32 @@ WP25: closed as proposal-only
 WP26: closed as manually validated
 ```
 
-WP26 evidence:
-
-```text
-control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_IMPLEMENTATION_STATUS.md
-output/macro/validation/deterministic_regime_report_integration_validation_20260613_codespace.json
-```
-
-## WP26 status
-
-```text
-closed / manually validated in GitHub Codespace / not workflow-proven
-```
-
-Observed validation evidence:
-
-```text
-5 passed in 0.05s
-18 passed in 0.06s
-ETF_MACRO_REPORT_SURFACE_OK | label=fixture | en_chars=2088 | nl_chars=2318
-ETF_MACRO_REPORT_SURFACE_OK | label=output/macro/latest.json | en_chars=2455 | nl_chars=2674
-```
-
-## Immediate next action
+## Active package
 
 ```text
 WP27 — Deterministic regime report integration closeout / visual report QA
 ```
+
+WP27 status:
+
+```text
+started / pending fresh report artifact / not closed
+```
+
+WP27 status file:
+
+```text
+control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_VISUAL_QA_STATUS.md
+```
+
+Required next evidence:
+
+```text
+fresh English report artifact after WP26 commits
+fresh Dutch report artifact after WP26 commits
+visual/readability check of review-only deterministic regime line
+```
+
+## Immediate next action
+
+Generate or provide fresh EN/NL report outputs after the WP26 commits, then inspect the deterministic review-only line and record QA evidence.
