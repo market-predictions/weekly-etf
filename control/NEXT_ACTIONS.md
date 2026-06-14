@@ -8,209 +8,86 @@
 
 ---
 
-## Phase 0 — control-layer operating discipline
-
-Every meaningful ETF architecture, debugging, prompt, state, workflow, delivery, discovery, localization, macro/thesis, or lab-optimization session starts with:
-
-1. `control/SYSTEM_INDEX.md`
-2. `control/CURRENT_STATE.md`
-3. `control/NEXT_ACTIONS.md`
-4. only then the minimum relevant execution files
-
-For deterministic macro work, also read:
+## Current production baseline
 
 ```text
-control/DETERMINISTIC_MACRO_REGIME_PROMOTION_CONTRACT.md
-control/DETERMINISTIC_MACRO_READ_PROMOTION_REVIEW.md
-control/MACRO_REPORT_SURFACE_STATUS.md
-control/MACRO_AUDIT_FOUNDATION_STATUS.md
-control/MACRO_REGIME_SHADOW_STATUS.md
-control/DETERMINISTIC_REGIME_ENGINE_PROMOTION_REVIEW.md
-control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
-```
-
-For historical-output cleanup/archive questions, also read:
-
-```text
-control/HISTORICAL_ARTIFACT_CLEANUP_POLICY.md
-```
-
----
-
-## Phase 1 — current baseline rule
-
-Current manifest-linked production baseline is `260612_08`.
-
-Use:
-
-```text
-output/run_manifests/weekly_etf_run_manifest_2026-06-12_20260613_113054.json
-output/delivery/weekly_etf_delivery_manifest_2026-06-12_20260613_113054.json
-```
-
-Latest verified production baseline:
-
-```text
-requested_close_date: 2026-06-12
+baseline: 260612_08
 run_id: 20260613_113054
-report_token: 260612
-english_report_path: output/weekly_analysis_pro_260612_08.md
-dutch_report_path: output/weekly_analysis_pro_nl_260612_08.md
-pricing_lineage_status: passed
 workflow_status: workflow_success
 delivery_status: smtp_sendmail_returned_no_exception
 ```
 
 Delivery evidence remains delivery-layer evidence only and is not an inbox receipt.
 
-Historical generated outputs remain immutable by default. Do not bulk-edit old reports to remove stale wording or old markers.
-
 ---
 
-## Phase 2 — closed repair / foundation / design packages
-
-WP16 is closed on the latest verified report set.
-
-WP17 is closed on the latest verified report set.
-
-WP18 is closed.
-
-WP19 is closed.
-
-WP20 is closed as review-only / not_promoted.
-
-WP21 is closed as design-only.
-
-WP21 closeout evidence:
+## Closed packages
 
 ```text
-design artifact: control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
-design_only=true
-specification_only=true
-not_implemented=true
-not_promoted=true
+WP16: closed
+WP17: closed
+WP18: closed
+WP19: closed
+WP20: closed as not_promoted
+WP21: closed as design-only
+WP22: closed as manually validated
 ```
 
-Do not continue patching WP16/WP17/WP18/WP19/WP20/WP21 unless a new defect is found in a later manifest-linked run.
-
----
-
-## Phase 3 — deterministic macro boundary
-
-Current deterministic macro boundary remains:
+WP22 evidence:
 
 ```text
-client-safe macro report surface: integrated
-raw deterministic macro read: not client-facing
-deterministic macro read as official production regime source: not promoted
-deterministic regime engine: not promoted
-deterministic regime client-safe surface: design-only, not implemented
-```
-
-WP16/WP17/WP18/WP19/WP20/WP21 do not promote deterministic macro.
-
-Standing authority boundary:
-
-```text
-client_facing_narrative_authority=false
-production_report_narrative_authority=false
-portfolio_action_authority=false
-lane_scoring_authority=false
-fundability_authority=false
-funding_authority=false
-portfolio_mutation=false
-delivery_authority=false
-execution_authority=false
-production_report_mutation=false
+output/macro/validation/deterministic_regime_client_surface_validation_20260613_codespace.json
+control/DETERMINISTIC_REGIME_CLIENT_SURFACE_VALIDATOR_STATUS.md
 ```
 
 ---
 
-## Phase 4 — active package
+## Deterministic macro boundary
 
-Active package:
+Deterministic regime work remains not promoted and not production-integrated.
+
+---
+
+## Active package
 
 ```text
-WP22 — Deterministic regime client-safe surface validator
+WP23 — Deterministic regime safe-surface helper
 ```
 
-Current WP22 status:
+Current status:
 
 ```text
-not_started / ready_to_start / validator-or-helper-only required
+not_started / ready_to_start / helper-only required
 ```
 
 Scope:
 
 ```text
-- validator/specification only or narrow helper-only implementation
-- validate the WP21 safe-surface design against fixture-rendered text
+- create a narrow helper that can build the safe DTO and render safe EN/NL text
+- use the WP21 design and WP22 validator
 - no production report integration
 - no automatic production promotion
 - no scoring/fundability changes
 - no portfolio mutation
-- no historical output rewrite
 ```
 
 Likely start files:
 
 ```text
 control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
-control/DETERMINISTIC_REGIME_ENGINE_PROMOTION_REVIEW.md
-control/MACRO_REPORT_SURFACE_STATUS.md
-tools/validate_macro_report_surface.py
-tools/validate_macro_compliance.py
-tools/validate_etf_macro_thesis_surface_leakage.py
-tests/test_macro_regime_promotion_contract.py
-```
-
-Required boundary:
-
-```text
-validator_or_helper_only=true
-client_facing_authority=false
-production_report_narrative_authority=false
-portfolio_action_authority=false
-lane_scoring_authority=false
-fundability_authority=false
-portfolio_mutation=false
-historical_output_mutation=false
-production_report_integration=false
+control/DETERMINISTIC_REGIME_CLIENT_SURFACE_VALIDATOR_STATUS.md
+tools/validate_deterministic_regime_client_surface.py
+fixtures/deterministic_regime_client_surface/safe_surface_fixture.json
 ```
 
 ---
 
-## Phase 5 — next package after WP22 closes
+## Next package after WP23
 
-Do not start this until WP22 is validated and closed.
-
-Likely next package:
+Do not start this until WP23 helper tests are green and recorded.
 
 ```text
-WP23 — Deterministic regime safe-surface helper, if WP22 validates the contract
+WP24 — Deterministic regime safe-surface integration review
 ```
 
-Tentative scope:
-
-```text
-- helper-only implementation behind tests
-- no production report integration
-- no automatic production promotion
-- no scoring/fundability changes
-- no portfolio mutation
-```
-
----
-
-## Do-not-do list
-
-```text
-Do not claim inbox delivery without receipt evidence.
-Do not promote deterministic macro by implication.
-Do not rewrite historical generated outputs.
-Do not use replacement-edge diagnostics for scoring, fundability, or trades.
-Do not weaken pricing-lineage or runtime-state authority.
-Do not localize ETF issuer/product names such as iShares, SPDR, VanEck, Sprott, or Global X.
-Do not bypass the PDF visual gate after WP17.
-Do not start WP23 before WP22 is validated and closed.
-```
+WP24 must remain review-only unless separately approved.
