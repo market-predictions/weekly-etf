@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "deterministic_regime_report_visual_qa_validation_evidence",
+  "status": "passed",
+  "repository": "market-predictions/weekly-etf",
+  "work_package": "WP27 — Deterministic regime report integration closeout / visual report QA",
+  "validation_source": "user_reported_github_codespace_terminal",
+  "fresh_outputs": {
+    "english_report_path": "output/weekly_analysis_pro_260612_13.md",
+    "dutch_report_path": "output/weekly_analysis_pro_nl_260612_13.md",
+    "runtime_state": "output/runtime/etf_report_state_20260612_20260613_201247.json"
+  },
+  "validation_commands": [
+    {
+      "command": "git pull --ff-only",
+      "status": "passed",
+      "observed_result": "Already up to date."
+    },
+    {
+      "command": "PYTHONPATH=. python -m pytest tests/test_deterministic_regime_report_surface_integration.py -q",
+      "status": "passed",
+      "observed_result": "6 passed in 0.04s"
+    },
+    {
+      "command": "PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py tests/test_deterministic_regime_client_surface_helper.py tests/test_deterministic_regime_report_surface_integration.py -q",
+      "status": "passed",
+      "observed_result": "19 passed in 0.07s"
+    },
+    {
+      "command": "PYTHONPATH=. python tools/validate_macro_report_surface.py --self-test",
+      "status": "passed",
+      "observed_result": "ETF_MACRO_REPORT_SURFACE_OK | label=fixture | en_chars=2087 | nl_chars=2317"
+    },
+    {
+      "command": "PYTHONPATH=. python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json",
+      "status": "passed",
+      "observed_result": "ETF_MACRO_REPORT_SURFACE_OK | label=output/macro/latest.json | en_chars=2454 | nl_chars=2673"
+    },
+    {
+      "command": "PYTHONPATH=. python runtime/render_etf_report_from_state.py --output-dir output",
+      "status": "passed",
+      "observed_result": "ETF_RUNTIME_RENDER_OK | en=output/weekly_analysis_pro_260612_13.md | nl=output/weekly_analysis_pro_nl_260612_13.md"
+    },
+    {
+      "command": "PYTHONPATH=. python runtime/polish_runtime_reports.py --output-dir output",
+      "status": "passed",
+      "observed_result": "ETF_RUNTIME_POLISH_NL_MACRO_OK | reason=native_dutch_macro_surface_applied; ETF_RUNTIME_POLISH_OK | en=weekly_analysis_pro_260612_13.md | nl=weekly_analysis_pro_nl_260612_13.md | runtime_state=output/runtime/etf_report_state_20260612_20260613_201247.json"
+    },
+    {
+      "command": "grep -nE \"Deterministic regime read|Deterministische regime-inschatting\" output/weekly_analysis_pro_260612_13.md output/weekly_analysis_pro_nl_260612_13.md",
+      "status": "passed",
+      "observed_result": "output/weekly_analysis_pro_260612_13.md:47:- Deterministic regime read — review-only: ... This does not authorize portfolio changes. The normal discipline gates remain decisive.; output/weekly_analysis_pro_nl_260612_13.md:31:- Deterministische regime-inschatting — alleen ter review: ... Dit geeft geen autoriteit voor portefeuillewijzigingen. De normale discipline blijft leidend."
+    },
+    {
+      "command": "grep -nE \"\\.\\;|macro_axes|macro_axis_scores|macro_evidence|confidence_decomposition|workflow_run_id|commit_sha|output/macro/validation\" output/weekly_analysis_pro_260612_13.md output/weekly_analysis_pro_nl_260612_13.md",
+      "status": "passed",
+      "observed_result": "no matches"
+    }
+  ],
+  "qa_findings": {
+    "review_only_line_present_en": true,
+    "review_only_line_present_nl": true,
+    "punctuation_defect_fixed": true,
+    "blocked_deterministic_internal_terms_absent": true,
+    "visual_readability_acceptable": true
+  },
+  "authority": {
+    "review_only_report_surface": true,
+    "deterministic_regime_engine_promoted": false,
+    "production_report_narrative_authority": false,
+    "portfolio_action_authority": false,
+    "lane_scoring_authority": false,
+    "fundability_authority": false,
+    "portfolio_mutation": false,
+    "historical_output_mutation": false
+  }
+}
