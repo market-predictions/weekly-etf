@@ -9,7 +9,7 @@ WP27 — Deterministic regime report integration closeout / visual report QA
 ## Status
 
 ```text
-started / validator green / pending polished fresh report artifact / not closed
+started / punctuation repaired / revalidation needed / not closed
 ```
 
 ## Scope
@@ -35,118 +35,54 @@ ETF_MACRO_REPORT_SURFACE_OK | label=fixture | en_chars=2088 | nl_chars=2318
 ETF_MACRO_REPORT_SURFACE_OK | label=output/macro/latest.json | en_chars=2455 | nl_chars=2674
 ```
 
-## WP27 partial QA evidence
+## WP27 visual QA finding
 
-Repo evidence artifact:
+A fresh polished report showed the deterministic review-only lines correctly and no blocked deterministic internal terms.
 
-```text
-output/macro/validation/deterministic_regime_report_visual_qa_partial_20260613_codespace.json
-```
-
-Observed user-reported evidence:
+However, visual QA found a small client-facing punctuation issue:
 
 ```text
-git pull --ff-only: passed
-PYTHONPATH=. python tools/validate_macro_report_surface.py --self-test: passed
-PYTHONPATH=. python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json: passed
-PYTHONPATH=. python runtime/render_etf_report_from_state.py --output-dir output: passed
+changes.; The normal discipline gates remain decisive.
+wijzigingen.; De normale discipline blijft leidend.
 ```
 
-The raw renderer created:
+This has been repaired in:
 
 ```text
-output/weekly_analysis_pro_260612_11.md
-output/weekly_analysis_pro_nl_260612_11.md
+runtime/deterministic_regime_client_surface.py
+tests/test_deterministic_regime_report_surface_integration.py
 ```
 
-The deterministic review-only line was not present in the raw rendered markdown because the shared macro report surface is applied by the polish step.
+New regression protection requires no `.;` in the English or Dutch deterministic safe surface.
 
-Production order:
+## Revalidation required
 
-```text
-runtime/render_etf_report_from_state.py
-→ runtime/polish_runtime_reports.py
-```
-
-Historical `.json` hits in older April reports are pricing-audit references, not deterministic-regime leakage.
-
-## Missing evidence for WP27 closeout
-
-WP27 still needs fresh polished EN/NL markdown or PDF outputs generated after the WP26 commits.
-
-Required fresh output evidence:
-
-```text
-English polished markdown or PDF containing the new deterministic review-only line
-Dutch polished markdown or PDF containing the new deterministic review-only line
-```
-
-## Generate and polish fresh markdown reports
-
-Run both commands:
+Run after pulling latest main:
 
 ```bash
+git pull --ff-only
+PYTHONPATH=. python -m pytest tests/test_deterministic_regime_report_surface_integration.py -q
+PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py tests/test_deterministic_regime_client_surface_helper.py tests/test_deterministic_regime_report_surface_integration.py -q
+PYTHONPATH=. python tools/validate_macro_report_surface.py --self-test
+PYTHONPATH=. python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json
 PYTHONPATH=. python runtime/render_etf_report_from_state.py --output-dir output
 PYTHONPATH=. python runtime/polish_runtime_reports.py --output-dir output
 ```
 
-The first command prints:
-
-```text
-ETF_RUNTIME_RENDER_OK | en=<fresh_en_path> | nl=<fresh_nl_path>
-```
-
-The polish step updates the latest matching EN/NL report files in place.
-
-Use the exact two fresh paths printed by the render command for the checks below.
-
-## Visual/readability checks
-
-Check the fresh polished English report for:
-
-```text
-Deterministic regime read — review-only
-This does not authorize portfolio changes
-The normal discipline gates remain decisive
-```
-
-Check the fresh polished Dutch report for:
-
-```text
-Deterministische regime-inschatting — alleen ter review
-Dit geeft geen autoriteit voor portefeuillewijzigingen
-De normale discipline blijft leidend
-```
-
-Check both fresh polished reports for absence of:
-
-```text
-macro_axes
-macro_axis_scores
-macro_evidence
-confidence_decomposition
-workflow_run_id
-commit_sha
-output/macro/validation
-```
-
-## Suggested local validation commands
-
-After generating and polishing a fresh report, replace the placeholders with the exact paths printed by the renderer:
+Then use the exact fresh paths printed by the render command:
 
 ```bash
 grep -nE "Deterministic regime read|Deterministische regime-inschatting" <fresh_en_path> <fresh_nl_path>
-grep -nE "macro_axes|macro_axis_scores|macro_evidence|confidence_decomposition|workflow_run_id|commit_sha|output/macro/validation" <fresh_en_path> <fresh_nl_path>
+grep -nE "\.\;|macro_axes|macro_axis_scores|macro_evidence|confidence_decomposition|workflow_run_id|commit_sha|output/macro/validation" <fresh_en_path> <fresh_nl_path>
 ```
 
-The first grep should find the safe review-only lines in the fresh polished reports.
+Expected:
 
-The second grep should return no matches in the fresh polished reports.
+```text
+first grep: finds both review-only lines
+second grep: no matches
+```
 
 ## Closeout condition
 
-WP27 can close only after fresh polished EN/NL report artifacts are inspected and the output evidence is recorded.
-
-## Next package after WP27
-
-If visual QA passes, the next package should be normal report-generation/delivery validation, not new deterministic regime logic.
+WP27 can close only after the revalidation output is recorded.
