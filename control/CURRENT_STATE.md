@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP26 are closed. WP27 deterministic regime report integration visual QA is started but pending fresh report artifacts. The latest manifest-linked production baseline remains `260612_08`.**
+**WP16 through WP27 are closed. WP27 deterministic regime report integration visual QA passed on fresh polished EN/NL markdown outputs. The latest manifest-linked production baseline remains `260612_08`.**
 
 ## Latest verified production baseline
 
@@ -48,34 +48,18 @@ WP23: closed as manually validated
 WP24: closed as review-only
 WP25: closed as proposal-only
 WP26: closed as manually validated
+WP27: closed as visual QA passed
 ```
 
-## Active package
-
-```text
-WP27 — Deterministic regime report integration closeout / visual report QA
-```
-
-WP27 status:
-
-```text
-started / pending fresh report artifact / not closed
-```
-
-WP27 status file:
+## WP27 evidence
 
 ```text
 control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_VISUAL_QA_STATUS.md
-```
-
-Required next evidence:
-
-```text
-fresh English report artifact after WP26 commits
-fresh Dutch report artifact after WP26 commits
-visual/readability check of review-only deterministic regime line
+output/macro/validation/deterministic_regime_report_visual_qa_validation_20260613_codespace.json
+output/weekly_analysis_pro_260612_13.md
+output/weekly_analysis_pro_nl_260612_13.md
 ```
 
 ## Immediate next action
 
-Generate or provide fresh EN/NL report outputs after the WP26 commits, then inspect the deterministic review-only line and record QA evidence.
+If a production delivery run is needed, continue with normal report-generation and delivery validation. No new deterministic regime logic is needed by default.
