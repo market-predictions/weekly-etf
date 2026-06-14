@@ -4,7 +4,8 @@
 This is a narrow integration guard for the report-facing macro/regime text. It
 proves that the shared macro surface can render English and Dutch text from the
 macro policy pack without leaking internal shadow fields, driver IDs, or
-predictive phrasing.
+predictive phrasing. It also validates any deterministic-regime safe surface
+through the dedicated WP22 safe-surface validator.
 """
 
 from __future__ import annotations
@@ -19,7 +20,14 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from runtime.macro_report_surface import dashboard_en, dashboard_nl, executive_lines_en, executive_lines_nl
+from runtime.macro_report_surface import (
+    dashboard_en,
+    dashboard_nl,
+    deterministic_regime_surface_dto,
+    executive_lines_en,
+    executive_lines_nl,
+)
+from tools.validate_deterministic_regime_client_surface import validate_surface_payload
 from tools.validate_etf_macro_thesis_surface_leakage import scan_text
 from tools.validate_macro_compliance import validate_text
 
@@ -128,9 +136,13 @@ def _validate_surface_text(name: str, text: str) -> None:
 
 
 def validate_pack(pack: dict[str, Any], label: str) -> None:
+    state = {"macro_policy_pack": pack}
     rendered = _render(pack)
     for name, text in rendered.items():
         _validate_surface_text(f"{label}_{name}", text)
+    dto = deterministic_regime_surface_dto(state)
+    if dto:
+        validate_surface_payload(dto)
     print(
         "ETF_MACRO_REPORT_SURFACE_OK | "
         f"label={label} | en_chars={len(rendered['en'])} | nl_chars={len(rendered['nl'])}"
