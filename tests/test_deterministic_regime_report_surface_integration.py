@@ -87,6 +87,16 @@ def test_deterministic_confidence_is_banded_not_numeric() -> None:
     assert "72%" not in dto["safe_surface_nl"]
 
 
+def test_review_only_surface_has_clean_client_facing_punctuation() -> None:
+    dto = deterministic_regime_surface_dto(_state())
+
+    assert dto is not None
+    assert ".;" not in dto["safe_surface_en"]
+    assert ".;" not in dto["safe_surface_nl"]
+    assert "changes. The normal discipline gates remain decisive." in dto["safe_surface_en"]
+    assert "wijzigingen. De normale discipline blijft leidend." in dto["safe_surface_nl"]
+
+
 def test_legacy_macro_regime_remains_present_and_deterministic_surface_is_additive() -> None:
     state = _state()
     en = dashboard_en(state)
