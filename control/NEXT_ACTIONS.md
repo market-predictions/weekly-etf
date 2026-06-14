@@ -47,15 +47,26 @@ WP27 — Deterministic regime report integration closeout / visual report QA
 Current status:
 
 ```text
-not_started / ready_to_start / closeout-and-visual-QA only
+started / pending fresh report artifact / not closed
 ```
 
-Scope:
+Status file:
 
 ```text
-- generate or inspect a fresh report output that includes the review-only deterministic regime line
-- confirm EN/NL visual/readability surface
-- no scoring/fundability changes
-- no portfolio mutation
-- no historical-output rewrite
+control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_VISUAL_QA_STATUS.md
 ```
+
+Required next step:
+
+```text
+generate or provide a fresh EN/NL report artifact after the WP26 commits
+```
+
+Minimum local checks after fresh report generation:
+
+```bash
+rg "Deterministic regime read|Deterministische regime-inschatting" output/weekly_analysis_pro*.md
+rg "macro_axes|macro_axis_scores|macro_evidence|confidence_decomposition|workflow_run_id|commit_sha|output/macro/validation|\.json" output/weekly_analysis_pro*.md
+```
+
+Close WP27 only after fresh EN/NL report output is inspected and evidence is recorded.
