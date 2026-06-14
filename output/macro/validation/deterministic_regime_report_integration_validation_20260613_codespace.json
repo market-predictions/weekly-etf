@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "deterministic_regime_report_integration_validation_evidence",
+  "status": "passed",
+  "validation_source": "user_reported_github_codespace_terminal",
+  "validated_at_utc": "2026-06-13T23:40:00Z",
+  "repository": "market-predictions/weekly-etf",
+  "work_package": "WP26 — Deterministic regime report integration implementation",
+  "commands": [
+    {
+      "command": "PYTHONPATH=. python -m pytest tests/test_deterministic_regime_report_surface_integration.py -q",
+      "status": "passed",
+      "observed_result": "5 passed in 0.05s"
+    },
+    {
+      "command": "PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py tests/test_deterministic_regime_client_surface_helper.py tests/test_deterministic_regime_report_surface_integration.py -q",
+      "status": "passed",
+      "observed_result": "18 passed in 0.06s"
+    },
+    {
+      "command": "PYTHONPATH=. python tools/validate_macro_report_surface.py --self-test",
+      "status": "passed",
+      "observed_marker": "ETF_MACRO_REPORT_SURFACE_OK",
+      "observed_result": "ETF_MACRO_REPORT_SURFACE_OK | label=fixture | en_chars=2088 | nl_chars=2318"
+    },
+    {
+      "command": "PYTHONPATH=. python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json",
+      "status": "passed",
+      "observed_marker": "ETF_MACRO_REPORT_SURFACE_OK",
+      "observed_result": "ETF_MACRO_REPORT_SURFACE_OK | label=output/macro/latest.json | en_chars=2455 | nl_chars=2674"
+    }
+  ],
+  "authority": {
+    "report_surface_review_only_text_integrated": true,
+    "deterministic_regime_engine_promoted": false,
+    "production_report_narrative_authority": false,
+    "portfolio_action_authority": false,
+    "lane_scoring_authority": false,
+    "fundability_authority": false,
+    "portfolio_mutation": false,
+    "historical_output_mutation": false
+  },
+  "notes": [
+    "Validation evidence is based on user-provided GitHub Codespace terminal output.",
+    "The integration is additive review-only report text using the narrow safe DTO.",
+    "The legacy macro policy pack remains the governing production macro source."
+  ]
+}
