@@ -9,80 +9,52 @@ WP27 — Deterministic regime report integration closeout / visual report QA
 ## Status
 
 ```text
-started / punctuation repaired / revalidation needed / not closed
+closed / visual QA passed / manually validated in GitHub Codespace / not workflow-proven
 ```
 
-## Scope
-
-WP27 is a closeout and visual/readability QA package for the WP26 deterministic regime report integration.
-
-It must not add new report logic, change portfolio state, change lane scoring, change fundability, change delivery behavior, or rewrite historical generated outputs.
-
-## Current evidence already available
-
-WP26 is closed based on manual Codespace validation evidence:
+## Final evidence artifact
 
 ```text
-output/macro/validation/deterministic_regime_report_integration_validation_20260613_codespace.json
+output/macro/validation/deterministic_regime_report_visual_qa_validation_20260613_codespace.json
 ```
 
-Observed WP26 validation evidence:
+## Fresh polished outputs inspected
 
 ```text
-5 passed in 0.05s
-18 passed in 0.06s
-ETF_MACRO_REPORT_SURFACE_OK | label=fixture | en_chars=2088 | nl_chars=2318
-ETF_MACRO_REPORT_SURFACE_OK | label=output/macro/latest.json | en_chars=2455 | nl_chars=2674
+output/weekly_analysis_pro_260612_13.md
+output/weekly_analysis_pro_nl_260612_13.md
 ```
 
-## WP27 visual QA finding
-
-A fresh polished report showed the deterministic review-only lines correctly and no blocked deterministic internal terms.
-
-However, visual QA found a small client-facing punctuation issue:
+## Runtime state used by polish step
 
 ```text
-changes.; The normal discipline gates remain decisive.
-wijzigingen.; De normale discipline blijft leidend.
+output/runtime/etf_report_state_20260612_20260613_201247.json
 ```
 
-This has been repaired in:
+## Observed validation evidence
 
 ```text
-runtime/deterministic_regime_client_surface.py
-tests/test_deterministic_regime_report_surface_integration.py
+6 passed in 0.04s
+19 passed in 0.07s
+ETF_MACRO_REPORT_SURFACE_OK | label=fixture | en_chars=2087 | nl_chars=2317
+ETF_MACRO_REPORT_SURFACE_OK | label=output/macro/latest.json | en_chars=2454 | nl_chars=2673
+ETF_RUNTIME_RENDER_OK | en=output/weekly_analysis_pro_260612_13.md | nl=output/weekly_analysis_pro_nl_260612_13.md
+ETF_RUNTIME_POLISH_NL_MACRO_OK | reason=native_dutch_macro_surface_applied
+ETF_RUNTIME_POLISH_OK | en=weekly_analysis_pro_260612_13.md | nl=weekly_analysis_pro_nl_260612_13.md | runtime_state=output/runtime/etf_report_state_20260612_20260613_201247.json
 ```
 
-New regression protection requires no `.;` in the English or Dutch deterministic safe surface.
+## Visual QA result
 
-## Revalidation required
+The fresh polished English and Dutch reports contain the deterministic regime review-only line.
 
-Run after pulling latest main:
+The blocked-term grep returned no matches for the fresh polished reports.
 
-```bash
-git pull --ff-only
-PYTHONPATH=. python -m pytest tests/test_deterministic_regime_report_surface_integration.py -q
-PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py tests/test_deterministic_regime_client_surface_helper.py tests/test_deterministic_regime_report_surface_integration.py -q
-PYTHONPATH=. python tools/validate_macro_report_surface.py --self-test
-PYTHONPATH=. python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json
-PYTHONPATH=. python runtime/render_etf_report_from_state.py --output-dir output
-PYTHONPATH=. python runtime/polish_runtime_reports.py --output-dir output
-```
+The punctuation defect found during WP27 was repaired and revalidated.
 
-Then use the exact fresh paths printed by the render command:
+## Closeout decision
 
-```bash
-grep -nE "Deterministic regime read|Deterministische regime-inschatting" <fresh_en_path> <fresh_nl_path>
-grep -nE "\.\;|macro_axes|macro_axis_scores|macro_evidence|confidence_decomposition|workflow_run_id|commit_sha|output/macro/validation" <fresh_en_path> <fresh_nl_path>
-```
+WP27 is closed.
 
-Expected:
+## Next package
 
-```text
-first grep: finds both review-only lines
-second grep: no matches
-```
-
-## Closeout condition
-
-WP27 can close only after the revalidation output is recorded.
+Normal report-generation or delivery validation may follow if a production delivery run is needed.
