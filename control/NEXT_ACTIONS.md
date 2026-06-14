@@ -26,6 +26,14 @@ WP22: closed as manually validated
 WP23: closed as manually validated
 WP24: closed as review-only
 WP25: closed as proposal-only
+WP26: closed as manually validated
+```
+
+WP26 evidence:
+
+```text
+control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_IMPLEMENTATION_STATUS.md
+output/macro/validation/deterministic_regime_report_integration_validation_20260613_codespace.json
 ```
 
 ---
@@ -33,41 +41,21 @@ WP25: closed as proposal-only
 ## Active package
 
 ```text
-WP26 — Deterministic regime report integration implementation
+WP27 — Deterministic regime report integration closeout / visual report QA
 ```
 
 Current status:
 
 ```text
-implemented / pending validation evidence
+not_started / ready_to_start / closeout-and-visual-QA only
 ```
 
-Status file:
+Scope:
 
 ```text
-control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_IMPLEMENTATION_STATUS.md
-```
-
-Run these validation commands:
-
-```bash
-PYTHONPATH=. python -m pytest tests/test_deterministic_regime_report_surface_integration.py -q
-PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py tests/test_deterministic_regime_client_surface_helper.py tests/test_deterministic_regime_report_surface_integration.py -q
-PYTHONPATH=. python tools/validate_macro_report_surface.py --self-test
-PYTHONPATH=. python tools/validate_macro_report_surface.py --macro-pack output/macro/latest.json
-```
-
-Expected result:
-
-```text
-all tests pass
-ETF_MACRO_REPORT_SURFACE_OK
-```
-
----
-
-## Next package after WP26
-
-```text
-WP27 — Deterministic regime report integration closeout / visual report QA
+- generate or inspect a fresh report output that includes the review-only deterministic regime line
+- confirm EN/NL visual/readability surface
+- no scoring/fundability changes
+- no portfolio mutation
+- no historical-output rewrite
 ```
