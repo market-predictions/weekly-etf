@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP22 are closed. WP22 deterministic regime client-safe surface validator is closed based on manual GitHub Codespace validation evidence. The latest manifest-linked production baseline remains `260612_08`. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default. The next package is WP23 — Deterministic regime safe-surface helper.**
+**WP16 through WP22 are closed. WP23 deterministic regime safe-surface helper is implemented but pending validation evidence. The latest manifest-linked production baseline remains `260612_08`. Deterministic macro remains not promoted. Historical generated outputs remain immutable by default.**
 
 ## Latest verified production baseline
 
@@ -46,61 +46,51 @@ WP21: closed — deterministic regime client-safe surface design, design-only
 WP22: closed — deterministic regime client-safe surface validator, manually validated
 ```
 
-WP20 review status remains:
-
-```text
-status=not_promoted
-client_facing_narrative_authority=false
-production_report_narrative_authority=false
-control_layer_decision=not_promoted
-explicit_control_layer_promotion_decision=false
-```
-
-WP21 design artifact:
-
-```text
-control/DETERMINISTIC_REGIME_CLIENT_SAFE_SURFACE_DESIGN.md
-```
-
-WP22 status artifact:
-
-```text
-control/DETERMINISTIC_REGIME_CLIENT_SURFACE_VALIDATOR_STATUS.md
-```
-
-WP22 validation evidence artifact:
+WP22 evidence:
 
 ```text
 output/macro/validation/deterministic_regime_client_surface_validation_20260613_codespace.json
 ```
 
-WP22 validation source:
+## WP23 deterministic regime safe-surface helper status
+
+WP23 is implemented but not yet closed.
+
+Status:
 
 ```text
-manual GitHub Codespace terminal evidence reported by user
-not GitHub Actions workflow evidence
+implemented / pending validation evidence
 ```
 
-Observed WP22 validation results:
+Implemented files:
 
 ```text
-DETERMINISTIC_REGIME_CLIENT_SURFACE_SELF_TEST_OK
-DETERMINISTIC_REGIME_CLIENT_SURFACE_OK
-7 passed in 0.03s
-DETERMINISTIC_REGIME_CLIENT_SURFACE_OK
+runtime/deterministic_regime_client_surface.py
+tests/test_deterministic_regime_client_surface_helper.py
+control/DETERMINISTIC_REGIME_SAFE_SURFACE_HELPER_STATUS.md
 ```
 
-WP22 validated checks:
+Implemented helper functions:
 
 ```text
-required DTO fields
-false authority fields
-safe English and Dutch text
-review-only wording
-confidence band rather than raw numeric confidence
-blocked raw macro fields and source paths absent from surface text
-macro compliance scan
-macro/thesis leakage scan
+confidence_band_en(confidence)
+confidence_band_nl(confidence)
+build_deterministic_regime_client_surface(...)
+render_deterministic_regime_surface_en(dto)
+render_deterministic_regime_surface_nl(dto)
+```
+
+Manual validation commands:
+
+```bash
+PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_helper.py -q
+PYTHONPATH=. python -m pytest tests/test_deterministic_regime_client_surface_validator.py tests/test_deterministic_regime_client_surface_helper.py -q
+```
+
+Expected result:
+
+```text
+all tests pass
 ```
 
 ## Deterministic macro boundary
@@ -114,9 +104,10 @@ deterministic macro read as official decision/regime source: not promoted
 deterministic regime engine: not promoted
 deterministic regime client-safe surface: design-only, not production-integrated
 WP22 validator: closed, manually validated, not workflow-proven
+WP23 helper: implemented, pending validation evidence
 ```
 
-Do not infer deterministic macro promotion from WP16 through WP22.
+Do not infer deterministic macro promotion from WP16 through WP23.
 
 Standing authority boundary:
 
@@ -143,7 +134,7 @@ current_baseline_scope=manifest_linked_latest_report_set
 historical_output_mutation=false
 ```
 
-WP16 through WP22 did not manually rewrite historical report artifacts. Current production truth is tied to the latest manifest-linked report/runtime/pricing/delivery artifacts.
+WP16 through WP23 did not manually rewrite historical report artifacts. Current production truth is tied to the latest manifest-linked report/runtime/pricing/delivery artifacts.
 
 ## Four-layer operating status
 
@@ -152,31 +143,30 @@ WP16 through WP22 did not manually rewrite historical report artifacts. Current 
 - WP20 reviewed deterministic regime engine promotion readiness and kept it not promoted.
 - WP21 defined a future client-safe deterministic regime surface shape without implementation.
 - WP22 validated the safe-surface contract on fixtures.
-- WP16 through WP22 do not promote deterministic macro.
+- WP23 adds a helper-only DTO/rendering layer, pending validation evidence.
+- WP16 through WP23 do not promote deterministic macro.
 
 ### 2. Input/state contract
 
 - Current production truth remains tied to manifest-linked runtime/pricing/delivery artifacts.
 - Macro audit values remain provenance input evidence only and are not production decision authority.
-- WP22 validates only a fixture DTO, not a production report path.
+- WP23 reads committed shadow/comparison evidence and emits only a narrow DTO.
 
 ### 3. Output contract
 
 - WP21 defines the future safe output surface.
 - WP22 validates fixture-rendered safe-surface text.
-- WP22 does not integrate deterministic regime output into English/Dutch reports.
+- WP23 creates helper-only safe text, not production report text.
 
 ### 4. Operational runbook
 
 - Do not claim inbox delivery; delivery evidence remains `smtp_sendmail_returned_no_exception` plus delivery manifest.
-- WP23 may start only as helper-only work.
+- WP23 must be validated before closing.
 
 ## Immediate next action
 
-Proceed only if desired:
+Run the WP23 manual validation commands above. After green validation evidence, close WP23 and only then consider:
 
 ```text
-WP23 — Deterministic regime safe-surface helper
+WP24 — Deterministic regime safe-surface integration review
 ```
-
-WP23 must remain helper-only unless a separate later package authorizes production report integration.
