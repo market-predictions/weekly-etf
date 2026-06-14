@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP24 are closed. WP24 deterministic regime safe-surface integration review is closed as review-only and allows only a separate future integration proposal package. The latest manifest-linked production baseline remains `260612_08`. Deterministic macro remains not promoted and not production-integrated. Historical generated outputs remain immutable by default. The next package is WP25 — Deterministic regime report integration proposal.**
+**WP16 through WP25 are closed. WP25 deterministic regime report integration proposal is closed as proposal-only and allows only a separately approved future implementation package. The latest manifest-linked production baseline remains `260612_08`. Deterministic macro remains not promoted and not production-integrated. Historical generated outputs remain immutable by default. The next package is WP26 — Deterministic regime report integration implementation, only if explicitly approved.**
 
 ## Latest verified production baseline
 
@@ -46,18 +46,7 @@ WP21: closed — deterministic regime client-safe surface design, design-only
 WP22: closed — deterministic regime client-safe surface validator, manually validated
 WP23: closed — deterministic regime safe-surface helper, manually validated
 WP24: closed — deterministic regime safe-surface integration review, review-only
-```
-
-WP22 evidence:
-
-```text
-output/macro/validation/deterministic_regime_client_surface_validation_20260613_codespace.json
-```
-
-WP23 evidence:
-
-```text
-output/macro/validation/deterministic_regime_safe_surface_helper_validation_20260613_codespace.json
+WP25: closed — deterministic regime report integration proposal, proposal-only
 ```
 
 WP24 review artifacts:
@@ -67,34 +56,43 @@ control/DETERMINISTIC_REGIME_SAFE_SURFACE_INTEGRATION_REVIEW.md
 output/macro/validation/deterministic_regime_safe_surface_integration_review_20260613_000000.json
 ```
 
-## WP24 deterministic regime safe-surface integration review status
+WP25 proposal artifacts:
 
-WP24 is closed.
+```text
+control/DETERMINISTIC_REGIME_REPORT_INTEGRATION_PROPOSAL.md
+output/macro/validation/deterministic_regime_report_integration_proposal_20260613_000000.json
+```
+
+## WP25 deterministic regime report integration proposal status
+
+WP25 is closed.
 
 Status:
 
 ```text
-closed / review-only / ready_for_separate_integration_proposal / not_integrated
+closed / proposal-only / implementation-not-started / integration-not-authorized
 ```
 
-WP24 decision:
+WP25 decision:
 
 ```text
-future_integration_proposal_allowed=true
-next_package=WP25 — Deterministic regime report integration proposal
+future_implementation_package_allowed=true
+next_package=WP26 — Deterministic regime report integration implementation, only if explicitly approved
 production_report_integration=false
 production_report_narrative_authority=false
 client_facing_authority=false
 automatic_promotion=false
 ```
 
-WP24 rationale:
+WP25 proposed future integration shape:
 
 ```text
-WP21 defines the safe output contract.
-WP22 validates safe-surface text.
-WP23 creates the helper-only DTO/rendering layer.
-The chain is ready for a separate proposal package, not for direct production integration.
+latest shadow validation evidence
++ latest shadow comparison evidence
+→ build_deterministic_regime_client_surface(...)
+→ render_deterministic_regime_surface_en/nl(dto)
+→ WP22 validator on rendered text
+→ optional insertion into macro dashboard section
 ```
 
 ## Deterministic macro boundary
@@ -107,10 +105,10 @@ deterministic macro read as raw/shadow object: not client-facing
 deterministic macro read as official decision/regime source: not promoted
 deterministic regime engine: not promoted
 deterministic regime client-safe surface: helper/validator chain complete but not production-integrated
-WP24 review: closed, future proposal allowed, no integration authority granted
+WP25 proposal: closed, future implementation package allowed only if explicitly approved
 ```
 
-Do not infer deterministic macro promotion from WP16 through WP24.
+Do not infer deterministic macro promotion from WP16 through WP25.
 
 Standing authority boundary:
 
@@ -137,7 +135,7 @@ current_baseline_scope=manifest_linked_latest_report_set
 historical_output_mutation=false
 ```
 
-WP16 through WP24 did not manually rewrite historical report artifacts. Current production truth is tied to the latest manifest-linked report/runtime/pricing/delivery artifacts.
+WP16 through WP25 did not manually rewrite historical report artifacts. Current production truth is tied to the latest manifest-linked report/runtime/pricing/delivery artifacts.
 
 ## Four-layer operating status
 
@@ -148,7 +146,8 @@ WP16 through WP24 did not manually rewrite historical report artifacts. Current 
 - WP22 validated the safe-surface contract on fixtures.
 - WP23 adds a helper-only DTO/rendering layer.
 - WP24 reviewed the chain and allowed only a future proposal package.
-- WP16 through WP24 do not promote deterministic macro.
+- WP25 proposed a future implementation shape but did not implement it.
+- WP16 through WP25 do not promote deterministic macro.
 
 ### 2. Input/state contract
 
@@ -161,19 +160,19 @@ WP16 through WP24 did not manually rewrite historical report artifacts. Current 
 - WP21 defines the future safe output surface.
 - WP22 validates fixture-rendered safe-surface text.
 - WP23 creates helper-only safe text, not production report text.
-- WP24 does not change any production report output.
+- WP24 and WP25 do not change any production report output.
 
 ### 4. Operational runbook
 
 - Do not claim inbox delivery; delivery evidence remains `smtp_sendmail_returned_no_exception` plus delivery manifest.
-- WP25 may start only as a proposal package.
+- WP26 may start only if explicitly approved.
 
 ## Immediate next action
 
-Proceed only if desired:
+Proceed only if explicitly approved:
 
 ```text
-WP25 — Deterministic regime report integration proposal
+WP26 — Deterministic regime report integration implementation
 ```
 
-WP25 must remain a separate proposal package and must not implement production report integration unless a later package explicitly authorizes implementation.
+WP26 must be a separate implementation package with explicit report-surface tests and no portfolio/scoring/fundability changes.
