@@ -36,7 +36,7 @@ fresh_send_validation_20260616: closed
 
 ## Active package
 
-None
+WP30: implemented; pending external verification
 
 ## Latest evidence
 
@@ -57,9 +57,24 @@ WP29 Codespaces verification: macro thesis leakage validator -> passed on 260616
 WP29 Codespaces verification: Dutch language quality validator -> passed on 260616 baseline
 WP29 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
 WP29 Codespaces verification: git diff --check -> clean
+control/STAGE2_PROMOTION_BRIDGE_DESIGN.md
+tools/validate_stage2_promotion_bridge_design.py
+tests/test_stage2_promotion_bridge_design.py
+.github/workflows/validate-stage2-promotion-bridge-design.yml
 
 ## Recommended next action
 
-Consider WP30 — Design-only Stage-2 promotion bridge.
+Verify WP30 in Codespaces or CI. Use:
 
-WP30 should remain design-only unless explicitly scoped otherwise. It must not promote Stage-2 output into production report wording, lane scoring, fundability, portfolio actions, delivery behavior, or historical output mutation.
+```bash
+pytest tests/test_stage2_promotion_bridge_design.py
+python tools/validate_stage2_promotion_bridge_design.py
+python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+python tools/validate_macro_thesis_bilingual_aliases.py
+python tools/validate_macro_report_surface.py
+git diff --check
+```
+
+If those pass, close WP30. The next roadmap candidate is WP31 — Stage-2 promotion review artifact schema.
+
+WP30 remains design-only. It does not promote Stage-2 output into production report wording, lane scoring, fundability, portfolio actions, delivery behavior, execution behavior, or historical output mutation.
