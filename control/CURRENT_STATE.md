@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP28 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP28 macro/thesis leakage firewall hardening is verified and closed.**
+**WP16 through WP28 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP29 bilingual macro/thesis alias source has been implemented as preparation-only and is pending external pytest/validator verification.**
 
 ## Latest verified production baseline
 
@@ -60,7 +60,7 @@ fresh_send_validation_20260616: closed as workflow_success
 ## In-progress / pending verification
 
 ```text
-None
+WP29: implemented; pending external pytest/validator verification
 ```
 
 ## Evidence
@@ -77,12 +77,16 @@ tests/test_macro_thesis_shadow_leakage_contract.py
 WP28 Codespaces verification: pytest tests/test_macro_thesis_shadow_leakage_contract.py -> 6 passed
 WP28 Codespaces verification: macro thesis leakage, report content, delivery HTML, and Dutch language validators -> passed on 260616 baseline
 WP28 Codespaces verification: git diff --check -> clean
+config/macro_thesis_bilingual_aliases.yml
+tools/validate_macro_thesis_bilingual_aliases.py
+tests/test_macro_thesis_bilingual_aliases.py
+.github/workflows/validate-macro-thesis-bilingual-aliases.yml
 ```
 
 ## Immediate next action
 
-Start the next roadmap package:
+Run the WP29 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP29 and then consider:
 
 ```text
-WP29 — Bilingual macro/thesis alias source
+WP30 — Design-only Stage-2 promotion bridge
 ```
