@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP29 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP29 bilingual macro/thesis alias source is verified and closed as preparation-only.**
+**WP16 through WP29 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP30 Stage-2 promotion bridge design has been implemented as design-only and is pending external pytest/validator verification.**
 
 ## Latest verified production baseline
 
@@ -61,7 +61,7 @@ fresh_send_validation_20260616: closed as workflow_success
 ## In-progress / pending verification
 
 ```text
-None
+WP30: implemented; pending external pytest/validator verification
 ```
 
 ## Evidence
@@ -88,12 +88,16 @@ WP29 Codespaces verification: macro thesis leakage validator -> passed on 260616
 WP29 Codespaces verification: Dutch language quality validator -> passed on 260616 baseline
 WP29 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
 WP29 Codespaces verification: git diff --check -> clean
+control/STAGE2_PROMOTION_BRIDGE_DESIGN.md
+tools/validate_stage2_promotion_bridge_design.py
+tests/test_stage2_promotion_bridge_design.py
+.github/workflows/validate-stage2-promotion-bridge-design.yml
 ```
 
 ## Immediate next action
 
-Consider the next roadmap package:
+Run the WP30 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP30 and then consider:
 
 ```text
-WP30 — Design-only Stage-2 promotion bridge
+WP31 — Stage-2 promotion review artifact schema
 ```
