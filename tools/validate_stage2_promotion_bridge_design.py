@@ -49,8 +49,8 @@ REQUIRED_PHRASES = [
 FORBIDDEN_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = tuple(
     (reason, re.compile(pattern, re.IGNORECASE))
     for reason, pattern in [
-        ("claims Stage-2 is currently promoted", r"\bstage[- ]?2\s+(?:is|has been|now)\s+promoted\b"),
-        ("claims Stage-2 output is promoted", r"\bstage[- ]?2\s+output\s+is\s+promoted\b"),
+        ("claims Stage-2 is currently promoted", r"\bstage[- ]?2\s+(?:is\s+now|is|has\s+been|now)\s+promoted\b"),
+        ("claims Stage-2 output is promoted", r"\bstage[- ]?2\s+output\s+(?:is\s+now|is|has\s+been|now)\s+promoted\b"),
         ("grants client-facing authority", r"\bclient_facing_authority\s*:\s*true\b"),
         ("grants production report narrative authority", r"\bproduction_report_narrative_authority\s*:\s*true\b"),
         ("grants portfolio-action authority", r"\bportfolio_action_authority\s*:\s*true\b"),
