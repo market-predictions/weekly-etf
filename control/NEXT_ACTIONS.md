@@ -29,12 +29,13 @@ WP24: closed
 WP25: closed
 WP26: closed
 WP27: closed
+WP28: closed as macro/thesis leakage firewall verified
 production_delivery_validation_20260614: closed
 fresh_send_validation_20260616: closed
 
 ## Active package
 
-WP28: implemented; pending external verification
+None
 
 ## Latest evidence
 
@@ -42,7 +43,12 @@ tools/validate_etf_macro_thesis_surface_leakage.py
 tests/test_macro_thesis_shadow_leakage_contract.py
 control/DECISION_LOG.md
 control/CURRENT_STATE.md
+WP28 Codespaces verification: pytest tests/test_macro_thesis_shadow_leakage_contract.py -> 6 passed
+WP28 Codespaces verification: macro thesis leakage, report content, delivery HTML, and Dutch language validators -> passed on 260616 baseline
+WP28 Codespaces verification: git diff --check -> clean
 
 ## Recommended next action
 
-Verify WP28 in Codespaces or CI. After verification, close WP28. The next roadmap candidate is WP29.
+Start WP29 — Bilingual macro/thesis alias source.
+
+WP29 must remain preparation-only: input/state contract plus output contract. It must not change production report output, portfolio actions, lane scoring, fundability, delivery behavior, or historical output files.
