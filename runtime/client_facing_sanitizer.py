@@ -200,9 +200,22 @@ def convert_residual_markdown_links(html: str) -> str:
     return RAW_MARKDOWN_LINK_RE.sub(repl, html)
 
 
+def _normalize_reflected_position_change_heading(html: str, *, language: str) -> str:
+    if language == "nl":
+        return html.replace(
+            "Positiewijzigingen in deze run",
+            "Positiewijzigingen verwerkt in de officiële portefeuillestaat",
+        )
+    return html.replace(
+        "Position Changes Executed This Run",
+        "Position Changes Reflected in Official State",
+    )
+
+
 def _apply_global_client_token_replacements(html: str, *, language: str) -> str:
     for forbidden, replacement in CLIENT_FACING_TOKEN_REPLACEMENTS.items():
         html = html.replace(forbidden, replacement)
+    html = _normalize_reflected_position_change_heading(html, language=language)
     html = clean_text(html, language=language)
     html = EN_DOUBLE_NEGATIVE_RE.sub(r"\1", html)
     html = NL_DOUBLE_NEGATIVE_RE.sub(r"\1", html)
