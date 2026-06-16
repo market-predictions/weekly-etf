@@ -1,0 +1,32 @@
+version: 1
+purpose: "Sanitized bilingual labels for future client-safe macro/thesis surfaces. Preparation only; not wired into reports."
+concepts:
+  evidence_alignment:
+    en: "Evidence alignment"
+    nl: "Bewijssamenhang"
+    client_safe: true
+
+  macro_context:
+    en: "Macro context"
+    nl: "Macrocontext"
+    client_safe: true
+
+  policy_context:
+    en: "Policy context"
+    nl: "Beleidscontext"
+    client_safe: true
+
+  portfolio_discipline_check:
+    en: "Portfolio discipline check"
+    nl: "Portefeuillediscipline-toets"
+    client_safe: true
+
+  regime_context:
+    en: "Regime context"
+    nl: "Regimecontext"
+    client_safe: true
+
+  risk_context:
+    en: "Risk context"
+    nl: "Risicocontext"
+    client_safe: true
