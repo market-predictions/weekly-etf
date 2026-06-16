@@ -35,7 +35,7 @@ fresh_send_validation_20260616: closed
 
 ## Active package
 
-None
+WP29: implemented; pending external verification
 
 ## Latest evidence
 
@@ -46,9 +46,24 @@ control/CURRENT_STATE.md
 WP28 Codespaces verification: pytest tests/test_macro_thesis_shadow_leakage_contract.py -> 6 passed
 WP28 Codespaces verification: macro thesis leakage, report content, delivery HTML, and Dutch language validators -> passed on 260616 baseline
 WP28 Codespaces verification: git diff --check -> clean
+config/macro_thesis_bilingual_aliases.yml
+tools/validate_macro_thesis_bilingual_aliases.py
+tests/test_macro_thesis_bilingual_aliases.py
+.github/workflows/validate-macro-thesis-bilingual-aliases.yml
 
 ## Recommended next action
 
-Start WP29 — Bilingual macro/thesis alias source.
+Verify WP29 in Codespaces or CI. Use:
 
-WP29 must remain preparation-only: input/state contract plus output contract. It must not change production report output, portfolio actions, lane scoring, fundability, delivery behavior, or historical output files.
+```bash
+pytest tests/test_macro_thesis_bilingual_aliases.py
+python tools/validate_macro_thesis_bilingual_aliases.py
+python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+python tools/validate_etf_dutch_language_quality.py --output-dir output
+python tools/validate_macro_report_surface.py
+git diff --check
+```
+
+If those pass, close WP29. The next roadmap candidate is WP30 — Design-only Stage-2 promotion bridge.
+
+WP29 remains preparation-only: input/state contract plus output contract. It does not change production report output, portfolio actions, lane scoring, fundability, delivery behavior, or historical output files.
