@@ -2,7 +2,7 @@
 
 ## Snapshot date
 
-2026-06-16
+2026-06-17
 
 ## Repository
 
@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP27 are closed. Fresh production report generation, delivery validation, delivery manifest writing, final run manifest writing, and artifact persistence passed for the latest user-requested send. The latest manifest-linked production baseline is now `260616` with run_id `20260616_211726`.**
+**WP16 through WP28 are closed. Fresh production report generation, delivery validation, delivery manifest writing, final run manifest writing, and artifact persistence passed for the latest user-requested send. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP28 hardened the macro/thesis shadow leakage firewall without changing production report content, pricing, state, delivery, or portfolio authority.**
 
 ## Latest verified production baseline
 
@@ -53,6 +53,7 @@ WP24: closed as review-only
 WP25: closed as proposal-only
 WP26: closed as manually validated
 WP27: closed as visual QA passed
+WP28: closed as validator/output-contract hardening
 production_delivery_validation_20260614: closed as workflow_success
 fresh_send_validation_20260616: closed as workflow_success
 ```
@@ -66,8 +67,17 @@ control/PRODUCTION_DELIVERY_VALIDATION_STATUS_20260614.md
 control/run_queue/weekly_etf_report_request_20260616_231500.md
 output/run_manifests/weekly_etf_run_manifest_2026-06-16_20260616_211726.json
 output/delivery/weekly_etf_delivery_manifest_2026-06-16_20260616_211726.json
+tools/validate_etf_macro_thesis_surface_leakage.py
+tests/test_macro_thesis_shadow_leakage_contract.py
 ```
 
 ## Immediate next action
 
 No deterministic-regime package is active. No production delivery action is currently pending.
+
+The next safe roadmap choices are:
+
+```text
+WP29 — Bilingual macro/thesis alias source
+WP30 — Design-only Stage-2 promotion bridge
+```
