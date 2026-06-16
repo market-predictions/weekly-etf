@@ -90,7 +90,7 @@ def test_driver_id_alias_value_fails(tmp_path: Path) -> None:
 version: 1
 concepts:
   macro_context:
-    en: "Driver id context"
+    en: "driver_id context"
     nl: "Macrocontext"
     client_safe: true
 """,
