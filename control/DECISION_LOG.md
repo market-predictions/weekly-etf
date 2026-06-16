@@ -314,3 +314,15 @@ Stage-1 thesis candidates, Stage-2 confirmation artifacts, driver IDs, driver ca
 ### Consequence
 
 The leakage firewall is an output-contract and operational-runbook guard only. It does not promote macro/thesis artifacts into report wording, lane scoring, fundability, portfolio rotation, delivery, or execution authority.
+
+---
+
+## 2026-06-17 — Macro/thesis bilingual aliases are terminology only
+
+### Decision
+
+Macro/thesis bilingual aliases may define sanitized future client-safe terminology, but they do not grant client-facing authority, report integration authority, lane-scoring authority, fundability authority, portfolio-action authority, delivery authority, execution authority, or historical-output mutation authority.
+
+### Consequence
+
+The alias source is an input/state and output-contract preparation layer only. It must not be wired into production report rendering, Dutch report generation, lane scoring, fundability checks, portfolio rotation, recommendations, delivery HTML, or historical output files without a separate explicit future work package and control-layer authority decision.
