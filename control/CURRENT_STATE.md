@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP27 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP28 macro/thesis leakage firewall hardening has been implemented in code, tests, and control docs and is pending external pytest/validator verification.**
+**WP16 through WP28 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP28 macro/thesis leakage firewall hardening is verified and closed.**
 
 ## Latest verified production baseline
 
@@ -52,6 +52,7 @@ WP24: closed as review-only
 WP25: closed as proposal-only
 WP26: closed as manually validated
 WP27: closed as visual QA passed
+WP28: closed as macro/thesis leakage firewall verified
 production_delivery_validation_20260614: closed as workflow_success
 fresh_send_validation_20260616: closed as workflow_success
 ```
@@ -59,7 +60,7 @@ fresh_send_validation_20260616: closed as workflow_success
 ## In-progress / pending verification
 
 ```text
-WP28: implemented; pending external pytest/validator verification
+None
 ```
 
 ## Evidence
@@ -73,13 +74,15 @@ output/run_manifests/weekly_etf_run_manifest_2026-06-16_20260616_211726.json
 output/delivery/weekly_etf_delivery_manifest_2026-06-16_20260616_211726.json
 tools/validate_etf_macro_thesis_surface_leakage.py
 tests/test_macro_thesis_shadow_leakage_contract.py
+WP28 Codespaces verification: pytest tests/test_macro_thesis_shadow_leakage_contract.py -> 6 passed
+WP28 Codespaces verification: macro thesis leakage, report content, delivery HTML, and Dutch language validators -> passed on 260616 baseline
+WP28 Codespaces verification: git diff --check -> clean
 ```
 
 ## Immediate next action
 
-Run the WP28 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP28 and then choose either:
+Start the next roadmap package:
 
 ```text
 WP29 — Bilingual macro/thesis alias source
-WP30 — Design-only Stage-2 promotion bridge
 ```
