@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP28 are closed. Fresh production report generation, delivery validation, delivery manifest writing, final run manifest writing, and artifact persistence passed for the latest user-requested send. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP28 hardened the macro/thesis shadow leakage firewall without changing production report content, pricing, state, delivery, or portfolio authority.**
+**WP16 through WP27 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP28 macro/thesis leakage firewall hardening has been implemented in code, tests, and control docs and is pending external pytest/validator verification.**
 
 ## Latest verified production baseline
 
@@ -28,7 +28,6 @@ pricing_lineage_status: passed
 workflow_status: workflow_success
 workflow_conclusion: success
 delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-16_20260616_211726.json
-delivery_status: smtp_sendmail_returned_no_exception
 total_portfolio_value_eur: 108100.61
 cash_eur: 1936.52
 fresh_holdings_count: 9
@@ -53,9 +52,14 @@ WP24: closed as review-only
 WP25: closed as proposal-only
 WP26: closed as manually validated
 WP27: closed as visual QA passed
-WP28: closed as validator/output-contract hardening
 production_delivery_validation_20260614: closed as workflow_success
 fresh_send_validation_20260616: closed as workflow_success
+```
+
+## In-progress / pending verification
+
+```text
+WP28: implemented; pending external pytest/validator verification
 ```
 
 ## Evidence
@@ -73,9 +77,7 @@ tests/test_macro_thesis_shadow_leakage_contract.py
 
 ## Immediate next action
 
-No deterministic-regime package is active. No production delivery action is currently pending.
-
-The next safe roadmap choices are:
+Run the WP28 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP28 and then choose either:
 
 ```text
 WP29 — Bilingual macro/thesis alias source
