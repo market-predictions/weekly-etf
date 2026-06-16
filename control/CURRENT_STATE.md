@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP28 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP29 bilingual macro/thesis alias source has been implemented as preparation-only and is pending external pytest/validator verification.**
+**WP16 through WP29 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP29 bilingual macro/thesis alias source is verified and closed as preparation-only.**
 
 ## Latest verified production baseline
 
@@ -53,6 +53,7 @@ WP25: closed as proposal-only
 WP26: closed as manually validated
 WP27: closed as visual QA passed
 WP28: closed as macro/thesis leakage firewall verified
+WP29: closed as bilingual macro/thesis alias source verified, preparation-only
 production_delivery_validation_20260614: closed as workflow_success
 fresh_send_validation_20260616: closed as workflow_success
 ```
@@ -60,7 +61,7 @@ fresh_send_validation_20260616: closed as workflow_success
 ## In-progress / pending verification
 
 ```text
-WP29: implemented; pending external pytest/validator verification
+None
 ```
 
 ## Evidence
@@ -81,11 +82,17 @@ config/macro_thesis_bilingual_aliases.yml
 tools/validate_macro_thesis_bilingual_aliases.py
 tests/test_macro_thesis_bilingual_aliases.py
 .github/workflows/validate-macro-thesis-bilingual-aliases.yml
+WP29 Codespaces verification: pytest tests/test_macro_thesis_bilingual_aliases.py -> 8 passed
+WP29 Codespaces verification: python tools/validate_macro_thesis_bilingual_aliases.py -> MACRO_THESIS_BILINGUAL_ALIASES_OK
+WP29 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
+WP29 Codespaces verification: Dutch language quality validator -> passed on 260616 baseline
+WP29 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
+WP29 Codespaces verification: git diff --check -> clean
 ```
 
 ## Immediate next action
 
-Run the WP29 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP29 and then consider:
+Consider the next roadmap package:
 
 ```text
 WP30 — Design-only Stage-2 promotion bridge
