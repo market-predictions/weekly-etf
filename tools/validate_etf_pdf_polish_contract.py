@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import re
 from pathlib import Path
 
@@ -10,7 +11,26 @@ SECTION_LABEL_RE = re.compile(r"<span\s+class=['\"]section-label['\"]>\s*(.*?)\s
 MARKDOWN_HEADING_RE = re.compile(r"<h[1-6][^>]*>\s*(.*?)\s*</h[1-6]>", re.I | re.S)
 
 
+def _explicit_delivery_html(output_dir: Path, *, language: str) -> Path | None:
+    env_name = "MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL" if language == "nl" else "MRKT_RPRTS_EXPLICIT_REPORT_PATH"
+    raw = os.environ.get(env_name, "").strip()
+    if not raw:
+        return None
+    report_path = Path(raw)
+    if not report_path.is_absolute():
+        report_path = Path.cwd() / report_path
+    candidate = report_path.with_name(report_path.stem + "_delivery.html")
+    if candidate.exists():
+        return candidate
+    # Some callers pass paths relative to the output dir rather than cwd.
+    fallback = output_dir / (Path(raw).stem + "_delivery.html")
+    return fallback if fallback.exists() else None
+
+
 def latest_delivery_html(output_dir: Path, *, language: str) -> Path:
+    explicit = _explicit_delivery_html(output_dir, language=language)
+    if explicit is not None:
+        return explicit
     regex = NL_RE if language == "nl" else EN_RE
     files = sorted(path for path in output_dir.glob("weekly_analysis_pro*_delivery.html") if regex.match(path.name))
     if not files:
