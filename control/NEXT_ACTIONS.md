@@ -30,12 +30,13 @@ WP25: closed
 WP26: closed
 WP27: closed
 WP28: closed as macro/thesis leakage firewall verified
+WP29: closed as bilingual macro/thesis alias source verified, preparation-only
 production_delivery_validation_20260614: closed
 fresh_send_validation_20260616: closed
 
 ## Active package
 
-WP29: implemented; pending external verification
+None
 
 ## Latest evidence
 
@@ -50,20 +51,15 @@ config/macro_thesis_bilingual_aliases.yml
 tools/validate_macro_thesis_bilingual_aliases.py
 tests/test_macro_thesis_bilingual_aliases.py
 .github/workflows/validate-macro-thesis-bilingual-aliases.yml
+WP29 Codespaces verification: pytest tests/test_macro_thesis_bilingual_aliases.py -> 8 passed
+WP29 Codespaces verification: python tools/validate_macro_thesis_bilingual_aliases.py -> MACRO_THESIS_BILINGUAL_ALIASES_OK
+WP29 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
+WP29 Codespaces verification: Dutch language quality validator -> passed on 260616 baseline
+WP29 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
+WP29 Codespaces verification: git diff --check -> clean
 
 ## Recommended next action
 
-Verify WP29 in Codespaces or CI. Use:
+Consider WP30 — Design-only Stage-2 promotion bridge.
 
-```bash
-pytest tests/test_macro_thesis_bilingual_aliases.py
-python tools/validate_macro_thesis_bilingual_aliases.py
-python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
-python tools/validate_etf_dutch_language_quality.py --output-dir output
-python tools/validate_macro_report_surface.py
-git diff --check
-```
-
-If those pass, close WP29. The next roadmap candidate is WP30 — Design-only Stage-2 promotion bridge.
-
-WP29 remains preparation-only: input/state contract plus output contract. It does not change production report output, portfolio actions, lane scoring, fundability, delivery behavior, or historical output files.
+WP30 should remain design-only unless explicitly scoped otherwise. It must not promote Stage-2 output into production report wording, lane scoring, fundability, portfolio actions, delivery behavior, or historical output mutation.
