@@ -302,3 +302,15 @@ WP26 — Deterministic regime report integration implementation
 ### Consequence
 
 WP25 does not change production report rendering and does not integrate deterministic regime output into English or Dutch reports. It does not grant production report narrative authority, client-facing authority, automatic promotion, portfolio-action authority, lane-scoring authority, fundability authority, portfolio mutation authority, or historical-output mutation authority.
+
+---
+
+## 2026-06-17 — Stage-1 and Stage-2 macro/thesis shadow artifacts remain blocked from client surfaces
+
+### Decision
+
+Stage-1 thesis candidates, Stage-2 confirmation artifacts, driver IDs, driver catalogs, beneficiary maps, raw authority fields, and shadow-only status labels must be blocked from all current client-facing ETF report surfaces unless a later explicit control-layer promotion decision changes that authority.
+
+### Consequence
+
+The leakage firewall is an output-contract and operational-runbook guard only. It does not promote macro/thesis artifacts into report wording, lane scoring, fundability, portfolio rotation, delivery, or execution authority.
