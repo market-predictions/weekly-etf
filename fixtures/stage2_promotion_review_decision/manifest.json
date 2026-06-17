@@ -22,7 +22,7 @@
     {"path": "fixtures/stage2_promotion_review_decision/fail_design_ref.json", "expected": "fail", "expected_failure_contains": "source_evidence.decision_artifact_design"},
     {"path": "fixtures/stage2_promotion_review_decision/fail_control_bool.json", "expected": "fail", "expected_failure_contains": "authority.decision_artifact_only"},
     {"path": "fixtures/stage2_promotion_review_decision/fail_plumbing_text.json", "expected": "fail", "expected_failure_contains": "raw driver plumbing label"},
-    {"path": "fixtures/stage2_promotion_review_decision/fail_fundable_claim_text.json", "expected": "fail", "expected_failure_contains": "readiness claim"},
+    {"path": "fixtures/stage2_promotion_review_decision/fail_claim_text.json", "expected": "fail", "expected_failure_contains": "readiness"},
     {"path": "fixtures/stage2_promotion_review_decision/fail_extra_property.json", "expected": "fail", "expected_failure_contains": "additional property not allowed"}
   ]
 }
