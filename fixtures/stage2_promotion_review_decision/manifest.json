@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "fixture_set": "stage2_promotion_review_decision",
+  "authority": {
+    "fixture_only": true,
+    "production_artifact": false,
+    "client_facing_authority": false,
+    "production_report_narrative_authority": false,
+    "lane_scoring_authority": false,
+    "fundability_authority": false,
+    "portfolio_action_authority": false,
+    "delivery_authority": false,
+    "execution_authority": false,
+    "historical_output_mutation": false
+  },
+  "fixtures": [
+    {
+      "path": "fixtures/stage2_promotion_review_decision/pass_not_promoted.json",
+      "expected": "pass",
+      "expected_decision_status": "not_promoted"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review_decision/pass_blocked_missing_evidence.json",
+      "expected": "pass",
+      "expected_decision_status": "blocked_missing_evidence"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review_decision/pass_ready_for_explicit_promotion_decision_not_promoted.json",
+      "expected": "pass",
+      "expected_decision_status": "ready_for_explicit_promotion_decision_not_promoted"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review_decision/fail_promoted_status.json",
+      "expected": "fail",
+      "expected_failure_contains": "forbidden promotional or action status"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review_decision/fail_authority_true.json",
+      "expected": "fail",
+      "expected_failure_contains": "authority.production_report_narrative_authority"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review_decision/fail_missing_decision_artifact_design_source.json",
+      "expected": "fail",
+      "expected_failure_contains": "source_evidence.decision_artifact_design"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review_decision/fail_missing_decision_artifact_only.json",
+      "expected": "fail",
+      "expected_failure_contains": "authority.decision_artifact_only"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review_decision/fail_raw_driver_id_text.json",
+      "expected": "fail",
+      "expected_failure_contains": "raw driver plumbing label"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review_decision/fail_fundable_claim_text.json",
+      "expected": "fail",
+      "expected_failure_contains": "forbidden promotional or readiness claim"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review_decision/fail_additional_property.json",
+      "expected": "fail",
+      "expected_failure_contains": "additional property not allowed"
+    }
+  ]
+}
