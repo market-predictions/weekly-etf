@@ -42,6 +42,21 @@ tools/validate_stage2_promotion_review_decision_artifact_design.py
 tests/test_stage2_promotion_review_decision_artifact_design.py
 .github/workflows/validate-stage2-promotion-review-decision-artifact-design.yml
 
+## Verification commands
+
+```bash
+pytest tests/test_stage2_promotion_review_decision_artifact_design.py
+python tools/validate_stage2_promotion_review_decision_artifact_design.py
+python tools/validate_stage2_promotion_review_fixtures.py
+python tools/validate_stage2_promotion_review_checklist.py
+python tools/validate_stage2_promotion_review_schema.py
+python tools/validate_stage2_promotion_bridge_design.py
+python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+python tools/validate_macro_thesis_bilingual_aliases.py
+python tools/validate_macro_report_surface.py
+git diff --check
+```
+
 ## Recommended next action
 
 Verify WP34 in Codespaces or CI. If verification passes, close WP34.
