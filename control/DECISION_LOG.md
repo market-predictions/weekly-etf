@@ -350,3 +350,15 @@ A Stage-2 promotion review artifact schema may define how future evidence is rev
 ### Consequence
 
 The schema is an input/state-contract, output-contract, and operational-runbook validation layer only. It may define allowed review statuses, source-artifact references, required false/no-authority fields, and validation checks, but it must not create production promotion artifacts or wire Stage-2 output into reports, scoring, fundability, portfolio actions, delivery, execution, or historical output mutation.
+
+---
+
+## 2026-06-17 — Stage-2 promotion review checklist validates completeness only
+
+### Decision
+
+A Stage-2 promotion review checklist may validate whether future review evidence is complete, but it does not grant Stage-2 client-facing authority, production report authority, lane-scoring authority, fundability authority, portfolio-action authority, delivery authority, execution authority, or historical-output mutation authority.
+
+### Consequence
+
+The checklist is an operational-runbook, input/state-contract, and output-contract validation layer only. It may calculate non-promotional checklist readiness status and validate source references, no-authority fields, and forbidden review text, but it must not create live production promotion artifacts or wire Stage-2 output into reports, scoring, fundability, portfolio actions, delivery, execution, or historical output mutation.
