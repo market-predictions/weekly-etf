@@ -24,26 +24,28 @@ WP24: closed
 WP25: closed
 WP26: closed
 WP27: closed
-WP28: closed as macro/thesis leakage firewall verified
-WP29: closed as bilingual macro/thesis alias source verified, preparation-only
-WP30: closed as Stage-2 bridge design verified, design-only
-WP31: closed as Stage-2 review schema verified, schema-only
-WP32: closed as Stage-2 review checklist verified, checklist-only
-WP33: closed as Stage-2 review fixture set verified, fixture-only
-WP34: closed as Stage-2 decision artifact design verified, design-only
-WP35: closed as Stage-2 decision artifact schema verified, schema-only
-WP36: closed as Stage-2 decision artifact validator fixtures verified, fixture-only
-WP37: closed as Stage-2 decision artifact validator hardening verified, validator-hardening only
-WP38: closed as Stage-2 decision sample generation gate verified, validation-only
-WP39: closed as Stage-2 decision dry-run builder verified, validation-only
+WP28: closed as leakage firewall verified
+WP29: closed as bilingual alias source verified, preparation-only
+WP30: closed as bridge design verified, design-only
+WP31: closed as review schema verified, schema-only
+WP32: closed as review checklist verified, checklist-only
+WP33: closed as review fixture set verified, fixture-only
+WP34: closed as decision artifact design verified, design-only
+WP35: closed as decision artifact schema verified, schema-only
+WP36: closed as decision artifact validator fixtures verified, fixture-only
+WP37: closed as decision artifact validator hardening verified, validator-hardening only
+WP38: closed as decision sample generation gate verified, validation-only
+WP39: closed as decision dry-run builder verified, validation-only
+WP40: closed as explicit decision artifact design review verified, design-review only
 
 ## Active package
 
 None
 
-## Latest WP39 evidence
+## Latest WP40 evidence
 
-pytest tests/test_stage2_promotion_review_decision_dry_run.py -> 22 passed
+pytest tests/test_stage2_promotion_review_explicit_decision_design_review.py -> 10 passed
+python tools/validate_stage2_promotion_review_explicit_decision_design_review.py -> STAGE2_PROMOTION_REVIEW_EXPLICIT_DECISION_DESIGN_REVIEW_OK
 python tools/validate_stage2_promotion_review_decision_dry_run.py -> STAGE2_PROMOTION_REVIEW_DECISION_DRY_RUN_OK
 python tools/validate_stage2_promotion_review_decision_sample_gate.py -> STAGE2_PROMOTION_REVIEW_DECISION_SAMPLE_GATE_OK
 python tools/validate_stage2_promotion_review_decision_schema.py -> STAGE2_PROMOTION_REVIEW_DECISION_SCHEMA_OK
@@ -61,6 +63,6 @@ git diff --check -> clean
 
 ## Recommended next action
 
-Consider WP40 — Stage-2 explicit review package.
+Consider WP41 — Stage-2 decision artifact non-production fixture gate.
 
-WP40 should remain design review or non-production gate only unless explicitly scoped otherwise.
+WP41 should remain non-production fixture gate or explicit control-layer decision package design only unless explicitly scoped otherwise.
