@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """Validate the Stage-2 promotion review decision artifact schema.
 
-WP35 is schema/design validation only. It defines a future decision artifact
-shape without creating a live decision artifact, promoting Stage-2 output, or
-granting production authority.
+WP35/WP36 are schema and fixture validation only. They define and prove a
+future decision artifact shape without creating live decision artifacts,
+promoting Stage-2 output, or granting production authority.
 """
 
 from __future__ import annotations
 
 import argparse
-import copy
 import json
 import re
 from dataclasses import dataclass
@@ -266,10 +265,7 @@ def valid_artifact() -> dict[str, Any]:
 
 def validate_artifact(payload: dict[str, Any], *, require_expected_sources: bool = False) -> None:
     findings: list[DecisionSchemaFinding] = []
-
-    for field in REQUIRED_TOP_LEVEL:
-        if field not in payload:
-            findings.append(_finding(field, "<missing>", "missing required top-level field"))
+    _validate_closed_object("", payload, REQUIRED_TOP_LEVEL, findings)
 
     if payload.get("schema_version") != "1.0":
         findings.append(_finding("schema_version", payload.get("schema_version"), "schema_version must be 1.0"))
@@ -288,6 +284,7 @@ def validate_artifact(payload: dict[str, Any], *, require_expected_sources: bool
     if not isinstance(authority, dict):
         findings.append(_finding("authority", authority, "authority block is required"))
     else:
+        _validate_closed_object("authority", authority, list(REQUIRED_AUTHORITY), findings)
         for field, expected in REQUIRED_AUTHORITY.items():
             if authority.get(field) is not expected:
                 findings.append(_finding(f"authority.{field}", authority.get(field), f"must be {expected!r}"))
@@ -296,6 +293,7 @@ def validate_artifact(payload: dict[str, Any], *, require_expected_sources: bool
     if not isinstance(source_evidence, dict):
         findings.append(_finding("source_evidence", source_evidence, "source_evidence block is required"))
     else:
+        _validate_closed_object("source_evidence", source_evidence, REQUIRED_SOURCE_EVIDENCE, findings)
         for field in REQUIRED_SOURCE_EVIDENCE:
             value = source_evidence.get(field)
             if not isinstance(value, str) or not value.strip():
@@ -305,12 +303,36 @@ def validate_artifact(payload: dict[str, Any], *, require_expected_sources: bool
                 if source_evidence.get(field) != expected:
                     findings.append(_finding(f"source_evidence.{field}", source_evidence.get(field), f"must be {expected!r}"))
 
-    for list_field in ["decision_rationale", "blocking_conditions", "required_future_work", "non_goals"]:
-        if not isinstance(payload.get(list_field), list):
-            findings.append(_finding(list_field, payload.get(list_field), "must be a list"))
+    for list_field in ["decision_rationale", "blocking_conditions", "required_future_work"]:
+        values = payload.get(list_field)
+        if not isinstance(values, list):
+            findings.append(_finding(list_field, values, "must be a list"))
+            continue
+        for idx, item in enumerate(values):
+            if not isinstance(item, dict):
+                findings.append(_finding(f"{list_field}[{idx}]", item, "must be an object"))
+                continue
+            _validate_closed_object(f"{list_field}[{idx}]", item, ["code", "severity", "summary"], findings)
+            if item.get("severity") not in {"info", "warning", "blocker"}:
+                findings.append(_finding(f"{list_field}[{idx}].severity", item.get("severity"), "severity must be info, warning, or blocker"))
+
+    if not isinstance(payload.get("non_goals"), list):
+        findings.append(_finding("non_goals", payload.get("non_goals"), "must be a list"))
 
     _validate_text_fields(payload, findings)
     _raise_if_findings(findings)
+
+
+def _validate_closed_object(prefix: str, obj: dict[str, Any], allowed_fields: list[str], findings: list[DecisionSchemaFinding]) -> None:
+    allowed = set(allowed_fields)
+    for field in allowed_fields:
+        if field not in obj:
+            dotted = f"{prefix}.{field}" if prefix else field
+            findings.append(_finding(dotted, "<missing>", "missing required field"))
+    for field in obj:
+        if field not in allowed:
+            dotted = f"{prefix}.{field}" if prefix else field
+            findings.append(_finding(dotted, obj.get(field), "additional property not allowed by closed schema"))
 
 
 def _validate_text_fields(payload: dict[str, Any], findings: list[DecisionSchemaFinding]) -> None:
