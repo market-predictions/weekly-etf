@@ -3,6 +3,24 @@ from __future__ import annotations
 from typing import Any
 
 
+WEIGHT_BASIS_NOTE_EN = (
+    "Weight basis note: action-table weights are model/action weights; current-holdings weights are live "
+    "market-value weights including cash. Small differences can occur when cash, rounding or override handling is included."
+)
+WEIGHT_BASIS_NOTE_NL = (
+    "Toelichting gewichtsbasis: gewichten in de actietabel zijn model-/actiegewichten; gewichten bij huidige posities zijn actuele "
+    "marktwaardegewichten inclusief cash. Kleine verschillen kunnen ontstaan door cash, afronding of override-verwerking."
+)
+HOLD_OVERRIDE_NOTE_EN = (
+    "Hold-with-override note: The model would normally force reduce/replace review, but the position is too small or "
+    "operationally impractical to trade this run."
+)
+HOLD_OVERRIDE_NOTE_NL = (
+    "Override-toelichting: Het model dwingt normaal een verklein-/vervangingsreview af, maar de positie is deze run te klein "
+    "of operationeel niet zinvol om te verhandelen."
+)
+
+
 def _text(value: Any, fallback: str = "") -> str:
     raw = str(value or "").strip()
     return raw if raw else fallback
@@ -66,8 +84,8 @@ REASON_TEXT = {
     "negative_pnl_gt_10": "Position has become a large performance drag",
     "better_alternative_exists": "A stronger alternative is available for comparison",
     "negative_contribution": "Portfolio contribution is negative",
-    "role_impaired": "Portfolio role is impaired",
-    "role_failed": "Portfolio role no longer justifies current capital",
+    "role_impaired": "Role under review",
+    "role_failed": "Role no longer justifies current capital",
     "factor_or_concentration_flag": "Concentration or factor-overlap discipline is active",
     "destination from trade_intents": "Proposed destination from the rotation plan",
     "destination_score": "Destination score confirmed by the rotation engine",
@@ -83,8 +101,8 @@ REASON_TEXT_NL = {
     "negative_pnl_gt_10": "Positie drukt zwaar op het rendement",
     "better_alternative_exists": "Sterker alternatief is beschikbaar voor vergelijking",
     "negative_contribution": "Portefeuillebĳdrage is negatief",
-    "role_impaired": "Portefeuillerol is verzwakt",
-    "role_failed": "Portefeuillerol rechtvaardigt huidige allocatie niet meer",
+    "role_impaired": "Rol onder herbeoordeling",
+    "role_failed": "Rol rechtvaardigt huidige allocatie niet meer",
     "factor_or_concentration_flag": "Concentratie- of factoroverlapdiscipline is actief",
     "destination from trade_intents": "Voorgestelde bestemming uit het rotatieplan",
     "destination_score": "Bestemmingsscore bevestigd door de rotatie-engine",
@@ -176,6 +194,10 @@ def final_action_table_from_rotation(state: dict[str, Any], etf_names: dict[str,
     decisions = _decision_by_ticker(state)
     targets = _target_weights(state)
     lines = [
+        WEIGHT_BASIS_NOTE_EN,
+        "",
+        HOLD_OVERRIDE_NOTE_EN,
+        "",
         "| Ticker | ETF | Current weight | Target weight | Delta weight | Action | Capital destination | Release score | Decision rationale | Override status |",
         "|---|---|---:|---:|---:|---|---|---:|---|---|",
     ]
@@ -203,6 +225,10 @@ def final_action_table_from_rotation_nl(state: dict[str, Any], etf_names: dict[s
     decisions = _decision_by_ticker(state)
     targets = _target_weights(state)
     lines = [
+        WEIGHT_BASIS_NOTE_NL,
+        "",
+        HOLD_OVERRIDE_NOTE_NL,
+        "",
         "| Ticker | ETF | Huidig gewicht | Doelgewicht | Delta gewicht | Actie | Kapitaalbestemming | Vrijmaakscore | Toelichting | Override-status |",
         "|---|---|---:|---:|---:|---|---|---:|---|---|",
     ]
@@ -239,12 +265,10 @@ def position_changes_table_from_rotation(state: dict[str, Any]) -> str:
         "|---|---|---:|---:|---:|---|---|",
     ]
     for trade in trades:
-        reasons = trade.get("reason_codes") or []
-        reason = "; ".join(_humanize_reason_code(r, language="en") for r in reasons[:4]) if isinstance(reasons, list) else _humanize_reason_code(reasons, language="en")
         lines.append(
-            f"| {_ticker(trade.get('source_ticker'))} | {_ticker(trade.get('destination_ticker')) or 'CASH'} | "
-            f"{_f2(trade.get('delta_weight_pct'))} | {_f2(trade.get('destination_delta_weight_pct'))} | "
-            f"{_f2(trade.get('estimated_notional_eur'))} | {action_label(trade.get('action_code'))} | {_short(reason, '-')} |"
+            f"| {_ticker(trade.get('source_ticker'))} | {_ticker(trade.get('destination_ticker'))} | "
+            f"{_f2(trade.get('delta_weight_pct'))} | {_f2(trade.get('destination_delta_weight_pct'))} | {_f2(trade.get('estimated_notional_eur'))} | "
+            f"{_short(trade.get('intent_status'), 'proposed')} | {_short(trade.get('rationale'), '-')} |"
         )
     return "\n".join(lines)
 
@@ -262,63 +286,9 @@ def position_changes_table_from_rotation_nl(state: dict[str, Any]) -> str:
         "|---|---|---:|---:|---:|---|---|",
     ]
     for trade in trades:
-        reasons = trade.get("reason_codes") or []
-        reason = "; ".join(_humanize_reason_code(r, language="nl") for r in reasons[:4]) if isinstance(reasons, list) else _humanize_reason_code(reasons, language="nl")
         lines.append(
-            f"| {_ticker(trade.get('source_ticker'))} | {_ticker(trade.get('destination_ticker')) or 'CASH'} | "
-            f"{_f2(trade.get('delta_weight_pct'))} | {_f2(trade.get('destination_delta_weight_pct'))} | "
-            f"{_f2(trade.get('estimated_notional_eur'))} | {action_label_nl(trade.get('action_code'))} | {_short(reason, '-')} |"
+            f"| {_ticker(trade.get('source_ticker'))} | {_ticker(trade.get('destination_ticker'))} | "
+            f"{_f2(trade.get('delta_weight_pct'))} | {_f2(trade.get('destination_delta_weight_pct'))} | {_f2(trade.get('estimated_notional_eur'))} | "
+            f"{_short(trade.get('intent_status'), 'voorgesteld')} | {_short(trade.get('rationale'), '-')} |"
         )
     return "\n".join(lines)
-
-
-def rotation_plan_summary_from_rotation(state: dict[str, Any]) -> str:
-    decisions = _decisions(state)
-    buckets = {"Close": [], "Reduce": [], "Hold": [], "Add": [], "Replace": [], "Override": []}
-    for row in decisions:
-        ticker = _ticker(row.get("ticker"))
-        action = _text(row.get("action_code"))
-        if action == "close":
-            buckets["Close"].append(ticker)
-        elif action == "reduce":
-            buckets["Reduce"].append(ticker)
-        elif action == "hold_with_override":
-            buckets["Override"].append(ticker)
-        elif action in {"replace_partial", "replace_full"}:
-            dest = _ticker(row.get("destination_ticker"))
-            buckets["Replace"].append(f"{ticker}→{dest}" if dest else ticker)
-        elif action == "add_from_cash":
-            buckets["Add"].append(ticker)
-        else:
-            buckets["Hold"].append(ticker)
-    return "\n".join([
-        "| Close | Reduce | Hold | Add | Replace | Override |",
-        "|---|---|---|---|---|---|",
-        "| " + " | ".join(", ".join(buckets[key]) if buckets[key] else "None" for key in ["Close", "Reduce", "Hold", "Add", "Replace", "Override"]) + " |",
-    ])
-
-
-def rotation_plan_summary_from_rotation_nl(state: dict[str, Any]) -> str:
-    decisions = _decisions(state)
-    buckets = {"Sluiten": [], "Verlagen": [], "Aanhouden": [], "Toevoegen": [], "Vervangen": [], "Override": []}
-    for row in decisions:
-        t = _ticker(row.get("ticker"))
-        action = _text(row.get("action_code"))
-        if action == "close":
-            buckets["Sluiten"].append(t)
-        elif action == "reduce":
-            buckets["Verlagen"].append(t)
-        elif action == "hold_with_override":
-            buckets["Override"].append(t)
-        elif action in {"replace_partial", "replace_full"}:
-            dest = _ticker(row.get("destination_ticker"))
-            buckets["Vervangen"].append(f"{t}→{dest}" if dest else t)
-        elif action == "add_from_cash":
-            buckets["Toevoegen"].append(t)
-        else:
-            buckets["Aanhouden"].append(t)
-    return "\n".join([
-        "| Sluiten | Verlagen | Aanhouden | Toevoegen | Vervangen | Override |",
-        "|---|---|---|---|---|---|",
-        "| " + " | ".join(", ".join(buckets[key]) if buckets[key] else "Geen" for key in ["Sluiten", "Verlagen", "Aanhouden", "Toevoegen", "Vervangen", "Override"]) + " |",
-    ])
