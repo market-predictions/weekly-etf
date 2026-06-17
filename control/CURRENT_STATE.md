@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP33 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP33 Stage-2 promotion review fixture set is verified and closed as fixture-set design and validation-only.**
+**WP16 through WP33 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP34 Stage-2 promotion review decision artifact design has been implemented as decision-artifact design-only and is pending external pytest/validator verification.**
 
 ## Latest verified production baseline
 
@@ -65,7 +65,7 @@ fresh_send_validation_20260616: closed as workflow_success
 ## In-progress / pending verification
 
 ```text
-None
+WP34: implemented; pending external pytest/validator verification
 ```
 
 ## Evidence
@@ -145,12 +145,16 @@ WP33 Codespaces verification: macro thesis leakage validator -> passed on 260616
 WP33 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
 WP33 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
 WP33 Codespaces verification: git diff --check -> clean
+control/STAGE2_PROMOTION_REVIEW_DECISION_ARTIFACT_DESIGN.md
+tools/validate_stage2_promotion_review_decision_artifact_design.py
+tests/test_stage2_promotion_review_decision_artifact_design.py
+.github/workflows/validate-stage2-promotion-review-decision-artifact-design.yml
 ```
 
 ## Immediate next action
 
-Consider the next roadmap package:
+Run the WP34 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP34 and then consider:
 
 ```text
-WP34 — Stage-2 promotion review decision artifact design
+WP35 — Stage-2 promotion review decision artifact schema
 ```
