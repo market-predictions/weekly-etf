@@ -21,6 +21,47 @@ NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 MACRO_LATEST = Path("output/macro/latest.json")
 RUNTIME_POINTER = Path("output/runtime/latest_etf_report_state_path.txt")
 
+MAIN_TAKEAWAY_EN = (
+    "SMH remains the best-supported core exposure, but fresh capital and replacement decisions must clear "
+    "price, relative-strength and portfolio-discipline gates."
+)
+MAIN_TAKEAWAY_NL = (
+    "SMH blijft de best onderbouwde kernblootstelling, maar nieuw kapitaal en vervangingsbeslissingen moeten "
+    "prijs-, relatieve-sterkte- en portefeuillediscipline doorstaan."
+)
+DECISION_COCKPIT_EN = """### Decision cockpit
+
+- **This week:** no portfolio action.
+- **Main active risk:** SMH concentration remains above the soft position cap.
+- **Main active reviews:** SPY versus SMH overlap, PAVE versus GRID, and GSG hedge-role validation.
+- **Next action trigger:** a replacement candidate must show confirmed relative-strength edge, clean pricing basis, thesis fit, and a clear funding source.
+- **Fresh capital:** blocked for positions under size or replacement review unless a future run clears the discipline gates.
+"""
+DECISION_COCKPIT_NL = """### Besliscockpit
+
+- **Deze week:** geen portefeuilleactie.
+- **Belangrijkste actieve risico:** SMH-concentratie blijft boven de zachte positielimiet.
+- **Belangrijkste actieve reviews:** SPY versus SMH-overlap, PAVE versus GRID, en validatie van de GSG-hedgerol.
+- **Trigger voor volgende actie:** een vervangingskandidaat moet bevestigde relatieve-sterktevoorsprong, schone prijsbasis, thesisfit en duidelijke financieringsbron tonen.
+- **Vers kapitaal:** geblokkeerd voor posities onder grootte- of vervangingsreview totdat een toekomstige run de disciplinepoorten vrijgeeft.
+"""
+WEIGHT_BASIS_NOTE_EN = (
+    "Weight basis note: action-table weights are model/action weights; current-holdings weights are live "
+    "market-value weights including cash. Small differences can occur when cash, rounding or override handling is included."
+)
+WEIGHT_BASIS_NOTE_NL = (
+    "Toelichting gewichtsbasis: gewichten in de actietabel zijn model-/actiegewichten; gewichten bij huidige posities zijn actuele "
+    "marktwaardegewichten inclusief cash. Kleine verschillen kunnen ontstaan door cash, afronding of override-verwerking."
+)
+HOLD_OVERRIDE_NOTE_EN = (
+    "Hold-with-override note: The model would normally force reduce/replace review, but the position is too small or "
+    "operationally impractical to trade this run."
+)
+HOLD_OVERRIDE_NOTE_NL = (
+    "Override-toelichting: Het model dwingt normaal een verklein-/vervangingsreview af, maar de positie is deze run te klein "
+    "of operationeel niet zinvol om te verhandelen."
+)
+
 
 def latest_report(output_dir: Path, pattern: re.Pattern[str]) -> Path:
     env_names = ("MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL",) if pattern is NL_RE else ("MRKT_RPRTS_EXPLICIT_REPORT_PATH",)
@@ -152,7 +193,6 @@ def _macro_reason_for_lane(lane_name: Any, pack: dict[str, Any]) -> str:
     if not isinstance(payload, dict):
         return ""
     reason = str(payload.get("reason") or "").strip()
-    # Keep the Radar client-safe: no internal authority vocabulary and no long research dump.
     reason = re.sub(r"\b(?:shadow_only|client_facing_authority|deterministic_regime_shadow)\b", "macro status", reason, flags=re.IGNORECASE)
     return reason if len(reason) <= 190 else reason[:189].rstrip() + "…"
 
@@ -263,7 +303,9 @@ def _executive_en(state: dict[str, Any]) -> str:
 - **Geopolitical regime:** {lines['geopolitical_regime']}
 - **What changed this week:** {lines['what_changed']}
 - **Overall portfolio judgment:** Keep discipline explicit: every holding must re-earn capital against alternatives, concentration limits and current price evidence.
-- **Main takeaway:** **SMH remains the earned leader, but portfolio rotation is governed by source/destination evidence rather than static review labels.**
+- **Main takeaway:** **{MAIN_TAKEAWAY_EN}**
+
+{DECISION_COCKPIT_EN.strip()}
 """
 
 
@@ -274,7 +316,9 @@ def _executive_nl(state: dict[str, Any]) -> str:
 - **Geopolitiek regime:** {lines['geopolitical_regime']}
 - **Wat is er deze week veranderd:** {lines['what_changed']}
 - **Algemeen portefeuilleoordeel:** Laat elke positie opnieuw kapitaal verdienen tegenover alternatieven, concentratielimieten en actuele prijsbevestiging.
-- **Belangrijkste conclusie:** SMH blijft de best onderbouwde kernpositie, maar nieuw kapitaal en vervangingsbeslissingen moeten prijs, relatieve sterkte en portefeuillediscipline doorstaan.
+- **Belangrijkste conclusie:** {MAIN_TAKEAWAY_NL}
+
+{DECISION_COCKPIT_NL.strip()}
 """
 
 
@@ -285,6 +329,47 @@ def _bottom_line_en(state: dict[str, Any]) -> str:
 - **What is acceptable but replaceable:** Holdings with high release scores require reduce/replace/override discipline.
 - **Single best portfolio upgrade this week:** Use the rotation artifact as the bridge between evidence and target weights.
 """
+
+
+def _ensure_decision_cockpit(text: str, *, language: str) -> str:
+    cockpit = DECISION_COCKPIT_NL if language == "nl" else DECISION_COCKPIT_EN
+    marker = "### Besliscockpit" if language == "nl" else "### Decision cockpit"
+    if marker in text:
+        return text
+    start_heading = "## 1. Kernsamenvatting" if language == "nl" else "## 1. Executive Summary"
+    next_heading = "## 2. Portefeuille-acties" if language == "nl" else "## 2. Portfolio Action Snapshot"
+    if start_heading in text and next_heading in text:
+        return text.replace(next_heading, cockpit.strip() + "\n\n" + next_heading, 1)
+    return cockpit.strip() + "\n\n" + text
+
+
+def _inject_weight_basis_note(text: str, *, language: str) -> str:
+    note = WEIGHT_BASIS_NOTE_NL if language == "nl" else WEIGHT_BASIS_NOTE_EN
+    override_note = HOLD_OVERRIDE_NOTE_NL if language == "nl" else HOLD_OVERRIDE_NOTE_EN
+    if note in text:
+        return text
+    headings = ["## 13. Definitieve actietabel", "## 6. Definitieve actietabel"] if language == "nl" else ["## 13. Final Action Table", "## 6. Final Action Table"]
+    for heading in headings:
+        if heading in text:
+            return text.replace(heading, f"{heading}\n\n{note}\n\n{override_note}", 1)
+    return text
+
+
+def _client_surface_cleanup(text: str, *, language: str) -> str:
+    if language == "nl":
+        replacements = {
+            "Portefeuillerol is verzwakt": "Rol onder herbeoordeling",
+            "portefeuillerol is verzwakt": "rol onder herbeoordeling",
+            "Portefeuillerol rechtvaardigt huidige allocatie niet meer": "Rol rechtvaardigt huidige allocatie niet meer",
+        }
+    else:
+        replacements = {
+            "Portfolio role is impaired": "Role under review",
+            "portfolio role is impaired": "role under review",
+        }
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    return text
 
 
 def polish_english(text: str, runtime_state: dict[str, Any] | None = None) -> str:
@@ -300,6 +385,9 @@ def polish_english(text: str, runtime_state: dict[str, Any] | None = None) -> st
         text = replace_between(text, "## 1. Executive Summary", "## 2. Portfolio Action Snapshot", _executive_en(state))
         text = replace_between(text, "## 3. Regime Dashboard", "## 4. Structural Opportunity Radar", dashboard_en(state))
         text = _inject_macro_radar_reasons(text, state)
+    text = _ensure_decision_cockpit(text, language="en")
+    text = _inject_weight_basis_note(text, language="en")
+    text = _client_surface_cleanup(text, language="en")
     text = replace_between(text, "## 6. Bottom Line", "## 7. Equity Curve and Portfolio Development", _bottom_line_en(state))
     text = _inject_replacement_edge_notes(text, state, language="en")
     return _patch_rotation_intent_language_en(text, state)
@@ -312,6 +400,9 @@ def polish_dutch(text: str, runtime_state: dict[str, Any] | None = None) -> str:
         text = replace_between(text, "## 1. Kernsamenvatting", "## 2. Portefeuille-acties", _executive_nl(state))
         text = replace_between(text, "## 3. Regime-dashboard", "## 4. Structurele kansenradar", dashboard_nl(state))
         print("ETF_RUNTIME_POLISH_NL_MACRO_OK | reason=native_dutch_macro_surface_applied")
+    text = _ensure_decision_cockpit(text, language="nl")
+    text = _inject_weight_basis_note(text, language="nl")
+    text = _client_surface_cleanup(text, language="nl")
     return _inject_replacement_edge_notes(text, state, language="nl")
 
 
