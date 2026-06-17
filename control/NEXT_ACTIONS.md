@@ -37,7 +37,7 @@ fresh_send_validation_20260616: closed
 
 ## Active package
 
-None
+WP31: implemented; pending external verification
 
 ## Latest evidence
 
@@ -68,9 +68,25 @@ WP30 Codespaces verification: macro thesis leakage validator -> passed on 260616
 WP30 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
 WP30 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
 WP30 Codespaces verification: git diff --check -> clean
+schemas/stage2_promotion_review.schema.json
+tools/validate_stage2_promotion_review_schema.py
+tests/test_stage2_promotion_review_schema.py
+.github/workflows/validate-stage2-promotion-review-schema.yml
 
 ## Recommended next action
 
-Consider WP31 — Stage-2 promotion review artifact schema.
+Verify WP31 in Codespaces or CI. Use:
 
-WP31 should remain schema/review-artifact design and validation only unless explicitly scoped otherwise. It must not promote Stage-2 output into production report wording, lane scoring, fundability, portfolio actions, delivery behavior, execution behavior, or historical output mutation.
+```bash
+pytest tests/test_stage2_promotion_review_schema.py
+python tools/validate_stage2_promotion_review_schema.py
+python tools/validate_stage2_promotion_bridge_design.py
+python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+python tools/validate_macro_thesis_bilingual_aliases.py
+python tools/validate_macro_report_surface.py
+git diff --check
+```
+
+If those pass, close WP31. The next roadmap candidate is WP32 — Stage-2 promotion review checklist validator.
+
+WP31 remains schema/review-artifact design and validation only. It does not promote Stage-2 output into production report wording, lane scoring, fundability, portfolio actions, delivery behavior, execution behavior, or historical output mutation.
