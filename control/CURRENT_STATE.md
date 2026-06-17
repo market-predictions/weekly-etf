@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP32 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP33 Stage-2 promotion review fixture set has been implemented as fixture-set design and validation-only and is pending external pytest/validator verification.**
+**WP16 through WP33 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP33 Stage-2 promotion review fixture set is verified and closed as fixture-set design and validation-only.**
 
 ## Latest verified production baseline
 
@@ -57,6 +57,7 @@ WP29: closed as bilingual macro/thesis alias source verified, preparation-only
 WP30: closed as Stage-2 promotion bridge design verified, design-only
 WP31: closed as Stage-2 promotion review artifact schema verified, schema/review-artifact validation-only
 WP32: closed as Stage-2 promotion review checklist validator verified, review-checklist validation-only
+WP33: closed as Stage-2 promotion review fixture set verified, fixture-set design and validation-only
 production_delivery_validation_20260614: closed as workflow_success
 fresh_send_validation_20260616: closed as workflow_success
 ```
@@ -64,7 +65,7 @@ fresh_send_validation_20260616: closed as workflow_success
 ## In-progress / pending verification
 
 ```text
-WP33: implemented; pending external pytest/validator verification
+None
 ```
 
 ## Evidence
@@ -135,11 +136,20 @@ fixtures/stage2_promotion_review/fail_fundable_claim_text.json
 tools/validate_stage2_promotion_review_fixtures.py
 tests/test_stage2_promotion_review_fixtures.py
 .github/workflows/validate-stage2-promotion-review-fixtures.yml
+WP33 Codespaces verification: pytest tests/test_stage2_promotion_review_fixtures.py -> 10 passed
+WP33 Codespaces verification: python tools/validate_stage2_promotion_review_fixtures.py -> STAGE2_PROMOTION_REVIEW_FIXTURES_OK
+WP33 Codespaces verification: python tools/validate_stage2_promotion_review_checklist.py -> STAGE2_PROMOTION_REVIEW_CHECKLIST_OK
+WP33 Codespaces verification: python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
+WP33 Codespaces verification: python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
+WP33 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
+WP33 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
+WP33 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
+WP33 Codespaces verification: git diff --check -> clean
 ```
 
 ## Immediate next action
 
-Run the WP33 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP33 and then consider:
+Consider the next roadmap package:
 
 ```text
 WP34 — Stage-2 promotion review decision artifact design
