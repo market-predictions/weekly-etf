@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP29 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP30 Stage-2 promotion bridge design has been implemented as design-only and is pending external pytest/validator verification.**
+**WP16 through WP30 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP30 Stage-2 promotion bridge design is verified and closed as design-only.**
 
 ## Latest verified production baseline
 
@@ -54,6 +54,7 @@ WP26: closed as manually validated
 WP27: closed as visual QA passed
 WP28: closed as macro/thesis leakage firewall verified
 WP29: closed as bilingual macro/thesis alias source verified, preparation-only
+WP30: closed as Stage-2 promotion bridge design verified, design-only
 production_delivery_validation_20260614: closed as workflow_success
 fresh_send_validation_20260616: closed as workflow_success
 ```
@@ -61,7 +62,7 @@ fresh_send_validation_20260616: closed as workflow_success
 ## In-progress / pending verification
 
 ```text
-WP30: implemented; pending external pytest/validator verification
+None
 ```
 
 ## Evidence
@@ -92,11 +93,17 @@ control/STAGE2_PROMOTION_BRIDGE_DESIGN.md
 tools/validate_stage2_promotion_bridge_design.py
 tests/test_stage2_promotion_bridge_design.py
 .github/workflows/validate-stage2-promotion-bridge-design.yml
+WP30 Codespaces verification: pytest tests/test_stage2_promotion_bridge_design.py -> 7 passed
+WP30 Codespaces verification: python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
+WP30 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
+WP30 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
+WP30 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
+WP30 Codespaces verification: git diff --check -> clean
 ```
 
 ## Immediate next action
 
-Run the WP30 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP30 and then consider:
+Consider the next roadmap package:
 
 ```text
 WP31 — Stage-2 promotion review artifact schema
