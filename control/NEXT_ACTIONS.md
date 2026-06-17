@@ -32,12 +32,13 @@ WP27: closed
 WP28: closed as macro/thesis leakage firewall verified
 WP29: closed as bilingual macro/thesis alias source verified, preparation-only
 WP30: closed as Stage-2 promotion bridge design verified, design-only
+WP31: closed as Stage-2 promotion review artifact schema verified, schema/review-artifact validation-only
 production_delivery_validation_20260614: closed
 fresh_send_validation_20260616: closed
 
 ## Active package
 
-WP31: implemented; pending external verification
+None
 
 ## Latest evidence
 
@@ -72,21 +73,16 @@ schemas/stage2_promotion_review.schema.json
 tools/validate_stage2_promotion_review_schema.py
 tests/test_stage2_promotion_review_schema.py
 .github/workflows/validate-stage2-promotion-review-schema.yml
+WP31 Codespaces verification: pytest tests/test_stage2_promotion_review_schema.py -> 9 passed
+WP31 Codespaces verification: python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
+WP31 Codespaces verification: python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
+WP31 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
+WP31 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
+WP31 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
+WP31 Codespaces verification: git diff --check -> clean
 
 ## Recommended next action
 
-Verify WP31 in Codespaces or CI. Use:
+Consider WP32 — Stage-2 promotion review checklist validator.
 
-```bash
-pytest tests/test_stage2_promotion_review_schema.py
-python tools/validate_stage2_promotion_review_schema.py
-python tools/validate_stage2_promotion_bridge_design.py
-python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
-python tools/validate_macro_thesis_bilingual_aliases.py
-python tools/validate_macro_report_surface.py
-git diff --check
-```
-
-If those pass, close WP31. The next roadmap candidate is WP32 — Stage-2 promotion review checklist validator.
-
-WP31 remains schema/review-artifact design and validation only. It does not promote Stage-2 output into production report wording, lane scoring, fundability, portfolio actions, delivery behavior, execution behavior, or historical output mutation.
+WP32 should remain review-checklist validation only unless explicitly scoped otherwise. It must not promote Stage-2 output into production report wording, lane scoring, fundability, portfolio actions, delivery behavior, execution behavior, or historical output mutation.
