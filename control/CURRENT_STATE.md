@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP41 are closed. WP41 is verified and closed as non-production fixture-gate validation-only. Latest baseline remains `260616` with run_id `20260616_211726`.**
+**WP16 through WP41 are closed. WP42 has been implemented and is pending external verification. Latest baseline remains `260616` with run_id `20260616_211726`.**
 
 ## Latest verified production baseline
 
@@ -61,34 +61,17 @@ WP41: closed as decision non-production fixture gate verified, validation-only
 ## In-progress / pending verification
 
 ```text
-None
+WP42: implemented; pending external verification
 ```
 
 ## Evidence
 
 ```text
-tools/wp41_builder.py
-tools/wp41_validator.py
-tests/test_wp41_fixture_gate.py
-WP41 Codespaces verification: pytest tests/test_wp41_fixture_gate.py -> 25 passed
-WP41 Codespaces verification: python tools/wp41_validator.py -> STAGE2_PROMOTION_REVIEW_DECISION_NON_PRODUCTION_FIXTURE_GATE_OK
-WP41 Codespaces verification: python tools/validate_stage2_promotion_review_explicit_decision_design_review.py -> STAGE2_PROMOTION_REVIEW_EXPLICIT_DECISION_DESIGN_REVIEW_OK
-WP41 Codespaces verification: python tools/validate_stage2_promotion_review_decision_dry_run.py -> STAGE2_PROMOTION_REVIEW_DECISION_DRY_RUN_OK
-WP41 Codespaces verification: python tools/validate_stage2_promotion_review_decision_sample_gate.py -> STAGE2_PROMOTION_REVIEW_DECISION_SAMPLE_GATE_OK
-WP41 Codespaces verification: python tools/validate_stage2_promotion_review_decision_schema.py -> STAGE2_PROMOTION_REVIEW_DECISION_SCHEMA_OK
-WP41 Codespaces verification: python tools/validate_stage2_promotion_review_decision_fixtures.py -> STAGE2_PROMOTION_REVIEW_DECISION_FIXTURES_OK
-WP41 Codespaces verification: python tools/validate_stage2_promotion_review_decision_hardening.py -> STAGE2_PROMOTION_REVIEW_DECISION_HARDENING_OK
-WP41 Codespaces verification: python tools/validate_stage2_promotion_review_decision_artifact_design.py -> STAGE2_PROMOTION_REVIEW_DECISION_ARTIFACT_DESIGN_OK
-WP41 Codespaces verification: python tools/validate_stage2_promotion_review_fixtures.py -> STAGE2_PROMOTION_REVIEW_FIXTURES_OK
-WP41 Codespaces verification: python tools/validate_stage2_promotion_review_checklist.py -> STAGE2_PROMOTION_REVIEW_CHECKLIST_OK
-WP41 Codespaces verification: python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
-WP41 Codespaces verification: python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
-WP41 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
-WP41 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
-WP41 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
-WP41 Codespaces verification: git diff --check -> clean
+control/STAGE2_CONTROL_LAYER_PACKAGE_DESIGN.md
+tools/wp42_validator.py
+tests/test_wp42_control_layer_design.py
 ```
 
 ## Immediate next action
 
-Consider WP42 — Stage-2 explicit control-layer package design.
+Run the WP42 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP42 and then consider WP43.
