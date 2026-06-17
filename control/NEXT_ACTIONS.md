@@ -38,44 +38,35 @@ WP38: closed as decision sample generation gate verified, validation-only
 WP39: closed as decision dry-run builder verified, validation-only
 WP40: closed as explicit decision artifact design review verified, design-review only
 WP41: closed as decision non-production fixture gate verified, validation-only
+WP42: closed as explicit control-layer package design verified, design-only
 
 ## Active package
 
-WP42: implemented; pending external verification
+None
 
-## Latest WP42 files
+## Latest WP42 evidence
 
-control/STAGE2_CONTROL_LAYER_PACKAGE_DESIGN.md
-tools/wp42_validator.py
-tests/test_wp42_control_layer_design.py
-
-## Verification commands
-
-```bash
-pytest tests/test_wp42_control_layer_design.py
-python tools/wp42_validator.py
-python tools/wp41_validator.py
-python tools/validate_stage2_promotion_review_explicit_decision_design_review.py
-python tools/validate_stage2_promotion_review_decision_dry_run.py
-python tools/validate_stage2_promotion_review_decision_sample_gate.py
-python tools/validate_stage2_promotion_review_decision_schema.py
-python tools/validate_stage2_promotion_review_decision_fixtures.py
-python tools/validate_stage2_promotion_review_decision_hardening.py
-python tools/validate_stage2_promotion_review_decision_artifact_design.py
-python tools/validate_stage2_promotion_review_fixtures.py
-python tools/validate_stage2_promotion_review_checklist.py
-python tools/validate_stage2_promotion_review_schema.py
-python tools/validate_stage2_promotion_bridge_design.py
-python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
-python tools/validate_macro_thesis_bilingual_aliases.py
-python tools/validate_macro_report_surface.py
-git diff --check
-```
+pytest tests/test_wp42_control_layer_design.py -> 13 passed
+python tools/wp42_validator.py -> STAGE2_PROMOTION_REVIEW_EXPLICIT_CONTROL_LAYER_DECISION_PACKAGE_DESIGN_OK
+python tools/wp41_validator.py -> STAGE2_PROMOTION_REVIEW_DECISION_NON_PRODUCTION_FIXTURE_GATE_OK
+python tools/validate_stage2_promotion_review_explicit_decision_design_review.py -> STAGE2_PROMOTION_REVIEW_EXPLICIT_DECISION_DESIGN_REVIEW_OK
+python tools/validate_stage2_promotion_review_decision_dry_run.py -> STAGE2_PROMOTION_REVIEW_DECISION_DRY_RUN_OK
+python tools/validate_stage2_promotion_review_decision_sample_gate.py -> STAGE2_PROMOTION_REVIEW_DECISION_SAMPLE_GATE_OK
+python tools/validate_stage2_promotion_review_decision_schema.py -> STAGE2_PROMOTION_REVIEW_DECISION_SCHEMA_OK
+python tools/validate_stage2_promotion_review_decision_fixtures.py -> STAGE2_PROMOTION_REVIEW_DECISION_FIXTURES_OK
+python tools/validate_stage2_promotion_review_decision_hardening.py -> STAGE2_PROMOTION_REVIEW_DECISION_HARDENING_OK
+python tools/validate_stage2_promotion_review_decision_artifact_design.py -> STAGE2_PROMOTION_REVIEW_DECISION_ARTIFACT_DESIGN_OK
+python tools/validate_stage2_promotion_review_fixtures.py -> STAGE2_PROMOTION_REVIEW_FIXTURES_OK
+python tools/validate_stage2_promotion_review_checklist.py -> STAGE2_PROMOTION_REVIEW_CHECKLIST_OK
+python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
+python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
+macro thesis leakage validator -> passed on 260616 baseline
+macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
+macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
+git diff --check -> clean
 
 ## Recommended next action
 
-Verify WP42 in Codespaces or CI. If verification passes, close WP42.
+Pause work-package chaining.
 
-Next candidate after clean closeout:
-
-WP43 — Stage-2 explicit control-layer decision package validator design
+Recommended next step: perform a roadmap consolidation review before creating more Stage-2 packages. The review should decide whether the Stage-2 decision-control scaffolding is now sufficient, whether any remaining packages are truly necessary, and whether attention should return to report quality, delivery reliability, or client-facing output.
