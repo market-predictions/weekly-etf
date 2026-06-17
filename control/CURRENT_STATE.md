@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP31 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP31 Stage-2 promotion review artifact schema is verified and closed as schema/review-artifact validation-only.**
+**WP16 through WP31 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP32 Stage-2 promotion review checklist validator has been implemented as review-checklist validation-only and is pending external pytest/validator verification.**
 
 ## Latest verified production baseline
 
@@ -63,7 +63,7 @@ fresh_send_validation_20260616: closed as workflow_success
 ## In-progress / pending verification
 
 ```text
-None
+WP32: implemented; pending external pytest/validator verification
 ```
 
 ## Evidence
@@ -111,12 +111,15 @@ WP31 Codespaces verification: macro thesis leakage validator -> passed on 260616
 WP31 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
 WP31 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
 WP31 Codespaces verification: git diff --check -> clean
+tools/validate_stage2_promotion_review_checklist.py
+tests/test_stage2_promotion_review_checklist.py
+.github/workflows/validate-stage2-promotion-review-checklist.yml
 ```
 
 ## Immediate next action
 
-Consider the next roadmap package:
+Run the WP32 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP32 and then consider:
 
 ```text
-WP32 — Stage-2 promotion review checklist validator
+WP33 — Stage-2 promotion review fixture set
 ```
