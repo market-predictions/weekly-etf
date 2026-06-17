@@ -1,1 +1,13 @@
-{}
+{
+  "schema_version": "1.0",
+  "artifact_type": "stage2_promotion_review_decision",
+  "generated_at_utc": "2026-06-17T00:00:00Z",
+  "decision_status": "not_promoted",
+  "decision_scope": "review_decision_only",
+  "authority": {"client_facing_authority": false, "production_report_narrative_authority": false, "lane_scoring_authority": false, "fundability_authority": false, "portfolio_action_authority": false, "portfolio_mutation": false, "historical_output_mutation": false, "delivery_authority": false, "execution_authority": false, "report_surface_allowed": false, "production_report_path_changed": false, "decision_artifact_only": true, "implementation_required_before_production_use": true, "explicit_control_layer_decision_required": true},
+  "source_evidence": {"promotion_bridge_design": "control/STAGE2_PROMOTION_BRIDGE_DESIGN.md", "review_schema": "schemas/stage2_promotion_review.schema.json", "review_checklist_validator": "tools/validate_stage2_promotion_review_checklist.py", "fixture_manifest": "fixtures/stage2_promotion_review/manifest.json", "fixture_validator": "tools/validate_stage2_promotion_review_fixtures.py", "decision_artifact_design_validator": "tools/validate_stage2_promotion_review_decision_artifact_design.py", "stage2_shadow_status": "control/MACRO_STAGE2_CONFIRMATION_STATUS.md", "stage2_shadow_validation": "output/macro/validation/latest_stage2_confirmation_validation.json", "leakage_validator": "tools/validate_etf_macro_thesis_surface_leakage.py", "bilingual_aliases": "config/macro_thesis_bilingual_aliases.yml", "macro_report_surface_validator": "tools/validate_macro_report_surface.py", "latest_verified_production_baseline": "control/CURRENT_STATE.md"},
+  "decision_rationale": [],
+  "blocking_conditions": [],
+  "required_future_work": [],
+  "non_goals": ["fixture failure"]
+}
