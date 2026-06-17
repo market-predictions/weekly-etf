@@ -338,3 +338,15 @@ A Stage-2 promotion bridge may define future promotion-review eligibility, but i
 ### Consequence
 
 The bridge is a decision-framework, input/state-contract, and output-contract design layer only. It may specify evidence prerequisites, bilingual alias dependency, leakage/compliance gates, and future implementation gates, but Stage-2 output remains shadow-only until a later explicit control-layer promotion decision and separate implementation package exist.
+
+---
+
+## 2026-06-17 — Stage-2 promotion review schema defines review shape only
+
+### Decision
+
+A Stage-2 promotion review artifact schema may define how future evidence is reviewed, but it does not grant Stage-2 client-facing authority, production report authority, lane-scoring authority, fundability authority, portfolio-action authority, delivery authority, execution authority, or historical-output mutation authority.
+
+### Consequence
+
+The schema is an input/state-contract, output-contract, and operational-runbook validation layer only. It may define allowed review statuses, source-artifact references, required false/no-authority fields, and validation checks, but it must not create production promotion artifacts or wire Stage-2 output into reports, scoring, fundability, portfolio actions, delivery, execution, or historical output mutation.
