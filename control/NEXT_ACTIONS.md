@@ -39,7 +39,7 @@ fresh_send_validation_20260616: closed
 
 ## Active package
 
-None
+WP33: implemented; pending external verification
 
 ## Latest evidence
 
@@ -92,9 +92,35 @@ WP32 Codespaces verification: macro thesis leakage validator -> passed on 260616
 WP32 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
 WP32 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
 WP32 Codespaces verification: git diff --check -> clean
+fixtures/stage2_promotion_review/README.md
+fixtures/stage2_promotion_review/manifest.json
+fixtures/stage2_promotion_review/pass_ready_for_review_not_promoted.json
+fixtures/stage2_promotion_review/pass_not_ready_missing_evidence.json
+fixtures/stage2_promotion_review/fail_authority_true.json
+fixtures/stage2_promotion_review/fail_promoted_status.json
+fixtures/stage2_promotion_review/fail_missing_bilingual_aliases.json
+fixtures/stage2_promotion_review/fail_raw_driver_id_text.json
+fixtures/stage2_promotion_review/fail_fundable_claim_text.json
+tools/validate_stage2_promotion_review_fixtures.py
+tests/test_stage2_promotion_review_fixtures.py
+.github/workflows/validate-stage2-promotion-review-fixtures.yml
 
 ## Recommended next action
 
-Consider WP33 — Stage-2 promotion review fixture set.
+Verify WP33 in Codespaces or CI. Use:
 
-WP33 should remain fixture-set design and validation only unless explicitly scoped otherwise. It must not create live production promotion artifacts, and it must not promote Stage-2 output into production report wording, lane scoring, fundability, portfolio actions, delivery behavior, execution behavior, or historical output mutation.
+```bash
+pytest tests/test_stage2_promotion_review_fixtures.py
+python tools/validate_stage2_promotion_review_fixtures.py
+python tools/validate_stage2_promotion_review_checklist.py
+python tools/validate_stage2_promotion_review_schema.py
+python tools/validate_stage2_promotion_bridge_design.py
+python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+python tools/validate_macro_thesis_bilingual_aliases.py
+python tools/validate_macro_report_surface.py
+git diff --check
+```
+
+If those pass, close WP33. The next roadmap candidate is WP34 — Stage-2 promotion review decision artifact design.
+
+WP33 remains fixture-set design and validation only. It must not create live production promotion artifacts, and it must not promote Stage-2 output into production report wording, lane scoring, fundability, portfolio actions, delivery behavior, execution behavior, or historical output mutation.
