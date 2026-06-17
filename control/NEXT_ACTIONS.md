@@ -40,29 +40,40 @@ WP40: closed as explicit decision artifact design review verified, design-review
 
 ## Active package
 
-None
+WP41: implemented; pending external verification
 
-## Latest WP40 evidence
+## Latest WP41 files
 
-pytest tests/test_stage2_promotion_review_explicit_decision_design_review.py -> 10 passed
-python tools/validate_stage2_promotion_review_explicit_decision_design_review.py -> STAGE2_PROMOTION_REVIEW_EXPLICIT_DECISION_DESIGN_REVIEW_OK
-python tools/validate_stage2_promotion_review_decision_dry_run.py -> STAGE2_PROMOTION_REVIEW_DECISION_DRY_RUN_OK
-python tools/validate_stage2_promotion_review_decision_sample_gate.py -> STAGE2_PROMOTION_REVIEW_DECISION_SAMPLE_GATE_OK
-python tools/validate_stage2_promotion_review_decision_schema.py -> STAGE2_PROMOTION_REVIEW_DECISION_SCHEMA_OK
-python tools/validate_stage2_promotion_review_decision_fixtures.py -> STAGE2_PROMOTION_REVIEW_DECISION_FIXTURES_OK
-python tools/validate_stage2_promotion_review_decision_hardening.py -> STAGE2_PROMOTION_REVIEW_DECISION_HARDENING_OK
-python tools/validate_stage2_promotion_review_decision_artifact_design.py -> STAGE2_PROMOTION_REVIEW_DECISION_ARTIFACT_DESIGN_OK
-python tools/validate_stage2_promotion_review_fixtures.py -> STAGE2_PROMOTION_REVIEW_FIXTURES_OK
-python tools/validate_stage2_promotion_review_checklist.py -> STAGE2_PROMOTION_REVIEW_CHECKLIST_OK
-python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
-python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
-macro thesis leakage validator -> passed on 260616 baseline
-macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
-macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
-git diff --check -> clean
+tools/wp41_builder.py
+tools/wp41_validator.py
+tests/test_wp41_fixture_gate.py
+
+## Verification commands
+
+```bash
+pytest tests/test_wp41_fixture_gate.py
+python tools/wp41_validator.py
+python tools/validate_stage2_promotion_review_explicit_decision_design_review.py
+python tools/validate_stage2_promotion_review_decision_dry_run.py
+python tools/validate_stage2_promotion_review_decision_sample_gate.py
+python tools/validate_stage2_promotion_review_decision_schema.py
+python tools/validate_stage2_promotion_review_decision_fixtures.py
+python tools/validate_stage2_promotion_review_decision_hardening.py
+python tools/validate_stage2_promotion_review_decision_artifact_design.py
+python tools/validate_stage2_promotion_review_fixtures.py
+python tools/validate_stage2_promotion_review_checklist.py
+python tools/validate_stage2_promotion_review_schema.py
+python tools/validate_stage2_promotion_bridge_design.py
+python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+python tools/validate_macro_thesis_bilingual_aliases.py
+python tools/validate_macro_report_surface.py
+git diff --check
+```
 
 ## Recommended next action
 
-Consider WP41 — Stage-2 decision artifact non-production fixture gate.
+Verify WP41 in Codespaces or CI. If verification passes, close WP41.
 
-WP41 should remain non-production fixture gate or explicit control-layer decision package design only unless explicitly scoped otherwise.
+Next candidate after clean closeout:
+
+WP42 — Stage-2 explicit control-layer package design
