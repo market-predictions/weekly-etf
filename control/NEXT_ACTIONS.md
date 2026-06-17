@@ -1,6 +1,6 @@
 # ETF Review OS — Next Actions
 
-## Current production baseline
+## Current production baseline recorded in control
 
 baseline: 260616
 run_id: 20260616_211726
@@ -9,6 +9,11 @@ workflow_status: workflow_success
 workflow_conclusion: success
 
 Delivery evidence remains delivery-layer evidence only and is not an inbox receipt.
+
+## Fresh report review baseline
+
+baseline: 260617
+examples: weekly_analysis_pro_260617.pdf and weekly_analysis_pro_nl_260617.pdf
 
 ## Closed packages
 
@@ -42,31 +47,32 @@ WP42: closed as explicit control-layer package design verified, design-only
 
 ## Active package
 
-None
+Report Quality Patch 260617: implemented; pending external verification
 
-## Latest WP42 evidence
+## Latest report-quality patch files
 
-pytest tests/test_wp42_control_layer_design.py -> 13 passed
-python tools/wp42_validator.py -> STAGE2_PROMOTION_REVIEW_EXPLICIT_CONTROL_LAYER_DECISION_PACKAGE_DESIGN_OK
-python tools/wp41_validator.py -> STAGE2_PROMOTION_REVIEW_DECISION_NON_PRODUCTION_FIXTURE_GATE_OK
-python tools/validate_stage2_promotion_review_explicit_decision_design_review.py -> STAGE2_PROMOTION_REVIEW_EXPLICIT_DECISION_DESIGN_REVIEW_OK
-python tools/validate_stage2_promotion_review_decision_dry_run.py -> STAGE2_PROMOTION_REVIEW_DECISION_DRY_RUN_OK
-python tools/validate_stage2_promotion_review_decision_sample_gate.py -> STAGE2_PROMOTION_REVIEW_DECISION_SAMPLE_GATE_OK
-python tools/validate_stage2_promotion_review_decision_schema.py -> STAGE2_PROMOTION_REVIEW_DECISION_SCHEMA_OK
-python tools/validate_stage2_promotion_review_decision_fixtures.py -> STAGE2_PROMOTION_REVIEW_DECISION_FIXTURES_OK
-python tools/validate_stage2_promotion_review_decision_hardening.py -> STAGE2_PROMOTION_REVIEW_DECISION_HARDENING_OK
-python tools/validate_stage2_promotion_review_decision_artifact_design.py -> STAGE2_PROMOTION_REVIEW_DECISION_ARTIFACT_DESIGN_OK
-python tools/validate_stage2_promotion_review_fixtures.py -> STAGE2_PROMOTION_REVIEW_FIXTURES_OK
-python tools/validate_stage2_promotion_review_checklist.py -> STAGE2_PROMOTION_REVIEW_CHECKLIST_OK
-python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
-python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
-macro thesis leakage validator -> passed on 260616 baseline
-macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
-macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
-git diff --check -> clean
+runtime/polish_runtime_reports.py
+runtime/rotation_render_tables.py
+tests/test_report_decision_clarity.py
+tests/test_report_weight_basis_labels.py
+tests/test_report_bilingual_takeaway_parity.py
+
+## Verification commands
+
+```bash
+pytest tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py
+python tools/validate_macro_report_surface.py
+python tools/validate_macro_thesis_bilingual_aliases.py
+python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+python tools/validate_etf_delivery_html_contract.py
+python tools/validate_etf_dutch_language_quality.py
+git diff --check
+```
+
+If a validator file is not present locally, report the missing validator and run the available validators without mutating output artifacts.
 
 ## Recommended next action
 
-Pause work-package chaining.
+Verify the report-quality patch in Codespaces or CI. If verification passes, regenerate or inspect a fresh report and perform client-grade QA.
 
-Recommended next step: perform a roadmap consolidation review before creating more Stage-2 packages. The review should decide whether the Stage-2 decision-control scaffolding is now sufficient, whether any remaining packages are truly necessary, and whether attention should return to report quality, delivery reliability, or client-facing output.
+Do not create another Stage-2 package unless a roadmap consolidation review identifies a concrete need.
