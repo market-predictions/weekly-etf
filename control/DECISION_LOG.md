@@ -326,3 +326,15 @@ Macro/thesis bilingual aliases may define sanitized future client-safe terminolo
 ### Consequence
 
 The alias source is an input/state and output-contract preparation layer only. It must not be wired into production report rendering, Dutch report generation, lane scoring, fundability checks, portfolio rotation, recommendations, delivery HTML, or historical output files without a separate explicit future work package and control-layer authority decision.
+
+---
+
+## 2026-06-17 — Stage-2 promotion bridge defines eligibility only
+
+### Decision
+
+A Stage-2 promotion bridge may define future promotion-review eligibility, but it does not grant Stage-2 client-facing authority, production report authority, lane-scoring authority, fundability authority, portfolio-action authority, delivery authority, execution authority, or historical-output mutation authority.
+
+### Consequence
+
+The bridge is a decision-framework, input/state-contract, and output-contract design layer only. It may specify evidence prerequisites, bilingual alias dependency, leakage/compliance gates, and future implementation gates, but Stage-2 output remains shadow-only until a later explicit control-layer promotion decision and separate implementation package exist.
