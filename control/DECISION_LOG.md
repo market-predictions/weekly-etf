@@ -362,3 +362,15 @@ A Stage-2 promotion review checklist may validate whether future review evidence
 ### Consequence
 
 The checklist is an operational-runbook, input/state-contract, and output-contract validation layer only. It may calculate non-promotional checklist readiness status and validate source references, no-authority fields, and forbidden review text, but it must not create live production promotion artifacts or wire Stage-2 output into reports, scoring, fundability, portfolio actions, delivery, execution, or historical output mutation.
+
+---
+
+## 2026-06-17 — Stage-2 promotion review fixtures prove pass/fail behavior only
+
+### Decision
+
+A Stage-2 promotion review fixture set may prove pass/fail behavior for future review artifacts, but it does not create live promotion artifacts and does not grant Stage-2 client-facing authority, production report authority, lane-scoring authority, fundability authority, portfolio-action authority, delivery authority, execution authority, or historical-output mutation authority.
+
+### Consequence
+
+The fixture set is an input/state-contract, output-contract, and operational-runbook validation layer only. It may replay deterministic pass and planted-failure artifacts for schema/checklist behavior, but it must not create live review artifacts under output, production promotion artifacts, report wording, scoring, fundability, portfolio actions, delivery, execution, or historical output mutation.
