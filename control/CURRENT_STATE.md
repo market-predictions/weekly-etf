@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP36 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP36 Stage-2 promotion review decision artifact validator fixtures are verified and closed as validator-fixture / sample-fixture validation-only.**
+**WP16 through WP36 are closed. WP37 validator hardening has been implemented and is pending external verification. Latest baseline remains `260616` with run_id `20260616_211726`.**
 
 ## Latest verified production baseline
 
@@ -20,19 +20,9 @@ market-predictions/weekly-etf
 requested_close_date: 2026-06-16
 run_id: 20260616_211726
 report_token: 260616
-english_report_path: output/weekly_analysis_pro_260616.md
-dutch_report_path: output/weekly_analysis_pro_nl_260616.md
-pricing_audit_path: output/pricing/price_audit_2026-06-16_20260616_211726.json
-runtime_state_path: output/runtime/etf_report_state_20260616_20260616_211726.json
 pricing_lineage_status: passed
 workflow_status: workflow_success
 workflow_conclusion: success
-delivery_manifest_path: output/delivery/weekly_etf_delivery_manifest_2026-06-16_20260616_211726.json
-total_portfolio_value_eur: 108100.61
-cash_eur: 1936.52
-fresh_holdings_count: 9
-carried_forward_holdings_count: 0
-unresolved_tickers: []
 ```
 
 Delivery evidence remains delivery-layer evidence only. It is not an end-recipient inbox receipt.
@@ -61,52 +51,26 @@ WP33: closed as Stage-2 promotion review fixture set verified, fixture-set desig
 WP34: closed as Stage-2 promotion review decision artifact design verified, decision-artifact design-only
 WP35: closed as Stage-2 promotion review decision artifact schema verified, schema/design validation-only
 WP36: closed as Stage-2 promotion review decision artifact validator fixtures verified, validator-fixture / sample-fixture validation-only
-production_delivery_validation_20260614: closed as workflow_success
-fresh_send_validation_20260616: closed as workflow_success
 ```
 
 ## In-progress / pending verification
 
 ```text
-None
+WP37: implemented; pending external verification
 ```
 
 ## Evidence
 
 ```text
-fixtures/stage2_promotion_review_decision/README.md
-fixtures/stage2_promotion_review_decision/manifest.json
-fixtures/stage2_promotion_review_decision/pass_not_promoted.json
-fixtures/stage2_promotion_review_decision/pass_blocked_missing_evidence.json
-fixtures/stage2_promotion_review_decision/pass_ready_for_explicit_promotion_decision_not_promoted.json
-fixtures/stage2_promotion_review_decision/fail_status_forbidden.json
-fixtures/stage2_promotion_review_decision/fail_authority_true.json
-fixtures/stage2_promotion_review_decision/fail_design_ref.json
-fixtures/stage2_promotion_review_decision/fail_control_bool.json
-fixtures/stage2_promotion_review_decision/fail_plumbing_text.json
-fixtures/stage2_promotion_review_decision/fail_claim_text.json
-fixtures/stage2_promotion_review_decision/fail_extra_property.json
-tools/validate_stage2_promotion_review_decision_fixtures.py
-tests/test_stage2_promotion_review_decision_fixtures.py
-.github/workflows/validate-stage2-promotion-review-decision-fixtures.yml
-WP36 Codespaces verification: pytest tests/test_stage2_promotion_review_decision_fixtures.py -> 12 passed
-WP36 Codespaces verification: python tools/validate_stage2_promotion_review_decision_fixtures.py -> STAGE2_PROMOTION_REVIEW_DECISION_FIXTURES_OK
-WP36 Codespaces verification: python tools/validate_stage2_promotion_review_decision_schema.py -> STAGE2_PROMOTION_REVIEW_DECISION_SCHEMA_OK
-WP36 Codespaces verification: python tools/validate_stage2_promotion_review_decision_artifact_design.py -> STAGE2_PROMOTION_REVIEW_DECISION_ARTIFACT_DESIGN_OK
-WP36 Codespaces verification: python tools/validate_stage2_promotion_review_fixtures.py -> STAGE2_PROMOTION_REVIEW_FIXTURES_OK
-WP36 Codespaces verification: python tools/validate_stage2_promotion_review_checklist.py -> STAGE2_PROMOTION_REVIEW_CHECKLIST_OK
-WP36 Codespaces verification: python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
-WP36 Codespaces verification: python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
-WP36 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
-WP36 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
-WP36 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
-WP36 Codespaces verification: git diff --check -> clean
+tools/validate_stage2_promotion_review_decision_hardening.py
+tests/test_stage2_promotion_review_decision_hardening.py
+.github/workflows/validate-stage2-promotion-review-decision-hardening.yml
 ```
 
 ## Immediate next action
 
-Consider the next roadmap package:
+Run the WP37 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP37 and then consider:
 
 ```text
-WP37 — Stage-2 promotion review decision artifact validator hardening
+WP38 — Stage-2 promotion review decision sample generation gate
 ```
