@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP32 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP32 Stage-2 promotion review checklist validator is verified and closed as review-checklist validation-only.**
+**WP16 through WP32 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP33 Stage-2 promotion review fixture set has been implemented as fixture-set design and validation-only and is pending external pytest/validator verification.**
 
 ## Latest verified production baseline
 
@@ -64,7 +64,7 @@ fresh_send_validation_20260616: closed as workflow_success
 ## In-progress / pending verification
 
 ```text
-None
+WP33: implemented; pending external pytest/validator verification
 ```
 
 ## Evidence
@@ -123,12 +123,24 @@ WP32 Codespaces verification: macro thesis leakage validator -> passed on 260616
 WP32 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
 WP32 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
 WP32 Codespaces verification: git diff --check -> clean
+fixtures/stage2_promotion_review/README.md
+fixtures/stage2_promotion_review/manifest.json
+fixtures/stage2_promotion_review/pass_ready_for_review_not_promoted.json
+fixtures/stage2_promotion_review/pass_not_ready_missing_evidence.json
+fixtures/stage2_promotion_review/fail_authority_true.json
+fixtures/stage2_promotion_review/fail_promoted_status.json
+fixtures/stage2_promotion_review/fail_missing_bilingual_aliases.json
+fixtures/stage2_promotion_review/fail_raw_driver_id_text.json
+fixtures/stage2_promotion_review/fail_fundable_claim_text.json
+tools/validate_stage2_promotion_review_fixtures.py
+tests/test_stage2_promotion_review_fixtures.py
+.github/workflows/validate-stage2-promotion-review-fixtures.yml
 ```
 
 ## Immediate next action
 
-Consider the next roadmap package:
+Run the WP33 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP33 and then consider:
 
 ```text
-WP33 — Stage-2 promotion review fixture set
+WP34 — Stage-2 promotion review decision artifact design
 ```
