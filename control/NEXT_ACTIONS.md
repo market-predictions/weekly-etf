@@ -30,44 +30,35 @@ WP30: closed as Stage-2 bridge design verified, design-only
 WP31: closed as Stage-2 review schema verified, schema-only
 WP32: closed as Stage-2 review checklist verified, checklist-only
 WP33: closed as Stage-2 review fixture set verified, fixture-only
-WP34: closed as Stage-2 promotion review decision artifact design verified, design-only
-WP35: closed as Stage-2 promotion review decision artifact schema verified, schema-only
-WP36: closed as Stage-2 promotion review decision artifact validator fixtures verified, fixture-only
+WP34: closed as Stage-2 decision artifact design verified, design-only
+WP35: closed as Stage-2 decision artifact schema verified, schema-only
+WP36: closed as Stage-2 decision artifact validator fixtures verified, fixture-only
+WP37: closed as Stage-2 decision artifact validator hardening verified, validator-hardening only
 
 ## Active package
 
-WP37: implemented; pending external verification
+None
 
-## Latest WP37 files
+## Latest WP37 evidence
 
-tools/validate_stage2_promotion_review_decision_hardening.py
-tests/test_stage2_promotion_review_decision_hardening.py
-.github/workflows/validate-stage2-promotion-review-decision-hardening.yml
-
-## Verification commands
-
-```bash
-pytest tests/test_stage2_promotion_review_decision_schema.py
-pytest tests/test_stage2_promotion_review_decision_fixtures.py
-pytest tests/test_stage2_promotion_review_decision_hardening.py
-python tools/validate_stage2_promotion_review_decision_schema.py
-python tools/validate_stage2_promotion_review_decision_fixtures.py
-python tools/validate_stage2_promotion_review_decision_hardening.py
-python tools/validate_stage2_promotion_review_decision_artifact_design.py
-python tools/validate_stage2_promotion_review_fixtures.py
-python tools/validate_stage2_promotion_review_checklist.py
-python tools/validate_stage2_promotion_review_schema.py
-python tools/validate_stage2_promotion_bridge_design.py
-python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
-python tools/validate_macro_thesis_bilingual_aliases.py
-python tools/validate_macro_report_surface.py
-git diff --check
-```
+pytest tests/test_stage2_promotion_review_decision_schema.py -> 12 passed
+pytest tests/test_stage2_promotion_review_decision_fixtures.py -> 12 passed
+pytest tests/test_stage2_promotion_review_decision_hardening.py -> 12 passed
+python tools/validate_stage2_promotion_review_decision_schema.py -> STAGE2_PROMOTION_REVIEW_DECISION_SCHEMA_OK
+python tools/validate_stage2_promotion_review_decision_fixtures.py -> STAGE2_PROMOTION_REVIEW_DECISION_FIXTURES_OK
+python tools/validate_stage2_promotion_review_decision_hardening.py -> STAGE2_PROMOTION_REVIEW_DECISION_HARDENING_OK
+python tools/validate_stage2_promotion_review_decision_artifact_design.py -> STAGE2_PROMOTION_REVIEW_DECISION_ARTIFACT_DESIGN_OK
+python tools/validate_stage2_promotion_review_fixtures.py -> STAGE2_PROMOTION_REVIEW_FIXTURES_OK
+python tools/validate_stage2_promotion_review_checklist.py -> STAGE2_PROMOTION_REVIEW_CHECKLIST_OK
+python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
+python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
+macro thesis leakage validator -> passed on 260616 baseline
+macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
+macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
+git diff --check -> clean
 
 ## Recommended next action
 
-Verify WP37 in Codespaces or CI. If verification passes, close WP37.
+Consider WP38 — Stage-2 promotion review decision sample generation gate.
 
-Next candidate after clean closeout:
-
-WP38 — Stage-2 promotion review decision sample generation gate
+WP38 should remain sample-generation-gate or dry-run-artifact-builder validation only unless explicitly scoped otherwise.
