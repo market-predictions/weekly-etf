@@ -2,7 +2,7 @@
 
 ## Snapshot date
 
-2026-06-17
+2026-06-18
 
 ## Repository
 
@@ -12,9 +12,9 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP42 are closed. WP42 is verified and closed as design-only. Latest baseline remains `260616` with run_id `20260616_211726`.**
+**WP16 through WP42 are closed. Report Quality Patch 260617 has been implemented and is pending external verification. Latest reviewed fresh report baseline is `260617`; latest recorded verified production baseline in control remains `260616` with run_id `20260616_211726`.**
 
-## Latest verified production baseline
+## Latest verified production baseline recorded in control
 
 ```text
 requested_close_date: 2026-06-16
@@ -62,35 +62,20 @@ WP42: closed as explicit control-layer package design verified, design-only
 ## In-progress / pending verification
 
 ```text
-None
+Report Quality Patch 260617: implemented; pending external verification
 ```
 
 ## Evidence
 
 ```text
-control/STAGE2_CONTROL_LAYER_PACKAGE_DESIGN.md
-tools/wp42_validator.py
-tests/test_wp42_control_layer_design.py
-WP42 Codespaces verification: pytest tests/test_wp42_control_layer_design.py -> 13 passed
-WP42 Codespaces verification: python tools/wp42_validator.py -> STAGE2_PROMOTION_REVIEW_EXPLICIT_CONTROL_LAYER_DECISION_PACKAGE_DESIGN_OK
-WP42 Codespaces verification: python tools/wp41_validator.py -> STAGE2_PROMOTION_REVIEW_DECISION_NON_PRODUCTION_FIXTURE_GATE_OK
-WP42 Codespaces verification: python tools/validate_stage2_promotion_review_explicit_decision_design_review.py -> STAGE2_PROMOTION_REVIEW_EXPLICIT_DECISION_DESIGN_REVIEW_OK
-WP42 Codespaces verification: python tools/validate_stage2_promotion_review_decision_dry_run.py -> STAGE2_PROMOTION_REVIEW_DECISION_DRY_RUN_OK
-WP42 Codespaces verification: python tools/validate_stage2_promotion_review_decision_sample_gate.py -> STAGE2_PROMOTION_REVIEW_DECISION_SAMPLE_GATE_OK
-WP42 Codespaces verification: python tools/validate_stage2_promotion_review_decision_schema.py -> STAGE2_PROMOTION_REVIEW_DECISION_SCHEMA_OK
-WP42 Codespaces verification: python tools/validate_stage2_promotion_review_decision_fixtures.py -> STAGE2_PROMOTION_REVIEW_DECISION_FIXTURES_OK
-WP42 Codespaces verification: python tools/validate_stage2_promotion_review_decision_hardening.py -> STAGE2_PROMOTION_REVIEW_DECISION_HARDENING_OK
-WP42 Codespaces verification: python tools/validate_stage2_promotion_review_decision_artifact_design.py -> STAGE2_PROMOTION_REVIEW_DECISION_ARTIFACT_DESIGN_OK
-WP42 Codespaces verification: python tools/validate_stage2_promotion_review_fixtures.py -> STAGE2_PROMOTION_REVIEW_FIXTURES_OK
-WP42 Codespaces verification: python tools/validate_stage2_promotion_review_checklist.py -> STAGE2_PROMOTION_REVIEW_CHECKLIST_OK
-WP42 Codespaces verification: python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
-WP42 Codespaces verification: python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
-WP42 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
-WP42 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
-WP42 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
-WP42 Codespaces verification: git diff --check -> clean
+Fresh report review examples: weekly_analysis_pro_260617.pdf and weekly_analysis_pro_nl_260617.pdf
+runtime/polish_runtime_reports.py
+runtime/rotation_render_tables.py
+tests/test_report_decision_clarity.py
+tests/test_report_weight_basis_labels.py
+tests/test_report_bilingual_takeaway_parity.py
 ```
 
 ## Immediate next action
 
-Pause work-package chaining and perform a roadmap consolidation review before creating more Stage-2 packages.
+Run the Report Quality Patch 260617 verification commands from `control/NEXT_ACTIONS.md`. If they pass, regenerate or inspect a fresh report and perform client-grade QA.
