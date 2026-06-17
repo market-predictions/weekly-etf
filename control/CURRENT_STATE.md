@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP34 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP35 Stage-2 promotion review decision artifact schema has been implemented as schema/design validation-only and is pending external pytest/validator verification.**
+**WP16 through WP35 are closed. The latest manifest-linked production baseline remains `260616` with run_id `20260616_211726`. WP35 Stage-2 promotion review decision artifact schema is verified and closed as schema/design validation-only.**
 
 ## Latest verified production baseline
 
@@ -59,6 +59,7 @@ WP31: closed as Stage-2 promotion review artifact schema verified, schema/review
 WP32: closed as Stage-2 promotion review checklist validator verified, review-checklist validation-only
 WP33: closed as Stage-2 promotion review fixture set verified, fixture-set design and validation-only
 WP34: closed as Stage-2 promotion review decision artifact design verified, decision-artifact design-only
+WP35: closed as Stage-2 promotion review decision artifact schema verified, schema/design validation-only
 production_delivery_validation_20260614: closed as workflow_success
 fresh_send_validation_20260616: closed as workflow_success
 ```
@@ -66,7 +67,7 @@ fresh_send_validation_20260616: closed as workflow_success
 ## In-progress / pending verification
 
 ```text
-WP35: implemented; pending external pytest/validator verification
+None
 ```
 
 ## Evidence
@@ -76,11 +77,22 @@ schemas/stage2_promotion_review_decision.schema.json
 tools/validate_stage2_promotion_review_decision_schema.py
 tests/test_stage2_promotion_review_decision_schema.py
 .github/workflows/validate-stage2-promotion-review-decision-schema.yml
+WP35 Codespaces verification: pytest tests/test_stage2_promotion_review_decision_schema.py -> 12 passed
+WP35 Codespaces verification: python tools/validate_stage2_promotion_review_decision_schema.py -> STAGE2_PROMOTION_REVIEW_DECISION_SCHEMA_OK
+WP35 Codespaces verification: python tools/validate_stage2_promotion_review_decision_artifact_design.py -> STAGE2_PROMOTION_REVIEW_DECISION_ARTIFACT_DESIGN_OK
+WP35 Codespaces verification: python tools/validate_stage2_promotion_review_fixtures.py -> STAGE2_PROMOTION_REVIEW_FIXTURES_OK
+WP35 Codespaces verification: python tools/validate_stage2_promotion_review_checklist.py -> STAGE2_PROMOTION_REVIEW_CHECKLIST_OK
+WP35 Codespaces verification: python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
+WP35 Codespaces verification: python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
+WP35 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
+WP35 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
+WP35 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
+WP35 Codespaces verification: git diff --check -> clean
 ```
 
 ## Immediate next action
 
-Run the WP35 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP35 and then consider:
+Consider the next roadmap package:
 
 ```text
 WP36 — Stage-2 promotion review decision artifact validator fixtures
