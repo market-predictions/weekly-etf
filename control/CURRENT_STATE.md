@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP39 are closed. WP39 is verified and closed as validation-only. Latest baseline remains `260616` with run_id `20260616_211726`.**
+**WP16 through WP40 are closed. WP40 is verified and closed as explicit design-review only. Latest baseline remains `260616` with run_id `20260616_211726`.**
 
 ## Latest verified production baseline
 
@@ -42,18 +42,19 @@ WP24: closed as review-only
 WP25: closed as proposal-only
 WP26: closed as manually validated
 WP27: closed as visual QA passed
-WP28: closed as macro/thesis leakage firewall verified
-WP29: closed as bilingual macro/thesis alias source verified, preparation-only
-WP30: closed as Stage-2 bridge design verified, design-only
-WP31: closed as Stage-2 review schema verified, schema-only
-WP32: closed as Stage-2 review checklist verified, checklist-only
-WP33: closed as Stage-2 review fixture set verified, fixture-only
-WP34: closed as Stage-2 decision artifact design verified, design-only
-WP35: closed as Stage-2 decision artifact schema verified, schema-only
-WP36: closed as Stage-2 decision artifact validator fixtures verified, fixture-only
-WP37: closed as Stage-2 decision artifact validator hardening verified, validator-hardening only
-WP38: closed as Stage-2 decision sample generation gate verified, validation-only
-WP39: closed as Stage-2 decision dry-run builder verified, validation-only
+WP28: closed as leakage firewall verified
+WP29: closed as bilingual alias source verified, preparation-only
+WP30: closed as bridge design verified, design-only
+WP31: closed as review schema verified, schema-only
+WP32: closed as review checklist verified, checklist-only
+WP33: closed as review fixture set verified, fixture-only
+WP34: closed as decision artifact design verified, design-only
+WP35: closed as decision artifact schema verified, schema-only
+WP36: closed as decision artifact validator fixtures verified, fixture-only
+WP37: closed as decision artifact validator hardening verified, validator-hardening only
+WP38: closed as decision sample generation gate verified, validation-only
+WP39: closed as decision dry-run builder verified, validation-only
+WP40: closed as explicit decision artifact design review verified, design-review only
 ```
 
 ## In-progress / pending verification
@@ -65,27 +66,27 @@ None
 ## Evidence
 
 ```text
-tools/build_stage2_promotion_review_decision_dry_run.py
-tools/validate_stage2_promotion_review_decision_dry_run.py
-tests/test_stage2_promotion_review_decision_dry_run.py
-.github/workflows/validate-stage2-decision-dry-run.yml
-WP39 Codespaces verification: pytest tests/test_stage2_promotion_review_decision_dry_run.py -> 22 passed
-WP39 Codespaces verification: python tools/validate_stage2_promotion_review_decision_dry_run.py -> STAGE2_PROMOTION_REVIEW_DECISION_DRY_RUN_OK
-WP39 Codespaces verification: python tools/validate_stage2_promotion_review_decision_sample_gate.py -> STAGE2_PROMOTION_REVIEW_DECISION_SAMPLE_GATE_OK
-WP39 Codespaces verification: python tools/validate_stage2_promotion_review_decision_schema.py -> STAGE2_PROMOTION_REVIEW_DECISION_SCHEMA_OK
-WP39 Codespaces verification: python tools/validate_stage2_promotion_review_decision_fixtures.py -> STAGE2_PROMOTION_REVIEW_DECISION_FIXTURES_OK
-WP39 Codespaces verification: python tools/validate_stage2_promotion_review_decision_hardening.py -> STAGE2_PROMOTION_REVIEW_DECISION_HARDENING_OK
-WP39 Codespaces verification: python tools/validate_stage2_promotion_review_decision_artifact_design.py -> STAGE2_PROMOTION_REVIEW_DECISION_ARTIFACT_DESIGN_OK
-WP39 Codespaces verification: python tools/validate_stage2_promotion_review_fixtures.py -> STAGE2_PROMOTION_REVIEW_FIXTURES_OK
-WP39 Codespaces verification: python tools/validate_stage2_promotion_review_checklist.py -> STAGE2_PROMOTION_REVIEW_CHECKLIST_OK
-WP39 Codespaces verification: python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
-WP39 Codespaces verification: python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
-WP39 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
-WP39 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
-WP39 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
-WP39 Codespaces verification: git diff --check -> clean
+control/STAGE2_PROMOTION_REVIEW_EXPLICIT_DECISION_ARTIFACT_DESIGN_REVIEW.md
+tools/validate_stage2_promotion_review_explicit_decision_design_review.py
+tests/test_stage2_promotion_review_explicit_decision_design_review.py
+WP40 Codespaces verification: pytest tests/test_stage2_promotion_review_explicit_decision_design_review.py -> 10 passed
+WP40 Codespaces verification: python tools/validate_stage2_promotion_review_explicit_decision_design_review.py -> STAGE2_PROMOTION_REVIEW_EXPLICIT_DECISION_DESIGN_REVIEW_OK
+WP40 Codespaces verification: python tools/validate_stage2_promotion_review_decision_dry_run.py -> STAGE2_PROMOTION_REVIEW_DECISION_DRY_RUN_OK
+WP40 Codespaces verification: python tools/validate_stage2_promotion_review_decision_sample_gate.py -> STAGE2_PROMOTION_REVIEW_DECISION_SAMPLE_GATE_OK
+WP40 Codespaces verification: python tools/validate_stage2_promotion_review_decision_schema.py -> STAGE2_PROMOTION_REVIEW_DECISION_SCHEMA_OK
+WP40 Codespaces verification: python tools/validate_stage2_promotion_review_decision_fixtures.py -> STAGE2_PROMOTION_REVIEW_DECISION_FIXTURES_OK
+WP40 Codespaces verification: python tools/validate_stage2_promotion_review_decision_hardening.py -> STAGE2_PROMOTION_REVIEW_DECISION_HARDENING_OK
+WP40 Codespaces verification: python tools/validate_stage2_promotion_review_decision_artifact_design.py -> STAGE2_PROMOTION_REVIEW_DECISION_ARTIFACT_DESIGN_OK
+WP40 Codespaces verification: python tools/validate_stage2_promotion_review_fixtures.py -> STAGE2_PROMOTION_REVIEW_FIXTURES_OK
+WP40 Codespaces verification: python tools/validate_stage2_promotion_review_checklist.py -> STAGE2_PROMOTION_REVIEW_CHECKLIST_OK
+WP40 Codespaces verification: python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
+WP40 Codespaces verification: python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
+WP40 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
+WP40 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
+WP40 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
+WP40 Codespaces verification: git diff --check -> clean
 ```
 
 ## Immediate next action
 
-Consider WP40 — Stage-2 promotion review explicit decision artifact design review.
+Consider WP41 — Stage-2 decision artifact non-production fixture gate.
