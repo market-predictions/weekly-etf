@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/market-predictions/weekly-etf/schemas/stage2_promotion_review_decision.schema.json",
+  "title": "Stage-2 promotion review decision artifact",
+  "description": "Schema for a future explicit Stage-2 promotion review decision artifact. Schema/design validation only; not a live decision artifact and not production authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "generated_at_utc",
+    "decision_status",
+    "decision_scope",
+    "authority",
+    "source_evidence",
+    "decision_rationale",
+    "blocking_conditions",
+    "required_future_work",
+    "non_goals"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "artifact_type": {
+      "type": "string",
+      "const": "stage2_promotion_review_decision"
+    },
+    "generated_at_utc": {
+      "type": "string"
+    },
+    "decision_status": {
+      "type": "string",
+      "enum": [
+        "not_promoted",
+        "rejected_not_promoted",
+        "blocked_missing_evidence",
+        "blocked_by_authority_boundary",
+        "ready_for_explicit_promotion_decision_not_promoted"
+      ]
+    },
+    "decision_scope": {
+      "type": "string",
+      "const": "review_decision_only"
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "client_facing_authority",
+        "production_report_narrative_authority",
+        "lane_scoring_authority",
+        "fundability_authority",
+        "portfolio_action_authority",
+        "portfolio_mutation",
+        "historical_output_mutation",
+        "delivery_authority",
+        "execution_authority",
+        "report_surface_allowed",
+        "production_report_path_changed",
+        "decision_artifact_only",
+        "implementation_required_before_production_use",
+        "explicit_control_layer_decision_required"
+      ],
+      "properties": {
+        "client_facing_authority": {"type": "boolean", "const": false},
+        "production_report_narrative_authority": {"type": "boolean", "const": false},
+        "lane_scoring_authority": {"type": "boolean", "const": false},
+        "fundability_authority": {"type": "boolean", "const": false},
+        "portfolio_action_authority": {"type": "boolean", "const": false},
+        "portfolio_mutation": {"type": "boolean", "const": false},
+        "historical_output_mutation": {"type": "boolean", "const": false},
+        "delivery_authority": {"type": "boolean", "const": false},
+        "execution_authority": {"type": "boolean", "const": false},
+        "report_surface_allowed": {"type": "boolean", "const": false},
+        "production_report_path_changed": {"type": "boolean", "const": false},
+        "decision_artifact_only": {"type": "boolean", "const": true},
+        "implementation_required_before_production_use": {"type": "boolean", "const": true},
+        "explicit_control_layer_decision_required": {"type": "boolean", "const": true}
+      }
+    },
+    "source_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "promotion_bridge_design",
+        "review_schema",
+        "review_checklist_validator",
+        "fixture_manifest",
+        "fixture_validator",
+        "decision_artifact_design",
+        "decision_artifact_design_validator",
+        "stage2_shadow_status",
+        "stage2_shadow_validation",
+        "leakage_validator",
+        "bilingual_aliases",
+        "macro_report_surface_validator",
+        "latest_verified_production_baseline"
+      ],
+      "properties": {
+        "promotion_bridge_design": {"type": "string"},
+        "review_schema": {"type": "string"},
+        "review_checklist_validator": {"type": "string"},
+        "fixture_manifest": {"type": "string"},
+        "fixture_validator": {"type": "string"},
+        "decision_artifact_design": {"type": "string"},
+        "decision_artifact_design_validator": {"type": "string"},
+        "stage2_shadow_status": {"type": "string"},
+        "stage2_shadow_validation": {"type": "string"},
+        "leakage_validator": {"type": "string"},
+        "bilingual_aliases": {"type": "string"},
+        "macro_report_surface_validator": {"type": "string"},
+        "latest_verified_production_baseline": {"type": "string"}
+      }
+    },
+    "decision_rationale": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/review_note"}
+    },
+    "blocking_conditions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/review_note"}
+    },
+    "required_future_work": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/review_note"}
+    },
+    "non_goals": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "$defs": {
+    "review_note": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "severity", "summary"],
+      "properties": {
+        "code": {"type": "string"},
+        "severity": {
+          "type": "string",
+          "enum": ["info", "warning", "blocker"]
+        },
+        "summary": {"type": "string"}
+      }
+    }
+  }
+}
