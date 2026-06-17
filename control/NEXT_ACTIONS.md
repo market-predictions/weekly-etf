@@ -31,12 +31,13 @@ WP26: closed
 WP27: closed
 WP28: closed as macro/thesis leakage firewall verified
 WP29: closed as bilingual macro/thesis alias source verified, preparation-only
+WP30: closed as Stage-2 promotion bridge design verified, design-only
 production_delivery_validation_20260614: closed
 fresh_send_validation_20260616: closed
 
 ## Active package
 
-WP30: implemented; pending external verification
+None
 
 ## Latest evidence
 
@@ -61,20 +62,15 @@ control/STAGE2_PROMOTION_BRIDGE_DESIGN.md
 tools/validate_stage2_promotion_bridge_design.py
 tests/test_stage2_promotion_bridge_design.py
 .github/workflows/validate-stage2-promotion-bridge-design.yml
+WP30 Codespaces verification: pytest tests/test_stage2_promotion_bridge_design.py -> 7 passed
+WP30 Codespaces verification: python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
+WP30 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
+WP30 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
+WP30 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
+WP30 Codespaces verification: git diff --check -> clean
 
 ## Recommended next action
 
-Verify WP30 in Codespaces or CI. Use:
+Consider WP31 — Stage-2 promotion review artifact schema.
 
-```bash
-pytest tests/test_stage2_promotion_bridge_design.py
-python tools/validate_stage2_promotion_bridge_design.py
-python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
-python tools/validate_macro_thesis_bilingual_aliases.py
-python tools/validate_macro_report_surface.py
-git diff --check
-```
-
-If those pass, close WP30. The next roadmap candidate is WP31 — Stage-2 promotion review artifact schema.
-
-WP30 remains design-only. It does not promote Stage-2 output into production report wording, lane scoring, fundability, portfolio actions, delivery behavior, execution behavior, or historical output mutation.
+WP31 should remain schema/review-artifact design and validation only unless explicitly scoped otherwise. It must not promote Stage-2 output into production report wording, lane scoring, fundability, portfolio actions, delivery behavior, execution behavior, or historical output mutation.
