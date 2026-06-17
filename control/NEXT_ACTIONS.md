@@ -33,12 +33,13 @@ WP28: closed as macro/thesis leakage firewall verified
 WP29: closed as bilingual macro/thesis alias source verified, preparation-only
 WP30: closed as Stage-2 promotion bridge design verified, design-only
 WP31: closed as Stage-2 promotion review artifact schema verified, schema/review-artifact validation-only
+WP32: closed as Stage-2 promotion review checklist validator verified, review-checklist validation-only
 production_delivery_validation_20260614: closed
 fresh_send_validation_20260616: closed
 
 ## Active package
 
-WP32: implemented; pending external verification
+None
 
 ## Latest evidence
 
@@ -83,22 +84,17 @@ WP31 Codespaces verification: git diff --check -> clean
 tools/validate_stage2_promotion_review_checklist.py
 tests/test_stage2_promotion_review_checklist.py
 .github/workflows/validate-stage2-promotion-review-checklist.yml
+WP32 Codespaces verification: pytest tests/test_stage2_promotion_review_checklist.py -> 11 passed
+WP32 Codespaces verification: python tools/validate_stage2_promotion_review_checklist.py -> STAGE2_PROMOTION_REVIEW_CHECKLIST_OK
+WP32 Codespaces verification: python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
+WP32 Codespaces verification: python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
+WP32 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
+WP32 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
+WP32 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
+WP32 Codespaces verification: git diff --check -> clean
 
 ## Recommended next action
 
-Verify WP32 in Codespaces or CI. Use:
+Consider WP33 — Stage-2 promotion review fixture set.
 
-```bash
-pytest tests/test_stage2_promotion_review_checklist.py
-python tools/validate_stage2_promotion_review_checklist.py
-python tools/validate_stage2_promotion_review_schema.py
-python tools/validate_stage2_promotion_bridge_design.py
-python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
-python tools/validate_macro_thesis_bilingual_aliases.py
-python tools/validate_macro_report_surface.py
-git diff --check
-```
-
-If those pass, close WP32. The next roadmap candidate is WP33 — Stage-2 promotion review fixture set.
-
-WP32 remains review-checklist validation only. It does not promote Stage-2 output into production report wording, lane scoring, fundability, portfolio actions, delivery behavior, execution behavior, or historical output mutation.
+WP33 should remain fixture-set design and validation only unless explicitly scoped otherwise. It must not create live production promotion artifacts, and it must not promote Stage-2 output into production report wording, lane scoring, fundability, portfolio actions, delivery behavior, execution behavior, or historical output mutation.
