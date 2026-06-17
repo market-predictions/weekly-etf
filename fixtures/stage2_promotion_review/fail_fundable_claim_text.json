@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "stage2_promotion_review",
+  "generated_at_utc": "2026-06-17T00:00:00Z",
+  "review_status": "eligible_for_promotion_review_not_promoted",
+  "promotion_status": "not_promoted",
+  "authority": {
+    "shadow_only": true,
+    "client_facing_authority": false,
+    "production_report_narrative_authority": false,
+    "lane_scoring_authority": false,
+    "fundability_authority": false,
+    "portfolio_action_authority": false,
+    "portfolio_mutation": false,
+    "historical_output_mutation": false,
+    "delivery_authority": false,
+    "execution_authority": false,
+    "report_surface_allowed": false,
+    "production_report_path_changed": false
+  },
+  "source_artifacts": {
+    "stage2_confirmation_validation": "output/macro/validation/latest_stage2_confirmation_validation.json",
+    "stage2_confirmation": "output/macro/latest_stage2_confirmation.json",
+    "thesis_candidates": "output/macro/latest_thesis_candidates.json",
+    "relative_strength": "output/market_history/etf_relative_strength.json",
+    "pricing_audit": "output/pricing/price_audit_<requested_close_date>_<run_id>.json",
+    "portfolio_state": "output/etf_portfolio_state.json",
+    "portfolio_discipline_clearance": "output/etf_recommendation_scorecard.csv",
+    "bilingual_aliases": "config/macro_thesis_bilingual_aliases.yml",
+    "leakage_validation": "tools/validate_etf_macro_thesis_surface_leakage.py",
+    "macro_report_surface_validation": "tools/validate_macro_report_surface.py"
+  },
+  "review_findings": [
+    {
+      "code": "bad_claim",
+      "severity": "blocker",
+      "summary": "This fixture intentionally claims the lane is fundable."
+    }
+  ],
+  "missing_requirements": [],
+  "non_goals": [
+    "fixture replay only"
+  ]
+}
