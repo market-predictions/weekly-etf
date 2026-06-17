@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/market-predictions/weekly-etf/schemas/stage2_promotion_review.schema.json",
+  "title": "Stage-2 promotion review artifact",
+  "description": "Schema for a future Stage-2 promotion review artifact. Review-only; not a promotion decision and not production authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "generated_at_utc",
+    "review_status",
+    "promotion_status",
+    "authority",
+    "source_artifacts",
+    "review_findings",
+    "missing_requirements",
+    "non_goals"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "artifact_type": {
+      "type": "string",
+      "const": "stage2_promotion_review"
+    },
+    "generated_at_utc": {
+      "type": "string",
+      "description": "UTC timestamp for review artifact creation."
+    },
+    "review_status": {
+      "type": "string",
+      "enum": [
+        "not_ready_missing_evidence",
+        "eligible_for_promotion_review_not_promoted",
+        "blocked_by_authority_boundary",
+        "rejected_by_review_not_promoted"
+      ]
+    },
+    "promotion_status": {
+      "type": "string",
+      "const": "not_promoted"
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shadow_only",
+        "client_facing_authority",
+        "production_report_narrative_authority",
+        "lane_scoring_authority",
+        "fundability_authority",
+        "portfolio_action_authority",
+        "portfolio_mutation",
+        "historical_output_mutation",
+        "delivery_authority",
+        "execution_authority",
+        "report_surface_allowed",
+        "production_report_path_changed"
+      ],
+      "properties": {
+        "shadow_only": {
+          "type": "boolean",
+          "const": true
+        },
+        "client_facing_authority": {
+          "type": "boolean",
+          "const": false
+        },
+        "production_report_narrative_authority": {
+          "type": "boolean",
+          "const": false
+        },
+        "lane_scoring_authority": {
+          "type": "boolean",
+          "const": false
+        },
+        "fundability_authority": {
+          "type": "boolean",
+          "const": false
+        },
+        "portfolio_action_authority": {
+          "type": "boolean",
+          "const": false
+        },
+        "portfolio_mutation": {
+          "type": "boolean",
+          "const": false
+        },
+        "historical_output_mutation": {
+          "type": "boolean",
+          "const": false
+        },
+        "delivery_authority": {
+          "type": "boolean",
+          "const": false
+        },
+        "execution_authority": {
+          "type": "boolean",
+          "const": false
+        },
+        "report_surface_allowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "production_report_path_changed": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "source_artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage2_confirmation_validation",
+        "stage2_confirmation",
+        "thesis_candidates",
+        "relative_strength",
+        "pricing_audit",
+        "portfolio_state",
+        "portfolio_discipline_clearance",
+        "bilingual_aliases",
+        "leakage_validation",
+        "macro_report_surface_validation"
+      ],
+      "properties": {
+        "stage2_confirmation_validation": {
+          "type": "string"
+        },
+        "stage2_confirmation": {
+          "type": "string"
+        },
+        "thesis_candidates": {
+          "type": "string"
+        },
+        "relative_strength": {
+          "type": "string"
+        },
+        "pricing_audit": {
+          "type": "string"
+        },
+        "portfolio_state": {
+          "type": "string"
+        },
+        "portfolio_discipline_clearance": {
+          "type": "string"
+        },
+        "bilingual_aliases": {
+          "type": "string"
+        },
+        "leakage_validation": {
+          "type": "string"
+        },
+        "macro_report_surface_validation": {
+          "type": "string"
+        }
+      }
+    },
+    "review_findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "severity",
+          "summary"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warning",
+              "blocker"
+            ]
+          },
+          "summary": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "missing_requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "non_goals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
