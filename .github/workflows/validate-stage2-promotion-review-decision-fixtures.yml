@@ -1,0 +1,19 @@
+name: Validate Stage-2 promotion review decision fixtures
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-decision-fixtures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip pytest
+      - run: pytest tests/test_stage2_promotion_review_decision_fixtures.py
+      - run: python tools/validate_stage2_promotion_review_decision_fixtures.py
