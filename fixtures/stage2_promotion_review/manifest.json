@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "fixture_set": "stage2_promotion_review",
+  "authority": {
+    "fixture_only": true,
+    "production_artifact": false,
+    "client_facing_authority": false,
+    "production_report_narrative_authority": false,
+    "lane_scoring_authority": false,
+    "fundability_authority": false,
+    "portfolio_action_authority": false,
+    "portfolio_mutation": false,
+    "historical_output_mutation": false,
+    "delivery_authority": false,
+    "execution_authority": false,
+    "report_surface_allowed": false,
+    "production_report_path_changed": false
+  },
+  "fixtures": [
+    {
+      "path": "fixtures/stage2_promotion_review/pass_ready_for_review_not_promoted.json",
+      "expected": "pass",
+      "expected_checklist_status": "checklist_ready_for_review_not_promoted"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review/pass_not_ready_missing_evidence.json",
+      "expected": "pass",
+      "expected_checklist_status": "checklist_not_ready_missing_evidence"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review/fail_authority_true.json",
+      "expected": "fail",
+      "expected_failure_contains": "authority.fundability_authority"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review/fail_promoted_status.json",
+      "expected": "fail",
+      "expected_failure_contains": "forbidden promotional status"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review/fail_missing_bilingual_aliases.json",
+      "expected": "fail",
+      "expected_failure_contains": "source_artifacts.bilingual_aliases"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review/fail_raw_driver_id_text.json",
+      "expected": "fail",
+      "expected_failure_contains": "raw driver plumbing"
+    },
+    {
+      "path": "fixtures/stage2_promotion_review/fail_fundable_claim_text.json",
+      "expected": "fail",
+      "expected_failure_contains": "forbidden promotional or readiness claim"
+    }
+  ]
+}
