@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP37 are closed. WP37 validator hardening is verified and closed as validator-hardening only. Latest baseline remains `260616` with run_id `20260616_211726`.**
+**WP16 through WP37 are closed. WP38 sample generation gate has been implemented and is pending external verification. Latest baseline remains `260616` with run_id `20260616_211726`.**
 
 ## Latest verified production baseline
 
@@ -57,36 +57,22 @@ WP37: closed as Stage-2 promotion review decision artifact validator hardening v
 ## In-progress / pending verification
 
 ```text
-None
+WP38: implemented; pending external verification
 ```
 
 ## Evidence
 
 ```text
-tools/validate_stage2_promotion_review_decision_hardening.py
-tests/test_stage2_promotion_review_decision_hardening.py
-.github/workflows/validate-stage2-promotion-review-decision-hardening.yml
-WP37 Codespaces verification: pytest tests/test_stage2_promotion_review_decision_schema.py -> 12 passed
-WP37 Codespaces verification: pytest tests/test_stage2_promotion_review_decision_fixtures.py -> 12 passed
-WP37 Codespaces verification: pytest tests/test_stage2_promotion_review_decision_hardening.py -> 12 passed
-WP37 Codespaces verification: python tools/validate_stage2_promotion_review_decision_schema.py -> STAGE2_PROMOTION_REVIEW_DECISION_SCHEMA_OK
-WP37 Codespaces verification: python tools/validate_stage2_promotion_review_decision_fixtures.py -> STAGE2_PROMOTION_REVIEW_DECISION_FIXTURES_OK
-WP37 Codespaces verification: python tools/validate_stage2_promotion_review_decision_hardening.py -> STAGE2_PROMOTION_REVIEW_DECISION_HARDENING_OK
-WP37 Codespaces verification: python tools/validate_stage2_promotion_review_decision_artifact_design.py -> STAGE2_PROMOTION_REVIEW_DECISION_ARTIFACT_DESIGN_OK
-WP37 Codespaces verification: python tools/validate_stage2_promotion_review_fixtures.py -> STAGE2_PROMOTION_REVIEW_FIXTURES_OK
-WP37 Codespaces verification: python tools/validate_stage2_promotion_review_checklist.py -> STAGE2_PROMOTION_REVIEW_CHECKLIST_OK
-WP37 Codespaces verification: python tools/validate_stage2_promotion_review_schema.py -> STAGE2_PROMOTION_REVIEW_SCHEMA_OK
-WP37 Codespaces verification: python tools/validate_stage2_promotion_bridge_design.py -> STAGE2_PROMOTION_BRIDGE_DESIGN_OK
-WP37 Codespaces verification: macro thesis leakage validator -> passed on 260616 baseline
-WP37 Codespaces verification: macro thesis bilingual aliases validator -> MACRO_THESIS_BILINGUAL_ALIASES_OK
-WP37 Codespaces verification: macro report surface validator -> ETF_MACRO_REPORT_SURFACE_OK
-WP37 Codespaces verification: git diff --check -> clean
+tools/build_stage2_promotion_review_decision_sample.py
+tools/validate_stage2_promotion_review_decision_sample_gate.py
+tests/test_stage2_promotion_review_decision_sample_gate.py
+.github/workflows/validate-stage2-promotion-review-decision-sample-gate.yml
 ```
 
 ## Immediate next action
 
-Consider the next roadmap package:
+Run the WP38 verification commands from `control/NEXT_ACTIONS.md`. If they pass, close WP38 and then consider:
 
 ```text
-WP38 — Stage-2 promotion review decision sample generation gate
+WP39 — Stage-2 promotion review decision dry-run artifact builder
 ```
