@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP42 are closed. Report Quality Patch 260617 and its Dutch localization bugfix are verified. Latest verified production baseline is `260617` with run_id `20260618_172254`.**
+**WP16 through WP42 are closed. Report Quality Patch 260617, its Dutch localization bugfix, and the PDF Surface Patch for Decision cockpit / Besliscockpit visibility are closed. Latest verified production baseline recorded in control remains `260617` with run_id `20260618_172254`; latest client-surface PDF visibility QA evidence is `260618_03`.**
 
 ## Latest verified production baseline recorded in control
 
@@ -60,6 +60,7 @@ WP41: closed as decision non-production fixture gate verified, validation-only
 WP42: closed as explicit control-layer package design verified, design-only
 Report Quality Patch 260617: closed as client-facing report-quality patch verified
 Report Quality Patch 260617 post-close Dutch localization bugfix: closed as workflow-validated
+PDF Surface Patch — Decision cockpit visible in final PDF/HTML: closed as client-surface verified
 ```
 
 ## In-progress / pending verification
@@ -93,6 +94,18 @@ English report: output/weekly_analysis_pro_260617_03.md
 Dutch report: output/weekly_analysis_pro_nl_260617_03.md
 ```
 
+## PDF Surface Patch evidence
+
+```text
+English 260618_03 PDF visibly shows "Decision cockpit" near the top, directly under Portfolio Action Snapshot.
+Dutch 260618_03 PDF visibly shows "Besliscockpit" near the top, directly under Portefeuille-acties.
+Main takeaway remains aligned between English and Dutch.
+Weight-basis note remains visible near the final action table.
+Hold-with-override explanation remains visible near the final action table.
+Dutch forbidden term "thesisfit" is absent; Dutch uses "aansluiting op de thesis".
+Focused tests/checks referenced: pytest tests/test_delivery_html_decision_cockpit.py tests/test_pdf_surface_decision_cockpit.py tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py; python tools/validate_etf_dutch_language_quality.py; python tools/validate_etf_delivery_html_contract.py; python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output; git diff --check.
+```
+
 ## Immediate next action
 
-Inspect the generated 260617_03 PDF/HTML client surface and confirm that the Decision cockpit, bilingual main takeaway parity, weight-basis note, and softened action wording are visible and useful. Do not claim inbox receipt; delivery evidence remains delivery-layer only.
+No active package. No new Stage-2 package. Continue only with normal report QA or roadmap consolidation if a concrete client-facing issue is identified. Do not claim inbox receipt; delivery evidence remains delivery-layer only unless a separate inbox receipt exists.
