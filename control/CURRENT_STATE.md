@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP42 are closed. Report Quality Patch 260617 has been implemented and is pending external verification. Latest reviewed fresh report baseline is `260617`; latest recorded verified production baseline in control remains `260616` with run_id `20260616_211726`.**
+**WP16 through WP42 are closed. Report Quality Patch 260617 is verified and closed. Latest reviewed fresh report baseline is `260617`; latest recorded verified production baseline in control remains `260616` with run_id `20260616_211726`.**
 
 ## Latest verified production baseline recorded in control
 
@@ -57,12 +57,13 @@ WP39: closed as decision dry-run builder verified, validation-only
 WP40: closed as explicit decision artifact design review verified, design-review only
 WP41: closed as decision non-production fixture gate verified, validation-only
 WP42: closed as explicit control-layer package design verified, design-only
+Report Quality Patch 260617: closed as client-facing report-quality patch verified
 ```
 
 ## In-progress / pending verification
 
 ```text
-Report Quality Patch 260617: implemented; pending external verification
+None
 ```
 
 ## Evidence
@@ -74,8 +75,15 @@ runtime/rotation_render_tables.py
 tests/test_report_decision_clarity.py
 tests/test_report_weight_basis_labels.py
 tests/test_report_bilingual_takeaway_parity.py
+Report Quality Patch 260617 Codespaces verification: pytest tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py -> 10 passed
+Report Quality Patch 260617 Codespaces verification: python tools/validate_macro_report_surface.py -> ETF_MACRO_REPORT_SURFACE_OK
+Report Quality Patch 260617 Codespaces verification: python tools/validate_macro_thesis_bilingual_aliases.py -> MACRO_THESIS_BILINGUAL_ALIASES_OK
+Report Quality Patch 260617 Codespaces verification: python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output -> ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK on 260617 EN/NL markdown, clean markdown and delivery HTML files
+Report Quality Patch 260617 Codespaces verification: python tools/validate_etf_delivery_html_contract.py -> ETF_DELIVERY_HTML_CONTRACT_OK for weekly_analysis_pro_260617.md and weekly_analysis_pro_nl_260617.md
+Report Quality Patch 260617 Codespaces verification: python tools/validate_etf_dutch_language_quality.py -> ETF_DUTCH_LANGUAGE_QUALITY_OK
+Report Quality Patch 260617 Codespaces verification: git diff --check -> clean
 ```
 
 ## Immediate next action
 
-Run the Report Quality Patch 260617 verification commands from `control/NEXT_ACTIONS.md`. If they pass, regenerate or inspect a fresh report and perform client-grade QA.
+Generate or inspect the next fresh report output and perform a client-grade QA pass focused on whether the Decision cockpit, bilingual main takeaway parity, weight-basis note, and softened action wording are visible and useful in the final PDF/HTML surface.
