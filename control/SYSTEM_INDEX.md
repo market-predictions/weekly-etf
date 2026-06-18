@@ -39,6 +39,8 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `control/ETF_PRICING_LINEAGE_CONTRACT_V1.md` — authoritative design contract for the pricing-lineage hardening cycle, including immutable audit identity, state persistence, exact close-date semantics, provider lineage, independent verification, and challenger pricing tiers.
 - `control/ETF_PRICING_LINEAGE_CHANGELOG.md` — central pricing-lineage changelog for regression review and implementation tracking.
 - `docs/roadmaps/WEEKLY_ETF_MACRO_THESIS_ROADMAP_20260531.md` — approved phased roadmap for macro/thesis modernization. It is a roadmap, not immediate production authority.
+- `docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_20260618.md` — approved roadmap for the forked cockpit-first product-surface preview lane. It keeps the current production report intact and develops cockpit artifacts separately.
+- `control/work_packages/WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_20260618.md` — first work package for the isolated cockpit preview renderer. It is preview-only and must not mutate portfolio state, pricing, scoring, execution, or delivery behavior.
 - `MACRO_METHODOLOGY.md` — methodology and compliance boundary for macro/regime/thesis content before client-surface promotion.
 - `control/MACRO_REPORT_SURFACE_STATUS.md` — current implementation/validation status for the client-safe macro report surface.
 
@@ -72,12 +74,14 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `runtime/polish_runtime_reports.py` — post-render editorial polish layer, including the shared macro report surface.
 - `runtime/link_runtime_report_tickers.py` — context-aware ticker linkification layer.
 - `runtime/delivery_html_overrides.py` — delivery-layer HTML overrides for branded sections that require strict layout/clickable behavior.
+- `runtime/render_cockpit_front_page.py` — planned preview-only cockpit-first front-page renderer. It must write only to `output/cockpit_preview/` until explicitly promoted.
 - `tools/validate_etf_delivery_html_contract.py` — dynamic render-regression validator for delivery HTML.
 - `send_report.py` — base HTML/PDF/email delivery logic and manifest handling.
 - `send_report_runtime_html.py` — delivery entrypoint that applies runtime-state HTML overrides before PDF/email output.
 - `etf-pro.txt` — premium English editorial delivery layer.
 - `etf-pro-nl.txt` — Dutch companion delivery layer derived from the completed English report.
 - `.github/workflows/send-weekly-report.yml` — production send workflow.
+- `.github/workflows/render-cockpit-preview.yml` — planned manual-only preview workflow for cockpit artifacts. It must not send email or mutate portfolio state.
 - `.github/workflows/validate-macro-compliance.yml` — isolated macro compliance validation workflow with safe and planted-failure fixtures.
 - `.github/workflows/validate-macro-report-output.yml` — isolated read-only macro report-output validation workflow for committed report artifacts and macro pack surface checks.
 - `.github/workflows/validate-thesis-candidates-shadow.yml` — isolated Stage-1 thesis candidate validation workflow. Not part of production report delivery.
@@ -96,6 +100,7 @@ For handover-heavy sessions or when resuming after a pause, also read:
 - `output/market_history/etf_relative_strength.json` — historical market-strength metrics used by discovery scoring when available.
 - `output/lane_reviews/` — machine-readable lane assessment artifacts created by the lane discovery engine.
 - `output/runtime/` — normalized runtime state artifacts.
+- `output/cockpit_preview/` — planned preview-only output directory for cockpit-first HTML/PDF artifacts. It is not production delivery authority until explicitly promoted.
 - `output/macro/macro_data_audit_<reference_date>_<run_id>.json` — run-scoped shadow-mode macro audit artifact.
 - `output/macro/latest_macro_data_audit_path.txt` — pointer to the latest macro audit artifact.
 - `output/macro/latest.json` — current schema-versioned macro policy pack consumed by lane discovery and the client-safe macro report surface.
@@ -134,6 +139,8 @@ Lab outputs are never production truth unless explicitly promoted through a revi
 - Do not let Phase 2 macro audit values change regime, confidence, lane scoring, fundability, or client-facing wording until later regime/compliance/bilingual gates explicitly promote them.
 - Do not allow predictive macro/regime/thesis wording, uncited overlay claims, orphan macro figures, Stage-1 candidate leakage, or shadow/internal labels onto the client surface.
 - Do not treat Stage-1 thesis candidates as fundable, reportable, or portfolio-action authority.
+- Do not let cockpit-first preview work replace, mutate, or silently promote the production report. Cockpit artifacts remain preview-only until an explicit promotion decision is recorded.
+- Do not include UCITS mapping, broker availability, PRIIPs/KID handling, or EU investability scoring in the US cockpit-surface roadmap; those belong to the parallel ETF EU track.
 
 ## Current direction of travel
 
@@ -153,4 +160,5 @@ ETF is moving toward:
 - client-safe macro/geopolitical/regime report surface backed by compliance/leakage validators
 - methodology and compliance gates before broader macro/thesis expansion
 - Stage-1 thesis candidates as internal-only shadow artifacts before Stage-2 confirmation and fundable integration
+- forked cockpit-first product-surface preview lane that preserves the current production report while testing a premium front-page surface
 - lab-only optimization as a QA/research surface, not a production allocator
