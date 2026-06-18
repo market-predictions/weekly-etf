@@ -31,3 +31,18 @@ def test_injects_dutch_besliscockpit_into_delivery_html() -> None:
     assert "Deze week: geen portefeuilleactie." in result
     assert "thesisfit" not in result
     assert result.index("Besliscockpit") < result.index("action-table")
+
+
+def test_wrapper_injects_decision_cockpit_before_return(monkeypatch) -> None:
+    def fake_build_html(md_text: str, report_date_str: str, image_src=None, render_mode="email") -> str:
+        return "<html><body><table class='action-table'><tr><td>Action</td></tr></table></body></html>"
+
+    monkeypatch.setattr(runtime_html, "sanitize_client_facing_html", lambda html, md_text, language: html)
+    monkeypatch.setattr(runtime_html, "build_runtime_state", lambda: {})
+    monkeypatch.setattr(runtime_html, "sanitize_over_cap_add_html", lambda html, state, language: html)
+
+    wrapped = runtime_html._with_client_facing_sanitizer(fake_build_html)
+    result = wrapped("## 2A. Decision cockpit\n\n- This week: no portfolio action.", "2026-06-18")
+
+    assert "Decision cockpit" in result
+    assert result.index("Decision cockpit") < result.index("action-table")

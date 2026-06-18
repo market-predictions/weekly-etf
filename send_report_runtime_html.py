@@ -113,7 +113,6 @@ def _decision_cockpit_html_from_markdown(md_text: str) -> str:
 
 def _inject_decision_cockpit_html(html: str, md_text: str) -> str:
     if "Decision cockpit" in html or "Besliscockpit" in html:
-        html = _inject_decision_cockpit_html(html, md_text)
         return html
     if "## 2A. Decision cockpit" not in md_text and "## 2A. Besliscockpit" not in md_text:
         return html
@@ -149,6 +148,7 @@ def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..
             html = sanitize_over_cap_add_html(html, state, language=language)
         except Exception:
             pass
+        html = _inject_decision_cockpit_html(html, md_text)
         if language == "nl" and render_mode.startswith("pdf"):
             points = report_module.parse_section7_equity_points_generic(md_text)
             html = replace_pdf_equity_png_with_svg(html, points, language=language)
