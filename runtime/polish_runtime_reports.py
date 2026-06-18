@@ -42,7 +42,7 @@ DECISION_COCKPIT_NL = """### Besliscockpit
 - **Deze week:** geen portefeuilleactie.
 - **Belangrijkste actieve risico:** SMH-concentratie blijft boven de zachte positielimiet.
 - **Belangrijkste actieve reviews:** SPY versus SMH-overlap, PAVE versus GRID, en validatie van de GSG-hedgerol.
-- **Trigger voor volgende actie:** een vervangingskandidaat moet bevestigde relatieve-sterktevoorsprong, schone prijsbasis, thesisfit en duidelijke financieringsbron tonen.
+- **Trigger voor volgende actie:** een vervangingskandidaat moet bevestigde relatieve-sterktevoorsprong, schone prijsbasis, aansluiting op de thesis en duidelijke financieringsbron tonen.
 - **Vers kapitaal:** geblokkeerd voor posities onder grootte- of vervangingsreview totdat een toekomstige run de disciplinepoorten vrijgeeft.
 """
 WEIGHT_BASIS_NOTE_EN = (
