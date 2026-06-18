@@ -54,9 +54,10 @@ Cockpit-first surface roadmap anchor: recorded
 
 ## Active package
 
-WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER: in_progress
+WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER: implemented on branch / validation pending
 branch: feature/cockpit-front-page-v1
 scope: preview renderer only
+handover: control/handovers/HANDOVER_COCKPIT_SURFACE_01_PREVIEW_RENDERER_20260618_2238.md
 
 ## Latest PDF Surface Patch evidence
 
@@ -118,4 +119,23 @@ US ETF report only. ETF EU / UCITS mapping is parked for the parallel ETF EU tra
 
 ## Recommended next action
 
-Continue WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER on feature/cockpit-front-page-v1. Build only the preview renderer and output path. Do not change the production send path or the current report artifacts.
+Run local validation for WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER on feature/cockpit-front-page-v1 before opening a pull request.
+
+Required validation:
+
+```bash
+python -m py_compile runtime/render_cockpit_front_page.py
+pytest tests/test_cockpit_front_page_preview.py tests/test_delivery_html_decision_cockpit.py tests/test_pdf_surface_decision_cockpit.py tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py
+python tools/validate_etf_delivery_html_contract.py --output-dir output
+python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+git diff --check
+```
+
+Optional smoke test:
+
+```bash
+python -m runtime.render_cockpit_front_page --output-dir output --html-only
+ls -la output/cockpit_preview/
+```
+
+Do not promote the cockpit into the production report in this package.
