@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP42 are closed. Report Quality Patch 260617 is verified and closed. Latest reviewed fresh report baseline is `260617`; latest recorded verified production baseline in control remains `260616` with run_id `20260616_211726`.**
+**WP16 through WP42 are closed. Report Quality Patch 260617 is closed, with a post-close Dutch localization bugfix implemented and pending verification. Latest reviewed fresh report baseline is `260617`; latest recorded verified production baseline in control remains `260616` with run_id `20260616_211726`.**
 
 ## Latest verified production baseline recorded in control
 
@@ -63,7 +63,7 @@ Report Quality Patch 260617: closed as client-facing report-quality patch verifi
 ## In-progress / pending verification
 
 ```text
-None
+Report Quality Patch 260617 post-close Dutch localization bugfix: implemented; pending verification
 ```
 
 ## Evidence
@@ -82,8 +82,10 @@ Report Quality Patch 260617 Codespaces verification: python tools/validate_etf_m
 Report Quality Patch 260617 Codespaces verification: python tools/validate_etf_delivery_html_contract.py -> ETF_DELIVERY_HTML_CONTRACT_OK for weekly_analysis_pro_260617.md and weekly_analysis_pro_nl_260617.md
 Report Quality Patch 260617 Codespaces verification: python tools/validate_etf_dutch_language_quality.py -> ETF_DUTCH_LANGUAGE_QUALITY_OK
 Report Quality Patch 260617 Codespaces verification: git diff --check -> clean
+Workflow #256 failure root cause: Dutch localization blocked cockpit term `thesisfit` before write.
+Bugfix: replaced `thesisfit` with `aansluiting op de thesis` and added a regression assertion.
 ```
 
 ## Immediate next action
 
-Generate or inspect the next fresh report output and perform a client-grade QA pass focused on whether the Decision cockpit, bilingual main takeaway parity, weight-basis note, and softened action wording are visible and useful in the final PDF/HTML surface.
+Rerun the focused report-quality tests and the send workflow. If workflow #256 or a rerun succeeds, verify the final PDF/HTML surface and delivery/run manifests without claiming inbox receipt unless evidence exists.
