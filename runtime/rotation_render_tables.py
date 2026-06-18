@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 WEIGHT_BASIS_NOTE_EN = (
     "Weight basis note: action-table weights are model/action weights; current-holdings weights are live "
     "market-value weights including cash. Small differences can occur when cash, rounding or override handling is included."
@@ -42,6 +41,11 @@ def _short(value: Any, fallback: str = "", max_len: int = 180) -> str:
     return raw if len(raw) <= max_len else raw[: max_len - 1].rstrip() + "…"
 
 
+def _join(values: list[str], fallback: str = "None") -> str:
+    cleaned = [v for v in values if v and v != "NONE"]
+    return ", ".join(cleaned) if cleaned else fallback
+
+
 def has_rotation_plan(state: dict[str, Any]) -> bool:
     return bool(state.get("rotation_decisions") or state.get("trade_intents") or (state.get("rotation_plan") or {}).get("rotation_decisions"))
 
@@ -72,6 +76,33 @@ def _trade_intents(state: dict[str, Any]) -> list[dict[str, Any]]:
 
 def _decision_by_ticker(state: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {_ticker(row.get("ticker")): row for row in _decisions(state) if _ticker(row.get("ticker"))}
+
+
+def _rotation_bucket_summary(state: dict[str, Any]) -> dict[str, list[str]]:
+    buckets = {"add": [], "hold": [], "override": [], "replace": [], "reduce": [], "close": []}
+    for row in _decisions(state):
+        ticker = _ticker(row.get("ticker"))
+        action = _text(row.get("action_code"))
+        destination = _ticker(row.get("destination_ticker"))
+        if not ticker:
+            continue
+        if action == "close":
+            buckets["close"].append(ticker)
+        elif action == "reduce":
+            buckets["reduce"].append(ticker)
+        elif action in {"replace_partial", "replace_full"}:
+            buckets["replace"].append(f"{ticker}->{destination}" if destination else ticker)
+        elif action == "hold_with_override":
+            buckets["override"].append(ticker)
+        elif action == "add_from_cash":
+            buckets["add"].append(ticker)
+        else:
+            buckets["hold"].append(ticker)
+    for trade in _trade_intents(state):
+        destination = _ticker(trade.get("destination_ticker"))
+        if destination and destination not in buckets["add"]:
+            buckets["add"].append(destination)
+    return buckets
 
 
 REASON_TEXT = {
@@ -188,6 +219,24 @@ def action_label_nl(action_code: Any) -> str:
         "add_from_cash": "Toevoegen vanuit cash",
     }
     return mapping.get(_text(action_code), _text(action_code, "Aanhouden"))
+
+
+def rotation_plan_summary_from_rotation(state: dict[str, Any]) -> str:
+    c = _rotation_bucket_summary(state)
+    return "\n".join([
+        "| Close | Reduce | Hold | Hold with override | Add / destination | Replace |",
+        "|---|---|---|---|---|---|",
+        f"| {_join(c['close'])} | {_join(c['reduce'])} | {_join(c['hold'])} | {_join(c['override'])} | {_join(c['add'])} | {_join(c['replace'])} |",
+    ])
+
+
+def rotation_plan_summary_from_rotation_nl(state: dict[str, Any]) -> str:
+    c = _rotation_bucket_summary(state)
+    return "\n".join([
+        "| Sluiten | Verlagen | Aanhouden | Aanhouden met override | Toevoegen / bestemming | Vervangen |",
+        "|---|---|---|---|---|---|",
+        f"| {_join(c['close'], 'Geen')} | {_join(c['reduce'], 'Geen')} | {_join(c['hold'], 'Geen')} | {_join(c['override'], 'Geen')} | {_join(c['add'], 'Geen')} | {_join(c['replace'], 'Geen')} |",
+    ])
 
 
 def final_action_table_from_rotation(state: dict[str, Any], etf_names: dict[str, str]) -> str:
