@@ -54,7 +54,9 @@ Cockpit-first surface roadmap anchor: recorded
 
 ## Active package
 
-WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER: not_started / claim required before implementation
+WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER: in_progress
+branch: feature/cockpit-front-page-v1
+scope: preview renderer only
 
 ## Latest PDF Surface Patch evidence
 
@@ -116,14 +118,4 @@ US ETF report only. ETF EU / UCITS mapping is parked for the parallel ETF EU tra
 
 ## Recommended next action
 
-Start `WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER` on an isolated branch only after claim confirmation.
-
-Recommended branch:
-
-```text
-feature/cockpit-front-page-v1
-```
-
-The first package should create the preview-only renderer and output path. It must not change production send behavior, portfolio state, pricing, scoring, fundability, trade ledger, valuation history, delivery behavior, or current report artifacts.
-
-Do not claim inbox receipt unless separate inbox-receipt evidence exists.
+Continue WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER on feature/cockpit-front-page-v1. Build only the preview renderer and output path. Do not change the production send path or the current report artifacts.
