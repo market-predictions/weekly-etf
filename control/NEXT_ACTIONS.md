@@ -2,18 +2,22 @@
 
 ## Current production baseline recorded in control
 
-baseline: 260616
-run_id: 20260616_211726
-requested_close_date: 2026-06-16
+baseline: 260617
+run_id: 20260618_172254
+requested_close_date: 2026-06-17
 workflow_status: workflow_success
 workflow_conclusion: success
+pricing_lineage_status: passed
+delivery_status: smtp_sendmail_returned_no_exception
 
 Delivery evidence remains delivery-layer evidence only and is not an inbox receipt.
 
 ## Fresh report review baseline
 
 baseline: 260617
-examples: weekly_analysis_pro_260617.pdf and weekly_analysis_pro_nl_260617.pdf
+reports: weekly_analysis_pro_260617_03.md and weekly_analysis_pro_nl_260617_03.md
+run_manifest: output/run_manifests/weekly_etf_run_manifest_2026-06-17_20260618_172254.json
+delivery_manifest: output/delivery/weekly_etf_delivery_manifest_2026-06-17_20260618_172254.json
 
 ## Closed packages
 
@@ -45,10 +49,11 @@ WP40: closed as explicit decision artifact design review verified, design-review
 WP41: closed as decision non-production fixture gate verified, validation-only
 WP42: closed as explicit control-layer package design verified, design-only
 Report Quality Patch 260617: closed as client-facing report-quality patch verified
+Report Quality Patch 260617 post-close Dutch localization bugfix: closed as workflow-validated
 
 ## Active package
 
-Report Quality Patch 260617 post-close Dutch localization bugfix: implemented; pending verification
+None
 
 ## Latest Report Quality Patch 260617 evidence
 
@@ -59,27 +64,22 @@ python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output ->
 python tools/validate_etf_delivery_html_contract.py -> ETF_DELIVERY_HTML_CONTRACT_OK for weekly_analysis_pro_260617.md and weekly_analysis_pro_nl_260617.md
 python tools/validate_etf_dutch_language_quality.py -> ETF_DUTCH_LANGUAGE_QUALITY_OK
 git diff --check -> clean
-
-## Latest bugfix
-
-Workflow #256 failed during Dutch localization before write because the new Dutch cockpit used the blocked term `thesisfit`.
-
-Bugfix implemented:
-
-- Replaced `thesisfit` with `aansluiting op de thesis`.
-- Added a regression assertion that the Dutch cockpit no longer contains `thesisfit`.
+workflow #257 -> Send weekly ETF Pro report succeeded on main
+run manifest -> output/run_manifests/weekly_etf_run_manifest_2026-06-17_20260618_172254.json
+delivery manifest -> output/delivery/weekly_etf_delivery_manifest_2026-06-17_20260618_172254.json
 
 ## Recommended next action
 
-Pull latest main and rerun the focused report-quality tests, then rerun the failed send workflow job or start a fresh send workflow run.
+Inspect the generated 260617_03 PDF/HTML client surface.
 
-```bash
-git pull --ff-only origin main
-pytest tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py
-python tools/validate_etf_dutch_language_quality.py
-git diff --check
-```
+The QA should verify only the client-facing surface:
 
-If the focused checks pass, rerun workflow #256 or run Send weekly ETF Pro report again.
+1. Decision cockpit appears near the top in English and Dutch.
+2. Main takeaway has equivalent meaning in English and Dutch.
+3. Weight-basis note appears near the final action table.
+4. Hold-with-override explanation is understandable.
+5. Harsh role wording is absent.
+6. Delivery status wording remains evidence-bound.
 
+Do not claim inbox receipt unless separate inbox-receipt evidence exists.
 Do not create another Stage-2 package unless a roadmap consolidation review identifies a concrete need.
