@@ -5,6 +5,8 @@ import os
 import re
 from pathlib import Path
 
+from runtime.polish_runtime_reports import DECISION_COCKPIT_EN, DECISION_COCKPIT_NL
+
 EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
 
@@ -73,6 +75,47 @@ def linkify_segment(segment: str) -> str:
     return "".join(chunk if protected else _linkify_plain_chunk(chunk) for chunk, protected in _split_protected_spans(segment))
 
 
+
+def _is_dutch_report(text: str) -> bool:
+    lower = text.lower()
+    markers = [
+        "# wekelijkse etf-review",
+        "## 1. kernsamenvatting",
+        "## 2. portefeuille-acties",
+    ]
+    return sum(marker in lower for marker in markers) >= 2
+
+
+def _remove_inline_decision_cockpit(text: str, marker: str, next_heading: str) -> str:
+    start = text.find(marker)
+    if start == -1:
+        return text
+    end = text.find("\n\n" + next_heading, start)
+    if end == -1:
+        end = text.find(next_heading, start)
+    if end == -1:
+        return text
+    return text[:start].rstrip() + "\n\n" + text[end:].lstrip()
+
+
+def ensure_visible_decision_cockpit(text: str) -> str:
+    if "## 2A. Decision cockpit" in text or "## 2A. Besliscockpit" in text:
+        return text
+
+    if _is_dutch_report(text):
+        text = _remove_inline_decision_cockpit(text, "### Besliscockpit", "## 2. Portefeuille-acties")
+        cockpit = DECISION_COCKPIT_NL.strip().replace("### Besliscockpit", "## 2A. Besliscockpit", 1)
+        insertion_heading = "## 3. Regime-dashboard"
+    else:
+        text = _remove_inline_decision_cockpit(text, "### Decision cockpit", "## 2. Portfolio Action Snapshot")
+        cockpit = DECISION_COCKPIT_EN.strip().replace("### Decision cockpit", "## 2A. Decision cockpit", 1)
+        insertion_heading = "## 3. Regime Dashboard"
+
+    if insertion_heading in text:
+        return text.replace(insertion_heading, cockpit + "\n\n" + insertion_heading, 1)
+
+    return cockpit + "\n\n" + text
+
 def _is_executive_summary_heading(line: str) -> bool:
     stripped = line.strip().lower()
     return stripped.startswith("## 1.") and (
@@ -93,6 +136,7 @@ def linkify_report(text: str) -> str:
     cards should keep a calm boardroom look and therefore must not carry ticker
     hyperlinks.
     """
+    text = ensure_visible_decision_cockpit(text)
     out: list[str] = []
     in_fenced_code = False
     in_executive_summary = False
