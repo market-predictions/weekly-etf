@@ -26,6 +26,8 @@ def test_dutch_polish_adds_besliscockpit() -> None:
     assert "Deze week:** geen portefeuilleactie" in result
     assert "SMH-concentratie blijft boven de zachte positielimiet" in result
     assert "Trigger voor volgende actie" in result
+    assert "aansluiting op de thesis" in result
+    assert "thesisfit" not in result
 
 
 def test_client_surface_cleanup_removes_harsh_role_language() -> None:
