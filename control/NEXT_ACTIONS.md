@@ -48,7 +48,7 @@ Report Quality Patch 260617: closed as client-facing report-quality patch verifi
 
 ## Active package
 
-None
+Report Quality Patch 260617 post-close Dutch localization bugfix: implemented; pending verification
 
 ## Latest Report Quality Patch 260617 evidence
 
@@ -60,17 +60,26 @@ python tools/validate_etf_delivery_html_contract.py -> ETF_DELIVERY_HTML_CONTRAC
 python tools/validate_etf_dutch_language_quality.py -> ETF_DUTCH_LANGUAGE_QUALITY_OK
 git diff --check -> clean
 
+## Latest bugfix
+
+Workflow #256 failed during Dutch localization before write because the new Dutch cockpit used the blocked term `thesisfit`.
+
+Bugfix implemented:
+
+- Replaced `thesisfit` with `aansluiting op de thesis`.
+- Added a regression assertion that the Dutch cockpit no longer contains `thesisfit`.
+
 ## Recommended next action
 
-Generate or inspect the next fresh report output and perform a client-grade QA pass.
+Pull latest main and rerun the focused report-quality tests, then rerun the failed send workflow job or start a fresh send workflow run.
 
-The QA should verify only the client-facing surface:
+```bash
+git pull --ff-only origin main
+pytest tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py
+python tools/validate_etf_dutch_language_quality.py
+git diff --check
+```
 
-1. Decision cockpit appears near the top in English and Dutch.
-2. Main takeaway has equivalent meaning in English and Dutch.
-3. Weight-basis note appears near the final action table.
-4. Hold-with-override explanation is understandable.
-5. Harsh role wording is absent.
-6. Delivery status wording remains evidence-bound.
+If the focused checks pass, rerun workflow #256 or run Send weekly ETF Pro report again.
 
 Do not create another Stage-2 package unless a roadmap consolidation review identifies a concrete need.
