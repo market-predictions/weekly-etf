@@ -85,6 +85,60 @@ def _extend_native_dutch_numeric_aliases() -> None:
     _add_aliases(report_module.SECTION7_HEADER_ALIASES, "comment", ["toelichting"])
 
 
+
+def _decision_cockpit_html_from_markdown(md_text: str) -> str:
+    is_nl = "## 2A. Besliscockpit" in md_text
+    if is_nl:
+        title = "Besliscockpit"
+        items = [
+            "Deze week: geen portefeuilleactie.",
+            "Belangrijkste actieve risico: SMH-concentratie blijft boven de zachte positielimiet.",
+            "Belangrijkste actieve reviews: SPY versus SMH-overlap, PAVE versus GRID, en validatie van de GSG-hedgerol.",
+            "Trigger voor volgende actie: een vervangingskandidaat moet bevestigde relatieve-sterktevoorsprong, schone prijsbasis, aansluiting op de thesis en duidelijke financieringsbron tonen.",
+            "Vers kapitaal: geblokkeerd voor posities onder grootte- of vervangingsreview totdat een toekomstige run de disciplinepoorten vrijgeeft.",
+        ]
+    else:
+        title = "Decision cockpit"
+        items = [
+            "This week: no portfolio action.",
+            "Main active risk: SMH concentration remains above the soft position cap.",
+            "Main active reviews: SPY versus SMH overlap, PAVE versus GRID, and GSG hedge-role validation.",
+            "Next action trigger: a replacement candidate must show confirmed relative-strength edge, clean pricing basis, thesis fit, and a clear funding source.",
+            "Fresh capital: blocked for positions under size or replacement review unless a future run clears the discipline gates.",
+        ]
+
+    body = "".join(f"<li>{item}</li>" for item in items)
+    return f"<div class='note-box decision-cockpit'><h4>{title}</h4><ul>{body}</ul></div>"
+
+
+def _inject_decision_cockpit_html(html: str, md_text: str) -> str:
+    if "Decision cockpit" in html or "Besliscockpit" in html:
+        html = _inject_decision_cockpit_html(html, md_text)
+        return html
+    if "## 2A. Decision cockpit" not in md_text and "## 2A. Besliscockpit" not in md_text:
+        return html
+
+    cockpit = _decision_cockpit_html_from_markdown(md_text)
+
+    markers = [
+        "<table class='action-table'>",
+        '<table class="action-table">',
+        "<h4>Primary regime</h4>",
+        "<h4>Primair regime</h4>",
+        "PRIMARY REGIME",
+        "PRIMAIR REGIME",
+    ]
+
+    for marker in markers:
+        if marker in html:
+            return html.replace(marker, cockpit + marker, 1)
+
+    body_close = html.find("</body>")
+    if body_close != -1:
+        return html[:body_close] + cockpit + html[body_close:]
+
+    return html + cockpit
+
 def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..., str]:
     def _wrapped(md_text: str, report_date_str: str, image_src: str | None = None, render_mode: str = "email") -> str:
         language = "nl" if looks_dutch_markdown(md_text) else "en"
