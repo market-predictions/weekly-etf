@@ -12,17 +12,18 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP42 are closed. Report Quality Patch 260617 is closed, with a post-close Dutch localization bugfix implemented and pending verification. Latest reviewed fresh report baseline is `260617`; latest recorded verified production baseline in control remains `260616` with run_id `20260616_211726`.**
+**WP16 through WP42 are closed. Report Quality Patch 260617 and its Dutch localization bugfix are verified. Latest verified production baseline is `260617` with run_id `20260618_172254`.**
 
 ## Latest verified production baseline recorded in control
 
 ```text
-requested_close_date: 2026-06-16
-run_id: 20260616_211726
-report_token: 260616
+requested_close_date: 2026-06-17
+run_id: 20260618_172254
+report_token: 260617
 pricing_lineage_status: passed
 workflow_status: workflow_success
 workflow_conclusion: success
+delivery_status: smtp_sendmail_returned_no_exception
 ```
 
 Delivery evidence remains delivery-layer evidence only. It is not an end-recipient inbox receipt.
@@ -58,12 +59,13 @@ WP40: closed as explicit decision artifact design review verified, design-review
 WP41: closed as decision non-production fixture gate verified, validation-only
 WP42: closed as explicit control-layer package design verified, design-only
 Report Quality Patch 260617: closed as client-facing report-quality patch verified
+Report Quality Patch 260617 post-close Dutch localization bugfix: closed as workflow-validated
 ```
 
 ## In-progress / pending verification
 
 ```text
-Report Quality Patch 260617 post-close Dutch localization bugfix: implemented; pending verification
+None
 ```
 
 ## Evidence
@@ -84,8 +86,13 @@ Report Quality Patch 260617 Codespaces verification: python tools/validate_etf_d
 Report Quality Patch 260617 Codespaces verification: git diff --check -> clean
 Workflow #256 failure root cause: Dutch localization blocked cockpit term `thesisfit` before write.
 Bugfix: replaced `thesisfit` with `aansluiting op de thesis` and added a regression assertion.
+Workflow #257: Send weekly ETF Pro report succeeded on main after the Dutch localization bugfix.
+Run manifest: output/run_manifests/weekly_etf_run_manifest_2026-06-17_20260618_172254.json
+Delivery manifest: output/delivery/weekly_etf_delivery_manifest_2026-06-17_20260618_172254.json
+English report: output/weekly_analysis_pro_260617_03.md
+Dutch report: output/weekly_analysis_pro_nl_260617_03.md
 ```
 
 ## Immediate next action
 
-Rerun the focused report-quality tests and the send workflow. If workflow #256 or a rerun succeeds, verify the final PDF/HTML surface and delivery/run manifests without claiming inbox receipt unless evidence exists.
+Inspect the generated 260617_03 PDF/HTML client surface and confirm that the Decision cockpit, bilingual main takeaway parity, weight-basis note, and softened action wording are visible and useful. Do not claim inbox receipt; delivery evidence remains delivery-layer only.
