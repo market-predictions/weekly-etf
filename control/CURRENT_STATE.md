@@ -12,7 +12,7 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP42 are closed. Report Quality Patch 260617, its Dutch localization bugfix, and the PDF Surface Patch for Decision cockpit / Besliscockpit visibility are closed. Latest verified production baseline recorded in control remains `260617` with run_id `20260618_172254`; latest client-surface PDF visibility QA evidence is `260618_03`.**
+**WP16 through WP42 are closed. Report Quality Patch 260617, its Dutch localization bugfix, and the PDF Surface Patch for Decision cockpit / Besliscockpit visibility are closed. A new cockpit-first product-surface roadmap is recorded as a forked preview lane. Latest verified production baseline recorded in control remains `260617` with run_id `20260618_172254`; latest client-surface PDF visibility QA evidence is `260618_03`.**
 
 ## Latest verified production baseline recorded in control
 
@@ -61,12 +61,13 @@ WP42: closed as explicit control-layer package design verified, design-only
 Report Quality Patch 260617: closed as client-facing report-quality patch verified
 Report Quality Patch 260617 post-close Dutch localization bugfix: closed as workflow-validated
 PDF Surface Patch — Decision cockpit visible in final PDF/HTML: closed as client-surface verified
+Cockpit-first surface roadmap anchor: recorded
 ```
 
 ## In-progress / pending verification
 
 ```text
-None
+WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER: not_started
 ```
 
 ## Evidence
@@ -106,6 +107,18 @@ Dutch forbidden term "thesisfit" is absent; Dutch uses "aansluiting op de thesis
 Focused tests/checks referenced: pytest tests/test_delivery_html_decision_cockpit.py tests/test_pdf_surface_decision_cockpit.py tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py; python tools/validate_etf_dutch_language_quality.py; python tools/validate_etf_delivery_html_contract.py; python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output; git diff --check.
 ```
 
+## Cockpit-first surface roadmap status
+
+```text
+Roadmap: docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_20260618.md
+Initial work package: control/work_packages/WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_20260618.md
+Stable decision: current production report remains intact; cockpit-first surface development proceeds as a forked branch/preview lane.
+Production branch: main
+Planned preview branch: feature/cockpit-front-page-v1
+Preview output path: output/cockpit_preview/
+ETF EU / UCITS mapping: explicitly parked for the parallel ETF EU track.
+```
+
 ## Immediate next action
 
-No active package. No new Stage-2 package. Continue only with normal report QA or roadmap consolidation if a concrete client-facing issue is identified. Do not claim inbox receipt; delivery evidence remains delivery-layer only unless a separate inbox receipt exists.
+Start `WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER` only after claim confirmation. The package must create an isolated cockpit preview renderer and must not mutate portfolio state, pricing, scoring, trade ledger, valuation history, production delivery behavior, or the current report artifacts.
