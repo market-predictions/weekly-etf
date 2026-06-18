@@ -14,10 +14,9 @@ Delivery evidence remains delivery-layer evidence only and is not an inbox recei
 
 ## Fresh report review baseline
 
-baseline: 260617
-reports: weekly_analysis_pro_260617_03.md and weekly_analysis_pro_nl_260617_03.md
-run_manifest: output/run_manifests/weekly_etf_run_manifest_2026-06-17_20260618_172254.json
-delivery_manifest: output/delivery/weekly_etf_delivery_manifest_2026-06-17_20260618_172254.json
+baseline: 260618_03 client-surface PDF QA
+reports: weekly_analysis_pro_260618_03.pdf and weekly_analysis_pro_nl_260618_03.pdf
+client_surface_status: Decision cockpit / Besliscockpit visible in final PDF surface
 
 ## Closed packages
 
@@ -50,36 +49,35 @@ WP41: closed as decision non-production fixture gate verified, validation-only
 WP42: closed as explicit control-layer package design verified, design-only
 Report Quality Patch 260617: closed as client-facing report-quality patch verified
 Report Quality Patch 260617 post-close Dutch localization bugfix: closed as workflow-validated
+PDF Surface Patch — Decision cockpit visible in final PDF/HTML: closed as client-surface verified
 
 ## Active package
 
 None
 
-## Latest Report Quality Patch 260617 evidence
+## Latest PDF Surface Patch evidence
 
-pytest tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py -> 10 passed
-python tools/validate_macro_report_surface.py -> ETF_MACRO_REPORT_SURFACE_OK
-python tools/validate_macro_thesis_bilingual_aliases.py -> MACRO_THESIS_BILINGUAL_ALIASES_OK
-python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output -> ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK on 260617 EN/NL markdown, clean markdown and delivery HTML files
-python tools/validate_etf_delivery_html_contract.py -> ETF_DELIVERY_HTML_CONTRACT_OK for weekly_analysis_pro_260617.md and weekly_analysis_pro_nl_260617.md
-python tools/validate_etf_dutch_language_quality.py -> ETF_DUTCH_LANGUAGE_QUALITY_OK
-git diff --check -> clean
-workflow #257 -> Send weekly ETF Pro report succeeded on main
-run manifest -> output/run_manifests/weekly_etf_run_manifest_2026-06-17_20260618_172254.json
-delivery manifest -> output/delivery/weekly_etf_delivery_manifest_2026-06-17_20260618_172254.json
+The PDF Surface Patch is closed. Decision cockpit / Besliscockpit visibility is verified in the 260618_03 PDFs.
+
+- English 260618_03 PDF visibly shows "Decision cockpit" near the top, directly under Portfolio Action Snapshot.
+- Dutch 260618_03 PDF visibly shows "Besliscockpit" near the top, directly under Portefeuille-acties.
+- Main takeaway remains aligned between English and Dutch.
+- Weight-basis note remains visible near the final action table.
+- Hold-with-override explanation remains visible near the final action table.
+- Dutch forbidden term "thesisfit" is absent; Dutch uses "aansluiting op de thesis".
+
+Focused tests/checks referenced:
+
+```text
+pytest tests/test_delivery_html_decision_cockpit.py tests/test_pdf_surface_decision_cockpit.py tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py
+python tools/validate_etf_dutch_language_quality.py
+python tools/validate_etf_delivery_html_contract.py
+python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+git diff --check
+```
 
 ## Recommended next action
 
-Inspect the generated 260617_03 PDF/HTML client surface.
-
-The QA should verify only the client-facing surface:
-
-1. Decision cockpit appears near the top in English and Dutch.
-2. Main takeaway has equivalent meaning in English and Dutch.
-3. Weight-basis note appears near the final action table.
-4. Hold-with-override explanation is understandable.
-5. Harsh role wording is absent.
-6. Delivery status wording remains evidence-bound.
+No new Stage-2 package. Next work should be normal report QA / roadmap consolidation only if a concrete client-facing issue is identified.
 
 Do not claim inbox receipt unless separate inbox-receipt evidence exists.
-Do not create another Stage-2 package unless a roadmap consolidation review identifies a concrete need.
