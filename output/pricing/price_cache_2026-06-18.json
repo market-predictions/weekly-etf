@@ -1,5 +1,35 @@
 {
   "results": {
+    "alpha_vantage:DBC/BIL:2026-06-17": {
+      "adjusted_close": null,
+      "asset_role": "radar_alternative",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "No time series returned",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "research_grade",
+      "provider_exchange": null,
+      "provider_symbol": "DBC/BIL",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-17",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "alpha_vantage",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "DBC/BIL",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "alpha_vantage:GENERATED:2026-06-17": {
       "adjusted_close": null,
       "asset_role": "challenger",
@@ -175,6 +205,36 @@
       "source_detail": null,
       "status": "unresolved",
       "symbol": "WAS",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "fmp:DBC/BIL:2026-06-17": {
+      "adjusted_close": null,
+      "asset_role": "radar_alternative",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "No matching EOD result",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "research_grade",
+      "provider_exchange": null,
+      "provider_symbol": "DBC/BIL",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-17",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "fmp",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "DBC/BIL",
       "verification": {
         "source": null,
         "status": "not_checked"
@@ -492,6 +552,36 @@
         "status": "not_checked"
       }
     },
+    "twelve_data:DBC/BIL:2026-06-17": {
+      "adjusted_close": null,
+      "asset_role": "radar_alternative",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "HTTP Error 404: Not Found",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "research_grade",
+      "provider_exchange": null,
+      "provider_symbol": "DBC/BIL",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-17",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "twelve_data",
+      "source_detail": null,
+      "status": "unresolved",
+      "symbol": "DBC/BIL",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "twelve_data:DFEN:2026-06-17": {
       "adjusted_close": null,
       "asset_role": "holding",
@@ -553,6 +643,72 @@
       "source_detail": "time_series",
       "status": "fresh_exact_unverified",
       "symbol": "EFA",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "twelve_data:EPI:2026-06-17": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "high",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "is_final_eod_bar": true,
+      "metadata": {
+        "endpoint": "time_series",
+        "provider": "twelve_data"
+      },
+      "price": 42.58,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": "NYSE",
+      "provider_symbol": "EPI",
+      "provider_timestamp": null,
+      "provider_timezone": "provider_daily_bar",
+      "raw_close": 42.58,
+      "requested_close_date": "2026-06-17",
+      "returned_close_date": "2026-06-17",
+      "selected_close": 42.58,
+      "selected_close_type": "raw_close",
+      "source": "twelve_data",
+      "source_detail": "time_series",
+      "status": "fresh_exact_unverified",
+      "symbol": "EPI",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "twelve_data:FIW:2026-06-17": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "high",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "is_final_eod_bar": true,
+      "metadata": {
+        "endpoint": "time_series",
+        "provider": "twelve_data"
+      },
+      "price": 104.86,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": "NYSE",
+      "provider_symbol": "FIW",
+      "provider_timestamp": null,
+      "provider_timezone": "provider_daily_bar",
+      "raw_close": 104.86,
+      "requested_close_date": "2026-06-17",
+      "returned_close_date": "2026-06-17",
+      "selected_close": 104.86,
+      "selected_close_type": "raw_close",
+      "source": "twelve_data",
+      "source_detail": "time_series",
+      "status": "fresh_exact_unverified",
+      "symbol": "FIW",
       "verification": {
         "source": null,
         "status": "not_checked"
@@ -748,6 +904,39 @@
       "source_detail": "time_series",
       "status": "fresh_exact_unverified",
       "symbol": "IEFA",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "twelve_data:INDA:2026-06-17": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "high",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "is_final_eod_bar": true,
+      "metadata": {
+        "endpoint": "time_series",
+        "provider": "twelve_data"
+      },
+      "price": 49.060001,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": "CBOE",
+      "provider_symbol": "INDA",
+      "provider_timestamp": null,
+      "provider_timezone": "provider_daily_bar",
+      "raw_close": 49.060001,
+      "requested_close_date": "2026-06-17",
+      "returned_close_date": "2026-06-17",
+      "selected_close": 49.060001,
+      "selected_close_type": "raw_close",
+      "source": "twelve_data",
+      "source_detail": "time_series",
+      "status": "fresh_exact_unverified",
+      "symbol": "INDA",
       "verification": {
         "source": null,
         "status": "not_checked"
@@ -1080,6 +1269,39 @@
         "status": "not_checked"
       }
     },
+    "twelve_data:PHO:2026-06-17": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "high",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "is_final_eod_bar": true,
+      "metadata": {
+        "endpoint": "time_series",
+        "provider": "twelve_data"
+      },
+      "price": 66.77,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": "NASDAQ",
+      "provider_symbol": "PHO",
+      "provider_timestamp": null,
+      "provider_timezone": "provider_daily_bar",
+      "raw_close": 66.77,
+      "requested_close_date": "2026-06-17",
+      "returned_close_date": "2026-06-17",
+      "selected_close": 66.77,
+      "selected_close_type": "raw_close",
+      "source": "twelve_data",
+      "source_detail": "time_series",
+      "status": "fresh_exact_unverified",
+      "symbol": "PHO",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "twelve_data:PICK:2026-06-17": {
       "adjusted_close": null,
       "asset_role": "challenger",
@@ -1204,6 +1426,39 @@
       "source_detail": "time_series",
       "status": "fresh_exact_unverified",
       "symbol": "QUAL",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "twelve_data:REMX:2026-06-17": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "high",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "is_final_eod_bar": true,
+      "metadata": {
+        "endpoint": "time_series",
+        "provider": "twelve_data"
+      },
+      "price": 96.040001,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": "NYSE",
+      "provider_symbol": "REMX",
+      "provider_timestamp": null,
+      "provider_timezone": "provider_daily_bar",
+      "raw_close": 96.040001,
+      "requested_close_date": "2026-06-17",
+      "returned_close_date": "2026-06-17",
+      "selected_close": 96.040001,
+      "selected_close_type": "raw_close",
+      "source": "twelve_data",
+      "source_detail": "time_series",
+      "status": "fresh_exact_unverified",
+      "symbol": "REMX",
       "verification": {
         "source": null,
         "status": "not_checked"
@@ -1624,6 +1879,36 @@
       "source_detail": "time_series",
       "status": "fresh_exact_unverified",
       "symbol": "XLU",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "yahoo_history:DBC/BIL:2026-06-17": {
+      "adjusted_close": null,
+      "asset_role": "radar_alternative",
+      "carried_forward": false,
+      "confidence": "low",
+      "currency": null,
+      "error": "HTTP Error 500: Cannot find server.",
+      "field_used": null,
+      "is_final_eod_bar": null,
+      "metadata": {},
+      "price": null,
+      "pricing_tier": "research_grade",
+      "provider_exchange": null,
+      "provider_symbol": "DBC/BIL",
+      "provider_timestamp": null,
+      "provider_timezone": null,
+      "raw_close": null,
+      "requested_close_date": "2026-06-17",
+      "returned_close_date": null,
+      "selected_close": null,
+      "selected_close_type": null,
+      "source": "yahoo_history",
+      "source_detail": "query1_chart_v8",
+      "status": "unresolved",
+      "symbol": "DBC/BIL",
       "verification": {
         "source": null,
         "status": "not_checked"
