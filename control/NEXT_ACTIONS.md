@@ -44,35 +44,33 @@ WP39: closed as decision dry-run builder verified, validation-only
 WP40: closed as explicit decision artifact design review verified, design-review only
 WP41: closed as decision non-production fixture gate verified, validation-only
 WP42: closed as explicit control-layer package design verified, design-only
+Report Quality Patch 260617: closed as client-facing report-quality patch verified
 
 ## Active package
 
-Report Quality Patch 260617: implemented; pending external verification
+None
 
-## Latest report-quality patch files
+## Latest Report Quality Patch 260617 evidence
 
-runtime/polish_runtime_reports.py
-runtime/rotation_render_tables.py
-tests/test_report_decision_clarity.py
-tests/test_report_weight_basis_labels.py
-tests/test_report_bilingual_takeaway_parity.py
-
-## Verification commands
-
-```bash
-pytest tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py
-python tools/validate_macro_report_surface.py
-python tools/validate_macro_thesis_bilingual_aliases.py
-python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
-python tools/validate_etf_delivery_html_contract.py
-python tools/validate_etf_dutch_language_quality.py
-git diff --check
-```
-
-If a validator file is not present locally, report the missing validator and run the available validators without mutating output artifacts.
+pytest tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py -> 10 passed
+python tools/validate_macro_report_surface.py -> ETF_MACRO_REPORT_SURFACE_OK
+python tools/validate_macro_thesis_bilingual_aliases.py -> MACRO_THESIS_BILINGUAL_ALIASES_OK
+python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output -> ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK on 260617 EN/NL markdown, clean markdown and delivery HTML files
+python tools/validate_etf_delivery_html_contract.py -> ETF_DELIVERY_HTML_CONTRACT_OK for weekly_analysis_pro_260617.md and weekly_analysis_pro_nl_260617.md
+python tools/validate_etf_dutch_language_quality.py -> ETF_DUTCH_LANGUAGE_QUALITY_OK
+git diff --check -> clean
 
 ## Recommended next action
 
-Verify the report-quality patch in Codespaces or CI. If verification passes, regenerate or inspect a fresh report and perform client-grade QA.
+Generate or inspect the next fresh report output and perform a client-grade QA pass.
+
+The QA should verify only the client-facing surface:
+
+1. Decision cockpit appears near the top in English and Dutch.
+2. Main takeaway has equivalent meaning in English and Dutch.
+3. Weight-basis note appears near the final action table.
+4. Hold-with-override explanation is understandable.
+5. Harsh role wording is absent.
+6. Delivery status wording remains evidence-bound.
 
 Do not create another Stage-2 package unless a roadmap consolidation review identifies a concrete need.
