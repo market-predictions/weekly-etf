@@ -50,10 +50,11 @@ WP42: closed as explicit control-layer package design verified, design-only
 Report Quality Patch 260617: closed as client-facing report-quality patch verified
 Report Quality Patch 260617 post-close Dutch localization bugfix: closed as workflow-validated
 PDF Surface Patch — Decision cockpit visible in final PDF/HTML: closed as client-surface verified
+Cockpit-first surface roadmap anchor: recorded
 
 ## Active package
 
-None
+WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER: not_started / claim required before implementation
 
 ## Latest PDF Surface Patch evidence
 
@@ -76,8 +77,53 @@ python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
 git diff --check
 ```
 
+## Cockpit-first surface roadmap
+
+Roadmap:
+
+```text
+docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_20260618.md
+```
+
+Initial work package:
+
+```text
+control/work_packages/WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_20260618.md
+```
+
+Stable decision:
+
+```text
+The current production report remains intact. Cockpit-first development proceeds as a forked surface branch and preview lane. Promotion requires an explicit decision.
+```
+
+Six-step roadmap:
+
+```text
+1. Create isolated branch and preview lane.
+2. Add deterministic cockpit renderer.
+3. Add manual-only preview workflow.
+4. Add visual and state-safety contract tests.
+5. Produce side-by-side comparison review.
+6. Record explicit promotion decision.
+```
+
+Scope boundary:
+
+```text
+US ETF report only. ETF EU / UCITS mapping is parked for the parallel ETF EU track.
+```
+
 ## Recommended next action
 
-No new Stage-2 package. Next work should be normal report QA / roadmap consolidation only if a concrete client-facing issue is identified.
+Start `WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER` on an isolated branch only after claim confirmation.
+
+Recommended branch:
+
+```text
+feature/cockpit-front-page-v1
+```
+
+The first package should create the preview-only renderer and output path. It must not change production send behavior, portfolio state, pricing, scoring, fundability, trade ledger, valuation history, delivery behavior, or current report artifacts.
 
 Do not claim inbox receipt unless separate inbox-receipt evidence exists.
