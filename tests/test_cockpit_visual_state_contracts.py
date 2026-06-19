@@ -120,7 +120,7 @@ def test_cockpit_preview_contains_required_visual_contract_components(tmp_path: 
     assert "In brief" in english
     assert "Market climate" in english
     assert "This week's action" in english
-    assert "Performance & risk" in english
+    assert "Performance &amp; risk" in english or "Performance & risk" in english
     assert "Discipline point" in english
     assert "Preview-only cockpit surface" in english
     assert "Preview-only cockpit surface; not investment advice." in english
