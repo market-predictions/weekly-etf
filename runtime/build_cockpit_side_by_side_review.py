@@ -11,6 +11,8 @@ from typing import Any
 REVIEW_DIR_NAME = "cockpit_review"
 SCHEMA_VERSION = "cockpit_side_by_side_review_v1"
 REVIEW_TYPE = "side_by_side_preview_only"
+PREVIOUS_PACKAGE = "WP_COCKPIT_SURFACE_07_PREVIEW_ITERATION_SOURCE_PROVENANCE"
+NEXT_PACKAGE = "WP_COCKPIT_SURFACE_09_PROMOTION_REVIEW_OR_FURTHER_ITERATION_DECISION"
 REVIEW_DIMENSIONS = [
     "readability",
     "density",
@@ -71,9 +73,10 @@ def _token_from_reports(output_dir: Path) -> str | None:
     tokens: list[str] = []
     pattern = re.compile(r"^weekly_analysis_pro(?:_nl)?_(\d{6})(?:_\d{2})?(?:_delivery)?\.(?:md|html)$")
     for path in output_dir.glob("weekly_analysis_pro*"):
-        if "cockpit" in path.name or "_clean" in path.name:
+        name = path.name
+        if "cockpit" in name or "_clean" in name:
             continue
-        match = pattern.match(path.name)
+        match = pattern.match(name)
         if match:
             tokens.append(match.group(1))
     return sorted(tokens)[-1] if tokens else None
@@ -147,8 +150,15 @@ def _metadata(output_dir: Path, token: str) -> dict[str, Any]:
         "cockpit_preview_sources": [_relative(path, output_dir) for path in preview],
         "review_dimensions": REVIEW_DIMENSIONS,
         "promotion_status": "not_promoted",
+        "production_report_change": "none",
+        "delivery_change": "none",
+        "state_change": "none",
         "state_mutation": "not_allowed",
         "delivery_mutation": "not_allowed",
+        "provenance_iteration_review": True,
+        "source_provenance_improvement": "present",
+        "previous_package": PREVIOUS_PACKAGE,
+        "next_package": NEXT_PACKAGE,
     }
 
 
@@ -165,9 +175,9 @@ def _dimension_table(language: str) -> str:
             "density": ("Rijk aan context en bewijs.", "Lager in dichtheid; geschikt als ingang, niet als vervanger van bewijs."),
             "visual_hierarchy": ("Sterk na recente besliscockpit-patches, maar nog rapportgericht.", "Sterkere eerste indruk door kaarten, grafiek en disciplinepunt."),
             "decision_clarity": ("Beslissingen blijven compleet onderbouwd.", "Beslissing wordt sneller zichtbaar, met minder uitleg."),
-            "trust_provenance_clarity": ("Auditspoor blijft het sterkst in de klassieke rapportlaag.", "Heeft duidelijke bronverwijzing nodig voordat promotie kan."),
+            "trust_provenance_clarity": ("Auditspoor blijft het sterkst in de klassieke rapportlaag.", "Verbeterd door Bronnen en bewijs: runtime-state, waarderingshistorie, pricing-audit, macro-pack en run-manifest zijn nu explicieter zichtbaar."),
             "premium_look_and_feel": ("Client-grade, maar tekstzwaar.", "Premium cockpitgevoel, mits bewijslaag behouden blijft."),
-            "audit_evidence_preservation": ("Bewijs en controles blijven volledig zichtbaar.", "Mag alleen als voorblad functioneren naast bestaande bewijslaag."),
+            "audit_evidence_preservation": ("Bewijs en controles blijven volledig zichtbaar.", "Kan als startlaag functioneren naast de bestaande bewijslaag; productie blijft klassiek."),
         }
     else:
         rows = {
@@ -175,9 +185,9 @@ def _dimension_table(language: str) -> str:
             "density": ("Rich in context and evidence.", "Lower density; suitable as an entry surface, not a replacement for evidence."),
             "visual_hierarchy": ("Improved by recent decision-cockpit patches, but still report-led.", "Stronger first impression through cards, chart, and discipline point."),
             "decision_clarity": ("Decisions remain fully supported.", "Decision state becomes visible faster, with less explanation."),
-            "trust_provenance_clarity": ("Audit trail is strongest in the classic report layer.", "Needs clearer source linkage before any promotion path."),
+            "trust_provenance_clarity": ("Audit trail is strongest in the classic report layer.", "Improved by Source & evidence: runtime state, valuation history, pricing audit, macro pack, and run-manifest references are now more explicit."),
             "premium_look_and_feel": ("Client-grade, but text-heavy.", "Premium cockpit feel if the evidence layer remains preserved."),
-            "audit_evidence_preservation": ("Evidence and controls remain fully visible.", "Can only operate as a front surface beside the existing evidence layer."),
+            "audit_evidence_preservation": ("Evidence and controls remain fully visible.", "Can operate as a starting surface beside the existing evidence layer; production remains classic."),
         }
     lines = ["| Dimension | Classic report | Cockpit preview |", "|---|---|---|"]
     for dimension in REVIEW_DIMENSIONS:
@@ -186,13 +196,47 @@ def _dimension_table(language: str) -> str:
     return "\n".join(lines)
 
 
+def _provenance_iteration_section(language: str) -> str:
+    if language == "nl":
+        return "\n".join(
+            [
+                "## WP07 bron/provenance-iteratie",
+                "",
+                "- Bron/provenance clarity improved: de cockpit toont nu een zichtbare sectie Bronnen en bewijs.",
+                "- De cockpit toont nu de runtime-state bron.",
+                "- De cockpit toont nu de waarderingshistoriebron.",
+                "- De cockpit toont nu een pricing-audit referentie wanneer beschikbaar.",
+                "- De cockpit toont nu een macro-pack referentie wanneer beschikbaar.",
+                "- De cockpit toont nu een run-manifest referentie wanneer beschikbaar.",
+                "- De cockpit blijft preview-only en niet gepromoveerd.",
+                "- Er wordt geen deliveryclaim gemaakt.",
+                "- Het klassieke productierapport blijft de autoriteit.",
+            ]
+        )
+    return "\n".join(
+        [
+            "## WP07 source/provenance iteration",
+            "",
+            "- Source/provenance clarity improved: the cockpit now exposes a visible Source & evidence section.",
+            "- The cockpit now exposes the runtime-state source.",
+            "- The cockpit now exposes the valuation-history source.",
+            "- The cockpit now exposes the pricing-audit reference when available.",
+            "- The cockpit now exposes the macro-pack reference when available.",
+            "- The cockpit now exposes the run-manifest reference when available.",
+            "- The cockpit remains preview-only and not promoted.",
+            "- No delivery claim is made.",
+            "- The classic production report remains authoritative.",
+        ]
+    )
+
+
 def _markdown(metadata: dict[str, Any], language: str) -> str:
     classic_sources = metadata["classic_report_sources"]
     cockpit_sources = metadata["cockpit_preview_sources"]
     token = metadata["token"]
     if language == "nl":
         title = "# Weekly ETF cockpit side-by-side review — NL"
-        intro = "Deze review vergelijkt de klassieke rapportlaag met de cockpitpreview. Het is een reviewlaag, geen promotiebesluit."
+        intro = "Deze review vergelijkt de klassieke rapportlaag met de cockpitpreview na de WP07 provenance-iteratie. Het is een reviewlaag, geen promotiebesluit."
         classic_empty = "geen klassieke rapportbron gevonden in deze lokale outputmap"
         cockpit_empty = "geen cockpitpreviewbron gevonden in deze lokale outputmap"
         classic_strengths = [
@@ -203,15 +247,15 @@ def _markdown(metadata: dict[str, Any], language: str) -> str:
         cockpit_strengths = [
             "De cockpitpreview maakt marktklimaat, actie, prestatie/risico en disciplinepunt sneller scanbaar.",
             "De visuele hiërarchie voelt meer als een premium startpagina voor een drukke lezer.",
-            "De preview blijft gescheiden van de productie-output en leest uit bestaande runtime-artifacts.",
+            "De preview blijft gescheiden van de productie-output en toont nu expliciet Bronnen en bewijs.",
         ]
         risks = [
-            "De cockpit kan te compact worden als bewijs en bronverwijzing niet zichtbaar genoeg blijven.",
+            "De cockpit blijft een samenvattende startlaag en mag niet de volledige bewijslaag vervangen.",
             "Promotie zonder expliciete beslissing kan de huidige rapportautoriteit onduidelijk maken.",
             "De cockpit mag geen nieuwe portefeuille- of leveringsautoriteit krijgen.",
         ]
         fixes = [
-            "Maak bron- en bewijsverwijzing explicieter in de cockpitlaag.",
+            "Voer na deze review een apart promotie-of-iteratiebesluit uit.",
             "Bepaal of de cockpit later bijlage, voorblad, vervanging of experiment blijft.",
             "Houd klassieke rapport- en delivery-validatie verplicht tijdens elke promotiestap.",
         ]
@@ -219,7 +263,7 @@ def _markdown(metadata: dict[str, Any], language: str) -> str:
         evidence = "## Evidence / Bewijs"
     else:
         title = "# Weekly ETF cockpit side-by-side review"
-        intro = "This review compares the classic report layer with the cockpit preview. It is a review layer, not a promotion decision."
+        intro = "This review compares the classic report layer with the cockpit preview after the WP07 provenance iteration. It is a review layer, not a promotion decision."
         classic_empty = "no classic report source found in this local output directory"
         cockpit_empty = "no cockpit preview source found in this local output directory"
         classic_strengths = [
@@ -230,15 +274,15 @@ def _markdown(metadata: dict[str, Any], language: str) -> str:
         cockpit_strengths = [
             "The cockpit preview makes market climate, action, performance/risk, and discipline point faster to scan.",
             "The visual hierarchy feels more like a premium starting page for a time-limited reader.",
-            "The preview remains separate from production output and reads from existing runtime artifacts.",
+            "The preview remains separate from production output and now exposes Source & evidence explicitly.",
         ]
         risks = [
-            "The cockpit may become too compact if evidence and source linkage are not visible enough.",
+            "The cockpit remains a summary starting layer and must not replace the full evidence layer.",
             "Promotion without an explicit decision could blur the current report authority.",
             "The cockpit must not gain new portfolio or delivery authority.",
         ]
         fixes = [
-            "Make source and evidence linkage more explicit in the cockpit layer.",
+            "Run a separate promotion-or-iteration decision after this review.",
             "Decide later whether the cockpit becomes an attachment, first page, replacement, or experiment.",
             "Keep classic report and delivery validation mandatory through every promotion step.",
         ]
@@ -254,8 +298,13 @@ def _markdown(metadata: dict[str, Any], language: str) -> str:
             f"token: `{token}`",
             f"schema_version: `{SCHEMA_VERSION}`",
             f"review_type: `{REVIEW_TYPE}`",
+            f"previous_package: `{metadata['previous_package']}`",
+            f"next_package: `{metadata['next_package']}`",
+            "provenance_iteration_review: `true`",
+            "source_provenance_improvement: `present`",
             no_promotion,
             intro,
+            _provenance_iteration_section(language),
             "## Classic report strengths / Sterktes klassiek rapport\n\n" + bullets(classic_strengths),
             "## Cockpit preview strengths / Sterktes cockpitpreview\n\n" + bullets(cockpit_strengths),
             "## Cockpit preview risks / Risico's cockpitpreview\n\n" + bullets(risks),
@@ -286,7 +335,7 @@ def _html_from_markdown(markdown: str, language: str) -> str:
 </style>
 </head>
 <body>
-<article data-cockpit-side-by-side-review=\"true\" data-preview-only=\"true\">
+<article data-cockpit-side-by-side-review=\"true\" data-preview-only=\"true\" data-provenance-iteration-review=\"true\">
 <pre>{escape(markdown)}</pre>
 </article>
 </body>
