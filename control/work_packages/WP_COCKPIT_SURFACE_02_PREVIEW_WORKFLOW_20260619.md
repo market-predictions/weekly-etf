@@ -14,7 +14,7 @@ Branch: `feature/cockpit-front-page-v1`
 
 ## Status
 
-`blocked / workflow-file write unavailable in connector environment`
+`claimed / in_progress / implementation continued in Codespaces`
 
 ## Purpose
 
@@ -36,6 +36,12 @@ No workflow file was created.
 No production report behavior was changed.
 No preview artifact was committed.
 No validation was run for WP02.
+
+## Codespaces continuation
+
+Implementation continued in Codespaces because direct connector creation of `.github/workflows/render-cockpit-preview.yml` was unavailable.
+
+The intended implementation files are now being created locally and must be validated before closeout.
 
 ## Authority and boundaries
 
