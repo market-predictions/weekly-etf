@@ -39,11 +39,11 @@ def _fixture_output(tmp_path: Path) -> Path:
     (output / "weekly_analysis_pro_nl_260618_04_delivery.html").write_text("<html><body>Klassieke delivery surface</body></html>", encoding="utf-8")
 
     (output / "cockpit_preview" / "weekly_analysis_pro_cockpit_260618_01.html").write_text(
-        "<html><body data-cockpit-front-page='true'>In brief Performance &amp; risk</body></html>",
+        "<html><body data-cockpit-front-page='true'>In brief Source &amp; evidence Performance &amp; risk</body></html>",
         encoding="utf-8",
     )
     (output / "cockpit_preview" / "weekly_analysis_pro_nl_cockpit_260618_01.html").write_text(
-        "<html><body data-cockpit-front-page='true'>In het kort Prestatie &amp; risico</body></html>",
+        "<html><body data-cockpit-front-page='true'>In het kort Bronnen en bewijs Prestatie &amp; risico</body></html>",
         encoding="utf-8",
     )
 
@@ -119,8 +119,15 @@ def test_side_by_side_review_metadata_and_artifacts_include_required_contract(tm
     assert metadata["token"] == "260618"
     assert metadata["review_dimensions"] == REVIEW_DIMENSIONS
     assert metadata["promotion_status"] == "not_promoted"
+    assert metadata["production_report_change"] == "none"
+    assert metadata["delivery_change"] == "none"
+    assert metadata["state_change"] == "none"
     assert metadata["state_mutation"] == "not_allowed"
     assert metadata["delivery_mutation"] == "not_allowed"
+    assert metadata["provenance_iteration_review"] is True
+    assert metadata["source_provenance_improvement"] == "present"
+    assert metadata["previous_package"] == "WP_COCKPIT_SURFACE_07_PREVIEW_ITERATION_SOURCE_PROVENANCE"
+    assert metadata["next_package"] == "WP_COCKPIT_SURFACE_09_PROMOTION_REVIEW_OR_FURTHER_ITERATION_DECISION"
     assert metadata["classic_report_sources"]
     assert metadata["cockpit_preview_sources"]
 
@@ -138,6 +145,19 @@ def test_side_by_side_review_metadata_and_artifacts_include_required_contract(tm
         "Explicit no-promotion statement",
         "Evidence",
         "promotion_status: not_promoted",
+        "WP07 source/provenance iteration",
+        "Source/provenance clarity improved",
+        "Source &amp; evidence",
+        "runtime-state source",
+        "valuation-history source",
+        "pricing-audit reference",
+        "macro-pack reference",
+        "run-manifest reference",
+        "classic production report remains authoritative",
+        "WP07 bron/provenance-iteratie",
+        "Bronnen en bewijs",
+        "Geen deliveryclaim",
+        "Niet gepromoveerd naar productie",
     ]:
         assert required in combined
 
