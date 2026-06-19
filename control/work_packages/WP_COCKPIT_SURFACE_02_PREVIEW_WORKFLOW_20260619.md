@@ -14,13 +14,28 @@ Branch: `feature/cockpit-front-page-v1`
 
 ## Status
 
-`claimed / in_progress`
+`blocked / workflow-file write unavailable in connector environment`
 
 ## Purpose
 
 Add a manual-only GitHub Actions workflow that renders cockpit preview artifacts for the US Weekly ETF report.
 
 The workflow must not replace the production report, send email, update portfolio state, update pricing, update trade ledger, update valuation history, update delivery manifests, or claim delivery success.
+
+## Blocker
+
+The work package was claimed, but implementation could not proceed in this connector-only environment because the attempted write to:
+
+```text
+.github/workflows/render-cockpit-preview.yml
+```
+
+was blocked by the GitHub connector safety checks.
+
+No workflow file was created.
+No production report behavior was changed.
+No preview artifact was committed.
+No validation was run for WP02.
 
 ## Authority and boundaries
 
@@ -51,7 +66,7 @@ output/delivery/
 
 Generated cockpit preview artifacts must not be committed to the repository in this package.
 
-## Expected implementation files
+## Expected implementation files when unblocked
 
 ```text
 .github/workflows/render-cockpit-preview.yml
