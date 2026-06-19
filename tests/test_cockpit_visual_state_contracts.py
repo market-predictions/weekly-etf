@@ -124,6 +124,16 @@ def test_cockpit_preview_contains_required_visual_contract_components(tmp_path: 
     assert "Discipline point" in english
     assert "Preview-only cockpit surface" in english
     assert "Preview-only cockpit surface; not investment advice." in english
+    assert "data-source-evidence" in english
+    assert "data-promotion-status=\"not_promoted\"" in english
+    assert "Source &amp; evidence" in english or "Source & evidence" in english
+    assert "Built from runtime state" in english
+    assert "Valuation history checked" in english
+    assert "Pricing audit reference" in english
+    assert "Macro pack reference" in english
+    assert "Run-manifest reference" in english
+    assert "No delivery claim" in english
+    assert "Not promoted to production" in english
 
     assert "data-cockpit-front-page" in dutch
     assert "In het kort" in dutch
@@ -133,6 +143,16 @@ def test_cockpit_preview_contains_required_visual_contract_components(tmp_path: 
     assert "Disciplinepunt" in dutch
     assert "Preview-only cockpit surface" in dutch
     assert "Preview-only cockpit surface; geen beleggingsadvies." in dutch
+    assert "data-source-evidence" in dutch
+    assert "data-promotion-status=\"not_promoted\"" in dutch
+    assert "Bronnen en bewijs" in dutch
+    assert "Gebouwd vanuit runtime-state" in dutch
+    assert "Waarderingshistorie gecontroleerd" in dutch
+    assert "Pricing-audit referentie" in dutch
+    assert "Macro-pack referentie" in dutch
+    assert "Run-manifest referentie" in dutch
+    assert "Geen deliveryclaim" in dutch
+    assert "Niet gepromoveerd naar productie" in dutch
 
 
 def test_cockpit_preview_does_not_overwrite_classic_report_surfaces(tmp_path: Path) -> None:
