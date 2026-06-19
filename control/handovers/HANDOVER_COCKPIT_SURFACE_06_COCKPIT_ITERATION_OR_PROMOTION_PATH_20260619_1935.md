@@ -3,7 +3,7 @@
 Date: 2026-06-19
 Repository: `market-predictions/weekly-etf`
 Branch: `feature/cockpit-iteration-or-promotion-path`
-Status: implemented / validation pending in Codespaces
+Status: implemented / locally validated
 
 ## Summary
 
@@ -45,30 +45,22 @@ WP05 validation: 16 passed
 
 This package did not add or modify runtime code, workflow code, delivery code, production renderer code, pricing, portfolio state, valuation history, trade ledger, runtime state, run manifests, delivery manifests, or generated output artifacts.
 
-## Validation to run
+## Validation evidence
 
-```bash
-git diff --check
+Codespaces validation completed successfully:
 
-python -m py_compile runtime/render_cockpit_front_page.py
-python -m py_compile runtime/build_cockpit_side_by_side_review.py
-
-pytest tests/test_cockpit_front_page_preview.py \
-       tests/test_cockpit_preview_workflow.py \
-       tests/test_cockpit_visual_state_contracts.py \
-       tests/test_cockpit_side_by_side_review.py
+```text
+git diff --check: clean
+python -m py_compile runtime/render_cockpit_front_page.py: passed
+python -m py_compile runtime/build_cockpit_side_by_side_review.py: passed
+pytest tests/test_cockpit_front_page_preview.py tests/test_cockpit_preview_workflow.py tests/test_cockpit_visual_state_contracts.py tests/test_cockpit_side_by_side_review.py: 16 passed in 0.19s
 ```
 
-Then clean generated cache files if present:
-
-```bash
-git clean -fd __pycache__ runtime/__pycache__ tests/__pycache__ tools/__pycache__ output/cockpit_preview output/cockpit_review
-git status --short
-```
+No preview or review artifacts were generated for this control-only package.
 
 ## Remaining work
 
-- Run validation in Codespaces.
-- Confirm only the three control files are changed.
+- Pull the validation-status commits from the branch.
+- Confirm local status is clean and only the three control files are part of the branch diff.
 - Open PR: `Record cockpit iteration or promotion path decision`.
 - After merge, start `WP_COCKPIT_SURFACE_07_PREVIEW_ITERATION_SOURCE_PROVENANCE` only if explicitly requested.
