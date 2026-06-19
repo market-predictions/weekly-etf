@@ -4,7 +4,7 @@ Date: 2026-06-19
 Repository: `market-predictions/weekly-etf`
 Branch: `feature/cockpit-promotion-decision-review`
 Layer: decision framework only
-Status: claimed / in_progress
+Status: implemented / locally validated
 
 ## Purpose
 
@@ -18,7 +18,27 @@ Decision-only. This package must not implement promotion, change production repo
 
 Passing tests proves the cockpit preview lane is safe and reviewable. Passing tests does not authorize production promotion.
 
-## Files to add
+## Decision recorded
+
+```text
+decision: not_promoted_needs_iteration
+promotion_status: not_promoted
+production_report_change: none
+delivery_change: none
+state_change: none
+next_package: WP_COCKPIT_SURFACE_06_COCKPIT_ITERATION_OR_PROMOTION_PATH
+```
+
+## Validation evidence
+
+```text
+git diff --check: clean
+python -m py_compile runtime/render_cockpit_front_page.py: passed
+python -m py_compile runtime/build_cockpit_side_by_side_review.py: passed
+pytest tests/test_cockpit_front_page_preview.py tests/test_cockpit_preview_workflow.py tests/test_cockpit_visual_state_contracts.py tests/test_cockpit_side_by_side_review.py: 16 passed in 0.20s
+```
+
+## Files added
 
 ```text
 control/COCKPIT_SURFACE_PROMOTION_DECISION_20260619.md
