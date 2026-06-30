@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from runtime.build_etf_report_state import build_runtime_state
+from runtime.portfolio_attribution_basis import entry_basis, ledger_entry_bases
 from runtime.render_etf_report_nl_from_state import nl_role, nl_thesis
 
 MARKET_HISTORY_PATH = Path("output/market_history/etf_relative_strength.json")
@@ -127,26 +128,27 @@ def _weight_map(state: dict[str, Any]) -> dict[str, float]:
     return out
 
 
-def _position_pl_eur(position: dict[str, Any], state: dict[str, Any]) -> float | None:
-    shares = _float(position.get("shares"))
-    avg_entry = _float(position.get("avg_entry_local"))
+def _position_pl_eur(position: dict[str, Any], state: dict[str, Any], basis: dict[str, float] | None = None) -> float | None:
     current_value_eur = _float(position.get("previous_market_value_eur") or position.get("market_value_eur"))
-    currency = str(position.get("currency") or "USD").upper()
-    fx_rate = _float((state.get("fx_basis") or {}).get("rate"))
-    if shares is not None and avg_entry is not None and current_value_eur is not None:
-        entry_value_local = shares * avg_entry
-        if currency == "EUR":
-            entry_value_eur = entry_value_local
-        elif fx_rate:
-            entry_value_eur = entry_value_local / fx_rate
-        else:
-            entry_value_eur = None
-        if entry_value_eur is not None:
-            return round(current_value_eur - entry_value_eur, 2)
+    cost_basis_eur = _float((basis or {}).get("cost_basis_eur"))
+    if current_value_eur is not None and cost_basis_eur is not None and cost_basis_eur > 0:
+        return round(current_value_eur - cost_basis_eur, 2)
 
     pnl_pct = _float(position.get("pnl_pct"))
     if current_value_eur is not None and pnl_pct is not None and abs(100.0 + pnl_pct) > 0.001:
         return round(current_value_eur * (pnl_pct / (100.0 + pnl_pct)), 2)
+    return None
+
+
+def _position_since_entry_pct(position: dict[str, Any], state: dict[str, Any], basis: dict[str, float] | None = None) -> float | None:
+    current_value_eur = _float(position.get("previous_market_value_eur") or position.get("market_value_eur"))
+    cost_basis_eur = _float((basis or {}).get("cost_basis_eur"))
+    if current_value_eur is not None and cost_basis_eur is not None and cost_basis_eur > 0:
+        return round((current_value_eur - cost_basis_eur) / cost_basis_eur * 100.0, 2)
+
+    pnl_pct = _float(position.get("pnl_pct"))
+    if pnl_pct is not None:
+        return pnl_pct
     return None
 
 
@@ -187,13 +189,15 @@ def _display_thesis(position: dict[str, Any], ticker: str, language: str = "en")
 def _performance_rows(state: dict[str, Any], language: str = "en") -> list[dict[str, Any]]:
     metrics = _load_market_metrics()
     weights = _weight_map(state)
+    ledger_bases = ledger_entry_bases(state)
     rows: list[dict[str, Any]] = []
     for position in state.get("positions", []) or []:
         ticker = str(position.get("ticker") or "").upper()
         if not ticker or ticker == "CASH":
             continue
         metric = metrics.get(ticker, {})
-        pl_eur = _position_pl_eur(position, state)
+        basis = entry_basis(position, state, ledger_bases)
+        pl_eur = _position_pl_eur(position, state, basis)
         if language == "nl":
             sleeve = nl_role(position.get("portfolio_role") or "Position")
         else:
@@ -208,7 +212,7 @@ def _performance_rows(state: dict[str, Any], language: str = "en") -> list[dict[
                 "return_1w_pct": metric.get("return_1w_pct"),
                 "return_1m_pct": metric.get("return_1m_pct"),
                 "return_3m_pct": metric.get("return_3m_pct"),
-                "since_entry_pct": position.get("pnl_pct"),
+                "since_entry_pct": _position_since_entry_pct(position, state, basis),
                 "pl_eur": pl_eur,
                 "contribution_pct": _contribution_pct(pl_eur, state),
             }
@@ -222,7 +226,7 @@ def _table(state: dict[str, Any], language: str = "en") -> str:
         lines = [
             "## 7A. Rendement huidige ETF-posities",
             "",
-            "Rendement wordt berekend op de huidige ETF-posities op basis van de meest recente gevalideerde slotkoers-audit en beschikbare markthistorie.",
+            "Rendement wordt berekend op de huidige ETF-posities op basis van de meest recente gevalideerde slotkoers-audit, beschikbare markthistorie en waar nodig de uitgevoerde modeltransacties.",
             "",
             "| Portefeuillesegment | Beleggingsthese | ETF | Gewicht % | 1w rendement | 1m rendement | 3m rendement | Sinds instap | P/L EUR | Bijdrage % |",
             "|---|---|---|---:|---:|---:|---:|---:|---:|---:|",
@@ -231,7 +235,7 @@ def _table(state: dict[str, Any], language: str = "en") -> str:
         lines = [
             "## 7A. ETF Position Performance",
             "",
-            "Performance is calculated on the current ETF holdings using the latest validated close-price audit and available market-history inputs.",
+            "Performance is calculated on the current ETF holdings using the latest validated close-price audit, available market-history inputs and, where needed, executed model-trade history.",
             "",
             "| Portfolio sleeve | Investment thesis | Tradable ETF | Weight % | 1w return | 1m return | 3m return | Since-entry | P/L EUR | Contribution % |",
             "|---|---|---|---:|---:|---:|---:|---:|---:|---:|",
