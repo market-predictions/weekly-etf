@@ -36,6 +36,17 @@ REQUIRED_SEMANTIC_THESES = {
     "XLU": "Defensive utilities / rate-sensitive ballast",
 }
 
+# These positions are known model-executed holdings with enough trade-ledger/runtime
+# evidence to reconstruct attribution. They should not silently render n/a in
+# since-entry, P/L EUR or contribution once Section 7A is built.
+REQUIRED_ATTRIBUTION_TICKERS = {"CIBR", "DFEN", "GSG", "IEFA", "XLU"}
+ATTRIBUTION_CELL_INDEXES = {
+    "Since-entry": 7,
+    "P/L EUR": 8,
+    "Contribution %": 9,
+}
+NA_CELLS = {"", "n/a", "na", "n.v.t.", "-"}
+
 GENERIC_THESIS_CELLS = {
     "",
     "Position",
@@ -93,6 +104,10 @@ def _rows_by_ticker(section: str) -> dict[str, list[str]]:
     return rows
 
 
+def _norm_cell(value: str) -> str:
+    return value.strip().lower().replace("**", "")
+
+
 def validate(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
     section = _section_7a(text, path.name)
@@ -114,6 +129,20 @@ def validate(path: Path) -> None:
             raise RuntimeError(
                 f"ETF position performance validation failed for {path.name}: {ticker} thesis must be {required_thesis!r}, found {thesis!r}."
             )
+
+    attribution_failures = []
+    for ticker in sorted(REQUIRED_ATTRIBUTION_TICKERS):
+        cells = rows.get(ticker)
+        if not cells:
+            continue
+        for label, index in ATTRIBUTION_CELL_INDEXES.items():
+            if len(cells) <= index or _norm_cell(cells[index]) in NA_CELLS:
+                attribution_failures.append(f"{ticker} {label}={cells[index] if len(cells) > index else 'MISSING'}")
+    if attribution_failures:
+        raise RuntimeError(
+            f"ETF position performance validation failed for {path.name}: ledger-backed attribution cells are missing: "
+            + ", ".join(attribution_failures)
+        )
 
     generic_failures = []
     ticker_only_failures = []
