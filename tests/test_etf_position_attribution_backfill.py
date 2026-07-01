@@ -82,6 +82,35 @@ def test_ledger_backfill_reconstructs_missing_cibr_attribution(monkeypatch, tmp_
     assert row["contribution_pct"] == 0.34
 
 
+def test_ledger_backfill_resolves_bare_runtime_artifact_names(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
+    _write_runtime_state(Path("output/runtime/etf_report_state_test.json"), "DFEN", selected_close=70.0, fx_rate=1.4)
+    _write_trade_ledger(
+        Path("output/etf_trade_ledger.csv"),
+        [{"trade_id": "buy-1", "source_report": "runtime:etf_report_state_test.json", "ticker": "DFEN", "shares_delta": "10"}],
+    )
+    state = {
+        "portfolio": {"starting_capital_eur": 100000.0, "total_portfolio_value_eur": 625.0},
+        "fx_basis": {"rate": 1.2},
+        "positions": [
+            {
+                "ticker": "DFEN",
+                "shares": 10.0,
+                "current_price_local": 75.0,
+                "previous_market_value_eur": 625.0,
+                "currency": "USD",
+                "portfolio_role": "Rotation destination",
+            }
+        ],
+    }
+
+    row = perf._performance_rows(state)[0]
+    assert row["ticker"] == "DFEN"
+    assert row["pl_eur"] == 125.0
+    assert row["since_entry_pct"] == 25.0
+    assert row["contribution_pct"] == 0.12
+
+
 def test_ledger_backfill_refuses_partial_unreconciled_basis(monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)
     _write_runtime_state(Path("output/runtime/state_1.json"), "IEFA", selected_close=80.0, fx_rate=1.2)
