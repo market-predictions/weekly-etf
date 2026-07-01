@@ -37,7 +37,7 @@
 - Huidig regime: Risk-on groei.
 - Vertrouwen: 66%.
 - Deterministische regime-inschatting — alleen ter review: De shadow-engine classificeert de marktomgeving momenteel als Risk-on groei, grotendeels in lijn met de bestaande regime-inschatting. De betrouwbaarheid is hoog maar alleen ter review en beschrijft samenhang in het bewijs, geen voorspelling. Dit geeft geen autoriteit voor portefeuillewijzigingen. De normale discipline blijft leidend.
-- Regimegeheugen: Risk-on growth has persisted for 57 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed.
+- Regimegeheugen: Risk-on groei houdt al 59 runs aan; de overgangsfase is stabiel, de marktbreedte verbetert en cross-asset bevestiging blijft gemengd.
 - Beslisregel: Roteer niet agressief tenzij een regimeverschuiving minstens twee runs aanhoudt of cross-asset bevestiging breed wordt.
 
 ### Beleids- en geopolitieke status
@@ -100,7 +100,7 @@
 - [SPY](https://www.tradingview.com/chart/?symbol=SPY) plus [SMH](https://www.tradingview.com/chart/?symbol=SMH) creëert hoge Amerikaanse tech-/AI-factoroverlap.
 - De brede grondstoffenhedge blijft een rol die periodiek moet worden bewezen en is geen vanzelfsprekende stabilisator.
 - [PPA](https://www.tradingview.com/chart/?symbol=PPA) en [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) blijven vervangbaar totdat de kwaliteit van de ETF-implementatie is bewezen.
-- Blootstelling aan ontwikkelde markten buiten de VS is via IEFA verhoogd, maar blijft onder bevestiging in relatieve sterkte.
+- Blootstelling aan ontwikkelde markten buiten de VS is via [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) verhoogd, maar blijft onder bevestiging in relatieve sterkte.
 
 ## 6. Conclusie
 
@@ -110,6 +110,8 @@
 - **Zwakste implementatievragen:** [PPA](https://www.tradingview.com/chart/?symbol=PPA) moet zich bewijzen tegenover [ITA](https://www.tradingview.com/chart/?symbol=ITA), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) tegenover [GRID](https://www.tradingview.com/chart/?symbol=GRID), en de brede grondstoffenhedge moet aantonen dat de rol nog steeds stabiliserend is.
 
 ## 7. Portefeuillecurve en portefeuilleontwikkeling
+
+`EQUITY_CURVE_CHART_PLACEHOLDER`
 
 - Startkapitaal (EUR): 100000.00
 - Huidige portefeuillewaarde (EUR): 111878.25
@@ -165,30 +167,28 @@ De bovenstaande portefeuillewaardering is gebaseerd op de slotkoersen per positi
 |---|---|---|---:|---|---|
 | EUR/USD | 2026-06-30 | 2026-06-30 | 1.1422 | Twelve Data | Exacte slotkoers, niet onafhankelijk geverifieerd |
 
-`EQUITY_CURVE_CHART_PLACEHOLDER`
-
 ## 7A. Rendement huidige ETF-posities
 
 Rendement wordt berekend op de huidige ETF-posities op basis van de meest recente gevalideerde slotkoers-audit, beschikbare markthistorie en waar nodig de uitgevoerde modeltransacties.
 
 | Portefeuillesegment | Beleggingsthese | ETF | Gewicht % | 1w rendement | 1m rendement | 3m rendement | Sinds instap | P/L EUR | Bijdrage % |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|
-| Rotatiebestemming | Cybersecurityweerbaarheid | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 17.86% | +6.79% | +1.00% | +47.93% | n.v.t. | n.v.t. | n.v.t. |
-| Rotatiebestemming | Defensie-innovatie / tactische defensiebèta | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 5.74% | +8.22% | +6.46% | +40.83% | n.v.t. | n.v.t. | n.v.t. |
+| Rotatiebestemming | Cybersecurityweerbaarheid | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 17.86% | +6.79% | +1.00% | +47.93% | -2.45% | -501.09 | -0.50% |
+| Rotatiebestemming | Defensie-innovatie / tactische defensiebèta | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 5.74% | +8.22% | +6.46% | +40.83% | +16.41% | 905.17 | +0.91% |
 | Rotatiebestemming | Grondstoffenbrede hedge-blootstelling | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 8.38% | -1.21% | -10.06% | -12.22% | -10.06% | -1,048.64 | -1.05% |
-| Rotatiebestemming | Diversificatie in ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 23.64% | +1.16% | +0.14% | +11.94% | n.v.t. | n.v.t. | n.v.t. |
+| Rotatiebestemming | Diversificatie in ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 23.64% | +1.16% | +0.14% | +11.94% | +0.95% | 249.83 | +0.25% |
 | Reële activa / capex | Netwerk- en infrastructuurcapex | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 0.03% | +2.10% | +4.82% | +19.99% | +13.36% | 4.34 | 0.00% |
 | Groeimotor | AI-rekenkracht en semiconductorleiderschap | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 30.28% | +5.44% | +9.51% | +80.92% | +56.12% | 12,178.33 | +12.18% |
 | Kernbeta | Amerikaanse large-cap kernblootstelling | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 0.03% | +1.80% | -1.03% | +18.47% | +10.39% | 2.83 | 0.00% |
 | Strategische energie | Kernenergie- en uraniumcyclus | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 7.04% | -5.57% | -14.18% | -10.01% | -22.09% | -2,232.24 | -2.23% |
-| Rotatiebestemming | Defensieve nutsbedrijven / rentegevoelige ballast | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 5.28% | +0.60% | +2.72% | -0.63% | n.v.t. | n.v.t. | n.v.t. |
+| Rotatiebestemming | Defensieve nutsbedrijven / rentegevoelige ballast | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 5.28% | +0.60% | +2.72% | -0.63% | +5.18% | 290.99 | +0.29% |
 
 ## 8. Allocatiekaart
 
 | Segment | Positionering | Toelichting |
 |---|---|---|
 | Amerikaanse aandelen | Neutraal | Belegbaar, maar concentratierisico is expliciet aanwezig. |
-| Europese aandelen | Neutraal | Alleen volglijst; blootstelling buiten de VS blijft een diversificatiekloof. |
+| Europese aandelen | Neutraal | IEFA biedt nu blootstelling aan ontwikkelde markten buiten de VS; verdere allocatie vraagt nog bevestiging in relatieve sterkte. |
 | Opkomende markten | Onderwogen | USD- en oliegevoeligheid blijven tegenwind. |
 | Large-cap | Neutraal | Kwaliteitsleiderschap werkt nog steeds. |
 | Small-cap | Onderwogen | Rentes en herfinanciering blijven lastig. |
@@ -196,7 +196,7 @@ Rendement wordt berekend op de huidige ETF-posities op basis van de meest recent
 | Kwaliteit | Overwogen | Winstbestendigheid blijft waardevol. |
 | Grondstoffen / hedge | Neutraal | Hedgerol blijft onder periodieke rolvalidatie. |
 | Industrie / defensie | Overwogen | Structurele thesis is valide; ETF-implementatie onder herbeoordeling. |
-| Niet-USD activa | Volglijst | IEFA biedt nu blootstelling aan ontwikkelde markten buiten de VS; verdere allocatie vraagt nog bevestiging. |
+| Niet-USD activa | Volglijst | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) biedt nu blootstelling aan ontwikkelde markten buiten de VS; verdere allocatie vraagt nog bevestiging. |
 
 ## 9. Tweede-orde-effectenkaart
 
@@ -332,7 +332,7 @@ Override-toelichting: Het model dwingt normaal een verklein-/vervangingsreview a
 | Defensie-innovatie / strategische weerbaarheid | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling. | Vervangingsanalyse vereist |
 | Netuitbreiding / elektrificatie | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructuurcapex blijft valide. | Vervangingsanalyse vereist |
 | Hedge- en grondstoffenbreedte | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [BIL](https://www.tradingview.com/chart/?symbol=BIL) / [DBC](https://www.tradingview.com/chart/?symbol=DBC) | Hedgefunctie en grondstoffenbreedte moeten periodiek worden bevestigd. | Onder herbeoordeling |
-| Ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | De portefeuille heeft via IEFA blootstelling aan ontwikkelde markten buiten de VS, maar verdere allocatie vraagt bevestiging in relatieve sterkte. | Volglijst |
+| Ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | De portefeuille heeft via [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) blootstelling aan ontwikkelde markten buiten de VS, maar verdere allocatie vraagt bevestiging in relatieve sterkte. | Volglijst |
 
 ### Continuïteit in aanbevelingsdiscipline
 - [SPY](https://www.tradingview.com/chart/?symbol=SPY): overlapreview tegenover [SMH](https://www.tradingview.com/chart/?symbol=SMH) blijft actief.

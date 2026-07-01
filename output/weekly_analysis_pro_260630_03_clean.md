@@ -69,7 +69,7 @@
 - Current regime: Risk-on growth.
 - Confidence: 66%.
 - Deterministic regime read — review-only: The shadow engine currently classifies the backdrop as Risk-on growth, broadly aligned with the legacy regime read. Confidence is high but review-only, reflecting evidence consistency rather than a forecast. This does not authorize portfolio changes. The normal discipline gates remain decisive.
-- Regime memory: Risk-on growth has persisted for 58 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed.
+- Regime memory: Risk-on growth has persisted for 59 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed.
 - Decision rule: Do not rotate aggressively unless a regime shift persists for at least two runs or cross-asset confirmation becomes broad.
 
 ### Policy and geopolitical status
@@ -131,7 +131,7 @@
 - [SPY](https://www.tradingview.com/chart/?symbol=SPY) plus [SMH](https://www.tradingview.com/chart/?symbol=SMH) creates high U.S. tech / AI factor overlap.
 - Hedge and defensive sleeves must justify their capital allocation through role validity, pricing and relative-strength evidence.
 - [PPA](https://www.tradingview.com/chart/?symbol=PPA) and [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) remain replaceable until their ETF implementation quality is proven.
-- Non-U.S. developed exposure has been increased through IEFA, but breadth and relative-strength confirmation remain required.
+- Non-U.S. developed exposure has been increased through [IEFA](https://www.tradingview.com/chart/?symbol=IEFA), but breadth and relative-strength confirmation remain required.
 
 ## 6. Bottom Line
 
@@ -176,6 +176,8 @@
 | 2026-06-29 | 110086.49 | Runtime valuation repriced from official portfolio-state shares |
 | 2026-06-30 | 111878.25 | Latest portfolio valuation based on confirmed closing prices and current holdings |
 
+`EQUITY_CURVE_CHART_PLACEHOLDER`
+
 ### Closing prices used in this report
 
 The portfolio valuation above is based on the per-position closes shown here. Requested close date: **2026-06-30**. The source column shows the market-data layer that supplied the close, not internal resolver names.
@@ -196,30 +198,28 @@ The portfolio valuation above is based on the per-position closes shown here. Re
 |---|---|---|---:|---|---|
 | EUR/USD | 2026-06-30 | 2026-06-30 | 1.1422 | Twelve Data | Fresh exact close, unverified |
 
-`EQUITY_CURVE_CHART_PLACEHOLDER`
-
 ## 7A. ETF Position Performance
 
 Performance is calculated on the current ETF holdings using the latest validated close-price audit, available market-history inputs and, where needed, executed model-trade history.
 
 | Portfolio sleeve | Investment thesis | Tradable ETF | Weight % | 1w return | 1m return | 3m return | Since-entry | P/L EUR | Contribution % |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|
-| Rotation destination | Cybersecurity resilience | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 17.86% | +6.79% | +1.00% | +47.93% | n/a | n/a | n/a |
-| Rotation destination | Defense innovation / tactical defense beta | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 5.74% | +8.22% | +6.46% | +40.83% | n/a | n/a | n/a |
+| Rotation destination | Cybersecurity resilience | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 17.86% | +6.79% | +1.00% | +47.93% | -2.45% | -501.09 | -0.50% |
+| Rotation destination | Defense innovation / tactical defense beta | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | 5.74% | +8.22% | +6.46% | +40.83% | +16.41% | 905.17 | +0.91% |
 | Rotation destination | Commodity-breadth hedge exposure | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 8.38% | -1.21% | -10.06% | -12.22% | -10.06% | -1,048.64 | -1.05% |
-| Rotation destination | Non-U.S. developed-market diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 23.64% | +1.16% | +0.14% | +11.94% | n/a | n/a | n/a |
+| Rotation destination | Non-U.S. developed-market diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 23.64% | +1.16% | +0.14% | +11.94% | +0.95% | 249.83 | +0.25% |
 | Real-asset capex | Grid and infrastructure capex | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 0.03% | +2.10% | +4.82% | +19.99% | +13.36% | 4.34 | 0.00% |
 | Growth engine | AI compute / semiconductor leadership | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 30.28% | +5.44% | +9.51% | +80.92% | +56.12% | 12,178.33 | +12.18% |
 | Core beta | Core U.S. large-cap exposure | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | 0.03% | +1.80% | -1.03% | +18.47% | +10.39% | 2.83 | 0.00% |
 | Strategic energy | Nuclear and uranium cycle exposure | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 7.04% | -5.57% | -14.18% | -10.01% | -22.09% | -2,232.24 | -2.23% |
-| Rotation destination | Defensive utilities / rate-sensitive ballast | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 5.28% | +0.60% | +2.72% | -0.63% | n/a | n/a | n/a |
+| Rotation destination | Defensive utilities / rate-sensitive ballast | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 5.28% | +0.60% | +2.72% | -0.63% | +5.18% | 290.99 | +0.29% |
 
 ## 8. Asset Allocation Map
 
 | Bucket | Stance | Reason |
 |---|---|---|
 | US equities | Neutral | Investable but concentration risk is explicit. |
-| Europe equities | Neutral | Watchlist only; non-U.S. exposure remains a diversification gap. |
+| Europe equities | Neutral | IEFA now provides non-U.S. developed-market exposure, but broader allocation still requires relative-strength confirmation. |
 | EM equities | Underweight | USD and oil sensitivity remain headwinds. |
 | large cap | Neutral | Quality leadership still works. |
 | small cap | Underweight | Rates and refinancing remain difficult. |
@@ -227,7 +227,7 @@ Performance is calculated on the current ETF holdings using the latest validated
 | quality | Overweight | Earnings durability remains valuable. |
 | defensive ballast | Neutral | Hedge and cash-like roles remain under opportunity-cost review. |
 | industrials / defense | Overweight | Structural thesis valid; vehicle under review. |
-| non-USD assets | Watchlist | IEFA now provides non-U.S. developed-market exposure, but broader allocation still requires relative-strength confirmation. |
+| non-USD assets | Watchlist | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) now provides non-U.S. developed-market exposure, but broader allocation still requires relative-strength confirmation. |
 
 ## 9. Second-Order Effects Map
 
@@ -334,15 +334,15 @@ Hold-with-override note: The model would normally force reduce/replace review, b
 ### Portfolio table
 | Ticker | ETF Name | Direction | Weight % | Avg Entry | Current Price | P/L % | Original Thesis | Role |
 |---|---|---:|---:|---:|---:|---:|---|---|
-| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Long | 17.86 |  | 89.85 |  |  | Rotation destination |
-| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | Long | 5.74 |  | 79.90 |  |  | Rotation destination |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Long | 8.38 | 31.80 | 28.60 |  | Rotation destination | Rotation destination |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Long | 23.64 |  | 96.66 |  |  | Rotation destination |
+| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Long | 17.86 | | 89.85 | | | Rotation destination |
+| [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) | Long | 5.74 | | 79.90 | | | Rotation destination |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Long | 8.38 | 31.80 | 28.60 | | Rotation destination | Rotation destination |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Long | 23.64 | | 96.66 | | | Rotation destination |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Long | 0.03 | 51.98 | 58.92 | 8.25 | Grid and infrastructure capex | Real-asset capex |
 | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Long | 30.28 | 420.13 | 655.89 | 20.61 | AI compute / semiconductor leadership | Growth engine |
 | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | Long | 0.03 | 676.33 | 746.77 | 6.17 | Core U.S. large-cap exposure | Core beta |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Long | 7.04 | 67.50 | 52.59 | -0.55 | Nuclear and uranium cycle exposure | Strategic energy |
-| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Long | 5.28 |  | 45.34 |  |  | Rotation destination |
+| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Long | 5.28 | | 45.34 | | | Rotation destination |
 
 ### Available cash
 - Cash %: 1.73
@@ -356,7 +356,7 @@ Hold-with-override note: The model would normally force reduce/replace review, b
 | Defense innovation / sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructure capex remains valid. | Duel required |
 | Commodity-breadth hedge review | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [DBC](https://www.tradingview.com/chart/?symbol=DBC) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Current commodity-breadth hedge role must be proven against cash and broad commodity alternatives. | Under review |
-| Non-U.S. developed diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | IEFA now provides non-U.S. developed-market exposure, with broader allocation still under confirmation. | Watchlist |
+| Non-U.S. developed diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) now provides non-U.S. developed-market exposure, with broader allocation still under confirmation. | Watchlist |
 
 ### Recommendation discipline continuity
 - Rotation execution: active.
