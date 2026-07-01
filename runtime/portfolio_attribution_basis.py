@@ -51,13 +51,14 @@ def runtime_state_path(source_report: str) -> Path | None:
     return direct
 
 
-def runtime_trade_price(runtime_path: Path, ticker: str) -> tuple[float, str, float | None] | None:
-    if not runtime_path.exists():
+def _executed_companion_path(runtime_path: Path) -> Path | None:
+    if runtime_path.stem.endswith("_executed"):
         return None
-    try:
-        payload = json.loads(runtime_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return None
+    candidate = runtime_path.with_name(f"{runtime_path.stem}_executed{runtime_path.suffix}")
+    return candidate if candidate.exists() else None
+
+
+def _trade_price_from_payload(payload: dict[str, Any], ticker: str) -> tuple[float, str, float | None] | None:
     position = position_by_ticker(payload, ticker)
     if not position:
         return None
@@ -67,6 +68,36 @@ def runtime_trade_price(runtime_path: Path, ticker: str) -> tuple[float, str, fl
     currency = str(position.get("currency") or "USD").upper()
     fx_rate = to_float((payload.get("fx_basis") or {}).get("rate"))
     return price, currency, fx_rate
+
+
+def _load_json(path: Path) -> dict[str, Any] | None:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def runtime_trade_price(runtime_path: Path, ticker: str) -> tuple[float, str, float | None] | None:
+    if not runtime_path.exists():
+        return None
+
+    payload = _load_json(runtime_path)
+    if payload is not None:
+        price_basis = _trade_price_from_payload(payload, ticker)
+        if price_basis is not None:
+            return price_basis
+
+    # Guarded model execution writes a pre-execution runtime state and a
+    # companion *_executed.json state. The trade ledger points at the base
+    # state, but new buy legs only appear in the executed companion. Use the
+    # companion only as a fallback when the ticker is absent from the base file.
+    executed_path = _executed_companion_path(runtime_path)
+    if executed_path is None:
+        return None
+    executed_payload = _load_json(executed_path)
+    if executed_payload is None:
+        return None
+    return _trade_price_from_payload(executed_payload, ticker)
 
 
 def local_to_eur(local_value: float, currency: str, fx_rate: float | None) -> float | None:
