@@ -111,6 +111,38 @@ def test_ledger_backfill_resolves_bare_runtime_artifact_names(monkeypatch, tmp_p
     assert row["contribution_pct"] == 0.12
 
 
+def test_ledger_backfill_uses_executed_companion_for_new_buy(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
+    _write_runtime_state(Path("output/runtime/etf_report_state_buy.json"), "PPA", selected_close=100.0, fx_rate=1.25)
+    _write_runtime_state(Path("output/runtime/etf_report_state_buy_executed.json"), "CIBR", selected_close=94.14, fx_rate=1.16325)
+    _write_trade_ledger(
+        Path("output/etf_trade_ledger.csv"),
+        [{"trade_id": "buy-1", "source_report": "runtime:etf_report_state_buy.json", "ticker": "CIBR", "shares_delta": "68.141070"}],
+    )
+    state = {
+        "portfolio": {"starting_capital_eur": 100000.0, "total_portfolio_value_eur": 5514.55},
+        "fx_basis": {"rate": 1.1},
+        "positions": [
+            {
+                "ticker": "CIBR",
+                "shares": 68.141070,
+                "current_price_local": 94.14,
+                "previous_market_value_eur": 5514.55,
+                "currency": "USD",
+                "portfolio_role": "Rotation destination",
+            }
+        ],
+    }
+
+    bases = ledger_entry_bases(state)
+    assert bases["CIBR"]["shares"] == 68.14107
+    row = perf._performance_rows(state)[0]
+    assert row["ticker"] == "CIBR"
+    assert row["pl_eur"] == 0.0
+    assert row["since_entry_pct"] == 0.0
+    assert row["contribution_pct"] == 0.0
+
+
 def test_ledger_backfill_refuses_partial_unreconciled_basis(monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)
     _write_runtime_state(Path("output/runtime/state_1.json"), "IEFA", selected_close=80.0, fx_rate=1.2)
