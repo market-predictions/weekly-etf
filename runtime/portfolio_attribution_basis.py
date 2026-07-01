@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_TRADE_LEDGER_PATH = Path("output/etf_trade_ledger.csv")
+DEFAULT_RUNTIME_DIR = Path("output/runtime")
 
 
 def to_float(value: Any) -> float | None:
@@ -30,7 +31,24 @@ def runtime_state_path(source_report: str) -> Path | None:
     if not source_report.startswith("runtime:"):
         return None
     raw = source_report.removeprefix("runtime:").strip()
-    return Path(raw) if raw else None
+    if not raw:
+        return None
+
+    direct = Path(raw)
+    if direct.exists():
+        return direct
+
+    # Older ledger rows store only the runtime artifact filename, for example
+    # runtime:etf_report_state_20260603_20260604_190001.json. Runtime state
+    # artifacts are stored under output/runtime/, so attribution backfill must
+    # resolve that bare filename deterministically instead of treating it as
+    # missing evidence.
+    if len(direct.parts) == 1:
+        runtime_candidate = DEFAULT_RUNTIME_DIR / direct.name
+        if runtime_candidate.exists():
+            return runtime_candidate
+
+    return direct
 
 
 def runtime_trade_price(runtime_path: Path, ticker: str) -> tuple[float, str, float | None] | None:
