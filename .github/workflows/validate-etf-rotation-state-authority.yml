@@ -39,7 +39,22 @@ jobs:
             runtime/portfolio_rotation_engine.py \
             tools/validate_etf_rotation_state_authority.py
 
-      - name: Run focused regression tests
+      - name: Test current-run valuation authority
+        run: pytest -q tests/test_etf_rotation_state_authority.py::test_current_run_valuation_recomputes_pnl_and_nav
+
+      - name: Test stale scorecard mismatch block
+        run: pytest -q tests/test_etf_rotation_state_authority.py::test_scorecard_refresh_blocks_stale_or_inconsistent_pnl
+
+      - name: Test deep-loss forced re-underwriting
+        run: pytest -q tests/test_etf_rotation_state_authority.py::test_deep_loss_sub4_position_clears_release_threshold
+
+      - name: Test alternative candidate eligibility
+        run: pytest -q tests/test_etf_rotation_state_authority.py::test_alternative_etf_is_independent_replacement_candidate
+
+      - name: Test failed holding mutation path
+        run: pytest -q tests/test_etf_rotation_state_authority.py::test_failed_holding_can_rotate_to_general_fundable_candidate
+
+      - name: Run focused regression suite
         run: pytest -q tests/test_etf_rotation_state_authority.py
 
       - name: Rebuild July production rotation plan in dry-run mode
