@@ -7,6 +7,7 @@ correction_suffix: 03
 original_run_id: 20260715_175910
 report_date: 2026-07-14
 send_confirmation: confirm_correction_resend
+trigger_route: merged_pull_request
 
 ## Authority boundary
 
