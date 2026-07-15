@@ -58,6 +58,7 @@ jobs:
             matplotlib \
             seaborn \
             markdown \
+            mistune \
             beautifulsoup4 \
             lxml \
             premailer \
