@@ -1,0 +1,5 @@
+# Dispatch corrected Weekly ETF report
+
+request_file: control/run_queue/weekly_etf_report_correction_request_20260715_230541.md
+dispatch_mode: workflow_dispatch
+execution_boundary: existing_execution_artifact_only
