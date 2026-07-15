@@ -32,6 +32,8 @@ jobs:
   validate-and-persist:
     if: github.head_ref == 'agent/fix-report-freshness-and-html-equity-graph'
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
     steps:
       - name: Check out PR head
         uses: actions/checkout@v4
@@ -106,7 +108,7 @@ jobs:
 
       - name: Run focused regression tests
         run: |
-          pytest -q \
+          python -m pytest -q \
             tests/test_report_freshness_and_html_equity.py \
             tests/test_wp16_followup5_equity_curve_png_contract.py \
             tests/test_etf_post_execution_report_consistency.py \
