@@ -13,6 +13,7 @@ on:
       - "runtime/fix_executed_report_contract.py"
       - "tests/test_etf_post_execution_report_consistency.py"
       - "tools/apply_post_execution_report_consistency_patch.py"
+      - "tools/fix_post_execution_legacy_cockpit.py"
       - ".github/workflows/validate-etf-post-execution-report-consistency.yml"
   workflow_dispatch:
 
@@ -37,12 +38,16 @@ jobs:
       - name: Apply staged post-execution surface patch
         id: staged_patch
         run: |
+          applied=false
           if test -f tools/apply_post_execution_report_consistency_patch.py; then
             python tools/apply_post_execution_report_consistency_patch.py
-            echo "applied=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "applied=false" >> "$GITHUB_OUTPUT"
+            applied=true
           fi
+          if test -f tools/fix_post_execution_legacy_cockpit.py; then
+            python tools/fix_post_execution_legacy_cockpit.py
+            applied=true
+          fi
+          echo "applied=$applied" >> "$GITHUB_OUTPUT"
 
       - name: Install focused test dependencies
         run: python -m pip install pytest PyYAML
@@ -156,6 +161,7 @@ jobs:
         if: steps.staged_patch.outputs.applied == 'true'
         run: |
           rm -f tools/apply_post_execution_report_consistency_patch.py
+          rm -f tools/fix_post_execution_legacy_cockpit.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add \
@@ -164,6 +170,6 @@ jobs:
             runtime/render_etf_report_from_state.py \
             runtime/render_etf_report_nl_from_state.py \
             runtime/fix_executed_report_contract.py
-          git add -u tools/apply_post_execution_report_consistency_patch.py
+          git add -u tools/apply_post_execution_report_consistency_patch.py tools/fix_post_execution_legacy_cockpit.py
           git commit -m "Integrate post-execution report consistency authority [post-execution-surface]"
           git push origin HEAD:${{ github.head_ref || github.ref_name }}
