@@ -66,12 +66,14 @@ def main() -> None:
 
     expected_en = [
         "No material regime change was recorded versus the prior review.",
-        "IEFA already represents 24.05% of the portfolio",
+        "already represents 24.05% of the portfolio",
+        "Existing funded position; no additional lane promotion was granted this run.",
         "DFEN",
     ]
     expected_nl = [
         "Er is geen materiële regimeverandering vastgesteld ten opzichte van de vorige review.",
-        "IEFA vertegenwoordigt al 24.05% van de portefeuille",
+        "vertegenwoordigt al 24.05% van de portefeuille",
+        "Bestaande gefinancierde positie; deze run is geen aanvullende lane-promotie toegekend.",
         "DFEN",
     ]
     for phrase in expected_en:
@@ -80,6 +82,22 @@ def main() -> None:
     for phrase in expected_nl:
         if phrase not in text_nl:
             raise RuntimeError(f"Dutch freshness proof is missing: {phrase}")
+
+    forbidden_en = [
+        "Zero allocation is an explicit U.S. exceptionalism bet.",
+        "Portfolio has limited non-U.S. exposure.",
+        "Non-U.S. equity exposure remains a diversification gap.",
+    ]
+    forbidden_nl = [
+        "De portefeuille heeft geen blootstelling aan ontwikkelde markten buiten de VS.",
+        "Niet-Amerikaanse aandelenblootstelling blijft een diversificatiekloof.",
+    ]
+    for phrase in forbidden_en:
+        if phrase in text_en:
+            raise RuntimeError(f"English stale wording remains: {phrase}")
+    for phrase in forbidden_nl:
+        if phrase in text_nl:
+            raise RuntimeError(f"Dutch stale wording remains: {phrase}")
 
     import send_report_runtime_html as delivery_entrypoint
 
