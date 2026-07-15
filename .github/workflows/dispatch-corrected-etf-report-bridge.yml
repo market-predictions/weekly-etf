@@ -78,8 +78,32 @@ jobs:
           test -n "$MRKT_RPRTS_MAIL_FROM"
           test -n "$MRKT_RPRTS_MAIL_TO"
 
-      - name: Generate, validate and send corrected reports
-        run: python -m runtime.run_post_execution_correction_delivery
+      - name: Capture corrected delivery execution
+        id: correction
+        run: |
+          set +e
+          python -m runtime.run_post_execution_correction_delivery 2>&1 | tee /tmp/etf-correction-delivery.log
+          status=${PIPESTATUS[0]}
+          echo "$status" > /tmp/etf-correction-delivery.status
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload corrected delivery diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: corrected-etf-delivery-diagnostics-${{ github.run_id }}
+          path: |
+            /tmp/etf-correction-delivery.log
+            /tmp/etf-correction-delivery.status
+            output/weekly_analysis_pro_260714_03.md
+            output/weekly_analysis_pro_nl_260714_03.md
+            output/runtime/latest_etf_report_state_path.txt
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Enforce corrected delivery execution
+        run: test "${{ steps.correction.outputs.status }}" -eq 0
 
       - name: Persist corrected reports and delivery evidence
         run: |
