@@ -8,21 +8,16 @@ on:
       - "control/run_queue/weekly_etf_report_correction_dispatch_20260715.md"
 
 permissions:
+  actions: read
   contents: write
 
 jobs:
-  correct-deliver-and-persist:
+  recover-and-persist:
     if: github.head_ref == 'ops/dispatch-corrected-etf-report-20260715'
     runs-on: ubuntu-latest
     env:
-      MRKT_RPRTS_SMTP_HOST: ${{ secrets.MRKT_RPRTS_SMTP_HOST }}
-      MRKT_RPRTS_SMTP_PORT: ${{ secrets.MRKT_RPRTS_SMTP_PORT }}
-      MRKT_RPRTS_SMTP_USER: ${{ secrets.MRKT_RPRTS_SMTP_USER }}
-      MRKT_RPRTS_SMTP_PASS: ${{ secrets.MRKT_RPRTS_SMTP_PASS }}
-      MRKT_RPRTS_MAIL_FROM: ${{ secrets.MRKT_RPRTS_MAIL_FROM }}
-      MRKT_RPRTS_MAIL_TO: ${{ secrets.MRKT_RPRTS_MAIL_TO }}
-      MRKT_RPRTS_MAIL_TO_NL: ${{ secrets.MRKT_RPRTS_MAIL_TO_NL }}
       ETF_CORRECTION_REQUEST_FILE: control/run_queue/weekly_etf_report_correction_request_20260715_230541.md
+      ETF_PRIOR_CORRECTION_WORKFLOW_RUN_ID: "29455717158"
 
     steps:
       - name: Check out main
@@ -69,42 +64,37 @@ jobs:
             jsonschema \
             yfinance
 
-      - name: Verify production SMTP contract
+      - name: Download successful corrected-delivery transcript
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          test -n "$MRKT_RPRTS_SMTP_HOST"
-          test -n "$MRKT_RPRTS_SMTP_PORT"
-          test -n "$MRKT_RPRTS_SMTP_USER"
-          test -n "$MRKT_RPRTS_SMTP_PASS"
-          test -n "$MRKT_RPRTS_MAIL_FROM"
-          test -n "$MRKT_RPRTS_MAIL_TO"
+          mkdir -p /tmp/prior-correction-delivery
+          gh run download "$ETF_PRIOR_CORRECTION_WORKFLOW_RUN_ID" \
+            --repo "${{ github.repository }}" \
+            --name "corrected-etf-delivery-diagnostics-$ETF_PRIOR_CORRECTION_WORKFLOW_RUN_ID" \
+            --dir /tmp/prior-correction-delivery
+          delivery_log="$(find /tmp/prior-correction-delivery -type f -name etf-correction-delivery.log -print -quit)"
+          test -n "$delivery_log"
+          test -s "$delivery_log"
+          grep -q "DELIVERY_OK | mode=pro_bilingual" "$delivery_log"
+          echo "ETF_PRIOR_CORRECTION_DELIVERY_LOG=$delivery_log" >> "$GITHUB_ENV"
 
-      - name: Capture corrected delivery execution
-        id: correction
-        run: |
-          set +e
-          python -m runtime.run_post_execution_correction_delivery 2>&1 | tee /tmp/etf-correction-delivery.log
-          status=${PIPESTATUS[0]}
-          echo "$status" > /tmp/etf-correction-delivery.status
-          echo "status=$status" >> "$GITHUB_OUTPUT"
-          exit 0
+      - name: Recover corrected reports, render assets and manifest without sending
+        run: python -m runtime.recover_post_execution_correction_evidence 2>&1 | tee /tmp/etf-correction-recovery.log
 
-      - name: Upload corrected delivery diagnostics
+      - name: Upload correction recovery evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: corrected-etf-delivery-diagnostics-${{ github.run_id }}
+          name: corrected-etf-recovery-${{ github.run_id }}
           path: |
-            /tmp/etf-correction-delivery.log
-            /tmp/etf-correction-delivery.status
-            output/weekly_analysis_pro_260714_03.md
-            output/weekly_analysis_pro_nl_260714_03.md
-            output/runtime/latest_etf_report_state_path.txt
+            /tmp/etf-correction-recovery.log
+            output/weekly_analysis_pro_260714_03*
+            output/weekly_analysis_pro_nl_260714_03*
+            output/delivery/weekly_etf_correction_*
           if-no-files-found: warn
-          retention-days: 14
-
-      - name: Enforce corrected delivery execution
-        run: test "${{ steps.correction.outputs.status }}" -eq 0
+          retention-days: 30
 
       - name: Persist corrected reports and delivery evidence
         run: |
@@ -114,13 +104,14 @@ jobs:
           git add -f \
             output/weekly_analysis_pro_260714_03* \
             output/weekly_analysis_pro_nl_260714_03* \
-            output/delivery/*.json
+            output/delivery/weekly_etf_correction_*.json \
+            output/delivery/weekly_etf_correction_*.txt
           if git diff --cached --quiet; then
-            echo "No corrected report or delivery artifacts changed" >&2
+            echo "No corrected report or recovery evidence changed" >&2
             exit 1
           fi
-          git commit -m "Persist corrected Weekly ETF report delivery evidence [skip ci]"
+          git commit -m "Persist corrected Weekly ETF report and verified delivery evidence [skip ci]"
           git push origin HEAD:main
 
-      - name: Record correction completion
-        run: echo "ETF_CORRECTION_DELIVERY_BRIDGE_OK"
+      - name: Record correction recovery completion
+        run: echo "ETF_CORRECTION_EVIDENCE_RECOVERY_BRIDGE_OK"
