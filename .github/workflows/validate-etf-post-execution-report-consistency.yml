@@ -89,6 +89,17 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+      - name: Upload replay report snapshots before enforcement
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-execution-report-snapshots
+          path: |
+            /tmp/weekly_analysis_pro_260714_03.md
+            /tmp/weekly_analysis_pro_nl_260714_03.md
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Enforce exact-artifact replay
         run: test "$(cat /tmp/post-execution-finalizer-status.txt)" -eq 0
 
