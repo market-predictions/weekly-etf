@@ -10,7 +10,7 @@ if start == -1:
 end = text.find(end_marker, start)
 if end == -1:
     raise SystemExit("dynamic cockpit helper end not found")
-new = '''def _ensure_decision_cockpit(text: str, state: dict[str, Any], *, language: str) -> str:
+new = r'''def _ensure_decision_cockpit(text: str, state: dict[str, Any], *, language: str) -> str:
     cockpit = decision_cockpit_nl(state) if language == "nl" else decision_cockpit_en(state)
     legacy_heading = "## 2A. Besliscockpit" if language == "nl" else "## 2A. Decision cockpit"
     legacy_end = "## 3. Regime-dashboard" if language == "nl" else "## 3. Regime Dashboard"
