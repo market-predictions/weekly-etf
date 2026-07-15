@@ -8,6 +8,13 @@ from pathlib import Path
 from typing import Any
 
 from runtime.build_etf_report_state import build_runtime_state
+from runtime.post_execution_report_surface import (
+    action_buckets,
+    executed_rotation_summary_en,
+    has_executed_changes,
+    position_action_label_en,
+    rotation_plan_table_en,
+)
 from runtime.render_etf_report_from_state import f2, position_rows
 from runtime.replacement_edge_report_notes import (
     build_notes_payload_from_paths,
@@ -242,6 +249,35 @@ def _rotation_bucket_summary(state: dict[str, Any]) -> dict[str, list[str]]:
 
 
 def action_snapshot_section(state: dict[str, Any]) -> str:
+    if has_executed_changes(state):
+        buckets = action_buckets(state)
+        joined = lambda key, none="None": ", ".join(buckets[key]) if buckets[key] else none
+        return "\n".join([
+            "### Add — executed",
+            "- " + joined("add"),
+            "",
+            "### Reduce — executed",
+            "- " + joined("reduce"),
+            "",
+            "### Close — executed",
+            "- " + joined("close"),
+            "",
+            "### Hold",
+            "- " + joined("hold"),
+            "",
+            "### Hold but replaceable",
+            "- " + joined("replaceable"),
+            "",
+            "### Rotation engine status",
+            "- " + executed_rotation_summary_en(state),
+            "- The one-major-rotation budget is consumed for this run; another mutation requires a future validated run.",
+            "",
+            "### Replacement pricing and duel status",
+            "",
+            replacement_duel_v2_markdown(state),
+            "",
+            _replacement_edge_notes(state),
+        ])
     if has_rotation_plan(state):
         buckets = _rotation_bucket_summary(state)
         replacement_note = _trade_summary(state) if _trade_intents(state) else "No proposed rotation trade intent was generated this run."
@@ -320,7 +356,7 @@ def current_position_cards(state: dict[str, Any]) -> str:
     for p in position_rows(state):
         ticker = str(p.get("ticker", "")).upper()
         decision = decision_by_ticker.get(ticker, {})
-        action = action_label(decision.get("action_code")) if decision else clean_action(p.get("rotation_action_code") or p.get("suggested_action"))
+        action = position_action_label_en(p, state) if has_executed_changes(state) else (action_label(decision.get("action_code")) if decision else clean_action(p.get("rotation_action_code") or p.get("suggested_action")))
         destination = clean_optional(decision.get("destination_ticker")) if decision else clean_optional(p.get("rotation_destination_ticker"))
         score = _score_label(p, ticker, lanes_by_ticker)
         fresh_cash = clean_action(p.get("fresh_cash_test"))
@@ -345,6 +381,8 @@ def current_position_cards(state: dict[str, Any]) -> str:
 
 
 def rotation_plan_sections(state: dict[str, Any]) -> str:
+    if has_executed_changes(state):
+        return rotation_plan_table_en(state)
     if has_rotation_plan(state):
         return rotation_plan_summary_from_rotation(state)
     positions = position_rows(state)
@@ -374,7 +412,9 @@ def lane_label(lane: dict[str, Any]) -> str:
 
 def best_new_opportunities(state: dict[str, Any]) -> str:
     lines = ["- SMH remains the leading funded growth exposure, subject to the max-position rule."]
-    if _trade_intents(state):
+    if has_executed_changes(state):
+        lines.append(f"- Executed rotation: {executed_rotation_summary_en(state)}")
+    elif _trade_intents(state):
         lines.append(f"- Proposed rotation: {_trade_summary(state)}")
     promoted = state.get("lane_assessment", {}).get("assessed_lanes", [])
     count = 0

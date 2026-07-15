@@ -8,6 +8,12 @@ from pathlib import Path
 from typing import Any
 
 from runtime.build_etf_report_state import build_runtime_state
+from runtime.post_execution_report_surface import (
+    has_executed_changes,
+    position_action_code,
+    position_action_label_en,
+    rotation_plan_table_en,
+)
 from runtime.render_etf_report_nl_from_state import render_nl_native
 from runtime.replacement_duel_v2 import replacement_duel_v2_markdown
 from runtime.rotation_render_tables import (
@@ -234,7 +240,11 @@ def final_action_table(state: dict[str, Any]) -> str:
     for p in position_rows(state):
         ticker = str(p.get("ticker", "")).upper()
         short_reason = sanitize_client_text_for_active_state(p.get("short_reason", ""), state)
-        lines.append(f"| {ticker} | {ETF_NAMES.get(ticker, ticker)} | {p.get('existing_new', 'Existing')} | {f2(p.get('weight_inherited_pct') or p.get('previous_weight_pct'))} | {f2(p.get('target_weight_pct') or w.get(ticker))} | {p.get('suggested_action', 'Hold')} | {p.get('conviction_tier', '')} | {f2(p.get('total_score'))} | {p.get('portfolio_role', '')} | {p.get('better_alternative_exists', 'No')} | {short_reason} |")
+        action = position_action_label_en(p, state) if has_executed_changes(state) else p.get("suggested_action", "Hold")
+        existing_new = "New" if position_action_code(p, state) == "add_executed" else p.get("existing_new", "Existing")
+        inherited = p.get("weight_inherited_pct") if p.get("weight_inherited_pct") is not None else p.get("previous_weight_pct")
+        target = p.get("target_weight_pct") if p.get("target_weight_pct") is not None else w.get(ticker)
+        lines.append(f"| {ticker} | {ETF_NAMES.get(ticker, ticker)} | {existing_new} | {f2(inherited)} | {f2(target)} | {action} | {p.get('conviction_tier', '')} | {f2(p.get('total_score'))} | {p.get('portfolio_role', '')} | {p.get('better_alternative_exists', 'No')} | {short_reason} |")
     return "\n".join(lines)
 
 
@@ -277,8 +287,10 @@ def action_tickers(state: dict[str, Any], predicate) -> str:
 
 
 def rotation_plan_table(state: dict[str, Any]) -> str:
+    if is_post_execution_state(state) and has_executed_changes(state):
+        return rotation_plan_table_en(state)
     if is_post_execution_state(state):
-        return "\n".join(["| Close | Reduce | Hold | Add / destination | Reflected replace / reduce |", "|---|---|---|---|---|", f"| None | None | SMH, GSG, URNM | GSG | {reflected_rotation_label(state)} |"])
+        return "\n".join(["| Close | Reduce | Hold | Add / destination | Reflected replace / reduce |", "|---|---|---|---|---|", f"| None | None | {', '.join(sorted(active_tickers(state)))} | None | prior guarded rotation already reflected |"] )
     if has_rotation_plan(state):
         return rotation_plan_summary_from_rotation(state)
     close = action_tickers(state, lambda action, p: "close" in action.lower() or "sell" in action.lower())

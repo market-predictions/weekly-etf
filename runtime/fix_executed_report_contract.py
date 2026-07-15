@@ -6,6 +6,12 @@ import re
 from pathlib import Path
 from typing import Any
 
+from runtime.post_execution_report_surface import (
+    decision_cockpit_en,
+    decision_cockpit_nl,
+    validate_post_execution_report_consistency,
+)
+
 FORBIDDEN_POST_EXECUTION_PHRASES = [
     "proposed until",
     "pending execution",
@@ -210,6 +216,22 @@ def _patch_common_text(text: str) -> str:
     return text
 
 
+def _replace_legacy_decision_cockpit(text: str, state: dict[str, Any], language: str) -> str:
+    if language == "nl":
+        start = "## 2A. Besliscockpit"
+        end = "## 3. Regime-dashboard"
+        cockpit = decision_cockpit_nl(state)
+    else:
+        start = "## 2A. Decision cockpit"
+        end = "## 3. Regime Dashboard"
+        cockpit = decision_cockpit_en(state)
+    if start not in text or end not in text:
+        return text
+    lines = cockpit.strip().splitlines()
+    body = "\n".join(lines[2:]).strip() if len(lines) > 2 else cockpit.strip()
+    return _replace_between(text, start, end, body)
+
+
 def patch_report(path: Path, state: dict[str, Any]) -> None:
     text = path.read_text(encoding="utf-8")
     text = _patch_common_text(text)
@@ -220,6 +242,9 @@ def patch_report(path: Path, state: dict[str, Any]) -> None:
     text = _replace_between(text, NL_POSITION_CHANGES_HEADING, "## 15. Huidige posities en cash", _position_changes_table_nl(state))
     text = text.replace("## 14. Positiewijzigingen in deze run", NL_POSITION_CHANGES_HEADING)
     validate_no_post_execution_proposed_language(text, report_name=path.name)
+    language = "nl" if "## 2. Portefeuille-acties" in text else "en"
+    text = _replace_legacy_decision_cockpit(text, state, language)
+    validate_post_execution_report_consistency(text, state, language=language)
     path.write_text(text, encoding="utf-8")
     print(f"ETF_EXECUTED_REPORT_CONTRACT_PATCHED | report={path.name}")
 
