@@ -132,6 +132,9 @@ jobs:
           validate_post_execution_report_consistency(en, state, language='en')
           validate_post_execution_report_consistency(nl, state, language='nl')
 
+          changes = {row['ticker']: row for row in state.get('executed_model_changes', [])}
+          urnm_delta = f"{float(changes['URNM']['shares_delta']):.2f}"
+          xbi_delta = f"{float(changes['XBI']['shares_delta']):.2f}"
           checks = {
               'en_cockpit_execution': 'Guarded model rotation executed and persisted' in en,
               'nl_cockpit_execution': 'Bewaakte modelrotatie uitgevoerd en verwerkt' in nl,
@@ -139,17 +142,20 @@ jobs:
               'en_xbi_add': 'Add — executed' in en and 'XBI' in en,
               'nl_urnm_reduce': 'Verlagen — uitgevoerd' in nl and 'URNM' in nl,
               'nl_xbi_add': 'Toevoegen — uitgevoerd' in nl and 'XBI' in nl,
-              'en_section14_urnm_shares': '-105.86' in en,
-              'en_section14_xbi_shares': '35.63' in en,
-              'nl_section14_urnm_shares': '-105.86' in nl,
-              'nl_section14_xbi_shares': '35.63' in nl,
+              'en_section14_urnm_shares': urnm_delta in en,
+              'en_section14_xbi_shares': xbi_delta in en,
+              'nl_section14_urnm_shares': urnm_delta in nl,
+              'nl_section14_xbi_shares': xbi_delta in nl,
               'en_no_contradiction': 'no portfolio action' not in en.lower(),
               'nl_no_contradiction': 'geen portefeuilleactie' not in nl.lower(),
           }
           failed = [name for name, passed in checks.items() if not passed]
           if failed:
               raise SystemExit('Post-execution report proof failed: ' + ', '.join(failed))
-          print('ETF_POST_EXECUTION_REPORT_CONSISTENCY_OK | changes=2 | source=URNM | destination=XBI | languages=EN,NL')
+          print(
+              'ETF_POST_EXECUTION_REPORT_CONSISTENCY_OK | '
+              f"changes=2 | source=URNM:{urnm_delta} | destination=XBI:{xbi_delta} | languages=EN,NL"
+          )
           PY
 
       - name: Upload corrected report replay evidence
