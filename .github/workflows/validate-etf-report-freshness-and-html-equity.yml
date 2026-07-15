@@ -13,6 +13,7 @@ on:
       - "send_report_runtime_html.py"
       - "tools/apply_report_freshness_integration_patch.py"
       - "tools/apply_report_freshness_followup_patch.py"
+      - "tools/apply_report_freshness_exact_phrase_patch.py"
       - "tools/render_report_freshness_preview.py"
       - "tests/test_report_freshness_and_html_equity.py"
       - ".github/workflows/validate-etf-report-freshness-and-html-equity.yml"
@@ -132,12 +133,17 @@ jobs:
         run: |
           grep -q "No material regime change was recorded versus the prior review" output/weekly_analysis_pro_260714_04.md
           grep -q "Er is geen materiële regimeverandering vastgesteld ten opzichte van de vorige review" output/weekly_analysis_pro_nl_260714_04.md
-          grep -q "IEFA already represents 24.05% of the portfolio" output/weekly_analysis_pro_260714_04.md
-          grep -q "IEFA vertegenwoordigt al 24.05% van de portefeuille" output/weekly_analysis_pro_nl_260714_04.md
+          grep -q "already represents 24.05% of the portfolio" output/weekly_analysis_pro_260714_04.md
+          grep -q "vertegenwoordigt al 24.05% van de portefeuille" output/weekly_analysis_pro_nl_260714_04.md
+          grep -q "Existing funded position; no additional lane promotion was granted this run" output/weekly_analysis_pro_260714_04.md
+          grep -q "Bestaande gefinancierde positie; deze run is geen aanvullende lane-promotie toegekend" output/weekly_analysis_pro_nl_260714_04.md
           ! grep -qi "raised rates this week" output/weekly_analysis_pro_260714_04.md
           ! grep -qi "verhoogde deze week de rente" output/weekly_analysis_pro_nl_260714_04.md
           ! grep -qi "Non-U.S. equity exposure remains a diversification gap" output/weekly_analysis_pro_260714_04.md
+          ! grep -qi "Zero allocation is an explicit U.S. exceptionalism bet" output/weekly_analysis_pro_260714_04.md
+          ! grep -qi "Portfolio has limited non-U.S. exposure" output/weekly_analysis_pro_260714_04.md
           ! grep -qi "Niet-Amerikaanse aandelenblootstelling blijft een diversificatiekloof" output/weekly_analysis_pro_nl_260714_04.md
+          ! grep -qi "De portefeuille heeft geen blootstelling aan ontwikkelde markten buiten de VS" output/weekly_analysis_pro_nl_260714_04.md
           ! grep -qi "Diagnostisch-only\|fundability-bevoegdheid\|Financial infrastructure and market plumbing\|Power infrastructure and utilities capex" output/weekly_analysis_pro_nl_260714_04.md
 
       - name: Verify standalone HTML equity graph
