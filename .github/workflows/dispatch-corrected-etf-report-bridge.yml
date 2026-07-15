@@ -1,0 +1,51 @@
+name: Dispatch corrected ETF report bridge
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/weekly_etf_report_correction_dispatch_20260715.md"
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  dispatch-and-watch:
+    if: github.head_ref == 'ops/dispatch-corrected-etf-report-20260715'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch guarded correction workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          dispatched_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          gh workflow run resend-corrected-post-execution-report.yml \
+            --repo "${{ github.repository }}" \
+            --ref main \
+            -f request_file=control/run_queue/weekly_etf_report_correction_request_20260715_230541.md \
+            -f send_confirmation=confirm_correction_resend
+
+          run_id=""
+          for attempt in $(seq 1 18); do
+            run_id="$(gh run list \
+              --repo "${{ github.repository }}" \
+              --workflow resend-corrected-post-execution-report.yml \
+              --event workflow_dispatch \
+              --limit 20 \
+              --json databaseId,createdAt \
+              --jq "map(select(.createdAt >= \"$dispatched_at\")) | sort_by(.createdAt) | last | .databaseId // empty")"
+            if test -n "$run_id"; then
+              break
+            fi
+            sleep 5
+          done
+
+          test -n "$run_id"
+          echo "CORRECTION_WORKFLOW_RUN_ID=$run_id"
+          gh run watch "$run_id" --repo "${{ github.repository }}" --exit-status
+
+      - name: Record dispatch completion
+        run: echo "ETF_CORRECTION_DISPATCH_BRIDGE_OK"
