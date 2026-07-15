@@ -1,0 +1,61 @@
+name: Diagnose ETF report freshness render
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/diagnose_report_freshness_render_20260716.md"
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose-render:
+    if: github.head_ref == 'agent/fix-report-freshness-and-html-equity-graph'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install PDF system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcairo2 libpango-1.0-0 libgdk-pixbuf-2.0-0 libffi-dev shared-mime-info fonts-liberation fonts-dejavu-core fonts-lato poppler-utils
+      - name: Install report dependencies
+        run: |
+          python -m pip install pandas matplotlib seaborn markdown mistune beautifulsoup4 lxml premailer weasyprint pillow requests pyyaml jsonschema yfinance
+      - name: Apply source integration
+        run: |
+          python tools/apply_report_freshness_integration_patch.py
+          python tools/apply_report_freshness_followup_patch.py
+      - name: Capture exact-artifact render
+        id: render
+        run: |
+          set +e
+          python tools/render_report_freshness_preview.py 2>&1 | tee /tmp/report-freshness-render.log
+          status=${PIPESTATUS[0]}
+          echo "$status" > /tmp/report-freshness-render.status
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Upload render diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-freshness-render-${{ github.run_id }}
+          path: |
+            /tmp/report-freshness-render.log
+            /tmp/report-freshness-render.status
+            output/weekly_analysis_pro_260714_04.md
+            output/weekly_analysis_pro_nl_260714_04.md
+            output/weekly_analysis_pro_260714_04_delivery.html
+            output/weekly_analysis_pro_nl_260714_04_delivery.html
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Enforce render result
+        run: test "${{ steps.render.outputs.status }}" -eq 0
