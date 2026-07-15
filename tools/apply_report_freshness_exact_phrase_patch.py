@@ -105,7 +105,23 @@ def main() -> None:
     changed |= add_mapping_after(
         path,
         '                "Zero allocation is an explicit bet on U.S. exceptionalism.": f"The portfolio already carries {iefa_weight:.2f}% non-U.S. developed-market exposure through IEFA; currency and regional concentration therefore require active monitoring.",',
+        '                "Zero allocation is an explicit U.S. exceptionalism bet.": f"The portfolio already carries {iefa_weight:.2f}% non-U.S. developed-market exposure through IEFA; currency and regional concentration therefore require active monitoring.",',
+    )
+    changed |= add_mapping_after(
+        path,
+        '                "Zero allocation is an explicit U.S. exceptionalism bet.": f"The portfolio already carries {iefa_weight:.2f}% non-U.S. developed-market exposure through IEFA; currency and regional concentration therefore require active monitoring.",',
         '                "Portfolio has limited non-U.S. exposure.": f"IEFA already provides a material non-U.S. developed-market allocation ({iefa_weight:.2f}%); further changes require relative-strength and concentration evidence.",',
+    )
+    changed |= add_mapping_after(
+        path,
+        '                "| Non-U.S. developed market diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Scored below the live radar cutoff versus stronger funded and challenger lanes. | Becomes fundable if U.S. factor concentration rises or non-U.S. breadth improves. |": "| Non-U.S. developed market diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Existing funded position; no additional lane promotion was granted this run. | Reassess only if relative strength, factor concentration or the funding case changes materially. |",',
+        '                "| Non-U.S. developed market diversification | IEFA | Scored below the live radar cutoff versus stronger funded and challenger lanes. | Becomes fundable if U.S. factor concentration rises or non-U.S. breadth improves. |": "| Non-U.S. developed market diversification | IEFA | Existing funded position; no additional lane promotion was granted this run. | Reassess only if relative strength, factor concentration or the funding case changes materially. |",',
+    )
+
+    changed |= replace_once(
+        path,
+        '            "zero allocation is an explicit bet",\n',
+        '            "zero allocation is an explicit bet",\n            "zero allocation is an explicit u.s. exceptionalism bet",\n            "portfolio has limited non-u.s. exposure",\n            "de portefeuille heeft geen blootstelling aan ontwikkelde markten buiten de vs",\n',
     )
 
     print(f"ETF_REPORT_FRESHNESS_EXACT_PHRASE_PATCH_OK | changed={str(changed).lower()}")
