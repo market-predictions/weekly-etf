@@ -9,13 +9,60 @@ on:
 
 permissions:
   actions: write
-  contents: read
+  contents: write
 
 jobs:
   dispatch-and-watch:
     if: github.head_ref == 'ops/dispatch-corrected-etf-report-20260715'
     runs-on: ubuntu-latest
     steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Align correction workflow with production SMTP contract
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/workflows/resend-corrected-post-execution-report.yml')
+          text = path.read_text(encoding='utf-8')
+          expr = '$' + '{{ secrets.'
+          replacements = {
+              '      MAIL_USERNAME: ' + expr + 'MAIL_USERNAME }}': '      MRKT_RPRTS_SMTP_USER: ' + expr + 'MRKT_RPRTS_SMTP_USER }}',
+              '      MAIL_PASSWORD: ' + expr + 'MAIL_PASSWORD }}': '      MRKT_RPRTS_SMTP_PASS: ' + expr + 'MRKT_RPRTS_SMTP_PASS }}',
+              '      MAIL_TO: ' + expr + 'MAIL_TO }}': '      MRKT_RPRTS_MAIL_TO: ' + expr + 'MRKT_RPRTS_MAIL_TO }}',
+              '      MAIL_TO_NL: ' + expr + 'MAIL_TO_NL }}': '      MRKT_RPRTS_MAIL_TO_NL: ' + expr + 'MRKT_RPRTS_MAIL_TO_NL }}',
+              '      SMTP_SERVER: ' + expr + 'SMTP_SERVER }}': '      MRKT_RPRTS_SMTP_HOST: ' + expr + 'MRKT_RPRTS_SMTP_HOST }}',
+              '      SMTP_PORT: ' + expr + 'SMTP_PORT }}': '      MRKT_RPRTS_SMTP_PORT: ' + expr + 'MRKT_RPRTS_SMTP_PORT }}\n      MRKT_RPRTS_MAIL_FROM: ' + expr + 'MRKT_RPRTS_MAIL_FROM }}',
+              '          test -n "$MAIL_USERNAME"': '          test -n "$MRKT_RPRTS_SMTP_USER"',
+              '          test -n "$MAIL_PASSWORD"': '          test -n "$MRKT_RPRTS_SMTP_PASS"',
+              '          test -n "$MAIL_TO"': '          test -n "$MRKT_RPRTS_MAIL_TO"',
+              '          test -n "$SMTP_SERVER"': '          test -n "$MRKT_RPRTS_SMTP_HOST"',
+              '          test -n "$SMTP_PORT"': '          test -n "$MRKT_RPRTS_SMTP_PORT"\n          test -n "$MRKT_RPRTS_MAIL_FROM"',
+          }
+          changed = False
+          for old, new in replacements.items():
+              if old in text:
+                  text = text.replace(old, new, 1)
+                  changed = True
+              elif new not in text:
+                  raise SystemExit(f'Missing expected SMTP contract line: {old}')
+          path.write_text(text, encoding='utf-8')
+          print(f'CORRECTION_SMTP_CONTRACT_PATCHED={str(changed).lower()}')
+          PY
+          git diff --check
+          if ! git diff --quiet -- .github/workflows/resend-corrected-post-execution-report.yml; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .github/workflows/resend-corrected-post-execution-report.yml
+            git commit -m "Align ETF correction workflow with production SMTP contract [skip ci]"
+            git push origin HEAD:main
+          fi
+
       - name: Dispatch guarded correction workflow
         env:
           GH_TOKEN: ${{ github.token }}
