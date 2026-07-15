@@ -1,5 +1,5 @@
 {
-  "breadth_trend": "improving",
+  "breadth_trend": "mixed",
   "confidence_trend": "flat",
   "cross_asset_confirmation": "mixed",
   "current_confidence": 0.66,
@@ -10,13 +10,13 @@
   "previous_confidence": 0.66,
   "prior_regime": "Risk-on growth",
   "regime_changed_this_run": false,
-  "report_date": "2026-07-01",
+  "report_date": "2026-07-14",
   "report_transfer": {
     "max_lines": 2,
     "show_in_report": true,
-    "summary": "Risk-on growth has persisted for 60 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed."
+    "summary": "Risk-on growth has persisted for 61 run(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed."
   },
   "transition_state": "stable",
-  "updated_at_utc": "2026-07-01T23:25:36.671236Z",
-  "weeks_in_regime": 60
+  "updated_at_utc": "2026-07-15T16:45:23.509870Z",
+  "weeks_in_regime": 61
 }
