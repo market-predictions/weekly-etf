@@ -11,6 +11,7 @@ on:
       - "tools/validate_etf_rotation_state_authority.py"
       - "tests/test_etf_rotation_state_authority.py"
       - "tools/apply_rotation_authority_finalize.py"
+      - "tools/fix_rotation_authority_finalize_newlines.py"
       - ".github/workflows/apply-rotation-authority-finalize.yml"
       - ".github/workflows/validate-etf-rotation-state-authority.yml"
   workflow_dispatch:
@@ -38,6 +39,7 @@ jobs:
         run: |
           if test -f tools/apply_rotation_authority_finalize.py; then
             python tools/apply_rotation_authority_finalize.py
+            python tools/fix_rotation_authority_finalize_newlines.py
             echo "applied=true" >> "$GITHUB_OUTPUT"
           else
             echo "applied=false" >> "$GITHUB_OUTPUT"
@@ -113,10 +115,11 @@ jobs:
         if: steps.finalize.outputs.applied == 'true'
         run: |
           rm -f tools/apply_rotation_authority_finalize.py
+          rm -f tools/fix_rotation_authority_finalize_newlines.py
           rm -f .github/workflows/apply-rotation-authority-finalize.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add runtime/rotation_state_authority.py runtime/portfolio_rotation_engine_v2.py tests/test_etf_rotation_state_authority.py
-          git add -u tools/apply_rotation_authority_finalize.py .github/workflows/apply-rotation-authority-finalize.yml
+          git add -u tools/apply_rotation_authority_finalize.py tools/fix_rotation_authority_finalize_newlines.py .github/workflows/apply-rotation-authority-finalize.yml
           git commit -m "Finalize rotation authority and destination ranking [rotation-authority-finalize]"
           git push origin HEAD:${{ github.head_ref || github.ref_name }}
