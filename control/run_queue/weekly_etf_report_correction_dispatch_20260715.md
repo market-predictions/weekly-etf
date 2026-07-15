@@ -1,6 +1,6 @@
 # Dispatch corrected Weekly ETF report
 
 request_file: control/run_queue/weekly_etf_report_correction_request_20260715_230541.md
-dispatch_mode: direct_correction_delivery_runner
+dispatch_mode: evidence_recovery_no_resend
 execution_boundary: existing_execution_artifact_only
-dispatch_attempt: 6
+dispatch_attempt: 7
