@@ -81,35 +81,35 @@ jobs:
 
       - name: Aggregate failure marker valuation build
         continue-on-error: true
-        run: '! grep -q "FAILED.*test_current_run_valuation_builds_position" /tmp/rotation-authority-pytest.txt'
+        run: '! grep -q "test_current_run_valuation_builds_position.*FAILED" /tmp/rotation-authority-pytest.txt'
 
       - name: Aggregate failure marker P&L arithmetic
         continue-on-error: true
-        run: '! grep -q "FAILED.*test_current_run_valuation_recomputes_pnl" /tmp/rotation-authority-pytest.txt'
+        run: '! grep -q "test_current_run_valuation_recomputes_pnl.*FAILED" /tmp/rotation-authority-pytest.txt'
 
       - name: Aggregate failure marker P&L basis
         continue-on-error: true
-        run: '! grep -q "FAILED.*test_current_run_valuation_records_pnl_basis" /tmp/rotation-authority-pytest.txt'
+        run: '! grep -q "test_current_run_valuation_records_pnl_basis.*FAILED" /tmp/rotation-authority-pytest.txt'
 
       - name: Aggregate failure marker NAV and weight
         continue-on-error: true
-        run: '! grep -q "FAILED.*test_current_run_valuation_recomputes_nav_and_weight" /tmp/rotation-authority-pytest.txt'
+        run: '! grep -q "test_current_run_valuation_recomputes_nav_and_weight.*FAILED" /tmp/rotation-authority-pytest.txt'
 
       - name: Aggregate failure marker scorecard mismatch block
         continue-on-error: true
-        run: '! grep -q "FAILED.*test_scorecard_refresh_blocks_stale_or_inconsistent_pnl" /tmp/rotation-authority-pytest.txt'
+        run: '! grep -q "test_scorecard_refresh_blocks_stale_or_inconsistent_pnl.*FAILED" /tmp/rotation-authority-pytest.txt'
 
       - name: Aggregate failure marker deep-loss release
         continue-on-error: true
-        run: '! grep -q "FAILED.*test_deep_loss_sub4_position_clears_release_threshold" /tmp/rotation-authority-pytest.txt'
+        run: '! grep -q "test_deep_loss_sub4_position_clears_release_threshold.*FAILED" /tmp/rotation-authority-pytest.txt'
 
       - name: Aggregate failure marker alternative candidate
         continue-on-error: true
-        run: '! grep -q "FAILED.*test_alternative_etf_is_independent_replacement_candidate" /tmp/rotation-authority-pytest.txt'
+        run: '! grep -q "test_alternative_etf_is_independent_replacement_candidate.*FAILED" /tmp/rotation-authority-pytest.txt'
 
       - name: Aggregate failure marker mutation path
         continue-on-error: true
-        run: '! grep -q "FAILED.*test_failed_holding_can_rotate_to_general_fundable_candidate" /tmp/rotation-authority-pytest.txt'
+        run: '! grep -q "test_failed_holding_can_rotate_to_general_fundable_candidate.*FAILED" /tmp/rotation-authority-pytest.txt'
 
       - name: Enforce focused regression suite
         run: test "$(cat /tmp/rotation-authority-pytest-status.txt)" -eq 0
