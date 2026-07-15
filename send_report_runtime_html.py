@@ -12,6 +12,7 @@ from runtime.equity_curve_png_contract import render_equity_curve_png
 from runtime.equity_curve_svg_contract import replace_pdf_equity_png_with_svg
 from runtime.macro_report_pre_send_guard import validate_macro_report_pre_send
 from runtime.max_position_action_contract import sanitize_over_cap_add_html
+from runtime.decision_cockpit_html import decision_cockpit_html_from_markdown
 from runtime.render_etf_report_from_state import cash_eur, invested_eur, total_nav
 
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
@@ -87,29 +88,7 @@ def _extend_native_dutch_numeric_aliases() -> None:
 
 
 def _decision_cockpit_html_from_markdown(md_text: str) -> str:
-    is_nl = "## 2A. Besliscockpit" in md_text
-    if is_nl:
-        title = "Besliscockpit"
-        items = [
-            "Deze week: geen portefeuilleactie.",
-            "Belangrijkste actieve risico: SMH-concentratie blijft boven de zachte positielimiet.",
-            "Belangrijkste actieve reviews: SPY versus SMH-overlap, PAVE versus GRID, en validatie van de GSG-hedgerol.",
-            "Trigger voor volgende actie: een vervangingskandidaat moet bevestigde relatieve-sterktevoorsprong, schone prijsbasis, aansluiting op de thesis en duidelijke financieringsbron tonen.",
-            "Vers kapitaal: geblokkeerd voor posities onder grootte- of vervangingsreview totdat een toekomstige run de disciplinepoorten vrijgeeft.",
-        ]
-    else:
-        title = "Decision cockpit"
-        items = [
-            "This week: no portfolio action.",
-            "Main active risk: SMH concentration remains above the soft position cap.",
-            "Main active reviews: SPY versus SMH overlap, PAVE versus GRID, and GSG hedge-role validation.",
-            "Next action trigger: a replacement candidate must show confirmed relative-strength edge, clean pricing basis, thesis fit, and a clear funding source.",
-            "Fresh capital: blocked for positions under size or replacement review unless a future run clears the discipline gates.",
-        ]
-
-    body = "".join(f"<li>{item}</li>" for item in items)
-    return f"<div class='note-box decision-cockpit'><h4>{title}</h4><ul>{body}</ul></div>"
-
+    return decision_cockpit_html_from_markdown(md_text)
 
 def _inject_decision_cockpit_html(html: str, md_text: str) -> str:
     if "Decision cockpit" in html or "Besliscockpit" in html:
@@ -118,6 +97,8 @@ def _inject_decision_cockpit_html(html: str, md_text: str) -> str:
         return html
 
     cockpit = _decision_cockpit_html_from_markdown(md_text)
+    if not cockpit:
+        return html
 
     markers = [
         "<table class='action-table'>",
