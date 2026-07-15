@@ -2,9 +2,8 @@
 
 Date: 2026-07-15
 Repository: `market-predictions/weekly-etf`
-Branch: `agent/fix-post-execution-report-consistency`
 Layer: output contract + operational runbook
-Status: validated / merge ready
+Status: closed
 
 ## Current issue
 
@@ -24,10 +23,11 @@ The execution artifact, official portfolio state and official trade ledger agree
 
 ## Root cause
 
-1. Post-execution finalization exposes `executed_model_changes` and clears the pre-execution rotation plan.
+1. Post-execution finalization exposed `executed_model_changes` and cleared the pre-execution rotation plan.
 2. Downstream renderer and polish layers could fall back to stale `suggested_action` values.
 3. Markdown and HTML decision-cockpit layers could inject static no-action wording.
 4. The executed-report validator did not enforce semantic agreement across Sections 1, 2, 12, 13, 14 and 15 and the delivery cockpit.
+5. The first correction runbook used obsolete SMTP secret names and expected JSON delivery manifests although the production sender emits text manifests.
 
 ## Implemented change
 
@@ -36,60 +36,65 @@ The execution artifact, official portfolio state and official trade ledger agree
 3. URNM renders as `Reduce — executed` / `Verlagen — uitgevoerd`.
 4. XBI renders as `Add — executed` / `Toevoegen — uitgevoerd`.
 5. Sections 1, 2, 12, 13, 14 and 15 are aligned.
-6. Delivery HTML cockpit content is derived from corrected Markdown instead of static no-action copy.
+6. Delivery HTML cockpit content is derived from corrected Markdown.
 7. A blocking semantic validator rejects cross-section contradictions.
-8. A dedicated correction-resend workflow reuses the existing execution artifact and proves portfolio-state and trade-ledger immutability.
+8. Correction delivery reuses the existing execution artifact and proves portfolio-state and trade-ledger immutability.
+9. A non-sending evidence-recovery path can regenerate and persist report assets from an already successful delivery transcript without sending duplicate emails.
 
-## Files
-
-```text
-runtime/post_execution_report_surface.py
-runtime/decision_cockpit_html.py
-runtime/polish_runtime_reports.py
-runtime/fix_report_output_contract.py
-runtime/render_etf_report_from_state.py
-runtime/render_etf_report_nl_from_state.py
-runtime/fix_executed_report_contract.py
-send_report_runtime_html.py
-tests/test_etf_post_execution_report_consistency.py
-tests/test_etf_decision_cockpit_html.py
-.github/workflows/validate-etf-post-execution-report-consistency.yml
-.github/workflows/resend-corrected-etf-report.yml
-control/work_packages/WP_POST_EXECUTION_REPORT_CONSISTENCY_20260715.md
-control/ETF_POST_EXECUTION_REPORT_CONSISTENCY_CHANGELOG.md
-control/POST_EXECUTION_REPORT_CONSISTENCY_STATUS_20260715.md
-control/handovers/HANDOVER_POST_EXECUTION_REPORT_CONSISTENCY_20260715.md
-```
-
-## Authority rules
+## Stable authority rules
 
 - `executed_model_changes` is authoritative for post-execution action classification.
 - Official portfolio state is authoritative for post-execution shares, values and holdings.
 - Official trade ledger is authoritative for executed share deltas.
 - `suggested_action` remains research memory only after execution.
 - A report with executed changes may not state that no action occurred.
-- A correction resend must reuse the existing execution artifact and must not execute the model mutation again.
+- A correction rerender must reuse the existing execution artifact and must not execute the model mutation again.
+- A successful send may be claimed only from a positive delivery-layer receipt; inbox delivery requires a separate inbox receipt.
 
 ## Validation evidence
 
-Final read-only workflow run:
-
 ```text
-workflow: Validate ETF post-execution report consistency
-run_id: 29442287444
-conclusion: success
+implementation_validation_run: 29442287444
+implementation_validation_conclusion: success
+corrected_delivery_run: 29455717158
+corrected_delivery_receipt: DELIVERY_OK | mode=pro_bilingual
+recovery_and_persistence_run: 29455966433
+recovery_and_persistence_conclusion: success
 ```
 
-Passed gates:
+Validated and verified:
 
-- compile affected production modules;
-- focused Markdown and delivery-HTML regression tests;
-- exact execution-artifact replay without model re-execution;
-- portfolio-state hash unchanged;
-- trade-ledger hash unchanged;
-- English and Dutch action-surface consistency;
-- English and Dutch delivery-cockpit consistency.
+- focused Markdown and delivery-HTML tests passed;
+- exact execution-artifact replay did not execute another model mutation;
+- English and Dutch reports consistently show URNM reduced and XBI added;
+- no stale no-action wording remains;
+- English and Dutch HTML/PDF render succeeded;
+- English and Dutch SMTP delivery returned without exception;
+- English and Dutch messages were confirmed in the Gmail inbox with PDF attachments;
+- official portfolio-state SHA-256 was unchanged before/after correction;
+- official trade-ledger SHA-256 was unchanged before/after correction.
 
-## Merge boundary
+## Final artifacts
 
-This package is validated and ready for PR merge. Merge does not complete corrected delivery. After merge, the dedicated correction workflow must be triggered once with explicit confirmation. Delivery closure still requires corrected EN/NL artifacts, positive delivery manifests, a correction manifest and inbox receipt confirmation.
+```text
+output/weekly_analysis_pro_260714_03.md
+output/weekly_analysis_pro_260714_03_clean.md
+output/weekly_analysis_pro_260714_03_delivery.html
+output/weekly_analysis_pro_260714_03.pdf
+output/weekly_analysis_pro_260714_03_equity_curve.png
+output/weekly_analysis_pro_nl_260714_03.md
+output/weekly_analysis_pro_nl_260714_03_clean.md
+output/weekly_analysis_pro_nl_260714_03_delivery.html
+output/weekly_analysis_pro_nl_260714_03.pdf
+output/weekly_analysis_pro_nl_260714_03_equity_curve.png
+output/delivery/weekly_etf_correction_delivery_receipt_2026-07-14_29455717158.txt
+output/delivery/weekly_etf_correction_manifest_2026-07-14_20260715_223718.json
+```
+
+## Closeout
+
+PR #59 was merged as `907598eff2a08a5d27b8bd2238610ecc83a31d76`.
+
+Corrected artifacts and verified delivery evidence were persisted on `main` in commit `d829e89329656b29be4c1d9b3b4aca75ba46f3b4`.
+
+All implementation, correction, rendering, delivery, persistence, immutability and inbox-receipt gates are satisfied. The work package is closed.

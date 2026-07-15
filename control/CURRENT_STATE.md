@@ -2,7 +2,7 @@
 
 ## Snapshot date
 
-2026-06-18
+2026-07-15
 
 ## Repository
 
@@ -12,113 +12,119 @@ market-predictions/weekly-etf
 
 ## Current status label
 
-**WP16 through WP42 are closed. Report Quality Patch 260617, its Dutch localization bugfix, and the PDF Surface Patch for Decision cockpit / Besliscockpit visibility are closed. A new cockpit-first product-surface roadmap is recorded as a forked preview lane. Latest verified production baseline recorded in control remains `260617` with run_id `20260618_172254`; latest client-surface PDF visibility QA evidence is `260618_03`.**
+**The July 14 production review is the latest verified production baseline. A guarded URNM-to-XBI rotation was executed and persisted. The first post-execution report surface was corrected through `WP_POST_EXECUTION_REPORT_CONSISTENCY`; corrected English and Dutch `260714_03` reports were rendered, delivered, persisted and confirmed in the inbox. The package is closed.**
 
-## Latest verified production baseline recorded in control
+## Latest verified production baseline
 
 ```text
-requested_close_date: 2026-06-17
-run_id: 20260618_172254
-report_token: 260617
+requested_close_date: 2026-07-14
+run_id: 20260715_175910
+report_token: 260714
 pricing_lineage_status: passed
-workflow_status: workflow_success
-workflow_conclusion: success
-delivery_status: smtp_sendmail_returned_no_exception
+portfolio_execution_status: executed
+portfolio_mutation: URNM -> XBI
 ```
 
-Delivery evidence remains delivery-layer evidence only. It is not an end-recipient inbox receipt.
-
-## Closed package status
+Authoritative mutation:
 
 ```text
-WP16: closed
-WP17: closed
-WP18: closed
-WP19: closed
-WP20: closed as not_promoted
-WP21: closed as design-only
-WP22: closed as manually validated
-WP23: closed as manually validated
-WP24: closed as review-only
-WP25: closed as proposal-only
-WP26: closed as manually validated
-WP27: closed as visual QA passed
-WP28: closed as leakage firewall verified
-WP29: closed as bilingual alias source verified, preparation-only
-WP30: closed as bridge design verified, design-only
-WP31: closed as review schema verified, schema-only
-WP32: closed as review checklist verified, checklist-only
-WP33: closed as review fixture set verified, fixture-only
-WP34: closed as decision artifact design verified, design-only
-WP35: closed as decision artifact schema verified, schema-only
-WP36: closed as decision artifact validator fixtures verified, fixture-only
-WP37: closed as decision artifact validator hardening verified, validator-hardening only
-WP38: closed as decision sample generation gate verified, validation-only
-WP39: closed as decision dry-run builder verified, validation-only
-WP40: closed as explicit decision artifact design review verified, design-review only
-WP41: closed as decision non-production fixture gate verified, validation-only
-WP42: closed as explicit control-layer package design verified, design-only
-Report Quality Patch 260617: closed as client-facing report-quality patch verified
-Report Quality Patch 260617 post-close Dutch localization bugfix: closed as workflow-validated
-PDF Surface Patch — Decision cockpit visible in final PDF/HTML: closed as client-surface verified
-Cockpit-first surface roadmap anchor: recorded
+URNM: Sell -122.008961 shares; model weight 7.01% -> 2.01%
+XBI: Buy +40.491749 shares; model weight 0.00% -> 5.00%
 ```
 
-## In-progress / pending verification
+Authority sources:
 
 ```text
-WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER: not_started
+output/runtime/etf_model_execution_20260714_20260715_175910.json
+output/runtime/etf_report_state_20260714_20260715_175910_executed.json
+output/etf_portfolio_state.json
+output/etf_trade_ledger.csv
 ```
 
-## Evidence
+## Latest verified client-delivery baseline
 
 ```text
-Fresh report review examples: weekly_analysis_pro_260617.pdf and weekly_analysis_pro_nl_260617.pdf
-runtime/polish_runtime_reports.py
-runtime/rotation_render_tables.py
-tests/test_report_decision_clarity.py
-tests/test_report_weight_basis_labels.py
-tests/test_report_bilingual_takeaway_parity.py
-Report Quality Patch 260617 Codespaces verification: pytest tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py -> 10 passed
-Report Quality Patch 260617 Codespaces verification: python tools/validate_macro_report_surface.py -> ETF_MACRO_REPORT_SURFACE_OK
-Report Quality Patch 260617 Codespaces verification: python tools/validate_macro_thesis_bilingual_aliases.py -> MACRO_THESIS_BILINGUAL_ALIASES_OK
-Report Quality Patch 260617 Codespaces verification: python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output -> ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK on 260617 EN/NL markdown, clean markdown and delivery HTML files
-Report Quality Patch 260617 Codespaces verification: python tools/validate_etf_delivery_html_contract.py -> ETF_DELIVERY_HTML_CONTRACT_OK for weekly_analysis_pro_260617.md and weekly_analysis_pro_nl_260617.md
-Report Quality Patch 260617 Codespaces verification: python tools/validate_etf_dutch_language_quality.py -> ETF_DUTCH_LANGUAGE_QUALITY_OK
-Report Quality Patch 260617 Codespaces verification: git diff --check -> clean
-Workflow #256 failure root cause: Dutch localization blocked cockpit term `thesisfit` before write.
-Bugfix: replaced `thesisfit` with `aansluiting op de thesis` and added a regression assertion.
-Workflow #257: Send weekly ETF Pro report succeeded on main after the Dutch localization bugfix.
-Run manifest: output/run_manifests/weekly_etf_run_manifest_2026-06-17_20260618_172254.json
-Delivery manifest: output/delivery/weekly_etf_delivery_manifest_2026-06-17_20260618_172254.json
-English report: output/weekly_analysis_pro_260617_03.md
-Dutch report: output/weekly_analysis_pro_nl_260617_03.md
+english_report: output/weekly_analysis_pro_260714_03.md
+english_pdf: output/weekly_analysis_pro_260714_03.pdf
+dutch_report: output/weekly_analysis_pro_nl_260714_03.md
+dutch_pdf: output/weekly_analysis_pro_nl_260714_03.pdf
+corrected_delivery_run: 29455717158
+delivery_layer_status: smtp_sendmail_returned_no_exception
+inbox_receipt_status: verified_bilingual
 ```
 
-## PDF Surface Patch evidence
+The corrected reports consistently show:
 
 ```text
-English 260618_03 PDF visibly shows "Decision cockpit" near the top, directly under Portfolio Action Snapshot.
-Dutch 260618_03 PDF visibly shows "Besliscockpit" near the top, directly under Portefeuille-acties.
-Main takeaway remains aligned between English and Dutch.
-Weight-basis note remains visible near the final action table.
-Hold-with-override explanation remains visible near the final action table.
-Dutch forbidden term "thesisfit" is absent; Dutch uses "aansluiting op de thesis".
-Focused tests/checks referenced: pytest tests/test_delivery_html_decision_cockpit.py tests/test_pdf_surface_decision_cockpit.py tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py; python tools/validate_etf_dutch_language_quality.py; python tools/validate_etf_delivery_html_contract.py; python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output; git diff --check.
+URNM: Reduce — executed / Verlagen — uitgevoerd
+XBI: Add — executed / Toevoegen — uitgevoerd
 ```
 
-## Cockpit-first surface roadmap status
+No stale `no portfolio action` / `geen portefeuilleactie` wording remains.
+
+## Delivery and persistence evidence
 
 ```text
-Roadmap: docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_20260618.md
-Initial work package: control/work_packages/WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_20260618.md
-Stable decision: current production report remains intact; cockpit-first surface development proceeds as a forked branch/preview lane.
-Production branch: main
-Planned preview branch: feature/cockpit-front-page-v1
-Preview output path: output/cockpit_preview/
-ETF EU / UCITS mapping: explicitly parked for the parallel ETF EU track.
+implementation_validation_run: 29442287444
+implementation_validation_conclusion: success
+corrected_delivery_run: 29455717158
+recovery_and_persistence_run: 29455966433
+recovery_and_persistence_conclusion: success
+persistence_commit: d829e89329656b29be4c1d9b3b4aca75ba46f3b4
+```
+
+Evidence artifacts:
+
+```text
+output/delivery/weekly_etf_correction_delivery_receipt_2026-07-14_29455717158.txt
+output/delivery/weekly_etf_correction_manifest_2026-07-14_20260715_223718.json
+```
+
+The final correction manifest proves:
+
+```text
+model_execution_replayed: false
+official_state_mutated: false
+official_trade_ledger_mutated: false
+state_sha256_before == state_sha256_after
+trade_ledger_sha256_before == trade_ledger_sha256_after
+```
+
+## Package status
+
+```text
+WP_POST_EXECUTION_REPORT_CONSISTENCY: closed
+PR #59: merged
+corrected EN/NL delivery: complete
+corrected EN/NL inbox receipts: verified
+```
+
+Previously closed WP16-WP42, report-quality, localization and PDF-surface packages remain closed. Their historical evidence is unchanged.
+
+## Cockpit-first surface roadmap
+
+The cockpit-first roadmap remains a separate preview lane. It has no production pricing, portfolio-action, state-mutation or delivery authority.
+
+```text
+roadmap: docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_20260618.md
+preview_output: output/cockpit_preview/
+production_promotion: not_granted
+```
+
+## Operational debt created during correction closeout
+
+A one-shot dispatch bridge and evidence-recovery runner were introduced to recover a successful delivery after the original correction runbook used obsolete SMTP secret names and expected the wrong manifest format.
+
+These files are useful evidence but should not silently become permanent production architecture without review:
+
+```text
+.github/workflows/dispatch-corrected-etf-report-bridge.yml
+runtime/run_post_execution_correction_delivery.py
+runtime/recover_post_execution_correction_evidence.py
 ```
 
 ## Immediate next action
 
-Start `WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER` only after claim confirmation. The package must create an isolated cockpit preview renderer and must not mutate portfolio state, pricing, scoring, trade ledger, valuation history, production delivery behavior, or the current report artifacts.
+Create a narrow cleanup work package to consolidate the correction runbook onto the established production SMTP contract, replace the wrong JSON-manifest assumption, retire the one-shot dispatch bridge, and preserve the delivery receipt/recovery evidence. Do not resend `260714_03`.
+
+After that cleanup, return to the explicitly selected ETF roadmap package.

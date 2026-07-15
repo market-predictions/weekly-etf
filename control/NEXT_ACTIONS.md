@@ -1,141 +1,131 @@
 # ETF Review OS — Next Actions
 
-## Current production baseline recorded in control
-
-baseline: 260617
-run_id: 20260618_172254
-requested_close_date: 2026-06-17
-workflow_status: workflow_success
-workflow_conclusion: success
-pricing_lineage_status: passed
-delivery_status: smtp_sendmail_returned_no_exception
-
-Delivery evidence remains delivery-layer evidence only and is not an inbox receipt.
-
-## Fresh report review baseline
-
-baseline: 260618_03 client-surface PDF QA
-reports: weekly_analysis_pro_260618_03.pdf and weekly_analysis_pro_nl_260618_03.pdf
-client_surface_status: Decision cockpit / Besliscockpit visible in final PDF surface
-
-## Closed packages
-
-WP16: closed
-WP17: closed
-WP18: closed
-WP19: closed
-WP20: closed
-WP21: closed
-WP22: closed
-WP23: closed
-WP24: closed
-WP25: closed
-WP26: closed
-WP27: closed
-WP28: closed as leakage firewall verified
-WP29: closed as bilingual alias source verified, preparation-only
-WP30: closed as bridge design verified, design-only
-WP31: closed as review schema verified, schema-only
-WP32: closed as review checklist verified, checklist-only
-WP33: closed as review fixture set verified, fixture-only
-WP34: closed as decision artifact design verified, design-only
-WP35: closed as decision artifact schema verified, schema-only
-WP36: closed as decision artifact validator fixtures verified, fixture-only
-WP37: closed as decision artifact validator hardening verified, validator-hardening only
-WP38: closed as decision sample generation gate verified, validation-only
-WP39: closed as decision dry-run builder verified, validation-only
-WP40: closed as explicit decision artifact design review verified, design-review only
-WP41: closed as decision non-production fixture gate verified, validation-only
-WP42: closed as explicit control-layer package design verified, design-only
-Report Quality Patch 260617: closed as client-facing report-quality patch verified
-Report Quality Patch 260617 post-close Dutch localization bugfix: closed as workflow-validated
-PDF Surface Patch — Decision cockpit visible in final PDF/HTML: closed as client-surface verified
-Cockpit-first surface roadmap anchor: recorded
-
-## Active package
-
-WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER: implemented on branch / validation pending
-branch: feature/cockpit-front-page-v1
-scope: preview renderer only
-handover: control/handovers/HANDOVER_COCKPIT_SURFACE_01_PREVIEW_RENDERER_20260618_2238.md
-
-## Latest PDF Surface Patch evidence
-
-The PDF Surface Patch is closed. Decision cockpit / Besliscockpit visibility is verified in the 260618_03 PDFs.
-
-- English 260618_03 PDF visibly shows "Decision cockpit" near the top, directly under Portfolio Action Snapshot.
-- Dutch 260618_03 PDF visibly shows "Besliscockpit" near the top, directly under Portefeuille-acties.
-- Main takeaway remains aligned between English and Dutch.
-- Weight-basis note remains visible near the final action table.
-- Hold-with-override explanation remains visible near the final action table.
-- Dutch forbidden term "thesisfit" is absent; Dutch uses "aansluiting op de thesis".
-
-Focused tests/checks referenced:
+## Current production baseline
 
 ```text
-pytest tests/test_delivery_html_decision_cockpit.py tests/test_pdf_surface_decision_cockpit.py tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py
-python tools/validate_etf_dutch_language_quality.py
-python tools/validate_etf_delivery_html_contract.py
-python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
-git diff --check
+requested_close_date: 2026-07-14
+run_id: 20260715_175910
+report_token: 260714
+portfolio_execution_status: executed
+portfolio_mutation: URNM -> XBI
 ```
 
-## Cockpit-first surface roadmap
-
-Roadmap:
+Authoritative mutation:
 
 ```text
-docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_20260618.md
+URNM: Sell -122.008961 shares; 7.01% -> 2.01%
+XBI: Buy +40.491749 shares; 0.00% -> 5.00%
 ```
 
-Initial work package:
+## Current client-delivery baseline
 
 ```text
-control/work_packages/WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_20260618.md
+report_en: output/weekly_analysis_pro_260714_03.md
+report_nl: output/weekly_analysis_pro_nl_260714_03.md
+pdf_en: output/weekly_analysis_pro_260714_03.pdf
+pdf_nl: output/weekly_analysis_pro_nl_260714_03.pdf
+delivery_workflow_run: 29455717158
+delivery_layer_status: smtp_sendmail_returned_no_exception
+inbox_receipt_status: verified_bilingual
 ```
 
-Stable decision:
+Delivery evidence:
 
 ```text
-The current production report remains intact. Cockpit-first development proceeds as a forked surface branch and preview lane. Promotion requires an explicit decision.
+output/delivery/weekly_etf_correction_delivery_receipt_2026-07-14_29455717158.txt
+output/delivery/weekly_etf_correction_manifest_2026-07-14_20260715_223718.json
 ```
 
-Six-step roadmap:
+Do not resend `260714_03`.
+
+## Closed active package
 
 ```text
-1. Create isolated branch and preview lane.
-2. Add deterministic cockpit renderer.
-3. Add manual-only preview workflow.
-4. Add visual and state-safety contract tests.
-5. Produce side-by-side comparison review.
-6. Record explicit promotion decision.
+WP_POST_EXECUTION_REPORT_CONSISTENCY: closed
+PR #59: merged
+implementation_validation_run: 29442287444
+corrected_delivery_run: 29455717158
+recovery_and_persistence_run: 29455966433
+persistence_commit: d829e89329656b29be4c1d9b3b4aca75ba46f3b4
 ```
 
-Scope boundary:
+All gates passed:
+
+- executed-state action authority;
+- bilingual Markdown and HTML consistency;
+- English and Dutch PDF rendering;
+- positive delivery-layer receipt;
+- bilingual inbox receipt confirmation;
+- portfolio-state immutability;
+- trade-ledger immutability;
+- corrected artifact persistence.
+
+## Recommended next package
+
+Create and execute a narrow operational cleanup package:
 
 ```text
-US ETF report only. ETF EU / UCITS mapping is parked for the parallel ETF EU track.
+WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP
 ```
 
-## Recommended next action
+### Purpose
 
-Run local validation for WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER on feature/cockpit-front-page-v1 before opening a pull request.
+Consolidate the correction path into one deterministic, reusable operational runbook without changing portfolio logic or resending the completed report.
 
-Required validation:
+### Required changes
 
-```bash
-python -m py_compile runtime/render_cockpit_front_page.py
-pytest tests/test_cockpit_front_page_preview.py tests/test_delivery_html_decision_cockpit.py tests/test_pdf_surface_decision_cockpit.py tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py
-python tools/validate_etf_delivery_html_contract.py --output-dir output
-python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
-git diff --check
+1. Update `.github/workflows/resend-corrected-post-execution-report.yml` to use the established production secret contract:
+
+```text
+MRKT_RPRTS_SMTP_HOST
+MRKT_RPRTS_SMTP_PORT
+MRKT_RPRTS_SMTP_USER
+MRKT_RPRTS_SMTP_PASS
+MRKT_RPRTS_MAIL_FROM
+MRKT_RPRTS_MAIL_TO
+MRKT_RPRTS_MAIL_TO_NL
 ```
 
-Optional smoke test:
+2. Replace the incorrect JSON-manifest assumption with the actual production delivery receipt/manifest format.
+3. Add a no-resend recovery mode for the case where SMTP succeeds but post-send evidence persistence fails.
+4. Retire the one-shot bridge after equivalent behavior is covered by the canonical correction workflow:
 
-```bash
-python -m runtime.render_cockpit_front_page --output-dir output --html-only
-ls -la output/cockpit_preview/
+```text
+.github/workflows/dispatch-corrected-etf-report-bridge.yml
 ```
 
-Do not promote the cockpit into the production report in this package.
+5. Decide whether these helpers remain canonical or are folded into a smaller runbook module:
+
+```text
+runtime/run_post_execution_correction_delivery.py
+runtime/recover_post_execution_correction_evidence.py
+```
+
+6. Preserve all historical correction evidence and do not mutate the official portfolio state or trade ledger.
+
+### Validation boundary
+
+The cleanup package must be validation-only for the completed `260714_03` delivery. It must not send another email and must not execute another portfolio mutation.
+
+Required gates:
+
+```text
+python -m py_compile runtime/run_post_execution_correction_delivery.py runtime/recover_post_execution_correction_evidence.py
+focused correction-runbook tests
+state hash unchanged
+trade-ledger hash unchanged
+existing correction manifest still validates
+no workflow path can resend without explicit confirmation
+```
+
+## Roadmap after cleanup
+
+After the correction-runbook cleanup is closed, select the next explicit roadmap package. The cockpit-first surface remains preview-only and must not be promoted into production without a separate decision.
+
+Possible next roadmap action:
+
+```text
+resume WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER validation
+```
+
+Do not mix the cleanup package with cockpit product-surface development.
