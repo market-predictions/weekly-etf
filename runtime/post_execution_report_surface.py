@@ -216,12 +216,57 @@ def _section(text: str, start: str, end: str) -> str:
     return text[start_index:] if end_index == -1 else text[start_index:end_index]
 
 
+def _contains_symbol(value: str, symbol: str) -> bool:
+    return bool(re.search(rf"(?<![A-Z0-9]){re.escape(symbol)}(?![A-Z0-9])", value))
+
+
+def _markdown_table_mapping(section: str) -> dict[str, str]:
+    table_lines = [line for line in section.splitlines() if line.startswith("|")]
+    if len(table_lines) < 3:
+        return {}
+    headers = [cell.strip() for cell in table_lines[0].strip().strip("|").split("|")]
+    values = [cell.strip() for cell in table_lines[2].strip().strip("|").split("|")]
+    return dict(zip(headers, values))
+
+
+def _section2_action_has_symbol(section: str, *, language: str, kind: str, symbol: str) -> bool:
+    if language == "nl":
+        labels = {"add": "Toevoegen", "reduce": "Verlagen", "close": "Sluiten"}
+        label = labels[kind]
+        for line in section.splitlines():
+            if not line.startswith("|"):
+                continue
+            cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+            if len(cells) >= 2 and cells[0] == label and _contains_symbol(cells[1], symbol):
+                return True
+        return False
+    labels = {"add": "### Add — executed", "reduce": "### Reduce — executed", "close": "### Close — executed"}
+    label = labels[kind]
+    start = section.find(label)
+    if start == -1:
+        return False
+    body_start = start + len(label)
+    next_heading = section.find("\n### ", body_start)
+    block = section[body_start:] if next_heading == -1 else section[body_start:next_heading]
+    return _contains_symbol(block, symbol)
+
+
+def _section12_action_has_symbol(section: str, *, language: str, kind: str, symbol: str) -> bool:
+    mapping = _markdown_table_mapping(section)
+    labels = (
+        {"add": "Toevoegen", "reduce": "Verlagen", "close": "Sluiten"}
+        if language == "nl"
+        else {"add": "Add", "reduce": "Reduce", "close": "Close"}
+    )
+    return _contains_symbol(mapping.get(labels[kind], ""), symbol)
+
+
 def _final_action_row(section: str, symbol: str) -> str:
     for line in section.splitlines():
         if not line.startswith("|"):
             continue
         first_cell = line.strip().strip("|").split("|", 1)[0]
-        if re.search(rf"(?<![A-Z0-9]){re.escape(symbol)}(?![A-Z0-9])", first_cell):
+        if _contains_symbol(first_cell, symbol):
             return line
     return ""
 
@@ -259,10 +304,10 @@ def validate_post_execution_report_consistency(text: str, state: dict[str, Any],
         symbol = _ticker(change.get("ticker"))
         kind = _change_kind(change)
         expected_label = {"add": add_label, "reduce": reduce_label, "close": close_label}[kind]
-        if symbol not in section2:
-            errors.append(f"action_snapshot_missing:{symbol}")
-        if symbol not in section12:
-            errors.append(f"rotation_plan_missing:{symbol}")
+        if not _section2_action_has_symbol(section2, language=language, kind=kind, symbol=symbol):
+            errors.append(f"action_snapshot_mismatch:{symbol}:{kind}")
+        if not _section12_action_has_symbol(section12, language=language, kind=kind, symbol=symbol):
+            errors.append(f"rotation_plan_mismatch:{symbol}:{kind}")
         row = _final_action_row(section13, symbol)
         if not row or expected_label not in row:
             errors.append(f"final_action_mismatch:{symbol}:{expected_label}")
