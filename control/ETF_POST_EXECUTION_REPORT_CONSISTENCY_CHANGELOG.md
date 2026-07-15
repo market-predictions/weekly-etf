@@ -5,16 +5,24 @@ Work package: `WP_POST_EXECUTION_REPORT_CONSISTENCY`
 
 ## 2026-07-15 — Production surface contradiction identified
 
-Run `20260715_175910` executed and persisted one guarded model rotation:
+Production run `20260715_175910` executed and persisted one guarded model rotation:
 
 ```text
-URNM: Sell, -105.862854 shares, model weight 7.01% -> 2.01%
-XBI: Buy, +35.634001 shares, model weight 0.00% -> 5.00%
+URNM: Sell -122.008961 shares; model weight 7.01% -> 2.01%
+XBI: Buy +40.491749 shares; model weight 0.00% -> 5.00%
 ```
 
-The official state and trade ledger were correct, but the English and Dutch reports mixed executed-state evidence with stale no-action wording. The decision cockpit said no action occurred, while Section 14 showed the actual sale and purchase.
+Authority sources:
 
-## 2026-07-15 — Output-authority design
+```text
+output/runtime/etf_model_execution_20260714_20260715_175910.json
+output/etf_portfolio_state.json
+output/etf_trade_ledger.csv
+```
+
+The first delivered English and Dutch reports mixed correct execution evidence with stale no-action wording. Earlier intermediate share quantities were superseded by the official execution artifact and ledger values above.
+
+## 2026-07-15 — Output-authority decision
 
 Stable rule introduced:
 
@@ -22,43 +30,51 @@ Stable rule introduced:
 executed_model_changes is authoritative for all post-execution action wording and classification.
 ```
 
-The report may use recommendation and lane data for research context, but an executed Buy/Sell may not be overwritten by stale `suggested_action` memory.
+Official portfolio state remains authoritative for post-execution holdings and values. Official trade ledger remains authoritative for executed share deltas. `suggested_action` is research memory only after execution.
 
-## 2026-07-15 — Implementation staged
+## 2026-07-15 — Implementation completed
 
-Added `runtime/post_execution_report_surface.py` with:
+Added deterministic post-execution action classification and bilingual report surfaces, including:
 
-- deterministic executed-change classification;
-- English and Dutch action buckets;
 - dynamic main takeaways;
-- dynamic decision cockpits;
-- dynamic post-execution rotation tables;
-- executed-action labels for final action tables;
-- a blocking cross-section consistency validator.
-
-Staged integration targets:
-
-```text
-runtime/polish_runtime_reports.py
-runtime/fix_report_output_contract.py
-runtime/render_etf_report_from_state.py
-runtime/render_etf_report_nl_from_state.py
-runtime/fix_executed_report_contract.py
-```
+- dynamic English and Dutch decision cockpits;
+- executed Add, Reduce and Close buckets;
+- executed-action labels in final action tables;
+- aligned Sections 1, 2, 12, 13, 14 and 15;
+- a blocking cross-section consistency validator;
+- delivery HTML cockpit generation from corrected Markdown;
+- a dedicated correction-resend workflow that does not rerun the model mutation.
 
 The validator rejects:
 
 - no-action wording when executed changes exist;
 - a changed ticker in the wrong Section 2 action bucket;
 - a changed ticker in the wrong Section 12 action column;
-- a Section 13 row without the correct executed-action label.
+- a Section 13 row without the correct executed-action label;
+- delivery HTML cockpit wording that contradicts corrected Markdown.
 
-## Validation pending
+## 2026-07-15 — Validation completed
 
-The exact execution artifact will be replayed without invoking model execution again:
+Final read-only validation:
 
 ```text
-output/runtime/etf_model_execution_20260714_20260715_175910.json
+workflow: Validate ETF post-execution report consistency
+run_id: 29442287444
+conclusion: success
 ```
 
-Corrected report delivery is not claimed until the focused tests, exact-artifact replay, PR merge, correction rerender/resend, delivery manifest and inbox receipt checks all pass.
+Verified:
+
+- affected modules compile;
+- focused Markdown and HTML tests pass;
+- exact execution artifact replays without model re-execution;
+- portfolio-state hash remains unchanged;
+- trade-ledger hash remains unchanged;
+- English and Dutch action surfaces agree with URNM reduction and XBI addition;
+- English and Dutch delivery cockpits contain no stale no-action wording.
+
+## 2026-07-15 — Merge-ready status
+
+PR #59 is governance-complete and may be promoted from draft and merged.
+
+Merge is not the delivery closeout. After merge, one explicitly confirmed correction resend must create corrected EN/NL reports and positive delivery evidence. Inbox receipt confirmation remains required before the package is fully closed.
