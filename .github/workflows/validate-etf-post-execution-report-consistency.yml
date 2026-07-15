@@ -57,40 +57,38 @@ jobs:
             runtime/render_etf_report_nl_from_state.py \
             runtime/fix_executed_report_contract.py
 
-      - name: Test executed action buckets
-        continue-on-error: true
-        run: python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_action_buckets_exclude_changed_positions_from_hold
+      - name: Run each semantic test independently
+        run: |
+          python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_action_buckets_exclude_changed_positions_from_hold
+          python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_executed_action_labels_override_stale_suggested_action
+          python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_dynamic_takeaway_and_cockpit_describe_execution
+          python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_final_action_tables_use_executed_labels
+          python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_consistency_validator_accepts_coherent_english_and_dutch
+          python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_consistency_validator_rejects_no_action_wording
+          python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_consistency_validator_rejects_wrong_action_bucket
+          python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_consistency_validator_accepts_linkified_final_action_tickers
 
-      - name: Test executed action labels
-        continue-on-error: true
-        run: python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_executed_action_labels_override_stale_suggested_action
+      - name: Capture aggregate focused regression result
+        run: |
+          set +e
+          python -m pytest -vv --tb=short tests/test_etf_post_execution_report_consistency.py 2>&1 | tee /tmp/post-execution-pytest.txt
+          status=${PIPESTATUS[0]}
+          echo "$status" > /tmp/post-execution-pytest-status.txt
+          exit 0
 
-      - name: Test dynamic takeaway and cockpit
-        continue-on-error: true
-        run: python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_dynamic_takeaway_and_cockpit_describe_execution
+      - name: Upload aggregate test transcript
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-execution-pytest-transcript
+          path: |
+            /tmp/post-execution-pytest.txt
+            /tmp/post-execution-pytest-status.txt
+          if-no-files-found: error
+          retention-days: 7
 
-      - name: Test final action tables
-        continue-on-error: true
-        run: python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_final_action_tables_use_executed_labels
-
-      - name: Test coherent bilingual report validation
-        continue-on-error: true
-        run: python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_consistency_validator_accepts_coherent_english_and_dutch
-
-      - name: Test no-action contradiction rejection
-        continue-on-error: true
-        run: python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_consistency_validator_rejects_no_action_wording
-
-      - name: Test wrong-bucket rejection
-        continue-on-error: true
-        run: python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_consistency_validator_rejects_wrong_action_bucket
-
-      - name: Test linkified ticker validation
-        continue-on-error: true
-        run: python -m pytest -q tests/test_etf_post_execution_report_consistency.py::test_consistency_validator_accepts_linkified_final_action_tickers
-
-      - name: Run focused regression tests
-        run: python -m pytest -q tests/test_etf_post_execution_report_consistency.py
+      - name: Enforce aggregate focused regression result
+        run: test "$(cat /tmp/post-execution-pytest-status.txt)" -eq 0
 
       - name: Record official state and ledger hashes
         run: |
