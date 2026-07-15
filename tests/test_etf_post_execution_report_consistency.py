@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from runtime.polish_runtime_reports import _ensure_decision_cockpit
 from runtime.post_execution_report_surface import (
     action_buckets,
     decision_cockpit_en,
@@ -224,3 +225,33 @@ def test_consistency_validator_accepts_linkified_final_action_tickers() -> None:
         "| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | XBI |",
     )
     validate_post_execution_report_consistency(linked, current, language="en")
+
+
+def test_legacy_section_2a_cockpit_is_replaced_from_execution_authority() -> None:
+    current = state()
+    english = """## 1. Executive Summary
+
+## 2. Portfolio Action Snapshot
+
+## 2A. Decision cockpit
+
+- **This week:** no portfolio action.
+
+## 3. Regime Dashboard
+"""
+    dutch = """## 1. Kernsamenvatting
+
+## 2. Portefeuille-acties
+
+## 2A. Besliscockpit
+
+- **Deze week:** geen portefeuilleactie.
+
+## 3. Regime-dashboard
+"""
+    corrected_en = _ensure_decision_cockpit(english, current, language="en")
+    corrected_nl = _ensure_decision_cockpit(dutch, current, language="nl")
+    assert "no portfolio action" not in corrected_en.lower()
+    assert "Guarded model rotation executed and persisted" in corrected_en
+    assert "geen portefeuilleactie" not in corrected_nl.lower()
+    assert "Bewaakte modelrotatie uitgevoerd en verwerkt" in corrected_nl
