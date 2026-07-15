@@ -1,0 +1,75 @@
+name: Validate ETF rotation state authority
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "runtime/portfolio_rotation_engine.py"
+      - "runtime/portfolio_rotation_engine_v2.py"
+      - "runtime/rotation_state_authority.py"
+      - "tools/validate_etf_rotation_state_authority.py"
+      - "tests/test_etf_rotation_state_authority.py"
+      - ".github/workflows/validate-etf-rotation-state-authority.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependency
+        run: python -m pip install pytest
+
+      - name: Compile authority implementation
+        run: |
+          python -m py_compile \
+            runtime/rotation_state_authority.py \
+            runtime/portfolio_rotation_engine_v2.py \
+            runtime/portfolio_rotation_engine.py \
+            tools/validate_etf_rotation_state_authority.py
+
+      - name: Run focused regression tests
+        run: pytest -q tests/test_etf_rotation_state_authority.py
+
+      - name: Rebuild July production rotation plan in dry-run mode
+        run: |
+          python -m runtime.portfolio_rotation_engine \
+            --portfolio-state output/etf_portfolio_state.json \
+            --scorecard output/etf_recommendation_scorecard.csv \
+            --pricing-audit output/pricing/price_audit_2026-07-14_20260715_164128.json \
+            --lane-artifact output/lane_reviews/etf_lane_assessment_260714.json \
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --run-id 20260715_authority_validation \
+            --dry-run > /tmp/etf_rotation_plan.json
+          python tools/validate_etf_rotation_state_authority.py \
+            --plan /tmp/etf_rotation_plan.json
+
+      - name: Assert corrected July plan surfaces a real mutation decision
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          plan = json.loads(Path('/tmp/etf_rotation_plan.json').read_text(encoding='utf-8'))
+          intents = plan.get('trade_intents', []) or []
+          if not intents:
+              raise SystemExit('Corrected July plan still contains no trade intent')
+          first = intents[0]
+          print(
+              'ETF_ROTATION_MUTATION_PROOF_OK | '
+              f"source={first.get('source_ticker')} | "
+              f"destination={first.get('destination_ticker')} | "
+              f"delta={first.get('delta_weight_pct')}"
+          )
+          PY
