@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 from typing import Any
+
+DEFAULT_TRADE_LEDGER = Path("output/etf_trade_ledger.csv")
+DEFAULT_RUNTIME_DIR = Path("output/runtime")
 
 PRICED_VALUATION_STATUSES = {
     "fresh_close",
@@ -79,8 +83,92 @@ def recompute_pnl_pct(current_price: Any, avg_entry: Any) -> float | None:
     return round((current / entry - 1.0) * 100.0, 2)
 
 
+def _execution_artifact_path(source_report: str, runtime_dir: Path) -> Path | None:
+    raw = str(source_report or "").strip()
+    if not raw.startswith("runtime:"):
+        return None
+    source_name = Path(raw.removeprefix("runtime:")).name
+    if not source_name.startswith("etf_report_state_"):
+        return None
+    return runtime_dir / source_name.replace(
+        "etf_report_state_", "etf_model_execution_", 1
+    )
+
+
+def _execution_positions(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for key in ("executed_positions", "shadow_positions", "positions"):
+        value = payload.get(key)
+        if isinstance(value, list):
+            rows.extend(row for row in value if isinstance(row, dict))
+    for key in ("post_trade_portfolio", "post_trade_shadow_portfolio", "result"):
+        nested = payload.get(key)
+        if not isinstance(nested, dict):
+            continue
+        value = nested.get("positions")
+        if isinstance(value, list):
+            rows.extend(row for row in value if isinstance(row, dict))
+    return rows
+
+
+def reconstruct_average_entry_local(
+    symbol: str,
+    trade_ledger_path: Path = DEFAULT_TRADE_LEDGER,
+    runtime_dir: Path = DEFAULT_RUNTIME_DIR,
+) -> float | None:
+    if not trade_ledger_path.exists():
+        return None
+    lots: list[tuple[float, float]] = []
+    with trade_ledger_path.open("r", encoding="utf-8", newline="") as handle:
+        for ledger_row in csv.DictReader(handle):
+            if ticker(ledger_row.get("ticker")) != ticker(symbol):
+                continue
+            shares_delta = number(ledger_row.get("shares_delta"))
+            if shares_delta is None or shares_delta <= 0:
+                continue
+            artifact_path = _execution_artifact_path(
+                str(ledger_row.get("source_report") or ""), runtime_dir
+            )
+            if artifact_path is None or not artifact_path.exists():
+                continue
+            try:
+                payload = json.loads(artifact_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            matching = [
+                row
+                for row in _execution_positions(payload)
+                if ticker(row.get("ticker")) == ticker(symbol)
+            ]
+            if not matching:
+                continue
+            positive = [
+                row
+                for row in matching
+                if (number(row.get("shares_delta_this_run"), 0.0) or 0.0) > 0
+            ]
+            selected = positive[0] if positive else matching[0]
+            execution_price = number(
+                selected.get("selected_close"),
+                number(selected.get("current_price_local")),
+            )
+            if execution_price is None or execution_price <= 0:
+                continue
+            lots.append((shares_delta, execution_price))
+    total_shares = sum(shares for shares, _ in lots)
+    if total_shares <= 0:
+        return None
+    return round(
+        sum(shares * price for shares, price in lots) / total_shares, 6
+    )
+
+
 def build_current_run_valuation_state(
-    portfolio_state: dict[str, Any], pricing_audit: dict[str, Any]
+    portfolio_state: dict[str, Any],
+    pricing_audit: dict[str, Any],
+    *,
+    trade_ledger_path: Path = DEFAULT_TRADE_LEDGER,
+    runtime_dir: Path = DEFAULT_RUNTIME_DIR,
 ) -> dict[str, Any]:
     prices = index_price_results(pricing_audit)
     fx = fx_rate(pricing_audit)
@@ -117,7 +205,19 @@ def build_current_run_valuation_state(
             errors.append(f"{symbol}:missing_fx_rate")
             continue
 
-        pnl = recompute_pnl_pct(price, row.get("avg_entry_local"))
+        avg_entry = number(row.get("avg_entry_local"))
+        avg_entry_source = "portfolio_state"
+        if avg_entry is None or avg_entry <= 0:
+            avg_entry = reconstruct_average_entry_local(
+                symbol,
+                trade_ledger_path=trade_ledger_path,
+                runtime_dir=runtime_dir,
+            )
+            avg_entry_source = "model_execution_history"
+        if avg_entry is None or avg_entry <= 0:
+            errors.append(f"{symbol}:missing_average_entry_authority")
+            continue
+        pnl = recompute_pnl_pct(price, avg_entry)
         row.update(
             {
                 "ticker": symbol,
@@ -136,8 +236,10 @@ def build_current_run_valuation_state(
                 "price_date": price_row.get("returned_close_date")
                 or pricing_audit.get("requested_close_date"),
                 "selected_close": price,
+                "avg_entry_local": avg_entry,
+                "avg_entry_source": avg_entry_source,
                 "pnl_pct": pnl,
-                "pnl_basis": "current_close_vs_avg_entry" if pnl is not None else "unresolved_missing_avg_entry",
+                "pnl_basis": "current_close_vs_avg_entry",
             }
         )
         invested += market_value_eur
@@ -176,6 +278,7 @@ def build_current_run_valuation_state(
             "current_run_prices_used": True,
             "current_run_weights_recomputed": True,
             "pnl_recomputed_from_avg_entry": True,
+            "average_entry_authority_complete": True,
             "prior_persisted_market_values_not_authoritative": True,
         },
     }
@@ -377,10 +480,9 @@ def validate_current_run_authority(
             position.get("current_price_local"), position.get("avg_entry_local")
         )
         actual_pnl = number(row.get("pnl_pct"))
-        if expected_pnl is not None and (
-            actual_pnl is None
-            or abs(actual_pnl - expected_pnl) > pnl_tolerance_pct
-        ):
+        if expected_pnl is None:
+            errors.append(f"{symbol}:missing_average_entry_authority")
+        elif actual_pnl is None or abs(actual_pnl - expected_pnl) > pnl_tolerance_pct:
             errors.append(
                 f"{symbol}:pnl_mismatch expected={expected_pnl:.2f} actual={actual_pnl}"
             )
@@ -398,6 +500,7 @@ def validate_current_run_authority(
     return {
         "scorecard_date_aligned": True,
         "pnl_consistent_with_current_close_and_avg_entry": True,
+        "average_entry_authority_complete": True,
         "current_price_consistent": True,
         "validated_holding_count": len(positions),
         "report_date": report_date,

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import csv
+import json
+
 import pytest
 
 from runtime.portfolio_rotation_engine import (
@@ -9,6 +12,7 @@ from runtime.portfolio_rotation_engine import (
 )
 from runtime.rotation_state_authority import (
     build_current_run_valuation_state,
+    reconstruct_average_entry_local,
     refresh_scorecard_rows,
     validate_current_run_authority,
 )
@@ -198,3 +202,33 @@ def test_failed_holding_can_rotate_to_general_fundable_candidate() -> None:
     assert intents[0]["source_ticker"] == "URNM"
     assert intents[0]["destination_ticker"] == "XBI"
     assert intents[0]["delta_weight_pct"] == -5.0
+
+
+
+def test_average_entry_reconstructed_from_execution_history(tmp_path) -> None:
+    runtime_dir = tmp_path / "runtime"
+    runtime_dir.mkdir()
+    ledger = tmp_path / "etf_trade_ledger.csv"
+    with ledger.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["ticker", "shares_delta", "source_report"])
+        writer.writeheader()
+        writer.writerow({"ticker": "TEST", "shares_delta": "10", "source_report": "runtime:output/runtime/etf_report_state_20260701_run1.json"})
+        writer.writerow({"ticker": "TEST", "shares_delta": "5", "source_report": "runtime:output/runtime/etf_report_state_20260702_run2.json"})
+    for name, shares_delta, price in (("etf_model_execution_20260701_run1.json", 10, 100.0), ("etf_model_execution_20260702_run2.json", 5, 110.0)):
+        (runtime_dir / name).write_text(json.dumps({"execution_status": "executed", "shadow_positions": [{"ticker": "TEST", "shares_delta_this_run": shares_delta, "selected_close": price}]}), encoding="utf-8")
+    avg_entry = reconstruct_average_entry_local("TEST", trade_ledger_path=ledger, runtime_dir=runtime_dir)
+    assert avg_entry == 103.333333
+    portfolio = {"cash_eur": 0.0, "positions": [{"ticker": "TEST", "shares": 15, "total_score": 4.0, "fresh_cash_test": "Hold"}]}
+    pricing = {"requested_close_date": "2026-07-14", "fx_basis": {"rate": 1.0}, "price_results": [{"symbol": "TEST", "selected_close": 120.0, "status": "fresh_exact_unverified", "pricing_tier": "valuation_grade", "currency": "USD"}]}
+    state = build_current_run_valuation_state(portfolio, pricing, trade_ledger_path=ledger, runtime_dir=runtime_dir)
+    position = state["positions"][0]
+    assert position["avg_entry_source"] == "model_execution_history"
+    assert position["pnl_pct"] == 16.13
+
+
+def test_destination_ranking_prefers_live_primary_over_alphabetical_tie() -> None:
+    incumbents = [{"ticker": "URNM", "current_weight_pct": 7.0, "release_score": 90, "release_reasons": ["loss_and_sub4_forced_reunderwrite"], "role_validity": "fail", "weeks_replaceable": 0}]
+    shared = {"destination_score": 100, "is_fundable_candidate": True, "funding_scope": "general", "price_status": "fresh_exact_unverified", "pricing_tier": "valuation_grade", "direct_rs_vs_holding": "", "direct_rs_vs_holding_1m_pct": 0.0, "direct_rs_vs_holding_3m_pct": 0.0, "relative_strength_score": 1.25}
+    candidates = [{**shared, "candidate": "IAI", "candidate_role": "alternative", "promoted_to_live_radar": False, "total_score": 3.8, "avg_dollar_volume_3m": 20_000_000}, {**shared, "candidate": "XBI", "candidate_role": "primary", "promoted_to_live_radar": True, "total_score": 4.36, "avg_dollar_volume_3m": 1_300_000_000}]
+    _, _, intents = build_decisions(incumbents, candidates, 110000.0, {"URNM"})
+    assert intents[0]["destination_ticker"] == "XBI"

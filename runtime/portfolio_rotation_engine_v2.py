@@ -542,7 +542,11 @@ def _choose_destination(
         eligible,
         key=lambda item: (
             item[0],
-            -item[1]["destination_score"],
+            0 if item[1].get("promoted_to_live_radar") else 1,
+            0 if item[1].get("candidate_role") == "primary" else 1,
+            -_num(item[1].get("total_score"), 0.0),
+            -_num(item[1].get("relative_strength_score"), 0.0),
+            -_num(item[1].get("avg_dollar_volume_3m"), 0.0),
             item[1]["candidate"],
         ),
     )[0][1]
@@ -758,7 +762,7 @@ def build_rotation_plan(
     )
 
     return {
-        "schema_version": "1.1",
+        "schema_version": "1.2",
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "run_id": run_id,
         "report_token": report_token,
@@ -792,6 +796,8 @@ def build_rotation_plan(
             "current_run_valuation_used": True,
             "primary_and_alternative_candidates_independently_selectable": True,
             "stale_scorecard_or_pnl_mismatch_is_blocking": True,
+            "average_entry_history_reconstruction_is_blocking": True,
+            "destination_tie_break_uses_quality_evidence": True,
         },
     }
 
