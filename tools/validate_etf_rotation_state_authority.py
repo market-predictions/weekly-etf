@@ -12,6 +12,15 @@ REQUIRED_FLAGS = {
     "current_run_valuation_used",
     "primary_and_alternative_candidates_independently_selectable",
     "stale_scorecard_or_pnl_mismatch_is_blocking",
+    "average_entry_history_reconstruction_is_blocking",
+    "destination_tie_break_uses_quality_evidence",
+}
+
+REQUIRED_AUTHORITY_PROOFS = {
+    "scorecard_date_aligned",
+    "pnl_consistent_with_current_close_and_avg_entry",
+    "average_entry_authority_complete",
+    "current_price_consistent",
 }
 
 
@@ -23,11 +32,7 @@ def validate_plan(plan: dict[str, Any]) -> dict[str, Any]:
             errors.append(f"missing_or_false_validation_flag:{key}")
 
     authority = dict(plan.get("state_authority_validation") or {})
-    for key in (
-        "scorecard_date_aligned",
-        "pnl_consistent_with_current_close_and_avg_entry",
-        "current_price_consistent",
-    ):
+    for key in sorted(REQUIRED_AUTHORITY_PROOFS):
         if authority.get(key) is not True:
             errors.append(f"missing_or_false_authority_proof:{key}")
 
