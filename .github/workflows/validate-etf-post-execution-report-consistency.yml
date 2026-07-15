@@ -57,64 +57,40 @@ jobs:
             runtime/render_etf_report_nl_from_state.py \
             runtime/fix_executed_report_contract.py
 
-      - name: Capture independent and aggregate test results
-        run: |
-          set +e
-          transcript=/tmp/post-execution-pytest.txt
-          status_file=/tmp/post-execution-pytest-status.txt
-          : > "$transcript"
-          status=0
-          tests=(
-            test_action_buckets_exclude_changed_positions_from_hold
-            test_executed_action_labels_override_stale_suggested_action
-            test_dynamic_takeaway_and_cockpit_describe_execution
-            test_final_action_tables_use_executed_labels
-            test_consistency_validator_accepts_coherent_english_and_dutch
-            test_consistency_validator_rejects_no_action_wording
-            test_consistency_validator_rejects_wrong_action_bucket
-            test_consistency_validator_accepts_linkified_final_action_tickers
-          )
-          for test_name in "${tests[@]}"; do
-            echo "===== INDEPENDENT $test_name =====" | tee -a "$transcript"
-            python -m pytest -vv --tb=short "tests/test_etf_post_execution_report_consistency.py::$test_name" >> "$transcript" 2>&1
-            rc=$?
-            echo "RETURN_CODE=$rc" | tee -a "$transcript"
-            if test "$rc" -ne 0; then status=1; fi
-          done
-          echo "===== AGGREGATE =====" | tee -a "$transcript"
-          python -m pytest -vv --tb=short tests/test_etf_post_execution_report_consistency.py >> "$transcript" 2>&1
-          rc=$?
-          echo "AGGREGATE_RETURN_CODE=$rc" | tee -a "$transcript"
-          if test "$rc" -ne 0; then status=1; fi
-          echo "$status" > "$status_file"
-          exit 0
-
-      - name: Upload focused test transcript
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: post-execution-pytest-transcript
-          path: |
-            /tmp/post-execution-pytest.txt
-            /tmp/post-execution-pytest-status.txt
-          if-no-files-found: error
-          retention-days: 7
-
-      - name: Enforce focused test result
-        run: test "$(cat /tmp/post-execution-pytest-status.txt)" -eq 0
+      - name: Run focused regression tests
+        run: python -m pytest -q tests/test_etf_post_execution_report_consistency.py
 
       - name: Record official state and ledger hashes
         run: |
           sha256sum output/etf_portfolio_state.json > /tmp/state-before.sha256
           sha256sum output/etf_trade_ledger.csv > /tmp/ledger-before.sha256
 
-      - name: Replay exact executed artifact without model re-execution
+      - name: Capture exact executed-artifact replay
         env:
           MRKT_RPRTS_EXPLICIT_REPORT_PATH: /tmp/weekly_analysis_pro_260714_03.md
           MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL: /tmp/weekly_analysis_pro_nl_260714_03.md
         run: |
+          set +e
           python -m runtime.finalize_executed_etf_report \
-            --artifact output/runtime/etf_model_execution_20260714_20260715_175910.json
+            --artifact output/runtime/etf_model_execution_20260714_20260715_175910.json \
+            2>&1 | tee /tmp/post-execution-finalizer.txt
+          status=${PIPESTATUS[0]}
+          echo "$status" > /tmp/post-execution-finalizer-status.txt
+          exit 0
+
+      - name: Upload exact-artifact replay transcript
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-execution-finalizer-transcript
+          path: |
+            /tmp/post-execution-finalizer.txt
+            /tmp/post-execution-finalizer-status.txt
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce exact-artifact replay
+        run: test "$(cat /tmp/post-execution-finalizer-status.txt)" -eq 0
 
       - name: Prove correction replay did not mutate official state or ledger
         run: |
