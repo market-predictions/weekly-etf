@@ -8,6 +8,15 @@ from pathlib import Path
 from typing import Any
 
 from runtime.macro_report_surface import dashboard_en, dashboard_nl, executive_lines_en, executive_lines_nl
+from runtime.post_execution_report_surface import (
+    action_buckets,
+    decision_cockpit_en,
+    decision_cockpit_nl,
+    executed_rotation_summary_en,
+    has_executed_changes,
+    main_takeaway_en,
+    main_takeaway_nl,
+)
 from runtime.replacement_edge_report_notes import (
     EN_AUTHORITY_DISCLAIMER,
     MARKER as REPLACEMENT_EDGE_NOTES_MARKER,
@@ -303,9 +312,9 @@ def _executive_en(state: dict[str, Any]) -> str:
 - **Geopolitical regime:** {lines['geopolitical_regime']}
 - **What changed this week:** {lines['what_changed']}
 - **Overall portfolio judgment:** Keep discipline explicit: every holding must re-earn capital against alternatives, concentration limits and current price evidence.
-- **Main takeaway:** **{MAIN_TAKEAWAY_EN}**
+- **Main takeaway:** **{main_takeaway_en(state)}**
 
-{DECISION_COCKPIT_EN.strip()}
+{decision_cockpit_en(state)}
 """
 
 
@@ -316,13 +325,23 @@ def _executive_nl(state: dict[str, Any]) -> str:
 - **Geopolitiek regime:** {lines['geopolitical_regime']}
 - **Wat is er deze week veranderd:** {lines['what_changed']}
 - **Algemeen portefeuilleoordeel:** Laat elke positie opnieuw kapitaal verdienen tegenover alternatieven, concentratielimieten en actuele prijsbevestiging.
-- **Belangrijkste conclusie:** {MAIN_TAKEAWAY_NL}
+- **Belangrijkste conclusie:** {main_takeaway_nl(state)}
 
-{DECISION_COCKPIT_NL.strip()}
+{decision_cockpit_nl(state)}
 """
 
 
 def _bottom_line_en(state: dict[str, Any]) -> str:
+    if has_executed_changes(state):
+        buckets = action_buckets(state)
+        reduced = ", ".join(buckets["reduce"] + buckets["close"]) or "the selected funding source"
+        added = ", ".join(buckets["add"]) or "the selected destination"
+        return f"""
+- **What was reduced or exited first:** {reduced}; the guarded mutation is executed and persisted.
+- **What received additional capital:** {added}; no further capital is deployed after the completed major rotation.
+- **What is acceptable but replaceable:** Holdings with high release scores remain subject to reduce/replace/override discipline.
+- **Single best portfolio upgrade this week:** **{executed_rotation_summary_en(state)}**
+"""
     return """
 - **What should be exited first:** Determined by the rotation plan when active; otherwise no close is executed by legacy state.
 - **What deserves additional capital first:** SMH remains the best-ranked funded lane, subject to the max-position rule.
@@ -331,8 +350,14 @@ def _bottom_line_en(state: dict[str, Any]) -> str:
 """
 
 
-def _ensure_decision_cockpit(text: str, *, language: str) -> str:
-    cockpit = DECISION_COCKPIT_NL if language == "nl" else DECISION_COCKPIT_EN
+def _ensure_decision_cockpit(text: str, state: dict[str, Any], *, language: str) -> str:
+    cockpit = decision_cockpit_nl(state) if language == "nl" else decision_cockpit_en(state)
+    legacy_heading = "## 2A. Besliscockpit" if language == "nl" else "## 2A. Decision cockpit"
+    legacy_end = "## 3. Regime-dashboard" if language == "nl" else "## 3. Regime Dashboard"
+    if legacy_heading in text and legacy_end in text:
+        cockpit_lines = cockpit.strip().splitlines()
+        cockpit_body = "\n".join(cockpit_lines[2:]).strip() if len(cockpit_lines) > 2 else cockpit.strip()
+        return replace_between(text, legacy_heading, legacy_end, cockpit_body)
     marker = "### Besliscockpit" if language == "nl" else "### Decision cockpit"
     if marker in text:
         return text
@@ -341,7 +366,6 @@ def _ensure_decision_cockpit(text: str, *, language: str) -> str:
     if start_heading in text and next_heading in text:
         return text.replace(next_heading, cockpit.strip() + "\n\n" + next_heading, 1)
     return cockpit.strip() + "\n\n" + text
-
 
 def _inject_weight_basis_note(text: str, *, language: str) -> str:
     note = WEIGHT_BASIS_NOTE_NL if language == "nl" else WEIGHT_BASIS_NOTE_EN
@@ -385,7 +409,7 @@ def polish_english(text: str, runtime_state: dict[str, Any] | None = None) -> st
         text = replace_between(text, "## 1. Executive Summary", "## 2. Portfolio Action Snapshot", _executive_en(state))
         text = replace_between(text, "## 3. Regime Dashboard", "## 4. Structural Opportunity Radar", dashboard_en(state))
         text = _inject_macro_radar_reasons(text, state)
-    text = _ensure_decision_cockpit(text, language="en")
+    text = _ensure_decision_cockpit(text, state, language="en")
     text = _inject_weight_basis_note(text, language="en")
     text = _client_surface_cleanup(text, language="en")
     text = replace_between(text, "## 6. Bottom Line", "## 7. Equity Curve and Portfolio Development", _bottom_line_en(state))
@@ -400,7 +424,7 @@ def polish_dutch(text: str, runtime_state: dict[str, Any] | None = None) -> str:
         text = replace_between(text, "## 1. Kernsamenvatting", "## 2. Portefeuille-acties", _executive_nl(state))
         text = replace_between(text, "## 3. Regime-dashboard", "## 4. Structurele kansenradar", dashboard_nl(state))
         print("ETF_RUNTIME_POLISH_NL_MACRO_OK | reason=native_dutch_macro_surface_applied")
-    text = _ensure_decision_cockpit(text, language="nl")
+    text = _ensure_decision_cockpit(text, state, language="nl")
     text = _inject_weight_basis_note(text, language="nl")
     text = _client_surface_cleanup(text, language="nl")
     return _inject_replacement_edge_notes(text, state, language="nl")

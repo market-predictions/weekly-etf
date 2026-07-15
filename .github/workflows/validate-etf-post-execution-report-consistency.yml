@@ -1,0 +1,133 @@
+name: Validate ETF post-execution report consistency
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "runtime/post_execution_report_surface.py"
+      - "runtime/decision_cockpit_html.py"
+      - "runtime/polish_runtime_reports.py"
+      - "runtime/fix_report_output_contract.py"
+      - "runtime/render_etf_report_from_state.py"
+      - "runtime/render_etf_report_nl_from_state.py"
+      - "runtime/fix_executed_report_contract.py"
+      - "send_report_runtime_html.py"
+      - "tests/test_etf_post_execution_report_consistency.py"
+      - "tests/test_etf_decision_cockpit_html.py"
+      - ".github/workflows/validate-etf-post-execution-report-consistency.yml"
+      - ".github/workflows/resend-corrected-post-execution-report.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused test dependencies
+        run: python -m pip install pytest PyYAML
+
+      - name: Compile post-execution and delivery implementation
+        run: |
+          python -m py_compile \
+            runtime/post_execution_report_surface.py \
+            runtime/decision_cockpit_html.py \
+            runtime/polish_runtime_reports.py \
+            runtime/fix_report_output_contract.py \
+            runtime/render_etf_report_from_state.py \
+            runtime/render_etf_report_nl_from_state.py \
+            runtime/fix_executed_report_contract.py \
+            send_report_runtime_html.py
+
+      - name: Run focused regression tests
+        run: |
+          python -m pytest -q \
+            tests/test_etf_post_execution_report_consistency.py \
+            tests/test_etf_decision_cockpit_html.py
+
+      - name: Record official state and ledger hashes
+        run: |
+          sha256sum output/etf_portfolio_state.json > /tmp/state-before.sha256
+          sha256sum output/etf_trade_ledger.csv > /tmp/ledger-before.sha256
+
+      - name: Replay exact executed artifact without model re-execution
+        env:
+          MRKT_RPRTS_EXPLICIT_REPORT_PATH: /tmp/weekly_analysis_pro_260714_03.md
+          MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL: /tmp/weekly_analysis_pro_nl_260714_03.md
+        run: |
+          python -m runtime.finalize_executed_etf_report \
+            --artifact output/runtime/etf_model_execution_20260714_20260715_175910.json
+
+      - name: Prove correction replay did not mutate official state or ledger
+        run: |
+          sha256sum -c /tmp/state-before.sha256
+          sha256sum -c /tmp/ledger-before.sha256
+
+      - name: Assert exact Markdown and delivery cockpit surfaces
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          state = json.loads(Path('output/runtime/etf_report_state_20260714_20260715_175910_executed.json').read_text(encoding='utf-8'))
+          en = Path('/tmp/weekly_analysis_pro_260714_03.md').read_text(encoding='utf-8')
+          nl = Path('/tmp/weekly_analysis_pro_nl_260714_03.md').read_text(encoding='utf-8')
+
+          from runtime.post_execution_report_surface import validate_post_execution_report_consistency
+          from runtime.decision_cockpit_html import decision_cockpit_html_from_markdown
+
+          validate_post_execution_report_consistency(en, state, language='en')
+          validate_post_execution_report_consistency(nl, state, language='nl')
+          en_html = decision_cockpit_html_from_markdown(en)
+          nl_html = decision_cockpit_html_from_markdown(nl)
+
+          changes = {row['ticker']: row for row in state.get('executed_model_changes', [])}
+          urnm_delta = f"{float(changes['URNM']['shares_delta']):.2f}"
+          xbi_delta = f"{float(changes['XBI']['shares_delta']):.2f}"
+          checks = {
+              'en_execution': 'Guarded model rotation executed and persisted' in en,
+              'nl_execution': 'Bewaakte modelrotatie uitgevoerd en verwerkt' in nl,
+              'en_urnm_reduce': 'Reduce — executed' in en and 'URNM' in en,
+              'en_xbi_add': 'Add — executed' in en and 'XBI' in en,
+              'nl_urnm_reduce': 'Verlagen — uitgevoerd' in nl and 'URNM' in nl,
+              'nl_xbi_add': 'Toevoegen — uitgevoerd' in nl and 'XBI' in nl,
+              'en_urnm_quantity': urnm_delta in en,
+              'en_xbi_quantity': xbi_delta in en,
+              'nl_urnm_quantity': urnm_delta in nl,
+              'nl_xbi_quantity': xbi_delta in nl,
+              'en_no_contradiction': 'no portfolio action' not in en.lower(),
+              'nl_no_contradiction': 'geen portefeuilleactie' not in nl.lower(),
+              'en_html_execution': 'Guarded model rotation executed and persisted' in en_html,
+              'nl_html_execution': 'Bewaakte modelrotatie uitgevoerd en verwerkt' in nl_html,
+              'en_html_no_contradiction': 'no portfolio action' not in en_html.lower(),
+              'nl_html_no_contradiction': 'geen portefeuilleactie' not in nl_html.lower(),
+              'delivery_entrypoint_delegates': 'return decision_cockpit_html_from_markdown(md_text)' in Path('send_report_runtime_html.py').read_text(encoding='utf-8'),
+          }
+          failed = [name for name, passed in checks.items() if not passed]
+          if failed:
+              raise SystemExit('Post-execution delivery proof failed: ' + ', '.join(failed))
+          print(
+              'ETF_POST_EXECUTION_DELIVERY_CONSISTENCY_OK | '
+              f"source=URNM:{urnm_delta} | destination=XBI:{xbi_delta} | markdown=EN,NL | html=EN,NL"
+          )
+          PY
+
+      - name: Upload corrected report replay evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: corrected-post-execution-etf-reports
+          path: |
+            /tmp/weekly_analysis_pro_260714_03.md
+            /tmp/weekly_analysis_pro_nl_260714_03.md
+          if-no-files-found: error
+          retention-days: 30

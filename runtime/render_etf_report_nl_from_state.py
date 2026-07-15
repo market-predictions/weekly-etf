@@ -5,6 +5,13 @@ from pathlib import Path
 from typing import Any, Callable
 
 from runtime.nl_dates import format_dutch_report_date
+from runtime.post_execution_report_surface import (
+    action_buckets,
+    has_executed_changes,
+    position_action_code,
+    position_action_label_nl,
+    rotation_plan_table_nl as post_execution_rotation_plan_table_nl,
+)
 from runtime.replacement_duel_v2 import replacement_duel_v2_markdown
 
 ETF_NAMES = {
@@ -407,7 +414,8 @@ def current_position_table_nl(state: dict[str, Any]) -> str:
     ]
     for p in position_rows(state):
         t = ticker(p.get("ticker"))
-        lines.append(f"| {t} | {nl_action(p.get('suggested_action'))} | {f2(p.get('total_score'))} | {nl_fresh_cash(p.get('fresh_cash_test'))} | {nl_role(p.get('portfolio_role'))} | {POSITION_NEXT_ACTION_NL.get(t, 'Aanhouden en opnieuw toetsen in de volgende run.')} |")
+        action = position_action_label_nl(p, state) if has_executed_changes(state) else nl_action(p.get('suggested_action'))
+        lines.append(f"| {t} | {action} | {f2(p.get('total_score'))} | {nl_fresh_cash(p.get('fresh_cash_test'))} | {nl_role(p.get('portfolio_role'))} | {POSITION_NEXT_ACTION_NL.get(t, 'Aanhouden en opnieuw toetsen in de volgende run.')} |")
     return "\n".join(lines)
 
 
@@ -419,7 +427,11 @@ def final_action_table_nl(state: dict[str, Any]) -> str:
     ]
     for p in position_rows(state):
         t = ticker(p.get("ticker"))
-        lines.append(f"| {t} | {ETF_NAMES.get(t, t)} | {nl_existing(p.get('existing_new'))} | {f2(p.get('weight_inherited_pct') or p.get('previous_weight_pct'))} | {f2(p.get('target_weight_pct') or w.get(t))} | {nl_action(p.get('suggested_action'))} | {text(p.get('conviction_tier')).replace('Tier', 'Niveau')} | {f2(p.get('total_score'))} | {nl_role(p.get('portfolio_role'))} | {nl_yes_no(p.get('better_alternative_exists'))} | {POSITION_SHORT_REASON_NL.get(t, 'Geen materiële wijziging deze run.')} |")
+        action = position_action_label_nl(p, state) if has_executed_changes(state) else nl_action(p.get("suggested_action"))
+        existing_new = "Nieuw" if position_action_code(p, state) == "add_executed" else nl_existing(p.get("existing_new"))
+        inherited = p.get("weight_inherited_pct") if p.get("weight_inherited_pct") is not None else p.get("previous_weight_pct")
+        target = p.get("target_weight_pct") if p.get("target_weight_pct") is not None else w.get(t)
+        lines.append(f"| {t} | {ETF_NAMES.get(t, t)} | {existing_new} | {f2(inherited)} | {f2(target)} | {action} | {text(p.get('conviction_tier')).replace('Tier', 'Niveau')} | {f2(p.get('total_score'))} | {nl_role(p.get('portfolio_role'))} | {nl_yes_no(p.get('better_alternative_exists'))} | {POSITION_SHORT_REASON_NL.get(t, 'Geen materiële wijziging deze run.')} |")
     return "\n".join(lines)
 
 
@@ -450,6 +462,8 @@ def position_changes_table_nl(state: dict[str, Any]) -> str:
 
 
 def rotation_plan_table_nl(state: dict[str, Any]) -> str:
+    if has_executed_changes(state):
+        return post_execution_rotation_plan_table_nl(state)
     close = action_tickers(state, lambda action, p: "close" in action.lower() or "sell" in action.lower())
     reduce = action_tickers(state, lambda action, p: "reduce" in action.lower())
     hold = action_tickers(state, lambda action, p: "hold" in action.lower())
@@ -538,9 +552,19 @@ def render_nl_native(state: dict[str, Any]) -> str:
     inv = invested_eur(state)
     cash = cash_eur(state)
     eurusd = eurusd_used(state)
-    holdings = ", ".join(ticker(p.get("ticker")) for p in position_rows(state))
-    add = action_tickers(state, lambda action, p: "add" in action.lower() or "buy" in text(p.get("action_executed_this_run")).lower())
-    review = review_tickers(state)
+    if has_executed_changes(state):
+        buckets = action_buckets(state)
+        holdings = ", ".join(buckets["hold"]) if buckets["hold"] else "Geen"
+        add = ", ".join(buckets["add"]) if buckets["add"] else "Geen"
+        reduce = ", ".join(buckets["reduce"]) if buckets["reduce"] else "Geen"
+        close = ", ".join(buckets["close"]) if buckets["close"] else "Geen"
+        review = ", ".join(buckets["replaceable"]) if buckets["replaceable"] else "Geen"
+    else:
+        holdings = ", ".join(ticker(p.get("ticker")) for p in position_rows(state))
+        add = action_tickers(state, lambda action, p: "add" in action.lower() or "buy" in text(p.get("action_executed_this_run")).lower())
+        reduce = "Geen"
+        close = "Geen"
+        review = review_tickers(state)
     hedge_label = hedge_review_label(state)
     return f"""# Wekelijkse ETF-review {format_dutch_report_date(report_date) if report_date != 'unknown' else report_date}
 
@@ -561,8 +585,8 @@ def render_nl_native(state: dict[str, Any]) -> str:
 | Toevoegen | {add} |
 | Aanhouden | {holdings} |
 | Aanhouden, maar vervangbaar | {review} blijven expliciet onder herbeoordeling. |
-| Verlagen | Geen |
-| Sluiten | Geen |
+| Verlagen | {reduce} |
+| Sluiten | {close} |
 
 ### Beste alternatieven om te financieren
 - Nog geen alternatief is sterk genoeg om direct te financieren. Elk genoemd alternatief moet eerst dezelfde prijsbasis, relatieve-sterkteanalyse en beleggingscase-toets doorstaan.
