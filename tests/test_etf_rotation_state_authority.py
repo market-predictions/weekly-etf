@@ -50,17 +50,34 @@ def _portfolio() -> dict:
     }
 
 
-def test_current_run_valuation_recomputes_pnl_and_nav() -> None:
-    state = build_current_run_valuation_state(_portfolio(), _pricing())
-    position = state["positions"][0]
+def _current_state() -> dict:
+    return build_current_run_valuation_state(_portfolio(), _pricing())
+
+
+def test_current_run_valuation_builds_position() -> None:
+    state = _current_state()
+    assert len(state["positions"]) == 1
+
+
+def test_current_run_valuation_recomputes_pnl() -> None:
+    position = _current_state()["positions"][0]
     assert position["pnl_pct"] == -23.57
+
+
+def test_current_run_valuation_records_pnl_basis() -> None:
+    position = _current_state()["positions"][0]
     assert position["pnl_basis"] == "current_close_vs_avg_entry"
+
+
+def test_current_run_valuation_recomputes_nav_and_weight() -> None:
+    state = _current_state()
+    position = state["positions"][0]
     assert state["portfolio"]["total_portfolio_value_eur"] > 0
     assert position["current_weight_pct"] > 0
 
 
 def test_scorecard_refresh_blocks_stale_or_inconsistent_pnl() -> None:
-    state = build_current_run_valuation_state(_portfolio(), _pricing())
+    state = _current_state()
     previous = [
         {
             "report_date": "2026-05-05",
