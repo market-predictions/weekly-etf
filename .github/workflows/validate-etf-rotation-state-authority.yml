@@ -63,6 +63,17 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Upload authority source snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: rotation-authority-source-snapshot
+          path: |
+            runtime/rotation_state_authority.py
+            runtime/portfolio_rotation_engine_v2.py
+            tests/test_etf_rotation_state_authority.py
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Assert corrected July plan surfaces a real mutation decision
         run: |
           python - <<'PY'
