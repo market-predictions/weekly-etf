@@ -14,6 +14,8 @@ jobs:
   diagnose:
     if: github.head_ref == 'agent/fix-report-freshness-and-html-equity-graph'
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,7 +33,7 @@ jobs:
         id: tests
         run: |
           set +e
-          pytest -vv tests/test_report_freshness_and_html_equity.py 2>&1 | tee /tmp/report-freshness-pytest.log
+          python -m pytest -vv tests/test_report_freshness_and_html_equity.py 2>&1 | tee /tmp/report-freshness-pytest.log
           status=${PIPESTATUS[0]}
           echo "$status" > /tmp/report-freshness-pytest.status
           echo "status=$status" >> "$GITHUB_OUTPUT"
