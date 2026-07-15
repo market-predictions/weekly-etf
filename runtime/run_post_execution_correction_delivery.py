@@ -16,6 +16,7 @@ DEFAULT_REQUEST = ROOT / "control/run_queue/weekly_etf_report_correction_request
 STATE_PATH = ROOT / "output/etf_portfolio_state.json"
 LEDGER_PATH = ROOT / "output/etf_trade_ledger.csv"
 DELIVERY_DIR = ROOT / "output/delivery"
+LATEST_EXECUTED_STATE_POINTER = ROOT / "output/runtime/latest_etf_report_state_path.txt"
 
 
 def sha256(path: Path) -> str:
@@ -67,6 +68,22 @@ def run(command: list[str], *, env: dict[str, str]) -> str:
     return result.stdout
 
 
+def resolved_executed_state_path() -> Path:
+    if not LATEST_EXECUTED_STATE_POINTER.is_file():
+        raise RuntimeError(
+            f"Finalizer did not write executed-state pointer: {LATEST_EXECUTED_STATE_POINTER}"
+        )
+    raw = LATEST_EXECUTED_STATE_POINTER.read_text(encoding="utf-8").strip()
+    if not raw:
+        raise RuntimeError("Executed-state pointer is empty.")
+    path = Path(raw)
+    if not path.is_absolute():
+        path = ROOT / path
+    if not path.is_file():
+        raise RuntimeError(f"Executed-state artifact not found: {path}")
+    return path
+
+
 def main() -> None:
     request_path = Path(os.environ.get("ETF_CORRECTION_REQUEST_FILE", str(DEFAULT_REQUEST)))
     if not request_path.is_absolute():
@@ -115,12 +132,14 @@ def main() -> None:
     if not report_nl.is_file() or not report_nl.stat().st_size:
         raise RuntimeError(f"Corrected Dutch report was not created: {report_nl}")
 
-    artifact = json.loads(source_artifact.read_text(encoding="utf-8"))
-    state_artifact = ROOT / str(artifact["post_execution_state_artifact"])
+    state_artifact = resolved_executed_state_path()
     state = json.loads(state_artifact.read_text(encoding="utf-8"))
     validate_post_execution_report_consistency(report_en.read_text(encoding="utf-8"), state, language="en")
     validate_post_execution_report_consistency(report_nl.read_text(encoding="utf-8"), state, language="nl")
-    print("ETF_CORRECTION_REPORT_SURFACE_OK | languages=EN,NL | mutation=URNM->XBI")
+    print(
+        "ETF_CORRECTION_REPORT_SURFACE_OK | "
+        f"languages=EN,NL | mutation=URNM->XBI | runtime_state={state_artifact.relative_to(ROOT)}"
+    )
 
     if sha256(STATE_PATH) != state_before or sha256(LEDGER_PATH) != ledger_before:
         raise RuntimeError("Correction finalization mutated official state or trade ledger.")
@@ -167,6 +186,8 @@ def main() -> None:
         "request_file": str(request_path.relative_to(ROOT)),
         "source_execution_artifact": str(source_artifact.relative_to(ROOT)),
         "source_execution_artifact_sha256": sha256(source_artifact),
+        "executed_runtime_state": str(state_artifact.relative_to(ROOT)),
+        "executed_runtime_state_sha256": sha256(state_artifact),
         "model_execution_replayed": False,
         "official_state_mutated": False,
         "official_trade_ledger_mutated": False,
