@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0",
+  "correction_type": "post_execution_report_surface_correction",
+  "status": "correction_rendered_delivered_and_evidence_recovered",
+  "created_at_utc": "2026-07-15T22:37:18.699450+00:00",
+  "recovery_run_id": "20260715_223718",
+  "original_run_id": "20260715_175910",
+  "report_date": "2026-07-14",
+  "request_file": "control/run_queue/weekly_etf_report_correction_request_20260715_230541.md",
+  "source_execution_artifact": "output/runtime/etf_model_execution_20260714_20260715_175910.json",
+  "source_execution_artifact_sha256": "b25692b0324c8339a5430e43cf395cd1df70c4261d86ddc2b204120f16dd72d2",
+  "executed_runtime_state": "output/runtime/etf_report_state_20260714_20260715_175910_executed.json",
+  "executed_runtime_state_sha256": "778b9e987f0c94ab8a34b0e43b05ca3e0e344269b231b224f7c45adfea3c1cc0",
+  "model_execution_replayed": false,
+  "official_state_mutated": false,
+  "official_trade_ledger_mutated": false,
+  "state_sha256_before": "5af90905202ba8346ba6d2c95bc7305911b70f4e3186cf91b02ace1a233f9855",
+  "state_sha256_after": "5af90905202ba8346ba6d2c95bc7305911b70f4e3186cf91b02ace1a233f9855",
+  "trade_ledger_sha256_before": "3cd30abc27687b9dcd59123806c3f542ef4c2820f7de1bdcd937b5cc55c5a255",
+  "trade_ledger_sha256_after": "3cd30abc27687b9dcd59123806c3f542ef4c2820f7de1bdcd937b5cc55c5a255",
+  "rendered_assets": {
+    "en": {
+      "report_path": {
+        "path": "output/weekly_analysis_pro_260714_03.md",
+        "sha256": "4ae4d6087a591b9a83a5faee94d8df03d85c4abd7ec35513d10521924c77bd2f",
+        "size_bytes": 40611
+      },
+      "clean_md_path": {
+        "path": "output/weekly_analysis_pro_260714_03_clean.md",
+        "sha256": "6f6f14ecd9cd896964b2f44d3e7e90415a11f70840e647436091c42420e5c8b4",
+        "size_bytes": 40600
+      },
+      "html_path": {
+        "path": "output/weekly_analysis_pro_260714_03_delivery.html",
+        "sha256": "60172848689cdcfa8cd575a5d2a112196a40922f207188e2aff2e5091cdf2521",
+        "size_bytes": 85828
+      },
+      "pdf_path": {
+        "path": "output/weekly_analysis_pro_260714_03.pdf",
+        "sha256": "e077db9985c75586aa342a7307fac00a9b98611c5f2c7de0a657923cbd768c29",
+        "size_bytes": 169351
+      },
+      "equity_curve_png": {
+        "path": "output/weekly_analysis_pro_260714_03_equity_curve.png",
+        "sha256": "9d823e070c45a50d2088c63a740af1ba9674c3ad844925e2bbd7d8e78c43923e",
+        "size_bytes": 70238
+      }
+    },
+    "nl": {
+      "report_path": {
+        "path": "output/weekly_analysis_pro_nl_260714_03.md",
+        "sha256": "0909445f0ebc79af42eae0c402d829e351e8543f12680d6ee2410007be24c078",
+        "size_bytes": 42611
+      },
+      "clean_md_path": {
+        "path": "output/weekly_analysis_pro_nl_260714_03_clean.md",
+        "sha256": "d7b099d927d5170fcd991a0d93b21d769714170de63fda8e16e57abf2e14c0a5",
+        "size_bytes": 42603
+      },
+      "html_path": {
+        "path": "output/weekly_analysis_pro_nl_260714_03_delivery.html",
+        "sha256": "050baa6c40b60de8cd4bf485a037c98a224ae1d4d40e2607265972b02816e022",
+        "size_bytes": 90128
+      },
+      "pdf_path": {
+        "path": "output/weekly_analysis_pro_nl_260714_03.pdf",
+        "sha256": "a7d5cf18b30cc720aabb93a849598f3362cd0eefa918047945a8f79ffbb9fd17",
+        "size_bytes": 112422
+      },
+      "equity_curve_png": {
+        "path": "output/weekly_analysis_pro_nl_260714_03_equity_curve.png",
+        "sha256": "5926511b8f21d2b1fb481c862a24600e441bf4ce79d139004fef88d503a99eda",
+        "size_bytes": 72289
+      }
+    }
+  },
+  "delivery_workflow_run_id": "29455717158",
+  "delivery_receipt_path": "output/delivery/weekly_etf_correction_delivery_receipt_2026-07-14_29455717158.txt",
+  "delivery_receipt_sha256": "525395ecb5718b5786b5c1c1e196b2345a6cca0cf04df44e713d7ef264750cbc",
+  "delivery_receipt_line": "DELIVERY_OK | mode=pro_bilingual | report_en=weekly_analysis_pro_260714_03.md | report_nl=weekly_analysis_pro_nl_260714_03.md | recipient_en=mrkt.rprts@gmail.com | recipient_nl=mrkt.rprts@gmail.com | html_body_en=full_report | html_body_nl=full_report | pdf_en=yes | pdf_nl=yes | manifest_en=weekly_analysis_pro_260714_03_delivery_manifest.txt | manifest_nl=weekly_analysis_pro_nl_260714_03_delivery_manifest.txt | attachments_en=weekly_analysis_pro_260714_03.pdf, weekly_analysis_pro_260714_03_clean.md, weekly_analysis_pro_260714_03_delivery.html, weekly_analysis_pro_260714_03_equity_curve.png | attachments_nl=weekly_analysis_pro_nl_260714_03.pdf, weekly_analysis_pro_nl_260714_03_clean.md, weekly_analysis_pro_nl_260714_03_delivery.html, weekly_analysis_pro_nl_260714_03_equity_curve.png",
+  "delivery_receipt_fields": {
+    "mode": "pro_bilingual",
+    "report_en": "weekly_analysis_pro_260714_03.md",
+    "report_nl": "weekly_analysis_pro_nl_260714_03.md",
+    "recipient_en": "mrkt.rprts@gmail.com",
+    "recipient_nl": "mrkt.rprts@gmail.com",
+    "html_body_en": "full_report",
+    "html_body_nl": "full_report",
+    "pdf_en": "yes",
+    "pdf_nl": "yes",
+    "manifest_en": "weekly_analysis_pro_260714_03_delivery_manifest.txt",
+    "manifest_nl": "weekly_analysis_pro_nl_260714_03_delivery_manifest.txt",
+    "attachments_en": "weekly_analysis_pro_260714_03.pdf, weekly_analysis_pro_260714_03_clean.md, weekly_analysis_pro_260714_03_delivery.html, weekly_analysis_pro_260714_03_equity_curve.png",
+    "attachments_nl": "weekly_analysis_pro_nl_260714_03.pdf, weekly_analysis_pro_nl_260714_03_clean.md, weekly_analysis_pro_nl_260714_03_delivery.html, weekly_analysis_pro_nl_260714_03_equity_curve.png"
+  },
+  "delivery_layer_status": "smtp_sendmail_returned_no_exception",
+  "inbox_receipt_status": "pending_external_verification",
+  "inbox_receipts": []
+}

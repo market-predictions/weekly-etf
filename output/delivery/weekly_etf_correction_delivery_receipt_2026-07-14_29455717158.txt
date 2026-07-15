@@ -1,0 +1,39 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/weekly-etf/weekly-etf/runtime/run_post_execution_correction_delivery.py", line 215, in <module>
+    main()
+  File "/home/runner/work/weekly-etf/weekly-etf/runtime/run_post_execution_correction_delivery.py", line 175, in main
+    raise RuntimeError(f"Expected English and Dutch delivery manifests; found {delivery_manifests}")
+RuntimeError: Expected English and Dutch delivery manifests; found []
+ETF_PRICE_BASIS_DISCLOSURE_ADDED | language=en | report=weekly_analysis_pro_260714_03.md
+ETF_PRICE_BASIS_DISCLOSURE_ADDED | language=nl | report=weekly_analysis_pro_nl_260714_03.md
+ETF_RUNTIME_POLISH_NL_MACRO_OK | reason=native_dutch_macro_surface_applied
+ETF_RUNTIME_POLISH_OK | en=weekly_analysis_pro_260714_03.md | nl=weekly_analysis_pro_nl_260714_03.md | runtime_state=output/runtime/etf_report_state_20260714_20260715_175910_executed.json
+ETF_OUTPUT_CONTRACT_FIX_PATCHED | report=weekly_analysis_pro_260714_03.md | rotation_plan=False
+ETF_OUTPUT_CONTRACT_FIX_SKIPPED | report=weekly_analysis_pro_nl_260714_03.md | reason=native_dutch_renderer
+ETF_OUTPUT_CONTRACT_FIX_OK
+ETF_POSITION_PERFORMANCE_SECTION_OK | report=weekly_analysis_pro_260714_03.md | language=en | rows=10
+ETF_POSITION_PERFORMANCE_SECTION_OK | report=weekly_analysis_pro_nl_260714_03.md | language=nl | rows=10
+ETF_NL_LOCALIZATION_OK | report=weekly_analysis_pro_nl_260714_03.md | native_dutch=True | mode=native_guard_only
+ETF_NL_CLIENT_LANGUAGE_SCRUB_OK | report=weekly_analysis_pro_nl_260714_03.md | mode=native_guard_only
+ETF_NL_PDF_AUDIT_SCRUB_OK | report=weekly_analysis_pro_nl_260714_03.md
+ETF_NL_DATE_LOCALIZATION_OK | report=weekly_analysis_pro_nl_260714_03.md
+ETF_LINKIFY_OK | report=weekly_analysis_pro_260714_03.md
+ETF_LINKIFY_OK | report=weekly_analysis_pro_nl_260714_03.md
+ETF_EXECUTED_REPORT_CONTRACT_PATCHED | report=weekly_analysis_pro_260714_03.md
+ETF_EXECUTED_REPORT_CONTRACT_PATCHED | report=weekly_analysis_pro_nl_260714_03.md
+ETF_EXECUTED_REPORT_CONTRACT_OK
+ETF_EXECUTED_REPORT_FINALIZED | runtime_state=output/runtime/etf_report_state_20260714_20260715_175910_executed.json | en=output/weekly_analysis_pro_260714_03.md | nl=output/weekly_analysis_pro_nl_260714_03.md | positions=10 | executed_changes=2 | status=executed
+ETF_CORRECTION_REPORT_SURFACE_OK | languages=EN,NL | mutation=URNM->XBI | runtime_state=output/runtime/etf_report_state_20260714_20260715_175910_executed.json
+RUNTIME_SECTION15_OK | positions=10 | invested_eur=108288.34 | cash_eur=1936.52 | total_nav=110224.86
+RUNTIME_EQUITY_CURVE_OK | latest_nav=110224.86
+RUNTIME_SECTION15_OK | positions=10 | invested_eur=108288.34 | cash_eur=1936.52 | total_nav=110224.86
+RUNTIME_EQUITY_CURVE_OK | latest_nav=110224.86
+RUNTIME_SECTION15_OK | positions=10 | invested_eur=108288.34 | cash_eur=1936.52 | total_nav=110224.86
+RUNTIME_EQUITY_CURVE_OK | latest_nav=110224.86
+RUNTIME_SECTION15_OK | positions=10 | invested_eur=108288.34 | cash_eur=1936.52 | total_nav=110224.86
+RUNTIME_EQUITY_CURVE_OK | latest_nav=110224.86
+ETF_MACRO_REPORT_SURFACE_OK | label=output/macro/latest.json | en_chars=2450 | nl_chars=2675
+ETF_MACRO_REPORT_PRE_SEND_GUARD_OK | macro_pack=output/macro/latest.json | files=weekly_analysis_pro_260714_03.md,weekly_analysis_pro_260714_03_delivery.html,weekly_analysis_pro_nl_260714_03.md,weekly_analysis_pro_nl_260714_03_delivery.html
+DELIVERY_OK | mode=pro_bilingual | report_en=weekly_analysis_pro_260714_03.md | report_nl=weekly_analysis_pro_nl_260714_03.md | recipient_en=mrkt.rprts@gmail.com | recipient_nl=mrkt.rprts@gmail.com | html_body_en=full_report | html_body_nl=full_report | pdf_en=yes | pdf_nl=yes | manifest_en=weekly_analysis_pro_260714_03_delivery_manifest.txt | manifest_nl=weekly_analysis_pro_nl_260714_03_delivery_manifest.txt | attachments_en=weekly_analysis_pro_260714_03.pdf, weekly_analysis_pro_260714_03_clean.md, weekly_analysis_pro_260714_03_delivery.html, weekly_analysis_pro_260714_03_equity_curve.png | attachments_nl=weekly_analysis_pro_nl_260714_03.pdf, weekly_analysis_pro_nl_260714_03_clean.md, weekly_analysis_pro_nl_260714_03_delivery.html, weekly_analysis_pro_nl_260714_03_equity_curve.png
