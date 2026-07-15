@@ -30,6 +30,11 @@ def main() -> None:
         '            "only watchlist; non-u.s. exposure remains a diversification gap",\n',
         '            "only watchlist; non-u.s. exposure remains a diversification gap",\n            "watchlist only; non-u.s. exposure remains a diversification gap",\n',
     )
+
+    broken_helper_line = '    next_section = text.find(f"\n## {section_number + 1}.", start + len(marker))'
+    escaped_helper_line = '    next_section = text.find(f"\\n## {section_number + 1}.", start + len(marker))'
+    changed |= replace_once(path, broken_helper_line, escaped_helper_line)
+
     print(f"ETF_REPORT_FRESHNESS_EXACT_PHRASE_PATCH_OK | changed={str(changed).lower()}")
 
 
