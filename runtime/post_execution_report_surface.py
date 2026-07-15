@@ -216,6 +216,16 @@ def _section(text: str, start: str, end: str) -> str:
     return text[start_index:] if end_index == -1 else text[start_index:end_index]
 
 
+def _final_action_row(section: str, symbol: str) -> str:
+    for line in section.splitlines():
+        if not line.startswith("|"):
+            continue
+        first_cell = line.strip().strip("|").split("|", 1)[0]
+        if re.search(rf"(?<![A-Z0-9]){re.escape(symbol)}(?![A-Z0-9])", first_cell):
+            return line
+    return ""
+
+
 def validate_post_execution_report_consistency(text: str, state: dict[str, Any], *, language: str) -> None:
     changes = executed_changes(state)
     if not changes:
@@ -229,7 +239,7 @@ def validate_post_execution_report_consistency(text: str, state: dict[str, Any],
 
     if language == "nl":
         section2 = _section(text, "## 2. Portefeuille-acties", "## 3. Regime-dashboard")
-        section12 = _section(text, "## 12. Portefeuillerotatieplan", "## 13. Definitieve actietabel")
+        section12 = _section(text, "## 12. Rotatieplan portefeuille", "## 13. Definitieve actietabel")
         section13 = _section(text, "## 13. Definitieve actietabel", "## 14.")
         add_label, reduce_label, close_label = "Toevoegen — uitgevoerd", "Verlagen — uitgevoerd", "Sluiten — uitgevoerd"
     else:
@@ -237,6 +247,13 @@ def validate_post_execution_report_consistency(text: str, state: dict[str, Any],
         section12 = _section(text, "## 12. Portfolio Rotation Plan", "## 13. Final Action Table")
         section13 = _section(text, "## 13. Final Action Table", "## 14.")
         add_label, reduce_label, close_label = "Add — executed", "Reduce — executed", "Close — executed"
+
+    if not section2:
+        errors.append("action_snapshot_section_missing")
+    if not section12:
+        errors.append("rotation_plan_section_missing")
+    if not section13:
+        errors.append("final_action_section_missing")
 
     for change in changes:
         symbol = _ticker(change.get("ticker"))
@@ -246,8 +263,8 @@ def validate_post_execution_report_consistency(text: str, state: dict[str, Any],
             errors.append(f"action_snapshot_missing:{symbol}")
         if symbol not in section12:
             errors.append(f"rotation_plan_missing:{symbol}")
-        row_match = re.search(rf"^\|\s*{re.escape(symbol)}\s*\|.*$", section13, flags=re.MULTILINE)
-        if not row_match or expected_label not in row_match.group(0):
+        row = _final_action_row(section13, symbol)
+        if not row or expected_label not in row:
             errors.append(f"final_action_mismatch:{symbol}:{expected_label}")
 
     if errors:
