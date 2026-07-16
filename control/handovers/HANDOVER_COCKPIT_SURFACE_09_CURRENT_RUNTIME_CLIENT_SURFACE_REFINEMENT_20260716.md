@@ -4,7 +4,7 @@ Date: 2026-07-16
 Repository: `market-predictions/weekly-etf`
 Branch: `feature/cockpit-wp09-current-runtime-client-surface-refinement`
 PR: #79
-Status: implementation validated / governance closeout pending
+Status: closed
 
 ## Claim status
 
@@ -31,6 +31,10 @@ tests/test_cockpit_visual_state_contracts.py
 .github/workflows/validate-cockpit-wp08-evidence-review.yml
 control/work_packages/WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT_20260716.md
 control/handovers/HANDOVER_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT_20260716.md
+control/decisions/COCKPIT_WP09_REFINEMENT_DECISION_20260716.md
+control/CURRENT_STATE.md
+control/NEXT_ACTIONS.md
+docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_STATUS_20260716.md
 ```
 
 ## Implemented refinement
@@ -80,13 +84,15 @@ premium_look_and_feel
 audit_evidence_preservation
 ```
 
-## Validation evidence
+## Validation and merge evidence
 
 ```text
-validated_head: d4e6fa7aae9dab98000716b0ecf24f45d9a7b04a
-WP08_validation_run: 29535872134
-current_runtime_validation_run: 29535872250
+final_validated_head: 739f80854456edc852baa167fcd849b98a56a4ff
+WP08_validation_run: 29536333738
+current_runtime_validation_run: 29536333731
 validation_conclusion: success
+PR: #79
+merge_commit: 9b679df825fdc4c7ce37cbdc2474acae6d25d67f
 ```
 
 Workflow artifact:
@@ -137,12 +143,12 @@ These are workflow artifacts, not production delivery files.
 WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW
 ```
 
-This next package must decide the production relationship. WP09 itself does not promote, attach, send or replace the cockpit.
+This next package must decide the production relationship. WP09 did not promote, attach, send or replace the cockpit.
 
 ## Final closeout fields
 
 ```text
-final_governance_head: pending
-final_validation_runs: pending
-merge_commit: pending
+final_governance_head: 739f80854456edc852baa167fcd849b98a56a4ff
+final_validation_runs: 29536333738, 29536333731
+merge_commit: 9b679df825fdc4c7ce37cbdc2474acae6d25d67f
 ```

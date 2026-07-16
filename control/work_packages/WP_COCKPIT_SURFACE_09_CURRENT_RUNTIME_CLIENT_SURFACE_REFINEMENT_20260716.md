@@ -15,10 +15,11 @@ operational runbook
 ## Status
 
 ```text
-implementation_status: validated_ready_for_governance_closeout
+implementation_status: closed
 review_conclusion: ready_for_promotion_decision
 blocking_findings: []
 promotion_status: not_promoted
+merge_commit: 9b679df825fdc4c7ce37cbdc2474acae6d25d67f
 next_package: WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW
 ```
 
@@ -48,7 +49,7 @@ output/macro/latest.json
 
 ## Operational gate correction
 
-The WP08 workflow previously hardcoded the pre-WP09 lifecycle result. It now enforces the state relationship rather than one fixed conclusion:
+The WP08 workflow now enforces the state relationship rather than one fixed lifecycle conclusion:
 
 ```text
 blocking findings present -> iteration_required
@@ -97,13 +98,15 @@ premium_look_and_feel
 audit_evidence_preservation
 ```
 
-## Validation evidence
+## Validation and merge evidence
 
 ```text
-validated_head: d4e6fa7aae9dab98000716b0ecf24f45d9a7b04a
-WP08_validation_run: 29535872134
-current_runtime_validation_run: 29535872250
+final_validated_head: 739f80854456edc852baa167fcd849b98a56a4ff
+WP08_validation_run: 29536333738
+current_runtime_validation_run: 29536333731
 validation_conclusion: success
+PR: #79
+merge_commit: 9b679df825fdc4c7ce37cbdc2474acae6d25d67f
 artifact: cockpit-wp08-evidence-review-29535872134
 artifact_digest: sha256:0a86df7071453783315c28bb60e9dd620c4eea4fbdf6f2f9fab9812a83fdb628
 ```
@@ -128,4 +131,4 @@ promotion_status: not_promoted
 WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW
 ```
 
-The next package must decide whether the cockpit remains an experiment, becomes an additive front page/attachment, or enters another iteration. WP09 itself does not promote the cockpit.
+The next package must decide whether the cockpit remains an experiment, becomes an additive front page/attachment, or enters another iteration. WP09 itself did not promote the cockpit.
