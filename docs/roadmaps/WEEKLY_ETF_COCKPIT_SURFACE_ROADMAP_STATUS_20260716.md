@@ -35,16 +35,14 @@ validation_run: 29525968480
 merge_commit: d80984b7336f343344719a80a29712506926bd26
 ```
 
-The cockpit now uses current post-execution weights and market values and derives specific bilingual action wording from runtime state.
-
 ## WP08 evidence-based review
 
 ```text
 package: WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION
-status: validated_ready_for_governance_closeout
+status: closed
 PR: #76
-validated_head: abe689064455dbd7206564037220e727c52b929b
-validation_run: 29533073516
+merge_commit: 4a8c1a81aa8bca7324969f59f8134cb6db1def8e
+validation_run: 29533435789
 review_conclusion: iteration_required
 promotion_status: not_promoted
 ```
@@ -76,7 +74,7 @@ premium_look_and_feel
 
 ```text
 WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
-status: next_after_WP08_merge
+status: next
 promotion_status: not_promoted
 ```
 
