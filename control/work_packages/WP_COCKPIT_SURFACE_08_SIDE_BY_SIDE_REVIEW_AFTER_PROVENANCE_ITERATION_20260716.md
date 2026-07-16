@@ -16,9 +16,10 @@ operational runbook
 ## Status
 
 ```text
-implementation_status: validated_ready_for_closeout
+implementation_status: closed
 review_conclusion: iteration_required
 promotion_status: not_promoted
+merge_commit: 4a8c1a81aa8bca7324969f59f8134cb6db1def8e
 next_package: WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
 ```
 
@@ -88,11 +89,13 @@ Cockpit NL: output/cockpit_preview/weekly_analysis_pro_nl_cockpit_260714_01.html
 ## Validation evidence
 
 ```text
-validated_head: abe689064455dbd7206564037220e727c52b929b
-WP08_run: 29533073516
+final_validated_head: 830f79c09cbb170f748f840647ddccfe78d3c68c
+WP08_run: 29533435789
 WP08_conclusion: success
-current_runtime_run: 29533073585
+current_runtime_run: 29533435716
 current_runtime_conclusion: success
+PR: #76
+merge_commit: 4a8c1a81aa8bca7324969f59f8134cb6db1def8e
 artifact: cockpit-wp08-evidence-review-29533073516
 artifact_digest: sha256:a52ec091725dae17d992d940454cb11daa8dad1c6b7f585beec90f0473a473f0
 ```
@@ -124,4 +127,4 @@ iteration_required
 WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
 ```
 
-WP09 should correct only the three blocking dimensions and rerun the unchanged WP08 review contract.
+WP09 should correct only the three blocking dimensions and rerun the unchanged WP08 review contract. Passing that review does not promote the cockpit.

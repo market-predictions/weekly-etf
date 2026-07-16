@@ -4,7 +4,7 @@ Date: 2026-07-16
 Repository: `market-predictions/weekly-etf`
 Branch: `feature/cockpit-wp08-evidence-side-by-side-review`
 PR: #76
-Status: implementation validated / governance closeout pending
+Status: closed
 
 ## Claim status
 
@@ -27,6 +27,10 @@ tests/test_cockpit_wp08_evidence_review.py
 .github/workflows/validate-cockpit-wp08-evidence-review.yml
 control/work_packages/WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION_20260716.md
 control/handovers/HANDOVER_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION_20260716.md
+control/decisions/COCKPIT_WP08_EVIDENCE_REVIEW_DECISION_20260716.md
+control/CURRENT_STATE.md
+control/NEXT_ACTIONS.md
+docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_STATUS_20260716.md
 ```
 
 ## Implemented
@@ -100,14 +104,16 @@ promotion_status: not_promoted
 next_recommended_package: WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
 ```
 
-## Validation evidence
+## Validation and merge evidence
 
 ```text
-validated_head: abe689064455dbd7206564037220e727c52b929b
-WP08_validation_run: 29533073516
+final_validated_head: 830f79c09cbb170f748f840647ddccfe78d3c68c
+WP08_validation_run: 29533435789
 WP08_validation_conclusion: success
-current_runtime_validation_run: 29533073585
+current_runtime_validation_run: 29533435716
 current_runtime_validation_conclusion: success
+PR: #76
+merge_commit: 4a8c1a81aa8bca7324969f59f8134cb6db1def8e
 ```
 
 Workflow artifact:
@@ -155,6 +161,6 @@ WP09 should make only the narrow preview-copy and bilingual refinements identifi
 ## Final closeout fields
 
 ```text
-final_head_validation: pending after governance updates
-merge_commit: pending
+final_head_validation: passed
+merge_commit: 4a8c1a81aa8bca7324969f59f8134cb6db1def8e
 ```

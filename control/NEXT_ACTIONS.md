@@ -48,15 +48,17 @@ WP_POST_EXECUTION_REPORT_CONSISTENCY: closed
 WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH: closed
 WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP: closed
 WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_CURRENT_RUNTIME_REVALIDATION: closed
+WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION: closed
 ```
 
 ## Cockpit status
 
 ```text
-WP01-WP07: implemented and merged
+WP01-WP08: implemented and merged
 promotion_status: not_promoted
 selected_path: iteration
 current_runtime_authority_PR: #74
+WP08_review_PR: #76
 ```
 
 Current cockpit authority:
@@ -66,22 +68,17 @@ current_weight_pct > target_weight_pct > previous_weight_pct > weight_inherited_
 market_value_eur > previous_market_value_eur
 ```
 
-## Current package — WP08
+## WP08 closeout
 
 ```text
 package: WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION
 PR: #76
-status: validated_ready_for_governance_closeout
+merge_commit: 4a8c1a81aa8bca7324969f59f8134cb6db1def8e
+final_validated_head: 830f79c09cbb170f748f840647ddccfe78d3c68c
+WP08_run: 29533435789
+current_runtime_run: 29533435716
 review_conclusion: iteration_required
 promotion_status: not_promoted
-```
-
-Validation:
-
-```text
-validated_head: abe689064455dbd7206564037220e727c52b929b
-WP08_run: 29533073516
-current_runtime_run: 29533073585
 artifact: cockpit-wp08-evidence-review-29533073516
 ```
 
@@ -115,7 +112,7 @@ Concrete defects:
 
 ## Immediate next package
 
-After PR #76 is merged, create and claim:
+Create and claim:
 
 ```text
 WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
