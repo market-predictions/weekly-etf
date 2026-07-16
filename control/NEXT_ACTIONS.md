@@ -41,152 +41,149 @@ email_sent: false
 
 Do not describe `_04` as delivered.
 
-## Closed packages
+## Cockpit roadmap status
 
 ```text
-WP_POST_EXECUTION_REPORT_CONSISTENCY: closed
-WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH: closed
-WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP: closed
-WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_CURRENT_RUNTIME_REVALIDATION: closed
-WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION: closed
-WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT: closed
-WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW: closed
-```
-
-## Promotion decision closeout
-
-```text
-selected_option: additive_delivery_front_page
-PR: #81
-merge_commit: 3200d2a39afa0027ff9fdc65f7490ed97e54ffc8
-promotion_decision_run: 29537562563
-WP08_evidence_run: 29537562528
-current_runtime_run: 29537562530
-production_change: false
+WP01-WP09: implemented and merged
+promotion relationship decision: additive delivery front page
+promotion decision PR: #81
+promotion decision closeout PR: #82
+WP10 implementation PR: #83
 promotion_status: not_promoted
 ```
 
-Selected route:
+## WP10 validation result
 
 ```text
-add one cockpit front page inside the existing English and Dutch HTML/PDF report
-preserve the complete classic report body
-preserve one email and one PDF per language
-preserve attachment and manifest contracts
-suppress the smaller duplicate decision cockpit when enabled
-feature-gate the integration
-default the feature to disabled
-fail closed to unchanged classic output
+package: WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE
+status: validated_ready_for_enablement_decision
+validated_code_head: b2ca4b032793f23f13b0d4557a919623366dc501
+final_validation_run: 29541727393
+visual_artifact_run: 29542004498
+feature_flag: MRKT_RPRTS_COCKPIT_FRONT_PAGE=disabled|enabled
+feature_default: disabled
+production_enablement: false
+email_sent: false
+promotion_status: not_promoted
 ```
 
-Rejected routes:
+Acceptance result:
 
 ```text
-preview-only as primary route: leaves validated client value unused
-separate attachment: adds manifest and recipient friction
-full replacement: unnecessary migration and rollback risk
-another iteration: no remaining WP08 blockers
+focused_and_existing_tests: 30 passed
+production_delivery_html_contract: passed
+macro_thesis_surface_leakage: passed
+WP08_review_conclusion: ready_for_promotion_decision
+WP08_blocking_findings: []
+disabled_EN_HTML_byte_identical: true
+disabled_NL_HTML_byte_identical: true
+enabled_front_page_count_EN: 1
+enabled_front_page_count_NL: 1
+enabled_front_page_PDF_pages_EN: 1
+enabled_front_page_PDF_pages_NL: 1
+classic_report_body: preserved
+small_decision_cockpit_duplicate: false
+standalone_equity_embed: passed
+email_equity_CID: passed
+email_count_change: false
+pdf_count_change: false
+attachment_contract_change: false
+manifest_contract_change: false
+protected_authority_mutation: false
 ```
 
-## Immediate package
-
-Create and claim:
+Persistent evidence:
 
 ```text
-WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE
+control/evidence/COCKPIT_WP10_ADDITIVE_DELIVERY_FRONT_PAGE_EVIDENCE_20260717.json
+```
+
+## Immediate next package
+
+After PR #83 is merged, create and claim:
+
+```text
+WP_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT
 ```
 
 ### Layer
 
 ```text
+decision framework
 output contract
 operational runbook
 ```
 
 ### Purpose
 
-Implement the selected additive cockpit front page in the delivery HTML/PDF pipeline without enabling it by default and without sending email.
+Decide whether the validated feature gate should be enabled in the real production workflow.
 
-### Required architecture
+### Required start sequence
 
-```text
-render source: current runtime inputs, not a committed preview artifact
-integration layer: send_report_runtime_html.py and/or runtime/delivery_html_overrides.py
-classic report body: preserved
-small decision cockpit: suppressed only when full front page is enabled
-email count: unchanged
-PDF count: unchanged
-attachment count: unchanged
-manifest contract: unchanged
-```
-
-### Feature gate
+Read:
 
 ```text
-flag required: true
-recommended name: MRKT_RPRTS_COCKPIT_FRONT_PAGE
-accepted values: disabled | enabled
-implementation default: disabled
-validation enablement: explicit
-production enablement: separate closeout required
-render failure: unchanged classic output
-rollback: disable flag
+control/SYSTEM_INDEX.md
+control/CURRENT_STATE.md
+control/NEXT_ACTIONS.md
+control/decisions/COCKPIT_PROMOTION_DECISION_20260716.md
+control/work_packages/WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE_20260717.md
+control/handovers/HANDOVER_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE_20260717.md
+control/evidence/COCKPIT_WP10_ADDITIVE_DELIVERY_FRONT_PAGE_EVIDENCE_20260717.json
+.github/workflows/send-weekly-report.yml
+send_report_runtime_html.py
+runtime/additive_cockpit_front_page.py
 ```
 
-No truthy/falsey aliases should be accepted unless deliberately normalized and tested.
+Check for an active WP11 claim before editing.
 
-### Required implementation checks
-
-1. Disabled mode produces the current classic delivery contract.
-2. Enabled mode adds exactly one cockpit front page at the beginning of EN HTML/PDF.
-3. Enabled mode adds exactly one cockpit front page at the beginning of NL HTML/PDF.
-4. Classic report content remains complete after the front page.
-5. The smaller `Decision cockpit / Besliscockpit` is not duplicated in enabled mode.
-6. Standalone HTML equity rendering remains valid.
-7. Email HTML validation remains valid.
-8. PDF generation remains valid.
-9. One PDF and one email body remain per language.
-10. Attachment and manifest semantics remain unchanged.
-11. The WP08 v2 evidence review remains all-pass.
-12. Protected authority hashes remain unchanged.
-13. Validation sends no email.
-14. A planted cockpit render exception returns unchanged classic output and records a diagnostic result.
-
-### Expected implementation evidence
+### Decision to make
 
 ```text
-feature-disabled HTML/PDF comparison
-feature-enabled HTML/PDF artifacts
-bilingual parity proof
-no-duplicate decision surface proof
-classic body preservation proof
-fail-closed planted failure proof
-protected authority before/after hashes
-production validator results
-WP08 v2 all-pass result
-email_sent: false
-promotion_status: not_promoted
+A. retain production default disabled
+B. enable the cockpit front page in the real production workflow
+C. require one more validate-only production-bundle replay
 ```
+
+The evidence supports option B technically, but WP11 must make the explicit operational decision and preserve a one-flag rollback.
+
+### Required safeguards
+
+```text
+no renderer redesign
+no state, pricing or execution change
+validate-only exact-current replay before any send
+one HTML body and one PDF per language preserved
+attachment and manifest contracts preserved
+rollback by MRKT_RPRTS_COCKPIT_FRONT_PAGE=disabled
+no send without separate explicit authorization
+no delivery-success claim without receipt/manifest
+```
+
+### If enablement is accepted
+
+The only intended production behavior change is an explicit workflow environment value:
+
+```text
+MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
+```
+
+WP11 must validate the enabled production bundle without email before merging. It must not send the `_04` package or mutate state.
 
 ### Safety boundary
 
 ```text
-production_enablement: false
-production_send: false
+production_send: false during WP11 validation
 portfolio_model_execution: false
 pricing_authority_change: false
 official_state_mutation: false
 official_trade_ledger_mutation: false
 ```
 
-## Following package
-
-If WP10 succeeds, create a separate implementation-promotion closeout package that decides whether to enable the feature in the real production workflow. Do not combine production enablement with WP10 implementation validation.
-
 ## Subsequent report-surface audit
 
-After the cockpit integration path is stable, inspect client-facing `_04` wording for internal or stale terms, including `shadow engine`. Handle confirmed leakage in a separate report-surface cleanup package using existing macro/thesis validators.
+After the cockpit production path is closed, inspect client-facing `_04` wording for internal or stale terms, including `shadow engine`. Handle confirmed leakage in a separate report-surface cleanup package using existing macro/thesis validators.
 
 ## Governance cleanup candidate
 
-A separate governance pass should reconcile stale `planned` labels in `control/SYSTEM_INDEX.md` for the already implemented cockpit renderer, workflow and output directory. Do not mix that cleanup into WP10 production integration.
+A separate governance pass may reconcile stale `planned` labels in `control/SYSTEM_INDEX.md` for cockpit assets that are already implemented. Do not combine that documentation cleanup with WP11 production enablement.
