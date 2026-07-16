@@ -48,7 +48,24 @@ jobs:
             tools/validate_post_execution_correction_runbook.py
 
       - name: Run focused tests
-        run: pytest -q tests/test_post_execution_correction_runbook.py
+        id: focused_tests
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          pytest -vv --tb=short tests/test_post_execution_correction_runbook.py 2>&1 | tee /tmp/post-execution-correction-tests.log
+
+      - name: Upload focused test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-execution-correction-test-log-${{ github.run_id }}
+          path: /tmp/post-execution-correction-tests.log
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce focused test result
+        if: steps.focused_tests.outcome != 'success'
+        run: exit 1
 
       - name: Validate canonical correction runbook
         run: python -m tools.validate_post_execution_correction_runbook
