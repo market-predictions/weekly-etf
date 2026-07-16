@@ -1,5 +1,5 @@
 ..............................                                           [100%]
-30 passed in 1.85s
+30 passed in 1.38s
 COCKPIT_FRONT_PAGE | status=disabled | feature=disabled | front_page_count=0 | diagnostic=feature_disabled
 ETF_DELIVERY_HTML_CONTRACT_OK | report=weekly_analysis_pro_260714_04.md | dynamic_holdings=CIBR,DFEN,GSG,IEFA,PAVE,SMH,SPY,URNM,XBI,XLU | post_execution=True
 COCKPIT_FRONT_PAGE | status=disabled | feature=disabled | front_page_count=0 | diagnostic=feature_disabled
@@ -45,10 +45,10 @@ ETF_MACRO_REPORT_PRE_SEND_GUARD_OK | macro_pack=output/macro/latest.json | files
   "artifact_sha256": {
     "disabled_en_html": "b46e9dd7e195d713aaa6ca04a6fe97d374ef93ed634ee6049ebbd28d83a3ee5e",
     "disabled_nl_html": "8580accf4495942f88a9aea582a7139e86f715cc5239a2da8a3fe0c330834dac",
-    "enabled_en_html": "ce35f1214ebaace4834b85a4f3bcb90b54092d46d265a815b9edf9a12ace25c1",
-    "enabled_en_pdf": "57b5a31f1a1bb378fbd59c9e16e966739796db8bc62d2808c2e1884b03f0a515",
-    "enabled_nl_html": "98cd6ff84d329d5a48971361e7e23a121ef9c2936c408c5c003bd6b0c0a16df7",
-    "enabled_nl_pdf": "76abf64c1750607dca7fdfd34ce83bc7a225c56afff6d7c2d5f682732e14a497"
+    "enabled_en_html": "3e560447e19c0c6ee51818e749bf4b54ee91dcb48910c151159ac83a212b2ed1",
+    "enabled_en_pdf": "99e046cb705c9cb060f243476225c003fced885b06a4c4b1a73c0abb184783ee",
+    "enabled_nl_html": "976f820e26cf39efa374eda54b8d99958531b52ebe67f489d7781ac5cf900a7b",
+    "enabled_nl_pdf": "f10fa65d930fb26db2dbbd5a63eb50d759746c7f6381a1018f8b5713dd456425"
   },
   "attachment_contract_change": false,
   "classic_report_body": "preserved",
@@ -65,14 +65,18 @@ ETF_MACRO_REPORT_PRE_SEND_GUARD_OK | macro_pack=output/macro/latest.json | files
     "nl": 1
   },
   "feature_default": "disabled",
+  "front_page_pdf_pages": {
+    "en": 1,
+    "nl": 1
+  },
   "implementation_status": "validated_ready_for_enablement_decision",
   "manifest_contract_change": false,
   "pdf_count_change": false,
   "pdf_generation": {
     "en_pages_disabled": 18,
-    "en_pages_enabled": 20,
+    "en_pages_enabled": 19,
     "nl_pages_disabled": 20,
-    "nl_pages_enabled": 22
+    "nl_pages_enabled": 21
   },
   "promotion_status": "not_promoted",
   "report_token": "260714",
@@ -83,10 +87,3 @@ ETF_MACRO_REPORT_PRE_SEND_GUARD_OK | macro_pack=output/macro/latest.json | files
 COCKPIT_PREVIEW_OK | language=en | html=output/cockpit_preview/weekly_analysis_pro_cockpit_260714_01.html | pdf=not_rendered
 COCKPIT_PREVIEW_OK | language=nl | html=output/cockpit_preview/weekly_analysis_pro_nl_cockpit_260714_01.html | pdf=not_rendered
 COCKPIT_SIDE_BY_SIDE_REVIEW_OK | token=260714 | schema=cockpit_side_by_side_review_v2 | conclusion=ready_for_promotion_decision | blockers=0 | json=output/cockpit_review/weekly_etf_cockpit_side_by_side_review_260714.json | promotion_status=not_promoted
-?? __pycache__/
-?? output/cockpit_preview/
-?? output/cockpit_review/
-?? output/wp10_validation/
-?? runtime/__pycache__/
-?? tests/__pycache__/
-?? tools/__pycache__/

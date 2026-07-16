@@ -2,10 +2,10 @@
   "email_sent": false,
   "exit_code": 0,
   "feature_default": "disabled",
-  "head_sha": "2b45fdbc76105b043d2670286bb39cdeb6181c10",
+  "head_sha": "b2ca4b032793f23f13b0d4557a919623366dc501",
   "promotion_status": "not_promoted",
-  "run_id": "29540379685",
-  "schema_version": "cockpit_wp10_self_reporting_validation_v1",
+  "run_id": "29541727393",
+  "schema_version": "cockpit_wp10_final_validation_v1",
   "status": "success",
-  "validated_at_utc": "2026-07-16T22:44:57.707092+00:00"
+  "validated_at_utc": "2026-07-16T23:16:14.353640+00:00"
 }
