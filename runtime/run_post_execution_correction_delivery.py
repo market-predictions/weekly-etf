@@ -4,13 +4,10 @@ import json
 import os
 import sys
 from datetime import datetime, timezone
-from pathlib import Path
 
 from runtime.post_execution_correction_runbook import (
     DELIVERY_DIR,
     ROOT,
-    STATE_PATH,
-    LEDGER_PATH,
     asset_record,
     assert_authority_hashes_unchanged,
     assert_dispatch_send_confirmation,
@@ -27,9 +24,35 @@ from runtime.post_execution_correction_runbook import (
 from runtime.post_execution_report_surface import validate_post_execution_report_consistency
 
 
+def _correction_output_paths(report_path):
+    return (
+        report_path,
+        report_path.with_name(f"{report_path.stem}_clean.md"),
+        report_path.with_name(f"{report_path.stem}_delivery.html"),
+        report_path.with_suffix(".pdf"),
+        report_path.with_name(f"{report_path.stem}_equity_curve.png"),
+    )
+
+
+def _require_fresh_correction_suffix(request) -> None:
+    existing = [
+        path
+        for report in (request.report_en, request.report_nl)
+        for path in _correction_output_paths(report)
+        if path.exists()
+    ]
+    if existing:
+        rendered = ", ".join(relative(path) for path in existing)
+        raise RuntimeError(
+            "Correction send target already exists; use recover_no_send for a prior successful delivery "
+            f"or choose a new correction suffix. Existing: {rendered}"
+        )
+
+
 def main() -> None:
     request_path, request = correction_request_from_env(require_send_confirmation=True)
     assert_dispatch_send_confirmation(os.environ.get("ETF_CORRECTION_SEND_CONFIRMATION", ""))
+    _require_fresh_correction_suffix(request)
 
     source_artifact = ROOT / request.source_artifact
     if not source_artifact.is_file():
