@@ -1,6 +1,11 @@
 name: Apply cockpit WP10 integration patch
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/apply-cockpit-wp10-integration.yml"
   push:
     branches:
       - feature/cockpit-wp10-additive-delivery-front-page
