@@ -3,6 +3,7 @@
 Date: 2026-07-17
 Repository: `market-predictions/weekly-etf`
 Branch: `feature/cockpit-wp10-additive-delivery-front-page`
+PR: #83
 
 ## Layer
 
@@ -14,57 +15,34 @@ operational runbook
 ## Status
 
 ```text
-status: claimed
+status: validated_ready_for_enablement_decision
+validated_code_head: b2ca4b032793f23f13b0d4557a919623366dc501
+final_validation_run: 29541727393
+visual_artifact_run: 29542004498
 production_enablement: false
 promotion_status: not_promoted
 email_send: false
+next_package: WP_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT
 ```
 
 ## Purpose
 
-Implement the promotion decision selected in `COCKPIT_PROMOTION_DECISION_20260716`:
+Implement the selected additive cockpit front page inside the existing English and Dutch delivery HTML/PDF while preserving the complete classic report body and all current delivery semantics.
 
-```text
-selected_option: additive_delivery_front_page
-```
-
-The implementation must add one runtime-derived cockpit front page to the beginning of the existing English and Dutch delivery HTML/PDF while preserving the complete classic report body and all current delivery semantics.
-
-This package implements and validates the path. It does not enable the path by default and does not send email.
-
-## Required start sequence
-
-Read in order:
-
-```text
-control/SYSTEM_INDEX.md
-control/CURRENT_STATE.md
-control/NEXT_ACTIONS.md
-control/decisions/COCKPIT_PROMOTION_DECISION_20260716.md
-control/decisions/cockpit_promotion_decision_20260716.json
-runtime/render_cockpit_front_page.py
-send_report_runtime_html.py
-runtime/delivery_html_overrides.py
-send_report.py
-.github/workflows/send-weekly-report.yml
-```
-
-Check for an active WP10 branch or pull request before editing.
+WP10 implements and validates the path. It does not enable the feature in the production workflow and does not send email.
 
 ## Decision framework
 
-The front page improves the client entry surface but does not replace the classic report evidence layer.
-
 ```text
-client entry surface: additive cockpit front page
+client entry surface: one additive cockpit front page
 classic report evidence body: preserved intact
-small Decision cockpit / Besliscockpit: suppressed only when full front page is enabled
-production enablement: separate closeout decision
+small Decision cockpit / Besliscockpit: suppressed only after successful full-front-page injection
+production enablement: separate WP11 decision
 ```
 
 ## Input/state contract
 
-Render directly from current runtime authority, never from a committed cockpit preview artifact.
+The front page renders directly from current runtime authority, never from a committed preview artifact.
 
 ```text
 runtime state pointer: output/runtime/latest_etf_report_state_path.txt
@@ -74,51 +52,14 @@ pricing audit pointer: output/pricing/latest_price_audit_path.txt
 run manifest pointer: output/run_manifests/latest_weekly_etf_run_manifest_path.txt
 ```
 
-Preserve current authority precedence:
+Authority precedence remains:
 
 ```text
 current_weight_pct > target_weight_pct > previous_weight_pct > weight_inherited_pct
 market_value_eur > previous_market_value_eur
 ```
 
-## Output contract
-
-### Disabled mode
-
-With the feature disabled, output must preserve the current classic delivery contract without a cockpit front page.
-
-### Enabled mode
-
-With the feature enabled:
-
-```text
-exactly one cockpit front page at the start of EN email HTML
-exactly one cockpit front page at the start of EN PDF HTML
-exactly one cockpit front page at the start of NL email HTML
-exactly one cockpit front page at the start of NL PDF HTML
-complete classic report body follows unchanged in semantic content
-small Decision cockpit / Besliscockpit is not injected
-one HTML body per language remains
-one PDF per language remains
-attachment and manifest semantics remain unchanged
-standalone HTML remains valid
-```
-
-The delivery surface must use client-facing delivery wording. It must not expose preview-only labels such as:
-
-```text
-Preview lane
-Preview-only cockpit
-No delivery claim
-Not promoted to production
-Voorbeeldcockpit
-Geen leveringsclaim
-Niet naar productie gepromoveerd
-```
-
 ## Feature gate
-
-Use exactly:
 
 ```text
 MRKT_RPRTS_COCKPIT_FRONT_PAGE=disabled|enabled
@@ -130,93 +71,82 @@ Rules:
 missing value -> disabled
 implementation default -> disabled
 validation enablement -> explicit enabled
-other values -> fail closed to unchanged classic output
-production enablement -> separate closeout package
-rollback -> set disabled
+invalid value -> fail closed to unchanged classic output
+render/injection failure -> fail closed to unchanged classic output
+rollback -> disabled
+production enablement -> separate closeout required
 ```
 
-Do not accept implicit truthy or falsey aliases.
+No implicit truthy or falsey aliases are accepted.
 
-## Failure isolation
+## Output contract
 
-Any front-page render or injection exception must:
+### Disabled
 
-1. return the unchanged classic HTML;
-2. retain the current smaller decision cockpit behavior;
-3. emit a machine-readable diagnostic status;
-4. avoid modifying output authority, state, pricing, ledger or delivery manifests.
+- EN and NL delivery HTML remain byte-identical to the current classic output.
+- The existing smaller decision cockpit remains available.
+- No front page is added.
 
-A planted-failure regression is mandatory.
+### Enabled
 
-## Exact implementation files
+- exactly one EN cockpit front page;
+- exactly one NL cockpit front page;
+- exactly one added PDF page per language;
+- complete classic report follows unchanged;
+- smaller decision cockpit is not duplicated;
+- one HTML body and one PDF remain per language;
+- attachment and manifest semantics remain unchanged;
+- standalone HTML equity uses the embedded data URI;
+- email HTML retains the equity CID contract.
 
-Expected narrow scope:
+The delivery surface contains no preview-only or promotion-status labels.
+
+## Implementation files
 
 ```text
-runtime/render_cockpit_front_page.py
 runtime/additive_cockpit_front_page.py
 send_report_runtime_html.py
 tests/test_cockpit_wp10_additive_delivery_front_page.py
+tools/validate_cockpit_wp10_delivery_integration.py
 .github/workflows/validate-cockpit-wp10-additive-front-page.yml
-control/work_packages/WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE_20260717.md
-control/handovers/HANDOVER_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE_20260717.md
+control/evidence/COCKPIT_WP10_ADDITIVE_DELIVERY_FRONT_PAGE_EVIDENCE_20260717.json
 ```
 
-Existing report or delivery files may only be changed when required by the narrow integration contract.
-
-## Required tests
-
-1. Feature flag parser accepts only `disabled` and `enabled`.
-2. Missing flag behaves as `disabled`.
-3. Disabled injection returns byte-identical classic HTML.
-4. Enabled injection adds exactly one delivery front page before the classic body.
-5. English and Dutch front pages use client-facing delivery wording.
-6. Preview-only labels do not appear in enabled delivery output.
-7. The smaller decision cockpit is suppressed only after successful full-front-page injection.
-8. Classic body markers remain present and in original order.
-9. Planted renderer failure returns unchanged classic output and a fallback diagnostic.
-10. Existing delivery HTML validator remains green.
-11. Existing report freshness/equity contracts remain green.
-12. Existing WP08 evidence review remains all-pass.
-13. Protected authority hashes remain byte-identical.
-14. No email is sent.
-
-## Validation workflow
-
-Create a read-only workflow that:
-
-- installs focused render dependencies;
-- snapshots protected authority files and pointer targets;
-- compiles modified modules;
-- runs WP10 plus existing cockpit/report regressions;
-- renders exact current `_04` delivery assets with the feature disabled and enabled without calling the send path;
-- validates EN/NL HTML and PDF generation;
-- verifies one front page, no duplicate small cockpit, complete classic body, valid embedded equity graph and unchanged attachment/manifest shape;
-- executes a planted failure and proves fail-closed output;
-- reruns WP08 v2;
-- proves protected hashes unchanged;
-- uploads evidence artifacts;
-- records `email_sent: false` and `promotion_status: not_promoted`.
-
-## Acceptance
+## Acceptance evidence
 
 ```text
-implementation_status: validated_ready_for_enablement_decision
-feature_default: disabled
-enabled_validation: passed
-fail_closed_validation: passed
+focused_and_existing_tests: 30 passed
+production_delivery_html_contract: passed
+macro_thesis_surface_leakage: passed
+WP08_review_conclusion: ready_for_promotion_decision
+WP08_blocking_findings: []
+all_eleven_WP08_dimensions: pass
+protected_authority_hashes_before_after: identical
+disabled_EN_HTML_byte_identical: true
+disabled_NL_HTML_byte_identical: true
+enabled_front_page_count_EN: 1
+enabled_front_page_count_NL: 1
+enabled_front_page_PDF_pages_EN: 1
+enabled_front_page_PDF_pages_NL: 1
 classic_report_body: preserved
 small_decision_cockpit_duplicate: false
+standalone_equity_embed: passed
+email_equity_CID: passed
 email_count_change: false
 pdf_count_change: false
 attachment_contract_change: false
 manifest_contract_change: false
-protected_authority_mutation: false
 email_sent: false
 promotion_status: not_promoted
 ```
 
-Passing this package does not enable the feature in the production send workflow. A separate implementation-promotion closeout must decide production enablement.
+Persistent evidence:
+
+```text
+control/evidence/COCKPIT_WP10_ADDITIVE_DELIVERY_FRONT_PAGE_EVIDENCE_20260717.json
+```
+
+Visual review of English and Dutch page 1 and the transition to the classic report on page 2 passed without clipping, overlap, broken glyphs or readability defects.
 
 ## Safety boundary
 
@@ -229,3 +159,11 @@ official_state_mutation: false
 official_trade_ledger_mutation: false
 report_markdown_rewrite: false
 ```
+
+## Next package
+
+```text
+WP_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT
+```
+
+WP11 must decide whether the explicit feature flag is enabled in the real production workflow. No send is authorized by WP10.
