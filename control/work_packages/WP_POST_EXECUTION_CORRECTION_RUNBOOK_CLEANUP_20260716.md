@@ -3,7 +3,7 @@
 Date: 2026-07-16
 Repository: `market-predictions/weekly-etf`
 Layer: operational runbook + delivery evidence contract
-Status: validated_ready_for_merge
+Status: closed
 
 ## Current issue
 
@@ -38,7 +38,7 @@ tests/test_post_execution_correction_runbook.py
 control/decisions/POST_EXECUTION_CORRECTION_RUNBOOK_DECISION_20260716.md
 ```
 
-The one-shot bridge is retired:
+The one-shot bridge was retired:
 
 ```text
 .github/workflows/dispatch-corrected-etf-report-bridge.yml
@@ -67,17 +67,18 @@ cleanup_historical_delivery_evidence_mutation: false
 
 Only read-only PR validation was executed during this cleanup. Neither `send` nor `recover_no_send` was dispatched.
 
-## Validation evidence
+## Validation and merge evidence
 
-Exact validated implementation head before governance recording:
+Final validated governance head:
 
 ```text
-head_sha: ef3c9628c422994b8a2f54455db2f640ad32b970
-correction_runbook_validation_run: 29520376036
+head_sha: b4aa326eefc42784537cb5baba76544ac59618ed
+correction_runbook_validation_run: 29520607344
 correction_runbook_validation_conclusion: success
-post_execution_consistency_run: 29520376034
+post_execution_consistency_run: 29520608204
 post_execution_consistency_conclusion: success
 PR: #72
+merge_commit: 7e3a4516418e7a0413ea1d4b8b21a66d9dab8fb7
 ```
 
 Validated gates:
@@ -95,6 +96,6 @@ Validated gates:
 - one-shot bridge is absent;
 - current official state and trade-ledger files remain unchanged during validation.
 
-## Merge closeout
+## Closeout
 
-Pending final validation of the governance head and merge of PR #72. Final merge evidence will be recorded in a separate closeout update.
+The correction operational debt is resolved. Historical `_03` delivery evidence and `_04` non-delivered review evidence remain unchanged. The next ETF package must be selected explicitly and must not reopen this runbook package without a new defect or authority decision.
