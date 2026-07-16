@@ -1,6 +1,14 @@
 from __future__ import annotations
 
+import base64
+from pathlib import Path
+from types import SimpleNamespace
+
 from runtime.report_freshness_contract import apply_report_freshness_contract, validate_report_freshness
+from runtime.standalone_html_equity_embed import (
+    validate_standalone_html_equity,
+    with_standalone_html_equity_embed,
+)
 
 
 def state() -> dict:
@@ -83,3 +91,43 @@ def test_dutch_plain_radar_and_no_exposure_wording_are_corrected() -> None:
     assert "De portefeuille heeft geen blootstelling aan ontwikkelde markten buiten de VS." not in result
     assert "24.05%" in result
     validate_report_freshness(result, state(), "nl")
+
+
+def test_sanitized_equity_source_is_restored_for_email_and_standalone_html(tmp_path: Path) -> None:
+    report = tmp_path / "weekly_analysis_pro_260714_04.md"
+    chart = tmp_path / "weekly_analysis_pro_260714_04_equity_curve.png"
+    html_path = tmp_path / "weekly_analysis_pro_260714_04_delivery.html"
+    report.write_text("# Report\n\n`EQUITY_CURVE_CHART_PLACEHOLDER`\n", encoding="utf-8")
+    chart.write_bytes(b"\x89PNG\r\n\x1a\npreview")
+    harmful_html = '<html><img src="#harmful-link" alt="Equity curve" /></html>'
+    html_path.write_text(harmful_html, encoding="utf-8")
+
+    def png_to_data_uri(path: Path) -> str:
+        return "data:image/png;base64," + base64.b64encode(path.read_bytes()).decode("ascii")
+
+    fake_module = SimpleNamespace(
+        png_to_data_uri=png_to_data_uri,
+        build_report_html=lambda *_args, **_kwargs: harmful_html,
+    )
+
+    def generate(_output_dir: Path, _report_path: Path, mode: str = "pro") -> dict:
+        return {
+            "bilingual": False,
+            "en": {
+                "report_path": report,
+                "equity_curve_png": chart,
+                "html_path": html_path,
+                "html_email": harmful_html,
+                "md_text_clean": report.read_text(encoding="utf-8"),
+                "report_date_str": "2026-07-14",
+            },
+        }
+
+    bundle = with_standalone_html_equity_embed(generate, fake_module)(tmp_path, report, mode="pro")
+
+    assert "cid:equitycurve" in bundle["en"]["html_email"]
+    assert "#harmful-link" not in bundle["en"]["html_email"]
+    validate_standalone_html_equity(html_path)
+    standalone = html_path.read_text(encoding="utf-8")
+    assert "data:image/png;base64," in standalone
+    assert "#harmful-link" not in standalone
