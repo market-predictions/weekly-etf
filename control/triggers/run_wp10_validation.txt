@@ -1,3 +1,4 @@
 WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE
 triggered_at: 2026-07-17
 purpose: exact-current disabled/enabled/fail-closed validation without email send
+nonce: one-page-contract-v2
