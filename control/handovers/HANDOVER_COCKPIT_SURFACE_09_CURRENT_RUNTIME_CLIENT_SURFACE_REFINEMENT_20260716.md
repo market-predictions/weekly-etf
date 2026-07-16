@@ -3,7 +3,8 @@
 Date: 2026-07-16
 Repository: `market-predictions/weekly-etf`
 Branch: `feature/cockpit-wp09-current-runtime-client-surface-refinement`
-Status: claimed / implementation in progress
+PR: #79
+Status: implementation applied / exact-current validation pending
 
 ## Claim status
 
@@ -20,17 +21,30 @@ blocking_findings:
 promotion_status: not_promoted
 ```
 
-## Narrow implementation target
+## Implemented refinement
 
-- action-aware English and Dutch summary;
-- dedicated bilingual next-action trigger;
-- correct Dutch discipline punctuation;
-- natural Dutch provenance labels;
-- unchanged cockpit structure and authority precedence.
+- summary is action-aware when runtime state contains executed actions;
+- no-action wording retains disciplined inactivity language;
+- a dedicated bilingual next-action trigger is derived from current concentration and review state;
+- Dutch discipline punctuation uses localized percentage formatting without whole-sentence replacement;
+- Dutch provenance labels use natural client-facing terminology;
+- the existing layout, metric cards, evidence strip, preview paths and authority precedence are preserved.
+
+## Operational gate adjustment
+
+The WP08 workflow no longer hardcodes one lifecycle conclusion. It now enforces:
+
+```text
+blocking findings present -> iteration_required
+no blocking findings -> ready_for_promotion_decision
+promotion_status -> not_promoted in both cases
+```
+
+The WP08 v2 review model and dimensions are unchanged.
 
 ## Acceptance gate
 
-Rerun `cockpit_side_by_side_review_v2` unchanged and require:
+Rerun `cockpit_side_by_side_review_v2` against the exact July 14 artifacts and require:
 
 ```text
 review_conclusion: ready_for_promotion_decision
@@ -51,4 +65,4 @@ official_trade_ledger_mutation: false
 
 ## Completion evidence
 
-Pending implementation, focused regressions, exact-current WP08 validation, protected-file hash comparison, PR and merge evidence.
+Focused renderer regressions passed during the patch commit. Exact-current WP08 validation, protected-file hash comparison, final PR head and merge evidence remain pending.
