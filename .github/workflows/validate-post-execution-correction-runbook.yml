@@ -1,0 +1,60 @@
+name: Validate post-execution correction runbook
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/resend-corrected-post-execution-report.yml"
+      - ".github/workflows/dispatch-corrected-etf-report-bridge.yml"
+      - ".github/workflows/validate-post-execution-correction-runbook.yml"
+      - "runtime/post_execution_correction_runbook.py"
+      - "runtime/run_post_execution_correction_delivery.py"
+      - "runtime/recover_post_execution_correction_evidence.py"
+      - "tools/validate_post_execution_correction_runbook.py"
+      - "tests/test_post_execution_correction_runbook.py"
+      - "control/work_packages/WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP_20260716.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused validation dependencies
+        run: python -m pip install pytest pyyaml
+
+      - name: Snapshot authority files
+        run: |
+          sha256sum output/etf_portfolio_state.json > /tmp/etf-state-before.sha256
+          sha256sum output/etf_trade_ledger.csv > /tmp/etf-ledger-before.sha256
+
+      - name: Compile correction runbook
+        run: |
+          python -m py_compile \
+            runtime/post_execution_correction_runbook.py \
+            runtime/run_post_execution_correction_delivery.py \
+            runtime/recover_post_execution_correction_evidence.py \
+            tools/validate_post_execution_correction_runbook.py
+
+      - name: Run focused tests
+        run: pytest -q tests/test_post_execution_correction_runbook.py
+
+      - name: Validate canonical correction runbook
+        run: python -m tools.validate_post_execution_correction_runbook
+
+      - name: Prove no authority mutation
+        run: |
+          sha256sum -c /tmp/etf-state-before.sha256
+          sha256sum -c /tmp/etf-ledger-before.sha256
+          git diff --exit-code -- output/etf_portfolio_state.json output/etf_trade_ledger.csv output/delivery/weekly_etf_correction_delivery_receipt_2026-07-14_29455717158.txt output/delivery/weekly_etf_correction_manifest_2026-07-14_20260715_223718.json
