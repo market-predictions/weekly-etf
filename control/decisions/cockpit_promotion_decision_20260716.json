@@ -1,0 +1,42 @@
+{
+  "schema_version": "cockpit_promotion_decision_v1",
+  "decision_date": "2026-07-16",
+  "repository": "market-predictions/weekly-etf",
+  "selected_option": "additive_delivery_front_page",
+  "decision_status": "accepted_for_implementation_planning",
+  "production_change_in_decision_package": false,
+  "promotion_status": "not_promoted",
+  "next_package": "WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE",
+  "integration_layer": "delivery_html_and_pdf_render_pipeline",
+  "classic_report_body": "preserved",
+  "email_count_change": false,
+  "pdf_count_change": false,
+  "attachment_contract_change": false,
+  "manifest_contract_change": false,
+  "duplicate_decision_surface_rule": "suppress_small_decision_cockpit_when_full_front_page_enabled",
+  "feature_gate": {
+    "required": true,
+    "implementation_default": "disabled",
+    "validation_enablement": "explicit",
+    "production_enablement": "requires_separate_closeout",
+    "failure_behavior": "return_unchanged_classic_output",
+    "rollback": "disable_feature_flag"
+  },
+  "authority_boundaries": {
+    "portfolio_model_execution": false,
+    "pricing_authority_change": false,
+    "official_state_mutation": false,
+    "official_trade_ledger_mutation": false,
+    "email_send": false
+  },
+  "evidence": {
+    "wp09_pr": 79,
+    "wp09_merge_commit": "9b679df825fdc4c7ce37cbdc2474acae6d25d67f",
+    "wp09_closeout_merge_commit": "009e0f1a910c44b43de0d6c5babf3b1e0eae5cfd",
+    "wp08_validation_run": 29536333738,
+    "current_runtime_validation_run": 29536333731,
+    "review_conclusion": "ready_for_promotion_decision",
+    "blocking_findings": 0,
+    "all_review_dimensions_pass": true
+  }
+}
