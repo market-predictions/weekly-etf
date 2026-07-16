@@ -11,9 +11,6 @@ on:
       - "runtime/macro_report_surface.py"
       - "runtime/link_runtime_report_tickers.py"
       - "send_report_runtime_html.py"
-      - "tools/apply_report_freshness_integration_patch.py"
-      - "tools/apply_report_freshness_followup_patch.py"
-      - "tools/apply_report_freshness_exact_phrase_patch.py"
       - "tools/render_report_freshness_preview.py"
       - "tests/test_report_freshness_and_html_equity.py"
       - "tests/test_report_freshness_production_variants.py"
@@ -21,17 +18,20 @@ on:
       - "control/work_packages/WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH_20260716.md"
       - "control/ETF_REPORT_FRESHNESS_CHANGELOG.md"
       - "control/REPORT_FRESHNESS_AND_HTML_EQUITY_STATUS_20260716.md"
-      - "control/run_queue/validate_report_freshness_20260716.md"
+      - "control/handovers/HANDOVER_REPORT_FRESHNESS_AND_HTML_EQUITY_20260716.md"
+      - "control/CURRENT_STATE.md"
+      - "control/NEXT_ACTIONS.md"
+      - "control/decisions/REPORT_FRESHNESS_AND_STANDALONE_HTML_EQUITY_DECISION_20260716.md"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: etf-report-freshness-${{ github.head_ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
-  validate-and-persist:
+  validate:
     if: github.head_ref == 'agent/fix-report-freshness-and-html-equity-graph'
     runs-on: ubuntu-latest
     env:
@@ -81,21 +81,6 @@ jobs:
             pyyaml \
             jsonschema \
             yfinance
-
-      - name: Record whether preview artifacts already exist
-        id: existing
-        run: |
-          if test -f output/validation/etf_report_freshness_260714_04.json; then
-            echo "present=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "present=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Apply deterministic source integration
-        run: |
-          python tools/apply_report_freshness_integration_patch.py
-          python tools/apply_report_freshness_followup_patch.py
-          git diff --check
 
       - name: Compile affected modules
         run: |
@@ -152,8 +137,8 @@ jobs:
         run: |
           grep -q "data:image/png;base64," output/weekly_analysis_pro_260714_04_delivery.html
           grep -q "data:image/png;base64," output/weekly_analysis_pro_nl_260714_04_delivery.html
-          ! grep -qi "cid:equitycurve" output/weekly_analysis_pro_260714_04_delivery.html
-          ! grep -qi "cid:equitycurve" output/weekly_analysis_pro_nl_260714_04_delivery.html
+          ! grep -qi "cid:equitycurve\|#harmful-link" output/weekly_analysis_pro_260714_04_delivery.html
+          ! grep -qi "cid:equitycurve\|#harmful-link" output/weekly_analysis_pro_nl_260714_04_delivery.html
           ! grep -qi "EQUITY_CURVE_CHART_PLACEHOLDER" output/weekly_analysis_pro_260714_04_delivery.html
           ! grep -qi "EQUITY_CURVE_CHART_PLACEHOLDER" output/weekly_analysis_pro_nl_260714_04_delivery.html
           test -s output/weekly_analysis_pro_260714_04.pdf
@@ -167,8 +152,7 @@ jobs:
           import json
           from pathlib import Path
 
-          path = Path('output/validation/etf_report_freshness_260714_04.json')
-          payload = json.loads(path.read_text(encoding='utf-8'))
+          payload = json.loads(Path('output/validation/etf_report_freshness_260714_04.json').read_text(encoding='utf-8'))
           assert payload['status'] == 'passed'
           assert payload['email_sent'] is False
           assert payload['model_execution_replayed'] is False
@@ -177,38 +161,8 @@ jobs:
           assert payload['state_sha256_before'] == payload['state_sha256_after']
           assert payload['trade_ledger_sha256_before'] == payload['trade_ledger_sha256_after']
           assert payload['html_equity_contract']['standalone_html_uses_embedded_data_uri'] is True
+          assert payload['html_equity_contract']['mime_email_html_keeps_cid_reference'] is True
           PY
 
-      - name: Restore committed preview binaries during clean revalidation
-        if: steps.existing.outputs.present == 'true'
-        run: |
-          git checkout -- \
-            output/weekly_analysis_pro_260714_04* \
-            output/weekly_analysis_pro_nl_260714_04* \
-            output/validation/etf_report_freshness_260714_04.json
-
-      - name: Persist source changes and first preview evidence
-        if: steps.existing.outputs.present == 'false'
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            runtime/report_freshness_contract.py \
-            runtime/standalone_html_equity_embed.py \
-            runtime/build_macro_policy_pack.py \
-            runtime/macro_report_surface.py \
-            runtime/link_runtime_report_tickers.py \
-            send_report_runtime_html.py \
-            output/weekly_analysis_pro_260714_04* \
-            output/weekly_analysis_pro_nl_260714_04* \
-            output/validation/etf_report_freshness_260714_04.json
-          if git diff --cached --quiet; then
-            echo "No source or preview artifacts changed" >&2
-            exit 1
-          fi
-          git commit -m "Persist ETF report freshness fixes and _04 preview evidence [skip ci]"
-          git push origin HEAD:${{ github.head_ref }}
-
-      - name: Final diff check
+      - name: Final diff syntax check
         run: git diff --check
