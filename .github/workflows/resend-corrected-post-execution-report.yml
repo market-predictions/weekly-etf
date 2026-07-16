@@ -47,6 +47,7 @@ jobs:
   correction-runbook:
     runs-on: ubuntu-latest
     env:
+      PYTHONPATH: .
       ETF_CORRECTION_REQUEST_FILE: ${{ inputs.request_file }}
       ETF_CORRECTION_SEND_CONFIRMATION: ${{ inputs.send_confirmation }}
       ETF_PRIOR_CORRECTION_DELIVERY_LOG: ${{ inputs.prior_delivery_receipt_path }}
