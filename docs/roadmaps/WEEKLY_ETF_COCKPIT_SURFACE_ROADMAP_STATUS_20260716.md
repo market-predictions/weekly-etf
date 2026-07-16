@@ -15,14 +15,12 @@ WP06: merged in PR #56
 WP07: merged in PR #57
 ```
 
-## Stable decisions
+## Stable boundary
 
 ```text
 promotion_status: not_promoted
-WP05 decision: not_promoted_needs_iteration
-WP06 selected_path: iteration_path
-production_report_change: none
-delivery_change: none
+classic_report_evidence_layer: preserved
+production_delivery_contract: unchanged
 ```
 
 ## Current-runtime revalidation
@@ -47,30 +45,62 @@ initial_review_conclusion: iteration_required
 promotion_status: not_promoted
 ```
 
-WP08 replaced the static June review with a content-derived v2 review contract and structured bilingual HTML.
+WP08 introduced the evidence-based v2 review contract.
 
 ## WP09 current-runtime client-surface refinement
 
 ```text
 package: WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
-status: validated_ready_for_governance_closeout
+status: closed
 PR: #79
-validated_head: d4e6fa7aae9dab98000716b0ecf24f45d9a7b04a
-WP08_validation_run: 29535872134
-current_runtime_validation_run: 29535872250
+merge_commit: 9b679df825fdc4c7ce37cbdc2474acae6d25d67f
+closeout_PR: #80
+closeout_merge_commit: 009e0f1a910c44b43de0d6c5babf3b1e0eae5cfd
+final_validation_run: 29536333738
 review_conclusion: ready_for_promotion_decision
 blocking_findings: []
 promotion_status: not_promoted
 ```
 
-All eleven evidence-review dimensions pass after the narrow summary, next-trigger, Dutch punctuation and provenance-label refinements.
+All eleven evidence-review dimensions pass.
+
+## Cockpit production-relationship decision
+
+```text
+package: WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW
+status: decision_recorded_validation_pending
+selected_option: additive_delivery_front_page
+production_change_in_decision_package: false
+promotion_status: not_promoted
+```
+
+Selected route:
+
+```text
+one additive cockpit front page inside the existing EN/NL HTML and PDF
+complete classic report body preserved
+one email body and one PDF per language preserved
+attachment and manifest contracts unchanged
+feature-gated implementation
+default disabled
+fail closed to classic output
+```
+
+Rejected at this stage:
+
+```text
+separate attachment
+full report replacement
+another refinement cycle
+remaining preview-only as the primary route
+```
 
 ## Next package
 
 ```text
-WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW
-status: next_after_WP09_merge
+WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE
+status: next_after_decision_merge
 promotion_status: not_promoted
 ```
 
-This package must select the cockpit's production relationship but may not itself change production rendering or delivery behavior.
+WP10 may implement the feature-gated integration but may not enable it by default or send email. A separate implementation-promotion closeout is required before actual production enablement.
