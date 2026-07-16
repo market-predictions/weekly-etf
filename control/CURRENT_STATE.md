@@ -21,6 +21,8 @@ portfolio_execution_status: executed
 portfolio_mutation: URNM -> XBI
 ```
 
+Executed mutation:
+
 ```text
 URNM: Sell -122.008961 shares; 7.01% -> 2.01%
 XBI: Buy +40.491749 shares; 0.00% -> 5.00%
@@ -49,6 +51,13 @@ inbox_receipt_status: verified_bilingual
 
 Do not resend `_03`.
 
+Delivery evidence:
+
+```text
+output/delivery/weekly_etf_correction_delivery_receipt_2026-07-14_29455717158.txt
+output/delivery/weekly_etf_correction_manifest_2026-07-14_20260715_223718.json
+```
+
 ## Latest validated non-delivered report package
 
 ```text
@@ -74,7 +83,11 @@ recovery_runner: runtime/recover_post_execution_correction_evidence.py
 modes: validate_only | recover_no_send | send
 ```
 
+The runbook is manual-only and requires explicit confirmation for any send operation.
+
 ## Cockpit preview lane
+
+Historical implementation:
 
 ```text
 WP01 preview renderer: PR #52
@@ -84,6 +97,11 @@ WP04 side-by-side review: PR #54
 WP05 promotion review: PR #55
 WP06 iteration-path decision: PR #56
 WP07 source/provenance iteration: PR #57
+```
+
+Stable cockpit status:
+
+```text
 promotion_status: not_promoted
 selected_path: iteration
 ```
@@ -98,11 +116,20 @@ merge_commit: d80984b7336f343344719a80a29712506926bd26
 validation_run: 29525968480
 ```
 
-Canonical authority:
+Authority precedence:
 
 ```text
 current_weight_pct > target_weight_pct > previous_weight_pct > weight_inherited_pct
 market_value_eur > previous_market_value_eur
+```
+
+A legitimate current zero remains authoritative.
+
+Current action surface:
+
+```text
+EN: URNM reduced · XBI added
+NL: URNM afgebouwd · XBI toegevoegd
 ```
 
 ## WP08 evidence-based side-by-side review — closed
@@ -126,6 +153,8 @@ schema_version: cockpit_side_by_side_review_v2
 review_type: evidence_based_side_by_side_preview_only
 ```
 
+The review now selects only the current `_04` classic sources and current bilingual cockpit previews, evaluates artifact contents against runtime state, records input SHA-256 values and produces structured bilingual HTML.
+
 Passed dimensions:
 
 ```text
@@ -147,12 +176,14 @@ bilingual_semantic_parity
 premium_look_and_feel
 ```
 
-Required preview refinements:
+Blocking findings:
 
-1. Remove the activity contradiction from the short summary after executed actions.
-2. Add a dedicated next-action trigger.
-3. Fix the Dutch trailing-comma defect.
-4. Replace hybrid Dutch provenance labels with natural Dutch wording.
+1. The summary says discipline is ahead of activity despite the executed URNM-to-XBI rotation.
+2. The cockpit lacks a dedicated next-action trigger available in the classic decision cockpit.
+3. The Dutch discipline sentence ends with a comma.
+4. Dutch provenance labels retain hybrid English terminology.
+
+These are preview presentation defects, not state, pricing or execution defects.
 
 WP08 evidence:
 
@@ -177,8 +208,10 @@ WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION: closed
 
 ## Immediate next action
 
+Claim:
+
 ```text
 WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
 ```
 
-WP09 remains preview-only. It must correct only the three WP08 blocking dimensions, preserve the current design and authority contract, and rerun WP08 v2 unchanged.
+WP09 remains preview-only. It must correct only the three WP08 blocking dimensions, preserve the current cockpit design and authority contract, and rerun WP08 v2 unchanged.
