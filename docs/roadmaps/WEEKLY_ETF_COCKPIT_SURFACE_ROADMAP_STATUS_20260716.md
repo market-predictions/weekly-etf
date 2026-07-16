@@ -43,39 +43,34 @@ status: closed
 PR: #76
 merge_commit: 4a8c1a81aa8bca7324969f59f8134cb6db1def8e
 validation_run: 29533435789
-review_conclusion: iteration_required
+initial_review_conclusion: iteration_required
 promotion_status: not_promoted
 ```
 
 WP08 replaced the static June review with a content-derived v2 review contract and structured bilingual HTML.
 
-Passed dimensions:
+## WP09 current-runtime client-surface refinement
 
 ```text
-readability
-density
-visual_hierarchy
-executed_action_clarity
-current_weight_accuracy
-performance_risk_accuracy
-trust_provenance_clarity
-audit_evidence_preservation
+package: WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
+status: validated_ready_for_governance_closeout
+PR: #79
+validated_head: d4e6fa7aae9dab98000716b0ecf24f45d9a7b04a
+WP08_validation_run: 29535872134
+current_runtime_validation_run: 29535872250
+review_conclusion: ready_for_promotion_decision
+blocking_findings: []
+promotion_status: not_promoted
 ```
 
-Blocking dimensions:
-
-```text
-decision_clarity
-bilingual_semantic_parity
-premium_look_and_feel
-```
+All eleven evidence-review dimensions pass after the narrow summary, next-trigger, Dutch punctuation and provenance-label refinements.
 
 ## Next package
 
 ```text
-WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
-status: next
+WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW
+status: next_after_WP09_merge
 promotion_status: not_promoted
 ```
 
-WP09 must correct only the WP08 blockers and rerun the unchanged v2 review. It may not promote, attach, send or replace the cockpit in production.
+This package must select the cockpit's production relationship but may not itself change production rendering or delivery behavior.

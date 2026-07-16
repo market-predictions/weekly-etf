@@ -122,6 +122,7 @@ def test_cockpit_preview_contains_required_visual_contract_components(tmp_path: 
     assert "This week's action" in english
     assert "Performance &amp; risk" in english or "Performance & risk" in english
     assert "Discipline point" in english
+    assert "Next action trigger" in english
     assert "Preview-only cockpit surface" in english
     assert "Preview-only cockpit surface; not investment advice." in english
     assert "data-source-evidence" in english
@@ -141,18 +142,19 @@ def test_cockpit_preview_contains_required_visual_contract_components(tmp_path: 
     assert "Actie deze week" in dutch
     assert "Prestatie &amp; risico" in dutch or "Prestatie & risico" in dutch
     assert "Disciplinepunt" in dutch
+    assert "Trigger voor volgende actie" in dutch
     assert "Preview-only cockpit surface" in dutch
     assert "Preview-only cockpit surface; geen beleggingsadvies." in dutch
     assert "data-source-evidence" in dutch
     assert "data-promotion-status=\"not_promoted\"" in dutch
     assert "Bronnen en bewijs" in dutch
-    assert "Gebouwd vanuit runtime-state" in dutch
+    assert "Gebouwd vanuit actuele portefeuillestatus" in dutch
     assert "Waarderingshistorie gecontroleerd" in dutch
-    assert "Pricing-audit referentie" in dutch
-    assert "Macro-pack referentie" in dutch
-    assert "Run-manifest referentie" in dutch
-    assert "Geen deliveryclaim" in dutch
-    assert "Niet gepromoveerd naar productie" in dutch
+    assert "Bron prijscontrole" in dutch
+    assert "Bron macrobeeld" in dutch
+    assert "Bron uitvoerregistratie" in dutch
+    assert "Geen leveringsclaim" in dutch
+    assert "Niet naar productie gepromoveerd" in dutch
 
 
 def test_cockpit_preview_does_not_overwrite_classic_report_surfaces(tmp_path: Path) -> None:

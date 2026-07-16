@@ -104,7 +104,7 @@ def _protected(output: Path) -> list[Path]:
     ]
 
 
-def test_wp08_review_is_evidence_based_and_records_current_blockers(tmp_path: Path) -> None:
+def test_wp08_review_is_evidence_based_and_accepts_refined_current_surface(tmp_path: Path) -> None:
     output = _fixture_output(tmp_path)
     before = {path: path.read_bytes() for path in _protected(output)}
 
@@ -114,29 +114,32 @@ def test_wp08_review_is_evidence_based_and_records_current_blockers(tmp_path: Pa
     findings = {row["dimension"]: row for row in metadata["findings"]}
 
     assert metadata["schema_version"] == "cockpit_side_by_side_review_v2"
-    assert metadata["review_conclusion"] == "iteration_required"
-    assert metadata["next_recommended_package"] == "WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT"
+    assert metadata["review_conclusion"] == "ready_for_promotion_decision"
+    assert metadata["next_recommended_package"] == "WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW"
     assert metadata["promotion_status"] == "not_promoted"
+    assert metadata["blocking_findings"] == []
+    assert all(finding["status"] == "pass" for finding in metadata["findings"])
 
-    assert findings["executed_action_clarity"]["status"] == "pass"
-    assert findings["current_weight_accuracy"]["status"] == "pass"
-    assert findings["performance_risk_accuracy"]["status"] == "pass"
-    assert findings["trust_provenance_clarity"]["status"] == "pass"
-    assert findings["audit_evidence_preservation"]["status"] == "pass"
-
-    assert findings["decision_clarity"]["status"] == "partial"
-    assert findings["bilingual_semantic_parity"]["status"] == "partial"
-    assert findings["premium_look_and_feel"]["status"] == "partial"
-    assert {"decision_clarity", "bilingual_semantic_parity", "premium_look_and_feel"}.issubset(metadata["blocking_findings"])
+    for dimension in (
+        "decision_clarity",
+        "executed_action_clarity",
+        "current_weight_accuracy",
+        "performance_risk_accuracy",
+        "trust_provenance_clarity",
+        "bilingual_semantic_parity",
+        "premium_look_and_feel",
+        "audit_evidence_preservation",
+    ):
+        assert findings[dimension]["status"] == "pass"
 
     evidence = json.dumps(metadata, ensure_ascii=False)
     assert "URNM reduced" in evidence
     assert "XBI added" in evidence
     assert "URNM 7.0% → 2.0%" in evidence
     assert "XBI 0.0% → 5.0%" in evidence
-    assert "summary_contradiction=True" in evidence
-    assert "dutch_punctuation_bug=True" in evidence
-    assert "hybrid_labels=" in evidence
+    assert "summary_contradiction=False" in evidence
+    assert "dutch_punctuation_bug=False" in evidence
+    assert "hybrid_labels=none" in evidence
 
     selected = metadata["selected_sources"]
     assert selected["classic"]["en"]["markdown"] == "output/weekly_analysis_pro_260714_04.md"
@@ -147,8 +150,8 @@ def test_wp08_review_is_evidence_based_and_records_current_blockers(tmp_path: Pa
     english_html = result.english_html_path.read_text(encoding="utf-8")
     dutch_html = result.dutch_html_path.read_text(encoding="utf-8")
     assert "<pre>" not in english_html
-    assert "Iteration required" in english_html
-    assert "Iteratie vereist" in dutch_html
+    assert "Ready for promotion decision" in english_html
+    assert "Gereed voor promotiebesluit" in dutch_html
     assert "data-preview-only=\"true\"" in english_html
     assert "promotion_status: not_promoted" in english_html
 

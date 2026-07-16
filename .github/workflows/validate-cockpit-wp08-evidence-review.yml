@@ -7,11 +7,12 @@ on:
     paths:
       - "runtime/build_cockpit_side_by_side_review.py"
       - "runtime/render_cockpit_front_page.py"
-      - "tests/test_cockpit_side_by_side_review.py"
-      - "tests/test_cockpit_wp08_evidence_review.py"
+      - "tests/test_cockpit_*.py"
       - ".github/workflows/validate-cockpit-wp08-evidence-review.yml"
       - "control/work_packages/WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION_20260716.md"
+      - "control/work_packages/WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT_20260716.md"
       - "control/handovers/HANDOVER_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION_20260716.md"
+      - "control/handovers/HANDOVER_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT_20260716.md"
       - "control/CURRENT_STATE.md"
       - "control/NEXT_ACTIONS.md"
   workflow_dispatch:
@@ -80,19 +81,23 @@ jobs:
           printf '%s\n' "${files[@]}" | sort -u > /tmp/wp08-protected-files.txt
           xargs -d '\n' sha256sum < /tmp/wp08-protected-files.txt > /tmp/wp08-protected-before.sha256
 
-      - name: Compile WP08 modules
+      - name: Compile cockpit modules
         run: |
           python -m py_compile \
             runtime/build_cockpit_side_by_side_review.py \
             runtime/render_cockpit_front_page.py \
             tests/test_cockpit_side_by_side_review.py \
-            tests/test_cockpit_wp08_evidence_review.py
+            tests/test_cockpit_wp08_evidence_review.py \
+            tests/test_cockpit_wp08_provenance_label_contract.py \
+            tests/test_cockpit_wp09_client_surface_refinement.py
 
-      - name: Run WP08 regressions
+      - name: Run cockpit regressions
         run: |
           pytest -q \
             tests/test_cockpit_side_by_side_review.py \
             tests/test_cockpit_wp08_evidence_review.py \
+            tests/test_cockpit_wp08_provenance_label_contract.py \
+            tests/test_cockpit_wp09_client_surface_refinement.py \
             tests/test_cockpit_front_page_preview.py \
             tests/test_cockpit_visual_state_contracts.py \
             tests/test_cockpit_current_runtime_authority.py
@@ -117,12 +122,17 @@ jobs:
           root = Path("output/cockpit_review")
           metadata = json.loads((root / "weekly_etf_cockpit_side_by_side_review_260714.json").read_text(encoding="utf-8"))
           findings = {row["dimension"]: row for row in metadata["findings"]}
+          blockers = set(metadata["blocking_findings"])
 
           assert metadata["schema_version"] == "cockpit_side_by_side_review_v2"
           assert metadata["review_type"] == "evidence_based_side_by_side_preview_only"
-          assert metadata["review_conclusion"] == "iteration_required"
           assert metadata["promotion_status"] == "not_promoted"
-          assert metadata["next_recommended_package"] == "WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT"
+          assert metadata["review_conclusion"] == ("iteration_required" if blockers else "ready_for_promotion_decision")
+          assert metadata["next_recommended_package"] == (
+              "WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT"
+              if blockers
+              else "WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW"
+          )
 
           selected = metadata["selected_sources"]
           assert selected["classic"]["en"]["markdown"] == "output/weekly_analysis_pro_260714_04.md"
@@ -132,7 +142,7 @@ jobs:
           assert selected["cockpit"]["en"] == "output/cockpit_preview/weekly_analysis_pro_cockpit_260714_01.html"
           assert selected["cockpit"]["nl"] == "output/cockpit_preview/weekly_analysis_pro_nl_cockpit_260714_01.html"
 
-          for dimension in (
+          always_pass = {
               "readability",
               "density",
               "visual_hierarchy",
@@ -141,25 +151,32 @@ jobs:
               "performance_risk_accuracy",
               "trust_provenance_clarity",
               "audit_evidence_preservation",
-          ):
+          }
+          for dimension in always_pass:
               assert findings[dimension]["status"] == "pass", (dimension, findings[dimension])
 
-          assert findings["decision_clarity"]["status"] == "partial"
-          assert findings["bilingual_semantic_parity"]["status"] == "partial"
-          assert findings["premium_look_and_feel"]["status"] == "partial"
-          assert set(metadata["blocking_findings"]) == {
+          transition_dimensions = {
               "decision_clarity",
               "bilingual_semantic_parity",
               "premium_look_and_feel",
           }
-
           payload = json.dumps(metadata, ensure_ascii=False)
           assert "URNM reduced" in payload
           assert "XBI added" in payload
-          assert "summary_contradiction=True" in payload
-          assert "dutch_punctuation_bug=True" in payload
-          assert "hybrid_labels=" in payload
           assert metadata["input_sha256"]
+
+          if blockers:
+              assert blockers == transition_dimensions
+              for dimension in transition_dimensions:
+                  assert findings[dimension]["status"] == "partial"
+              assert "summary_contradiction=True" in payload
+              assert "dutch_punctuation_bug=True" in payload
+              assert "hybrid_labels=" in payload
+          else:
+              assert all(row["status"] == "pass" for row in metadata["findings"])
+              assert "summary_contradiction=False" in payload
+              assert "dutch_punctuation_bug=False" in payload
+              assert "hybrid_labels=none" in payload
 
           for path in [
               root / "weekly_etf_cockpit_side_by_side_review_260714.html",
