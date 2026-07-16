@@ -198,8 +198,8 @@ def validate(*, repo_root: Path, work_root: Path, evidence_dir: Path) -> Path:
     enabled_nl_pdf = Path(enabled_bundle["nl"]["pdf_path"])
     enabled_en_pages, enabled_en_pdf_text = _pdf_text(enabled_en_pdf)
     enabled_nl_pages, enabled_nl_pdf_text = _pdf_text(enabled_nl_pdf)
-    assert enabled_en_pages >= disabled_en_pages + 1
-    assert enabled_nl_pages >= disabled_nl_pages + 1
+    assert enabled_en_pages == disabled_en_pages + 1
+    assert enabled_nl_pages == disabled_nl_pages + 1
     assert "Report front page" in enabled_en_pdf_text
     assert "Rapportvoorpagina" in enabled_nl_pdf_text
 
@@ -221,6 +221,10 @@ def validate(*, repo_root: Path, work_root: Path, evidence_dir: Path) -> Path:
             "nl": _sha256_bytes(original_nl_html) == _sha256_bytes(disabled_nl_html.encode("utf-8")),
         },
         "enabled_front_page_count": {"en": 1, "nl": 1},
+        "front_page_pdf_pages": {
+            "en": enabled_en_pages - disabled_en_pages,
+            "nl": enabled_nl_pages - disabled_nl_pages,
+        },
         "classic_report_body": "preserved",
         "small_decision_cockpit_duplicate": False,
         "standalone_equity_embed": "passed",
@@ -248,6 +252,7 @@ def validate(*, repo_root: Path, work_root: Path, evidence_dir: Path) -> Path:
         },
     }
     assert all(evidence["disabled_html_byte_identical"].values())
+    assert evidence["front_page_pdf_pages"] == {"en": 1, "nl": 1}
 
     evidence_path = evidence_dir / "cockpit_wp10_additive_delivery_front_page_260714.json"
     evidence_path.write_text(json.dumps(evidence, indent=2, sort_keys=True), encoding="utf-8")
