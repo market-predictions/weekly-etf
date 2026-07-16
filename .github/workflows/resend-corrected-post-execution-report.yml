@@ -173,8 +173,7 @@ jobs:
         run: python -m runtime.recover_post_execution_correction_evidence
 
       - name: Prove official authority files are unchanged
-        run: |
-          git diff --exit-code -- output/etf_portfolio_state.json output/etf_trade_ledger.csv
+        run: git diff --exit-code -- output/etf_portfolio_state.json output/etf_trade_ledger.csv
 
       - name: Upload runbook evidence
         if: always()
@@ -195,15 +194,20 @@ jobs:
         if: inputs.mode == 'send' || inputs.mode == 'recover_no_send'
         run: |
           set -euo pipefail
+          report_token="$(awk -F': *' '$1=="report_token" {print $2; exit}' "$ETF_CORRECTION_REQUEST_FILE")"
+          correction_suffix="$(awk -F': *' '$1=="correction_suffix" {print $2; exit}' "$ETF_CORRECTION_REQUEST_FILE")"
+          report_date="$(awk -F': *' '$1=="report_date" {print $2; exit}' "$ETF_CORRECTION_REQUEST_FILE")"
+          [[ "$report_token" =~ ^[0-9]{6}$ ]]
+          [[ "$correction_suffix" =~ ^[0-9]{2}$ ]]
+          [[ "$report_date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f \
-            output/weekly_analysis_pro_${ETF_CORRECTION_REQUEST_FILE##*request_}* 2>/dev/null || true
-          git add -f \
-            output/weekly_analysis_pro_*_* \
-            output/weekly_analysis_pro_nl_*_* \
-            output/delivery/weekly_etf_correction_*.json \
-            output/delivery/weekly_etf_correction_*.txt
+            output/weekly_analysis_pro_${report_token}_${correction_suffix}* \
+            output/weekly_analysis_pro_nl_${report_token}_${correction_suffix}* \
+            output/delivery/weekly_etf_correction_manifest_${report_date}_*.json \
+            output/delivery/weekly_etf_correction_delivery_receipt_${report_date}_*.txt
           git reset -- output/etf_portfolio_state.json output/etf_trade_ledger.csv || true
           if git diff --cached --quiet; then
             echo "No new correction evidence to persist"
