@@ -1,3 +1,5 @@
+"""Regression contract for legacy and natural Dutch cockpit provenance labels."""
+
 from runtime.build_cockpit_side_by_side_review import _dutch_provenance_status
 
 
