@@ -1,3 +1,0 @@
-WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE
-purpose: clean governance closeout and exact committed-head validation
-nonce: closeout-v1
