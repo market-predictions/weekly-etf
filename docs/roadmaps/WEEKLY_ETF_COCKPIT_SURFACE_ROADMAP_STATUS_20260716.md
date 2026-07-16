@@ -1,6 +1,6 @@
 # Weekly ETF Cockpit Surface Roadmap — Current Status
 
-Date: 2026-07-16
+Date: 2026-07-17
 Repository: `market-predictions/weekly-etf`
 
 ## Historical completion
@@ -13,99 +13,91 @@ WP04: merged in PR #54
 WP05: merged in PR #55
 WP06: merged in PR #56
 WP07: merged in PR #57
+current-runtime revalidation: merged in PR #74
+WP08 evidence review: merged in PR #76
+WP09 refinement: merged in PR #79
+WP09 closeout: merged in PR #80
+promotion decision: merged in PR #81
+promotion decision closeout: merged in PR #82
 ```
 
 ## Stable boundary
 
 ```text
-promotion_status: not_promoted
 classic_report_evidence_layer: preserved
-production_delivery_contract: unchanged
-```
-
-## Current-runtime revalidation
-
-```text
-package: WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_CURRENT_RUNTIME_REVALIDATION
-status: closed
-PR: #74
-validation_run: 29525968480
-merge_commit: d80984b7336f343344719a80a29712506926bd26
-```
-
-## WP08 evidence-based review
-
-```text
-package: WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION
-status: closed
-PR: #76
-merge_commit: 4a8c1a81aa8bca7324969f59f8134cb6db1def8e
-validation_run: 29533435789
-initial_review_conclusion: iteration_required
+one email body per language: preserved
+one PDF per language: preserved
+attachment_contract: unchanged
+manifest_contract: unchanged
+portfolio/pricing/execution authority: unchanged
 promotion_status: not_promoted
 ```
 
-WP08 introduced the evidence-based v2 review contract.
-
-## WP09 current-runtime client-surface refinement
+## Evidence-based review status
 
 ```text
-package: WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
-status: closed
-PR: #79
-merge_commit: 9b679df825fdc4c7ce37cbdc2474acae6d25d67f
-closeout_PR: #80
-closeout_merge_commit: 009e0f1a910c44b43de0d6c5babf3b1e0eae5cfd
-final_validation_run: 29536333738
+schema_version: cockpit_side_by_side_review_v2
 review_conclusion: ready_for_promotion_decision
 blocking_findings: []
-promotion_status: not_promoted
+all_eleven_dimensions: pass
 ```
 
-All eleven evidence-review dimensions pass.
-
-## Cockpit production-relationship decision
+## Selected production relationship
 
 ```text
-package: WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW
-status: closed
 selected_option: additive_delivery_front_page
-production_change_in_decision_package: false
-promotion_status: not_promoted
-PR: #81
-merge_commit: 3200d2a39afa0027ff9fdc65f7490ed97e54ffc8
-promotion_decision_run: 29537562563
-WP08_evidence_run: 29537562528
-current_runtime_run: 29537562530
+integration_layer: delivery HTML/PDF render pipeline
+complete classic report body: preserved
+small decision cockpit: suppressed only when full front page succeeds
+feature gate: required
+feature default: disabled
+failure behavior: classic output
+rollback: disable feature flag
 ```
 
-Selected route:
+## WP10 additive delivery front page
 
 ```text
-one additive cockpit front page inside the existing EN/NL HTML and PDF
-complete classic report body preserved
-one email body and one PDF per language preserved
-attachment and manifest contracts unchanged
-feature-gated implementation
-default disabled
-fail closed to classic output
-```
-
-Rejected at this stage:
-
-```text
-separate attachment
-full report replacement
-another refinement cycle
-remaining preview-only as the primary route
-```
-
-## Active next package
-
-```text
-WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE
-status: next
+package: WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE
+status: validated_ready_for_enablement_decision
+PR: #83
+validated_code_head: b2ca4b032793f23f13b0d4557a919623366dc501
+final_validation_run: 29541727393
+visual_artifact_run: 29542004498
+feature_flag: MRKT_RPRTS_COCKPIT_FRONT_PAGE=disabled|enabled
+feature_default: disabled
+production_enablement: false
+email_sent: false
 promotion_status: not_promoted
 ```
 
-WP10 may implement the feature-gated integration but may not enable it by default or send email. A separate implementation-promotion closeout is required before actual production enablement.
+WP10 passes disabled, enabled and fail-closed validation:
+
+```text
+disabled EN/NL HTML byte-identical: true
+enabled EN/NL front-page count: one each
+enabled EN/NL PDF page addition: one each
+classic report body preserved: true
+small decision cockpit duplicate: false
+standalone equity embed: passed
+email equity CID: passed
+attachment/manifest changes: false
+protected authority mutation: false
+WP08 blockers: none
+```
+
+Persistent evidence:
+
+```text
+control/evidence/COCKPIT_WP10_ADDITIVE_DELIVERY_FRONT_PAGE_EVIDENCE_20260717.json
+```
+
+## Next package
+
+```text
+WP_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT
+status: next_after_WP10_merge
+promotion_status: not_promoted
+```
+
+WP11 must decide whether to enable the explicit feature flag in `.github/workflows/send-weekly-report.yml`. No send is authorized by WP10, and rollback must remain a single switch to `disabled`.
