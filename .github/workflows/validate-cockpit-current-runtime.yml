@@ -34,8 +34,25 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install focused dependencies
-        run: python -m pip install pytest
+      - name: Install focused report dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            pytest \
+            pandas \
+            matplotlib \
+            seaborn \
+            markdown \
+            mistune \
+            beautifulsoup4 \
+            lxml \
+            premailer \
+            weasyprint \
+            pillow \
+            requests \
+            pyyaml \
+            jsonschema \
+            yfinance
 
       - name: Snapshot protected authority files
         run: |
