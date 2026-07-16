@@ -1,0 +1,64 @@
+name: Inspect WP10 PDF pages
+
+on:
+  push:
+    branches:
+      - feature/cockpit-wp10-additive-delivery-front-page
+    paths:
+      - "control/triggers/inspect_wp10_pdf_pages.txt"
+
+permissions:
+  contents: write
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/cockpit-wp10-additive-delivery-front-page
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pypdf
+      - name: Inspect page text distribution
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from pypdf import PdfReader
+
+          root = Path('output/wp10_validation')
+          files = {
+              'disabled_en': root / 'disabled' / 'weekly_analysis_pro_260714_04.pdf',
+              'enabled_en': root / 'enabled' / 'weekly_analysis_pro_260714_04.pdf',
+              'disabled_nl': root / 'disabled' / 'weekly_analysis_pro_nl_260714_04.pdf',
+              'enabled_nl': root / 'enabled' / 'weekly_analysis_pro_nl_260714_04.pdf',
+          }
+          result = {}
+          for key, path in files.items():
+              reader = PdfReader(str(path))
+              pages = []
+              for index, page in enumerate(reader.pages, start=1):
+                  text = ' '.join((page.extract_text() or '').split())
+                  pages.append({
+                      'page': index,
+                      'chars': len(text),
+                      'starts_with': text[:180],
+                      'contains_report_front_page': 'Report front page' in text,
+                      'contains_rapportvoorpagina': 'Rapportvoorpagina' in text,
+                      'contains_weekly_masthead': 'WEEKLY ETF PRO REVIEW' in text.upper() or 'WEKELIJKSE ETF-REVIEW' in text.upper(),
+                      'contains_executive_summary': 'Executive Summary' in text or 'Kernsamenvatting' in text,
+                  })
+              result[key] = {'page_count': len(reader.pages), 'pages': pages}
+          out = root / 'pdf_page_analysis.json'
+          out.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding='utf-8')
+          print(out.read_text(encoding='utf-8'))
+          PY
+      - name: Commit page analysis
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f output/wp10_validation/pdf_page_analysis.json
+          git commit -m "Record WP10 PDF page analysis" || exit 0
+          git push origin HEAD:feature/cockpit-wp10-additive-delivery-front-page
