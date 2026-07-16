@@ -1,0 +1,122 @@
+name: Validate cockpit current-runtime authority
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "runtime/render_cockpit_front_page.py"
+      - "runtime/build_cockpit_side_by_side_review.py"
+      - "tests/test_cockpit_*.py"
+      - ".github/workflows/render-cockpit-preview.yml"
+      - ".github/workflows/validate-cockpit-current-runtime.yml"
+      - "control/work_packages/WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_20260618.md"
+      - "control/CURRENT_STATE.md"
+      - "control/NEXT_ACTIONS.md"
+      - "docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_20260618.md"
+      - "control/handovers/HANDOVER_COCKPIT_SURFACE_01_CURRENT_RUNTIME_REVALIDATION_*.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: python -m pip install pytest
+
+      - name: Snapshot protected authority files
+        run: |
+          set -euo pipefail
+          files=(
+            output/etf_portfolio_state.json
+            output/etf_trade_ledger.csv
+            output/etf_valuation_history.csv
+            output/runtime/latest_etf_report_state_path.txt
+            output/pricing/latest_price_audit_path.txt
+            output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+          )
+          for pointer in \
+            output/runtime/latest_etf_report_state_path.txt \
+            output/pricing/latest_price_audit_path.txt \
+            output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+          do
+            if [ -s "$pointer" ]; then
+              target="$(cat "$pointer")"
+              if [ -f "$target" ]; then
+                files+=("$target")
+              fi
+            fi
+          done
+          printf '%s\n' "${files[@]}" | sort -u > /tmp/cockpit-protected-files.txt
+          xargs -d '\n' sha256sum < /tmp/cockpit-protected-files.txt > /tmp/cockpit-protected-before.sha256
+
+      - name: Compile cockpit implementation
+        run: |
+          python -m py_compile \
+            runtime/render_cockpit_front_page.py \
+            runtime/build_cockpit_side_by_side_review.py \
+            tests/test_cockpit_current_runtime_authority.py
+
+      - name: Run cockpit and report-surface regressions
+        run: |
+          pytest -q \
+            tests/test_cockpit_front_page_preview.py \
+            tests/test_cockpit_preview_workflow.py \
+            tests/test_cockpit_visual_state_contracts.py \
+            tests/test_cockpit_side_by_side_review.py \
+            tests/test_cockpit_current_runtime_authority.py \
+            tests/test_delivery_html_decision_cockpit.py \
+            tests/test_pdf_surface_decision_cockpit.py \
+            tests/test_report_decision_clarity.py \
+            tests/test_report_weight_basis_labels.py \
+            tests/test_report_bilingual_takeaway_parity.py
+
+      - name: Validate production report contracts
+        run: |
+          python tools/validate_etf_delivery_html_contract.py --output-dir output
+          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+
+      - name: Render current bilingual preview and side-by-side review
+        run: |
+          python -m runtime.render_cockpit_front_page --output-dir output --language both --html-only
+          python -m runtime.build_cockpit_side_by_side_review --output-dir output
+          grep -R "URNM reduced" output/cockpit_preview/
+          grep -R "XBI added" output/cockpit_preview/
+          grep -R "URNM afgebouwd" output/cockpit_preview/
+          grep -R "XBI toegevoegd" output/cockpit_preview/
+          grep -R 'promotion_status.*not_promoted' output/cockpit_review/
+
+      - name: Prove authority files unchanged
+        run: |
+          set -euo pipefail
+          sha256sum -c /tmp/cockpit-protected-before.sha256
+          git diff --exit-code -- \
+            output/etf_portfolio_state.json \
+            output/etf_trade_ledger.csv \
+            output/etf_valuation_history.csv \
+            output/runtime/latest_etf_report_state_path.txt \
+            output/pricing/latest_price_audit_path.txt \
+            output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+
+      - name: Upload preview-only evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cockpit-current-runtime-${{ github.run_id }}
+          path: |
+            output/cockpit_preview/
+            output/cockpit_review/
+          if-no-files-found: error
+          retention-days: 14
