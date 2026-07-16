@@ -4,18 +4,18 @@ Date: 2026-07-16
 Repository: `market-predictions/weekly-etf`
 Branch: `agent/fix-report-freshness-and-html-equity-graph`
 Layer: input/state contract + output contract + operational runbook
-Status: implementation in progress
+Status: validated / merge ready
 
 ## Current issue
 
 The corrected `260714_03` report resolved the post-execution URNM-to-XBI action contradiction, but a wider client-surface review identified additional freshness and rendering defects:
 
-1. `What changed / Wat veranderde` publishes persistent threshold states as if they were new weekly changes.
-2. The ECB rate event dated 2026-06-11 is still described as occurring `this week / deze week` in the report dated 2026-07-14.
-3. IEFA is an approximately 24% funded holding, while several report sections still describe non-U.S. exposure as watchlist-only, a diversification gap, or a zero allocation.
-4. PPA is described as if it were the current defense holding, while current official state contains DFEN and does not contain PPA.
-5. The attached standalone HTML uses `cid:equitycurve`, which resolves inside the multipart email but not when the HTML file is opened independently.
-6. The Dutch surface retains several English or hybrid terms.
+1. `What changed / Wat veranderde` published persistent threshold states as if they were new weekly changes.
+2. The ECB event dated 2026-06-11 was described as occurring `this week / deze week` in the report dated 2026-07-14.
+3. IEFA was a funded holding at 24.05%, while several sections described non-U.S. exposure as watchlist-only, a diversification gap, limited, absent or zero.
+4. PPA was described as if it were the current defense holding, while official state contained DFEN and did not contain PPA.
+5. The standalone HTML equity image was sanitized to `#harmful-link`; neither the MIME CID nor the standalone data URI survived the final client sanitizer.
+6. The Dutch surface retained English or hybrid terms.
 
 ## Decision framework
 
@@ -30,7 +30,7 @@ A persistent condition may not be presented as a change merely because it still 
 
 ## Input/state contract
 
-Authority order for freshness corrections:
+Authority order:
 
 1. current official runtime positions and weights;
 2. dated event fields in the macro pack;
@@ -42,37 +42,55 @@ Consequences:
 
 - IEFA current weight overrides old zero-allocation/watchlist wording;
 - DFEN current holding overrides old PPA-as-incumbent wording;
-- a dated policy event may be called `this week` only when its date falls inside the report-week window;
+- a dated policy event may use `this week` only inside the report-week window;
 - PPA may remain visible as a challenger/candidate where factually relevant.
 
 ## Output contract
 
-English and Dutch reports must:
+English and Dutch reports now:
 
 - use delta-only wording in the executive summary and Section 3;
 - remove stale relative-date policy wording;
-- describe current funded holdings consistently across Sections 4-10;
-- preserve legitimate challenger analysis;
+- describe IEFA and DFEN consistently across the report;
+- preserve PPA as a candidate rather than a current holding;
 - remove specified Dutch mixed-language fragments;
 - keep the executed URNM/XBI action surfaces unchanged.
 
-Standalone HTML must:
+HTML authority is split by surface:
 
-- contain the equity graph as an embedded `data:image/png;base64,...` resource;
-- contain no `cid:equitycurve` reference;
-- contain no visible equity placeholder.
+```text
+MIME email body: cid:equitycurve
+standalone delivery HTML: data:image/png;base64,...
+```
 
-The MIME email body may continue to use CID because that is the correct transport contract for inline email images.
+The final post-sanitizer helper restores only the identified equity image source. Other links and images are not modified.
 
-## Operational runbook
+## Implemented files
 
-Create a non-sending exact-artifact replay from:
+```text
+runtime/report_freshness_contract.py
+runtime/standalone_html_equity_embed.py
+runtime/build_macro_policy_pack.py
+runtime/macro_report_surface.py
+runtime/link_runtime_report_tickers.py
+send_report_runtime_html.py
+tools/render_report_freshness_preview.py
+tests/test_report_freshness_and_html_equity.py
+tests/test_report_freshness_production_variants.py
+.github/workflows/validate-etf-report-freshness-and-html-equity.yml
+```
+
+Temporary migration scripts and diagnostic workflows were removed after the integrated source and preview evidence were persisted.
+
+## Preview evidence
+
+Exact-artifact, non-sending replay source:
 
 ```text
 output/runtime/etf_model_execution_20260714_20260715_175910.json
 ```
 
-Expected preview artifacts:
+Persisted preview package:
 
 ```text
 output/weekly_analysis_pro_260714_04.md
@@ -88,35 +106,39 @@ output/weekly_analysis_pro_nl_260714_04_equity_curve.png
 output/validation/etf_report_freshness_260714_04.json
 ```
 
+## Validation evidence
+
+Final read-only workflow:
+
+```text
+workflow: Validate ETF report freshness and HTML equity
+run_id: 29460852590
+conclusion: success
+```
+
+Passed gates:
+
+- affected modules compile;
+- focused freshness, production-phrase, equity, post-execution and cockpit tests pass;
+- exact-artifact `_04` replay succeeds;
+- English and Dutch freshness assertions pass;
+- standalone HTML contains an embedded equity PNG and no CID, placeholder or `#harmful-link`;
+- MIME email HTML retains the CID contract;
+- English and Dutch PDF/PNG assets are non-empty;
+- official portfolio-state hash is unchanged;
+- official trade-ledger hash is unchanged;
+- validation evidence records `email_sent=false` and `model_execution_replayed=false`.
+
 ## Safety boundary
 
-This package must not:
+This package did not:
 
 - send email;
 - rerun portfolio allocation or model execution;
 - mutate `output/etf_portfolio_state.json`;
 - mutate `output/etf_trade_ledger.csv`;
-- overwrite or rewrite the delivered historical `_03` package.
+- overwrite the delivered historical `_03` package.
 
-## Required validation
+## Merge boundary
 
-- deterministic integration patch applies cleanly and idempotently;
-- affected Python modules compile;
-- focused freshness and standalone-HTML tests pass;
-- exact-artifact `_04` replay succeeds;
-- EN/NL reports pass freshness validation;
-- EN/NL standalone HTML files embed their equity PNG;
-- EN/NL PDF and PNG assets exist and are non-empty;
-- official state hash remains unchanged;
-- official trade-ledger hash remains unchanged;
-- validation evidence records `email_sent=false`.
-
-## Completion boundary
-
-The package closes only after:
-
-1. source changes are merged;
-2. focused workflow is green;
-3. `_04` artifacts and validation evidence are persisted;
-4. current control state and next actions are updated;
-5. no delivery claim is made for `_04` unless a separate explicit send is authorized and evidenced.
+PR #70 is validated and may be promoted and merged after the final governance-head workflow passes. The `_04` package is review evidence, not a delivered report. Any delivery requires separate explicit authorization and real delivery evidence.
