@@ -10,14 +10,12 @@ portfolio_execution_status: executed
 portfolio_mutation: URNM -> XBI
 ```
 
-Authoritative mutation:
-
 ```text
 URNM: Sell -122.008961 shares; 7.01% -> 2.01%
 XBI: Buy +40.491749 shares; 0.00% -> 5.00%
 ```
 
-## Current client-delivery baseline
+## Delivered client baseline
 
 ```text
 report_en: output/weekly_analysis_pro_260714_03.md
@@ -25,44 +23,38 @@ report_nl: output/weekly_analysis_pro_nl_260714_03.md
 pdf_en: output/weekly_analysis_pro_260714_03.pdf
 pdf_nl: output/weekly_analysis_pro_nl_260714_03.pdf
 delivery_workflow_run: 29455717158
-delivery_layer_status: smtp_sendmail_returned_no_exception
 inbox_receipt_status: verified_bilingual
 ```
 
-Delivery evidence:
+Do not resend `_03`.
+
+## Validated review baseline
 
 ```text
-output/delivery/weekly_etf_correction_delivery_receipt_2026-07-14_29455717158.txt
-output/delivery/weekly_etf_correction_manifest_2026-07-14_20260715_223718.json
+report_en: output/weekly_analysis_pro_260714_04.md
+report_nl: output/weekly_analysis_pro_nl_260714_04.md
+html_en: output/weekly_analysis_pro_260714_04_delivery.html
+html_nl: output/weekly_analysis_pro_nl_260714_04_delivery.html
+validation: output/validation/etf_report_freshness_260714_04.json
+email_sent: false
 ```
 
-Do not resend `260714_03`.
+Do not describe `_04` as delivered. It is non-sending review evidence.
 
-## Closed active package
+## Closed packages
 
 ```text
 WP_POST_EXECUTION_REPORT_CONSISTENCY: closed
-PR #59: merged
-implementation_validation_run: 29442287444
-corrected_delivery_run: 29455717158
-recovery_and_persistence_run: 29455966433
-persistence_commit: d829e89329656b29be4c1d9b3b4aca75ba46f3b4
+WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH: closed
+PR #70: merged
+PR #70 merge_commit: 61f6a6a5ab2dd1dfe60f28f1b86a5517a0813dd5
+freshness_validation_run: 29461019794
+post_execution_validation_run: 29461019772
 ```
-
-All gates passed:
-
-- executed-state action authority;
-- bilingual Markdown and HTML consistency;
-- English and Dutch PDF rendering;
-- positive delivery-layer receipt;
-- bilingual inbox receipt confirmation;
-- portfolio-state immutability;
-- trade-ledger immutability;
-- corrected artifact persistence.
 
 ## Recommended next package
 
-Create and execute a narrow operational cleanup package:
+Create and execute:
 
 ```text
 WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP
@@ -70,11 +62,11 @@ WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP
 
 ### Purpose
 
-Consolidate the correction path into one deterministic, reusable operational runbook without changing portfolio logic or resending the completed report.
+Consolidate the correction path into one deterministic reusable runbook without changing portfolio logic or resending a completed report.
 
-### Required changes
+### Required scope
 
-1. Update `.github/workflows/resend-corrected-post-execution-report.yml` to use the established production secret contract:
+1. Align `.github/workflows/resend-corrected-post-execution-report.yml` with the production secret contract:
 
 ```text
 MRKT_RPRTS_SMTP_HOST
@@ -86,46 +78,33 @@ MRKT_RPRTS_MAIL_TO
 MRKT_RPRTS_MAIL_TO_NL
 ```
 
-2. Replace the incorrect JSON-manifest assumption with the actual production delivery receipt/manifest format.
-3. Add a no-resend recovery mode for the case where SMTP succeeds but post-send evidence persistence fails.
-4. Retire the one-shot bridge after equivalent behavior is covered by the canonical correction workflow:
+2. Replace the incorrect JSON-manifest assumption with the actual production text-manifest/receipt contract.
+3. Add a no-resend recovery mode for SMTP-success/post-send-persistence-failure cases.
+4. Retire `.github/workflows/dispatch-corrected-etf-report-bridge.yml` after equivalent canonical behavior is validated.
+5. Decide whether the current correction/recovery helpers remain canonical or are folded into a smaller module.
+6. Preserve all historical evidence.
+
+### Safety boundary
+
+The cleanup package must:
 
 ```text
-.github/workflows/dispatch-corrected-etf-report-bridge.yml
+email_send: false
+portfolio_model_execution: false
+official_state_mutation: false
+official_trade_ledger_mutation: false
+historical_delivery_evidence_mutation: false
 ```
-
-5. Decide whether these helpers remain canonical or are folded into a smaller runbook module:
-
-```text
-runtime/run_post_execution_correction_delivery.py
-runtime/recover_post_execution_correction_evidence.py
-```
-
-6. Preserve all historical correction evidence and do not mutate the official portfolio state or trade ledger.
-
-### Validation boundary
-
-The cleanup package must be validation-only for the completed `260714_03` delivery. It must not send another email and must not execute another portfolio mutation.
 
 Required gates:
 
-```text
-python -m py_compile runtime/run_post_execution_correction_delivery.py runtime/recover_post_execution_correction_evidence.py
-focused correction-runbook tests
-state hash unchanged
-trade-ledger hash unchanged
-existing correction manifest still validates
-no workflow path can resend without explicit confirmation
-```
+- focused correction-runbook tests;
+- existing correction manifest validates;
+- state hash unchanged;
+- trade-ledger hash unchanged;
+- no send path works without explicit confirmation;
+- no-resend recovery cannot invoke SMTP.
 
 ## Roadmap after cleanup
 
-After the correction-runbook cleanup is closed, select the next explicit roadmap package. The cockpit-first surface remains preview-only and must not be promoted into production without a separate decision.
-
-Possible next roadmap action:
-
-```text
-resume WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER validation
-```
-
-Do not mix the cleanup package with cockpit product-surface development.
+After cleanup, select the next explicit roadmap package. The cockpit-first surface remains preview-only and must not be promoted without a separate decision.

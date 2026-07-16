@@ -2,7 +2,7 @@
 
 ## Snapshot date
 
-2026-07-15
+2026-07-16
 
 ## Repository
 
@@ -10,11 +10,11 @@
 market-predictions/weekly-etf
 ```
 
-## Current status label
+## Current status
 
-**The July 14 production review is the latest verified production baseline. A guarded URNM-to-XBI rotation was executed and persisted. The first post-execution report surface was corrected through `WP_POST_EXECUTION_REPORT_CONSISTENCY`; corrected English and Dutch `260714_03` reports were rendered, delivered, persisted and confirmed in the inbox. The package is closed.**
+The July 14 production review remains the latest verified production baseline. The guarded URNM-to-XBI rotation was executed and persisted. The delivered bilingual `_03` package remains the latest verified client-delivery baseline. A subsequent non-sending `_04` review package validates report-freshness fixes and the standalone HTML equity graph. Both post-execution consistency and report-freshness packages are closed.
 
-## Latest verified production baseline
+## Production authority
 
 ```text
 requested_close_date: 2026-07-14
@@ -24,8 +24,6 @@ pricing_lineage_status: passed
 portfolio_execution_status: executed
 portfolio_mutation: URNM -> XBI
 ```
-
-Authoritative mutation:
 
 ```text
 URNM: Sell -122.008961 shares; model weight 7.01% -> 2.01%
@@ -41,7 +39,7 @@ output/etf_portfolio_state.json
 output/etf_trade_ledger.csv
 ```
 
-## Latest verified client-delivery baseline
+## Latest verified delivered client package
 
 ```text
 english_report: output/weekly_analysis_pro_260714_03.md
@@ -53,78 +51,57 @@ delivery_layer_status: smtp_sendmail_returned_no_exception
 inbox_receipt_status: verified_bilingual
 ```
 
-The corrected reports consistently show:
+Do not resend `_03`.
 
-```text
-URNM: Reduce — executed / Verlagen — uitgevoerd
-XBI: Add — executed / Toevoegen — uitgevoerd
-```
-
-No stale `no portfolio action` / `geen portefeuilleactie` wording remains.
-
-## Delivery and persistence evidence
-
-```text
-implementation_validation_run: 29442287444
-implementation_validation_conclusion: success
-corrected_delivery_run: 29455717158
-recovery_and_persistence_run: 29455966433
-recovery_and_persistence_conclusion: success
-persistence_commit: d829e89329656b29be4c1d9b3b4aca75ba46f3b4
-```
-
-Evidence artifacts:
+Delivery evidence:
 
 ```text
 output/delivery/weekly_etf_correction_delivery_receipt_2026-07-14_29455717158.txt
 output/delivery/weekly_etf_correction_manifest_2026-07-14_20260715_223718.json
 ```
 
-The final correction manifest proves:
+## Latest validated non-delivered review package
 
 ```text
-model_execution_replayed: false
-official_state_mutated: false
-official_trade_ledger_mutated: false
-state_sha256_before == state_sha256_after
-trade_ledger_sha256_before == trade_ledger_sha256_after
+english_report: output/weekly_analysis_pro_260714_04.md
+english_html: output/weekly_analysis_pro_260714_04_delivery.html
+english_pdf: output/weekly_analysis_pro_260714_04.pdf
+dutch_report: output/weekly_analysis_pro_nl_260714_04.md
+dutch_html: output/weekly_analysis_pro_nl_260714_04_delivery.html
+dutch_pdf: output/weekly_analysis_pro_nl_260714_04.pdf
+validation: output/validation/etf_report_freshness_260714_04.json
+email_sent: false
 ```
 
-## Package status
+The `_04` review package proves:
+
+- `What changed / Wat veranderde` is delta-only;
+- the 11 June ECB event is not represented as a 14 July report-week event;
+- IEFA's current 24.05% allocation is reflected consistently;
+- DFEN is the current defense holding and PPA remains an alternative;
+- specified Dutch hybrid terms are removed;
+- standalone HTML embeds the equity PNG;
+- MIME email HTML retains the CID contract;
+- portfolio-state and trade-ledger hashes are unchanged.
+
+## Closed package evidence
 
 ```text
 WP_POST_EXECUTION_REPORT_CONSISTENCY: closed
-PR #59: merged
-corrected EN/NL delivery: complete
-corrected EN/NL inbox receipts: verified
+WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH: closed
+PR #70 merge_commit: 61f6a6a5ab2dd1dfe60f28f1b86a5517a0813dd5
+freshness_validation_run: 29461019794
+post_execution_validation_run: 29461019772
 ```
 
-Previously closed WP16-WP42, report-quality, localization and PDF-surface packages remain closed. Their historical evidence is unchanged.
+## Operational debt
 
-## Cockpit-first surface roadmap
+The correction-resend path still requires a narrow runbook cleanup to align the canonical workflow with the production SMTP secret contract and actual text-manifest format, add no-resend recovery, and retire the one-shot bridge. This cleanup must not resend `_03` or `_04` and must not mutate official state or the trade ledger.
 
-The cockpit-first roadmap remains a separate preview lane. It has no production pricing, portfolio-action, state-mutation or delivery authority.
+## Cockpit roadmap
 
-```text
-roadmap: docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_20260618.md
-preview_output: output/cockpit_preview/
-production_promotion: not_granted
-```
-
-## Operational debt created during correction closeout
-
-A one-shot dispatch bridge and evidence-recovery runner were introduced to recover a successful delivery after the original correction runbook used obsolete SMTP secret names and expected the wrong manifest format.
-
-These files are useful evidence but should not silently become permanent production architecture without review:
-
-```text
-.github/workflows/dispatch-corrected-etf-report-bridge.yml
-runtime/run_post_execution_correction_delivery.py
-runtime/recover_post_execution_correction_evidence.py
-```
+The cockpit-first roadmap remains a separate preview lane with no production promotion authority.
 
 ## Immediate next action
 
-Create a narrow cleanup work package to consolidate the correction runbook onto the established production SMTP contract, replace the wrong JSON-manifest assumption, retire the one-shot dispatch bridge, and preserve the delivery receipt/recovery evidence. Do not resend `260714_03`.
-
-After that cleanup, return to the explicitly selected ETF roadmap package.
+Execute `WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP`, then select the next explicit ETF roadmap package. Do not mix operational cleanup with cockpit product-surface development.
