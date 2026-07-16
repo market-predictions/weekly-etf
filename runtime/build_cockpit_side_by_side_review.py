@@ -299,6 +299,20 @@ def _contains_all(text: str, values: list[str]) -> bool:
     return all(value.lower() in lower for value in values)
 
 
+def _contains_any(text: str, values: tuple[str, ...]) -> bool:
+    lower = text.lower()
+    return any(value.lower() in lower for value in values)
+
+
+def _dutch_provenance_status(text: str) -> tuple[bool, bool]:
+    delivery_status = _contains_any(text, ("Geen deliveryclaim", "Geen leveringsclaim"))
+    promotion_status = _contains_any(
+        text,
+        ("Niet gepromoveerd naar productie", "Niet naar productie gepromoveerd"),
+    )
+    return delivery_status, promotion_status
+
+
 def _finding(
     dimension: str,
     status: str,
@@ -459,21 +473,29 @@ def _analyze(
         "No delivery claim",
         "Not promoted to production",
     ]
-    provenance_terms_nl = [
+    provenance_paths_nl = [
         _relative(state_path, output_dir) or "",
         _relative(pricing_path, output_dir) or "",
         _relative(manifest_path, output_dir) or "",
-        "Geen deliveryclaim",
-        "Niet gepromoveerd naar productie",
     ]
-    provenance_pass = _contains_all(cockpit_en, provenance_terms_en) and _contains_all(cockpit_nl, provenance_terms_nl)
+    nl_delivery_status, nl_promotion_status = _dutch_provenance_status(cockpit_nl)
+    provenance_pass = (
+        _contains_all(cockpit_en, provenance_terms_en)
+        and _contains_all(cockpit_nl, provenance_paths_nl)
+        and nl_delivery_status
+        and nl_promotion_status
+    )
+    provenance_evidence = provenance_terms_en + [
+        f"nl_delivery_status={nl_delivery_status}",
+        f"nl_promotion_status={nl_promotion_status}",
+    ]
     findings.append(
         _finding(
             "trust_provenance_clarity",
             "pass" if provenance_pass else "fail",
             "The classic report keeps the full pricing, holdings and audit context.",
             "The WP07 provenance strip now exposes runtime state, pricing audit, run manifest, no-delivery and no-promotion status." if provenance_pass else "The cockpit provenance strip is incomplete.",
-            provenance_terms_en,
+            provenance_evidence,
             "Treat the WP07 provenance requirement as closed; preserve the visible evidence strip." if provenance_pass else "Restore complete visible source and status provenance.",
             blocking=not provenance_pass,
         )
