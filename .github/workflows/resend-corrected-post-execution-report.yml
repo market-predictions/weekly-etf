@@ -1,24 +1,40 @@
-name: Resend corrected post-execution ETF report
+name: Post-execution ETF correction runbook
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "control/run_queue/weekly_etf_report_correction_request_*.md"
   workflow_dispatch:
     inputs:
+      mode:
+        description: "Runbook mode"
+        required: true
+        type: choice
+        options:
+          - validate_only
+          - recover_no_send
+          - send
+        default: validate_only
       request_file:
         description: "Correction request file in control/run_queue"
         required: true
         type: string
+        default: control/run_queue/weekly_etf_report_correction_request_20260715_230541.md
       send_confirmation:
-        description: "Required guarded correction resend confirmation"
+        description: "Required only for guarded send"
         required: true
         type: choice
         options:
           - not_confirmed
           - confirm_correction_resend
+        default: not_confirmed
+      prior_delivery_receipt_path:
+        description: "Persisted text receipt used only by recover_no_send"
+        required: false
+        type: string
+        default: output/delivery/weekly_etf_correction_delivery_receipt_2026-07-14_29455717158.txt
+      prior_workflow_run_id:
+        description: "Original successful delivery workflow run id for recovery evidence"
+        required: false
+        type: string
+        default: "29455717158"
 
 permissions:
   contents: write
@@ -28,25 +44,25 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  correct-and-resend:
+  correction-runbook:
     runs-on: ubuntu-latest
     env:
-      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
-      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-      MAIL_TO: ${{ secrets.MAIL_TO }}
-      MAIL_TO_NL: ${{ secrets.MAIL_TO_NL }}
-      SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
-      SMTP_PORT: ${{ secrets.SMTP_PORT }}
-      MRKT_RPRTS_REPORT_MODE: pro
-      MRKT_RPRTS_SUBJECT_PREFIX: Corrected Weekly ETF Pro Review
-      MRKT_RPRTS_SUBJECT_PREFIX_NL: Gecorrigeerde Weekly ETF Pro Review | Nederlands
-      MRKT_RPRTS_DRY_RUN_EMAIL: "0"
+      ETF_CORRECTION_REQUEST_FILE: ${{ inputs.request_file }}
+      ETF_CORRECTION_SEND_CONFIRMATION: ${{ inputs.send_confirmation }}
+      ETF_PRIOR_CORRECTION_DELIVERY_LOG: ${{ inputs.prior_delivery_receipt_path }}
+      ETF_PRIOR_CORRECTION_WORKFLOW_RUN_ID: ${{ inputs.prior_workflow_run_id }}
+      MRKT_RPRTS_SMTP_HOST: ${{ secrets.MRKT_RPRTS_SMTP_HOST }}
+      MRKT_RPRTS_SMTP_PORT: ${{ secrets.MRKT_RPRTS_SMTP_PORT }}
+      MRKT_RPRTS_SMTP_USER: ${{ secrets.MRKT_RPRTS_SMTP_USER }}
+      MRKT_RPRTS_SMTP_PASS: ${{ secrets.MRKT_RPRTS_SMTP_PASS }}
+      MRKT_RPRTS_MAIL_FROM: ${{ secrets.MRKT_RPRTS_MAIL_FROM }}
+      MRKT_RPRTS_MAIL_TO: ${{ secrets.MRKT_RPRTS_MAIL_TO }}
+      MRKT_RPRTS_MAIL_TO_NL: ${{ secrets.MRKT_RPRTS_MAIL_TO_NL }}
 
     steps:
-      - name: Check out main
+      - name: Check out selected ref
         uses: actions/checkout@v4
         with:
-          ref: main
           fetch-depth: 0
 
       - name: Set up Python
@@ -54,239 +70,144 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install production report dependencies
+      - name: Install system packages for PDF rendering
+        if: inputs.mode != 'validate_only'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2 \
+            libpango-1.0-0 \
+            libgdk-pixbuf-2.0-0 \
+            libffi-dev \
+            shared-mime-info \
+            fonts-liberation \
+            fonts-dejavu-core \
+            fonts-lato \
+            poppler-utils
+
+      - name: Install validation dependencies
         run: |
           python -m pip install --upgrade pip
+          python -m pip install pytest pyyaml
+
+      - name: Install production report dependencies
+        if: inputs.mode != 'validate_only'
+        run: |
           python -m pip install \
             pandas \
             matplotlib \
             seaborn \
             markdown \
+            mistune \
             beautifulsoup4 \
             lxml \
             premailer \
             weasyprint \
             pillow \
             requests \
-            pyyaml \
             jsonschema \
             yfinance
 
-      - name: Resolve and guard correction request
-        id: request
+      - name: Guard runbook mode
+        run: |
+          set -euo pipefail
+          test -f "$ETF_CORRECTION_REQUEST_FILE"
+          case "${{ inputs.mode }}" in
+            validate_only)
+              test "${{ inputs.send_confirmation }}" = "not_confirmed"
+              ;;
+            recover_no_send)
+              test "${{ inputs.send_confirmation }}" = "not_confirmed"
+              test -n "$ETF_PRIOR_CORRECTION_DELIVERY_LOG"
+              test -f "$ETF_PRIOR_CORRECTION_DELIVERY_LOG"
+              ;;
+            send)
+              test "${{ inputs.send_confirmation }}" = "confirm_correction_resend"
+              ;;
+            *)
+              echo "Unsupported correction mode" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Compile correction runbook
+        run: |
+          python -m py_compile \
+            runtime/post_execution_correction_runbook.py \
+            runtime/run_post_execution_correction_delivery.py \
+            runtime/recover_post_execution_correction_evidence.py \
+            tools/validate_post_execution_correction_runbook.py
+
+      - name: Run focused correction-runbook tests
+        run: pytest -q tests/test_post_execution_correction_runbook.py
+
+      - name: Validate canonical runbook and historical evidence
+        run: python -m tools.validate_post_execution_correction_runbook
+
+      - name: Verify production mail configuration
+        if: inputs.mode == 'send'
+        run: |
+          set -euo pipefail
+          test -n "$MRKT_RPRTS_SMTP_HOST"
+          test -n "$MRKT_RPRTS_SMTP_PORT"
+          test -n "$MRKT_RPRTS_SMTP_USER"
+          test -n "$MRKT_RPRTS_SMTP_PASS"
+          test -n "$MRKT_RPRTS_MAIL_FROM"
+          test -n "$MRKT_RPRTS_MAIL_TO"
+          test -n "$MRKT_RPRTS_MAIL_TO_NL"
+
+      - name: Execute guarded correction send
+        if: inputs.mode == 'send'
+        run: python -m runtime.run_post_execution_correction_delivery
+
+      - name: Recover evidence without SMTP
+        if: inputs.mode == 'recover_no_send'
         env:
-          DISPATCH_REQUEST_FILE: ${{ inputs.request_file }}
-          DISPATCH_CONFIRMATION: ${{ inputs.send_confirmation }}
-          BEFORE_SHA: ${{ github.event.before }}
-          CURRENT_SHA: ${{ github.sha }}
-          EVENT_NAME: ${{ github.event_name }}
+          MRKT_RPRTS_SMTP_HOST: ""
+          MRKT_RPRTS_SMTP_PORT: ""
+          MRKT_RPRTS_SMTP_USER: ""
+          MRKT_RPRTS_SMTP_PASS: ""
+          MRKT_RPRTS_MAIL_FROM: ""
+          MRKT_RPRTS_MAIL_TO: ""
+          MRKT_RPRTS_MAIL_TO_NL: ""
+        run: python -m runtime.recover_post_execution_correction_evidence
+
+      - name: Prove official authority files are unchanged
         run: |
-          set -euo pipefail
-          if test "$EVENT_NAME" = "workflow_dispatch"; then
-            request_file="$DISPATCH_REQUEST_FILE"
-            confirmation="$DISPATCH_CONFIRMATION"
-          else
-            request_file="$(git diff --name-only "$BEFORE_SHA" "$CURRENT_SHA" | grep -E '^control/run_queue/weekly_etf_report_correction_request_.*\.md$' | tail -n 1)"
-            confirmation="$(awk -F': *' '$1=="send_confirmation" {print $2; exit}' "$request_file")"
-          fi
-          test -n "$request_file"
-          test -f "$request_file"
-          test "$confirmation" = "confirm_correction_resend"
+          git diff --exit-code -- output/etf_portfolio_state.json output/etf_trade_ledger.csv
 
-          source_artifact="$(awk -F': *' '$1=="source_artifact" {print $2; exit}' "$request_file")"
-          report_token="$(awk -F': *' '$1=="report_token" {print $2; exit}' "$request_file")"
-          correction_suffix="$(awk -F': *' '$1=="correction_suffix" {print $2; exit}' "$request_file")"
-          original_run_id="$(awk -F': *' '$1=="original_run_id" {print $2; exit}' "$request_file")"
-          report_date="$(awk -F': *' '$1=="report_date" {print $2; exit}' "$request_file")"
+      - name: Upload runbook evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-execution-correction-runbook-${{ github.run_id }}
+          path: |
+            output/weekly_analysis_pro_*_*.md
+            output/weekly_analysis_pro_*_*.pdf
+            output/weekly_analysis_pro_*_*_delivery.html
+            output/weekly_analysis_pro_*_*_equity_curve.png
+            output/delivery/weekly_etf_correction_*.json
+            output/delivery/weekly_etf_correction_*.txt
+          if-no-files-found: warn
+          retention-days: 30
 
-          test -f "$source_artifact"
-          [[ "$report_token" =~ ^[0-9]{6}$ ]]
-          [[ "$correction_suffix" =~ ^[0-9]{2}$ ]]
-          [[ "$original_run_id" =~ ^[0-9]{8}_[0-9]{6}$ ]]
-          [[ "$report_date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]
-
-          report_en="output/weekly_analysis_pro_${report_token}_${correction_suffix}.md"
-          report_nl="output/weekly_analysis_pro_nl_${report_token}_${correction_suffix}.md"
-          correction_run_id="$(date -u +%Y%m%d_%H%M%S)"
-
-          {
-            echo "REQUEST_FILE=$request_file"
-            echo "SOURCE_ARTIFACT=$source_artifact"
-            echo "REPORT_TOKEN=$report_token"
-            echo "CORRECTION_SUFFIX=$correction_suffix"
-            echo "ORIGINAL_RUN_ID=$original_run_id"
-            echo "REPORT_DATE=$report_date"
-            echo "REPORT_EN=$report_en"
-            echo "REPORT_NL=$report_nl"
-            echo "CORRECTION_RUN_ID=$correction_run_id"
-            echo "MRKT_RPRTS_EXPLICIT_REPORT_PATH=$report_en"
-            echo "MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL=$report_nl"
-          } >> "$GITHUB_ENV"
-
-          echo "request_file=$request_file" >> "$GITHUB_OUTPUT"
-          echo "report_en=$report_en" >> "$GITHUB_OUTPUT"
-          echo "report_nl=$report_nl" >> "$GITHUB_OUTPUT"
-          echo "correction_run_id=$correction_run_id" >> "$GITHUB_OUTPUT"
-
-      - name: Verify mail configuration
-        run: |
-          set -euo pipefail
-          test -n "$MAIL_USERNAME"
-          test -n "$MAIL_PASSWORD"
-          test -n "$MAIL_TO"
-          test -n "$SMTP_SERVER"
-          test -n "$SMTP_PORT"
-
-      - name: Snapshot immutable state and delivery inventory
-        run: |
-          set -euo pipefail
-          mkdir -p /tmp/weekly-etf-correction
-          sha256sum output/etf_portfolio_state.json > /tmp/weekly-etf-correction/state-before.sha256
-          sha256sum output/etf_trade_ledger.csv > /tmp/weekly-etf-correction/ledger-before.sha256
-          find output/delivery -maxdepth 1 -type f -printf '%f\n' | sort > /tmp/weekly-etf-correction/delivery-before.txt
-          sha256sum "$SOURCE_ARTIFACT" > /tmp/weekly-etf-correction/source-artifact.sha256
-
-      - name: Rebuild corrected reports from existing execution artifact
-        run: |
-          set -euo pipefail
-          python -m runtime.finalize_executed_etf_report --artifact "$SOURCE_ARTIFACT"
-          test -s "$REPORT_EN"
-          test -s "$REPORT_NL"
-
-      - name: Prove correction replay did not mutate official state or ledger
-        run: |
-          set -euo pipefail
-          sha256sum -c /tmp/weekly-etf-correction/state-before.sha256
-          sha256sum -c /tmp/weekly-etf-correction/ledger-before.sha256
-
-      - name: Validate corrected bilingual report surfaces
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          from runtime.post_execution_report_surface import validate_post_execution_report_consistency
-
-          artifact = json.loads(Path(os.environ['SOURCE_ARTIFACT']).read_text(encoding='utf-8'))
-          state_path = Path(str(artifact['post_execution_state_artifact']))
-          state = json.loads(state_path.read_text(encoding='utf-8'))
-          en = Path(os.environ['REPORT_EN']).read_text(encoding='utf-8')
-          nl = Path(os.environ['REPORT_NL']).read_text(encoding='utf-8')
-          validate_post_execution_report_consistency(en, state, language='en')
-          validate_post_execution_report_consistency(nl, state, language='nl')
-          print('ETF_CORRECTION_REPORT_SURFACE_OK | languages=EN,NL | mutation=URNM->XBI')
-          PY
-
-      - name: Render and send corrected English and Dutch reports
-        run: |
-          set -euo pipefail
-          python send_report_runtime_html.py 2>&1 | tee /tmp/weekly-etf-correction/delivery.log
-          grep -q "DELIVERY_OK | mode=pro_bilingual" /tmp/weekly-etf-correction/delivery.log
-
-      - name: Prove delivery rendering did not mutate official state or ledger
-        run: |
-          set -euo pipefail
-          sha256sum -c /tmp/weekly-etf-correction/state-before.sha256
-          sha256sum -c /tmp/weekly-etf-correction/ledger-before.sha256
-
-      - name: Write correction manifest
-        run: |
-          set -euo pipefail
-          find output/delivery -maxdepth 1 -type f -printf '%f\n' | sort > /tmp/weekly-etf-correction/delivery-after.txt
-          comm -13 /tmp/weekly-etf-correction/delivery-before.txt /tmp/weekly-etf-correction/delivery-after.txt > /tmp/weekly-etf-correction/new-delivery-files.txt
-          python - <<'PY'
-          import hashlib
-          import json
-          import os
-          from datetime import datetime, timezone
-          from pathlib import Path
-
-          def sha256(path: Path) -> str:
-              digest = hashlib.sha256()
-              with path.open('rb') as handle:
-                  for chunk in iter(lambda: handle.read(1024 * 1024), b''):
-                      digest.update(chunk)
-              return digest.hexdigest()
-
-          root = Path('.')
-          state = root / 'output/etf_portfolio_state.json'
-          ledger = root / 'output/etf_trade_ledger.csv'
-          source = root / os.environ['SOURCE_ARTIFACT']
-          report_en = root / os.environ['REPORT_EN']
-          report_nl = root / os.environ['REPORT_NL']
-          new_names = [line.strip() for line in Path('/tmp/weekly-etf-correction/new-delivery-files.txt').read_text(encoding='utf-8').splitlines() if line.strip()]
-          new_delivery = [str(Path('output/delivery') / name) for name in new_names]
-          delivery_manifests = []
-          delivery_statuses = []
-          for raw in new_delivery:
-              path = Path(raw)
-              if path.suffix != '.json':
-                  continue
-              try:
-                  payload = json.loads(path.read_text(encoding='utf-8'))
-              except Exception:
-                  continue
-              if 'delivery_status' in payload:
-                  delivery_manifests.append(raw)
-                  delivery_statuses.append(payload.get('delivery_status'))
-
-          before_state = Path('/tmp/weekly-etf-correction/state-before.sha256').read_text(encoding='utf-8').split()[0]
-          before_ledger = Path('/tmp/weekly-etf-correction/ledger-before.sha256').read_text(encoding='utf-8').split()[0]
-          manifest = {
-              'schema_version': '1.0',
-              'correction_type': 'post_execution_report_surface_correction',
-              'created_at_utc': datetime.now(timezone.utc).isoformat(),
-              'correction_run_id': os.environ['CORRECTION_RUN_ID'],
-              'original_run_id': os.environ['ORIGINAL_RUN_ID'],
-              'report_date': os.environ['REPORT_DATE'],
-              'request_file': os.environ['REQUEST_FILE'],
-              'source_execution_artifact': os.environ['SOURCE_ARTIFACT'],
-              'source_execution_artifact_sha256': sha256(source),
-              'model_execution_replayed': False,
-              'official_state_mutated': False,
-              'official_trade_ledger_mutated': False,
-              'state_sha256_before': before_state,
-              'state_sha256_after': sha256(state),
-              'trade_ledger_sha256_before': before_ledger,
-              'trade_ledger_sha256_after': sha256(ledger),
-              'corrected_report_en': os.environ['REPORT_EN'],
-              'corrected_report_en_sha256': sha256(report_en),
-              'corrected_report_nl': os.environ['REPORT_NL'],
-              'corrected_report_nl_sha256': sha256(report_nl),
-              'new_delivery_files': new_delivery,
-              'delivery_manifests': delivery_manifests,
-              'delivery_statuses': delivery_statuses,
-              'delivery_log_status': 'DELIVERY_OK',
-              'email_receipt_status': 'not_checked_by_workflow',
-              'status': 'correction_rendered_and_delivery_layer_completed',
-          }
-          if manifest['state_sha256_before'] != manifest['state_sha256_after']:
-              raise SystemExit('Correction mutated official portfolio state')
-          if manifest['trade_ledger_sha256_before'] != manifest['trade_ledger_sha256_after']:
-              raise SystemExit('Correction mutated official trade ledger')
-          if len(delivery_manifests) < 2:
-              raise SystemExit('Expected English and Dutch delivery manifests')
-          if any(status != 'smtp_sendmail_returned_no_exception' for status in delivery_statuses):
-              raise SystemExit(f'Unexpected delivery statuses: {delivery_statuses}')
-          out = Path('output/delivery') / f"weekly_etf_correction_manifest_{os.environ['REPORT_DATE']}_{os.environ['CORRECTION_RUN_ID']}.json"
-          out.write_text(json.dumps(manifest, indent=2), encoding='utf-8')
-          print(f'ETF_CORRECTION_MANIFEST_OK | path={out} | delivery_manifests={len(delivery_manifests)}')
-          PY
-
-      - name: Persist corrected reports and delivery evidence
+      - name: Persist newly produced correction evidence
+        if: inputs.mode == 'send' || inputs.mode == 'recover_no_send'
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f \
-            output/weekly_analysis_pro_${REPORT_TOKEN}_${CORRECTION_SUFFIX}* \
-            output/weekly_analysis_pro_nl_${REPORT_TOKEN}_${CORRECTION_SUFFIX}* \
-            output/delivery/*.json
+            output/weekly_analysis_pro_${ETF_CORRECTION_REQUEST_FILE##*request_}* 2>/dev/null || true
+          git add -f \
+            output/weekly_analysis_pro_*_* \
+            output/weekly_analysis_pro_nl_*_* \
+            output/delivery/weekly_etf_correction_*.json \
+            output/delivery/weekly_etf_correction_*.txt
+          git reset -- output/etf_portfolio_state.json output/etf_trade_ledger.csv || true
           if git diff --cached --quiet; then
-            echo "No correction artifacts changed"
-            exit 1
+            echo "No new correction evidence to persist"
+            exit 0
           fi
-          git commit -m "Persist corrected Weekly ETF report delivery evidence [skip ci]"
-          git push origin HEAD:main
+          git commit -m "Persist post-execution correction evidence [skip ci]"
+          git push origin HEAD:${GITHUB_REF_NAME}
