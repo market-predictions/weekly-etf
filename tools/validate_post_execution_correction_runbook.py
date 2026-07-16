@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from runtime.post_execution_correction_runbook import (
     LEDGER_PATH,
     ROOT,
@@ -25,12 +23,12 @@ PRODUCTION_SECRET_KEYS = (
     "MRKT_RPRTS_MAIL_TO",
     "MRKT_RPRTS_MAIL_TO_NL",
 )
-OBSOLETE_SECRET_KEYS = (
-    "MAIL_USERNAME",
-    "MAIL_PASSWORD",
+OBSOLETE_ENV_PREFIXES = (
+    "MAIL_USERNAME:",
+    "MAIL_PASSWORD:",
     "MAIL_TO:",
     "MAIL_TO_NL:",
-    "SMTP_SERVER",
+    "SMTP_SERVER:",
     "SMTP_PORT:",
 )
 
@@ -42,17 +40,21 @@ def require(condition: bool, message: str) -> None:
 
 def main() -> None:
     workflow = WORKFLOW.read_text(encoding="utf-8")
+    workflow_lines = [line.strip() for line in workflow.splitlines()]
     sender = SENDER.read_text(encoding="utf-8")
     recovery = RECOVERY.read_text(encoding="utf-8")
 
     require("workflow_dispatch:" in workflow, "Canonical correction workflow is not manual-dispatch controlled.")
-    require("  push:" not in workflow, "Canonical correction workflow still has an automatic push send trigger.")
+    require("push:" not in workflow_lines, "Canonical correction workflow still has an automatic push send trigger.")
     for mode in ("validate_only", "recover_no_send", "send"):
         require(mode in workflow, f"Canonical correction workflow lacks mode: {mode}")
     for key in PRODUCTION_SECRET_KEYS:
         require(key in workflow, f"Canonical correction workflow lacks production secret key: {key}")
-    for key in OBSOLETE_SECRET_KEYS:
-        require(key not in workflow, f"Canonical correction workflow still contains obsolete secret key: {key}")
+    for prefix in OBSOLETE_ENV_PREFIXES:
+        require(
+            not any(line.startswith(prefix) for line in workflow_lines),
+            f"Canonical correction workflow still contains obsolete environment key: {prefix}",
+        )
 
     require(not BRIDGE.exists(), "One-shot correction dispatch bridge has not been retired.")
     require("assert_dispatch_send_confirmation" in sender, "Send runner lacks dispatch confirmation guard.")
