@@ -14,6 +14,7 @@ from runtime.standalone_html_equity_embed import with_standalone_html_equity_emb
 from runtime.macro_report_pre_send_guard import validate_macro_report_pre_send
 from runtime.max_position_action_contract import sanitize_over_cap_add_html
 from runtime.decision_cockpit_html import decision_cockpit_html_from_markdown
+from runtime.additive_cockpit_front_page import inject_additive_cockpit_front_page
 from runtime.render_etf_report_from_state import cash_eur, invested_eur, total_nav
 
 PRO_REPORT_RE = re.compile(r"^weekly_analysis_pro_(\d{6})(?:_(\d{2}))?\.md$")
@@ -91,6 +92,7 @@ def _extend_native_dutch_numeric_aliases() -> None:
 def _decision_cockpit_html_from_markdown(md_text: str) -> str:
     return decision_cockpit_html_from_markdown(md_text)
 
+
 def _inject_decision_cockpit_html(html: str, md_text: str) -> str:
     if "Decision cockpit" in html or "Besliscockpit" in html:
         return html
@@ -120,6 +122,32 @@ def _inject_decision_cockpit_html(html: str, md_text: str) -> str:
 
     return html + cockpit
 
+
+def _apply_cockpit_front_page(
+    html: str,
+    md_text: str,
+    *,
+    language: str,
+    render_mode: str,
+) -> str:
+    output_dir = Path(report_module.os.environ.get("MRKT_RPRTS_OUTPUT_DIR", "output"))
+    result = inject_additive_cockpit_front_page(
+        html,
+        language=language,
+        output_dir=output_dir,
+        render_mode=render_mode,
+    )
+    diagnostic = " ".join(str(result.diagnostic).split())
+    print(
+        "COCKPIT_FRONT_PAGE | "
+        f"status={result.status} | feature={result.feature_value} | "
+        f"front_page_count={result.front_page_count} | diagnostic={diagnostic}"
+    )
+    if result.status == "enabled":
+        return result.html
+    return _inject_decision_cockpit_html(result.html, md_text)
+
+
 def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..., str]:
     def _wrapped(md_text: str, report_date_str: str, image_src: str | None = None, render_mode: str = "email") -> str:
         language = "nl" if looks_dutch_markdown(md_text) else "en"
@@ -130,7 +158,9 @@ def _with_client_facing_sanitizer(build_html: Callable[..., str]) -> Callable[..
             html = sanitize_over_cap_add_html(html, state, language=language)
         except Exception:
             pass
-        html = _inject_decision_cockpit_html(html, md_text)
+        html = _apply_cockpit_front_page(
+            html, md_text, language=language, render_mode=render_mode
+        )
         if language == "nl" and render_mode.startswith("pdf"):
             points = report_module.parse_section7_equity_points_generic(md_text)
             html = replace_pdf_equity_png_with_svg(html, points, language=language)
