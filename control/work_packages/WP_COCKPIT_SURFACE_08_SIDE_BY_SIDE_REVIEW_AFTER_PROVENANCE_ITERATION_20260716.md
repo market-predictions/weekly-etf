@@ -3,6 +3,7 @@
 Date: 2026-07-16
 Repository: `market-predictions/weekly-etf`
 Branch: `feature/cockpit-wp08-evidence-side-by-side-review`
+PR: #76
 
 ## Layer
 
@@ -15,154 +16,112 @@ operational runbook
 ## Status
 
 ```text
-claimed
+implementation_status: validated_ready_for_closeout
+review_conclusion: iteration_required
 promotion_status: not_promoted
+next_package: WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
 ```
 
 ## Purpose
 
-Perform an evidence-based side-by-side review of the current July 14 classic report and the corrected current-runtime cockpit after the source/provenance iteration.
+Review the current July 14 classic report and current-runtime cockpit using artifact contents and runtime authority. WP08 is a review package, not a promotion package.
 
-The existing WP04 review builder is a historical foundation. WP08 must not repeat its static June conclusions. It must inspect the selected current artifacts, record pass/fail findings for the required dimensions, produce a clear review conclusion and identify the narrow next package.
-
-## Authority inputs
+## Implemented contract
 
 ```text
-output/runtime/latest_etf_report_state_path.txt
-output/weekly_analysis_pro_260714_04.md
-output/weekly_analysis_pro_260714_04_delivery.html
-output/weekly_analysis_pro_nl_260714_04.md
-output/weekly_analysis_pro_nl_260714_04_delivery.html
-output/cockpit_preview/weekly_analysis_pro_cockpit_260714_<seq>.html
-output/cockpit_preview/weekly_analysis_pro_nl_cockpit_260714_<seq>.html
-output/etf_valuation_history.csv
-output/pricing/latest_price_audit_path.txt
-output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+schema_version: cockpit_side_by_side_review_v2
+review_type: evidence_based_side_by_side_preview_only
 ```
 
-The runtime state and pointers remain authoritative. The report sources are review surfaces, not independent state authority.
+The builder now:
 
-## Required review dimensions
+- selects one current classic baseline per language;
+- selects one latest cockpit preview per language;
+- records SHA-256 identities for selected inputs;
+- evaluates eleven dimensions from actual content;
+- records status, observations, evidence, required fix and blocking state;
+- renders structured English/Dutch HTML instead of escaped Markdown.
+
+## Exact-current findings
 
 ```text
-readability
-density
-visual_hierarchy
-decision_clarity
-executed_action_clarity
-current_weight_accuracy
-performance_risk_accuracy
-trust_provenance_clarity
-bilingual_semantic_parity
-premium_look_and_feel
-audit_evidence_preservation
+readability: pass
+density: pass
+visual_hierarchy: pass
+decision_clarity: partial / blocking
+executed_action_clarity: pass
+current_weight_accuracy: pass
+performance_risk_accuracy: pass
+trust_provenance_clarity: pass
+bilingual_semantic_parity: partial / blocking
+premium_look_and_feel: partial / blocking
+audit_evidence_preservation: pass
 ```
 
-## Required findings contract
+Blocking evidence:
 
-The review metadata must record for each dimension:
+1. The summary says discipline is ahead of activity although URNM was reduced and XBI was added.
+2. The cockpit lacks a dedicated next-action trigger present in the classic decision cockpit.
+3. The Dutch discipline sentence ends with a comma.
+4. Dutch provenance labels still contain hybrid English terminology.
+
+The current action and weight surfaces pass:
 
 ```text
-status: pass | partial | fail
-classic_observation
-cockpit_observation
-evidence
-required_fix
+URNM reduced / URNM afgebouwd
+XBI added / XBI toegevoegd
+URNM 7.0% -> 2.0%
+XBI 0.0% -> 5.0%
 ```
 
-It must also record:
+## Selected sources
 
 ```text
-selected current classic source per language
-selected current cockpit source per language
-runtime-state source
-report token and date
-review conclusion
-blocking findings
-next recommended package
+Classic EN: output/weekly_analysis_pro_260714_04.md
+Classic EN HTML: output/weekly_analysis_pro_260714_04_delivery.html
+Classic NL: output/weekly_analysis_pro_nl_260714_04.md
+Classic NL HTML: output/weekly_analysis_pro_nl_260714_04_delivery.html
+Cockpit EN: output/cockpit_preview/weekly_analysis_pro_cockpit_260714_01.html
+Cockpit NL: output/cockpit_preview/weekly_analysis_pro_nl_cockpit_260714_01.html
+```
+
+## Validation evidence
+
+```text
+validated_head: abe689064455dbd7206564037220e727c52b929b
+WP08_run: 29533073516
+WP08_conclusion: success
+current_runtime_run: 29533073585
+current_runtime_conclusion: success
+artifact: cockpit-wp08-evidence-review-29533073516
+artifact_digest: sha256:a52ec091725dae17d992d940454cb11daa8dad1c6b7f585beec90f0473a473f0
+```
+
+Compilation, regressions, production report validators, exact-current review assertions and protected-file hash comparisons all passed.
+
+## Output and authority boundary
+
+```text
+review_output: output/cockpit_review/
 promotion_status: not_promoted
-```
-
-## Current defects already evidenced
-
-The WP08 baseline review has identified these issues that the new review contract must capture rather than hide:
-
-1. The historical builder selects every report variant for the token instead of one current canonical baseline per language.
-2. The historical builder emits static prose and does not inspect report or cockpit contents.
-3. The historical builder still says source linkage must become explicit even though WP07 added a visible source/evidence strip.
-4. The current cockpit summary says discipline is ahead of activity even though URNM was reduced and XBI was added.
-5. The Dutch discipline sentence ends with a comma because punctuation is changed by whole-sentence replacement.
-6. The cockpit lacks a dedicated explicit next-action trigger even though the classic decision cockpit contains one.
-
-WP08 reviews and records these issues. Product-surface corrections belong to the next narrow preview-only package.
-
-## Output contract
-
-Write only under:
-
-```text
-output/cockpit_review/
-```
-
-Expected files:
-
-```text
-weekly_etf_cockpit_side_by_side_review_<token>.json
-weekly_etf_cockpit_side_by_side_review_<token>.md
-weekly_etf_cockpit_side_by_side_review_<token>.html
-weekly_etf_cockpit_side_by_side_review_nl_<token>.md
-weekly_etf_cockpit_side_by_side_review_nl_<token>.html
-```
-
-The HTML must be a readable client-grade review surface, not escaped Markdown inside a `<pre>` block.
-
-## Safety boundary
-
-```text
-production_promotion: false
-production_report_replacement: false
 email_send: false
 portfolio_model_execution: false
-pricing_authority_change: false
-official_state_mutation: false
-official_trade_ledger_mutation: false
-valuation_history_mutation: false
-delivery_manifest_creation: false
-preview_output_only: output/cockpit_preview/
-review_output_only: output/cockpit_review/
+authority_file_mutation: false
+delivery_change: false
 ```
 
-## Minimum validation
+## Acceptance result
 
-```text
-python -m py_compile runtime/build_cockpit_side_by_side_review.py
-pytest -q tests/test_cockpit_side_by_side_review.py tests/test_cockpit_wp08_evidence_review.py
-python tools/validate_etf_delivery_html_contract.py --output-dir output
-python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
-render current bilingual cockpit preview
-build WP08 review
-prove protected authority hashes unchanged
-```
-
-## Acceptance
-
-- one current classic baseline per language is selected deterministically;
-- one latest current cockpit baseline per language is selected deterministically;
-- findings are derived from artifact content and runtime state;
-- the review exposes current gaps rather than repeating historical template language;
-- English and Dutch review surfaces are semantically parallel;
-- HTML is visually structured and readable;
-- review conclusion remains non-promotional;
-- the next package is explicit;
-- no authority or delivery file is mutated.
-
-## Expected conclusion boundary
-
-WP08 may conclude:
+All WP08 acceptance conditions pass. The evidence-based conclusion is:
 
 ```text
 iteration_required
-ready_for_promotion_decision
 ```
 
-It may not itself promote the cockpit. Based on the evidenced baseline defects, the expected initial conclusion is `iteration_required` and the likely next package is a narrow current-runtime cockpit refinement package.
+## Next package
+
+```text
+WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
+```
+
+WP09 should correct only the three blocking dimensions and rerun the unchanged WP08 review contract.
