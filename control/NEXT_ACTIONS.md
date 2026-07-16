@@ -50,28 +50,18 @@ WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP: closed
 WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_CURRENT_RUNTIME_REVALIDATION: closed
 WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION: closed
 WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT: closed
+WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW: closed
 ```
 
-WP09 evidence:
+## Promotion decision closeout
 
 ```text
-PR: #79
-merge_commit: 9b679df825fdc4c7ce37cbdc2474acae6d25d67f
-closeout_PR: #80
-closeout_merge_commit: 009e0f1a910c44b43de0d6c5babf3b1e0eae5cfd
-WP08_validation_run: 29536333738
-current_runtime_validation_run: 29536333731
-review_conclusion: ready_for_promotion_decision
-blocking_findings: []
-promotion_status: not_promoted
-```
-
-## Current package — promotion decision review
-
-```text
-package: WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW
-status: decision_recorded_validation_pending
 selected_option: additive_delivery_front_page
+PR: #81
+merge_commit: 3200d2a39afa0027ff9fdc65f7490ed97e54ffc8
+promotion_decision_run: 29537562563
+WP08_evidence_run: 29537562528
+current_runtime_run: 29537562530
 production_change: false
 promotion_status: not_promoted
 ```
@@ -79,7 +69,7 @@ promotion_status: not_promoted
 Selected route:
 
 ```text
-add a cockpit front page inside the existing English and Dutch HTML/PDF report
+add one cockpit front page inside the existing English and Dutch HTML/PDF report
 preserve the complete classic report body
 preserve one email and one PDF per language
 preserve attachment and manifest contracts
@@ -92,15 +82,15 @@ fail closed to unchanged classic output
 Rejected routes:
 
 ```text
-preview-only: leaves validated client value unused
+preview-only as primary route: leaves validated client value unused
 separate attachment: adds manifest and recipient friction
 full replacement: unnecessary migration and rollback risk
 another iteration: no remaining WP08 blockers
 ```
 
-## Immediate next package
+## Immediate package
 
-After the decision package validates and merges, create and claim:
+Create and claim:
 
 ```text
 WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE
@@ -134,17 +124,13 @@ manifest contract: unchanged
 
 ```text
 flag required: true
+recommended name: MRKT_RPRTS_COCKPIT_FRONT_PAGE
+accepted values: disabled | enabled
 implementation default: disabled
 validation enablement: explicit
 production enablement: separate closeout required
 render failure: unchanged classic output
 rollback: disable flag
-```
-
-The feature flag name must be explicit and scoped, for example:
-
-```text
-MRKT_RPRTS_COCKPIT_FRONT_PAGE=disabled|enabled
 ```
 
 No truthy/falsey aliases should be accepted unless deliberately normalized and tested.
@@ -164,13 +150,13 @@ No truthy/falsey aliases should be accepted unless deliberately normalized and t
 11. The WP08 v2 evidence review remains all-pass.
 12. Protected authority hashes remain unchanged.
 13. Validation sends no email.
-14. Any cockpit render exception returns unchanged classic output and records a diagnostic result.
+14. A planted cockpit render exception returns unchanged classic output and records a diagnostic result.
 
 ### Expected implementation evidence
 
 ```text
-feature_disabled HTML/PDF comparison
-feature_enabled HTML/PDF artifacts
+feature-disabled HTML/PDF comparison
+feature-enabled HTML/PDF artifacts
 bilingual parity proof
 no-duplicate decision surface proof
 classic body preservation proof
