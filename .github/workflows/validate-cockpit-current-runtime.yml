@@ -136,6 +136,8 @@ jobs:
       - name: Prove authority files unchanged
         run: |
           set -euo pipefail
+          xargs -d '\n' sha256sum < /tmp/cockpit-protected-files.txt > /tmp/cockpit-protected-after.sha256
+          diff -u /tmp/cockpit-protected-before.sha256 /tmp/cockpit-protected-after.sha256
           sha256sum -c /tmp/cockpit-protected-before.sha256
           git diff --exit-code -- \
             output/etf_portfolio_state.json \
@@ -152,5 +154,8 @@ jobs:
           path: |
             output/cockpit_preview/
             output/cockpit_review/
+            /tmp/cockpit-protected-files.txt
+            /tmp/cockpit-protected-before.sha256
+            /tmp/cockpit-protected-after.sha256
           if-no-files-found: error
           retention-days: 14
