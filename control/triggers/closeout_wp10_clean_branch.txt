@@ -1,0 +1,1 @@
+finalize WP10 governance, remove temporary validation files, and validate clean committed head
