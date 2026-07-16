@@ -98,3 +98,11 @@ def test_recovery_source_never_invokes_delivery_entrypoint() -> None:
     assert "send_report_runtime_html.py" not in source
     assert "generate_delivery_assets_for_run" in source
     assert "prove_recovery_has_no_smtp" in source
+    assert "Recovery would overwrite existing historical report evidence" in source
+    assert "_restore_outputs(output_snapshot)" in source
+
+
+def test_send_source_requires_unused_correction_suffix() -> None:
+    source = Path("runtime/run_post_execution_correction_delivery.py").read_text(encoding="utf-8")
+    assert "_require_fresh_correction_suffix(request)" in source
+    assert "Correction send target already exists" in source
