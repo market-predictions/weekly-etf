@@ -56,12 +56,21 @@ jobs:
           set -o pipefail
           pytest -vv --tb=short tests/test_post_execution_correction_runbook.py 2>&1 | tee /tmp/post-execution-correction-tests.log
 
-      - name: Upload focused test diagnostics
+      - name: Validate canonical correction runbook
+        id: runbook_validator
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python -m tools.validate_post_execution_correction_runbook 2>&1 | tee /tmp/post-execution-correction-validator.log
+
+      - name: Upload correction diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: post-execution-correction-test-log-${{ github.run_id }}
-          path: /tmp/post-execution-correction-tests.log
+          name: post-execution-correction-diagnostics-${{ github.run_id }}
+          path: |
+            /tmp/post-execution-correction-tests.log
+            /tmp/post-execution-correction-validator.log
           if-no-files-found: error
           retention-days: 7
 
@@ -69,8 +78,9 @@ jobs:
         if: steps.focused_tests.outcome != 'success'
         run: exit 1
 
-      - name: Validate canonical correction runbook
-        run: python -m tools.validate_post_execution_correction_runbook
+      - name: Enforce runbook validator result
+        if: steps.runbook_validator.outcome != 'success'
+        run: exit 1
 
       - name: Prove no authority mutation
         run: |
