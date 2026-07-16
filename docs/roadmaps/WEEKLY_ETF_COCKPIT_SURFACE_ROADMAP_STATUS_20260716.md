@@ -68,10 +68,15 @@ All eleven evidence-review dimensions pass.
 
 ```text
 package: WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW
-status: decision_recorded_validation_pending
+status: closed
 selected_option: additive_delivery_front_page
 production_change_in_decision_package: false
 promotion_status: not_promoted
+PR: #81
+merge_commit: 3200d2a39afa0027ff9fdc65f7490ed97e54ffc8
+promotion_decision_run: 29537562563
+WP08_evidence_run: 29537562528
+current_runtime_run: 29537562530
 ```
 
 Selected route:
@@ -95,11 +100,11 @@ another refinement cycle
 remaining preview-only as the primary route
 ```
 
-## Next package
+## Active next package
 
 ```text
 WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE
-status: next_after_decision_merge
+status: next
 promotion_status: not_promoted
 ```
 

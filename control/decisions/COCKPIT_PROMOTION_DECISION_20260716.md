@@ -63,6 +63,8 @@ failure behavior: unchanged classic output
 rollback: disable feature flag
 ```
 
+The integration is feature-gated and must fail closed to the unchanged classic report whenever cockpit rendering cannot complete safely.
+
 Enabling the feature in actual production requires a separate implementation closeout with exact HTML/PDF and delivery-contract evidence.
 
 ## Evidence

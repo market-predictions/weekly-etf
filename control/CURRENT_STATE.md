@@ -203,27 +203,24 @@ portfolio_model_execution: false
 authority_file_mutation: false
 ```
 
-## Cockpit promotion decision review
+## Cockpit promotion decision review — closed
 
 ```text
 package: WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW
-status: decision_recorded_validation_pending
+status: closed
 selected_option: additive_delivery_front_page
 production_change_in_decision_package: false
 promotion_status: not_promoted
+PR: #81
+merge_commit: 3200d2a39afa0027ff9fdc65f7490ed97e54ffc8
+final_validated_head: d37c43cb1e36f376a58f00c7f4bd469d7133dc8f
+promotion_decision_run: 29537562563
+WP08_evidence_run: 29537562528
+current_runtime_run: 29537562530
 next_package: WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE
 ```
 
-Decision rationale:
-
-- the cockpit has no remaining review blockers;
-- the classic report remains the complete audit/evidence layer;
-- the current delivery contract is one HTML body and one PDF per language;
-- an additive front page improves the client entry surface without adding attachment or manifest complexity;
-- full replacement creates unnecessary migration risk;
-- a separate attachment creates avoidable recipient and delivery friction.
-
-Selected implementation architecture:
+Selected architecture:
 
 ```text
 integration_layer: delivery HTML/PDF render pipeline
@@ -256,14 +253,15 @@ WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP: closed
 WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_CURRENT_RUNTIME_REVALIDATION: closed
 WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION: closed
 WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT: closed
+WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW: closed
 ```
 
 ## Immediate next action
 
-After the promotion decision package validates and merges, create:
+Create and claim:
 
 ```text
 WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE
 ```
 
-WP10 may implement a feature-gated production render path, but must remain disabled by default, send no email during validation and preserve fail-closed classic output.
+WP10 may implement the feature-gated production render path, but must remain disabled by default, send no email during validation and preserve fail-closed classic output.
