@@ -75,16 +75,6 @@ email_sent: false
 
 The `_04` package is review evidence only. Do not describe it as delivered.
 
-It proves:
-
-- `What changed / Wat veranderde` is delta-only;
-- stale ECB week-language is removed;
-- current IEFA and DFEN authority is reflected;
-- Dutch hybrid terms are removed;
-- standalone HTML embeds the equity PNG;
-- MIME email HTML retains the CID contract;
-- official portfolio state and trade ledger were unchanged.
-
 ## Canonical post-execution correction runbook
 
 ```text
@@ -97,13 +87,11 @@ modes: validate_only | recover_no_send | send
 
 The runbook is manual-only, uses the established `MRKT_RPRTS_*` mail contract, requires exact dual confirmation for sending, prevents correction-suffix reuse and supports no-send evidence recovery.
 
-No correction send or recovery operation was executed during the cleanup package.
-
 ## Cockpit preview lane
 
-The cockpit surface remains a separate preview lane with no production promotion authority.
+The cockpit remains a separate preview/review lane with no production promotion authority.
 
-Historical implementation status is now reconciled:
+Historical implementation status is reconciled:
 
 ```text
 WP01 preview renderer: merged in PR #52
@@ -117,28 +105,37 @@ promotion_status: not_promoted
 selected_path: iteration
 ```
 
-The old `WP01: not_started` status was stale.
+The old `WP01: not_started` status was stale and is retired.
 
-## Cockpit current-runtime revalidation
-
-PR #74 validates the existing cockpit against the authoritative July 14 post-execution state.
-
-Confirmed defects:
+## Cockpit current-runtime revalidation — closed
 
 ```text
-previous_weight_pct was selected before current_weight_pct
-previous_market_value_eur was selected before market_value_eur
-executed rotations were reduced to generic action-present wording
+package: WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_CURRENT_RUNTIME_REVALIDATION
+status: closed
+PR: #74
+merge_commit: d80984b7336f343344719a80a29712506926bd26
+final_validated_head: 523bb038db9ccc10c009b88e6c8f6dd489bc7dc5
+final_validation_run: 29525968480
+final_validation_conclusion: success
+promotion_status: not_promoted
 ```
 
-Corrected authority order:
+Closed defects:
+
+```text
+previous_weight_pct selected before current_weight_pct
+previous_market_value_eur selected before market_value_eur
+generic action-present wording for executed rotations
+```
+
+Canonical cockpit authority order:
 
 ```text
 current_weight_pct > target_weight_pct > previous_weight_pct > weight_inherited_pct
 market_value_eur > previous_market_value_eur
 ```
 
-Authoritative zero values are preserved.
+A legitimate current zero remains authoritative.
 
 Current executed-action surface:
 
@@ -147,7 +144,7 @@ EN: URNM reduced · XBI added
 NL: URNM afgebouwd · XBI toegevoegd
 ```
 
-The action note shows:
+with the current runtime transitions:
 
 ```text
 URNM 7.01% -> 2.01%
@@ -158,26 +155,20 @@ XBI 0.00% -> 5.00%
 
 ```text
 implementation_head: e605eb8de532eed44ec9c44a7be7c6705f128893
-workflow_run: 29525632206
-workflow_conclusion: success
-promotion_status: not_promoted
+implementation_validation_run: 29525632206
+final_governance_head: 523bb038db9ccc10c009b88e6c8f6dd489bc7dc5
+final_governance_validation_run: 29525968480
+focused_tests: 33 passed
+production_delivery_html_contract: passed
+macro_thesis_leakage_validator: passed
+protected_authority_hashes_before_after: identical
 email_send: false
 portfolio_model_execution: false
 official_state_mutation: false
 official_trade_ledger_mutation: false
 ```
 
-The workflow passed:
-
-- 33 focused tests;
-- production delivery HTML validation;
-- macro/thesis surface leakage validation;
-- bilingual current-runtime rendering;
-- side-by-side review generation;
-- exact executed-action assertions;
-- before/after SHA-256 equality for nine protected authority files and pointer targets.
-
-Generated CI artifacts are preview/review evidence only:
+Generated CI artifacts remained preview/review evidence only:
 
 ```text
 output/cockpit_preview/weekly_analysis_pro_cockpit_260714_01.html
@@ -186,7 +177,7 @@ output/cockpit_review/weekly_etf_cockpit_side_by_side_review_260714.*
 output/cockpit_review/weekly_etf_cockpit_side_by_side_review_nl_260714.*
 ```
 
-These artifacts were uploaded by the read-only workflow and were not committed as production output.
+They were uploaded as workflow artifacts and were not committed as production output or treated as delivery evidence.
 
 ## Closed packages
 
@@ -194,18 +185,18 @@ These artifacts were uploaded by the read-only workflow and were not committed a
 WP_POST_EXECUTION_REPORT_CONSISTENCY: closed
 WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH: closed
 WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP: closed
+WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_CURRENT_RUNTIME_REVALIDATION: closed
 PR #70 merge_commit: 61f6a6a5ab2dd1dfe60f28f1b86a5517a0813dd5
 PR #72 merge_commit: 7e3a4516418e7a0413ea1d4b8b21a66d9dab8fb7
+PR #74 merge_commit: d80984b7336f343344719a80a29712506926bd26
 ```
 
 ## Immediate next action
 
-Complete PR #74 only after the exact governance head passes the read-only cockpit current-runtime workflow.
-
-After closeout, continue with:
+Select and claim:
 
 ```text
 WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION
 ```
 
-WP08 remains preview-only. It must compare the current classic report with the corrected cockpit and may not make a production promotion decision.
+WP08 must compare the current July 14 classic report with the corrected current-runtime cockpit. It remains review-only and may not make a production promotion, attachment or delivery change.

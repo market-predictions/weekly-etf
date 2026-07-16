@@ -27,13 +27,14 @@ operational runbook
 ```text
 historical_implementation_status: implemented_and_merged
 historical_implementation_pr: 52
-current_runtime_revalidation_status: validated_ready_for_merge
+current_runtime_revalidation_status: closed
 current_runtime_revalidation_pr: 74
+current_runtime_revalidation_merge_commit: d80984b7336f343344719a80a29712506926bd26
 promotion_status: not_promoted
 selected_path: iteration
 ```
 
-The original `not_started` status was stale. The renderer and manual preview workflow were implemented in June 2026 and merged through PR #52. This file retains the original package purpose while recording the factual implementation and current-runtime validation status.
+The original `not_started` status was stale. The renderer and manual preview workflow were implemented in June 2026 and merged through PR #52. The current-runtime revalidation was completed and merged through PR #74.
 
 ## Historical implementation sequence
 
@@ -75,7 +76,7 @@ output/cockpit_preview/
 
 The cockpit remains a parallel presentation surface. It has no portfolio, pricing, execution, delivery or promotion authority.
 
-## Current-runtime defect found in 2026-07 revalidation
+## Current-runtime defect closed in 2026-07 revalidation
 
 The June renderer selected continuity fields before post-execution authority:
 
@@ -100,7 +101,7 @@ XBI: Buy +40.491749 shares; 0.00% -> 5.00%
 
 ## Current authority contract
 
-The preview renderer now applies:
+The preview renderer applies:
 
 ```text
 current_weight_pct
@@ -116,9 +117,9 @@ market_value_eur
 then previous_market_value_eur
 ```
 
-A legitimate current value of zero is authoritative and must not fall through to an older non-zero value.
+A legitimate current value of zero is authoritative and cannot fall through to an older non-zero value.
 
-Executed-action wording is derived from the current runtime state. For the July 14 execution the preview renders semantically parallel wording:
+Executed-action wording is derived from the current runtime state. For the July 14 execution the preview renders:
 
 ```text
 EN: URNM reduced · XBI added
@@ -129,19 +130,12 @@ with the executed weight transitions shown in the action note.
 
 ## Output boundary
 
-Preview output remains restricted to:
-
 ```text
-output/cockpit_preview/
+preview_output: output/cockpit_preview/
+review_output: output/cockpit_review/
+artifact_policy: workflow_artifact_only
+production_delivery_authority: false
 ```
-
-Side-by-side review output remains restricted to:
-
-```text
-output/cockpit_review/
-```
-
-Generated output is workflow-artifact evidence only and is not report delivery evidence.
 
 ## Safety boundary
 
@@ -155,14 +149,24 @@ official_trade_ledger_mutation: false
 preview_only: true
 ```
 
-## Validation evidence
+## Validation and merge evidence
 
-Implementation head:
+Implementation validation:
 
 ```text
-head_sha: e605eb8de532eed44ec9c44a7be7c6705f128893
-workflow_run: 29525632206
-conclusion: success
+implementation_head: e605eb8de532eed44ec9c44a7be7c6705f128893
+implementation_workflow_run: 29525632206
+implementation_conclusion: success
+```
+
+Final governance head validation:
+
+```text
+final_head: 523bb038db9ccc10c009b88e6c8f6dd489bc7dc5
+final_workflow_run: 29525968480
+final_conclusion: success
+PR: #74
+merge_commit: d80984b7336f343344719a80a29712506926bd26
 ```
 
 Validated gates:
@@ -171,7 +175,7 @@ Validated gates:
 - production delivery HTML contract passed;
 - macro/thesis leakage validator passed;
 - bilingual July 14 cockpit preview rendered;
-- URNM reduction and XBI addition were found in English and Dutch output;
+- URNM reduction and XBI addition were verified in English and Dutch;
 - side-by-side review retained `promotion_status: not_promoted`;
 - nine protected authority files and pointer targets had identical SHA-256 values before and after;
 - no email, model execution, production report replacement or authority mutation occurred.
