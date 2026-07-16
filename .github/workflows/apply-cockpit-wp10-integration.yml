@@ -1,0 +1,114 @@
+name: Apply cockpit WP10 integration patch
+
+on:
+  push:
+    branches:
+      - feature/cockpit-wp10-additive-delivery-front-page
+    paths:
+      - ".github/workflows/apply-cockpit-wp10-integration.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out WP10 branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/cockpit-wp10-additive-delivery-front-page
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest pandas matplotlib markdown mistune beautifulsoup4 lxml premailer pillow requests pyyaml jsonschema yfinance
+
+      - name: Patch delivery wrapper
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("send_report_runtime_html.py")
+          text = path.read_text(encoding="utf-8")
+
+          import_anchor = "from runtime.decision_cockpit_html import decision_cockpit_html_from_markdown\n"
+          import_block = (
+              import_anchor
+              + "from runtime.additive_cockpit_front_page import inject_additive_cockpit_front_page\n"
+          )
+          if "from runtime.additive_cockpit_front_page import inject_additive_cockpit_front_page" not in text:
+              if import_anchor not in text:
+                  raise SystemExit("WP10 import anchor not found")
+              text = text.replace(import_anchor, import_block, 1)
+
+          function_anchor = "    return html + cockpit\n\ndef _with_client_facing_sanitizer"
+          function_block = '''    return html + cockpit
+
+
+def _apply_cockpit_front_page(
+    html: str,
+    md_text: str,
+    *,
+    language: str,
+    render_mode: str,
+) -> str:
+    output_dir = Path(report_module.os.environ.get("MRKT_RPRTS_OUTPUT_DIR", "output"))
+    result = inject_additive_cockpit_front_page(
+        html,
+        language=language,
+        output_dir=output_dir,
+        render_mode=render_mode,
+    )
+    diagnostic = " ".join(str(result.diagnostic).split())
+    print(
+        "COCKPIT_FRONT_PAGE | "
+        f"status={result.status} | feature={result.feature_value} | "
+        f"front_page_count={result.front_page_count} | diagnostic={diagnostic}"
+    )
+    if result.status == "enabled":
+        return result.html
+    return _inject_decision_cockpit_html(result.html, md_text)
+
+
+def _with_client_facing_sanitizer'''
+          if "def _apply_cockpit_front_page(" not in text:
+              if function_anchor not in text:
+                  raise SystemExit("WP10 function anchor not found")
+              text = text.replace(function_anchor, function_block, 1)
+
+          old_call = "        html = _inject_decision_cockpit_html(html, md_text)\n"
+          new_call = (
+              "        html = _apply_cockpit_front_page(\n"
+              "            html, md_text, language=language, render_mode=render_mode\n"
+              "        )\n"
+          )
+          if old_call in text:
+              text = text.replace(old_call, new_call, 1)
+          elif "html = _apply_cockpit_front_page(" not in text:
+              raise SystemExit("WP10 decision cockpit call anchor not found")
+
+          path.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Validate focused integration
+        run: |
+          python -m py_compile runtime/additive_cockpit_front_page.py send_report_runtime_html.py tests/test_cockpit_wp10_additive_delivery_front_page.py
+          pytest -q tests/test_cockpit_wp10_additive_delivery_front_page.py
+
+      - name: Remove temporary workflow
+        run: rm .github/workflows/apply-cockpit-wp10-integration.yml
+
+      - name: Commit and push integration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add send_report_runtime_html.py .github/workflows/apply-cockpit-wp10-integration.yml
+          git commit -m "Integrate feature-gated cockpit delivery front page"
+          git push origin HEAD:feature/cockpit-wp10-additive-delivery-front-page
