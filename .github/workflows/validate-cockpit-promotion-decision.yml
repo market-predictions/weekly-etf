@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -59,9 +61,11 @@ jobs:
           PY
 
       - name: Prove decision package has no production-code change
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          git fetch origin main --depth=1
-          changed="$(git diff --name-only origin/main...HEAD)"
+          changed="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
           printf '%s\n' "$changed"
           if printf '%s\n' "$changed" | grep -E '^(send_report|runtime/(delivery_html_overrides|render_cockpit_front_page)|output/|pricing/|\.github/workflows/send-weekly-report)' ; then
             echo "Decision package contains an unauthorized production or authority change."
@@ -69,6 +73,9 @@ jobs:
           fi
 
       - name: Syntax and diff checks
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           python -m json.tool control/decisions/cockpit_promotion_decision_20260716.json >/dev/null
-          git diff --check origin/main...HEAD
+          git diff --check "$BASE_SHA" "$HEAD_SHA"
