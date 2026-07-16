@@ -218,6 +218,18 @@ def _replace_many(text: str, replacements: dict[str, str]) -> str:
     return text
 
 
+def _replace_in_section(text: str, section_number: int, replacements: dict[str, str]) -> str:
+    marker = f"## {section_number}."
+    start = text.find(marker)
+    if start == -1:
+        return text
+    next_section = text.find(f"\n## {section_number + 1}.", start + len(marker))
+    if next_section == -1:
+        next_section = len(text)
+    section = _replace_many(text[start:next_section], replacements)
+    return text[:start] + section + text[next_section:]
+
+
 def _apply_state_consistency(text: str, state: dict[str, Any], language: str) -> str:
     positions = _positions(state)
     iefa_weight = _weight(state, "IEFA")
@@ -238,43 +250,97 @@ def _apply_state_consistency(text: str, state: dict[str, Any], language: str) ->
                     "Niet-Amerikaanse aandelenblootstelling blijft een diversificatiekloof.": f"IEFA levert inmiddels een materiële allocatie naar ontwikkelde markten buiten de VS ({iefa_weight:.2f}%); verdere uitbreiding vraagt nog relatieve-sterkte- en concentratiebevestiging.",
                     "Alleen volglijst; blootstelling buiten de VS blijft een diversificatiekloof.": f"IEFA vertegenwoordigt al {iefa_weight:.2f}% van de portefeuille; verdere uitbreiding is niet automatisch en blijft afhankelijk van relatieve sterkte en concentratie.",
                     "Nulallocatie is een expliciete inzet op Amerikaanse uitzonderingskracht.": f"De portefeuille heeft via IEFA al {iefa_weight:.2f}% niet-Amerikaanse ontwikkelde-marktenblootstelling; valuta- en regioconcentratie moeten daarom actief worden bewaakt.",
+                    "De portefeuille heeft geen blootstelling aan ontwikkelde markten buiten de VS.": f"IEFA biedt al een materiële allocatie naar ontwikkelde markten buiten de VS ({iefa_weight:.2f}%); verdere wijzigingen vereisen relatieve-sterkte- en concentratiebewijs.",
                     "[QUAL](https://www.tradingview.com/chart/?symbol=QUAL), [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) op de volglijst": "[QUAL](https://www.tradingview.com/chart/?symbol=QUAL) als kwaliteitsalternatief en [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) als reeds gefinancierde diversificatie",
+                    "QUAL, IEFA op de volglijst": "QUAL als kwaliteitsalternatief en IEFA als reeds gefinancierde diversificatie",
                     "| Ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Relatieve sterkte tegenover de relevante huidige positie is nog onvoldoende overtuigend. | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. |": "| Ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Bestaande gefinancierde positie; deze run is geen aanvullende lane-promotie toegekend. | Heroverweeg alleen bij een duidelijke wijziging in relatieve sterkte, factorconcentratie of financieringsbron. |",
+                    "| Ontwikkelde markten buiten de VS | IEFA | Relatieve sterkte tegenover de relevante huidige positie is nog onvoldoende overtuigend. | Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase. |": "| Ontwikkelde markten buiten de VS | IEFA | Bestaande gefinancierde positie; deze run is geen aanvullende lane-promotie toegekend. | Heroverweeg alleen bij een duidelijke wijziging in relatieve sterkte, factorconcentratie of financieringsbron. |",
                 }
+            )
+        text = _replace_many(text, replacements)
+        if has_iefa:
+            text = _replace_in_section(
+                text,
+                9,
+                {
+                    "[QUAL](https://www.tradingview.com/chart/?symbol=QUAL), [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) op de volglijst": "[QUAL](https://www.tradingview.com/chart/?symbol=QUAL) als kwaliteitsalternatief en [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) als reeds gefinancierde diversificatie",
+                },
             )
         if has_dfen and not has_ppa:
-            replacements.update(
+            text = _replace_in_section(
+                text,
+                5,
                 {
                     "[PPA](https://www.tradingview.com/chart/?symbol=PPA) en [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) blijven vervangbaar totdat de kwaliteit van de ETF-implementatie is bewezen.": "[DFEN](https://www.tradingview.com/chart/?symbol=DFEN) en [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) blijven onder implementatie- en vervangingsreview; bij DFEN moet ook het hefboomprofiel expliciet worden meegewogen.",
-                    "[PPA](https://www.tradingview.com/chart/?symbol=PPA) moet zich bewijzen tegenover [ITA](https://www.tradingview.com/chart/?symbol=ITA)": "[DFEN](https://www.tradingview.com/chart/?symbol=DFEN) moet worden vergeleken met niet-gehevelde defensiealternatieven zoals [ITA](https://www.tradingview.com/chart/?symbol=ITA) en [PPA](https://www.tradingview.com/chart/?symbol=PPA)",
-                    "Houd [PPA](https://www.tradingview.com/chart/?symbol=PPA) onder herbeoordeling": "Houd de implementatiekwaliteit en het hefboomprofiel van [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) onder herbeoordeling",
-                    "Voordat nieuw kapitaal naar alternatieven gaat, moeten [SPY](https://www.tradingview.com/chart/?symbol=SPY), [PPA](https://www.tradingview.com/chart/?symbol=PPA) en [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) expliciet worden getoetst": "Voordat nieuw kapitaal naar alternatieven gaat, moeten [SPY](https://www.tradingview.com/chart/?symbol=SPY), [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) en [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) expliciet worden getoetst",
-                    "[PPA](https://www.tradingview.com/chart/?symbol=PPA) moet zich bewijzen tegenover [ITA](https://www.tradingview.com/chart/?symbol=ITA), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) tegenover [GRID](https://www.tradingview.com/chart/?symbol=GRID)": "[DFEN](https://www.tradingview.com/chart/?symbol=DFEN) moet worden getoetst aan niet-gehevelde defensiealternatieven, en [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) aan [GRID](https://www.tradingview.com/chart/?symbol=GRID)",
-                }
+                    "PPA en PAVE blijven vervangbaar totdat de kwaliteit van de ETF-implementatie is bewezen.": "DFEN en PAVE blijven onder implementatie- en vervangingsreview; bij DFEN moet ook het hefboomprofiel expliciet worden meegewogen.",
+                },
             )
-        return _replace_many(text, replacements)
+            text = _replace_in_section(
+                text,
+                6,
+                {
+                    "Voordat nieuw kapitaal naar alternatieven gaat, moeten [SPY](https://www.tradingview.com/chart/?symbol=SPY), [PPA](https://www.tradingview.com/chart/?symbol=PPA) en [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) expliciet worden getoetst": "Voordat nieuw kapitaal naar alternatieven gaat, moeten [SPY](https://www.tradingview.com/chart/?symbol=SPY), [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) en [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) expliciet worden getoetst",
+                    "Voordat nieuw kapitaal naar alternatieven gaat, moeten SPY, PPA en PAVE expliciet worden getoetst": "Voordat nieuw kapitaal naar alternatieven gaat, moeten SPY, DFEN en PAVE expliciet worden getoetst",
+                    "[PPA](https://www.tradingview.com/chart/?symbol=PPA) moet zich bewijzen tegenover [ITA](https://www.tradingview.com/chart/?symbol=ITA), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) tegenover [GRID](https://www.tradingview.com/chart/?symbol=GRID)": "[DFEN](https://www.tradingview.com/chart/?symbol=DFEN) moet worden getoetst aan niet-gehevelde defensiealternatieven, en [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) aan [GRID](https://www.tradingview.com/chart/?symbol=GRID)",
+                    "PPA moet zich bewijzen tegenover ITA, PAVE tegenover GRID": "DFEN moet worden getoetst aan niet-gehevelde defensiealternatieven, en PAVE aan GRID",
+                },
+            )
+            text = _replace_in_section(
+                text,
+                9,
+                {
+                    "[PPA](https://www.tradingview.com/chart/?symbol=PPA) moet zich bewijzen tegenover [ITA](https://www.tradingview.com/chart/?symbol=ITA)": "[DFEN](https://www.tradingview.com/chart/?symbol=DFEN) moet worden vergeleken met niet-gehevelde defensiealternatieven zoals [ITA](https://www.tradingview.com/chart/?symbol=ITA) en [PPA](https://www.tradingview.com/chart/?symbol=PPA)",
+                    "PPA moet zich bewijzen tegenover ITA": "DFEN moet worden vergeleken met niet-gehevelde defensiealternatieven zoals ITA en PPA",
+                    "Houd [PPA](https://www.tradingview.com/chart/?symbol=PPA) onder herbeoordeling": "Houd de implementatiekwaliteit en het hefboomprofiel van [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) onder herbeoordeling",
+                    "Houd PPA onder herbeoordeling": "Houd de implementatiekwaliteit en het hefboomprofiel van DFEN onder herbeoordeling",
+                },
+            )
+        return text
 
     replacements = {}
     if has_iefa:
         replacements.update(
             {
                 "Non-U.S. equity exposure remains a diversification gap.": f"IEFA now provides a material non-U.S. developed-market allocation ({iefa_weight:.2f}%); further expansion still requires relative-strength and concentration confirmation.",
-                "Only watchlist; non-U.S. exposure remains a diversification gap.": f"IEFA already represents {iefa_weight:.2f}% of the portfolio; further expansion is not automatic and remains relative-strength and concentration gated.",
+                "Watchlist only; non-U.S. exposure remains a diversification gap.": f"IEFA already represents {iefa_weight:.2f}% of the portfolio; further expansion is not automatic and remains relative-strength and concentration gated.",
                 "Zero allocation is an explicit bet on U.S. exceptionalism.": f"The portfolio already carries {iefa_weight:.2f}% non-U.S. developed-market exposure through IEFA; currency and regional concentration therefore require active monitoring.",
+                "Zero allocation is an explicit U.S. exceptionalism bet.": f"The portfolio already carries {iefa_weight:.2f}% non-U.S. developed-market exposure through IEFA; currency and regional concentration therefore require active monitoring.",
+                "Portfolio has limited non-U.S. exposure.": f"IEFA already provides a material non-U.S. developed-market allocation ({iefa_weight:.2f}%); further changes require relative-strength and concentration evidence.",
                 "QUAL, IEFA on the watchlist": "QUAL as a quality alternative and IEFA as an already funded diversifier",
                 "| Non-U.S. developed market diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Scored below the live radar cutoff versus stronger funded and challenger lanes. | Becomes fundable if U.S. factor concentration rises or non-U.S. breadth improves. |": "| Non-U.S. developed market diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Existing funded position; no additional lane promotion was granted this run. | Reassess only if relative strength, factor concentration or the funding case changes materially. |",
+                "| Non-U.S. developed market diversification | IEFA | Scored below the live radar cutoff versus stronger funded and challenger lanes. | Becomes fundable if U.S. factor concentration rises or non-U.S. breadth improves. |": "| Non-U.S. developed market diversification | IEFA | Existing funded position; no additional lane promotion was granted this run. | Reassess only if relative strength, factor concentration or the funding case changes materially. |",
             }
+        )
+    text = _replace_many(text, replacements)
+    if has_iefa:
+        text = _replace_in_section(
+            text,
+            9,
+            {
+                "[QUAL](https://www.tradingview.com/chart/?symbol=QUAL), [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) watchlist": "[QUAL](https://www.tradingview.com/chart/?symbol=QUAL) as a quality alternative and [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) as an already funded diversifier",
+                "QUAL, IEFA watchlist": "QUAL as a quality alternative and IEFA as an already funded diversifier",
+            },
         )
     if has_dfen and not has_ppa:
-        replacements.update(
+        text = _replace_in_section(
+            text,
+            5,
             {
-                "PPA and PAVE remain replaceable until ETF implementation quality is proven.": "DFEN and PAVE remain under implementation and replacement review; DFEN's leverage profile must also be assessed explicitly.",
-                "PPA must prove itself versus ITA": "DFEN must be compared with unlevered defense alternatives such as ITA and PPA",
-                "Keep PPA under review": "Keep DFEN implementation quality and leverage under review",
-                "SPY, PPA and PAVE must be explicitly tested": "SPY, DFEN and PAVE must be explicitly tested",
-            }
+                "[PPA](https://www.tradingview.com/chart/?symbol=PPA) and [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) remain replaceable until their ETF implementation quality is proven.": "[DFEN](https://www.tradingview.com/chart/?symbol=DFEN) and [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) remain under implementation and replacement review; DFEN's leverage profile must also be assessed explicitly.",
+                "PPA and PAVE remain replaceable until their ETF implementation quality is proven.": "DFEN and PAVE remain under implementation and replacement review; DFEN's leverage profile must also be assessed explicitly.",
+            },
         )
-    return _replace_many(text, replacements)
+        text = _replace_in_section(
+            text,
+            9,
+            {
+                "[PPA](https://www.tradingview.com/chart/?symbol=PPA) must justify itself versus [ITA](https://www.tradingview.com/chart/?symbol=ITA)": "[DFEN](https://www.tradingview.com/chart/?symbol=DFEN) must be compared with unlevered defense alternatives such as [ITA](https://www.tradingview.com/chart/?symbol=ITA) and [PPA](https://www.tradingview.com/chart/?symbol=PPA)",
+                "PPA must justify itself versus ITA": "DFEN must be compared with unlevered defense alternatives such as ITA and PPA",
+                "Hold [PPA](https://www.tradingview.com/chart/?symbol=PPA) under review": "Keep [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) implementation quality and leverage under review",
+                "Hold PPA under review": "Keep DFEN implementation quality and leverage under review",
+            },
+        )
+    return text
 
 
 def apply_report_freshness_contract(text: str, state: dict[str, Any], language: str) -> str:
@@ -317,7 +383,11 @@ def validate_report_freshness(text: str, state: dict[str, Any], language: str) -
         for phrase in (
             "non-u.s. equity exposure remains a diversification gap",
             "only watchlist; non-u.s. exposure remains a diversification gap",
+            "watchlist only; non-u.s. exposure remains a diversification gap",
             "zero allocation is an explicit bet",
+            "zero allocation is an explicit u.s. exceptionalism bet",
+            "portfolio has limited non-u.s. exposure",
+            "de portefeuille heeft geen blootstelling aan ontwikkelde markten buiten de vs",
             "niet-amerikaanse aandelenblootstelling blijft een diversificatiekloof",
             "alleen volglijst; blootstelling buiten de vs blijft een diversificatiekloof",
             "nulallocatie is een expliciete inzet",
