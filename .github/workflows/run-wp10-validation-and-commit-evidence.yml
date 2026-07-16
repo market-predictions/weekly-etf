@@ -33,6 +33,68 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pytest pandas matplotlib seaborn markdown mistune beautifulsoup4 lxml premailer weasyprint pillow requests pyyaml jsonschema yfinance pypdf
 
+      - name: Apply idempotent one-page PDF contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          renderer = Path('runtime/additive_cockpit_front_page.py')
+          text = renderer.read_text(encoding='utf-8')
+          old = "@media print{{.etf-cockpit-page{{page-break-after:always;break-after:page;border:none;margin:0;max-width:none}}}}"
+          new = """@media print{{
+          .etf-cockpit-page{{page-break-after:always;break-after:page;border:none;margin:0;max-width:none;font-size:9px;break-inside:avoid;page-break-inside:avoid}}
+          .etf-cockpit-inner{{padding:14px 22px 12px}}
+          .etf-cockpit-header{{gap:12px;padding-bottom:7px}}
+          .etf-cockpit-kicker{{font-size:8px}}
+          .etf-cockpit-mast{{font-size:28px;margin-top:4px}}
+          .etf-cockpit-issue{{font-size:8.5px;line-height:1.35}}
+          .etf-cockpit-strap{{margin-top:5px;gap:7px;font-size:8px}}
+          .etf-cockpit-section-title{{margin:10px 0 5px;font-size:8.5px;gap:8px}}
+          .etf-cockpit-lede{{font-size:14px;line-height:1.28}}
+          .etf-cockpit-row{{gap:8px;margin-top:8px}}
+          .etf-cockpit-card{{padding:8px 10px}}
+          .etf-cockpit-label{{font-size:7.5px;margin-bottom:4px}}
+          .etf-cockpit-value{{font-size:14.5px;line-height:1.1}}
+          .etf-cockpit-note{{font-size:9px;line-height:1.25;margin-top:4px}}
+          .etf-cockpit-confidence{{gap:5px;margin-top:5px;font-size:8px}}
+          .etf-cockpit-bar{{height:4px}}
+          .etf-cockpit-chart{{padding:8px 10px 2px}}
+          .etf-cockpit-chart-caption{{gap:8px;margin-bottom:3px;font-size:9px}}
+          .etf-cockpit-chart-title{{font-size:7.5px}}
+          .etf-cockpit-page svg.spark{{height:58px}}
+          .etf-cockpit-metric{{padding:6px 8px}}
+          .etf-cockpit-metric-label{{font-size:7px}}
+          .etf-cockpit-metric-value{{font-size:16px;margin-top:3px}}
+          .etf-cockpit-metric-sub{{font-size:8px;margin-top:2px}}
+          .etf-cockpit-discipline{{padding:7px 9px;font-size:9px;line-height:1.25}}
+          .etf-cockpit-trigger{{margin-top:4px;padding:6px 8px;font-size:8.5px;line-height:1.25}}
+          .etf-cockpit-evidence{{padding:6px 8px}}
+          .etf-cockpit-evidence-intro{{margin:0 0 4px;font-size:8px;line-height:1.2}}
+          .etf-cockpit-evidence-grid{{grid-template-columns:repeat(3,1fr);gap:3px 8px}}
+          .etf-cockpit-evidence-item{{padding-top:3px}}
+          .etf-cockpit-evidence-label{{font-size:6.5px}}
+          .etf-cockpit-evidence-value{{margin-top:1px;font-size:7.5px}}
+          .etf-cockpit-footer{{margin-top:6px;padding-top:4px;font-size:7.5px}}
+          }}"""
+          if old in text:
+              renderer.write_text(text.replace(old, new, 1), encoding='utf-8')
+          elif 'en_pages_enabled' not in text and 'font-size:9px;break-inside:avoid' not in text:
+              raise SystemExit('print CSS is neither legacy nor compacted')
+
+          validator = Path('tools/validate_cockpit_wp10_delivery_integration.py')
+          text = validator.read_text(encoding='utf-8')
+          old_asserts = """    assert enabled_en_pages >= disabled_en_pages + 1
+    assert enabled_nl_pages >= disabled_nl_pages + 1
+"""
+          new_asserts = """    assert enabled_en_pages == disabled_en_pages + 1
+    assert enabled_nl_pages == disabled_nl_pages + 1
+"""
+          if old_asserts in text:
+              validator.write_text(text.replace(old_asserts, new_asserts, 1), encoding='utf-8')
+          elif new_asserts not in text:
+              raise SystemExit('PDF page assertion is neither legacy nor exact')
+          PY
+
       - name: Run full WP10 validation and persist result
         shell: bash
         run: |
@@ -119,10 +181,15 @@ jobs:
           git status --short
           exit 0
 
-      - name: Commit evidence to validation branch
+      - name: Commit code and evidence to validation branch
         run: |
+          rm -f .github/workflows/apply-wp10-print-compaction.yml
+          rm -f .github/workflows/inspect-wp10-pdf-pages.yml
+          rm -f control/triggers/apply_wp10_print_compaction.txt
+          rm -f control/triggers/inspect_wp10_pdf_pages.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add runtime/additive_cockpit_front_page.py tools/validate_cockpit_wp10_delivery_integration.py .github/workflows/apply-wp10-print-compaction.yml .github/workflows/inspect-wp10-pdf-pages.yml control/triggers/apply_wp10_print_compaction.txt control/triggers/inspect_wp10_pdf_pages.txt
           git add -f output/wp10_validation
-          git commit -m "Record WP10 validation evidence" || exit 0
+          git commit -m "Validate one-page additive cockpit delivery front page" || exit 0
           git push origin HEAD:feature/cockpit-wp10-additive-delivery-front-page
