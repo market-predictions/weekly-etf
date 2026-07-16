@@ -12,7 +12,9 @@ market-predictions/weekly-etf
 
 ## Current status
 
-The July 14 production review remains the latest verified production baseline. The guarded URNM-to-XBI rotation was executed and persisted. The delivered bilingual `_03` package remains the latest verified client-delivery baseline. A subsequent non-sending `_04` review package validates report-freshness fixes and the standalone HTML equity graph. Both post-execution consistency and report-freshness packages are closed.
+The July 14 production review remains the latest verified production baseline. The guarded URNM-to-XBI rotation was executed and persisted. The delivered bilingual `_03` package remains the latest verified client-delivery baseline. The non-sending `_04` package remains the latest validated report-freshness and standalone-HTML review evidence.
+
+The post-execution report consistency, report freshness/HTML equity and post-execution correction-runbook cleanup packages are closed.
 
 ## Production authority
 
@@ -77,26 +79,54 @@ The `_04` review package proves:
 
 - `What changed / Wat veranderde` is delta-only;
 - the 11 June ECB event is not represented as a 14 July report-week event;
-- IEFA's current 24.05% allocation is reflected consistently;
-- DFEN is the current defense holding and PPA remains an alternative;
+- IEFA's current allocation and DFEN's incumbent role are reflected consistently;
 - specified Dutch hybrid terms are removed;
 - standalone HTML embeds the equity PNG;
 - MIME email HTML retains the CID contract;
-- portfolio-state and trade-ledger hashes are unchanged.
+- portfolio-state and trade-ledger hashes were unchanged during validation.
+
+Do not describe `_04` as delivered.
+
+## Canonical post-execution correction runbook
+
+```text
+workflow: .github/workflows/resend-corrected-post-execution-report.yml
+contract: runtime/post_execution_correction_runbook.py
+send_runner: runtime/run_post_execution_correction_delivery.py
+recovery_runner: runtime/recover_post_execution_correction_evidence.py
+modes: validate_only | recover_no_send | send
+```
+
+The correction runbook now:
+
+- is manual-only and has no automatic push-triggered send;
+- uses the established `MRKT_RPRTS_*` production mail contract;
+- requires exact confirmation in both request and dispatch before sending;
+- rejects an already-used correction suffix;
+- treats the positive `DELIVERY_OK` text line and English/Dutch `*_delivery_manifest.txt` names as delivery evidence authority;
+- provides a no-send recovery mode that strips mail configuration and uses render-only generation;
+- restores original bytes and fails if recovery would change existing historical report evidence;
+- compares current official state and trade-ledger hashes before and after each operation.
+
+The one-shot bridge was retired:
+
+```text
+.github/workflows/dispatch-corrected-etf-report-bridge.yml
+```
+
+No send or recovery operation was executed during cleanup.
 
 ## Closed package evidence
 
 ```text
 WP_POST_EXECUTION_REPORT_CONSISTENCY: closed
 WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH: closed
+WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP: closed
 PR #70 merge_commit: 61f6a6a5ab2dd1dfe60f28f1b86a5517a0813dd5
-freshness_validation_run: 29461019794
-post_execution_validation_run: 29461019772
+PR #72 merge_commit: 7e3a4516418e7a0413ea1d4b8b21a66d9dab8fb7
+correction_runbook_validation_run: 29520607344
+post_execution_consistency_run: 29520608204
 ```
-
-## Operational debt
-
-The correction-resend path still requires a narrow runbook cleanup to align the canonical workflow with the production SMTP secret contract and actual text-manifest format, add no-resend recovery, and retire the one-shot bridge. This cleanup must not resend `_03` or `_04` and must not mutate official state or the trade ledger.
 
 ## Cockpit roadmap
 
@@ -104,4 +134,4 @@ The cockpit-first roadmap remains a separate preview lane with no production pro
 
 ## Immediate next action
 
-Execute `WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP`, then select the next explicit ETF roadmap package. Do not mix operational cleanup with cockpit product-surface development.
+Select and claim the next explicit ETF roadmap package. The recommended continuation is validation of `WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER`, keeping all cockpit artifacts preview-only under `output/cockpit_preview/` and making no production promotion decision in that package.
