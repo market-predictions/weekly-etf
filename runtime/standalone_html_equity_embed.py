@@ -1,11 +1,29 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any, Callable
 
 
 class StandaloneHtmlEquityError(RuntimeError):
     pass
+
+
+EQUITY_IMG_RE = re.compile(
+    r"(<img\b(?=[^>]*\balt=[\"'](?:Equity curve|Portefeuillecurve)[\"'])[^>]*\bsrc=[\"'])"
+    r"(?:#harmful-link|cid:equitycurve|data:image/png;base64,[^\"']*)"
+    r"([\"'][^>]*>)",
+    flags=re.IGNORECASE,
+)
+
+
+def _set_equity_image_src(html: str, image_src: str) -> str:
+    updated, count = EQUITY_IMG_RE.subn(lambda match: match.group(1) + image_src + match.group(2), html, count=1)
+    if count != 1:
+        raise StandaloneHtmlEquityError(
+            "Could not resolve exactly one equity-curve image element after client sanitization."
+        )
+    return updated
 
 
 def _embed_standalone_html(assets: dict[str, Any], report_module: Any) -> None:
@@ -21,6 +39,7 @@ def _embed_standalone_html(assets: dict[str, Any], report_module: Any) -> None:
         image_src=image_src,
         render_mode="email",
     )
+    standalone_html = _set_equity_image_src(standalone_html, image_src)
     lowered = standalone_html.lower()
     if "data:image/png;base64," not in lowered:
         raise StandaloneHtmlEquityError(
@@ -29,6 +48,10 @@ def _embed_standalone_html(assets: dict[str, Any], report_module: Any) -> None:
     if "cid:equitycurve" in lowered:
         raise StandaloneHtmlEquityError(
             f"Standalone HTML still depends on MIME CID resolution: {html_path}"
+        )
+    if "#harmful-link" in lowered:
+        raise StandaloneHtmlEquityError(
+            f"Standalone HTML still contains a sanitized equity source: {html_path}"
         )
     if "equity_curve_chart_placeholder" in lowered:
         raise StandaloneHtmlEquityError(
@@ -44,12 +67,13 @@ def with_standalone_html_equity_embed(
     generate_assets_for_run: Callable[..., dict[str, Any]],
     report_module: Any,
 ) -> Callable[..., dict[str, Any]]:
-    """Keep CID HTML for the MIME email body and persist self-contained HTML files.
+    """Restore the correct equity image source for each delivery surface.
 
-    The existing delivery generator correctly creates a CID-backed ``html_email``
-    for the multipart email. A CID cannot resolve when the attached HTML file is
-    opened by itself, so this wrapper rebuilds only the persisted HTML artifact
-    with an embedded data URI. PDF generation and the email body remain unchanged.
+    The client-facing sanitizer treats CID and data-URI image sources as unsafe
+    and rewrites the equity image to ``#harmful-link``. The MIME email body needs
+    the CID source, while a standalone attached HTML file needs an embedded data
+    URI. This wrapper restores only the identified equity image after all normal
+    HTML sanitization and leaves every other link untouched.
     """
 
     def _wrapped(output_dir: Path, report_path_en: Path, mode: str = "standard") -> dict[str, Any]:
@@ -58,11 +82,23 @@ def with_standalone_html_equity_embed(
             assets = bundle.get(language)
             if not isinstance(assets, dict):
                 continue
-            email_html = str(assets.get("html_email") or "")
-            if Path(assets["equity_curve_png"]).is_file() and "cid:equitycurve" not in email_html.lower():
+            chart_path = Path(assets["equity_curve_png"])
+            if not chart_path.is_file() or chart_path.stat().st_size <= 0:
                 raise StandaloneHtmlEquityError(
-                    f"MIME email HTML lost its CID equity reference for language={language}."
+                    f"MIME email equity PNG is missing or empty for language={language}."
                 )
+
+            email_html = _set_equity_image_src(
+                str(assets.get("html_email") or ""),
+                "cid:equitycurve",
+            )
+            if "cid:equitycurve" not in email_html.lower() or "#harmful-link" in email_html.lower():
+                raise StandaloneHtmlEquityError(
+                    f"MIME email HTML does not contain a valid CID equity reference for language={language}."
+                )
+            assets["html_email"] = email_html
+            assets["html_email_image_mode"] = "mime_cid"
+
             _embed_standalone_html(assets, report_module)
         return bundle
 
@@ -76,5 +112,7 @@ def validate_standalone_html_equity(path: Path) -> None:
         raise StandaloneHtmlEquityError(f"Embedded equity graph missing from {path}")
     if "cid:equitycurve" in lowered:
         raise StandaloneHtmlEquityError(f"Standalone HTML still contains cid:equitycurve: {path}")
+    if "#harmful-link" in lowered:
+        raise StandaloneHtmlEquityError(f"Standalone HTML still contains #harmful-link: {path}")
     if "equity_curve_chart_placeholder" in lowered:
         raise StandaloneHtmlEquityError(f"Equity placeholder leaked into {path}")
