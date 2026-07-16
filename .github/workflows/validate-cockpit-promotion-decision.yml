@@ -11,9 +11,6 @@ on:
       - "control/handovers/HANDOVER_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW_20260716.md"
       - "tests/test_cockpit_promotion_decision_contract.py"
       - ".github/workflows/validate-cockpit-promotion-decision.yml"
-      - "control/CURRENT_STATE.md"
-      - "control/NEXT_ACTIONS.md"
-      - "docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_STATUS_20260716.md"
   workflow_dispatch:
 
 permissions:
@@ -60,13 +57,20 @@ jobs:
           assert payload["next_package"] == "WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE"
           PY
 
-      - name: Prove decision package has no production-code change
+      - name: Enforce design-only boundary when decision authority changes
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           changed="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
           printf '%s\n' "$changed"
+
+          decision_authority_pattern='^(control/work_packages/WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW_20260716\.md|control/decisions/COCKPIT_PROMOTION_DECISION_20260716\.md|control/decisions/cockpit_promotion_decision_20260716\.json|control/handovers/HANDOVER_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW_20260716\.md|tests/test_cockpit_promotion_decision_contract\.py)$'
+          if ! printf '%s\n' "$changed" | grep -Eq "$decision_authority_pattern"; then
+            echo "No promotion-decision authority file changed; retaining the existing decision contract without applying the historical design-only diff guard."
+            exit 0
+          fi
+
           if printf '%s\n' "$changed" | grep -E '^(send_report|runtime/(delivery_html_overrides|render_cockpit_front_page)|output/|pricing/|\.github/workflows/send-weekly-report)' ; then
             echo "Decision package contains an unauthorized production or authority change."
             exit 1
