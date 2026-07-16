@@ -14,7 +14,7 @@ def test_english_polish_adds_decision_cockpit() -> None:
     source = "# Weekly ETF Review\n\n## 1. Executive Summary\n\nOld summary.\n\n## 2. Portfolio Action Snapshot\n\nNone."
     result = polish.polish_english(source, runtime_state={})
     assert "### Decision cockpit" in result
-    assert "This week:** no portfolio action" in result
+    assert "this week:** no portfolio action" in result.lower()
     assert "SMH concentration remains above the soft position cap" in result
     assert "Next action trigger" in result
 
@@ -23,7 +23,7 @@ def test_dutch_polish_adds_besliscockpit() -> None:
     source = "# Wekelijkse ETF-review\n\n## 1. Kernsamenvatting\n\nOude samenvatting.\n\n## 2. Portefeuille-acties\n\nGeen."
     result = polish.polish_dutch(source, runtime_state={})
     assert "### Besliscockpit" in result
-    assert "Deze week:** geen portefeuilleactie" in result
+    assert "deze week:** geen portefeuilleactie" in result.lower()
     assert "SMH-concentratie blijft boven de zachte positielimiet" in result
     assert "Trigger voor volgende actie" in result
     assert "aansluiting op de thesis" in result

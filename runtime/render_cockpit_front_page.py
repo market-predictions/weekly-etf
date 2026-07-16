@@ -89,6 +89,20 @@ def _float(value: Any, default: float = 0.0) -> float:
         return default
 
 
+def _first_present_number(mapping: dict[str, Any], *keys: str, default: float = 0.0) -> float:
+    """Use the first present numeric field without treating an authoritative zero as missing."""
+    for key in keys:
+        if key not in mapping or mapping[key] is None or mapping[key] == "":
+            continue
+        try:
+            value = float(mapping[key])
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value):
+            return value
+    return default
+
+
 def _fmt_eur(value: float, language: str) -> str:
     text = f"{value:,.0f}"
     return "€" + (text.replace(",", ".") if language == "nl" else text)
@@ -116,11 +130,15 @@ def _positions(state: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def _market_value_eur(position: dict[str, Any]) -> float:
-    return _float(position.get("previous_market_value_eur") or position.get("market_value_eur"))
+    return _first_present_number(position, "market_value_eur", "previous_market_value_eur")
 
 
 def _position_weight(position: dict[str, Any]) -> float:
-    return _float(position.get("previous_weight_pct") or position.get("current_weight_pct") or position.get("weight_inherited_pct"))
+    return _first_present_number(position, "current_weight_pct", "target_weight_pct", "previous_weight_pct", "weight_inherited_pct")
+
+
+def _previous_weight(position: dict[str, Any]) -> float:
+    return _first_present_number(position, "previous_weight_pct", "weight_inherited_pct", "current_weight_pct")
 
 
 def _total_nav(state: dict[str, Any]) -> float:
@@ -195,24 +213,49 @@ def _macro_surface(macro: dict[str, Any]) -> tuple[str, int]:
     return current, confidence
 
 
-def _has_material_action(state: dict[str, Any]) -> bool:
+def _executed_actions(state: dict[str, Any]) -> list[dict[str, Any]]:
+    actions: list[dict[str, Any]] = []
     for position in _positions(state):
-        if abs(_float(position.get("shares_delta_this_run"))) > 1e-9:
-            return True
-        action = str(position.get("action_executed_this_run") or "").strip().lower()
-        if action and action not in {"none", "no", "n/a"}:
-            return True
-    return False
+        shares_delta = _float(position.get("shares_delta_this_run"))
+        action = str(position.get("action_executed_this_run") or "").strip()
+        if abs(shares_delta) <= 1e-9 and action.lower() in {"", "none", "no", "n/a"}:
+            continue
+        actions.append(
+            {
+                "ticker": str(position.get("ticker") or "-").upper(),
+                "shares_delta": shares_delta,
+                "action": action,
+                "previous_weight_pct": _previous_weight(position),
+                "current_weight_pct": _position_weight(position),
+            }
+        )
+    return actions
 
 
 def _action_surface(state: dict[str, Any], language: str) -> tuple[str, str]:
-    if not _has_material_action(state):
+    actions = _executed_actions(state)
+    if not actions:
         if language == "nl":
-            return "Geen portefeuilleactie", "Geen posities geopend, gesloten of vergroot in deze preview-run."
-        return "No portfolio action", "No positions opened, closed, or increased in this preview run."
-    if language == "nl":
-        return "Portefeuilleactie", "Actie aanwezig volgens runtime state."
-    return "Portfolio action", "Action present in runtime state."
+            return "Geen portefeuilleactie", "Geen posities geopend, gesloten, vergroot of verkleind in deze preview-run."
+        return "No portfolio action", "No positions opened, closed, increased, or reduced in this preview run."
+
+    labels: list[str] = []
+    details: list[str] = []
+    for item in actions:
+        normalized_action = str(item["action"]).lower()
+        shares_delta = float(item["shares_delta"])
+        if shares_delta < 0 or normalized_action in {"sell", "reduce", "reduced", "close", "closed"}:
+            verb = "afgebouwd" if language == "nl" else "reduced"
+        elif shares_delta > 0 or normalized_action in {"buy", "add", "added", "open", "opened"}:
+            verb = "toegevoegd" if language == "nl" else "added"
+        else:
+            verb = "aangepast" if language == "nl" else "adjusted"
+        labels.append(f"{item['ticker']} {verb}")
+        details.append(
+            f"{item['ticker']} {_fmt_pct(float(item['previous_weight_pct']), language)} → "
+            f"{_fmt_pct(float(item['current_weight_pct']), language)}"
+        )
+    return " · ".join(labels), "; ".join(details) + "."
 
 
 def _review_tickers(state: dict[str, Any]) -> list[str]:
@@ -249,8 +292,8 @@ def _plain_summary(state: dict[str, Any], macro: dict[str, Any], points: list[tu
     ticker, weight = _largest_position(state)
     action_title, _ = _action_surface(state, language)
     if language == "nl":
-        return f"We houden deze week discipline boven activiteit. De portefeuille staat sinds de start op {_fmt_pct(since, 'nl', signed=True)}, het marktklimaat blijft {escape(regime)}, en de grootste concentratie zit in {ticker} met {_fmt_pct(weight, 'nl')}. Actie deze week: {action_title.lower()}."
-    return f"We keep discipline ahead of activity this week. The portfolio is {_fmt_pct(since, 'en', signed=True)} since inception, the market climate remains {escape(regime)}, and the largest concentration is {ticker} at {_fmt_pct(weight, 'en')}. This week's action: {action_title.lower()}."
+        return f"We houden deze week discipline boven activiteit. De portefeuille staat sinds de start op {_fmt_pct(since, 'nl', signed=True)}, het marktklimaat blijft {escape(regime)}, en de grootste concentratie zit in {ticker} met {_fmt_pct(weight, 'nl')}. Actie deze week: {action_title}."
+    return f"We keep discipline ahead of activity this week. The portfolio is {_fmt_pct(since, 'en', signed=True)} since inception, the market climate remains {escape(regime)}, and the largest concentration is {ticker} at {_fmt_pct(weight, 'en')}. This week's action: {action_title}."
 
 
 def _sparkline_svg(points: list[tuple[str, float]]) -> str:
@@ -357,8 +400,8 @@ def _html_document(state: dict[str, Any], macro: dict[str, Any], points: list[tu
     summary = _plain_summary(state, macro, points, language)
     discipline = _discipline_surface(state, language)
     html = f"""<!DOCTYPE html><html lang="{'nl' if is_nl else 'en'}"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>{escape(text['title'])} — Cockpit preview</title><style>
-:root{{--paper:#F6F1E7;--paper-2:#EFE8D9;--ink:#211C16;--ink-soft:#5A5043;--line:#D8CDB8;--petrol:#0F4438;--brass:#B07D2B;--pos:#2F7A57;--neg:#A8452C}}*{{box-sizing:border-box}}body{{margin:0;padding:28px 16px;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}}.sheet{{max-width:780px;margin:0 auto;border:1px solid var(--line);background:var(--paper);box-shadow:0 18px 48px -28px rgba(33,28,22,.45)}}.pad{{padding:34px 42px 28px}}.top{{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid var(--ink);padding-bottom:14px}}.kicker,.issue,.strap,.section-title,.lab,.ms,.foot,.ei-label,.ei-value{{font-family:'Courier New',monospace}}.kicker{{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)}}.mast{{font-family:Georgia,'Times New Roman',serif;font-size:40px;font-weight:700;line-height:1;margin-top:8px;letter-spacing:-.02em}}.mast em{{color:var(--petrol);font-style:italic;font-weight:400}}.issue{{text-align:right;font-size:10.5px;line-height:1.65;color:var(--ink-soft)}}.strap{{margin-top:12px;display:flex;gap:12px;align-items:center;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft)}}.dot{{width:5px;height:5px;border-radius:50%;background:var(--brass);display:inline-block}}.section-title{{margin:28px 0 12px;color:var(--petrol);font-size:11px;letter-spacing:.19em;text-transform:uppercase;display:flex;align-items:center;gap:12px}}.section-title:after{{content:"";height:1px;background:var(--line);flex:1}}.lede{{font-family:Georgia,'Times New Roman',serif;font-size:20px;line-height:1.48}}.row{{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}}.card{{border:1px solid var(--line);background:var(--paper-2);padding:16px 18px}}.lab{{font-size:9.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px}}.value{{font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:600;line-height:1.25}}.note{{font-size:12px;color:var(--ink-soft);line-height:1.45;margin-top:9px}}.conf{{display:flex;align-items:center;gap:9px;margin-top:12px}}.bar{{flex:1;height:6px;background:#E2D9C6;border-radius:4px;overflow:hidden}}.bar i{{display:block;height:100%;width:{max(0, min(confidence, 100))}%;background:linear-gradient(90deg,var(--petrol),#1c6b56)}}.perf-wrap{{border:1px solid var(--line);background:#fff}}.chartbox{{padding:18px 18px 6px}}.chart-cap{{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:6px}}.chart-cap .t{{font-family:'Courier New',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}}svg.spark{{width:100%;height:120px;display:block}}.metrics{{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}}.metric{{padding:15px 16px;border-right:1px solid var(--line);border-top:1px solid var(--line)}}.metric:nth-child(3n){{border-right:none}}.metric:nth-child(-n+3){{border-top:none}}.ml{{font-family:'Courier New',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}}.mv{{font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:600;margin-top:7px;line-height:1}}.mv.pos{{color:var(--pos)}}.mv.neg{{color:var(--neg)}}.ms{{font-size:10.5px;color:var(--ink-soft);margin-top:5px}}.discipline{{border-left:4px solid var(--brass);background:rgba(176,125,43,.10);padding:14px 16px;font-size:13px;line-height:1.5}}.evidence-strip{{border:1px solid var(--line);background:#fff;padding:14px 16px}}.evidence-intro{{margin:0 0 12px;color:var(--ink-soft);font-size:12px;line-height:1.45}}.evidence-grid{{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}}.evidence-item{{border-top:1px solid var(--line);padding-top:8px}}.ei-label{{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}}.ei-value{{margin-top:4px;font-size:10px;color:var(--ink);overflow-wrap:anywhere}}.foot{{margin-top:22px;padding-top:13px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;color:var(--ink-soft);font-size:10px}}@media print{{body{{padding:0}}.sheet{{box-shadow:none;border:none}}}}
-</style></head><body><div class="sheet" data-cockpit-front-page="true" data-preview-only="true"><div class="pad"><header class="top"><div><div class="kicker">{escape(text['kicker'])}</div><div class="mast">{escape(text['title']).replace('ETF', '<em>ETF</em>')}</div></div><div class="issue">{escape(text['model'])}<br>{escape(_fmt_date(report_date, language))}<br><b>Preview lane</b></div></header><div class="strap"><span>{escape(text['frequency'])}</span><span class="dot"></span><span>US ETF</span><span class="dot"></span><span>{escape(text['preview'])}</span></div><div class="section-title">{escape(text['short'])}</div><p class="lede">{summary}</p><div class="row"><div class="card"><div class="lab">{escape(text['climate'])}</div><div class="value">{escape(regime)}</div><div class="conf"><div class="bar"><i></i></div><span>{confidence}% {escape(text['confidence'])}</span></div></div><div class="card"><div class="lab">{escape(text['action'])}</div><div class="value">{escape(action_title)}</div><div class="note">{escape(action_note)}</div></div></div><div class="section-title">{escape(text['perf'])}</div><div class="perf-wrap"><div class="chartbox"><div class="chart-cap"><span class="t">{escape(text['nav'])} · EUR</span><span class="v">{escape(_fmt_eur(nav, language))} · <b>{escape(_fmt_pct(since, language, signed=True))}</b></span></div>{_sparkline_svg(points)}</div><div class="metrics"><div class="metric"><div class="ml">{escape(text['ret'])}</div><div class="mv {'pos' if since >= 0 else 'neg'}">{escape(_fmt_pct(since, language, signed=True))}</div><div class="ms">{escape(_fmt_eur(points[0][1], language))} → {escape(_fmt_eur(nav, language))}</div></div><div class="metric"><div class="ml">{escape(text['dd'])}</div><div class="mv {'neg' if drawdown < 0 else ''}">{escape(_fmt_pct(drawdown, language))}</div><div class="ms">{escape(text['since'])}</div></div><div class="metric"><div class="ml">{escape(text['cash'])}</div><div class="mv">{escape(_fmt_pct(cash_pct, language))}</div><div class="ms">{escape(_fmt_eur(cash, language))}</div></div><div class="metric"><div class="ml">{escape(text['positions'])}</div><div class="mv">{len(_positions(state))}</div><div class="ms">{escape(text['holdings'])}</div></div><div class="metric"><div class="ml">{escape(text['largest'])}</div><div class="mv">{escape(largest_ticker)}</div><div class="ms">{escape(_fmt_pct(largest_weight, language))}</div></div><div class="metric"><div class="ml">EUR/USD</div><div class="mv">{_float((state.get('fx_basis') or {}).get('rate')):.4f}</div><div class="ms">{escape(text['pricing'])}</div></div></div></div><div class="section-title">{escape(text['disc'])}</div><div class="discipline">{escape(discipline)}</div>{evidence_html}<div class="foot"><span>{escape(text['foot'])}</span><span>01 — cockpit preview</span></div></div></div></body></html>"""
+    :root{{--paper:#F6F1E7;--paper-2:#EFE8D9;--ink:#211C16;--ink-soft:#5A5043;--line:#D8CDB8;--petrol:#0F4438;--brass:#B07D2B;--pos:#2F7A57;--neg:#A8452C}}*{{box-sizing:border-box}}body{{margin:0;padding:28px 16px;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}}.sheet{{max-width:780px;margin:0 auto;border:1px solid var(--line);background:var(--paper);box-shadow:0 18px 48px -28px rgba(33,28,22,.45)}}.pad{{padding:34px 42px 28px}}.top{{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid var(--ink);padding-bottom:14px}}.kicker,.issue,.strap,.section-title,.lab,.ms,.foot,.ei-label,.ei-value{{font-family:'Courier New',monospace}}.kicker{{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)}}.mast{{font-family:Georgia,'Times New Roman',serif;font-size:40px;font-weight:700;line-height:1;margin-top:8px;letter-spacing:-.02em}}.mast em{{color:var(--petrol);font-style:italic;font-weight:400}}.issue{{text-align:right;font-size:10.5px;line-height:1.65;color:var(--ink-soft)}}.strap{{margin-top:12px;display:flex;gap:12px;align-items:center;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft)}}.dot{{width:5px;height:5px;border-radius:50%;background:var(--brass);display:inline-block}}.section-title{{margin:28px 0 12px;color:var(--petrol);font-size:11px;letter-spacing:.19em;text-transform:uppercase;display:flex;align-items:center;gap:12px}}.section-title:after{{content:"";height:1px;background:var(--line);flex:1}}.lede{{font-family:Georgia,'Times New Roman',serif;font-size:20px;line-height:1.48}}.row{{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}}.card{{border:1px solid var(--line);background:var(--paper-2);padding:16px 18px}}.lab{{font-size:9.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px}}.value{{font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:600;line-height:1.25}}.note{{font-size:12px;color:var(--ink-soft);line-height:1.45;margin-top:9px}}.conf{{display:flex;align-items:center;gap:9px;margin-top:12px}}.bar{{flex:1;height:6px;background:#E2D9C6;border-radius:4px;overflow:hidden}}.bar i{{display:block;height:100%;width:{max(0, min(confidence, 100))}%;background:linear-gradient(90deg,var(--petrol),#1c6b56)}}.perf-wrap{{border:1px solid var(--line);background:#fff}}.chartbox{{padding:18px 18px 6px}}.chart-cap{{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:6px}}.chart-cap .t{{font-family:'Courier New',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}}svg.spark{{width:100%;height:120px;display:block}}.metrics{{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}}.metric{{padding:15px 16px;border-right:1px solid var(--line);border-top:1px solid var(--line)}}.metric:nth-child(3n){{border-right:none}}.metric:nth-child(-n+3){{border-top:none}}.ml{{font-family:'Courier New',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}}.mv{{font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:600;margin-top:7px;line-height:1}}.mv.pos{{color:var(--pos)}}.mv.neg{{color:var(--neg)}}.ms{{font-size:10.5px;color:var(--ink-soft);margin-top:5px}}.discipline{{border-left:4px solid var(--brass);background:rgba(176,125,43,.10);padding:14px 16px;font-size:13px;line-height:1.5}}.evidence-strip{{border:1px solid var(--line);background:#fff;padding:14px 16px}}.evidence-intro{{margin:0 0 12px;color:var(--ink-soft);font-size:12px;line-height:1.45}}.evidence-grid{{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}}.evidence-item{{border-top:1px solid var(--line);padding-top:8px}}.ei-label{{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}}.ei-value{{margin-top:4px;font-size:10px;color:var(--ink);overflow-wrap:anywhere}}.foot{{margin-top:22px;padding-top:13px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;color:var(--ink-soft);font-size:10px}}@media print{{body{{padding:0}}.sheet{{box-shadow:none;border:none}}}}
+    </style></head><body><div class="sheet" data-cockpit-front-page="true" data-preview-only="true"><div class="pad"><header class="top"><div><div class="kicker">{escape(text['kicker'])}</div><div class="mast">{escape(text['title']).replace('ETF', '<em>ETF</em>')}</div></div><div class="issue">{escape(text['model'])}<br>{escape(_fmt_date(report_date, language))}<br><b>Preview lane</b></div></header><div class="strap"><span>{escape(text['frequency'])}</span><span class="dot"></span><span>US ETF</span><span class="dot"></span><span>{escape(text['preview'])}</span></div><div class="section-title">{escape(text['short'])}</div><p class="lede">{summary}</p><div class="row"><div class="card"><div class="lab">{escape(text['climate'])}</div><div class="value">{escape(regime)}</div><div class="conf"><div class="bar"><i></i></div><span>{confidence}% {escape(text['confidence'])}</span></div></div><div class="card"><div class="lab">{escape(text['action'])}</div><div class="value">{escape(action_title)}</div><div class="note">{escape(action_note)}</div></div></div><div class="section-title">{escape(text['perf'])}</div><div class="perf-wrap"><div class="chartbox"><div class="chart-cap"><span class="t">{escape(text['nav'])} · EUR</span><span class="v">{escape(_fmt_eur(nav, language))} · <b>{escape(_fmt_pct(since, language, signed=True))}</b></span></div>{_sparkline_svg(points)}</div><div class="metrics"><div class="metric"><div class="ml">{escape(text['ret'])}</div><div class="mv {'pos' if since >= 0 else 'neg'}">{escape(_fmt_pct(since, language, signed=True))}</div><div class="ms">{escape(_fmt_eur(points[0][1], language))} → {escape(_fmt_eur(nav, language))}</div></div><div class="metric"><div class="ml">{escape(text['dd'])}</div><div class="mv {'neg' if drawdown < 0 else ''}">{escape(_fmt_pct(drawdown, language))}</div><div class="ms">{escape(text['since'])}</div></div><div class="metric"><div class="ml">{escape(text['cash'])}</div><div class="mv">{escape(_fmt_pct(cash_pct, language))}</div><div class="ms">{escape(_fmt_eur(cash, language))}</div></div><div class="metric"><div class="ml">{escape(text['positions'])}</div><div class="mv">{len(_positions(state))}</div><div class="ms">{escape(text['holdings'])}</div></div><div class="metric"><div class="ml">{escape(text['largest'])}</div><div class="mv">{escape(largest_ticker)}</div><div class="ms">{escape(_fmt_pct(largest_weight, language))}</div></div><div class="metric"><div class="ml">EUR/USD</div><div class="mv">{_float((state.get('fx_basis') or {}).get('rate')):.4f}</div><div class="ms">{escape(text['pricing'])}</div></div></div></div><div class="section-title">{escape(text['disc'])}</div><div class="discipline">{escape(discipline)}</div>{evidence_html}<div class="foot"><span>{escape(text['foot'])}</span><span>01 — cockpit preview</span></div></div></div></body></html>"""
     lower = html.lower()
     leaked = [token for token in INTERNAL_SURFACE_TOKENS if token in lower]
     if leaked:

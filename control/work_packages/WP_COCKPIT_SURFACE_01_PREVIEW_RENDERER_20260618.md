@@ -17,166 +17,169 @@ market-predictions/weekly-fx
 ## Layer
 
 ```text
-output contract + operational runbook
+input/state contract
+output contract
+operational runbook
 ```
 
-## Status
+## Reconciled status — 2026-07-16
 
 ```text
-not_started
+historical_implementation_status: implemented_and_merged
+historical_implementation_pr: 52
+current_runtime_revalidation_status: validated_ready_for_merge
+current_runtime_revalidation_pr: 74
+promotion_status: not_promoted
+selected_path: iteration
 ```
 
-## Purpose
+The original `not_started` status was stale. The renderer and manual preview workflow were implemented in June 2026 and merged through PR #52. This file retains the original package purpose while recording the factual implementation and current-runtime validation status.
 
-Create the isolated cockpit-first preview renderer for the US Weekly ETF report.
-
-The current production report must remain intact. This package creates a parallel preview surface only.
-
-## Required start sequence
-
-Read in order:
+## Historical implementation sequence
 
 ```text
-control/SYSTEM_INDEX.md
-control/CURRENT_STATE.md
-control/NEXT_ACTIONS.md
-docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_20260618.md
+WP01 — preview renderer: merged in PR #52
+WP02 — manual preview workflow: merged in PR #52
+WP03 — visual/state-safety contracts: merged in PR #53
+WP04 — side-by-side review: merged in PR #54
+WP05 — promotion decision review: merged in PR #55
+WP06 — iteration path decision: merged in PR #56
+WP07 — source/provenance iteration: merged in PR #57
 ```
 
-Then inspect the minimum relevant files:
+WP05 recorded:
 
 ```text
-runtime/render_etf_report_from_state.py
-runtime/delivery_html_overrides.py
-send_report_runtime_html.py
-runtime/equity_curve_png_contract.py
-runtime/equity_curve_svg_contract.py
+decision: not_promoted_needs_iteration
+promotion_status: not_promoted
 ```
 
-## Claim rule
-
-Before editing, check whether this work package is already claimed or in progress.
-
-If it is already claimed by another worker:
+WP06 selected:
 
 ```text
-stop and report the claim; change nothing
+selected_path: iteration_path
 ```
 
-If unclaimed, claim narrowly by recording the claim in `control/NEXT_ACTIONS.md` or a package handover file before product-code edits.
+## Original purpose
 
-## Scope
+Create an isolated cockpit-first preview renderer for the US Weekly ETF report while keeping the production report intact.
 
-In scope:
-
-- Add a deterministic cockpit preview renderer.
-- Render a cockpit-first front page from existing runtime state.
-- Write preview output only under `output/cockpit_preview/`.
-- Preserve English and Dutch support.
-- Add focused tests for the renderer if required.
-
-Out of scope:
-
-- production report replacement
-- production send behavior
-- email delivery changes
-- portfolio state mutation
-- pricing changes
-- target-weight changes
-- lane scoring changes
-- fundability changes
-- trade ledger changes
-- valuation history mutation
-- UCITS / ETF EU mapping
-- broker availability
-- PRIIPs/KID layer
-- Box 3 / Dutch tax layer
-
-## Required implementation direction
-
-Create a new renderer, expected path:
+The package established:
 
 ```text
 runtime/render_cockpit_front_page.py
+.github/workflows/render-cockpit-preview.yml
+tests/test_cockpit_front_page_preview.py
+output/cockpit_preview/
 ```
 
-The renderer should read existing artifacts, preferably through current runtime-state helpers:
+The cockpit remains a parallel presentation surface. It has no portfolio, pricing, execution, delivery or promotion authority.
+
+## Current-runtime defect found in 2026-07 revalidation
+
+The June renderer selected continuity fields before post-execution authority:
 
 ```text
-output/runtime/latest_etf_report_state_path.txt
-output/etf_valuation_history.csv
-output/pricing/latest_price_audit_path.txt
+previous_weight_pct before current_weight_pct
+previous_market_value_eur before market_value_eur
 ```
 
-It should output preview artifacts only:
+It also reduced an executed rotation to generic wording:
 
 ```text
-output/cockpit_preview/weekly_analysis_pro_cockpit_<token>_<seq>.html
-output/cockpit_preview/weekly_analysis_pro_cockpit_<token>_<seq>.pdf
-output/cockpit_preview/weekly_analysis_pro_nl_cockpit_<token>_<seq>.html
-output/cockpit_preview/weekly_analysis_pro_nl_cockpit_<token>_<seq>.pdf
+Portfolio action — Action present in runtime state.
+Portefeuilleactie — Actie aanwezig volgens runtime state.
 ```
 
-## Required cockpit content
-
-The first preview should include:
+This was incorrect for the authoritative 2026-07-14 executed state:
 
 ```text
-masthead
-plain-language short summary
-market climate / regime card
-this week's action card
-performance & risk card
-main discipline point
+URNM: Sell -122.008961 shares; 7.01% -> 2.01%
+XBI: Buy +40.491749 shares; 0.00% -> 5.00%
 ```
 
-The mock-up direction may be used as inspiration, but the renderer must not hardcode example values such as GLD -> GSG unless those are actually present in the runtime state.
+## Current authority contract
 
-## Design constraints
-
-- Preserve determinism.
-- Avoid external font/network dependencies in the render path.
-- Keep current production report untouched.
-- Keep the classic report and cockpit preview comparable side by side.
-- Use reader-facing language; do not expose internal engine terms on the cockpit surface.
-
-## Minimum tests/checks
-
-Run focused checks appropriate to the implementation, plus:
-
-```bash
-python -m py_compile runtime/render_cockpit_front_page.py
-pytest tests/test_delivery_html_decision_cockpit.py tests/test_pdf_surface_decision_cockpit.py tests/test_report_decision_clarity.py tests/test_report_weight_basis_labels.py tests/test_report_bilingual_takeaway_parity.py
-python tools/validate_etf_delivery_html_contract.py --output-dir output
-python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
-git diff --check
-```
-
-If new tests are added, include them in the handover.
-
-## Handover requirement
-
-Write a handover under:
+The preview renderer now applies:
 
 ```text
-control/handovers/HANDOVER_COCKPIT_SURFACE_01_PREVIEW_RENDERER_<yyyymmdd_hhmm>.md
+current_weight_pct
+then target_weight_pct
+then previous_weight_pct
+then weight_inherited_pct
 ```
 
-The handover must include:
+For market value:
 
 ```text
-package title
-claim status
-files changed
-what was implemented
-what was not implemented
-tests/checks run
-preview artifact paths, if generated
-remaining risks
-next recommended package
-commit SHA
+market_value_eur
+then previous_market_value_eur
 ```
 
-## Expected output
+A legitimate current value of zero is authoritative and must not fall through to an older non-zero value.
 
-At closeout, the repo should have an isolated cockpit preview renderer while the current production report remains unchanged.
+Executed-action wording is derived from the current runtime state. For the July 14 execution the preview renders semantically parallel wording:
+
+```text
+EN: URNM reduced · XBI added
+NL: URNM afgebouwd · XBI toegevoegd
+```
+
+with the executed weight transitions shown in the action note.
+
+## Output boundary
+
+Preview output remains restricted to:
+
+```text
+output/cockpit_preview/
+```
+
+Side-by-side review output remains restricted to:
+
+```text
+output/cockpit_review/
+```
+
+Generated output is workflow-artifact evidence only and is not report delivery evidence.
+
+## Safety boundary
+
+```text
+production_promotion: false
+email_send: false
+portfolio_model_execution: false
+pricing_authority_change: false
+official_state_mutation: false
+official_trade_ledger_mutation: false
+preview_only: true
+```
+
+## Validation evidence
+
+Implementation head:
+
+```text
+head_sha: e605eb8de532eed44ec9c44a7be7c6705f128893
+workflow_run: 29525632206
+conclusion: success
+```
+
+Validated gates:
+
+- 33 focused cockpit and report-surface tests passed;
+- production delivery HTML contract passed;
+- macro/thesis leakage validator passed;
+- bilingual July 14 cockpit preview rendered;
+- URNM reduction and XBI addition were found in English and Dutch output;
+- side-by-side review retained `promotion_status: not_promoted`;
+- nine protected authority files and pointer targets had identical SHA-256 values before and after;
+- no email, model execution, production report replacement or authority mutation occurred.
+
+## Next package
+
+```text
+WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION
+```
+
+WP08 must review the corrected current-runtime cockpit against the current classic report. It remains preview-only and may not promote the cockpit without a separate explicit decision.

@@ -10,13 +10,9 @@
 market-predictions/weekly-etf
 ```
 
-## Current status
+## Current production status
 
-The July 14 production review remains the latest verified production baseline. The guarded URNM-to-XBI rotation was executed and persisted. The delivered bilingual `_03` package remains the latest verified client-delivery baseline. The non-sending `_04` package remains the latest validated report-freshness and standalone-HTML review evidence.
-
-The post-execution report consistency, report freshness/HTML equity and post-execution correction-runbook cleanup packages are closed.
-
-## Production authority
+The July 14 production review remains the latest verified production baseline.
 
 ```text
 requested_close_date: 2026-07-14
@@ -26,6 +22,8 @@ pricing_lineage_status: passed
 portfolio_execution_status: executed
 portfolio_mutation: URNM -> XBI
 ```
+
+Executed mutation:
 
 ```text
 URNM: Sell -122.008961 shares; model weight 7.01% -> 2.01%
@@ -62,7 +60,7 @@ output/delivery/weekly_etf_correction_delivery_receipt_2026-07-14_29455717158.tx
 output/delivery/weekly_etf_correction_manifest_2026-07-14_20260715_223718.json
 ```
 
-## Latest validated non-delivered review package
+## Latest validated non-delivered report package
 
 ```text
 english_report: output/weekly_analysis_pro_260714_04.md
@@ -75,17 +73,17 @@ validation: output/validation/etf_report_freshness_260714_04.json
 email_sent: false
 ```
 
-The `_04` review package proves:
+The `_04` package is review evidence only. Do not describe it as delivered.
+
+It proves:
 
 - `What changed / Wat veranderde` is delta-only;
-- the 11 June ECB event is not represented as a 14 July report-week event;
-- IEFA's current allocation and DFEN's incumbent role are reflected consistently;
-- specified Dutch hybrid terms are removed;
+- stale ECB week-language is removed;
+- current IEFA and DFEN authority is reflected;
+- Dutch hybrid terms are removed;
 - standalone HTML embeds the equity PNG;
 - MIME email HTML retains the CID contract;
-- portfolio-state and trade-ledger hashes were unchanged during validation.
-
-Do not describe `_04` as delivered.
+- official portfolio state and trade ledger were unchanged.
 
 ## Canonical post-execution correction runbook
 
@@ -97,26 +95,100 @@ recovery_runner: runtime/recover_post_execution_correction_evidence.py
 modes: validate_only | recover_no_send | send
 ```
 
-The correction runbook now:
+The runbook is manual-only, uses the established `MRKT_RPRTS_*` mail contract, requires exact dual confirmation for sending, prevents correction-suffix reuse and supports no-send evidence recovery.
 
-- is manual-only and has no automatic push-triggered send;
-- uses the established `MRKT_RPRTS_*` production mail contract;
-- requires exact confirmation in both request and dispatch before sending;
-- rejects an already-used correction suffix;
-- treats the positive `DELIVERY_OK` text line and English/Dutch `*_delivery_manifest.txt` names as delivery evidence authority;
-- provides a no-send recovery mode that strips mail configuration and uses render-only generation;
-- restores original bytes and fails if recovery would change existing historical report evidence;
-- compares current official state and trade-ledger hashes before and after each operation.
+No correction send or recovery operation was executed during the cleanup package.
 
-The one-shot bridge was retired:
+## Cockpit preview lane
+
+The cockpit surface remains a separate preview lane with no production promotion authority.
+
+Historical implementation status is now reconciled:
 
 ```text
-.github/workflows/dispatch-corrected-etf-report-bridge.yml
+WP01 preview renderer: merged in PR #52
+WP02 manual preview workflow: merged in PR #52
+WP03 visual/state-safety contracts: merged in PR #53
+WP04 side-by-side review: merged in PR #54
+WP05 promotion decision review: merged in PR #55
+WP06 iteration path decision: merged in PR #56
+WP07 source/provenance iteration: merged in PR #57
+promotion_status: not_promoted
+selected_path: iteration
 ```
 
-No send or recovery operation was executed during cleanup.
+The old `WP01: not_started` status was stale.
 
-## Closed package evidence
+## Cockpit current-runtime revalidation
+
+PR #74 validates the existing cockpit against the authoritative July 14 post-execution state.
+
+Confirmed defects:
+
+```text
+previous_weight_pct was selected before current_weight_pct
+previous_market_value_eur was selected before market_value_eur
+executed rotations were reduced to generic action-present wording
+```
+
+Corrected authority order:
+
+```text
+current_weight_pct > target_weight_pct > previous_weight_pct > weight_inherited_pct
+market_value_eur > previous_market_value_eur
+```
+
+Authoritative zero values are preserved.
+
+Current executed-action surface:
+
+```text
+EN: URNM reduced · XBI added
+NL: URNM afgebouwd · XBI toegevoegd
+```
+
+The action note shows:
+
+```text
+URNM 7.01% -> 2.01%
+XBI 0.00% -> 5.00%
+```
+
+## Cockpit validation evidence
+
+```text
+implementation_head: e605eb8de532eed44ec9c44a7be7c6705f128893
+workflow_run: 29525632206
+workflow_conclusion: success
+promotion_status: not_promoted
+email_send: false
+portfolio_model_execution: false
+official_state_mutation: false
+official_trade_ledger_mutation: false
+```
+
+The workflow passed:
+
+- 33 focused tests;
+- production delivery HTML validation;
+- macro/thesis surface leakage validation;
+- bilingual current-runtime rendering;
+- side-by-side review generation;
+- exact executed-action assertions;
+- before/after SHA-256 equality for nine protected authority files and pointer targets.
+
+Generated CI artifacts are preview/review evidence only:
+
+```text
+output/cockpit_preview/weekly_analysis_pro_cockpit_260714_01.html
+output/cockpit_preview/weekly_analysis_pro_nl_cockpit_260714_01.html
+output/cockpit_review/weekly_etf_cockpit_side_by_side_review_260714.*
+output/cockpit_review/weekly_etf_cockpit_side_by_side_review_nl_260714.*
+```
+
+These artifacts were uploaded by the read-only workflow and were not committed as production output.
+
+## Closed packages
 
 ```text
 WP_POST_EXECUTION_REPORT_CONSISTENCY: closed
@@ -124,14 +196,16 @@ WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH: closed
 WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP: closed
 PR #70 merge_commit: 61f6a6a5ab2dd1dfe60f28f1b86a5517a0813dd5
 PR #72 merge_commit: 7e3a4516418e7a0413ea1d4b8b21a66d9dab8fb7
-correction_runbook_validation_run: 29520607344
-post_execution_consistency_run: 29520608204
 ```
-
-## Cockpit roadmap
-
-The cockpit-first roadmap remains a separate preview lane with no production promotion authority.
 
 ## Immediate next action
 
-Select and claim the next explicit ETF roadmap package. The recommended continuation is validation of `WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER`, keeping all cockpit artifacts preview-only under `output/cockpit_preview/` and making no production promotion decision in that package.
+Complete PR #74 only after the exact governance head passes the read-only cockpit current-runtime workflow.
+
+After closeout, continue with:
+
+```text
+WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION
+```
+
+WP08 remains preview-only. It must compare the current classic report with the corrected cockpit and may not make a production promotion decision.
