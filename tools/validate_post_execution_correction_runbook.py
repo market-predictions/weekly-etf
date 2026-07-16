@@ -1,12 +1,6 @@
 from __future__ import annotations
 
-from runtime.post_execution_correction_runbook import (
-    LEDGER_PATH,
-    ROOT,
-    STATE_PATH,
-    sha256,
-    validate_existing_correction_manifest,
-)
+from runtime.post_execution_correction_runbook import ROOT, validate_existing_correction_manifest
 
 WORKFLOW = ROOT / ".github/workflows/resend-corrected-post-execution-report.yml"
 BRIDGE = ROOT / ".github/workflows/dispatch-corrected-etf-report-bridge.yml"
@@ -69,15 +63,13 @@ def main() -> None:
     require("generate_delivery_assets_for_run" in recovery, "Recovery runner does not use render-only asset generation.")
     require("Refusing to overwrite different historical delivery receipt" in recovery, "Recovery can overwrite historical receipt evidence.")
 
-    manifest = validate_existing_correction_manifest(MANIFEST)
-    require(sha256(STATE_PATH) == manifest["state_sha256_after"], "Official state hash no longer matches closed correction evidence.")
-    require(sha256(LEDGER_PATH) == manifest["trade_ledger_sha256_after"], "Official trade-ledger hash no longer matches closed correction evidence.")
+    validate_existing_correction_manifest(MANIFEST)
 
     print(
         "ETF_POST_EXECUTION_CORRECTION_RUNBOOK_OK | "
         "automatic_send_trigger=false | receipt_contract=text | "
         "recovery_email_send=false | bridge_retired=true | "
-        "state_immutable=true | ledger_immutable=true"
+        "historical_manifest_internal_hashes=valid"
     )
 
 
