@@ -1,0 +1,96 @@
+name: Apply cockpit WP09 refinement
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/apply-cockpit-wp09-refinement.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.head_ref == 'feature/cockpit-wp09-current-runtime-client-surface-refinement'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused test dependency
+        run: python -m pip install pytest
+
+      - name: Apply narrow renderer patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('runtime/render_cockpit_front_page.py')
+          text = path.read_text(encoding='utf-8')
+
+          discipline_old = '''        if weight > SOFT_MAX_POSITION_PCT:\n            return f"Belangrijkste disciplinepunt: {ticker} is {weight:.1f}% en blijft boven de zachte positielimiet; nieuw kapitaal blijft dus geblokkeerd totdat de disciplinepoorten vrijgeven.".replace(".", ",")\n'''
+          discipline_new = '''        if weight > SOFT_MAX_POSITION_PCT:\n            return f"Belangrijkste disciplinepunt: {ticker} is {_fmt_pct(weight, 'nl')} en blijft boven de zachte positielimiet; nieuw kapitaal blijft dus geblokkeerd totdat de disciplinepoorten vrijgeven."\n'''
+          if discipline_old not in text:
+              raise SystemExit('Dutch discipline target not found')
+          text = text.replace(discipline_old, discipline_new, 1)
+
+          summary_old = '''def _plain_summary(state: dict[str, Any], macro: dict[str, Any], points: list[tuple[str, float]], language: str) -> str:\n    regime, _ = _macro_surface(macro)\n    nav = _total_nav(state)\n    since = _since_start_pct(points, nav)\n    ticker, weight = _largest_position(state)\n    action_title, _ = _action_surface(state, language)\n    if language == "nl":\n        return f"We houden deze week discipline boven activiteit. De portefeuille staat sinds de start op {_fmt_pct(since, 'nl', signed=True)}, het marktklimaat blijft {escape(regime)}, en de grootste concentratie zit in {ticker} met {_fmt_pct(weight, 'nl')}. Actie deze week: {action_title}."\n    return f"We keep discipline ahead of activity this week. The portfolio is {_fmt_pct(since, 'en', signed=True)} since inception, the market climate remains {escape(regime)}, and the largest concentration is {ticker} at {_fmt_pct(weight, 'en')}. This week's action: {action_title}."\n'''
+          summary_new = '''def _next_action_trigger(state: dict[str, Any], language: str) -> str:\n    ticker, weight = _largest_position(state)\n    reviews = _review_tickers(state)\n    review_focus = ", ".join(reviews[:3]) or ticker\n    if language == "nl":\n        if weight > SOFT_MAX_POSITION_PCT:\n            return (\n                f"Trigger voor volgende actie: een volgende mutatie vereist dat {ticker} terugkeert binnen de zachte positielimiet, "\n                f"of dat een alternatief voor {review_focus} bevestigde relatieve sterkte, een geldige prijsbasis, "\n                "aansluiting op de beleggingsthese en een duidelijke financieringsbron toont."\n            )\n        if reviews:\n            return (\n                f"Trigger voor volgende actie: een mutatie in {review_focus} vereist bevestigde relatieve sterkte, "\n                "een geldige prijsbasis, aansluiting op de beleggingsthese en een duidelijke financieringsbron."\n            )\n        return (\n            "Trigger voor volgende actie: een nieuwe allocatie vereist bevestigde relatieve sterkte, "\n            "een geldige prijsbasis, aansluiting op de beleggingsthese en een duidelijke financieringsbron."\n        )\n    if weight > SOFT_MAX_POSITION_PCT:\n        return (\n            f"Next action trigger: another mutation requires {ticker} to return within the soft position cap, "\n            f"or an alternative to {review_focus} to show confirmed relative strength, a valid pricing basis, "\n            "thesis fit, and a clear funding source."\n        )\n    if reviews:\n        return (\n            f"Next action trigger: a mutation in {review_focus} requires confirmed relative strength, "\n            "a valid pricing basis, thesis fit, and a clear funding source."\n        )\n    return (\n        "Next action trigger: a new allocation requires confirmed relative strength, "\n        "a valid pricing basis, thesis fit, and a clear funding source."\n    )\n\n\ndef _plain_summary(state: dict[str, Any], macro: dict[str, Any], points: list[tuple[str, float]], language: str) -> str:\n    regime, _ = _macro_surface(macro)\n    nav = _total_nav(state)\n    since = _since_start_pct(points, nav)\n    ticker, weight = _largest_position(state)\n    action_title, _ = _action_surface(state, language)\n    if _executed_actions(state):\n        if language == "nl":\n            return f"Deze week is een gecontroleerde rotatie uitgevoerd: {action_title}. De portefeuille staat sinds de start op {_fmt_pct(since, 'nl', signed=True)}, het marktklimaat blijft {escape(regime)}, en de grootste concentratie zit in {ticker} met {_fmt_pct(weight, 'nl')}."\n        return f"A controlled rotation was executed this week: {action_title}. The portfolio is {_fmt_pct(since, 'en', signed=True)} since inception, the market climate remains {escape(regime)}, and the largest concentration is {ticker} at {_fmt_pct(weight, 'en')}."\n    if language == "nl":\n        return f"We houden deze week discipline boven activiteit. De portefeuille staat sinds de start op {_fmt_pct(since, 'nl', signed=True)}, het marktklimaat blijft {escape(regime)}, en de grootste concentratie zit in {ticker} met {_fmt_pct(weight, 'nl')}. Actie deze week: {action_title}."\n    return f"We keep discipline ahead of activity this week. The portfolio is {_fmt_pct(since, 'en', signed=True)} since inception, the market climate remains {escape(regime)}, and the largest concentration is {ticker} at {_fmt_pct(weight, 'en')}. This week's action: {action_title}."\n'''
+          if summary_old not in text:
+              raise SystemExit('summary target not found')
+          text = text.replace(summary_old, summary_new, 1)
+
+          labels_old = '''        labels = [\n            ("Gebouwd vanuit runtime-state", _relative_label(state_path, output_dir)),\n            ("Waarderingshistorie gecontroleerd", _relative_label(valuation_path, output_dir) if valuation_path.exists() else "niet beschikbaar"),\n            ("Pricing-audit referentie", _relative_label(pricing_path, output_dir) if pricing_path and pricing_path.exists() else "niet beschikbaar"),\n            ("Macro-pack referentie", _relative_label(macro_path, output_dir) if macro_path.exists() else "niet beschikbaar"),\n            ("Run-manifest referentie", _relative_label(run_manifest_path, output_dir) if run_manifest_path and run_manifest_path.exists() else "niet beschikbaar"),\n            ("Preview-only cockpit", "beschikbaar"),\n            ("Geen deliveryclaim", "deliverylaag niet aangeroepen"),\n            ("Niet gepromoveerd naar productie", "productierapport ongewijzigd"),\n        ]\n        title = "Bronnen en bewijs"\n        intro = "Deze cockpit is een preview-laag bovenop bestaande runtime- en auditbestanden. Hij vervangt het productierapport niet."\n'''
+          labels_new = '''        labels = [\n            ("Gebouwd vanuit actuele portefeuillestatus", _relative_label(state_path, output_dir)),\n            ("Waarderingshistorie gecontroleerd", _relative_label(valuation_path, output_dir) if valuation_path.exists() else "niet beschikbaar"),\n            ("Bron prijscontrole", _relative_label(pricing_path, output_dir) if pricing_path and pricing_path.exists() else "niet beschikbaar"),\n            ("Bron macrobeeld", _relative_label(macro_path, output_dir) if macro_path.exists() else "niet beschikbaar"),\n            ("Bron uitvoerregistratie", _relative_label(run_manifest_path, output_dir) if run_manifest_path and run_manifest_path.exists() else "niet beschikbaar"),\n            ("Voorbeeldcockpit", "beschikbaar"),\n            ("Geen leveringsclaim", "leveringslaag niet aangeroepen"),\n            ("Niet naar productie gepromoveerd", "productierapport ongewijzigd"),\n        ]\n        title = "Bronnen en bewijs"\n        intro = "Deze cockpit is een voorbeeldlaag bovenop bestaande status- en controlebestanden. Hij vervangt het productierapport niet."\n'''
+          if labels_old not in text:
+              raise SystemExit('Dutch evidence labels target not found')
+          text = text.replace(labels_old, labels_new, 1)
+
+          compute_old = '''    summary = _plain_summary(state, macro, points, language)\n    discipline = _discipline_surface(state, language)\n    html = f''' + '"""'
+          compute_new = '''    summary = _plain_summary(state, macro, points, language)\n    discipline = _discipline_surface(state, language)\n    next_trigger = _next_action_trigger(state, language)\n    html = f''' + '"""'
+          if compute_old not in text:
+              raise SystemExit('render computation target not found')
+          text = text.replace(compute_old, compute_new, 1)
+
+          css_old = '''.discipline{{border-left:4px solid var(--brass);background:rgba(176,125,43,.10);padding:14px 16px;font-size:13px;line-height:1.5}}.evidence-strip'''
+          css_new = '''.discipline{{border-left:4px solid var(--brass);background:rgba(176,125,43,.10);padding:14px 16px;font-size:13px;line-height:1.5}}.trigger{{margin-top:10px;border:1px solid var(--line);background:#fff;padding:13px 15px;font-size:12.5px;line-height:1.5;color:var(--ink-soft)}}.evidence-strip'''
+          if css_old not in text:
+              raise SystemExit('trigger CSS target not found')
+          text = text.replace(css_old, css_new, 1)
+
+          html_old = '''<div class="discipline">{escape(discipline)}</div>{evidence_html}'''
+          html_new = '''<div class="discipline">{escape(discipline)}</div><div class="trigger" data-next-action-trigger="true">{escape(next_trigger)}</div>{evidence_html}'''
+          if html_old not in text:
+              raise SystemExit('trigger HTML target not found')
+          text = text.replace(html_old, html_new, 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Validate focused refinement
+        run: |
+          python -m py_compile runtime/render_cockpit_front_page.py
+          python -m pytest -q \
+            tests/test_cockpit_wp09_client_surface_refinement.py \
+            tests/test_cockpit_current_runtime_authority.py \
+            tests/test_cockpit_front_page_preview.py
+
+      - name: Remove temporary patch workflow
+        run: rm -f .github/workflows/apply-cockpit-wp09-refinement.yml
+
+      - name: Commit and push renderer refinement
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add runtime/render_cockpit_front_page.py .github/workflows/apply-cockpit-wp09-refinement.yml
+          git commit -m "Refine current-runtime cockpit client surface"
+          git push origin HEAD:${{ github.head_ref }}
