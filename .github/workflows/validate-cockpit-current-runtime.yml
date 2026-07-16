@@ -71,8 +71,11 @@ jobs:
             tests/test_cockpit_current_runtime_authority.py
 
       - name: Run cockpit and report-surface regressions
+        id: focused_tests
+        continue-on-error: true
         run: |
-          pytest -q \
+          set -o pipefail
+          pytest -vv --tb=short \
             tests/test_cockpit_front_page_preview.py \
             tests/test_cockpit_preview_workflow.py \
             tests/test_cockpit_visual_state_contracts.py \
@@ -82,7 +85,21 @@ jobs:
             tests/test_pdf_surface_decision_cockpit.py \
             tests/test_report_decision_clarity.py \
             tests/test_report_weight_basis_labels.py \
-            tests/test_report_bilingual_takeaway_parity.py
+            tests/test_report_bilingual_takeaway_parity.py \
+            2>&1 | tee /tmp/cockpit-current-runtime-tests.log
+
+      - name: Upload focused test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cockpit-current-runtime-test-log-${{ github.run_id }}
+          path: /tmp/cockpit-current-runtime-tests.log
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce focused test result
+        if: steps.focused_tests.outcome != 'success'
+        run: exit 1
 
       - name: Validate production report contracts
         run: |
