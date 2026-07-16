@@ -1,0 +1,81 @@
+name: Validate cockpit promotion decision
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "control/work_packages/WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW_20260716.md"
+      - "control/decisions/COCKPIT_PROMOTION_DECISION_20260716.md"
+      - "control/decisions/cockpit_promotion_decision_20260716.json"
+      - "control/handovers/HANDOVER_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW_20260716.md"
+      - "tests/test_cockpit_promotion_decision_contract.py"
+      - ".github/workflows/validate-cockpit-promotion-decision.yml"
+      - "control/CURRENT_STATE.md"
+      - "control/NEXT_ACTIONS.md"
+      - "docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_STATUS_20260716.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependency
+        run: python -m pip install pytest
+
+      - name: Run decision contract tests
+        run: python -m pytest -q tests/test_cockpit_promotion_decision_contract.py
+
+      - name: Validate machine-readable decision
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("control/decisions/cockpit_promotion_decision_20260716.json")
+          payload = json.loads(path.read_text(encoding="utf-8"))
+          assert payload["selected_option"] == "additive_delivery_front_page"
+          assert payload["promotion_status"] == "not_promoted"
+          assert payload["production_change_in_decision_package"] is False
+          assert payload["classic_report_body"] == "preserved"
+          assert payload["email_count_change"] is False
+          assert payload["pdf_count_change"] is False
+          assert payload["attachment_contract_change"] is False
+          assert payload["manifest_contract_change"] is False
+          assert payload["feature_gate"]["implementation_default"] == "disabled"
+          assert payload["feature_gate"]["failure_behavior"] == "return_unchanged_classic_output"
+          assert payload["next_package"] == "WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE"
+          PY
+
+      - name: Prove decision package has no production-code change
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          changed="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
+          printf '%s\n' "$changed"
+          if printf '%s\n' "$changed" | grep -E '^(send_report|runtime/(delivery_html_overrides|render_cockpit_front_page)|output/|pricing/|\.github/workflows/send-weekly-report)' ; then
+            echo "Decision package contains an unauthorized production or authority change."
+            exit 1
+          fi
+
+      - name: Syntax and diff checks
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python -m json.tool control/decisions/cockpit_promotion_decision_20260716.json >/dev/null
+          git diff --check "$BASE_SHA" "$HEAD_SHA"

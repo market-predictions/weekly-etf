@@ -85,9 +85,7 @@ modes: validate_only | recover_no_send | send
 
 The runbook is manual-only and requires explicit confirmation for any send operation.
 
-## Cockpit preview lane
-
-Historical implementation:
+## Cockpit preview lane — historical implementation
 
 ```text
 WP01 preview renderer: PR #52
@@ -99,11 +97,11 @@ WP06 iteration-path decision: PR #56
 WP07 source/provenance iteration: PR #57
 ```
 
-Stable cockpit status:
+Stable boundary:
 
 ```text
 promotion_status: not_promoted
-selected_path: iteration
+classic_report_evidence_layer: preserved
 ```
 
 ## Cockpit current-runtime authority — closed
@@ -125,13 +123,6 @@ market_value_eur > previous_market_value_eur
 
 A legitimate current zero remains authoritative.
 
-Current action surface:
-
-```text
-EN: URNM reduced · XBI added
-NL: URNM afgebouwd · XBI toegevoegd
-```
-
 ## WP08 evidence-based side-by-side review — closed
 
 ```text
@@ -139,21 +130,19 @@ package: WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION
 status: closed
 PR: #76
 merge_commit: 4a8c1a81aa8bca7324969f59f8134cb6db1def8e
-final_validated_head: 830f79c09cbb170f748f840647ddccfe78d3c68c
 WP08_validation_run: 29533435789
-current_runtime_validation_run: 29533435716
-review_conclusion: iteration_required
+initial_review_conclusion: iteration_required
 promotion_status: not_promoted
 ```
 
-WP08 replaced the static June review with:
+WP08 introduced:
 
 ```text
 schema_version: cockpit_side_by_side_review_v2
 review_type: evidence_based_side_by_side_preview_only
 ```
 
-Its initial current-runtime review passed eight dimensions and identified three blocking dimensions:
+Its initial exact-current review identified three presentation blockers:
 
 ```text
 decision_clarity
@@ -161,17 +150,18 @@ bilingual_semantic_parity
 premium_look_and_feel
 ```
 
-The blockers were confined to summary wording, the missing next-action trigger, Dutch punctuation and hybrid Dutch provenance labels.
-
-## WP09 current-runtime client-surface refinement
+## WP09 current-runtime client-surface refinement — closed
 
 ```text
 package: WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
-status: validated_ready_for_governance_closeout
+status: closed
 PR: #79
-validated_head: d4e6fa7aae9dab98000716b0ecf24f45d9a7b04a
-WP08_validation_run: 29535872134
-current_runtime_validation_run: 29535872250
+merge_commit: 9b679df825fdc4c7ce37cbdc2474acae6d25d67f
+closeout_PR: #80
+closeout_merge_commit: 009e0f1a910c44b43de0d6c5babf3b1e0eae5cfd
+final_validated_head: 739f80854456edc852baa167fcd849b98a56a4ff
+WP08_validation_run: 29536333738
+current_runtime_validation_run: 29536333731
 review_conclusion: ready_for_promotion_decision
 blocking_findings: []
 promotion_status: not_promoted
@@ -183,9 +173,9 @@ Implemented preview refinements:
 2. Dedicated bilingual next-action trigger derived from current state.
 3. Correct Dutch discipline punctuation.
 4. Natural Dutch provenance labels.
-5. Preserved design, evidence strip, preview paths and current-runtime authority.
+5. Preserved design, evidence strip, preview paths and authority precedence.
 
-The exact-current WP08 v2 review now passes all eleven dimensions:
+All eleven WP08 dimensions pass:
 
 ```text
 readability
@@ -213,7 +203,49 @@ portfolio_model_execution: false
 authority_file_mutation: false
 ```
 
-`ready_for_promotion_decision` does not mean promoted. The cockpit remains preview-only until a separate explicit promotion decision is completed.
+## Cockpit promotion decision review
+
+```text
+package: WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW
+status: decision_recorded_validation_pending
+selected_option: additive_delivery_front_page
+production_change_in_decision_package: false
+promotion_status: not_promoted
+next_package: WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE
+```
+
+Decision rationale:
+
+- the cockpit has no remaining review blockers;
+- the classic report remains the complete audit/evidence layer;
+- the current delivery contract is one HTML body and one PDF per language;
+- an additive front page improves the client entry surface without adding attachment or manifest complexity;
+- full replacement creates unnecessary migration risk;
+- a separate attachment creates avoidable recipient and delivery friction.
+
+Selected implementation architecture:
+
+```text
+integration_layer: delivery HTML/PDF render pipeline
+classic_report_body: preserved
+email_count: unchanged
+PDF_count: unchanged
+attachment_contract: unchanged
+manifest_contract: unchanged
+feature_gate: required
+implementation_default: disabled
+failure_behavior: unchanged classic output
+rollback: disable feature flag
+```
+
+When the full cockpit front page is enabled, the smaller injected `Decision cockpit / Besliscockpit` must be suppressed to prevent duplication. The underlying classic report sections remain intact.
+
+The decision is recorded in:
+
+```text
+control/decisions/COCKPIT_PROMOTION_DECISION_20260716.md
+control/decisions/cockpit_promotion_decision_20260716.json
+```
 
 ## Closed operational packages
 
@@ -223,14 +255,15 @@ WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH: closed
 WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP: closed
 WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_CURRENT_RUNTIME_REVALIDATION: closed
 WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION: closed
+WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT: closed
 ```
 
 ## Immediate next action
 
-After WP09 governance closeout and merge, create:
+After the promotion decision package validates and merges, create:
 
 ```text
-WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW
+WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE
 ```
 
-The package must decide the cockpit's relationship to production. It may recommend an additive front page, attachment, continued experiment or another iteration, but no production or delivery change is authorized yet.
+WP10 may implement a feature-gated production render path, but must remain disabled by default, send no email during validation and preserve fail-closed classic output.
