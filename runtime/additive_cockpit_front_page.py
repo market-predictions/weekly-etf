@@ -138,7 +138,41 @@ def _delivery_css() -> str:
 .etf-cockpit-evidence-label{{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#5A5043}}
 .etf-cockpit-evidence-value{{margin-top:4px;font-size:10px;color:#211C16;overflow-wrap:anywhere}}
 .etf-cockpit-footer{{margin-top:22px;padding-top:13px;border-top:1px solid #D8CDB8;display:flex;justify-content:space-between;gap:12px;color:#5A5043;font-size:10px}}
-@media print{{.etf-cockpit-page{{page-break-after:always;break-after:page;border:none;margin:0;max-width:none}}}}
+@media print{{
+.etf-cockpit-page{{page-break-after:always;break-after:page;border:none;margin:0;max-width:none;font-size:9px;break-inside:avoid;page-break-inside:avoid}}
+.etf-cockpit-inner{{padding:14px 22px 12px}}
+.etf-cockpit-header{{gap:12px;padding-bottom:7px}}
+.etf-cockpit-kicker{{font-size:8px}}
+.etf-cockpit-mast{{font-size:28px;margin-top:4px}}
+.etf-cockpit-issue{{font-size:8.5px;line-height:1.35}}
+.etf-cockpit-strap{{margin-top:5px;gap:7px;font-size:8px}}
+.etf-cockpit-section-title{{margin:10px 0 5px;font-size:8.5px;gap:8px}}
+.etf-cockpit-lede{{font-size:14px;line-height:1.28}}
+.etf-cockpit-row{{gap:8px;margin-top:8px}}
+.etf-cockpit-card{{padding:8px 10px}}
+.etf-cockpit-label{{font-size:7.5px;margin-bottom:4px}}
+.etf-cockpit-value{{font-size:14.5px;line-height:1.1}}
+.etf-cockpit-note{{font-size:9px;line-height:1.25;margin-top:4px}}
+.etf-cockpit-confidence{{gap:5px;margin-top:5px;font-size:8px}}
+.etf-cockpit-bar{{height:4px}}
+.etf-cockpit-chart{{padding:8px 10px 2px}}
+.etf-cockpit-chart-caption{{gap:8px;margin-bottom:3px;font-size:9px}}
+.etf-cockpit-chart-title{{font-size:7.5px}}
+.etf-cockpit-page svg.spark{{height:58px}}
+.etf-cockpit-metric{{padding:6px 8px}}
+.etf-cockpit-metric-label{{font-size:7px}}
+.etf-cockpit-metric-value{{font-size:16px;margin-top:3px}}
+.etf-cockpit-metric-sub{{font-size:8px;margin-top:2px}}
+.etf-cockpit-discipline{{padding:7px 9px;font-size:9px;line-height:1.25}}
+.etf-cockpit-trigger{{margin-top:4px;padding:6px 8px;font-size:8.5px;line-height:1.25}}
+.etf-cockpit-evidence{{padding:6px 8px}}
+.etf-cockpit-evidence-intro{{margin:0 0 4px;font-size:8px;line-height:1.2}}
+.etf-cockpit-evidence-grid{{grid-template-columns:repeat(3,1fr);gap:3px 8px}}
+.etf-cockpit-evidence-item{{padding-top:3px}}
+.etf-cockpit-evidence-label{{font-size:6.5px}}
+.etf-cockpit-evidence-value{{margin-top:1px;font-size:7.5px}}
+.etf-cockpit-footer{{margin-top:6px;padding-top:4px;font-size:7.5px}}
+}}
 @media (max-width:640px){{.etf-cockpit-inner{{padding:24px 20px}}.etf-cockpit-header{{display:block}}.etf-cockpit-issue{{text-align:left;margin-top:14px}}.etf-cockpit-row,.etf-cockpit-evidence-grid{{grid-template-columns:1fr}}.etf-cockpit-metrics{{grid-template-columns:1fr 1fr}}.etf-cockpit-metric:nth-child(3n){{border-right:1px solid #D8CDB8}}.etf-cockpit-metric:nth-child(2n){{border-right:none}}}}
 </style>"""
 
