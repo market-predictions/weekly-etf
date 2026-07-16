@@ -46,65 +46,75 @@ Do not describe `_04` as delivered. It is non-sending review evidence.
 ```text
 WP_POST_EXECUTION_REPORT_CONSISTENCY: closed
 WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH: closed
-PR #70: merged
+WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP: closed
 PR #70 merge_commit: 61f6a6a5ab2dd1dfe60f28f1b86a5517a0813dd5
-freshness_validation_run: 29461019794
-post_execution_validation_run: 29461019772
+PR #72 merge_commit: 7e3a4516418e7a0413ea1d4b8b21a66d9dab8fb7
+correction_runbook_validation_run: 29520607344
+post_execution_consistency_run: 29520608204
 ```
+
+## Canonical correction runbook
+
+```text
+workflow: .github/workflows/resend-corrected-post-execution-report.yml
+modes: validate_only | recover_no_send | send
+contract: runtime/post_execution_correction_runbook.py
+```
+
+Operating rules:
+
+1. `send` is manual-only and requires `confirm_correction_resend` in both the request file and workflow dispatch.
+2. A send must use a new correction suffix and cannot overwrite an existing report package.
+3. Production mail configuration uses only the established `MRKT_RPRTS_*` contract.
+4. Delivery evidence is the persisted positive `DELIVERY_OK` text receipt and the English/Dutch `*_delivery_manifest.txt` names recorded in it.
+5. `recover_no_send` strips mail configuration, uses render-only asset generation and may not invoke the mail delivery entrypoint.
+6. Recovery restores original bytes and fails if existing historical report artifacts would change.
+7. Every operation proves current official state and trade-ledger hashes unchanged.
+8. Historical manifest hashes are historical immutability evidence, not a requirement that future legitimate production state retain the same hash.
+
+No send or recovery mode was executed during the cleanup package.
 
 ## Recommended next package
 
-Create and execute:
+Select and claim the next explicit product-roadmap package:
 
 ```text
-WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP
+WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER
 ```
 
-### Purpose
+### Immediate purpose
 
-Consolidate the correction path into one deterministic reusable runbook without changing portfolio logic or resending a completed report.
+Resume validation of the isolated cockpit-first preview renderer against the current runtime and delivery contracts without changing the production report.
 
-### Required scope
+### Required start sequence
 
-1. Align `.github/workflows/resend-corrected-post-execution-report.yml` with the production secret contract:
+Read:
 
 ```text
-MRKT_RPRTS_SMTP_HOST
-MRKT_RPRTS_SMTP_PORT
-MRKT_RPRTS_SMTP_USER
-MRKT_RPRTS_SMTP_PASS
-MRKT_RPRTS_MAIL_FROM
-MRKT_RPRTS_MAIL_TO
-MRKT_RPRTS_MAIL_TO_NL
+control/SYSTEM_INDEX.md
+control/CURRENT_STATE.md
+control/NEXT_ACTIONS.md
+docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_20260618.md
+control/work_packages/WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_20260618.md
 ```
 
-2. Replace the incorrect JSON-manifest assumption with the actual production text-manifest/receipt contract.
-3. Add a no-resend recovery mode for SMTP-success/post-send-persistence-failure cases.
-4. Retire `.github/workflows/dispatch-corrected-etf-report-bridge.yml` after equivalent canonical behavior is validated.
-5. Decide whether the current correction/recovery helpers remain canonical or are folded into a smaller module.
-6. Preserve all historical evidence.
+Then inspect only the minimum relevant execution files, beginning with:
+
+```text
+runtime/render_cockpit_front_page.py
+.github/workflows/render-cockpit-preview.yml
+```
 
 ### Safety boundary
 
-The cleanup package must:
-
 ```text
+production_promotion: false
 email_send: false
 portfolio_model_execution: false
+pricing_authority_change: false
 official_state_mutation: false
 official_trade_ledger_mutation: false
-historical_delivery_evidence_mutation: false
+preview_output_only: output/cockpit_preview/
 ```
 
-Required gates:
-
-- focused correction-runbook tests;
-- existing correction manifest validates;
-- state hash unchanged;
-- trade-ledger hash unchanged;
-- no send path works without explicit confirmation;
-- no-resend recovery cannot invoke SMTP.
-
-## Roadmap after cleanup
-
-After cleanup, select the next explicit roadmap package. The cockpit-first surface remains preview-only and must not be promoted without a separate decision.
+The next package must assess the existing preview implementation before adding new product-surface work. Do not mix cockpit validation with correction-runbook changes.
