@@ -153,22 +153,7 @@ schema_version: cockpit_side_by_side_review_v2
 review_type: evidence_based_side_by_side_preview_only
 ```
 
-The review now selects only the current `_04` classic sources and current bilingual cockpit previews, evaluates artifact contents against runtime state, records input SHA-256 values and produces structured bilingual HTML.
-
-Passed dimensions:
-
-```text
-readability
-density
-visual_hierarchy
-executed_action_clarity
-current_weight_accuracy
-performance_risk_accuracy
-trust_provenance_clarity
-audit_evidence_preservation
-```
-
-Blocking dimensions:
+Its initial current-runtime review passed eight dimensions and identified three blocking dimensions:
 
 ```text
 decision_clarity
@@ -176,25 +161,59 @@ bilingual_semantic_parity
 premium_look_and_feel
 ```
 
-Blocking findings:
+The blockers were confined to summary wording, the missing next-action trigger, Dutch punctuation and hybrid Dutch provenance labels.
 
-1. The summary says discipline is ahead of activity despite the executed URNM-to-XBI rotation.
-2. The cockpit lacks a dedicated next-action trigger available in the classic decision cockpit.
-3. The Dutch discipline sentence ends with a comma.
-4. Dutch provenance labels retain hybrid English terminology.
-
-These are preview presentation defects, not state, pricing or execution defects.
-
-WP08 evidence:
+## WP09 current-runtime client-surface refinement
 
 ```text
-artifact: cockpit-wp08-evidence-review-29533073516
-artifact_digest: sha256:a52ec091725dae17d992d940454cb11daa8dad1c6b7f585beec90f0473a473f0
+package: WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
+status: validated_ready_for_governance_closeout
+PR: #79
+validated_head: d4e6fa7aae9dab98000716b0ecf24f45d9a7b04a
+WP08_validation_run: 29535872134
+current_runtime_validation_run: 29535872250
+review_conclusion: ready_for_promotion_decision
+blocking_findings: []
+promotion_status: not_promoted
+```
+
+Implemented preview refinements:
+
+1. Action-aware controlled-rotation summary.
+2. Dedicated bilingual next-action trigger derived from current state.
+3. Correct Dutch discipline punctuation.
+4. Natural Dutch provenance labels.
+5. Preserved design, evidence strip, preview paths and current-runtime authority.
+
+The exact-current WP08 v2 review now passes all eleven dimensions:
+
+```text
+readability
+density
+visual_hierarchy
+decision_clarity
+executed_action_clarity
+current_weight_accuracy
+performance_risk_accuracy
+trust_provenance_clarity
+bilingual_semantic_parity
+premium_look_and_feel
+audit_evidence_preservation
+```
+
+Evidence:
+
+```text
+artifact: cockpit-wp08-evidence-review-29535872134
+artifact_digest: sha256:0a86df7071453783315c28bb60e9dd620c4eea4fbdf6f2f9fab9812a83fdb628
+input_sha256_count: 10
 protected_authority_hashes_before_after: identical
 email_send: false
 portfolio_model_execution: false
 authority_file_mutation: false
 ```
+
+`ready_for_promotion_decision` does not mean promoted. The cockpit remains preview-only until a separate explicit promotion decision is completed.
 
 ## Closed operational packages
 
@@ -208,10 +227,10 @@ WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION: closed
 
 ## Immediate next action
 
-Claim:
+After WP09 governance closeout and merge, create:
 
 ```text
-WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
+WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW
 ```
 
-WP09 remains preview-only. It must correct only the three WP08 blocking dimensions, preserve the current cockpit design and authority contract, and rerun WP08 v2 unchanged.
+The package must decide the cockpit's relationship to production. It may recommend an additive front page, attachment, continued experiment or another iteration, but no production or delivery change is authorized yet.
