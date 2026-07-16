@@ -1,214 +1,166 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import os
-import subprocess
 import sys
 from datetime import datetime, timezone
-from pathlib import Path
 
+from runtime.post_execution_correction_runbook import (
+    DELIVERY_DIR,
+    ROOT,
+    asset_record,
+    assert_authority_hashes_unchanged,
+    assert_dispatch_send_confirmation,
+    correction_request_from_env,
+    delivery_environment,
+    delivery_receipt_fields,
+    relative,
+    require_smtp_environment,
+    resolve_executed_state_path,
+    run_command,
+    sha256,
+    snapshot_authority_hashes,
+)
 from runtime.post_execution_report_surface import validate_post_execution_report_consistency
 
 
-ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_REQUEST = ROOT / "control/run_queue/weekly_etf_report_correction_request_20260715_230541.md"
-STATE_PATH = ROOT / "output/etf_portfolio_state.json"
-LEDGER_PATH = ROOT / "output/etf_trade_ledger.csv"
-DELIVERY_DIR = ROOT / "output/delivery"
-LATEST_EXECUTED_STATE_POINTER = ROOT / "output/runtime/latest_etf_report_state_path.txt"
-
-
-def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def parse_request(path: Path) -> dict[str, str]:
-    values: dict[str, str] = {}
-    for raw in path.read_text(encoding="utf-8").splitlines():
-        if ":" not in raw or raw.lstrip().startswith("#"):
-            continue
-        key, value = raw.split(":", 1)
-        values[key.strip()] = value.strip()
-    required = {
-        "source_artifact",
-        "report_token",
-        "correction_suffix",
-        "original_run_id",
-        "report_date",
-        "send_confirmation",
-    }
-    missing = sorted(required - values.keys())
-    if missing:
-        raise RuntimeError(f"Correction request missing fields: {', '.join(missing)}")
-    if values["send_confirmation"] != "confirm_correction_resend":
-        raise RuntimeError("Correction resend is not explicitly confirmed.")
-    return values
-
-
-def run(command: list[str], *, env: dict[str, str]) -> str:
-    result = subprocess.run(
-        command,
-        cwd=ROOT,
-        env=env,
-        text=True,
-        capture_output=True,
-        check=False,
+def _correction_output_paths(report_path):
+    return (
+        report_path,
+        report_path.with_name(f"{report_path.stem}_clean.md"),
+        report_path.with_name(f"{report_path.stem}_delivery.html"),
+        report_path.with_suffix(".pdf"),
+        report_path.with_name(f"{report_path.stem}_equity_curve.png"),
     )
-    if result.stdout:
-        print(result.stdout, end="")
-    if result.stderr:
-        print(result.stderr, end="", file=sys.stderr)
-    if result.returncode != 0:
-        raise RuntimeError(f"Command failed ({result.returncode}): {' '.join(command)}")
-    return result.stdout
 
 
-def resolved_executed_state_path() -> Path:
-    if not LATEST_EXECUTED_STATE_POINTER.is_file():
+def _require_fresh_correction_suffix(request) -> None:
+    existing = [
+        path
+        for report in (request.report_en, request.report_nl)
+        for path in _correction_output_paths(report)
+        if path.exists()
+    ]
+    if existing:
+        rendered = ", ".join(relative(path) for path in existing)
         raise RuntimeError(
-            f"Finalizer did not write executed-state pointer: {LATEST_EXECUTED_STATE_POINTER}"
+            "Correction send target already exists; use recover_no_send for a prior successful delivery "
+            f"or choose a new correction suffix. Existing: {rendered}"
         )
-    raw = LATEST_EXECUTED_STATE_POINTER.read_text(encoding="utf-8").strip()
-    if not raw:
-        raise RuntimeError("Executed-state pointer is empty.")
-    path = Path(raw)
-    if not path.is_absolute():
-        path = ROOT / path
-    if not path.is_file():
-        raise RuntimeError(f"Executed-state artifact not found: {path}")
-    return path
 
 
 def main() -> None:
-    request_path = Path(os.environ.get("ETF_CORRECTION_REQUEST_FILE", str(DEFAULT_REQUEST)))
-    if not request_path.is_absolute():
-        request_path = ROOT / request_path
-    request = parse_request(request_path)
+    request_path, request = correction_request_from_env(require_send_confirmation=True)
+    assert_dispatch_send_confirmation(os.environ.get("ETF_CORRECTION_SEND_CONFIRMATION", ""))
+    _require_fresh_correction_suffix(request)
 
-    source_artifact = ROOT / request["source_artifact"]
+    source_artifact = ROOT / request.source_artifact
     if not source_artifact.is_file():
         raise RuntimeError(f"Source execution artifact not found: {source_artifact}")
 
-    report_token = request["report_token"]
-    suffix = request["correction_suffix"]
-    report_en = ROOT / f"output/weekly_analysis_pro_{report_token}_{suffix}.md"
-    report_nl = ROOT / f"output/weekly_analysis_pro_nl_{report_token}_{suffix}.md"
+    env = delivery_environment(request)
+    require_smtp_environment(env)
+    authority_before = snapshot_authority_hashes()
     correction_run_id = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
-    state_before = sha256(STATE_PATH)
-    ledger_before = sha256(LEDGER_PATH)
-    delivery_before = {path.name for path in DELIVERY_DIR.glob("*") if path.is_file()}
-
-    env = dict(os.environ)
-    env.update(
-        {
-            "MRKT_RPRTS_REPORT_MODE": "pro",
-            "MRKT_RPRTS_SUBJECT_PREFIX": "Corrected Weekly ETF Pro Review",
-            "MRKT_RPRTS_SUBJECT_PREFIX_NL": "Gecorrigeerde Weekly ETF Pro Review | Nederlands",
-            "MRKT_RPRTS_DRY_RUN_EMAIL": "0",
-            "MRKT_RPRTS_EXPLICIT_REPORT_PATH": str(report_en.relative_to(ROOT)),
-            "MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL": str(report_nl.relative_to(ROOT)),
-        }
-    )
-
-    run(
+    run_command(
         [
             sys.executable,
             "-m",
             "runtime.finalize_executed_etf_report",
             "--artifact",
-            str(source_artifact.relative_to(ROOT)),
+            relative(source_artifact),
         ],
         env=env,
     )
+    if not request.report_en.is_file() or request.report_en.stat().st_size <= 0:
+        raise RuntimeError(f"Corrected English report was not created: {request.report_en}")
+    if not request.report_nl.is_file() or request.report_nl.stat().st_size <= 0:
+        raise RuntimeError(f"Corrected Dutch report was not created: {request.report_nl}")
 
-    if not report_en.is_file() or not report_en.stat().st_size:
-        raise RuntimeError(f"Corrected English report was not created: {report_en}")
-    if not report_nl.is_file() or not report_nl.stat().st_size:
-        raise RuntimeError(f"Corrected Dutch report was not created: {report_nl}")
-
-    state_artifact = resolved_executed_state_path()
+    state_artifact = resolve_executed_state_path()
     state = json.loads(state_artifact.read_text(encoding="utf-8"))
-    validate_post_execution_report_consistency(report_en.read_text(encoding="utf-8"), state, language="en")
-    validate_post_execution_report_consistency(report_nl.read_text(encoding="utf-8"), state, language="nl")
+    validate_post_execution_report_consistency(
+        request.report_en.read_text(encoding="utf-8"), state, language="en"
+    )
+    validate_post_execution_report_consistency(
+        request.report_nl.read_text(encoding="utf-8"), state, language="nl"
+    )
+    assert_authority_hashes_unchanged(authority_before)
     print(
-        "ETF_CORRECTION_REPORT_SURFACE_OK | "
-        f"languages=EN,NL | mutation=URNM->XBI | runtime_state={state_artifact.relative_to(ROOT)}"
+        "ETF_CORRECTION_REPORT_SURFACE_OK | languages=EN,NL | "
+        f"runtime_state={relative(state_artifact)}"
     )
 
-    if sha256(STATE_PATH) != state_before or sha256(LEDGER_PATH) != ledger_before:
-        raise RuntimeError("Correction finalization mutated official state or trade ledger.")
+    delivery_log = run_command([sys.executable, "send_report_runtime_html.py"], env=env)
+    receipt = delivery_receipt_fields(delivery_log)
+    authority_after = assert_authority_hashes_unchanged(authority_before)
 
-    delivery_log = run([sys.executable, "send_report_runtime_html.py"], env=env)
-    if "DELIVERY_OK | mode=pro_bilingual" not in delivery_log:
-        raise RuntimeError("Delivery entrypoint did not emit the bilingual DELIVERY_OK receipt.")
+    DELIVERY_DIR.mkdir(parents=True, exist_ok=True)
+    receipt_path = DELIVERY_DIR / (
+        f"weekly_etf_correction_delivery_receipt_{request.report_date}_{correction_run_id}.txt"
+    )
+    receipt_path.write_text(delivery_log, encoding="utf-8")
 
-    state_after = sha256(STATE_PATH)
-    ledger_after = sha256(LEDGER_PATH)
-    if state_after != state_before:
-        raise RuntimeError("Correction delivery mutated official portfolio state.")
-    if ledger_after != ledger_before:
-        raise RuntimeError("Correction delivery mutated official trade ledger.")
-
-    delivery_after = {path.name for path in DELIVERY_DIR.glob("*") if path.is_file()}
-    new_delivery_files = sorted(delivery_after - delivery_before)
-    delivery_manifests: list[str] = []
-    delivery_statuses: list[str] = []
-    for name in new_delivery_files:
-        path = DELIVERY_DIR / name
-        if path.suffix != ".json":
-            continue
-        try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
-        except Exception:
-            continue
-        if "delivery_status" in payload:
-            delivery_manifests.append(str(path.relative_to(ROOT)))
-            delivery_statuses.append(str(payload.get("delivery_status")))
-
-    if len(delivery_manifests) < 2:
-        raise RuntimeError(f"Expected English and Dutch delivery manifests; found {delivery_manifests}")
-    if any(status != "smtp_sendmail_returned_no_exception" for status in delivery_statuses):
-        raise RuntimeError(f"Unexpected delivery statuses: {delivery_statuses}")
+    rendered_assets = {
+        "en": {
+            "report_path": asset_record(request.report_en),
+            "clean_md_path": asset_record(request.report_en.with_name(f"{request.report_en.stem}_clean.md")),
+            "html_path": asset_record(request.report_en.with_name(f"{request.report_en.stem}_delivery.html")),
+            "pdf_path": asset_record(request.report_en.with_suffix(".pdf")),
+            "equity_curve_png": asset_record(request.report_en.with_name(f"{request.report_en.stem}_equity_curve.png")),
+        },
+        "nl": {
+            "report_path": asset_record(request.report_nl),
+            "clean_md_path": asset_record(request.report_nl.with_name(f"{request.report_nl.stem}_clean.md")),
+            "html_path": asset_record(request.report_nl.with_name(f"{request.report_nl.stem}_delivery.html")),
+            "pdf_path": asset_record(request.report_nl.with_suffix(".pdf")),
+            "equity_curve_png": asset_record(request.report_nl.with_name(f"{request.report_nl.stem}_equity_curve.png")),
+        },
+    }
 
     manifest = {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "correction_type": "post_execution_report_surface_correction",
+        "status": "correction_rendered_and_delivery_layer_completed",
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "correction_run_id": correction_run_id,
-        "original_run_id": request["original_run_id"],
-        "report_date": request["report_date"],
-        "request_file": str(request_path.relative_to(ROOT)),
-        "source_execution_artifact": str(source_artifact.relative_to(ROOT)),
+        "original_run_id": request.original_run_id,
+        "report_date": request.report_date,
+        "request_file": relative(request_path),
+        "source_execution_artifact": relative(source_artifact),
         "source_execution_artifact_sha256": sha256(source_artifact),
-        "executed_runtime_state": str(state_artifact.relative_to(ROOT)),
+        "executed_runtime_state": relative(state_artifact),
         "executed_runtime_state_sha256": sha256(state_artifact),
         "model_execution_replayed": False,
         "official_state_mutated": False,
         "official_trade_ledger_mutated": False,
-        "state_sha256_before": state_before,
-        "state_sha256_after": state_after,
-        "trade_ledger_sha256_before": ledger_before,
-        "trade_ledger_sha256_after": ledger_after,
-        "corrected_report_en": str(report_en.relative_to(ROOT)),
-        "corrected_report_en_sha256": sha256(report_en),
-        "corrected_report_nl": str(report_nl.relative_to(ROOT)),
-        "corrected_report_nl_sha256": sha256(report_nl),
-        "new_delivery_files": [str((DELIVERY_DIR / name).relative_to(ROOT)) for name in new_delivery_files],
-        "delivery_manifests": delivery_manifests,
-        "delivery_statuses": delivery_statuses,
-        "delivery_log_status": "DELIVERY_OK",
-        "email_receipt_status": "not_checked_by_workflow",
-        "status": "correction_rendered_and_delivery_layer_completed",
+        "state_sha256_before": authority_before["state"],
+        "state_sha256_after": authority_after["state"],
+        "trade_ledger_sha256_before": authority_before["ledger"],
+        "trade_ledger_sha256_after": authority_after["ledger"],
+        "rendered_assets": rendered_assets,
+        "delivery_receipt_path": relative(receipt_path),
+        "delivery_receipt_sha256": sha256(receipt_path),
+        "delivery_receipt_line": receipt["line"],
+        "delivery_receipt_fields": receipt["fields"],
+        "delivery_text_manifests": [
+            receipt["fields"]["manifest_en"],
+            receipt["fields"]["manifest_nl"],
+        ],
+        "delivery_layer_status": "smtp_sendmail_returned_no_exception",
+        "inbox_receipt_status": "pending_external_verification",
+        "inbox_receipts": [],
     }
-    manifest_path = DELIVERY_DIR / f"weekly_etf_correction_manifest_{request['report_date']}_{correction_run_id}.json"
+    manifest_path = DELIVERY_DIR / (
+        f"weekly_etf_correction_manifest_{request.report_date}_{correction_run_id}.json"
+    )
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    print(f"ETF_CORRECTION_MANIFEST_OK | path={manifest_path.relative_to(ROOT)} | delivery_manifests={len(delivery_manifests)}")
+    print(
+        "ETF_CORRECTION_MANIFEST_OK | "
+        f"path={relative(manifest_path)} | receipt_contract=text | "
+        "state_immutable=true | ledger_immutable=true"
+    )
 
 
 if __name__ == "__main__":
