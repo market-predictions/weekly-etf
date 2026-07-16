@@ -15,15 +15,34 @@ EQUITY_IMG_RE = re.compile(
     r"([\"'][^>]*>)",
     flags=re.IGNORECASE,
 )
+EQUITY_SRC_FALLBACK_RE = re.compile(
+    r"(<img\b[^>]*\bsrc=[\"'])"
+    r"(?:#harmful-link|cid:equitycurve)"
+    r"([\"'][^>]*>)",
+    flags=re.IGNORECASE,
+)
 
 
 def _set_equity_image_src(html: str, image_src: str) -> str:
-    updated, count = EQUITY_IMG_RE.subn(lambda match: match.group(1) + image_src + match.group(2), html, count=1)
-    if count != 1:
-        raise StandaloneHtmlEquityError(
-            "Could not resolve exactly one equity-curve image element after client sanitization."
+    updated, count = EQUITY_IMG_RE.subn(
+        lambda match: match.group(1) + image_src + match.group(2),
+        html,
+        count=1,
+    )
+    if count == 1:
+        return updated
+
+    matches = list(EQUITY_SRC_FALLBACK_RE.finditer(html))
+    if len(matches) == 1:
+        return EQUITY_SRC_FALLBACK_RE.sub(
+            lambda match: match.group(1) + image_src + match.group(2),
+            html,
+            count=1,
         )
-    return updated
+
+    raise StandaloneHtmlEquityError(
+        "Could not resolve exactly one equity-curve image element after client sanitization."
+    )
 
 
 def _embed_standalone_html(assets: dict[str, Any], report_module: Any) -> None:
