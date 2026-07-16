@@ -1,0 +1,1975 @@
+<html>
+      <head>
+        <meta charset="utf-8" />
+        <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #F6F2EC;
+      color: #2B3742;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .report-shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 0 18px 0;
+    }
+    .hero {
+      background: #607887;
+      color: #FBFAF7;
+      padding: 20px 24px 18px 24px;
+      border-radius: 14px 14px 0 0;
+    }
+    .hero-secondary {
+      margin-top: 26px;
+    }
+    .hero-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .hero-table td {
+      vertical-align: middle;
+    }
+    .hero-left {
+      text-align: left;
+    }
+    .hero-right {
+      text-align: right;
+      white-space: nowrap;
+      padding-left: 24px;
+    }
+    .masthead {
+      font-family: Georgia, "Times Nieuw Roman", serif;
+      font-weight: 700;
+      font-size: 30px;
+      letter-spacing: 1px;
+      margin: 0 0 8px 0;
+      text-transform: uppercase;
+    }
+    .hero-sub {
+      font-size: 14px;
+      color: #EFF4F6;
+      margin: 0;
+    }
+    .hero-side-label {
+      font-size: 16px;
+      line-height: 1.2;
+      font-weight: 700;
+      color: #FBFAF7;
+      letter-spacing: .03em;
+    }
+    .hero-rule {
+      height: 5px;
+      background: #D4B483;
+      margin: 8px 0 18px 0;
+      border-radius: 999px;
+    }
+    .notice {
+      background: #F8F4EE;
+      border: 1px solid #D9D3CB;
+      color: #6B7882;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 12px;
+      margin: 0 0 18px 0;
+    }
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 14px;
+      margin: 0 0 18px 0;
+    }
+    .mini-card {
+      background: #FCFAF7;
+      border: 1px solid #D9D3CB;
+      border-radius: 16px;
+      padding: 14px 18px;
+    }
+    .mini-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #6B7882;
+      margin: 0 0 8px 0;
+    }
+    .mini-value {
+      font-family: Georgia, "Times Nieuw Roman", serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: #2B3742;
+      line-height: 1.22;
+    }
+    .client-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 18px;
+      align-items: start;
+      margin: 0 0 18px 0;
+    }
+    .panel {
+      background: #FCFAF7;
+      border: 1px solid #D9D3CB;
+      border-radius: 18px;
+      padding: 16px 18px;
+      margin: 0 0 18px 0;
+    }
+    .panel-compact,
+    .panel-exec,
+    .panel-snapshot,
+    .panel-risks {
+      page-break-inside: avoid;
+      break-inside: avoid-page;
+    }
+    .section-kicker {
+      width: auto;
+      border-collapse: collapse;
+      margin: 0 0 18px 0;
+    }
+    .section-kicker td {
+      vertical-align: middle;
+    }
+    .section-badge-cell {
+      width: 64px;
+      padding: 0 16px 0 0;
+      vertical-align: middle;
+    }
+    .section-label-cell {
+      padding: 0;
+      vertical-align: middle;
+    }
+    .section-badge {
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      background: #2A5384;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 17px;
+      display: block;
+      text-align: center;
+      line-height: 46px;
+      mso-line-height-rule: exactly;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .section-label {
+      display: block;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #6B7882;
+      line-height: 1.12;
+      mso-line-height-rule: exactly;
+    }
+    .summary-line {
+      margin: 0 0 12px 0;
+      padding: 0 0 12px 0;
+      border-bottom: 1px solid #D9D3CB;
+    }
+    .summary-key {
+      color: #6B7882;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin: 0 0 6px 0;
+    }
+    .summary-value {
+      color: #2B3742;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .takeaway {
+      margin: 18px 0 0 0;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #F4EEE4;
+      border: 1px solid #E7D7BB;
+    }
+    .takeaway-label {
+      color: #6B7882;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin: 0 0 6px 0;
+    }
+    .takeaway-text {
+      color: #2B3742;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.42;
+    }
+    .snapshot-table,
+    .rotation-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 16px 0;
+      border: 1px solid #D9D3CB;
+      table-layout: fixed;
+    }
+    .snapshot-table th,
+    .rotation-table th {
+      background: #F2EBDD;
+      color: #2B3742;
+      text-align: left;
+      padding: 9px 10px;
+      border-bottom: 1px solid #D9D3CB;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .snapshot-table td,
+    .rotation-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid #ECE6DE;
+      vertical-align: top;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .snapshot-table tbody tr:nth-child(even) td,
+    .rotation-table tbody tr:nth-child(even) td {
+      background: #FEFCF9;
+    }
+    .rotation-table ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .subgrid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .subblock {
+      margin: 0 0 14px 0;
+      padding: 12px 14px;
+      background: #FBF7F0;
+      border: 1px solid #D9D3CB;
+      border-radius: 12px;
+    }
+    .subblock-title {
+      color: #6B7882;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin: 0 0 8px 0;
+    }
+    .subblock ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .panel p, .panel li {
+      font-size: 14px;
+      line-height: 1.58;
+      margin-top: 0;
+      font-weight: 400;
+    }
+    .panel strong {
+      font-weight: 700;
+    }
+    .panel ul, .panel ol {
+      margin-top: 0;
+      padding-left: 22px;
+    }
+    .panel h3 {
+      color: #2B3742;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin: 18px 0 10px 0;
+    }
+    .panel h4 {
+      color: #6B7882;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 700;
+      margin: 18px 0 8px 0;
+    }
+    .panel h5 {
+      color: #6B7882;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .10em;
+      font-weight: 700;
+      margin: 12px 0 16px 0;
+    }
+    .panel blockquote {
+      margin: 12px 0;
+      padding: 10px 12px;
+      border-left: 4px solid #D4B483;
+      background: #F8F3EB;
+      color: #6B7882;
+    }
+    .panel table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin: 12px 0 14px 0;
+      border: 1px solid #D9D3CB;
+      font-size: 12px;
+    }
+    .panel thead {
+      display: table-header-group;
+    }
+    .panel th {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid #D9D3CB;
+      background: #F2EBDD;
+      color: #2B3742;
+      vertical-align: middle;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .panel td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #ECE6DE;
+      vertical-align: top;
+      word-wrap: break-word;
+    }
+    .panel tr:nth-child(even) td {
+      background: #FEFCF9;
+    }
+    .panel img {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid #D9D3CB;
+      border-radius: 10px;
+      margin: 10px 0 4px 0;
+      display: block;
+    }
+    .panel-positions h3 {
+      margin-top: 22px;
+      padding: 10px 12px;
+      background: #F7F1E8;
+      border: 1px solid #D9D3CB;
+      border-radius: 10px;
+      font-size: 17px;
+    }
+    .panel-opportunities h3 {
+      margin: 0 0 8px 0;
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.28;
+      color: #2B3742;
+    }
+    .panel-opportunities h4 {
+      margin: 16px 0 8px 0;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #6B7882;
+    }
+    .panel-opportunities h5 {
+      margin: 8px 0 18px 0;
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #6B7882;
+      font-weight: 700;
+      text-align: right;
+    }
+    .panel-opportunities h5 + h3 {
+      margin-top: 0;
+    }
+    .panel-opportunities a {
+      display: inline-block;
+      margin: 0 0 16px 0;
+      font-size: 14px;
+    }
+    .panel-carry > p:first-of-type {
+      padding: 12px 14px;
+      background: #F8F4EE;
+      border: 1px solid #D9D3CB;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+    .empty-cell {
+      color: #6B7882;
+      font-style: italic;
+    }
+    .analyst-divider {
+      display: none;
+    }
+    a {
+      color: #315F8B;
+      text-decoration: underline;
+    }
+    
+    .report-stack {
+      margin-top: 0;
+    }
+    @media screen and (max-width: 1100px) {
+      .summary-strip, .client-grid, .subgrid {
+        display: block;
+      }
+      .hero-table, .hero-table tbody, .hero-table tr, .hero-table td {
+        display: block;
+        width: 100%;
+      }
+      .hero-right {
+        text-align: left;
+        padding-left: 0;
+        padding-top: 10px;
+      }
+      .mini-card, .panel {
+        margin-bottom: 16px;
+      }
+      .rotation-table, .snapshot-table, .panel table {
+        table-layout: auto;
+      }
+    }
+    </style>
+      
+<style id="etf-table-pagination-guard">
+  @media print {
+    table { page-break-inside: auto; break-inside: auto; border-collapse: collapse; }
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    tr, th, td { page-break-inside: avoid; break-inside: avoid; }
+    .panel table tr, .panel table th, .panel table td,
+    .data-table tr, .action-table tr, .rotation-plan-table tr,
+    .position-review-table tr, .replacement-duel-v2-table tr {
+      page-break-inside: avoid; break-inside: avoid;
+    }
+  }
+</style>
+
+
+<style id="etf-hero-layout-guard">
+  .summary-strip .mini-card {
+    overflow: hidden;
+  }
+  .summary-strip .mini-value {
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: auto;
+  }
+  .summary-strip .mini-card:nth-child(3) .mini-value {
+    font-size: 19px;
+    line-height: 1.22;
+  }
+  .panel-equity,
+  .equity-curve-panel,
+  .equity-curve {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    overflow: visible;
+  }
+  .panel-equity img,
+  .equity-curve-panel img,
+  .equity-curve img,
+  img[src*="equity"],
+  img[alt*="Equity"],
+  img[alt*="Portefeuillecurve"] {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+    object-fit: contain;
+    object-position: center center;
+  }
+  @media screen and (max-width: 1100px) {
+    .summary-strip .mini-card:nth-child(3) .mini-value {
+      font-size: 18px;
+      line-height: 1.24;
+    }
+  }
+</style>
+
+<style id="etf-cockpit-delivery-front-page-style">
+.etf-cockpit-page{max-width:780px;margin:0 auto 28px;background:#F6F1E7;color:#211C16;border:1px solid #D8CDB8;font-family:Arial,Helvetica,sans-serif;box-sizing:border-box}
+.etf-cockpit-page *{box-sizing:border-box}
+.etf-cockpit-inner{padding:34px 42px 28px}
+.etf-cockpit-header{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #211C16;padding-bottom:14px}
+.etf-cockpit-kicker,.etf-cockpit-issue,.etf-cockpit-strap,.etf-cockpit-section-title,.etf-cockpit-label,.etf-cockpit-metric-label,.etf-cockpit-metric-sub,.etf-cockpit-footer,.etf-cockpit-evidence-label,.etf-cockpit-evidence-value{font-family:'Courier New',monospace}
+.etf-cockpit-kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#B07D2B}
+.etf-cockpit-mast{font-family:Georgia,'Times New Roman',serif;font-size:40px;font-weight:700;line-height:1;margin-top:8px;letter-spacing:-.02em}
+.etf-cockpit-mast em{color:#0F4438;font-style:italic;font-weight:400}
+.etf-cockpit-issue{text-align:right;font-size:10.5px;line-height:1.65;color:#5A5043}
+.etf-cockpit-strap{margin-top:12px;display:flex;gap:12px;align-items:center;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#5A5043}
+.etf-cockpit-dot{width:5px;height:5px;border-radius:50%;background:#B07D2B;display:inline-block}
+.etf-cockpit-section-title{margin:28px 0 12px;color:#0F4438;font-size:11px;letter-spacing:.19em;text-transform:uppercase;display:flex;align-items:center;gap:12px}
+.etf-cockpit-section-title:after{content:'';height:1px;background:#D8CDB8;flex:1}
+.etf-cockpit-lede{font-family:Georgia,'Times New Roman',serif;font-size:20px;line-height:1.48;margin:0}
+.etf-cockpit-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+.etf-cockpit-card{border:1px solid #D8CDB8;background:#EFE8D9;padding:16px 18px}
+.etf-cockpit-label{font-size:9.5px;letter-spacing:.17em;text-transform:uppercase;color:#5A5043;margin-bottom:9px}
+.etf-cockpit-value{font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:600;line-height:1.25}
+.etf-cockpit-note{font-size:12px;color:#5A5043;line-height:1.45;margin-top:9px}
+.etf-cockpit-confidence{display:flex;align-items:center;gap:9px;margin-top:12px}
+.etf-cockpit-bar{flex:1;height:6px;background:#E2D9C6;border-radius:4px;overflow:hidden}
+.etf-cockpit-bar i{display:block;height:100%;background:#0F4438}
+.etf-cockpit-performance{border:1px solid #D8CDB8;background:#fff}
+.etf-cockpit-chart{padding:18px 18px 6px}
+.etf-cockpit-chart-caption{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:6px}
+.etf-cockpit-chart-title{font-family:'Courier New',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#5A5043}
+.etf-cockpit-page svg.spark{width:100%;height:120px;display:block}
+.etf-cockpit-metrics{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #D8CDB8}
+.etf-cockpit-metric{padding:15px 16px;border-right:1px solid #D8CDB8;border-top:1px solid #D8CDB8}
+.etf-cockpit-metric:nth-child(3n){border-right:none}
+.etf-cockpit-metric:nth-child(-n+3){border-top:none}
+.etf-cockpit-metric-label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#5A5043}
+.etf-cockpit-metric-value{font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:600;margin-top:7px;line-height:1}
+.etf-cockpit-positive{color:#2F7A57}
+.etf-cockpit-negative{color:#A8452C}
+.etf-cockpit-metric-sub{font-size:10.5px;color:#5A5043;margin-top:5px}
+.etf-cockpit-discipline{border-left:4px solid #B07D2B;background:rgba(176,125,43,.10);padding:14px 16px;font-size:13px;line-height:1.5}
+.etf-cockpit-trigger{margin-top:10px;border:1px solid #D8CDB8;background:#fff;padding:13px 15px;font-size:12.5px;line-height:1.5;color:#5A5043}
+.etf-cockpit-evidence{border:1px solid #D8CDB8;background:#fff;padding:14px 16px}
+.etf-cockpit-evidence-intro{margin:0 0 12px;color:#5A5043;font-size:12px;line-height:1.45}
+.etf-cockpit-evidence-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}
+.etf-cockpit-evidence-item{border-top:1px solid #D8CDB8;padding-top:8px}
+.etf-cockpit-evidence-label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#5A5043}
+.etf-cockpit-evidence-value{margin-top:4px;font-size:10px;color:#211C16;overflow-wrap:anywhere}
+.etf-cockpit-footer{margin-top:22px;padding-top:13px;border-top:1px solid #D8CDB8;display:flex;justify-content:space-between;gap:12px;color:#5A5043;font-size:10px}
+@media print{.etf-cockpit-page{page-break-after:always;break-after:page;border:none;margin:0;max-width:none}}
+@media (max-width:640px){.etf-cockpit-inner{padding:24px 20px}.etf-cockpit-header{display:block}.etf-cockpit-issue{text-align:left;margin-top:14px}.etf-cockpit-row,.etf-cockpit-evidence-grid{grid-template-columns:1fr}.etf-cockpit-metrics{grid-template-columns:1fr 1fr}.etf-cockpit-metric:nth-child(3n){border-right:1px solid #D8CDB8}.etf-cockpit-metric:nth-child(2n){border-right:none}}
+</style></head>
+      <body><section class="etf-cockpit-page" data-cockpit-front-page="delivery" data-cockpit-language="nl" data-render-mode="email">
+<div class="etf-cockpit-inner">
+<header class="etf-cockpit-header"><div><div class="etf-cockpit-kicker">Beleggersrapport · US ETF-strategie</div><div class="etf-cockpit-mast">De <em>ETF</em>-Review</div></div><div class="etf-cockpit-issue">Modelportefeuille · EUR<br>14 juli 2026<br><b>Rapportvoorpagina</b></div></header>
+<div class="etf-cockpit-strap"><span>Wekelijks</span><span class="etf-cockpit-dot"></span><span>US ETF</span><span class="etf-cockpit-dot"></span><span>Clientcockpit · geen beleggingsadvies</span></div>
+<div class="etf-cockpit-section-title">In het kort</div><p class="etf-cockpit-lede">Deze week is een gecontroleerde rotatie uitgevoerd: URNM afgebouwd · XBI toegevoegd. De portefeuille staat sinds de start op +10,2%, het marktklimaat blijft Risk-on growth, en de grootste concentratie zit in SMH met 28,1%.</p>
+<div class="etf-cockpit-row"><div class="etf-cockpit-card"><div class="etf-cockpit-label">Marktklimaat</div><div class="etf-cockpit-value">Risk-on growth</div><div class="etf-cockpit-confidence"><div class="etf-cockpit-bar"><i style="width:66%"></i></div><span>66% vertrouwen</span></div></div><div class="etf-cockpit-card"><div class="etf-cockpit-label">Actie deze week</div><div class="etf-cockpit-value">URNM afgebouwd · XBI toegevoegd</div><div class="etf-cockpit-note">URNM 7,0% → 2,0%; XBI 0,0% → 5,0%.</div></div></div>
+<div class="etf-cockpit-section-title">Prestatie &amp; risico</div><div class="etf-cockpit-performance"><div class="etf-cockpit-chart"><div class="etf-cockpit-chart-caption"><span class="etf-cockpit-chart-title">Portefeuillewaarde · EUR</span><span>€110.225 · <b>+10,2%</b></span></div><svg class="spark" viewBox="0 0 620 130" role="img" aria-label="Equity curve preview"><line x1="18" y1="110.0" x2="602" y2="110.0" stroke="#D8CDB8" stroke-width="1" stroke-dasharray="2 4"/><polyline points="18.0,110.0 41.4,104.7 64.7,94.0 88.1,74.5 111.4,95.3 134.8,89.1 158.2,82.0 181.5,35.7 204.9,30.6 228.2,31.1 251.6,28.3 275.0,12.0 298.3,18.2 321.7,22.1 345.0,60.5 368.4,78.4 391.8,48.7 415.1,44.7 438.5,30.9 461.8,45.9 485.2,37.4 508.6,19.1 531.9,30.1 555.3,15.9 578.6,26.9 602.0,29.0" fill="none" stroke="#0F4438" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><circle cx="602.0" cy="29.0" r="4.2" fill="#0F4438"/></svg></div><div class="etf-cockpit-metrics"><div class="etf-cockpit-metric"><div class="etf-cockpit-metric-label">Rendement sinds start</div><div class="etf-cockpit-metric-value etf-cockpit-positive">+10,2%</div><div class="etf-cockpit-metric-sub">€100.000 → €110.225</div></div><div class="etf-cockpit-metric"><div class="etf-cockpit-metric-label">Grootste terugval</div><div class="etf-cockpit-metric-value etf-cockpit-negative">-7,5%</div><div class="etf-cockpit-metric-sub">sinds start</div></div><div class="etf-cockpit-metric"><div class="etf-cockpit-metric-label">Cash</div><div class="etf-cockpit-metric-value">1,8%</div><div class="etf-cockpit-metric-sub">€1.937</div></div><div class="etf-cockpit-metric"><div class="etf-cockpit-metric-label">Posities</div><div class="etf-cockpit-metric-value">10</div><div class="etf-cockpit-metric-sub">actieve posities</div></div><div class="etf-cockpit-metric"><div class="etf-cockpit-metric-label">Grootste positie</div><div class="etf-cockpit-metric-value">SMH</div><div class="etf-cockpit-metric-sub">28,1%</div></div><div class="etf-cockpit-metric"><div class="etf-cockpit-metric-label">EUR/USD</div><div class="etf-cockpit-metric-value">1.1421</div><div class="etf-cockpit-metric-sub">prijsbasis</div></div></div></div>
+<div class="etf-cockpit-section-title">Disciplinepunt</div><div class="etf-cockpit-discipline">Belangrijkste disciplinepunt: SMH is 28,1% en blijft boven de zachte positielimiet; nieuw kapitaal blijft dus geblokkeerd totdat de disciplinepoorten vrijgeven.</div><div class="etf-cockpit-trigger" data-next-action-trigger="true">Trigger voor volgende actie: een volgende mutatie vereist dat SMH terugkeert binnen de zachte positielimiet, of dat een alternatief voor DFEN, PAVE, SMH bevestigde relatieve sterkte, een geldige prijsbasis, aansluiting op de beleggingsthese en een duidelijke financieringsbron toont.</div>
+<div class='etf-cockpit-section-title'>Bronnen en controle</div><div class='etf-cockpit-evidence' data-source-evidence='true'><p class='etf-cockpit-evidence-intro'>De voorpagina is opgebouwd uit de actuele portefeuillestatus. De volledige analyse en onderliggende tabellen volgen hierna.</p><div class='etf-cockpit-evidence-grid'><div class='etf-cockpit-evidence-item'><div class='etf-cockpit-evidence-label'>Portefeuillestatus</div><div class='etf-cockpit-evidence-value'>actuele uitvoerautoriteit</div></div><div class='etf-cockpit-evidence-item'><div class='etf-cockpit-evidence-label'>Waarderingshistorie</div><div class='etf-cockpit-evidence-value'>gereconcilieerd</div></div><div class='etf-cockpit-evidence-item'><div class='etf-cockpit-evidence-label'>Prijscontrole</div><div class='etf-cockpit-evidence-value'>gekoppeld</div></div><div class='etf-cockpit-evidence-item'><div class='etf-cockpit-evidence-label'>Macrobeeld</div><div class='etf-cockpit-evidence-value'>gekoppeld</div></div><div class='etf-cockpit-evidence-item'><div class='etf-cockpit-evidence-label'>Uitvoerregistratie</div><div class='etf-cockpit-evidence-value'>gekoppeld</div></div><div class='etf-cockpit-evidence-item'><div class='etf-cockpit-evidence-label'>Volledig rapport</div><div class='etf-cockpit-evidence-value'>volgt direct na deze voorpagina</div></div></div></div><div class="etf-cockpit-footer"><span>Volledige analyse en bewijslaag volgen hierna.</span><span>01</span></div>
+</div></section>
+        <div class="report-shell">
+          <div class="hero">
+            <table class="hero-table" role="presentation" cellpadding="0" cellspacing="0"><tr>
+              <td class="hero-left"><div class="masthead">WEKELIJKSE ETF-REVIEW</div><p class="hero-sub">Dinsdag 14 juli 2026</p></td>
+              <td class="hero-right"><div class="hero-side-label">Beleggersrapport</div></td>
+            </tr></table>
+          </div>
+          <div class="hero-rule"></div>
+          <div class="notice">Dit rapport wordt uitsluitend verstrekt voor informatieve en educatieve doeleinden; zie de disclaimer aan het einde.</div>
+          <div class="summary-strip"><div class='mini-card'><div class='mini-label'>Primair regime</div><div class='mini-value'>Risk-on groei</div></div><div class='mini-card'><div class='mini-label'>Geopolitiek regime</div><div class='mini-value'>Verhoogd maar gelokaliseerd</div></div><div class='mini-card'><div class='mini-label'>Kernconclusie</div><div class='mini-value'>De portefeuille voerde één gecontroleerde rotatie uit: URNM werd verlaagd en XBI werd toegevoegd; verdere wijzigingen blijven bewijs- en churnbegrensd.</div></div></div>
+          <div class="client-grid"><div class='exec-summary-render-marker' style='display:none'>Kernsamenvatting / Kernsamenvatting</div><div class='panel panel-action-snapshot'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>2</span></td><td class='section-label-cell'><span class='section-label'>Portefeuille-acties</span></td></tr></table><table class='action-table'><thead><tr><th>Advies</th><th>Tickers / toelichting</th></tr></thead><tbody><tr><th>Toevoegen / bestemming</th><td><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td></tr><tr><th>Aanhouden</th><td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a>, <a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a>, <a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a>, <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a>, <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>, <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a>, <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a>, <a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a>, <a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a>, <a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td></tr><tr><th>Aanhouden met override</th><td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a>, <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>, <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a>, <a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a> blijven expliciet onder herbeoordeling.</td></tr><tr><th>Verwerkte vervanging / verlaging</th><td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a> → <a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td></tr><tr><th>Sluiten</th><td>Geen</td></tr></tbody></table><div class='note-box'><h4>Status rotatie-uitvoering</h4><ul><li>De bewaakte modelrotatie is al verwerkt in de officiële portefeuillestaat en het handelslogboek; deze run heeft geen dubbele staat- of handelslogboekmutatie uitgevoerd.</li></ul></div><div class='note-box'><h4>Beste alternatieven om te financieren</h4><ul><li>De bewaakte modelrotatie <a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a> → <a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a> is al verwerkt in de officiële portefeuillestaat en het handelslogboek; deze rapport-render heeft geen dubbele staat- of handelslogboekmutatie uitgevoerd.</li></ul></div></div><div class='panel panel-regime'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>3</span></td><td class='section-label-cell'><span class='section-label'>Regime-dashboard</span></td></tr></table><h3>Regimesamenvatting</h3>
+<ul>
+<li>Huidig regime: Risk-on groei.</li>
+<li>Vertrouwen: 66%.</li>
+<li>Deterministische regime-inschatting — alleen ter review: De shadow-engine classificeert de marktomgeving momenteel als Risk-on groei, grotendeels in lijn met de bestaande regime-inschatting. De betrouwbaarheid is hoog maar alleen ter review en beschrijft samenhang in het bewijs, geen voorspelling. Dit geeft geen autoriteit voor portefeuillewijzigingen. De normale discipline blijft leidend.</li>
+<li>Regimegeheugen: Risk-on groei houdt al 62 runs aan; de overgangsfase is stabiel, de marktbreedte is gemengd en cross-asset bevestiging blijft gemengd.</li>
+<li>Beslisregel: Roteer niet agressief tenzij een regimeverschuiving minstens twee runs aanhoudt of cross-asset bevestiging breed wordt.</li>
+</ul>
+<h3>Beleids- en geopolitieke status</h3>
+<ul>
+<li>Status: Verhoogd maar gelokaliseerd.</li>
+<li>Fed-houding: Restrictief / datagedreven. Portefeuillelezing: Geef voorkeur aan kwaliteit, winstgevende groei en kasdiscipline boven zwakke balans-bèta.</li>
+<li>ECB-houding: Verkrappend / inflatiegevoelig. Portefeuillelezing: <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a>-blootstelling is nu aanwezig, maar verdere allocaties naar ontwikkelde markten buiten de VS vragen nog bevestiging in relatieve sterkte, prijsbasis en portefeuillediscipline.</li>
+</ul>
+<h3>Wat veranderde</h3>
+<ul>
+<li>Er is geen materiële regimeverandering vastgesteld ten opzichte van de vorige review. AI- en semiconductorleiderschap bleef dominant, terwijl marktbreedte en cross-assetbevestiging gemengd bleven.</li>
+</ul>
+<h3>Portefeuille-implicaties</h3>
+<ul>
+<li>De risicobereidheid blijft ondersteunend, maar aanvullende allocaties vragen nog ruimte binnen de positielimiet en koersbevestiging.</li>
+<li>Groei- en infrastructuurthema’s kunnen worden overwogen zolang ze de concentratie niet vergroten.</li>
+<li>Defensieve hedgeposities moeten worden getoetst op opportuniteitskosten.</li>
+</ul>
+<h3>Beleidscatalysatoren in dit rapport</h3>
+<ul>
+<li>AI-infrastructuur en semiconductor-toeleveringsketens: Kapitaaluitgaven en strategisch toeleveringsbeleid blijven semiconductor- en infrastructuurthema’s ondersteunen.</li>
+<li>Defensie en strategische weerbaarheid: De duurzaamheid van defensiebudgetten blijft een structurele steun, maar de ETF-keuze blijft belangrijk.</li>
+</ul>
+</div><div class='panel panel-radar'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>4</span></td><td class='section-label-cell'><span class='section-label'>Structurele kansenradar</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Thema</th>
+  <th>Primaire ETF</th>
+  <th>Alternatieve ETF</th>
+  <th>Waarom relevant</th>
+  <th style="text-align:right">Structurele aansluiting</th>
+  <th style="text-align:right">Macro-timing</th>
+  <th>Status</th>
+  <th>Benodigde bevestiging</th>
+  <th>Tijdshorizon</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Cybersecurityweerbaarheid</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=BUG" target="_blank" rel="noopener noreferrer">BUG</a></td>
+  <td>Cybersecurity-uitgaven profiteren van AI, cloud, datacenters en geopolitieke weerbaarheid.</td>
+  <td style="text-align:right">4</td>
+  <td style="text-align:right">4</td>
+  <td>Actiegericht</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+  <td>3-12 maanden</td>
+</tr>
+<tr>
+  <td>AI-rekenkrachtinfrastructuur</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SOXX" target="_blank" rel="noopener noreferrer">SOXX</a></td>
+  <td>AI-rekenkracht en semiconductor-capex blijven de sterkste structurele groeibronnen.</td>
+  <td style="text-align:right">5</td>
+  <td style="text-align:right">5</td>
+  <td>Actiegericht</td>
+  <td>Aanhoudend leiderschap, maar met positiegrootte- en concentratiediscipline.</td>
+  <td>3-12 maanden</td>
+</tr>
+<tr>
+  <td>Biotechinnovatie / therapeutische platforms</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IBB" target="_blank" rel="noopener noreferrer">IBB</a></td>
+  <td>Biotechinnovatie / therapeutische platforms blijft relevant, maar vraagt om bevestiging in prijs, timing en portefeuillefit.</td>
+  <td style="text-align:right">4</td>
+  <td style="text-align:right">3</td>
+  <td>Volglijst / onder herbeoordeling</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+  <td>3-12 maanden</td>
+</tr>
+<tr>
+  <td>Healthcarekwaliteit en defensieve groei</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLV" target="_blank" rel="noopener noreferrer">XLV</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=VHT" target="_blank" rel="noopener noreferrer">VHT</a></td>
+  <td>Healthcarekwaliteit en defensieve groei blijft relevant, maar vraagt om bevestiging in prijs, timing en portefeuillefit.</td>
+  <td style="text-align:right">3</td>
+  <td style="text-align:right">3</td>
+  <td>Volglijst / onder herbeoordeling</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+  <td>3-12 maanden</td>
+</tr>
+<tr>
+  <td>Netuitbreiding / elektrificatie</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a></td>
+  <td>Stroomvraag, netcongestie en reshoring ondersteunen infrastructuurinvesteringen.</td>
+  <td style="text-align:right">5</td>
+  <td style="text-align:right">4</td>
+  <td>Volglijst / onder herbeoordeling</td>
+  <td>Bevestiging dat <a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a> structureel beter past dan <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>.</td>
+  <td>3-12 maanden</td>
+</tr>
+<tr>
+  <td>Financiële infrastructuur en marktinfrastructuur</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=KCE" target="_blank" rel="noopener noreferrer">KCE</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IAI" target="_blank" rel="noopener noreferrer">IAI</a></td>
+  <td>Financiële infrastructuur en marktinfrastructuur blijft relevant, maar vraagt om bevestiging in prijs, timing en portefeuillefit.</td>
+  <td style="text-align:right">3</td>
+  <td style="text-align:right">3</td>
+  <td>Volglijst / onder herbeoordeling</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+  <td>3-12 maanden</td>
+</tr>
+</tbody>
+</table>
+<h3>Beste structurele kansen die nog niet actiegericht zijn</h3>
+<ul>
+<li>Voedselzekerheid / landbouwinputs</li>
+<li>Waterinfrastructuur / waterbehandeling</li>
+<li>Kritieke mineralen / koper / raffinage</li>
+</ul>
+<h3>Opvallende thema’s beoordeeld, maar deze week niet gepromoveerd</h3>
+<table>
+<thead>
+<tr>
+  <th>Thema</th>
+  <th>Primaire ETF</th>
+  <th>Waarom niet gepromoveerd</th>
+  <th>Wat dat zou veranderen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Agrarische grondstoffen</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DBA" target="_blank" rel="noopener noreferrer">DBA</a></td>
+  <td>Scoorde lager dan sterkere gefinancierde posities en alternatieven.</td>
+  <td>Bredere grondstoffenbevestiging voordat kapitaal wordt toegewezen.</td>
+</tr>
+<tr>
+  <td>Defensie-innovatie / strategische weerbaarheid</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a></td>
+  <td>Scoorde lager dan sterkere gefinancierde posities en alternatieven.</td>
+  <td>Duidelijkere ETF-implementatie en relatieve sterkte tegenover defensiealternatieven.</td>
+</tr>
+<tr>
+  <td>Energie-infrastructuur en investeringen in nutsbedrijven</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td>Relatieve sterkte tegenover de relevante huidige positie is nog onvoldoende overtuigend.</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+</tr>
+<tr>
+  <td>Ontwikkelde markten buiten de VS</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td>Bestaande gefinancierde positie; deze run is geen aanvullende lane-promotie toegekend.</td>
+  <td>Heroverweeg alleen bij een duidelijke wijziging in relatieve sterkte, factorconcentratie of financieringsbron.</td>
+</tr>
+<tr>
+  <td>Waterinfrastructuur / waterbehandeling</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=FIW" target="_blank" rel="noopener noreferrer">FIW</a></td>
+  <td>Scoorde lager dan sterkere gefinancierde posities en alternatieven.</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+</tr>
+<tr>
+  <td>Fintech / payments rails</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=FINX" target="_blank" rel="noopener noreferrer">FINX</a></td>
+  <td>Scoorde lager dan sterkere gefinancierde posities en alternatieven.</td>
+  <td>Sterkere relatieve sterkte en duidelijke aansluiting op de beleggingscase.</td>
+</tr>
+</tbody>
+</table>
+<h2>4A. Shortkansenradar</h2>
+<table>
+<thead>
+<tr>
+  <th>Shortthema</th>
+  <th>Kandidaat-ETF</th>
+  <th>Shortthese</th>
+  <th>Trigger</th>
+  <th>Invalidering</th>
+  <th>Tijdshorizon</th>
+  <th>Vertrouwen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Rentegevoelige small-caps</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IWM" target="_blank" rel="noopener noreferrer">IWM</a></td>
+  <td>Restrictieve reële rentes zetten zwakkere balansen onder druk.</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IWM" target="_blank" rel="noopener noreferrer">IWM</a> verzwakt verder tegenover <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a> terwijl rentes stevig blijven.</td>
+  <td>Duidelijke renteontspanning en betere kredietbreedte.</td>
+  <td>1-3 maanden</td>
+  <td>Gemiddeld</td>
+</tr>
+<tr>
+  <td>Chinese platformbeta</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=KWEB" target="_blank" rel="noopener noreferrer">KWEB</a></td>
+  <td>Beleidsvertrouwen blijft kwetsbaar.</td>
+  <td>Mislukte rally of hernieuwde valuta-/beleidsstress.</td>
+  <td>Duurzame stimulans en winstherstel.</td>
+  <td>1-3 maanden</td>
+  <td>Gemiddeld</td>
+</tr>
+<tr>
+  <td>Langlopende obligaties</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=TLT" target="_blank" rel="noopener noreferrer">TLT</a></td>
+  <td>Hardnekkige inflatie en reëlerenterisico blijven tegenwind.</td>
+  <td>Reële rentes stijgen opnieuw.</td>
+  <td>Groeischrik en duidelijke neerwaartse rente-uitbraak.</td>
+  <td>1-3 maanden</td>
+  <td>Gemiddeld</td>
+</tr>
+<tr>
+  <td>Speculatieve cleantechbeta</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=ICLN" target="_blank" rel="noopener noreferrer">ICLN</a></td>
+  <td>Financieringsdruk en zwakke winstgevendheid blijven knelpunten.</td>
+  <td>Geen herstel in een brede risk-on-markt.</td>
+  <td>Scherpe rentedaling of grote beleidsverrassing.</td>
+  <td>3-12 maanden</td>
+  <td>Gemiddeld</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel panel-risks panel-compact'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>5</span></td><td class='section-label-cell'><span class='section-label'>Belangrijkste risico’s / invalidaties</span></td></tr></table><ul>
+<li><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a> plus <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> creëert hoge Amerikaanse tech-/AI-factoroverlap.</li>
+<li>De brede grondstoffenhedge blijft een rol die periodiek moet worden bewezen en is geen vanzelfsprekende stabilisator.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a> en <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a> blijven onder implementatie- en vervangingsreview; bij <a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a> moet ook het hefboomprofiel expliciet worden meegewogen.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a> levert inmiddels een materiële allocatie naar ontwikkelde markten buiten de VS (24.05%); verdere uitbreiding vraagt nog relatieve-sterkte- en concentratiebevestiging.</li>
+</ul>
+</div><div class='panel panel-bottomline panel-compact'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>6</span></td><td class='section-label-cell'><span class='section-label'>Conclusie</span></td></tr></table><ul>
+<li><strong>Portefeuillehouding:</strong> <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft de best onderbouwde kernpositie, maar smal marktleiderschap mag niet worden verward met brede portefeuillediversificatie.</li>
+<li><strong>Best onderbouwde blootstelling:</strong> <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft de sterkste bijdrage in de portefeuille en de zuiverste structurele groeiblootstelling.</li>
+<li><strong>Belangrijkste disciplinepunt:</strong> Voordat nieuw kapitaal naar alternatieven gaat, moeten <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a>, <a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a> en <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a> expliciet worden getoetst aan hun belangrijkste vervangingskandidaten.</li>
+<li><strong>Zwakste implementatievragen:</strong> <a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a> moet worden getoetst aan niet-gehevelde defensiealternatieven, en <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a> aan <a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a>, en de brede grondstoffenhedge moet aantonen dat de rol nog steeds stabiliserend is.</li>
+</ul>
+</div><div class='panel panel-equity'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>7</span></td><td class='section-label-cell'><span class='section-label'>Portefeuillecurve en portefeuilleontwikkeling</span></td></tr></table><ul>
+<li>Startkapitaal (EUR): 100000.00</li>
+<li>Huidige portefeuillewaarde (EUR): 110224.86</li>
+<li>Rendement sinds start (%): 10.22</li>
+<li>Status portefeuillecurve: aangesloten op sectie 15 met volledige waarderingshistorie</li>
+<li>EUR/USD gebruikt: 1.1421</li>
+<li>Toelichting: Sectie 7 gebruikt de volledige waarderingshistorie plus de actuele portefeuillewaarde; sectie 15 wordt uit dezelfde genormaliseerde portefeuillestaat opgebouwd.</li>
+</ul>
+<table>
+<thead>
+<tr>
+  <th>Datum</th>
+  <th style="text-align:right">Portefeuillewaarde EUR</th>
+  <th>Opmerking</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>2026-03-28</td>
+  <td style="text-align:right">100000.00</td>
+  <td>Initiële modelportefeuille vastgesteld</td>
+</tr>
+<tr>
+  <td>2026-04-16</td>
+  <td style="text-align:right">100671.75</td>
+  <td>Verse herprijzing per ticker op basis van de meest recente volledige slotkoersset</td>
+</tr>
+<tr>
+  <td>2026-04-20</td>
+  <td style="text-align:right">102026.08</td>
+  <td>Verse herprijzing voor zes van zes posities op basis van de volledige slotkoersset van 20 april</td>
+</tr>
+<tr>
+  <td>2026-04-24</td>
+  <td style="text-align:right">104477.54</td>
+  <td>Gedeeltelijke herprijzing op basis van laatst geverifieerde koersen</td>
+</tr>
+<tr>
+  <td>2026-04-29</td>
+  <td style="text-align:right">101854.68</td>
+  <td>Verse herprijzing voor zes van zes posities op basis van de vastgelegde prijsaudit van 2026-04-29</td>
+</tr>
+<tr>
+  <td>2026-05-04</td>
+  <td style="text-align:right">102636.85</td>
+  <td>Gedeeltelijk prijsherstel op basis van laatst geverifieerde koersen</td>
+</tr>
+<tr>
+  <td>2026-05-05</td>
+  <td style="text-align:right">103536.96</td>
+  <td>Laatste slotkoersbasis van 4 mei; +8 <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> vanuit cash</td>
+</tr>
+<tr>
+  <td>2026-05-27</td>
+  <td style="text-align:right">109387.17</td>
+  <td>Waardering uit onveranderlijke prijsaudit en expliciete portefeuillestaat</td>
+</tr>
+<tr>
+  <td>2026-05-28</td>
+  <td style="text-align:right">110032.93</td>
+  <td>Waardering uit onveranderlijke prijsaudit en expliciete portefeuillestaat</td>
+</tr>
+<tr>
+  <td>2026-05-29</td>
+  <td style="text-align:right">109964.97</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-01</td>
+  <td style="text-align:right">110321.58</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-02</td>
+  <td style="text-align:right">112376.10</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-03</td>
+  <td style="text-align:right">111596.95</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-04</td>
+  <td style="text-align:right">111105.47</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-09</td>
+  <td style="text-align:right">106246.36</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-10</td>
+  <td style="text-align:right">103994.26</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-11</td>
+  <td style="text-align:right">107747.59</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-12</td>
+  <td style="text-align:right">108243.33</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-15</td>
+  <td style="text-align:right">109983.62</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-16</td>
+  <td style="text-align:right">108100.61</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-17</td>
+  <td style="text-align:right">109172.83</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-18</td>
+  <td style="text-align:right">111477.30</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-29</td>
+  <td style="text-align:right">110086.49</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-06-30</td>
+  <td style="text-align:right">111878.25</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-07-01</td>
+  <td style="text-align:right">110493.44</td>
+  <td>Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen</td>
+</tr>
+<tr>
+  <td>2026-07-14</td>
+  <td style="text-align:right">110224.86</td>
+  <td>Doorgeschoven waardering uit prijsaudit en expliciete portefeuillestaat</td>
+</tr>
+</tbody>
+</table>
+<h3>Gebruikte slotkoersen in dit rapport</h3>
+<p>De bovenstaande portefeuillewaardering is gebaseerd op de slotkoersen per positie in deze tabel. Gevraagde slotdatum: <strong>2026-07-14</strong>. De bronkolom toont de marktdata-laag die de slotkoers leverde, niet interne resolvernamen.</p>
+<table>
+<thead>
+<tr>
+  <th>Positie</th>
+  <th>Gevraagde slotdatum</th>
+  <th>Gebruikte slotdatum</th>
+  <th style="text-align:right">Gebruikte slotkoers</th>
+  <th>Valuta</th>
+  <th>Marktdata-bron</th>
+  <th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td>2026-07-14</td>
+  <td>2026-07-14</td>
+  <td style="text-align:right">94.73</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td>2026-07-14</td>
+  <td>2026-07-14</td>
+  <td style="text-align:right">72.19</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td>2026-07-14</td>
+  <td>2026-07-14</td>
+  <td style="text-align:right">31.00</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td>2026-07-14</td>
+  <td>2026-07-14</td>
+  <td style="text-align:right">96.89</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td>2026-07-14</td>
+  <td>2026-07-14</td>
+  <td style="text-align:right">56.71</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td>2026-07-14</td>
+  <td>2026-07-14</td>
+  <td style="text-align:right">600.31</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td>2026-07-14</td>
+  <td>2026-07-14</td>
+  <td style="text-align:right">751.83</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td>2026-07-14</td>
+  <td>2026-07-14</td>
+  <td style="text-align:right">51.59</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td>
+  <td>2026-07-14</td>
+  <td>2026-07-14</td>
+  <td style="text-align:right">155.45</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td>2026-07-14</td>
+  <td>2026-07-14</td>
+  <td style="text-align:right">45.69</td>
+  <td>USD</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+  <th>FX-basis</th>
+  <th>Gevraagde datum</th>
+  <th>Gebruikte datum</th>
+  <th style="text-align:right">Koers</th>
+  <th>Bron</th>
+  <th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>EUR/USD</td>
+  <td>2026-07-14</td>
+  <td>2026-07-14</td>
+  <td style="text-align:right">1.1421</td>
+  <td>Twelve Data</td>
+  <td>Exacte slotkoers, niet onafhankelijk geverifieerd</td>
+</tr>
+</tbody>
+</table>
+<p><img src="data:image/png;base64,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u++6KzQAAAC3YAUGAAAA2ozk5GTL67y8PJv75Obm6rPPPtPPP/9sWaXQqVMnnX322br88svVqVMnu8dfsGCBXn75ZUnSCy+8oKFDh6qwsFAfffSRfv75Z2VnZ+vEiRO666679Oqrr1qOL52sRf/CCy/UO15MTIw++eQTm+cymUz65ptvtGLFCu3bt08FBQUKDw9Xnz59NGHCBJ177rlWc9577z1L749jx45Jkvbs2WP1NPdLL71U73vlzDlr/f3vf9fy5cslSV988YUiIiLs7vvvf/9bCxculCR9+umn6ty5c73t3333nf72t79Jkh5//HFdcMEFdo/lLGfe86nHWblypVauXKndu3crPz9f4eHhio2N1eDBgzVlyhSb15Yrv2+OXp8vvviiZs+eLbPZrLPOOkv/93//1+j7++mnn/Twww9Lkq677jrdeeeddr8Prvh+NubTTz+1vL7kkktccszWYsCAAZbXBQUFje7frl07DR8+XKtXr9bnn3+uyspKS0IDAADA25HAAAAAQJtx/Phxy+vg4GCr7c8884yefvpplZaWWm2bN2+e7r//fj388MN6+OGHbdaJz8zMtDTlLigo0JdffqkZM2ZYkgW1pkyZYtmv1o4dO6yO17VrV5vvY+XKlbrrrru0c+dOm9v/+c9/atSoUfrggw/qHePgwYNW5y0tLbUaKywsdNk5a+3atctynqqqKpvHqLV3717LvuXl5Vbb8/LyLNvtJaJcwdn3XGvFihWaNWuWzT/jWnfddZdee+01zZw5s964K79vjl6f4eHhOnHihDZu3Kj169frT3/6kzp27NjguV999VXLsV988UWb+7jq++mIr7/+WpIUFxen2NhYp47V2tT9OddQwrWuESNGaPXq1SopKdGqVavcmhQEAABwJUpIAQAAoM3473//a3ndo0ePett+97vf6eGHH7aZvKhVVlamRx55xOomsy3r16/X5MmTrW4OS5LZbG5C1PW99957Gj9+vN2bwLV+/vlnnXXWWTp06FCzz+XJc3qaq97z3LlzddFFFzWYvJBOrkywda24S2PX56233irpZNLk/fffb/BYx48f1+LFiyVJiYmJOvPMM632aclraM+ePZbyUWeddVazj9NaffTRR5bX/fv3d2hO3e/TmjVrXB4TAACAu7ACAwAAAK1edna2nnzyyXr13SdMmGB5/fHHH+v111+3fN2rVy/dfvvtGjRokAwGgzZv3qzXX39du3fvliS99dZbGjt2rK677jq753zsscdUVVWls846SzNmzFDv3r0t/Sa6dOmikSNHatmyZfrHP/4hSXryySd13nnn1TtGYGBgva9TUlI0c+ZM1dTUSJIGDhyo6dOnq2fPnurQoYOOHj2q9PR0vfnmm8rNzdWRI0d000036bvvvpMk3XjjjZZzTJ48Wfn5+TrjjDP0zjvv1DvPoEGDXHbO1shV73nNmjW66667ZDKZJJ1sMn/ttdfq3HPPVefOnVVSUqLMzEylp6dbEgAtpaHrMyEhQddee63uv/9+nThxQu+8847+8Ic/2D3WBx98YOmpcsstt1htb+lrKC0tzfJ68ODBTZq7YcMGh5t4f/TRR4qLi2vS8d3p2LFjevrppzV//nzL2N133+3Q3KSkJMtrR/pmAAAAeAsSGAAAAGg1du7cWe/mY01NjTIzM5WdnW25iSyd7C1Rt0b/448/bnk9depUffjhhwoICLCMjR8/Xvfcc4+uueYaLVmyRJL0xBNPaPr06TIabS9arqqq0oMPPqhnn33WZrmpLl261Hsqv2/fvo3eOP3zn/+syspKGY1GvfXWW7rpppus9rnmmmv0l7/8RVOnTtXXX3+tlStXasOGDRo6dKgSEhKUkJAgSfLz85MkhYSENHheZ8/ZGrnqPT/00EOqrq6WJA0bNkyLFy+2W87o1Vdfdahfgas0dn0GBQVp6tSp+uCDD7R58+YG/zxrE2ABAQE2G2a39DW0f/9+y+sOHTo0aW5hYaFVSTV7Tpw40aRju8qpSRaz2az8/Hzt3r3bkiSSTiapbPWysaV9+/aW13W/fwAAAN6OElIAAABoNUpKSvTzzz9b/lu3bp0yMzPrJS86d+6sL774QuHh4ZKk7du3a9u2bZJO1ot/77336iUvagUEBGjevHmKjo6WdLI3webNm+3GkpiYaPfmcHPk5OTom2++kSTNmDHD5k3gWsHBwZozZ47l69p+AK3hnJ7mqveckZGh1atXSzrZU2Lp0qUN9mIwGo2KiopyMnrHOXJ91l1N8fbbb9vcJz09XSkpKZJOruo59T144hqqLR8lqUW/py2lNslS+9+aNWu0Y8cOS/Ji8ODBWrBggaXRvSMiIyMtydgjR464JW4AAAB3YAUGAAAA2oQePXpo2rRpuu++++o9bfzLL79YXk+fPl0hISF2jxEWFqbrrrtO//73vyVJ69atU2Jios19r7vuOpclLyTpp59+srz++eefLaWg6vbTqH1tNpvrje/du7fVnNPTXPWeV61aZXl93XXXOdxMuaU4cn2OHTtWPXr00L59+zR//nz961//sipr9tZbb1le1/bNqMsT11BZWZnldWRkZJPmDh061PL5bkx8fHyTjt1SfHx86pWBc4TBYFBkZKTy8/Prff8AAAC8HQkMAAAAtBp9+vTRm2++afnaaDQqLCxMsbGx9ZIWddV92tiRevl1a8U39KRynz59HIjYcZmZmZbXe/bs0Z49exye29zSRJ44p6e56j1nZ2dbXttqau1pjlyfBoNBN910kx599FEVFBRo0aJFuvbaay3bKysr9cEHH0g62Tdj3LhxVsfwxDVUWx5NksrLy5s0NyIiwuEeGLb4+v72T+jKykqH59WNs278tpyaZCkoKNCuXbs0d+5c7dixQ6mpqTrvvPP066+/qmvXrg7HUJu4aOz8AAAA3oQEBgAAAFqN0NDQJt98rG0+LFk3zbal7j51554qODi4SXE0prS0tNlz65bQ8vZzepqr3nPda6O2ObY3cfT6vOmmm/TYY4/JZDLpnXfeqZfA+Pzzz3Xs2DFJ0s0332yzH4wnrqGIiAjL6/z8/GafvyXPffz4ccvrxlaN2Euy3Hvvvbruuuv08ccfKy8vTzfddJO+//57h85fXl5uSaLUfQ8AAADejgQGAAAA2rS6NwuzsrIa3b/uE+Xt2rVzR0g21a3l/8gjj+iiiy5yeK691Sctec66N7erqqoanFtcXOzweVzNVe+57uuDBw82Ox5Pf98SEhJ04YUX6uuvv9Z3332njIwMy1P9tX0xDAaDbr75ZpvzPXHd1jaql1o+gdG5c2fL661btzo05/jx45YVO35+fs3u2+Hr66t33nlHGzZs0L59+/TDDz9o0aJFmjp1aqNzaxNRktSlS5dmnR8AAMATSGAAAACgTevXr5/l9ddff60HHnigwf2//PJLy+u+ffs6de6m9Mjo37+/5XVOTo5TZW48cc7Q0FDL64yMDMXExNjdd/369c0+j7Nc9Z4HDhxoef3ZZ5/pT3/6U7OO4w3ft1tvvVVff/21zGaz3n33Xf3tb39Tdna2pTn3+eefr27dutmc6+nr9sCBA24/X13Dhw+3vP72229VXl7e6Mquzz//3PI6OTnZqRJOwcHBeu6553TFFVdIOpk0mjJlis3VMXXV/T7V/ZkIAADg7Rr+LQcAAABo5UaOHGkp8bNixQp99dVXdvddvny5VqxYIUny9/d3+mZs3TI+hYWFDe47evRoy2qR9957r16TaHtqamr08ssvN7uMjyvPWfcG95IlS+zO/+9//6sdO3Y0K15XcNV7HjlypOVJ+vXr1+vVV19tVjze8H2bPHmyZTXEu+++a0lk1NTUSJJuueUWu3M9cd0mJSVZelG0dDJs0KBBlhUghYWFevrppxvcv7i4WE888YTl6wkTJjgdw9SpUzV06FBJ0vbt2/X+++83OueXX36xvB42bJjTMQAAALQUEhgAAABo00JDQ3XjjTdavr7iiiv0xhtv1GvAW1lZqddff11XXnmlZWzGjBmN1qpvTFxcnOX1woULGywR5O/vrz/+8Y+STpYSuuiii/T444/XK2lVKycnR//5z380cOBAzZo1q9HSQy1xzrrJnn//+9965513ZDabLWMlJSV69tlndfvttzcrVldx1Xv28/PTH/7wB8vX99xzj+6++26bKwIOHDigf/3rX1q0aJHVNm/4vvn7++v666+3xLpy5Uq9++67kk6WYGuoRJEnrtvg4GCNHDlSkpSent5grxpXMxqNuueeeyxfP/XUU5o1a5bV+zWZTFq5cqVGjx6tffv2STrZK+WOO+5wSRx1kyKPP/64qqurG9y/bgLjggsucEkMAAAALcIMAAAAeLHNmzebJZklmc8888xmHSMvL88cFxdnOY4kc0hIiDk5Odk8ZMgQc0hISL1tMTEx5iNHjlgd57nnnrPs8+233zZ63qKiInNgYKBlTmRkpHnYsGHmUaNGmUeNGmW+8sor6+1fWVlpHjt2bL1YJJnj4uLMQ4cONQ8dOtSckJBgtf348eNW5+7UqZNZkjkxMbHBGF15ziFDhtTbJyIiwjxkyBDzwIEDzX5+fmZJZj8/P/Pw4cMt++zfv9/qOPPnz7dsnz9/vsu3u+o9V1RUmM8++2yr/RISEszDhg0z9+/f3xweHm4Zf+aZZ2z+Gbjq+9bU67Ou9PR0y9z+/ftbXt91112NznXlNeSouu911apVDe67atWqet/b2s9fY/9dc801dt9v3T+L2v+6detmHj58uDkpKckcERFhtf21115zKMYL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3gmpzl/GZAkpAAD8x2UCwzAMfffdd5o8ebK6deumatWq6YYbbtDUqVO1bds21alTR7fffrs++OADHT58WAcPHtT777+v2267zZfxu2QYhv73v/9Jkm655RZZrY4fOGrXrq2rr75akvTVV185nP/3v/8tSWrbtm2JNgz3xvX9XR8AAACVS3Zevp783w7dM3uDUrOcrw8vSaPax+nLP1+pxjXY7wKA743t0cCz+j1d13e2gbfEElIAAPiTyz0wsrOzdc0119j/Py4uTv369VP//v01YMAANW/e3CcBltbhw4d1/vx5SdKVV17pslyvXr20cOFCbdmyRfn5+bJYfl9T87vvvpMk3XDDDZKkbdu2acmSJUpMTFS1atXUo0cP9enTp9DMBm9d39/1AQAAUHkcOZehBz7ZpG0nXO81F2UN0mODG2hQ81j2uwDgNx3qxWhQqzgt3ZVQ4rqDWsWpfXy0y/OJac4TGNUjSWAAAOAvbm3iHRMTo9GjR2vgwIHq16+fYmJiyjgsz+3bt8/+dePGjV2WKziXnZ2to0ePqlGjRpKkI0eO6OzZs5KkVq1aaezYsfroo48c6rdr104ff/yxrrjiCq9e39/1AQAAUDks2npKk+dtVVq261kXbetG660xHRWWn+HDyADAkclk0pRbO2rMjLXaetx10vVy7eKjNeXWjk5fQCyQ4CSBER0WTNIWAAA/cpnACAoK0u23367ly5frxIkTeuutt/TWW2/JbDarY8eOGjBggAYMGKA+ffooIiLClzG7JSXl9w8yRSVcLj2Xmppq/7pgQxVJeu6557Rz5061bNlSI0eOVHR0tLZs2aLPP/9cW7duVZ8+ffTrr7+qSZMmXru+v+sXpagPfJe69HuI8iM5OdnfIQAO6JeojOj3KGvZeTZNWXFU87YkFlnulo5xerBPPYXkZ9AvATfwc+IbU0c00T+/OaiVB5OLLduncYyevraxMlOSlFlEueNnHX8njg2zVIjfbemXqIzo9whE9MuSKzKBUbCB9d69e7Vs2TItX75cP/74ozZs2KANGzbolVdeUXBwsLp162ZPaPTs2dPpfgu+lpX1++ZbISEhLsuFhobav75w4YL964yM398u27lzp2666SbNnTtXQUG/f8seeOAB9evXT8nJyXrkkUf09ddfe+36/q4PAACAiuvo+Sz9feEB7U10/SgvymrR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2WWXdTp+9913Z8+ePUmSlpaWTJ06tdP4tGnTOgLGggUL8vjjj+fyyy8/YMBYtWpVpk6dmurq6i4B46OPPsrUqVMzcODAnHfeeamtrc17773Xac5JJ52U1157LSNHjkxjY2Nqa2vz2WefdZpz6aWXpq6uLsccc8xBfjEAACgeAQMAAOiWbr755jz44IPZunVrFi5c2ClgbNu2LS+++GLKyspy9tlnZ9CgQamqqsp3332XlStXpqmpKePHj8/ixYs7RYw77rgj69evz7Jly1JaWtolOowZM+aQX8fu3btzySWXZPPmzRk7dmz+9a9/5ZtvvsmHH36YDRs2ZPz48Xn99ddzzTXXpLW1NZdffnkGDBiQdevWpb6+PsuXL8/kyZOzaNGiQ743AAA4nAQMAACgWyopKcmFF16Yurq6rFy5Mu3t7enRo0eSpLq6OrNnz84NN9yQPn36dFq3bdu23H333VmwYEHuv//+NDY2dqx74YUXUldXl2XLlqV3795dHiF1ODQ3N6ekpCQffPBBzj///I7jb731ViZNmpTt27fn0ksvzdChQ7Nw4cIMHTq0Y86TTz6ZmTNnZvHixamvr8+oUaMO+34BAOBQ6fnnUwAAAI5MQ4YMSZK0trZm165dHcePO+641NbWdokXSdK/f/+88sorKS8vz5dffpm1a9f+r7Z7QM8++2yneJEk1157bS666KIkyd69e/Pqq692ihdJ8uCDD+aEE05Iki6PnwIAgKJzBwYAANBtVVVVdXxubm5OdXV1lznffvttGhsbs2PHjuzZsyft7e1JkqOPPjqtra1pamrKsGHD/md7/r969eqVG2+8cb9jw4cPz/vvv5+TTz55v3dXlJSU5LTTTsuWLVuyefPmw71VAAA4pAQMAACg2/r55587PldUVHQae/fddzNz5szU19cf9Bw7d+48HFv7y4499tiUl5fvd+z3F3MPGjTogOt/n9Pa2nroNwcAAIeRgAEAAHRb33//fZJ9dyL07du34/g777yTa6+9Nm1tbenVq1fOOuusDB48OJWVlSkpKUmS1NXVpbm5Ob/99tvfsvff9ez550/+/Stzfr+zBAAAjhQCBgAA0G19/PHHSZIRI0Z0+if/Qw89lLa2tlx88cWZP39+jj/++C5rly1blubm5sO6P1EBAAAOzEu8AQCAbmnFihX5+uuvkyTjxo3rOL5jx440NjYmSWbNmrXfeNHS0tJx98Z/qlevXkmS3bt3H3DODz/88F99BwAAdGcCBgAA0O389NNPuffee5MkZWVlue+++zrG/hgUevfuvd/18+bNyy+//LLfsdLS0iRJW1vbQfdw3HHHJUk2btyYvXv37nfO22+/fdBzAADAP5mAAQAAdCsff/xxampq8uWXXyZJHnvssQwcOLBjfMCAATnqqKOSJC+//HKX9atWrcqMGTMOeP4BAwYk2feC8O++++6A82pqapLsu8tizpw5Xcbnzp2bN9544y9cEQAA/DN5BwYAAHDEWbRoUTZv3pxk350Qu3btysaNG/Phhx+mqakpyb4Xdz/yyCNdYkRpaWmmTJmSl156KU8//XS++OKLjBs3LuXl5fn8888zf/789OjRI5WVlft9/NOZZ56Z6urqNDc3Z+LEiZk8eXL69euXJDnjjDM6wsXIkSMzZsyYfPLJJ7nrrruyfPnynHvuufn111+zZMmSLFmyJP369cv27dsP508FAABHLAEDAAA44jzzzDMHHCstLc2kSZMyc+bMnHPOOfud89RTT2XDhg1ZunRpx9/v+vfvn7lz52b69On56quvuqwtLy/PrFmzcs8992T16tVZvXp1x9i0adM6AkaSvPrqq5kwYUK++uqrzJs3L/PmzesYu/7663P99dfn1ltv/f9cOgAA/GMIGAAAwBGhX79+qa2t7XSsR48eKSsrS1VVVfr375+zzjoro0aNSlVV1UHPVVFRkcWLF2fp0qVZvnx5fvzxx/Tt2zcjRozI1VdfncrKyqxcuTJbtmzJ6aef3mX9nXfemYsvvjgLFy7Mpk2b0tLSkvb29owZM6bTvMGDB2fNmjVZsGBBPv/887S0tOTEE0/MlVdemdGjR6ehoSG1tbUdj7T6o1NOOSW1tbU55phjDngdo0ePTm1tbYYNG3bAOVdccUX69OmTCy644KC/CQAAFE2P9vb29r97EwAAAAAAAH/kJd4AAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDhCBgAAAAAAEDh/BujmJpbCcSaWQAAAABJRU5ErkJggg==" alt="Equity curve" /></p>
+<h2>7A. Rendement huidige ETF-posities</h2>
+<p>Rendement wordt berekend op de huidige ETF-posities op basis van de meest recente gevalideerde slotkoers-audit, beschikbare markthistorie en waar nodig de uitgevoerde modeltransacties.</p>
+<table>
+<thead>
+<tr>
+  <th>Portefeuillesegment</th>
+  <th>Beleggingsthese</th>
+  <th>ETF</th>
+  <th style="text-align:right">Gewicht %</th>
+  <th style="text-align:right">1w rendement</th>
+  <th style="text-align:right">1m rendement</th>
+  <th style="text-align:right">3m rendement</th>
+  <th style="text-align:right">Sinds instap</th>
+  <th style="text-align:right">P/L EUR</th>
+  <th style="text-align:right">Bijdrage %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Rotatiebestemming</td>
+  <td>Cybersecurityweerbaarheid</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td style="text-align:right">19.11%</td>
+  <td style="text-align:right">+1.43%</td>
+  <td style="text-align:right">+9.04%</td>
+  <td style="text-align:right">+48.19%</td>
+  <td style="text-align:right">+2.86%</td>
+  <td style="text-align:right">585.15</td>
+  <td style="text-align:right">+0.59%</td>
+</tr>
+<tr>
+  <td>Rotatiebestemming</td>
+  <td>Defensie-innovatie / tactische defensiebèta</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td style="text-align:right">5.26%</td>
+  <td style="text-align:right">-4.30%</td>
+  <td style="text-align:right">+1.68%</td>
+  <td style="text-align:right">-5.74%</td>
+  <td style="text-align:right">+5.19%</td>
+  <td style="text-align:right">286.07</td>
+  <td style="text-align:right">+0.29%</td>
+</tr>
+<tr>
+  <td>Rotatiebestemming</td>
+  <td>Grondstoffenbrede hedge-blootstelling</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td style="text-align:right">9.22%</td>
+  <td style="text-align:right">+3.22%</td>
+  <td style="text-align:right">+1.13%</td>
+  <td style="text-align:right">-0.88%</td>
+  <td style="text-align:right">-2.52%</td>
+  <td style="text-align:right">-262.17</td>
+  <td style="text-align:right">-0.26%</td>
+</tr>
+<tr>
+  <td>Rotatiebestemming</td>
+  <td>Diversificatie in ontwikkelde markten buiten de VS</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td style="text-align:right">24.05%</td>
+  <td style="text-align:right">+1.26%</td>
+  <td style="text-align:right">+1.18%</td>
+  <td style="text-align:right">+2.47%</td>
+  <td style="text-align:right">+1.21%</td>
+  <td style="text-align:right">315.74</td>
+  <td style="text-align:right">+0.32%</td>
+</tr>
+<tr>
+  <td>Reële activa / capex</td>
+  <td>Netwerk- en infrastructuurcapex</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td style="text-align:right">0.03%</td>
+  <td style="text-align:right">+1.08%</td>
+  <td style="text-align:right">-1.76%</td>
+  <td style="text-align:right">+3.17%</td>
+  <td style="text-align:right">+9.11%</td>
+  <td style="text-align:right">2.96</td>
+  <td style="text-align:right">0.00%</td>
+</tr>
+<tr>
+  <td>Groeimotor</td>
+  <td>AI-rekenkracht en semiconductorleiderschap</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td style="text-align:right">28.13%</td>
+  <td style="text-align:right">-0.92%</td>
+  <td style="text-align:right">-5.23%</td>
+  <td style="text-align:right">+29.98%</td>
+  <td style="text-align:right">+42.89%</td>
+  <td style="text-align:right">9,307.88</td>
+  <td style="text-align:right">+9.31%</td>
+</tr>
+<tr>
+  <td>Kernbeta</td>
+  <td>Amerikaanse large-cap kernblootstelling</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td style="text-align:right">0.03%</td>
+  <td style="text-align:right">+1.18%</td>
+  <td style="text-align:right">+1.94%</td>
+  <td style="text-align:right">+8.89%</td>
+  <td style="text-align:right">+11.16%</td>
+  <td style="text-align:right">3.04</td>
+  <td style="text-align:right">0.00%</td>
+</tr>
+<tr>
+  <td>Strategische energie</td>
+  <td>Kernenergie- en uraniumcyclus</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td style="text-align:right">2.01%</td>
+  <td style="text-align:right">-0.68%</td>
+  <td style="text-align:right">-6.58%</td>
+  <td style="text-align:right">-23.24%</td>
+  <td style="text-align:right">-23.57%</td>
+  <td style="text-align:right">-682.46</td>
+  <td style="text-align:right">-0.68%</td>
+</tr>
+<tr>
+  <td>Rotatiebestemming</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td>
+  <td style="text-align:right">5.00%</td>
+  <td style="text-align:right">-4.25%</td>
+  <td style="text-align:right">+16.75%</td>
+  <td style="text-align:right">+15.09%</td>
+  <td style="text-align:right">-0.00%</td>
+  <td style="text-align:right">0.00</td>
+  <td style="text-align:right">-0.00%</td>
+</tr>
+<tr>
+  <td>Rotatiebestemming</td>
+  <td>Defensieve nutsbedrijven / rentegevoelige ballast</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td style="text-align:right">5.40%</td>
+  <td style="text-align:right">0.00%</td>
+  <td style="text-align:right">+2.51%</td>
+  <td style="text-align:right">-1.77%</td>
+  <td style="text-align:right">+6.00%</td>
+  <td style="text-align:right">336.96</td>
+  <td style="text-align:right">+0.34%</td>
+</tr>
+</tbody>
+</table>
+</div><div class='hero hero-secondary'><table class='hero-table' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='hero-left'><div class='masthead'>WEKELIJKSE ETF-REVIEW</div><p class='hero-sub'>Dinsdag 14 juli 2026</p></td><td class='hero-right'><div class='hero-side-label'>Analistenrapport</div></td></tr></table></div><div class='hero-rule'></div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>1</span></td><td class='section-label-cell'><span class='section-label'>Allocatiekaart</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Segment</th>
+  <th>Positionering</th>
+  <th>Toelichting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Amerikaanse aandelen</td>
+  <td>Neutraal</td>
+  <td>Belegbaar, maar concentratierisico is expliciet aanwezig.</td>
+</tr>
+<tr>
+  <td>Europese aandelen</td>
+  <td>Neutraal</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a> vertegenwoordigt al 24.05% van de portefeuille; verdere uitbreiding is niet automatisch en blijft afhankelijk van relatieve sterkte en concentratie.</td>
+</tr>
+<tr>
+  <td>Opkomende markten</td>
+  <td>Onderwogen</td>
+  <td>USD- en oliegevoeligheid blijven tegenwind.</td>
+</tr>
+<tr>
+  <td>Large-cap</td>
+  <td>Neutraal</td>
+  <td>Kwaliteitsleiderschap werkt nog steeds.</td>
+</tr>
+<tr>
+  <td>Small-cap</td>
+  <td>Onderwogen</td>
+  <td>Rentes en herfinanciering blijven lastig.</td>
+</tr>
+<tr>
+  <td>Groei</td>
+  <td>Neutraal</td>
+  <td>Selectieve groei onder leiding van <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft aantrekkelijk.</td>
+</tr>
+<tr>
+  <td>Kwaliteit</td>
+  <td>Overwogen</td>
+  <td>Winstbestendigheid blijft waardevol.</td>
+</tr>
+<tr>
+  <td>Grondstoffen / hedge</td>
+  <td>Neutraal</td>
+  <td>Hedgerol blijft onder periodieke rolvalidatie.</td>
+</tr>
+<tr>
+  <td>Industrie / defensie</td>
+  <td>Overwogen</td>
+  <td>Structurele thesis is valide; ETF-implementatie onder herbeoordeling.</td>
+</tr>
+<tr>
+  <td>Niet-USD activa</td>
+  <td>Volglijst</td>
+  <td>De portefeuille heeft via <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a> al 24.05% niet-Amerikaanse ontwikkelde-marktenblootstelling; valuta- en regioconcentratie moeten daarom actief worden bewaakt.</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>2</span></td><td class='section-label-cell'><span class='section-label'>Tweede-orde-effectenkaart</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Drijver</th>
+  <th>Eerste-orde-effect</th>
+  <th>Tweede-orde-effect</th>
+  <th>Waarschijnlijke winnaars</th>
+  <th>Kwetsbare segmenten</th>
+  <th>ETF-implicatie</th>
+  <th>Timing</th>
+  <th>Vertrouwen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>AI-leiderschap</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft de zuiverste groeiblootstelling</td>
+  <td>Concentratie moet worden bewaakt</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a>, <a href="https://www.tradingview.com/chart/?symbol=SOXX" target="_blank" rel="noopener noreferrer">SOXX</a></td>
+  <td>Cyclische waarden van lagere kwaliteit</td>
+  <td>Aanhouden rond maximale positiegrootte</td>
+  <td>Direct</td>
+  <td>Hoog</td>
+</tr>
+<tr>
+  <td>Factorconcentratie</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a> en <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> overlappen</td>
+  <td>De portefeuille is minder gediversifieerd dan het aantal tickers suggereert</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=QUAL" target="_blank" rel="noopener noreferrer">QUAL</a> als kwaliteitsalternatief en <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a> als reeds gefinancierde diversificatie</td>
+  <td>Overlappende Amerikaanse beta</td>
+  <td>Houd <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a> onder herbeoordeling</td>
+  <td>1-3 maanden</td>
+  <td>Gemiddeld</td>
+</tr>
+<tr>
+  <td>Defensiethesis versus ETF-implementatie</td>
+  <td>Defensie blijft structureel valide</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a> moet worden vergeleken met niet-gehevelde defensiealternatieven zoals <a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a> en <a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a>, <a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a></td>
+  <td>Zwakke ETF-selectie</td>
+  <td>Houd de implementatiekwaliteit en het hefboomprofiel van <a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a> onder herbeoordeling</td>
+  <td>Direct</td>
+  <td>Gemiddeld</td>
+</tr>
+<tr>
+  <td>Grondstoffenhedge</td>
+  <td>Hedgefunctie moet periodiek worden bewezen</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a>, <a href="https://www.tradingview.com/chart/?symbol=BIL" target="_blank" rel="noopener noreferrer">BIL</a>, <a href="https://www.tradingview.com/chart/?symbol=DBC" target="_blank" rel="noopener noreferrer">DBC</a> blijven relevante vergelijkingspunten</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a>, <a href="https://www.tradingview.com/chart/?symbol=BIL" target="_blank" rel="noopener noreferrer">BIL</a>, <a href="https://www.tradingview.com/chart/?symbol=DBC" target="_blank" rel="noopener noreferrer">DBC</a></td>
+  <td>Onproductieve hedgepositie</td>
+  <td>Houd brede hedge- en grondstoffenrol onder herbeoordeling</td>
+  <td>Direct</td>
+  <td>Gemiddeld</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel panel-position-review'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>3</span></td><td class='section-label-cell'><span class='section-label'>Review huidige posities</span></td></tr></table><table class='data-table position-review-table'><thead><tr><th>Ticker</th><th>Actie</th><th>Score</th><th>Nieuw kapitaal</th><th>Rol</th><th>Volgende toets</th></tr></thead><tbody><tr><td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td><td>Aanhouden</td><td class='num'>4.97</td><td>Aanhouden / monitoren</td><td>Rotatiebestemming</td><td>Aanhouden en opnieuw toetsen in de volgende run.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td><td>Aanhouden</td><td class='num'>3.10</td><td>Nee / onder herbeoordeling</td><td>Rotatiebestemming</td><td>Aanhouden en opnieuw toetsen in de volgende run.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td><td>Aanhouden</td><td class='num'>3.59</td><td>Aanhouden / monitoren</td><td>Rotatiebestemming</td><td>Monitor commodity-breedte en bijdrage aan de hedgefunctie.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td><td>Aanhouden</td><td class='num'>3.52</td><td>Aanhouden / monitoren</td><td>Rotatiebestemming</td><td>Aanhouden en opnieuw toetsen in de volgende run.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td><td>Aanhouden</td><td class='num'>3.68</td><td>Kleiner / onder herbeoordeling</td><td>Reële activa / capex</td><td>Voer de vervangingsanalyse tegenover GRID opnieuw uit.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td><td>Aanhouden</td><td class='num'>4.28</td><td>Kleiner / onder herbeoordeling</td><td>Groeimotor</td><td>Aanhouden binnen de maximale positiegrootte en opnieuw toetsen op concentratie.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td><td>Aanhouden</td><td class='num'>3.53</td><td>Kleiner / onder herbeoordeling</td><td>Kernbeta</td><td>Toets overlap met SMH voordat extra kapitaal wordt toegewezen.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td><td>Aanhouden</td><td class='num'>3.70</td><td>Aanhouden</td><td>Strategische energie</td><td>Aanhouden en vergelijken met URA/NLR als uraniumbreedte verbetert.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td><td>Toevoegen</td><td class='num'>4.36</td><td>Aanhouden / monitoren</td><td>Rotatiebestemming</td><td>Aanhouden en opnieuw toetsen in de volgende run.</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td><td>Aanhouden</td><td class='num'>3.00</td><td>Nee / onder herbeoordeling</td><td>Rotatiebestemming</td><td>Aanhouden en opnieuw toetsen in de volgende run.</td></tr></tbody></table></div><div class='panel panel-opportunities'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>4</span></td><td class='section-label-cell'><span class='section-label'>Beste nieuwe kansen</span></td></tr></table><ul>
+<li><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft de leidende gefinancierde groeiblootstelling, begrensd door de maximale positiegrootte.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a> / <a href="https://www.tradingview.com/chart/?symbol=BUG" target="_blank" rel="noopener noreferrer">BUG</a>: Cybersecurity-uitgaven profiteren van AI, cloud, datacenters en geopolitieke weerbaarheid.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a> / <a href="https://www.tradingview.com/chart/?symbol=IBB" target="_blank" rel="noopener noreferrer">IBB</a>: Biotechinnovatie / therapeutische platforms blijft relevant, maar vraagt om bevestiging in prijs, timing en portefeuillefit.</li>
+<li>Vervangingskandidaten blijven afhankelijk van bewijs: prijsbasis, relatieve sterkte en aansluiting op de beleggingscase moeten zichtbaar zijn vóór allocatie.</li>
+</ul>
+<h3>Vervangingsanalyse</h3>
+
+<table>
+<thead>
+<tr>
+  <th>Huidige positie</th>
+  <th>Alternatief</th>
+  <th style="text-align:right">1m relatieve sterkte</th>
+  <th style="text-align:right">3m relatieve sterkte</th>
+  <th>Prijsbasis</th>
+  <th>Beoordeling</th>
+  <th>Benodigde bevestiging</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IWM" target="_blank" rel="noopener noreferrer">IWM</a></td>
+  <td style="text-align:right">-0.55%</td>
+  <td style="text-align:right">+1.65%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-07-14.</td>
+  <td>Het alternatief verbetert; houd de vervangingsanalyse actief.</td>
+  <td>Vereist herhaalde 3-maands voorsprong en duidelijke financieringsbron.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=QUAL" target="_blank" rel="noopener noreferrer">QUAL</a></td>
+  <td style="text-align:right">-0.51%</td>
+  <td style="text-align:right">-0.65%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-07-14.</td>
+  <td>Huidige positie blijft sterker; geen vervanging.</td>
+  <td>Vereist aanhoudende relatieve outperformance.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=EFA" target="_blank" rel="noopener noreferrer">EFA</a></td>
+  <td style="text-align:right">-0.74%</td>
+  <td style="text-align:right">-6.35%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-07-14.</td>
+  <td>Huidige positie blijft sterker; geen vervanging.</td>
+  <td>Vereist aanhoudende relatieve outperformance.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td style="text-align:right">-0.76%</td>
+  <td style="text-align:right">-6.42%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-07-14.</td>
+  <td>Huidige positie blijft sterker; geen vervanging.</td>
+  <td>Vereist aanhoudende relatieve outperformance.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a></td>
+  <td style="text-align:right">-1.17%</td>
+  <td style="text-align:right">-1.94%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-07-14.</td>
+  <td>Huidige positie blijft sterker; geen vervanging.</td>
+  <td>Vereist aanhoudende relatieve outperformance.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URA" target="_blank" rel="noopener noreferrer">URA</a></td>
+  <td style="text-align:right">-3.40%</td>
+  <td style="text-align:right">+0.79%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-07-14.</td>
+  <td>Het alternatief verbetert; houd de vervangingsanalyse actief.</td>
+  <td>Vereist herhaalde 3-maands voorsprong en duidelijke financieringsbron.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SOXX" target="_blank" rel="noopener noreferrer">SOXX</a></td>
+  <td style="text-align:right">-1.93%</td>
+  <td style="text-align:right">+7.99%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-07-14.</td>
+  <td>Vervangingskandidaat blijft op de volglijst — het alternatief leidt over drie maanden.</td>
+  <td>Bevestig aansluiting op de beleggingscase, liquiditeit en financieringsbron.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=VPU" target="_blank" rel="noopener noreferrer">VPU</a></td>
+  <td style="text-align:right">+4.12%</td>
+  <td style="text-align:right">-4.90%</td>
+  <td>Prijsbasis: huidige positie en alternatief zijn beide gevalideerd op slotkoersen van 2026-07-14.</td>
+  <td>Alleen vroege 1-maands verbetering; wacht op 3-maands bevestiging.</td>
+  <td>Vereist 3-maands bevestiging.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Alleen diagnostisch: deze notities geven geen allocatiebevoegdheid, financieringsbevoegdheid, lane-scoring-bevoegdheid, productie-aanbevelingsbevoegdheid, uitvoeringsbevoegdheid of portefeuillemutatiebevoegdheid.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+  <th>Huidige positie</th>
+  <th>Alternatief</th>
+  <th style="text-align:right">Diagnostische score</th>
+  <th style="text-align:right">1m-edge</th>
+  <th style="text-align:right">3m-edge</th>
+  <th style="text-align:right">Drawdown-edge</th>
+  <th style="text-align:right">Volatiliteitsedge</th>
+  <th>Niet-autoritatieve notitie</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=INDA" target="_blank" rel="noopener noreferrer">INDA</a></td>
+  <td style="text-align:right">0.00</td>
+  <td style="text-align:right">+2.77%</td>
+  <td style="text-align:right">-4.94%</td>
+  <td style="text-align:right">-0.09%</td>
+  <td style="text-align:right">+6.66%</td>
+  <td>Neutraale diagnostische score; reguliere vervangingspoorten blijven leidend.</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel panel-rotation-plan'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>5</span></td><td class='section-label-cell'><span class='section-label'>Rotatieplan portefeuille</span></td></tr></table><table class='data-table rotation-plan-table'><thead><tr><th>Sluiten</th><th>Verlagen</th><th>Aanhouden</th><th>Toevoegen</th><th>Vervangen</th></tr></thead><tbody><tr><td>Geen</td><td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td><td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a>, <a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a>, <a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a>, <a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a>, <a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>, <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a>, <a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a>, <a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a>, <a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a>, <a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td><td><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td><td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a> → <a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td></tr></tbody></table><div class='note-box'><ul><li>De bewaakte modelrotatie is al verwerkt in de officiële portefeuillestaat en het handelslogboek; deze run heeft geen dubbele staat- of handelslogboekmutatie uitgevoerd.</li></ul></div></div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>6</span></td><td class='section-label-cell'><span class='section-label'>Definitieve actietabel</span></td></tr></table><p>Toelichting gewichtsbasis: gewichten in de actietabel zijn model-/actiegewichten; gewichten bij huidige posities zijn actuele marktwaardegewichten inclusief cash. Kleine verschillen kunnen ontstaan door cash, afronding of override-verwerking.</p>
+<p>Override-toelichting: Het model dwingt normaal een verklein-/vervangingsreview af, maar de positie is deze run te klein of operationeel niet zinvol om te verhandelen.</p>
+<table>
+<thead>
+<tr>
+  <th>Ticker</th>
+  <th>ETF</th>
+  <th>Bestaand/nieuw</th>
+  <th style="text-align:right">Vorig gewicht</th>
+  <th style="text-align:right">Doelgewicht</th>
+  <th>Advies</th>
+  <th>Convictieniveau</th>
+  <th style="text-align:right">Totaalscore</th>
+  <th>Portefeuillerol</th>
+  <th>Sterker alternatief?</th>
+  <th>Korte toelichting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td>Bestaand</td>
+  <td style="text-align:right">19.11</td>
+  <td style="text-align:right">17.98</td>
+  <td>Aanhouden</td>
+  <td>Niveau 2</td>
+  <td style="text-align:right">4.97</td>
+  <td>Rotatiebestemming</td>
+  <td>Nee</td>
+  <td>Geen materiële wijziging deze run.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td>Bestaand</td>
+  <td style="text-align:right">5.26</td>
+  <td style="text-align:right">5.00</td>
+  <td>Aanhouden met override</td>
+  <td>Niveau 3</td>
+  <td style="text-align:right">3.10</td>
+  <td>Rotatiebestemming</td>
+  <td>Ja</td>
+  <td>Geen materiële wijziging deze run.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td>iShares S&amp;P GSCI Commodity-Indexed Trust</td>
+  <td>Bestaand</td>
+  <td style="text-align:right">9.22</td>
+  <td style="text-align:right">9.47</td>
+  <td>Aanhouden</td>
+  <td>Niveau 2</td>
+  <td style="text-align:right">3.59</td>
+  <td>Rotatiebestemming</td>
+  <td>Nee</td>
+  <td>Brede grondstoffenblootstelling blijft onder rolvalidatie als hedge- en inflatiesensitieve positie.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td>Bestaand</td>
+  <td style="text-align:right">24.05</td>
+  <td style="text-align:right">24.46</td>
+  <td>Aanhouden</td>
+  <td>Niveau 3</td>
+  <td style="text-align:right">3.52</td>
+  <td>Rotatiebestemming</td>
+  <td>Nee</td>
+  <td>Geen materiële wijziging deze run.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td>Global X U.S. Infrastructure Development ETF</td>
+  <td>Bestaand</td>
+  <td style="text-align:right">0.03</td>
+  <td style="text-align:right">0.03</td>
+  <td>Aanhouden met override</td>
+  <td>Niveau 2</td>
+  <td style="text-align:right">3.68</td>
+  <td>Reële activa / capex</td>
+  <td>Ja</td>
+  <td>Infrastructuurcase blijft valide, maar <a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a> is de scherpste vervangingskandidaat.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td>VanEck Semiconductor ETF</td>
+  <td>Bestaand</td>
+  <td style="text-align:right">28.13</td>
+  <td style="text-align:right">27.56</td>
+  <td>Aanhouden met override</td>
+  <td>Niveau 1</td>
+  <td style="text-align:right">4.28</td>
+  <td>Groeimotor</td>
+  <td>Nee</td>
+  <td>Best onderbouwde groeiblootstelling; uitbreiding blijft begrensd door de maximale positiegrootte.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td>SPDR S&amp;P 500 ETF Trust</td>
+  <td>Bestaand</td>
+  <td style="text-align:right">0.03</td>
+  <td style="text-align:right">0.03</td>
+  <td>Aanhouden met override</td>
+  <td>Niveau 2</td>
+  <td style="text-align:right">3.53</td>
+  <td>Kernbeta</td>
+  <td>Ja</td>
+  <td>Nuttig als kernblootstelling, maar de overlap met <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft expliciet onder herbeoordeling.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td>Sprott Uranium Miners ETF</td>
+  <td>Bestaand</td>
+  <td style="text-align:right">7.01</td>
+  <td style="text-align:right">2.01</td>
+  <td>Verlagen — uitgevoerd</td>
+  <td>Niveau 2</td>
+  <td style="text-align:right">3.70</td>
+  <td>Strategische energie</td>
+  <td>Nee</td>
+  <td>Strategische energiecase blijft valide, maar krijgt deze run geen extra kapitaal boven <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a>.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td>
+  <td>Nieuw</td>
+  <td style="text-align:right">0.00</td>
+  <td style="text-align:right">5.00</td>
+  <td>Toevoegen — uitgevoerd</td>
+  <td>Niveau 2</td>
+  <td style="text-align:right">4.36</td>
+  <td>Rotatiebestemming</td>
+  <td>Nee</td>
+  <td>Geen materiële wijziging deze run.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td>Bestaand</td>
+  <td style="text-align:right">5.40</td>
+  <td style="text-align:right">5.00</td>
+  <td>Aanhouden met override</td>
+  <td>Niveau 3</td>
+  <td style="text-align:right">3.00</td>
+  <td>Rotatiebestemming</td>
+  <td>Ja</td>
+  <td>Geen materiële wijziging deze run.</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>7</span></td><td class='section-label-cell'><span class='section-label'>Positiewijzigingen verwerkt in de officiële portefeuillestaat</span></td></tr></table><table>
+<thead>
+<tr>
+  <th>Ticker</th>
+  <th style="text-align:right">Vorig gewicht %</th>
+  <th style="text-align:right">Nieuw gewicht %</th>
+  <th style="text-align:right">Gewichtswijziging %</th>
+  <th style="text-align:right">Wijziging aantal stukken</th>
+  <th>Verwerkte actie</th>
+  <th>Financieringsbron / toelichting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td style="text-align:right">7.01</td>
+  <td style="text-align:right">2.01</td>
+  <td style="text-align:right">-5.00</td>
+  <td style="text-align:right">-122.01</td>
+  <td>Verkopen</td>
+  <td>Bewaakte modeluitvoering: URNM verlaagd om XBI te financieren.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td>
+  <td style="text-align:right">0.00</td>
+  <td style="text-align:right">5.00</td>
+  <td style="text-align:right">5.00</td>
+  <td style="text-align:right">40.49</td>
+  <td>Kopen</td>
+  <td>Bewaakte modeluitvoering: XBI gekocht, gefinancierd uit URNM.</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CASH" target="_blank" rel="noopener noreferrer">CASH</a></td>
+  <td style="text-align:right">-</td>
+  <td style="text-align:right">1.76</td>
+  <td style="text-align:right">-</td>
+  <td style="text-align:right">0.00</td>
+  <td>Geen</td>
+  <td>Resterende cash</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>8</span></td><td class='section-label-cell'><span class='section-label'>Huidige posities en cash</span></td></tr></table><ul>
+<li>Startkapitaal (EUR): 100000.00</li>
+<li>Belegde marktwaarde (EUR): 108288.34</li>
+<li>Cash (EUR): 1936.52</li>
+<li>Totale portefeuillewaarde (EUR): 110224.86</li>
+<li>Rendement sinds start (%): 10.22</li>
+<li>EUR/USD gebruikt: 1.1421</li>
+</ul>
+<table>
+<thead>
+<tr>
+  <th>Ticker</th>
+  <th style="text-align:right">Aantal aandelen</th>
+  <th style="text-align:right">Prijs lokaal</th>
+  <th>Valuta</th>
+  <th style="text-align:right">Marktwaarde lokaal</th>
+  <th style="text-align:right">Marktwaarde EUR</th>
+  <th style="text-align:right">Gewicht %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td style="text-align:right">253.94</td>
+  <td style="text-align:right">94.73</td>
+  <td>USD</td>
+  <td style="text-align:right">24055.40</td>
+  <td style="text-align:right">21062.24</td>
+  <td style="text-align:right">19.11</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td style="text-align:right">91.77</td>
+  <td style="text-align:right">72.19</td>
+  <td>USD</td>
+  <td style="text-align:right">6624.73</td>
+  <td style="text-align:right">5800.43</td>
+  <td style="text-align:right">5.26</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td style="text-align:right">374.29</td>
+  <td style="text-align:right">31.00</td>
+  <td>USD</td>
+  <td style="text-align:right">11603.09</td>
+  <td style="text-align:right">10159.35</td>
+  <td style="text-align:right">9.22</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td style="text-align:right">312.49</td>
+  <td style="text-align:right">96.89</td>
+  <td>USD</td>
+  <td style="text-align:right">30277.02</td>
+  <td style="text-align:right">26509.72</td>
+  <td style="text-align:right">24.05</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td style="text-align:right">0.71</td>
+  <td style="text-align:right">56.71</td>
+  <td>USD</td>
+  <td style="text-align:right">40.51</td>
+  <td style="text-align:right">35.47</td>
+  <td style="text-align:right">0.03</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td style="text-align:right">59.00</td>
+  <td style="text-align:right">600.31</td>
+  <td>USD</td>
+  <td style="text-align:right">35418.29</td>
+  <td style="text-align:right">31011.28</td>
+  <td style="text-align:right">28.13</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td style="text-align:right">0.05</td>
+  <td style="text-align:right">751.83</td>
+  <td>USD</td>
+  <td style="text-align:right">34.60</td>
+  <td style="text-align:right">30.29</td>
+  <td style="text-align:right">0.03</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td style="text-align:right">48.99</td>
+  <td style="text-align:right">51.59</td>
+  <td>USD</td>
+  <td style="text-align:right">2527.45</td>
+  <td style="text-align:right">2212.97</td>
+  <td style="text-align:right">2.01</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td>
+  <td style="text-align:right">40.49</td>
+  <td style="text-align:right">155.45</td>
+  <td>USD</td>
+  <td style="text-align:right">6294.44</td>
+  <td style="text-align:right">5511.24</td>
+  <td style="text-align:right">5.00</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td style="text-align:right">148.87</td>
+  <td style="text-align:right">45.69</td>
+  <td>USD</td>
+  <td style="text-align:right">6801.67</td>
+  <td style="text-align:right">5955.35</td>
+  <td style="text-align:right">5.40</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CASH" target="_blank" rel="noopener noreferrer">CASH</a></td>
+  <td style="text-align:right">-</td>
+  <td style="text-align:right">1.00</td>
+  <td>EUR</td>
+  <td style="text-align:right">1936.52</td>
+  <td style="text-align:right">1936.52</td>
+  <td style="text-align:right">1.76</td>
+</tr>
+</tbody>
+</table>
+</div><div class='panel panel-carry'><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>9</span></td><td class='section-label-cell'><span class='section-label'>Input voor de volgende run</span></td></tr></table><p><strong>Deze sectie is de canonieke standaardinput voor de volgende run tenzij de gebruiker expliciet iets anders opgeeft. Vraag de gebruiker niet opnieuw om portefeuille-input zolang deze sectie beschikbaar is.</strong></p>
+<h3>Portefeuilletabel</h3>
+<table>
+<thead>
+<tr>
+  <th>Ticker</th>
+  <th>ETF-naam</th>
+  <th>Richting</th>
+  <th style="text-align:right">Gewicht %</th>
+  <th style="text-align:right">Gem. instap</th>
+  <th style="text-align:right">Huidige prijs</th>
+  <th style="text-align:right">P/L %</th>
+  <th>Oorspronkelijke thesis</th>
+  <th>Rol</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=CIBR" target="_blank" rel="noopener noreferrer">CIBR</a></td>
+  <td>Longpositie</td>
+  <td style="text-align:right">19.11</td>
+  <td style="text-align:right"></td>
+  <td style="text-align:right">94.73</td>
+  <td style="text-align:right">1.05</td>
+  <td>Portefeuilleblootstelling</td>
+  <td>Rotatiebestemming</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=DFEN" target="_blank" rel="noopener noreferrer">DFEN</a></td>
+  <td>Longpositie</td>
+  <td style="text-align:right">5.26</td>
+  <td style="text-align:right"></td>
+  <td style="text-align:right">72.19</td>
+  <td style="text-align:right">3.28</td>
+  <td>Portefeuilleblootstelling</td>
+  <td>Rotatiebestemming</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td>iShares S&amp;P GSCI Commodity-Indexed Trust</td>
+  <td>Longpositie</td>
+  <td style="text-align:right">9.22</td>
+  <td style="text-align:right">31.80</td>
+  <td style="text-align:right">31.00</td>
+  <td style="text-align:right">-2.52</td>
+  <td>Brede grondstoffen- en inflatiegevoelige hedgepositie</td>
+  <td>Rotatiebestemming</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td>Longpositie</td>
+  <td style="text-align:right">24.05</td>
+  <td style="text-align:right"></td>
+  <td style="text-align:right">96.89</td>
+  <td style="text-align:right">-0.08</td>
+  <td>Portefeuilleblootstelling</td>
+  <td>Rotatiebestemming</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td>Global X U.S. Infrastructure Development ETF</td>
+  <td>Longpositie</td>
+  <td style="text-align:right">0.03</td>
+  <td style="text-align:right">51.98</td>
+  <td style="text-align:right">56.71</td>
+  <td style="text-align:right">9.10</td>
+  <td>Netwerk- en infrastructuurcapex</td>
+  <td>Reële activa / capex</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td>VanEck Semiconductor ETF</td>
+  <td>Longpositie</td>
+  <td style="text-align:right">28.13</td>
+  <td style="text-align:right">420.13</td>
+  <td style="text-align:right">600.31</td>
+  <td style="text-align:right">42.89</td>
+  <td>AI-rekenkracht en semiconductorleiderschap</td>
+  <td>Groeimotor</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a></td>
+  <td>SPDR S&amp;P 500 ETF Trust</td>
+  <td>Longpositie</td>
+  <td style="text-align:right">0.03</td>
+  <td style="text-align:right">676.33</td>
+  <td style="text-align:right">751.83</td>
+  <td style="text-align:right">11.16</td>
+  <td>Amerikaanse large-cap kernblootstelling</td>
+  <td>Kernbeta</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=URNM" target="_blank" rel="noopener noreferrer">URNM</a></td>
+  <td>Sprott Uranium Miners ETF</td>
+  <td>Longpositie</td>
+  <td style="text-align:right">2.01</td>
+  <td style="text-align:right">67.50</td>
+  <td style="text-align:right">51.59</td>
+  <td style="text-align:right">-23.57</td>
+  <td>Kernenergie- en uraniumcyclus</td>
+  <td>Strategische energie</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XBI" target="_blank" rel="noopener noreferrer">XBI</a></td>
+  <td>Longpositie</td>
+  <td style="text-align:right">5.00</td>
+  <td style="text-align:right"></td>
+  <td style="text-align:right">155.45</td>
+  <td style="text-align:right"></td>
+  <td>Portefeuilleblootstelling</td>
+  <td>Rotatiebestemming</td>
+</tr>
+<tr>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=XLU" target="_blank" rel="noopener noreferrer">XLU</a></td>
+  <td>Longpositie</td>
+  <td style="text-align:right">5.40</td>
+  <td style="text-align:right"></td>
+  <td style="text-align:right">45.69</td>
+  <td style="text-align:right">4.08</td>
+  <td>Portefeuilleblootstelling</td>
+  <td>Rotatiebestemming</td>
+</tr>
+</tbody>
+</table>
+<h3>Beschikbare cash</h3>
+<ul>
+<li>Cash %: 1.76</li>
+<li>Margegebruik %: 0.00</li>
+<li>Leverage toegestaan: Nee</li>
+</ul>
+<h3>Volglijst / dynamisch radargeheugen</h3>
+<table>
+<thead>
+<tr>
+  <th>Thema</th>
+  <th>Primaire ETF</th>
+  <th>Alternatieve ETF</th>
+  <th>Waarom op de radar</th>
+  <th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>AI-rekenkrachtinfrastructuur</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=SOXX" target="_blank" rel="noopener noreferrer">SOXX</a></td>
+  <td>Sterkste structurele groeiblootstelling.</td>
+  <td>Actief</td>
+</tr>
+<tr>
+  <td>Defensie-innovatie / strategische weerbaarheid</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a></td>
+  <td>Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling.</td>
+  <td>Vervangingsanalyse vereist</td>
+</tr>
+<tr>
+  <td>Netuitbreiding / elektrificatie</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a></td>
+  <td>Infrastructuurcapex blijft valide.</td>
+  <td>Vervangingsanalyse vereist</td>
+</tr>
+<tr>
+  <td>Hedge- en grondstoffenbreedte</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=GSG" target="_blank" rel="noopener noreferrer">GSG</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=BIL" target="_blank" rel="noopener noreferrer">BIL</a> / <a href="https://www.tradingview.com/chart/?symbol=DBC" target="_blank" rel="noopener noreferrer">DBC</a></td>
+  <td>Hedgefunctie en grondstoffenbreedte moeten periodiek worden bevestigd.</td>
+  <td>Onder herbeoordeling</td>
+</tr>
+<tr>
+  <td>Ontwikkelde markten buiten de VS</td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=EFA" target="_blank" rel="noopener noreferrer">EFA</a></td>
+  <td><a href="https://www.tradingview.com/chart/?symbol=IEFA" target="_blank" rel="noopener noreferrer">IEFA</a> biedt al een materiële allocatie naar ontwikkelde markten buiten de VS (24.05%); verdere wijzigingen vereisen relatieve-sterkte- en concentratiebewijs.</td>
+  <td>Volglijst</td>
+</tr>
+</tbody>
+</table>
+<h3>Continuïteit in aanbevelingsdiscipline</h3>
+<ul>
+<li><a href="https://www.tradingview.com/chart/?symbol=SPY" target="_blank" rel="noopener noreferrer">SPY</a>: overlapreview tegenover <a href="https://www.tradingview.com/chart/?symbol=SMH" target="_blank" rel="noopener noreferrer">SMH</a> blijft actief.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=PPA" target="_blank" rel="noopener noreferrer">PPA</a>: directe vervangingsanalyse tegenover <a href="https://www.tradingview.com/chart/?symbol=ITA" target="_blank" rel="noopener noreferrer">ITA</a> vereist.</li>
+<li><a href="https://www.tradingview.com/chart/?symbol=PAVE" target="_blank" rel="noopener noreferrer">PAVE</a>: directe vervangingsanalyse tegenover <a href="https://www.tradingview.com/chart/?symbol=GRID" target="_blank" rel="noopener noreferrer">GRID</a> vereist.</li>
+<li>Brede grondstoffenhedge: rolvalidatie blijft vereist.</li>
+<li>Vervangingskandidaten: niet geschikt voor allocatie zonder afgeronde vervangingsanalyse.</li>
+</ul>
+<h3>Randvoorwaarden</h3>
+<ul>
+<li>Maximale positiegrootte: 25%</li>
+<li>Maximaal aantal posities: 8</li>
+<li>Alleen UCITS: Nee</li>
+<li>Leveraged ETF’s toegestaan: Nee</li>
+<li>Drawdown-tolerantie: Gemiddeld</li>
+<li>Voorkeur inkomen versus groei: gebalanceerde groei met nadruk op weerbaarheid</li>
+</ul>
+<h3>Wijzigingen sinds de vorige review</h3>
+<ul>
+<li>Toegevoegd: een gevalideerd productiepad op basis van expliciete portefeuillestaat, prijsaudit en macro-/beleidsregime-input.</li>
+<li>Verlaagd: Geen, tenzij de expliciete portefeuillestaat anders aangeeft.</li>
+<li>Gesloten: Geen.</li>
+<li>Thesiswijzigingen: Geen structurele thesis is losgelaten; implementatie- en macroregimediscipline zijn duidelijk aangescherpt.</li>
+</ul>
+</div><div class='panel '><table class='section-kicker' role='presentation' cellpadding='0' cellspacing='0'><tr><td class='section-badge-cell'><span class='section-badge'>10</span></td><td class='section-label-cell'><span class='section-label'>Disclaimer</span></td></tr></table><p>Dit rapport wordt uitsluitend verstrekt voor informatieve en educatieve doeleinden. Het is geen beleggingsadvies, juridisch advies, fiscaal advies of financieel advies, en vormt geen aanbeveling om effecten te kopen, te verkopen of aan te houden. Het rapport houdt geen rekening met individuele beleggingsdoelen, financiële situatie of specifieke behoeften van de ontvanger. Beleggen brengt risico’s met zich mee, waaronder het risico op verlies van inleg.</p>
+</div></div>
+        </div>
+      </body>
+    </html>

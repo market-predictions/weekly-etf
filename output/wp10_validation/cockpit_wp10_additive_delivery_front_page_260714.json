@@ -1,0 +1,39 @@
+{
+  "artifact_sha256": {
+    "disabled_en_html": "b46e9dd7e195d713aaa6ca04a6fe97d374ef93ed634ee6049ebbd28d83a3ee5e",
+    "disabled_nl_html": "8580accf4495942f88a9aea582a7139e86f715cc5239a2da8a3fe0c330834dac",
+    "enabled_en_html": "ce35f1214ebaace4834b85a4f3bcb90b54092d46d265a815b9edf9a12ace25c1",
+    "enabled_en_pdf": "57b5a31f1a1bb378fbd59c9e16e966739796db8bc62d2808c2e1884b03f0a515",
+    "enabled_nl_html": "98cd6ff84d329d5a48971361e7e23a121ef9c2936c408c5c003bd6b0c0a16df7",
+    "enabled_nl_pdf": "76abf64c1750607dca7fdfd34ce83bc7a225c56afff6d7c2d5f682732e14a497"
+  },
+  "attachment_contract_change": false,
+  "classic_report_body": "preserved",
+  "delivery_directory_digest_unchanged": true,
+  "disabled_html_byte_identical": {
+    "en": true,
+    "nl": true
+  },
+  "email_count_change": false,
+  "email_equity_cid": "passed",
+  "email_sent": false,
+  "enabled_front_page_count": {
+    "en": 1,
+    "nl": 1
+  },
+  "feature_default": "disabled",
+  "implementation_status": "validated_ready_for_enablement_decision",
+  "manifest_contract_change": false,
+  "pdf_count_change": false,
+  "pdf_generation": {
+    "en_pages_disabled": 18,
+    "en_pages_enabled": 20,
+    "nl_pages_disabled": 20,
+    "nl_pages_enabled": 22
+  },
+  "promotion_status": "not_promoted",
+  "report_token": "260714",
+  "schema_version": "cockpit_wp10_additive_delivery_front_page_v1",
+  "small_decision_cockpit_duplicate": false,
+  "standalone_equity_embed": "passed"
+}
