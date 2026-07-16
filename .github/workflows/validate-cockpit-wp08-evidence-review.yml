@@ -1,0 +1,200 @@
+name: Validate cockpit WP08 evidence review
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "runtime/build_cockpit_side_by_side_review.py"
+      - "runtime/render_cockpit_front_page.py"
+      - "tests/test_cockpit_side_by_side_review.py"
+      - "tests/test_cockpit_wp08_evidence_review.py"
+      - ".github/workflows/validate-cockpit-wp08-evidence-review.yml"
+      - "control/work_packages/WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION_20260716.md"
+      - "control/handovers/HANDOVER_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION_20260716.md"
+      - "control/CURRENT_STATE.md"
+      - "control/NEXT_ACTIONS.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            pytest \
+            pandas \
+            matplotlib \
+            seaborn \
+            markdown \
+            mistune \
+            beautifulsoup4 \
+            lxml \
+            premailer \
+            weasyprint \
+            pillow \
+            requests \
+            pyyaml \
+            jsonschema \
+            yfinance
+
+      - name: Snapshot protected authority files
+        run: |
+          set -euo pipefail
+          files=(
+            output/etf_portfolio_state.json
+            output/etf_trade_ledger.csv
+            output/etf_valuation_history.csv
+            output/etf_recommendation_scorecard.csv
+            output/runtime/latest_etf_report_state_path.txt
+            output/pricing/latest_price_audit_path.txt
+            output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+          )
+          for pointer in \
+            output/runtime/latest_etf_report_state_path.txt \
+            output/pricing/latest_price_audit_path.txt \
+            output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+          do
+            if [ -s "$pointer" ]; then
+              target="$(cat "$pointer")"
+              if [ -f "$target" ]; then
+                files+=("$target")
+              fi
+            fi
+          done
+          printf '%s\n' "${files[@]}" | sort -u > /tmp/wp08-protected-files.txt
+          xargs -d '\n' sha256sum < /tmp/wp08-protected-files.txt > /tmp/wp08-protected-before.sha256
+
+      - name: Compile WP08 modules
+        run: |
+          python -m py_compile \
+            runtime/build_cockpit_side_by_side_review.py \
+            runtime/render_cockpit_front_page.py \
+            tests/test_cockpit_side_by_side_review.py \
+            tests/test_cockpit_wp08_evidence_review.py
+
+      - name: Run WP08 regressions
+        run: |
+          pytest -q \
+            tests/test_cockpit_side_by_side_review.py \
+            tests/test_cockpit_wp08_evidence_review.py \
+            tests/test_cockpit_front_page_preview.py \
+            tests/test_cockpit_visual_state_contracts.py \
+            tests/test_cockpit_current_runtime_authority.py
+
+      - name: Validate production report contracts
+        run: |
+          python tools/validate_etf_delivery_html_contract.py --output-dir output
+          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+
+      - name: Build exact current WP08 evidence
+        run: |
+          rm -rf output/cockpit_preview output/cockpit_review
+          python -m runtime.render_cockpit_front_page --output-dir output --language both --html-only
+          python -m runtime.build_cockpit_side_by_side_review --output-dir output --token 260714
+
+      - name: Verify exact current WP08 conclusion
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("output/cockpit_review")
+          metadata = json.loads((root / "weekly_etf_cockpit_side_by_side_review_260714.json").read_text(encoding="utf-8"))
+          findings = {row["dimension"]: row for row in metadata["findings"]}
+
+          assert metadata["schema_version"] == "cockpit_side_by_side_review_v2"
+          assert metadata["review_type"] == "evidence_based_side_by_side_preview_only"
+          assert metadata["review_conclusion"] == "iteration_required"
+          assert metadata["promotion_status"] == "not_promoted"
+          assert metadata["next_recommended_package"] == "WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT"
+
+          selected = metadata["selected_sources"]
+          assert selected["classic"]["en"]["markdown"] == "output/weekly_analysis_pro_260714_04.md"
+          assert selected["classic"]["nl"]["markdown"] == "output/weekly_analysis_pro_nl_260714_04.md"
+          assert selected["classic"]["en"]["html"] == "output/weekly_analysis_pro_260714_04_delivery.html"
+          assert selected["classic"]["nl"]["html"] == "output/weekly_analysis_pro_nl_260714_04_delivery.html"
+          assert selected["cockpit"]["en"] == "output/cockpit_preview/weekly_analysis_pro_cockpit_260714_01.html"
+          assert selected["cockpit"]["nl"] == "output/cockpit_preview/weekly_analysis_pro_nl_cockpit_260714_01.html"
+
+          for dimension in (
+              "readability",
+              "density",
+              "visual_hierarchy",
+              "executed_action_clarity",
+              "current_weight_accuracy",
+              "performance_risk_accuracy",
+              "trust_provenance_clarity",
+              "audit_evidence_preservation",
+          ):
+              assert findings[dimension]["status"] == "pass", (dimension, findings[dimension])
+
+          assert findings["decision_clarity"]["status"] == "partial"
+          assert findings["bilingual_semantic_parity"]["status"] == "partial"
+          assert findings["premium_look_and_feel"]["status"] == "partial"
+          assert set(metadata["blocking_findings"]) == {
+              "decision_clarity",
+              "bilingual_semantic_parity",
+              "premium_look_and_feel",
+          }
+
+          payload = json.dumps(metadata, ensure_ascii=False)
+          assert "URNM reduced" in payload
+          assert "XBI added" in payload
+          assert "summary_contradiction=True" in payload
+          assert "dutch_punctuation_bug=True" in payload
+          assert "hybrid_labels=" in payload
+          assert metadata["input_sha256"]
+
+          for path in [
+              root / "weekly_etf_cockpit_side_by_side_review_260714.html",
+              root / "weekly_etf_cockpit_side_by_side_review_nl_260714.html",
+          ]:
+              html = path.read_text(encoding="utf-8")
+              assert "<pre>" not in html
+              assert 'data-schema-version="cockpit_side_by_side_review_v2"' in html
+              assert "promotion_status: not_promoted" in html
+          PY
+
+      - name: Prove authority files unchanged
+        run: |
+          set -euo pipefail
+          xargs -d '\n' sha256sum < /tmp/wp08-protected-files.txt > /tmp/wp08-protected-after.sha256
+          diff -u /tmp/wp08-protected-before.sha256 /tmp/wp08-protected-after.sha256
+          sha256sum -c /tmp/wp08-protected-before.sha256
+          git diff --exit-code -- \
+            output/etf_portfolio_state.json \
+            output/etf_trade_ledger.csv \
+            output/etf_valuation_history.csv \
+            output/etf_recommendation_scorecard.csv \
+            output/runtime/latest_etf_report_state_path.txt \
+            output/pricing/latest_price_audit_path.txt \
+            output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+
+      - name: Upload WP08 review evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cockpit-wp08-evidence-review-${{ github.run_id }}
+          path: |
+            output/cockpit_preview/
+            output/cockpit_review/
+            /tmp/wp08-protected-files.txt
+            /tmp/wp08-protected-before.sha256
+            /tmp/wp08-protected-after.sha256
+          if-no-files-found: error
+          retention-days: 14
