@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 
 from runtime.polish_runtime_reports import DECISION_COCKPIT_EN, DECISION_COCKPIT_NL
+from runtime.report_freshness_contract import apply_report_freshness_contract, load_runtime_state
 
 EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
@@ -165,10 +166,17 @@ def main() -> None:
     args = parser.parse_args()
 
     output_dir = Path(args.output_dir)
-    for pattern in (EN_RE, NL_RE):
+    state = load_runtime_state()
+    for pattern, language in ((EN_RE, "en"), (NL_RE, "nl")):
         report_path = latest_report(output_dir, pattern)
-        report_path.write_text(linkify_report(report_path.read_text(encoding="utf-8")), encoding="utf-8")
-        print(f"ETF_LINKIFY_OK | report={report_path.name}")
+        text = report_path.read_text(encoding="utf-8")
+        if state:
+            text = apply_report_freshness_contract(text, state, language)
+        report_path.write_text(linkify_report(text), encoding="utf-8")
+        print(
+            f"ETF_LINKIFY_OK | report={report_path.name} | "
+            f"freshness_contract={'applied' if state else 'skipped_no_runtime_state'}"
+        )
 
 
 if __name__ == "__main__":

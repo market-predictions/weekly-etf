@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -128,6 +128,12 @@ def _ecb_june_2026_hike_applies(report_date: str | None) -> bool:
     return bool(report and hike and report >= hike)
 
 
+def _event_is_in_report_week(report_date: str | None, event_date: str | None, lookback_days: int = 6) -> bool:
+    report = _date_or_none(report_date)
+    event = _date_or_none(event_date)
+    return bool(report and event and report - timedelta(days=lookback_days) <= event <= report)
+
+
 def classify_regime(metrics: dict[str, Any]) -> tuple[str, float, list[str]]:
     smh = _return_3m(metrics, "SMH")
     spy = _return_3m(metrics, "SPY")
@@ -167,7 +173,7 @@ def central_banks_for_regime(regime: str, report_date: str | None = None) -> dic
     if _ecb_june_2026_hike_applies(report_date):
         ecb = {
             "stance": "Tightening / inflation-sensitive",
-            "likely_direction": "Rate hike delivered; the next step remains data- and inflation-dependent.",
+            "likely_direction": "Following the 11 June 2026 rate increase, the next step remains data- and inflation-dependent.",
             "main_risk": "Renewed energy-led inflation pressure can raise the hurdle for rate-sensitive and non-U.S. developed-market exposure.",
             "etf_implication": "IEFA exposure is now present, but further non-U.S. developed allocations still require relative-strength, pricing and portfolio-discipline confirmation.",
             "confidence": 0.70,
@@ -190,7 +196,7 @@ def policy_catalysts(metrics: dict[str, Any], report_date: str | None = None) ->
         {"policy_area": "Energy security and nuclear policy", "latest_signal": "Energy-security policy keeps uranium and nuclear infrastructure relevant, but timing remains price-confirmation dependent.", "affected_lanes": ["Uranium / nuclear fuel cycle"], "direction": "supportive but cyclical", "time_horizon": "6-24 months", "confidence": 0.60, "transfer_to_report": False},
         {"policy_area": "China stimulus and platform regulation", "latest_signal": "Support remains watchlist-relevant, but confidence and earnings confirmation are still required.", "affected_lanes": ["China platform beta", "EM equity beta"], "direction": "mixed", "time_horizon": "1-6 months", "confidence": 0.52, "transfer_to_report": False},
     ]
-    if _ecb_june_2026_hike_applies(report_date):
+    if _event_is_in_report_week(report_date, ECB_JUNE_2026_HIKE_DATE):
         catalysts.insert(
             0,
             {
@@ -222,10 +228,10 @@ def lane_adjustments(regime: str, metrics: dict[str, Any]) -> dict[str, dict[str
 
 def portfolio_implications(regime: str) -> list[str]:
     if regime == "Risk-on narrow leadership":
-        return ["Keep SMH as the earned leader, but do not confuse narrow leadership with broad diversification.", "Require replacement duels for SPY overlap, PPA implementation quality and PAVE versus GRID before funding challengers.", "Keep cash discipline because the regime supports selectivity more than broad risk expansion."]
+        return ["Keep SMH as the earned leader, but do not confuse narrow leadership with broad diversification.", "Require replacement reviews for factor overlap and implementation-sensitive defense and infrastructure holdings before funding challengers.", "Keep cash discipline because the regime supports selectivity more than broad risk expansion."]
     if regime == "Risk-on growth":
         return ["Risk appetite is supportive, but fresh adds still need position-size room and pricing confirmation.", "Growth and infrastructure lanes can be considered if they do not worsen concentration.", "Defensive hedges should be reviewed for opportunity cost."]
-    return ["Stay invested, but make new capital pass a stricter macro and relative-strength filter.", "Treat SPY, PPA, PAVE and GLD as active review items rather than passive holds.", "Do not fund replacement candidates until the pricing basis and direct duel evidence are visible."]
+    return ["Stay invested, but make new capital pass a stricter macro and relative-strength filter.", "Treat implementation-sensitive and weak-contribution positions as active reviews rather than passive holds.", "Do not fund replacement candidates until the pricing basis and direct duel evidence are visible."]
 
 
 def _field_authority_contract() -> dict[str, dict[str, Any]]:
@@ -291,6 +297,25 @@ def _active_drivers_placeholder() -> list[dict[str, Any]]:
     return []
 
 
+def _regime_delta_lines(pack: dict[str, Any]) -> list[str]:
+    regime = pack.get("regime") or {}
+    memory = pack.get("regime_memory") or {}
+    current = str(memory.get("current_regime") or regime.get("current") or "Unknown")
+    prior = str(memory.get("prior_regime") or regime.get("previous") or "Unknown")
+    breadth = str(memory.get("breadth_trend") or "mixed").replace("_", " ")
+    cross = str(memory.get("cross_asset_confirmation") or "mixed").replace("_", " ")
+    if memory.get("regime_changed_this_run") and prior not in {"", "Unknown"}:
+        return [
+            f"The regime changed versus the prior review from {prior} to {current}; "
+            f"market breadth is {breadth} and cross-asset confirmation is {cross}."
+        ]
+    return [
+        "No material regime change was recorded versus the prior review; "
+        f"the {current} backdrop remained intact, market breadth is {breadth}, "
+        f"and cross-asset confirmation is {cross}."
+    ]
+
+
 def build_pack(pricing_audit_path: Path, relative_strength_path: Path, macro_context_path: Path, macro_data_audit_path: Path | None = None) -> dict[str, Any]:
     pricing = load_json(pricing_audit_path)
     rs_payload = load_json(relative_strength_path)
@@ -329,13 +354,14 @@ def build_pack(pricing_audit_path: Path, relative_strength_path: Path, macro_con
             "hedge_ballast": {"signal": "under_review" if _return_3m(metrics, "GLD") <= 0 else "supportive", "evidence": {"GLD_return_3m_pct": _return_3m(metrics, "GLD")}},
         },
         "policy_catalysts": policy_catalysts(metrics, report_date),
-        "cross_asset_confirmation": ["Semiconductor leadership supports SMH, but SPY overlap must remain explicit.", "Small-cap and duration signals are not strong enough to justify broad beta expansion.", "Gold is treated as a hedge review item unless price behavior improves."],
+        "cross_asset_confirmation": ["Semiconductor leadership supports SMH, but factor overlap must remain explicit.", "Small-cap and duration signals are not strong enough to justify broad beta expansion.", "Hedge exposures must re-earn their role through current contribution and price behavior."],
         "portfolio_implications": portfolio_implications(regime),
         "lane_adjustments": lane_adjustments(regime, metrics),
         "active_drivers": _active_drivers_placeholder(),
         "report_transfer": {"max_what_changed_bullets": 3, "max_portfolio_implications": 3, "max_policy_catalysts": 3, "style_rule": "Transfer only decision-relevant macro information. Do not dump the full research pack into the report."},
     }
     pack["regime_memory"] = update_regime_memory(pack)
+    pack["regime"]["what_changed"] = _regime_delta_lines(pack)
     _validate_pack(pack)
     return pack
 

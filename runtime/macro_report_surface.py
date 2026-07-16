@@ -405,7 +405,7 @@ def executive_lines_nl(state: dict[str, Any]) -> dict[str, str]:
     return {
         "primary_regime": regime,
         "geopolitical_regime": geo,
-        "what_changed": f"Macro-, beleids- en regime-input komen nu uit de runtime macro-pack; portefeuilleacties blijven afhankelijk van prijs, relatieve sterkte en portefeuillediscipline. Kernpunt: {changed}",
+        "what_changed": changed,
     }
 
 

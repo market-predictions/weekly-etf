@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.0",
+  "status": "passed",
+  "created_at_utc": "2026-07-16T00:08:55.550639+00:00",
+  "validation_type": "report_freshness_and_standalone_html_equity",
+  "source_execution_artifact": "output/runtime/etf_model_execution_20260714_20260715_175910.json",
+  "source_execution_artifact_sha256": "b25692b0324c8339a5430e43cf395cd1df70c4261d86ddc2b204120f16dd72d2",
+  "email_sent": false,
+  "model_execution_replayed": false,
+  "official_state_mutated": false,
+  "official_trade_ledger_mutated": false,
+  "state_sha256_before": "5af90905202ba8346ba6d2c95bc7305911b70f4e3186cf91b02ace1a233f9855",
+  "state_sha256_after": "5af90905202ba8346ba6d2c95bc7305911b70f4e3186cf91b02ace1a233f9855",
+  "trade_ledger_sha256_before": "3cd30abc27687b9dcd59123806c3f542ef4c2820f7de1bdcd937b5cc55c5a255",
+  "trade_ledger_sha256_after": "3cd30abc27687b9dcd59123806c3f542ef4c2820f7de1bdcd937b5cc55c5a255",
+  "freshness_contract": {
+    "what_changed_delta_only": true,
+    "stale_relative_policy_event_removed": true,
+    "current_iefa_allocation_reflected": true,
+    "current_dfen_holding_reflected": true,
+    "dutch_mixed_language_fragments_removed": true
+  },
+  "html_equity_contract": {
+    "standalone_html_uses_embedded_data_uri": true,
+    "standalone_html_contains_no_cid_reference": true,
+    "mime_email_html_keeps_cid_reference": true
+  },
+  "artifacts": {
+    "en": {
+      "report_path": {
+        "path": "output/weekly_analysis_pro_260714_04.md",
+        "sha256": "5ae8ff2bd793c39247d4098c1630c69b615504f3c5394663c5fd9e80f8448e18",
+        "size_bytes": 41382
+      },
+      "clean_md_path": {
+        "path": "output/weekly_analysis_pro_260714_04_clean.md",
+        "sha256": "2fbcd60b67db7b3b1885bcf11b65b72461d1b228a8288bd7b64cfbad455e2e6d",
+        "size_bytes": 41371
+      },
+      "html_path": {
+        "path": "output/weekly_analysis_pro_260714_04_delivery.html",
+        "sha256": "b46e9dd7e195d713aaa6ca04a6fe97d374ef93ed634ee6049ebbd28d83a3ee5e",
+        "size_bytes": 180312
+      },
+      "pdf_path": {
+        "path": "output/weekly_analysis_pro_260714_04.pdf",
+        "sha256": "0ef5e93ac7e107add6d0862cdd5c891174cbe0b67e88861197145a671bd44a72",
+        "size_bytes": 170333
+      },
+      "equity_curve_png": {
+        "path": "output/weekly_analysis_pro_260714_04_equity_curve.png",
+        "sha256": "9d823e070c45a50d2088c63a740af1ba9674c3ad844925e2bbd7d8e78c43923e",
+        "size_bytes": 70238
+      }
+    },
+    "nl": {
+      "report_path": {
+        "path": "output/weekly_analysis_pro_nl_260714_04.md",
+        "sha256": "c51c391bc068eee0e978eb6aec9f1078d772af95be1bdc7831a9a89a376e63d3",
+        "size_bytes": 43228
+      },
+      "clean_md_path": {
+        "path": "output/weekly_analysis_pro_nl_260714_04_clean.md",
+        "sha256": "dcdb10bff2c3ecb58ee953a69cb3e3c91b113fdb3f0c36759047dabd5f0d09e4",
+        "size_bytes": 43220
+      },
+      "html_path": {
+        "path": "output/weekly_analysis_pro_nl_260714_04_delivery.html",
+        "sha256": "8580accf4495942f88a9aea582a7139e86f715cc5239a2da8a3fe0c330834dac",
+        "size_bytes": 187312
+      },
+      "pdf_path": {
+        "path": "output/weekly_analysis_pro_nl_260714_04.pdf",
+        "sha256": "4e9d877d2cf75884eaa65e5b1c323110cf7ff8eb7beefbefad52d14ee7336f87",
+        "size_bytes": 113749
+      },
+      "equity_curve_png": {
+        "path": "output/weekly_analysis_pro_nl_260714_04_equity_curve.png",
+        "sha256": "5926511b8f21d2b1fb481c862a24600e441bf4ce79d139004fef88d503a99eda",
+        "size_bytes": 72289
+      }
+    }
+  }
+}

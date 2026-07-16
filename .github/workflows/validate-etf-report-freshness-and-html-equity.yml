@@ -1,0 +1,168 @@
+name: Validate ETF report freshness and HTML equity
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "runtime/report_freshness_contract.py"
+      - "runtime/standalone_html_equity_embed.py"
+      - "runtime/build_macro_policy_pack.py"
+      - "runtime/macro_report_surface.py"
+      - "runtime/link_runtime_report_tickers.py"
+      - "send_report_runtime_html.py"
+      - "tools/render_report_freshness_preview.py"
+      - "tests/test_report_freshness_and_html_equity.py"
+      - "tests/test_report_freshness_production_variants.py"
+      - ".github/workflows/validate-etf-report-freshness-and-html-equity.yml"
+      - "control/work_packages/WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH_20260716.md"
+      - "control/ETF_REPORT_FRESHNESS_CHANGELOG.md"
+      - "control/REPORT_FRESHNESS_AND_HTML_EQUITY_STATUS_20260716.md"
+      - "control/handovers/HANDOVER_REPORT_FRESHNESS_AND_HTML_EQUITY_20260716.md"
+      - "control/CURRENT_STATE.md"
+      - "control/NEXT_ACTIONS.md"
+      - "control/decisions/REPORT_FRESHNESS_AND_STANDALONE_HTML_EQUITY_DECISION_20260716.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: etf-report-freshness-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    if: github.head_ref == 'agent/fix-report-freshness-and-html-equity-graph'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+    steps:
+      - name: Check out PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PDF system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2 \
+            libpango-1.0-0 \
+            libgdk-pixbuf-2.0-0 \
+            libffi-dev \
+            shared-mime-info \
+            fonts-liberation \
+            fonts-dejavu-core \
+            fonts-lato \
+            poppler-utils
+
+      - name: Install report dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            pytest \
+            pandas \
+            matplotlib \
+            seaborn \
+            markdown \
+            mistune \
+            beautifulsoup4 \
+            lxml \
+            premailer \
+            weasyprint \
+            pillow \
+            requests \
+            pyyaml \
+            jsonschema \
+            yfinance
+
+      - name: Compile affected modules
+        run: |
+          python -m py_compile \
+            runtime/report_freshness_contract.py \
+            runtime/standalone_html_equity_embed.py \
+            runtime/build_macro_policy_pack.py \
+            runtime/macro_report_surface.py \
+            runtime/link_runtime_report_tickers.py \
+            send_report_runtime_html.py \
+            tools/render_report_freshness_preview.py
+
+      - name: Run focused regression tests
+        run: |
+          python -m pytest -q \
+            tests/test_report_freshness_and_html_equity.py \
+            tests/test_report_freshness_production_variants.py \
+            tests/test_wp16_followup5_equity_curve_png_contract.py \
+            tests/test_etf_post_execution_report_consistency.py \
+            tests/test_etf_decision_cockpit_html.py
+
+      - name: Record official state hashes
+        id: hashes
+        run: |
+          echo "state=$(sha256sum output/etf_portfolio_state.json | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+          echo "ledger=$(sha256sum output/etf_trade_ledger.csv | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
+      - name: Render exact-artifact non-sending preview
+        run: python tools/render_report_freshness_preview.py
+
+      - name: Verify official state immutability
+        run: |
+          test "${{ steps.hashes.outputs.state }}" = "$(sha256sum output/etf_portfolio_state.json | awk '{print $1}')"
+          test "${{ steps.hashes.outputs.ledger }}" = "$(sha256sum output/etf_trade_ledger.csv | awk '{print $1}')"
+
+      - name: Verify report freshness proof
+        run: |
+          grep -q "No material regime change was recorded versus the prior review" output/weekly_analysis_pro_260714_04.md
+          grep -q "Er is geen materiële regimeverandering vastgesteld ten opzichte van de vorige review" output/weekly_analysis_pro_nl_260714_04.md
+          grep -q "already represents 24.05% of the portfolio" output/weekly_analysis_pro_260714_04.md
+          grep -q "vertegenwoordigt al 24.05% van de portefeuille" output/weekly_analysis_pro_nl_260714_04.md
+          grep -q "Existing funded position; no additional lane promotion was granted this run" output/weekly_analysis_pro_260714_04.md
+          grep -q "Bestaande gefinancierde positie; deze run is geen aanvullende lane-promotie toegekend" output/weekly_analysis_pro_nl_260714_04.md
+          ! grep -qi "raised rates this week" output/weekly_analysis_pro_260714_04.md
+          ! grep -qi "verhoogde deze week de rente" output/weekly_analysis_pro_nl_260714_04.md
+          ! grep -qi "Non-U.S. equity exposure remains a diversification gap" output/weekly_analysis_pro_260714_04.md
+          ! grep -qi "Zero allocation is an explicit U.S. exceptionalism bet" output/weekly_analysis_pro_260714_04.md
+          ! grep -qi "Portfolio has limited non-U.S. exposure" output/weekly_analysis_pro_260714_04.md
+          ! grep -qi "Niet-Amerikaanse aandelenblootstelling blijft een diversificatiekloof" output/weekly_analysis_pro_nl_260714_04.md
+          ! grep -qi "De portefeuille heeft geen blootstelling aan ontwikkelde markten buiten de VS" output/weekly_analysis_pro_nl_260714_04.md
+          ! grep -qi "Diagnostisch-only\|fundability-bevoegdheid\|Financial infrastructure and market plumbing\|Power infrastructure and utilities capex" output/weekly_analysis_pro_nl_260714_04.md
+
+      - name: Verify standalone HTML equity graph
+        run: |
+          grep -q "data:image/png;base64," output/weekly_analysis_pro_260714_04_delivery.html
+          grep -q "data:image/png;base64," output/weekly_analysis_pro_nl_260714_04_delivery.html
+          ! grep -qi "cid:equitycurve\|#harmful-link" output/weekly_analysis_pro_260714_04_delivery.html
+          ! grep -qi "cid:equitycurve\|#harmful-link" output/weekly_analysis_pro_nl_260714_04_delivery.html
+          ! grep -qi "EQUITY_CURVE_CHART_PLACEHOLDER" output/weekly_analysis_pro_260714_04_delivery.html
+          ! grep -qi "EQUITY_CURVE_CHART_PLACEHOLDER" output/weekly_analysis_pro_nl_260714_04_delivery.html
+          test -s output/weekly_analysis_pro_260714_04.pdf
+          test -s output/weekly_analysis_pro_nl_260714_04.pdf
+          test -s output/weekly_analysis_pro_260714_04_equity_curve.png
+          test -s output/weekly_analysis_pro_nl_260714_04_equity_curve.png
+
+      - name: Verify validation evidence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path('output/validation/etf_report_freshness_260714_04.json').read_text(encoding='utf-8'))
+          assert payload['status'] == 'passed'
+          assert payload['email_sent'] is False
+          assert payload['model_execution_replayed'] is False
+          assert payload['official_state_mutated'] is False
+          assert payload['official_trade_ledger_mutated'] is False
+          assert payload['state_sha256_before'] == payload['state_sha256_after']
+          assert payload['trade_ledger_sha256_before'] == payload['trade_ledger_sha256_after']
+          assert payload['html_equity_contract']['standalone_html_uses_embedded_data_uri'] is True
+          assert payload['html_equity_contract']['mime_email_html_keeps_cid_reference'] is True
+          PY
+
+      - name: Final diff syntax check
+        run: git diff --check
