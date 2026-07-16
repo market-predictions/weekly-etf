@@ -5,38 +5,32 @@ Repository: `market-predictions/weekly-etf`
 Work package: `WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH`
 PR: #70
 
-## Current status
+## Final status
 
 ```text
 implementation_status: complete
 focused_validation_status: passed
 exact_artifact_replay_status: passed
 standalone_html_equity_status: passed
-merge_status: ready after final governance-head gate
+merge_status: merged
+package_status: closed
 preview_delivery_status: not_authorized_not_sent
 portfolio_state_mutation_authority: false
 trade_ledger_mutation_authority: false
 ```
 
-## Root causes resolved
-
-1. Persistent threshold states are no longer labelled as weekly changes.
-2. Dated policy events must fall inside the report-week window before relative wording such as `this week` is allowed.
-3. Current runtime holdings and weights override stale editorial memory.
-4. PPA remains a candidate where relevant but is not described as the current defense holding.
-5. The client sanitizer's `#harmful-link` substitution is corrected only for the identified equity image after normal sanitization.
-6. Standalone HTML and MIME email HTML now use separate, correct image-source contracts.
-
-## Validation evidence
+## Evidence
 
 ```text
-workflow: Validate ETF report freshness and HTML equity
-run_id: 29460852590
-conclusion: success
+validated_head: 2864050289b2bf4259e5c2f0375b6b9c42078fed
+freshness_validation_run: 29461019794
+post_execution_validation_run: 29461019772
+PR: #70
+merge_commit: 61f6a6a5ab2dd1dfe60f28f1b86a5517a0813dd5
 validation_artifact: output/validation/etf_report_freshness_260714_04.json
 ```
 
-The validation artifact proves:
+The validation artifact records:
 
 ```text
 email_sent: false
@@ -60,8 +54,4 @@ output/weekly_analysis_pro_nl_260714_04_delivery.html
 output/weekly_analysis_pro_nl_260714_04.pdf
 ```
 
-The `_04` files are validated review artifacts. They were not emailed.
-
-## Remaining action
-
-Run the final read-only gate on the governance-complete PR head, promote PR #70 from draft, merge it, and then update canonical control state to record the package as closed.
+The `_04` package is validated review evidence and was not emailed.
