@@ -16,6 +16,7 @@ on:
       - "tools/apply_report_freshness_exact_phrase_patch.py"
       - "tools/render_report_freshness_preview.py"
       - "tests/test_report_freshness_and_html_equity.py"
+      - "tests/test_report_freshness_production_variants.py"
       - ".github/workflows/validate-etf-report-freshness-and-html-equity.yml"
       - "control/work_packages/WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH_20260716.md"
       - "control/ETF_REPORT_FRESHNESS_CHANGELOG.md"
@@ -111,6 +112,7 @@ jobs:
         run: |
           python -m pytest -q \
             tests/test_report_freshness_and_html_equity.py \
+            tests/test_report_freshness_production_variants.py \
             tests/test_wp16_followup5_equity_curve_png_contract.py \
             tests/test_etf_post_execution_report_consistency.py \
             tests/test_etf_decision_cockpit_html.py
