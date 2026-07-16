@@ -28,7 +28,7 @@ inbox_receipt_status: verified_bilingual
 
 Do not resend `_03`.
 
-## Validated non-delivered report baseline
+## Validated non-delivered baseline
 
 ```text
 report_en: output/weekly_analysis_pro_260714_04.md
@@ -48,25 +48,15 @@ WP_POST_EXECUTION_REPORT_CONSISTENCY: closed
 WP_REPORT_FRESHNESS_AND_HTML_EQUITY_GRAPH: closed
 WP_POST_EXECUTION_CORRECTION_RUNBOOK_CLEANUP: closed
 WP_COCKPIT_SURFACE_01_PREVIEW_RENDERER_CURRENT_RUNTIME_REVALIDATION: closed
-PR #70 merge_commit: 61f6a6a5ab2dd1dfe60f28f1b86a5517a0813dd5
-PR #72 merge_commit: 7e3a4516418e7a0413ea1d4b8b21a66d9dab8fb7
-PR #74 merge_commit: d80984b7336f343344719a80a29712506926bd26
 ```
 
-## Cockpit history and current contract
-
-Do not recreate WP01–WP07.
+## Cockpit status
 
 ```text
-WP01 renderer: PR #52
-WP02 preview workflow: PR #52
-WP03 visual contracts: PR #53
-WP04 side-by-side review: PR #54
-WP05 promotion review: PR #55
-WP06 iteration decision: PR #56
-WP07 source/provenance iteration: PR #57
+WP01-WP07: implemented and merged
 promotion_status: not_promoted
 selected_path: iteration
+current_runtime_authority_PR: #74
 ```
 
 Current cockpit authority:
@@ -76,43 +66,82 @@ current_weight_pct > target_weight_pct > previous_weight_pct > weight_inherited_
 market_value_eur > previous_market_value_eur
 ```
 
-Current executed-action example from the authoritative July 14 state:
+## Current package — WP08
 
 ```text
-EN: URNM reduced · XBI added
-NL: URNM afgebouwd · XBI toegevoegd
-```
-
-PR #74 was validated and merged:
-
-```text
-final_validated_head: 523bb038db9ccc10c009b88e6c8f6dd489bc7dc5
-validation_run: 29525968480
-conclusion: success
-merge_commit: d80984b7336f343344719a80a29712506926bd26
-focused_tests: 33 passed
+package: WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION
+PR: #76
+status: validated_ready_for_governance_closeout
+review_conclusion: iteration_required
 promotion_status: not_promoted
 ```
 
-## Immediate next package
-
-Create or claim:
+Validation:
 
 ```text
-WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION
+validated_head: abe689064455dbd7206564037220e727c52b929b
+WP08_run: 29533073516
+current_runtime_run: 29533073585
+artifact: cockpit-wp08-evidence-review-29533073516
 ```
 
-No canonical WP08 work-package file currently exists. The worker should create a narrow review-only package rather than reopening WP01–WP07.
+WP08 passes:
+
+```text
+readability
+density
+visual_hierarchy
+executed_action_clarity
+current_weight_accuracy
+performance_risk_accuracy
+trust_provenance_clarity
+audit_evidence_preservation
+```
+
+WP08 identifies these blockers:
+
+```text
+decision_clarity
+bilingual_semantic_parity
+premium_look_and_feel
+```
+
+Concrete defects:
+
+1. Activity-contradicting summary after an executed rotation.
+2. Missing dedicated next-action trigger.
+3. Dutch discipline sentence with trailing comma.
+4. Hybrid Dutch provenance labels.
+
+## Immediate next package
+
+After PR #76 is merged, create and claim:
+
+```text
+WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT
+```
+
+### Layer
+
+```text
+output contract
+operational runbook
+```
 
 ### Purpose
 
-Perform a fresh side-by-side review using:
+Apply only the narrow current-runtime cockpit refinements required by WP08 and rerun the unchanged WP08 evidence contract.
 
-```text
-classic baseline: current July 14 classic report artifacts
-cockpit baseline: corrected current-runtime cockpit from PR #74
-provenance baseline: WP07 source/evidence surface
-```
+### Required changes
+
+1. Make the short summary action-aware:
+   - when actions exist, state that a controlled rotation was executed;
+   - do not say discipline was ahead of activity;
+   - when no action exists, retain disciplined no-action wording.
+2. Add a concise bilingual next-action trigger derived from current runtime authority and existing decision rules.
+3. Fix Dutch punctuation without replacing punctuation across the entire sentence.
+4. Replace hybrid Dutch provenance labels with natural Dutch client-facing wording.
+5. Preserve the existing design, cards, metrics, evidence strip and preview-only filenames.
 
 ### Required start sequence
 
@@ -123,50 +152,32 @@ control/SYSTEM_INDEX.md
 control/CURRENT_STATE.md
 control/NEXT_ACTIONS.md
 docs/roadmaps/WEEKLY_ETF_COCKPIT_SURFACE_ROADMAP_20260618.md
-control/handovers/HANDOVER_COCKPIT_SURFACE_01_CURRENT_RUNTIME_REVALIDATION_20260716_2020.md
-control/handovers/HANDOVER_COCKPIT_SURFACE_07_PREVIEW_ITERATION_SOURCE_PROVENANCE_20260619_2015.md
+control/work_packages/WP_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION_20260716.md
+control/decisions/COCKPIT_WP08_EVIDENCE_REVIEW_DECISION_20260716.md
+control/handovers/HANDOVER_COCKPIT_SURFACE_08_SIDE_BY_SIDE_REVIEW_AFTER_PROVENANCE_ITERATION_20260716.md
 runtime/render_cockpit_front_page.py
 runtime/build_cockpit_side_by_side_review.py
 ```
 
-Then check for an active WP08 claim or overlapping cockpit-review PR.
+Check for an active WP09 claim before editing.
 
-### Required review dimensions
+### Acceptance
 
-```text
-decision clarity
-executed-action clarity
-current-weight accuracy
-performance and risk accuracy
-source and provenance clarity
-English/Dutch semantic parity
-readability and density
-visual hierarchy
-premium client-grade appearance
-audit evidence preservation
-```
-
-### Expected outputs
-
-Review-only artifacts under:
+Rerun WP08 v2 unchanged. Expected result:
 
 ```text
-output/cockpit_review/
-```
-
-A handover must record:
-
-```text
+review_conclusion: ready_for_promotion_decision
+blocking_findings: []
 promotion_status: not_promoted
-review conclusion
-remaining gaps
-recommended next package
 ```
+
+Passing the review does not promote the cockpit. A separate promotion decision remains required.
 
 ### Safety boundary
 
 ```text
 production_promotion: false
+production_report_replacement: false
 email_send: false
 portfolio_model_execution: false
 pricing_authority_change: false
@@ -176,4 +187,6 @@ preview_output_only: output/cockpit_preview/
 review_output_only: output/cockpit_review/
 ```
 
-WP08 may recommend a subsequent decision package, but it may not attach, promote or replace the production report itself.
+## Subsequent report-surface audit
+
+After WP09, review client-facing `_04` wording for internal terms that may still be visible, including the phrase `shadow engine`. Handle any confirmed leakage in a separate report-surface cleanup package with the existing macro/thesis leakage validators. Do not combine that report cleanup into WP09.
