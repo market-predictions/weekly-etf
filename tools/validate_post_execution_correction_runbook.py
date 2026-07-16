@@ -56,12 +56,15 @@ def main() -> None:
     require("delivery_receipt_fields" in sender, "Send runner does not validate the text delivery receipt.")
     require("Expected English and Dutch delivery manifests" not in sender, "Send runner retains obsolete JSON-manifest assumption.")
     require("delivery_text_manifests" in sender, "Send manifest does not record production text manifests.")
+    require("_require_fresh_correction_suffix(request)" in sender, "Send runner can overwrite an existing correction package.")
 
     require("prove_recovery_has_no_smtp" in recovery, "Recovery runner lacks explicit no-SMTP proof.")
     require("run_post_execution_correction_delivery" not in recovery, "Recovery runner invokes the send runner.")
     require("send_report_runtime_html.py" not in recovery, "Recovery runner invokes the SMTP delivery entrypoint.")
     require("generate_delivery_assets_for_run" in recovery, "Recovery runner does not use render-only asset generation.")
     require("Refusing to overwrite different historical delivery receipt" in recovery, "Recovery can overwrite historical receipt evidence.")
+    require("Recovery would overwrite existing historical report evidence" in recovery, "Recovery can overwrite historical report artifacts.")
+    require("_restore_outputs(output_snapshot)" in recovery, "Recovery lacks transactional restoration of report artifacts.")
 
     validate_existing_correction_manifest(MANIFEST)
 
@@ -69,7 +72,7 @@ def main() -> None:
         "ETF_POST_EXECUTION_CORRECTION_RUNBOOK_OK | "
         "automatic_send_trigger=false | receipt_contract=text | "
         "recovery_email_send=false | bridge_retired=true | "
-        "historical_manifest_internal_hashes=valid"
+        "historical_outputs_protected=true | historical_manifest_internal_hashes=valid"
     )
 
 
