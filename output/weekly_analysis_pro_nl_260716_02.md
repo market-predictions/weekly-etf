@@ -8,7 +8,7 @@
 - **Geopolitiek regime:** Verhoogd maar gelokaliseerd
 - **Wat veranderde ten opzichte van de vorige review:** Er is geen materiële regimeverandering vastgesteld ten opzichte van de vorige review. AI- en semiconductorleiderschap bleef dominant, terwijl marktbreedte en cross-assetbevestiging gemengd bleven.
 - **Algemeen portefeuilleoordeel:** Laat elke positie opnieuw kapitaal verdienen tegenover alternatieven, concentratielimieten en actuele prijsbevestiging.
-- **Belangrijkste conclusie:** De portefeuille voerde één gecontroleerde rotatie uit: XLU werd verlaagd en PAVE werd toegevoegd; verdere wijzigingen blijven bewijs- en churnbegrensd.
+- **Belangrijkste conclusie:** De portefeuille voerde één gecontroleerde rotatie uit: XLU werd verlaagd en PAVE werd toegevoegd; verdere wijzigingen blijven afhankelijk van nieuwe prijs-, relatieve-sterkte- en concentratiebevestiging.
 
 ## 2. Portefeuille-acties
 
@@ -25,11 +25,11 @@
 
 ## 2A. Besliscockpit
 
-- **Deze week:** Bewaakte modelrotatie uitgevoerd en verwerkt: [XLU](https://www.tradingview.com/chart/?symbol=XLU) verlaagd van 5.49% naar 0.52% van de NAV; [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) toegevoegd op 4.96% van de NAV.
-- **Belangrijkste actieve risico:** [SMH](https://www.tradingview.com/chart/?symbol=SMH)-concentratie blijft boven de zachte positielimiet.
-- **Belangrijkste actieve reviews:** [URNM](https://www.tradingview.com/chart/?symbol=URNM) blijven expliciet onder herbeoordeling.
-- **Trigger voor volgende actie:** een volgende mutatie vereist bevestigde relatieve-sterktevoorsprong, schone prijsbasis, aansluiting op de thesis, een vrij te maken financieringsbron en beschikbare churnruimte.
-- **Vers kapitaal:** geen verdere inzet na de voltooide hoofdrotatie totdat een toekomstige run alle disciplinepoorten vrijgeeft.
+- **Deze week:** Portefeuillerotatie voltooid: XLU verlaagd van 5.49% naar 0.52% van de NAV; PAVE toegevoegd op 4.96% van de NAV.
+- **Belangrijkste actieve risico:** SMH-concentratie blijft boven de zachte positielimiet.
+- **Belangrijkste actieve reviews:** URNM blijven expliciet onder herbeoordeling.
+- **Trigger voor volgende actie:** een volgende mutatie vereist bevestigde relatieve-sterktevoorsprong, schone prijsbasis, aansluiting op de thesis, een vrij te maken financieringsbron en ruimte binnen de wekelijkse transactielimiet.
+- **Vers kapitaal:** geen verdere inzet na de voltooide hoofdrotatie totdat een toekomstige review de vereiste prijs-, relatieve-sterkte- en concentratievoorwaarden bevestigt.
 
 ## 3. Regime-dashboard
 
@@ -37,7 +37,7 @@
 - Huidig regime: Risk-on groei.
 - Vertrouwen: 66%.
 - Aanvullende regimecontrole: Een tweede regelgebaseerde beoordeling wijst op Risk-on groei en is grotendeels in lijn met het primaire regimebeeld. De betrouwbaarheid is hoog en weerspiegelt consistentie in het onderliggende bewijs, niet een voorspelling. Deze aanvullende controle verandert de portefeuilleacties niet. Prijsbasis, relatieve sterkte en positiediscipline blijven leidend.
-- Regimegeheugen: Risk-on growth has persisted for 64 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed.
+- Regimegeheugen: Risk-on groei houdt al 64 wekelijkse meetmomenten aan; de overgangsfase is stabiel, de marktbreedte verbetert en cross-asset bevestiging blijft gemengd.
 - Beslisregel: Roteer niet agressief tenzij een regimeverschuiving minstens twee runs aanhoudt of cross-asset bevestiging breed wordt.
 
 ### Beleids- en geopolitieke status
@@ -109,6 +109,8 @@
 
 ## 7. Portefeuillecurve en portefeuilleontwikkeling
 
+`EQUITY_CURVE_CHART_PLACEHOLDER`
+
 - Startkapitaal (EUR): 100000.00
 - Huidige portefeuillewaarde (EUR): 107117.94
 - Rendement sinds start (%): 7.12
@@ -143,7 +145,7 @@
 | 2026-06-29 | 110086.49 | Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen |
 | 2026-06-30 | 111878.25 | Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen |
 | 2026-07-01 | 110493.44 | Waardering op basis van officiële portefeuillestaat en gevalideerde slotkoersen |
-| 2026-07-14 | 110224.86 | Runtime-derived valuation from pricing audit and explicit portfolio state |
+| 2026-07-14 | 110224.86 | Portfolio valuation based on confirmed prices and official holdings |
 | 2026-07-16 | 107117.94 | Doorgeschoven waardering uit prijsaudit en expliciete portefeuillestaat |
 
 ### Gebruikte slotkoersen in dit rapport
@@ -166,23 +168,21 @@ De bovenstaande portefeuillewaardering is gebaseerd op de slotkoersen per positi
 |---|---|---|---:|---|---|
 | EUR/USD | 2026-07-16 | 2026-07-16 | 1.1443 | Twelve Data | Exacte slotkoers, niet onafhankelijk geverifieerd |
 
-`EQUITY_CURVE_CHART_PLACEHOLDER`
-
 ## 7A. Rendement huidige ETF-posities
 
 Rendement wordt berekend op de huidige ETF-posities op basis van de meest recente gevalideerde slotkoers-audit, beschikbare markthistorie en waar nodig de uitgevoerde modeltransacties.
 
 | Portefeuillesegment | Beleggingsthese | ETF | Gewicht % | 1w rendement | 1m rendement | 3m rendement | Sinds instap | P/L EUR | Bijdrage % |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|
-| Rotatiebestemming | Cybersecurityweerbaarheid | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 18.97% | +0.08% | +8.17% | +39.61% | -0.42% | -85.26 | -0.09% |
-| Rotatiebestemming | Grondstoffenbrede hedge-blootstelling | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 9.43% | +6.26% | +5.55% | -0.71% | -2.86% | -297.42 | -0.30% |
-| Rotatiebestemming | Diversificatie in ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 24.63% | -1.09% | -1.16% | +1.62% | +0.88% | 228.92 | +0.23% |
-| Rotatiebestemming | Netwerk- en infrastructuurcapex | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 4.96% | -0.19% | -3.11% | +5.29% | 0.00% | 0.00 | 0.00% |
+| Portefeuilleallocatie | Cybersecurityweerbaarheid | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 18.97% | +0.08% | +8.17% | +39.61% | -0.42% | -85.26 | -0.09% |
+| Portefeuilleallocatie | Grondstoffenbrede hedge-blootstelling | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 9.43% | +6.26% | +5.55% | -0.71% | -2.86% | -297.42 | -0.30% |
+| Portefeuilleallocatie | Diversificatie in ontwikkelde markten buiten de VS | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 24.63% | -1.09% | -1.16% | +1.62% | +0.88% | 228.92 | +0.23% |
+| Portefeuilleallocatie | Netwerk- en infrastructuurcapex | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 4.96% | -0.19% | -3.11% | +5.29% | 0.00% | 0.00 | 0.00% |
 | Groeimotor | AI-rekenkracht en semiconductorleiderschap | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 27.38% | -9.19% | -9.92% | +22.00% | +35.42% | 7,671.54 | +7.67% |
 | Strategische energie | Kernenergie- en uraniumcyclus | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 1.91% | -9.57% | -16.53% | -30.68% | -27.75% | -785.66 | -0.79% |
-| Rotatiebestemming | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | 4.96% | -3.51% | +13.49% | +13.39% | -2.41% | -131.06 | -0.13% |
-| Rotatiebestemming | Defensieve nutsbedrijven / rentegevoelige ballast | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 0.52% | +0.65% | +2.08% | -0.76% | +5.28% | 27.92 | +0.03% |
-| Rotatiebestemming | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | 4.88% | +0.91% | +6.59% | +11.20% | -0.00% | 0.00 | -0.00% |
+| Portefeuilleallocatie | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | 4.96% | -3.51% | +13.49% | +13.39% | -2.41% | -131.06 | -0.13% |
+| Portefeuilleallocatie | Defensieve nutsbedrijven / rentegevoelige ballast | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 0.52% | +0.65% | +2.08% | -0.76% | +5.28% | 27.92 | +0.03% |
+| Portefeuilleallocatie | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | 4.88% | +0.91% | +6.59% | +11.20% | -0.00% | 0.00 | -0.00% |
 
 ## 8. Allocatiekaart
 
@@ -214,15 +214,15 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 
 | Ticker | Actie | Score | Nieuw-kapitaaltoets | Rol | Volgende toets |
 |---|---|---:|---|---|---|
-| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Aanhouden | 4.97 | Aanhouden | Rotatiebestemming | Aanhouden en opnieuw toetsen in de volgende run. |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Aanhouden | 3.59 | Aanhouden | Rotatiebestemming | Monitor commodity-breedte en bijdrage aan de hedgefunctie. |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Aanhouden | 3.52 | Aanhouden | Rotatiebestemming | Aanhouden en opnieuw toetsen in de volgende run. |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Toevoegen — uitgevoerd | 4.25 | Kleiner / onder herbeoordeling | Rotatiebestemming | Voer de vervangingsanalyse tegenover [GRID](https://www.tradingview.com/chart/?symbol=GRID) opnieuw uit. |
+| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Aanhouden | 4.97 | Aanhouden | Portefeuilleallocatie | Aanhouden en opnieuw toetsen in de volgende run. |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Aanhouden | 3.59 | Aanhouden | Portefeuilleallocatie | Monitor commodity-breedte en bijdrage aan de hedgefunctie. |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Aanhouden | 3.52 | Aanhouden | Portefeuilleallocatie | Aanhouden en opnieuw toetsen in de volgende run. |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Toevoegen — uitgevoerd | 4.25 | Kleiner / onder herbeoordeling | Portefeuilleallocatie | Herbeoordeel tegenover [GRID](https://www.tradingview.com/chart/?symbol=GRID) opnieuw uit. |
 | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | Aanhouden | 4.28 | Kleiner / onder herbeoordeling | Groeimotor | Aanhouden binnen de maximale positiegrootte en opnieuw toetsen op concentratie. |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Aanhouden met override | 3.70 | Aanhouden | Strategische energie | Aanhouden en vergelijken met [URA](https://www.tradingview.com/chart/?symbol=URA)/[NLR](https://www.tradingview.com/chart/?symbol=NLR) als uraniumbreedte verbetert. |
-| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | Aanhouden | 4.36 | Onder herbeoordeling | Rotatiebestemming | Aanhouden en opnieuw toetsen in de volgende run. |
-| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Verlagen — uitgevoerd | 3.00 | Kleiner / onder herbeoordeling | Rotatiebestemming | Aanhouden en opnieuw toetsen in de volgende run. |
-| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | Aanhouden | 4.38 | Aanhouden | Rotatiebestemming | Aanhouden en opnieuw toetsen in de volgende run. |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Aanhouden — geen verdere wijziging in deze review | 3.70 | Aanhouden | Strategische energie | Aanhouden en vergelijken met [URA](https://www.tradingview.com/chart/?symbol=URA)/[NLR](https://www.tradingview.com/chart/?symbol=NLR) als uraniumbreedte verbetert. |
+| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | Aanhouden | 4.36 | Onder herbeoordeling | Portefeuilleallocatie | Aanhouden en opnieuw toetsen in de volgende run. |
+| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Verlagen — uitgevoerd | 3.00 | Kleiner / onder herbeoordeling | Portefeuilleallocatie | Aanhouden en opnieuw toetsen in de volgende run. |
+| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | Aanhouden | 4.38 | Aanhouden | Portefeuilleallocatie | Aanhouden en opnieuw toetsen in de volgende run. |
 
 ## 11. Beste nieuwe kansen
 
@@ -266,22 +266,22 @@ Override-toelichting: Het model dwingt normaal een verklein-/vervangingsreview a
 
 | Ticker | ETF | Bestaand/nieuw | Vorig gewicht | Doelgewicht | Advies | Convictieniveau | Totaalscore | Portefeuillerol | Sterker alternatief? | Korte toelichting |
 |---|---|---|---:|---:|---|---|---:|---|---|---|
-| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Bestaand | 18.97 | 18.97 | Aanhouden | Niveau 2 | 4.97 | Rotatiebestemming | Nee | Geen materiële wijziging deze run. |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | iShares S&P GSCI Commodity-Indexed Trust | Bestaand | 9.43 | 9.43 | Aanhouden | Niveau 2 | 3.59 | Rotatiebestemming | Nee | Brede grondstoffenblootstelling blijft onder rolvalidatie als hedge- en inflatiesensitieve positie. |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Bestaand | 24.63 | 24.63 | Aanhouden | Niveau 3 | 3.52 | Rotatiebestemming | Nee | Geen materiële wijziging deze run. |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Nieuw | 0.00 | 4.96 | Toevoegen — uitgevoerd | Niveau 2 | 4.25 | Rotatiebestemming | Ja | Infrastructuurcase blijft valide, maar [GRID](https://www.tradingview.com/chart/?symbol=GRID) is de scherpste vervangingskandidaat. |
+| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Bestaand | 18.97 | 18.97 | Aanhouden | Niveau 2 | 4.97 | Portefeuilleallocatie | Nee | Geen materiële wijziging deze run. |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | iShares S&P GSCI Commodity-Indexed Trust | Bestaand | 9.43 | 9.43 | Aanhouden | Niveau 2 | 3.59 | Portefeuilleallocatie | Nee | Brede grondstoffenblootstelling blijft onder rolvalidatie als hedge- en inflatiesensitieve positie. |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Bestaand | 24.63 | 24.63 | Aanhouden | Niveau 3 | 3.52 | Portefeuilleallocatie | Nee | Geen materiële wijziging deze run. |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Nieuw | 0.00 | 4.96 | Toevoegen — uitgevoerd | Niveau 2 | 4.25 | Portefeuilleallocatie | Ja | Infrastructuurcase blijft valide, maar [GRID](https://www.tradingview.com/chart/?symbol=GRID) is de scherpste vervangingskandidaat. |
 | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Bestaand | 27.38 | 27.38 | Aanhouden | Niveau 1 | 4.28 | Groeimotor | Nee | Best onderbouwde groeiblootstelling; uitbreiding blijft begrensd door de maximale positiegrootte. |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Bestaand | 1.91 | 1.91 | Aanhouden met override | Niveau 2 | 3.70 | Strategische energie | Nee | Strategische energiecase blijft valide, maar krijgt deze run geen extra kapitaal boven [SMH](https://www.tradingview.com/chart/?symbol=SMH). |
-| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | Bestaand | 4.96 | 4.96 | Aanhouden | Niveau 2 | 4.36 | Rotatiebestemming | Nee | Geen materiële wijziging deze run. |
-| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Bestaand | 5.49 | 0.52 | Verlagen — uitgevoerd | Niveau 3 | 3.00 | Rotatiebestemming | Ja | Geen materiële wijziging deze run. |
-| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | Bestaand | 4.88 | 4.88 | Aanhouden | Niveau 2 | 4.38 | Rotatiebestemming | Nee | Geen materiële wijziging deze run. |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Bestaand | 1.91 | 1.91 | Aanhouden — geen verdere wijziging in deze review | Niveau 2 | 3.70 | Strategische energie | Nee | Strategische energiecase blijft valide, maar krijgt deze run geen extra kapitaal boven [SMH](https://www.tradingview.com/chart/?symbol=SMH). |
+| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | Bestaand | 4.96 | 4.96 | Aanhouden | Niveau 2 | 4.36 | Portefeuilleallocatie | Nee | Geen materiële wijziging deze run. |
+| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Bestaand | 5.49 | 0.52 | Verlagen — uitgevoerd | Niveau 3 | 3.00 | Portefeuilleallocatie | Ja | Geen materiële wijziging deze run. |
+| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | Bestaand | 4.88 | 4.88 | Aanhouden | Niveau 2 | 4.38 | Portefeuilleallocatie | Nee | Geen materiële wijziging deze run. |
 
 ## 14. Positiewijzigingen verwerkt in de officiële portefeuillestaat
 
 | Ticker | Vorig gewicht % | Nieuw gewicht % | Gewichtswijziging % | Wijziging aantal stukken | Verwerkte actie | Financieringsbron / toelichting |
 |---|---:|---:|---:|---:|---|---|
-| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 5.49 | 0.52 | -4.97 | -134.00 | Verkopen | Bewaakte modeluitvoering: [XLU](https://www.tradingview.com/chart/?symbol=XLU) verlaagd om [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) te financieren. |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 0.00 | 4.96 | 4.96 | 107.00 | Kopen | Bewaakte modeluitvoering: [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) gekocht, gefinancierd uit [XLU](https://www.tradingview.com/chart/?symbol=XLU). |
+| XLU | 5.49 | 0.52 | -4.97 | -134.00 | Verkopen | Bewaakte modeluitvoering: XLU verlaagd om PAVE te financieren. |
+| PAVE | 0.00 | 4.96 | 4.96 | 107.00 | Kopen | Bewaakte modeluitvoering: PAVE gekocht, gefinancierd uit XLU. |
 | CASH | - | 2.37 | - | 0.00 | Geen | Resterende cash |
 
 ## 15. Huidige posities en cash
@@ -313,15 +313,15 @@ Override-toelichting: Het model dwingt normaal een verklein-/vervangingsreview a
 ### Portefeuilletabel
 | Ticker | ETF-naam | Richting | Gewicht % | Gem. instap | Huidige prijs | P/L % | Oorspronkelijke thesis | Rol |
 |---|---|---|---:|---:|---:|---:|---|---|
-| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Longpositie | 18.97 |  | 91.89 | -1.98 | Portefeuilleblootstelling | Rotatiebestemming |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | iShares S&P GSCI Commodity-Indexed Trust | Longpositie | 9.43 | 31.80 | 30.89 | -2.86 | Brede grondstoffen- en inflatiegevoelige hedgepositie | Rotatiebestemming |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Longpositie | 24.63 |  | 96.76 | -0.22 | Portefeuilleblootstelling | Rotatiebestemming |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Longpositie | 4.96 |  | 56.78 |  | Netwerk- en infrastructuurcapex | Rotatiebestemming |
+| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Longpositie | 18.97 |  | 91.89 | -1.98 | Portefeuilleblootstelling | Portefeuilleallocatie |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | iShares S&P GSCI Commodity-Indexed Trust | Longpositie | 9.43 | 31.80 | 30.89 | -2.86 | Brede grondstoffen- en inflatiegevoelige hedgepositie | Portefeuilleallocatie |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Longpositie | 24.63 |  | 96.76 | -0.22 | Portefeuilleblootstelling | Portefeuilleallocatie |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Longpositie | 4.96 |  | 56.78 |  | Netwerk- en infrastructuurcapex | Portefeuilleallocatie |
 | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Longpositie | 27.38 | 420.13 | 568.92 | 35.42 | AI-rekenkracht en semiconductorleiderschap | Groeimotor |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Longpositie | 1.91 | 67.50 | 48.77 | -27.75 | Kernenergie- en uraniumcyclus | Strategische energie |
-| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | Longpositie | 4.96 |  | 152.00 | -2.22 | Portefeuilleblootstelling | Rotatiebestemming |
-| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Longpositie | 0.52 |  | 45.47 | 3.58 | Portefeuilleblootstelling | Rotatiebestemming |
-| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | Longpositie | 4.88 |  | 161.80 | 0.00 | Portefeuilleblootstelling | Rotatiebestemming |
+| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | Longpositie | 4.96 |  | 152.00 | -2.22 | Portefeuilleblootstelling | Portefeuilleallocatie |
+| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Longpositie | 0.52 |  | 45.47 | 3.58 | Portefeuilleblootstelling | Portefeuilleallocatie |
+| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | Longpositie | 4.88 |  | 161.80 | 0.00 | Portefeuilleblootstelling | Portefeuilleallocatie |
 
 ### Beschikbare cash
 - Cash %: 2.37
@@ -331,7 +331,7 @@ Override-toelichting: Het model dwingt normaal een verklein-/vervangingsreview a
 ### Volglijst / dynamisch radargeheugen
 | Thema | Primaire ETF | Alternatieve ETF | Waarom op de radar | Status |
 |---|---|---|---|---|
-| AI-rekenkrachtinfrastructuur | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Sterkste structurele groeiblootstelling. | Actief / begrensd |
+| AI-rekenkrachtinfrastructuur | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Sterkste structurele groeiblootstelling. | Actief |
 | Defensie-innovatie / strategische weerbaarheid | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling. | Vervangingsanalyse vereist |
 | Netuitbreiding / elektrificatie | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructuurcapex blijft valide. | Vervangingsanalyse vereist |
 | Hedge- en grondstoffenbreedte | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [BIL](https://www.tradingview.com/chart/?symbol=BIL) / [DBC](https://www.tradingview.com/chart/?symbol=DBC) | Hedgefunctie en grondstoffenbreedte moeten periodiek worden bevestigd. | Onder herbeoordeling |
@@ -345,8 +345,8 @@ Override-toelichting: Het model dwingt normaal een verklein-/vervangingsreview a
 - Vervangingskandidaten: niet geschikt voor allocatie zonder afgeronde vervangingsanalyse.
 
 ### Randvoorwaarden
-- Maximale positiegrootte: 25% zachte bovengrens; bestaande overwegingen krijgen geen nieuw kapitaal en blijven onder verklein-/reviewdiscipline
-- Maximaal aantal posities: 8 zachte doelstelling; het huidige geërfde aantal kan tijdelijk hoger zijn totdat bewaakte rotatie dit verlaagt
+- Maximale positiegrootte: 25%
+- Maximaal aantal posities: 8
 - Alleen UCITS: Nee
 - Leveraged ETF’s toegestaan: Nee
 - Drawdown-tolerantie: Gemiddeld
