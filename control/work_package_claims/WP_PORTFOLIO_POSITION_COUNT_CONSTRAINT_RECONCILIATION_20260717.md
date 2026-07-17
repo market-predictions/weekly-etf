@@ -8,8 +8,10 @@ claimed_at_utc: 2026-07-17T16:40:00Z
 implementation_branch: agent/position-count-constraint-reconciliation
 implementation_pull_request: 91
 implementation_merge: 0bcb6af7e243775d876b59719ce9898fa97c690f
-closeout_branch: agent/position-count-constraint-closeout
+closeout_branch: agent/position-count-constraint-closeout-final
 closeout_pull_request: 93
+closeout_merge: 9cfca787620c73e65a4302d2e4dc403a921f5ffb
+metadata_correction_pull_request: 94
 status: closed / released
 released_at_utc: 2026-07-17T22:45:00Z
 scope: decision rule, input/state contract, guarded execution preflight, output contract, validation, governance closeout
