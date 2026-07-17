@@ -7,6 +7,8 @@ on:
     paths:
       - ".github/workflows/diagnose-fresh-weekly-etf-send-recovery.yml"
       - "tools/validate_etf_delivery_html_contract.py"
+      - "tools/validate_etf_client_surface_clean.py"
+      - "tools/validate_etf_macro_thesis_surface_leakage.py"
       - "runtime/client_facing_sanitizer.py"
       - "runtime/report_surface_language_contract.py"
       - "runtime/wp16_followup3_cleanup.py"
@@ -26,6 +28,8 @@ jobs:
       MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL: output/weekly_analysis_pro_nl_260716_02.md
       MRKT_RPRTS_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260716_20260717_154351_executed.json
       ETF_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260716_20260717_154351_executed.json
+      MRKT_RPRTS_PRICING_AUDIT_PATH: output/pricing/price_audit_2026-07-16_20260717_154351.json
+      ETF_PRICING_AUDIT_PATH: output/pricing/price_audit_2026-07-16_20260717_154351.json
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -38,7 +42,7 @@ jobs:
       - name: Install focused dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install matplotlib mistune markdown weasyprint pyyaml pandas pillow beautifulsoup4 lxml premailer
+          python -m pip install matplotlib mistune markdown weasyprint pyyaml pandas pillow beautifulsoup4 lxml premailer jsonschema
 
       - name: Reproduce delivery HTML contract
         id: delivery_contract
@@ -47,15 +51,37 @@ jobs:
           set -o pipefail
           python tools/validate_etf_delivery_html_contract.py --output-dir output 2>&1 | tee /tmp/fresh-send-delivery-contract.log
 
-      - name: Upload diagnostic log
+      - name: Reproduce client-surface clean contract
+        id: client_surface
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python tools/validate_etf_client_surface_clean.py --output-dir output 2>&1 | tee /tmp/fresh-send-client-surface.log
+
+      - name: Reproduce macro-thesis leakage contract
+        id: macro_leakage
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output 2>&1 | tee /tmp/fresh-send-macro-leakage.log
+
+      - name: Record post-scrub diff
+        if: always()
+        run: git diff -- output/weekly_analysis_pro_260716_02.md output/weekly_analysis_pro_nl_260716_02.md output/weekly_analysis_pro_260716_02_delivery.html output/weekly_analysis_pro_nl_260716_02_delivery.html > /tmp/fresh-send-post-scrub.diff || true
+
+      - name: Upload diagnostic logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: fresh-send-delivery-contract-${{ github.run_id }}
-          path: /tmp/fresh-send-delivery-contract.log
+          name: fresh-send-gate-diagnostics-${{ github.run_id }}
+          path: |
+            /tmp/fresh-send-delivery-contract.log
+            /tmp/fresh-send-client-surface.log
+            /tmp/fresh-send-macro-leakage.log
+            /tmp/fresh-send-post-scrub.diff
           if-no-files-found: error
           retention-days: 7
 
-      - name: Enforce diagnostic result
-        if: steps.delivery_contract.outcome != 'success'
+      - name: Enforce diagnostic results
+        if: steps.delivery_contract.outcome != 'success' || steps.client_surface.outcome != 'success' || steps.macro_leakage.outcome != 'success'
         run: exit 1
