@@ -42,8 +42,8 @@ def test_rejects_json_path_in_surface_text() -> None:
 def test_rejects_numeric_confidence_precision() -> None:
     payload = _payload()
     payload["safe_surface_en"] = payload["safe_surface_en"].replace(
-        "Confidence is high but review-only",
-        "Confidence 82% is high but review-only",
+        "Confidence is high",
+        "Confidence 82% is high",
     )
 
     with pytest.raises(RuntimeError, match="numeric_confidence"):
@@ -58,12 +58,14 @@ def test_rejects_positive_authority_field() -> None:
         validate_surface_payload(payload)
 
 
-def test_rejects_missing_review_only_disclaimer() -> None:
+def test_rejects_missing_client_safe_action_boundary() -> None:
     payload = _payload()
-    payload["safe_surface_nl"] = payload["safe_surface_nl"].replace("alleen ter review", "ter informatie")
-    payload["confidence_band_nl"] = "hoog maar ter informatie"
+    payload["safe_surface_nl"] = payload["safe_surface_nl"].replace(
+        "Deze aanvullende controle verandert de portefeuilleacties niet.",
+        "Deze aanvullende controle is informatief.",
+    )
 
-    with pytest.raises(RuntimeError, match="alleen ter review"):
+    with pytest.raises(RuntimeError, match="verandert de portefeuilleacties niet"):
         validate_surface_payload(payload)
 
 
@@ -74,3 +76,11 @@ def test_rejects_full_shadow_payload_field_name() -> None:
 
     with pytest.raises(RuntimeError, match="raw_shadow_payload"):
         validate_surface_payload(broken)
+
+
+def test_rejects_internal_shadow_engine_wording() -> None:
+    payload = _payload()
+    payload["safe_surface_en"] += " The shadow engine remains visible."
+
+    with pytest.raises(RuntimeError, match="shadow_engine"):
+        validate_surface_payload(payload)
