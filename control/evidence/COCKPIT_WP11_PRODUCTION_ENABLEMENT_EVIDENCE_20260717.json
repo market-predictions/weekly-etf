@@ -1,0 +1,111 @@
+{
+  "schema_version": "cockpit_wp11_production_enablement_evidence_v1",
+  "date": "2026-07-17",
+  "repository": "market-predictions/weekly-etf",
+  "package": "WP_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT",
+  "status": "validated_ready_for_production_enablement_merge",
+  "selected_option": "B_enable_additive_delivery_front_page",
+  "validated_head_sha": "1c02bb4ad5cda51f26011ccde03e49bd0291e99a",
+  "validation_run_id": 29582753816,
+  "validation_job_id": 87892175344,
+  "artifact_id": 8407711197,
+  "artifact_digest": "sha256:b483b7157a69939e66c9a7b3624b2401a2211c5ba2db1367b97374aa1b0899a9",
+  "regression_runs": {
+    "current_runtime_authority": 29582753774,
+    "wp08_evidence_review": 29582753837
+  },
+  "production_feature": {
+    "name": "MRKT_RPRTS_COCKPIT_FRONT_PAGE",
+    "value": "enabled",
+    "rollback_value": "disabled",
+    "failure_behavior": "unchanged_classic_output"
+  },
+  "exact_current_authority": {
+    "official_portfolio_state": "output/etf_portfolio_state.json",
+    "base_runtime_state": "output/runtime/etf_report_state_20260716_20260717_094728.json",
+    "whole_share_status": "compliant",
+    "position_count": 8,
+    "nav_eur": 107117.94,
+    "cash_eur": 2519.05,
+    "largest_position": "SMH",
+    "overlay_persisted_to_production": false
+  },
+  "languages": {
+    "en": {
+      "disabled_front_page_count": 0,
+      "enabled_front_page_count": 1,
+      "enabled_small_decision_cockpit_count": 0,
+      "classic_report_body": "preserved",
+      "disabled_pdf_pages": 16,
+      "enabled_pdf_pages": 17,
+      "pdf_page_delta": 1,
+      "front_page_metrics": {
+        "portfolio_caption": "Portfolio value · EUR €107,118 · +7.1%",
+        "positions": "8",
+        "largest_position": "SMH",
+        "largest_position_weight": "27.4%",
+        "cash": "2.4%",
+        "cash_eur": "€2,519",
+        "eur_usd": "1.1443",
+        "max_drawdown": "-7.5%"
+      },
+      "artifact_sha256": {
+        "disabled_html": "d6e6aecf32eb0eab71595cfe5232836fa46666d3da7068ac6ee869bccfa8b04c",
+        "enabled_html": "50d99214f42638d15eb33fb519563b4eada2f256f89a94ed7604840a5e8f97e4",
+        "disabled_pdf": "297bc46ae53cbbf31f8a9f3da86942d9191edf514943a5d253eca834dace7239",
+        "enabled_pdf": "da1eb1c020b0a8c37ccb30efcf0c041cb7c9a356c179435ba69bd4e5bb6817ef"
+      }
+    },
+    "nl": {
+      "disabled_front_page_count": 0,
+      "enabled_front_page_count": 1,
+      "enabled_small_decision_cockpit_count": 0,
+      "classic_report_body": "preserved",
+      "disabled_pdf_pages": 17,
+      "enabled_pdf_pages": 18,
+      "pdf_page_delta": 1,
+      "front_page_metrics": {
+        "portfolio_caption": "Portefeuillewaarde · EUR €107.118 · +7,1%",
+        "positions": "8",
+        "largest_position": "SMH",
+        "largest_position_weight": "27,4%",
+        "cash": "2,4%",
+        "cash_eur": "€2.519",
+        "eur_usd": "1.1443",
+        "max_drawdown": "-7,5%"
+      },
+      "artifact_sha256": {
+        "disabled_html": "9e1552d211ef1e43178657671a5ac914f8604b8143229c26db4d5456f7808f07",
+        "enabled_html": "9341e37a9b7a3fbb2a5130e3ce5acb95772ecc4febbd8818d4a6599ad05a21bb",
+        "disabled_pdf": "257c008c85d04193301fab40dc40429905534d7da19df7681183497aea0b7d80",
+        "enabled_pdf": "72f45dd55952a29fc1d57ae3049d3563efde465b7b7d1a74921667e951399096"
+      }
+    }
+  },
+  "delivery_contract": {
+    "email_count_change": false,
+    "pdf_count_change": false,
+    "attachment_contract_change": false,
+    "manifest_contract_change": false,
+    "email_sent": false
+  },
+  "authority_contract": {
+    "protected_hashes_before_after": "identical",
+    "portfolio_model_execution": false,
+    "official_state_mutation": false,
+    "official_trade_ledger_mutation": false,
+    "pricing_authority_change": false
+  },
+  "protected_sha256": {
+    "output/etf_portfolio_state.json": "5fd4849b0da1a6cbdca4903dafc72ac9d42f9121ec8f31def0c354c0f7d171c4",
+    "output/etf_recommendation_scorecard.csv": "5a767cf3451dc13f5c476d199632a1b090cad1281647bbf9f2e0056831e3e896",
+    "output/etf_trade_ledger.csv": "97a726eaf330d1df230a14cb3ea3167c41778671136e238a4dff12c79aa726a2",
+    "output/etf_valuation_history.csv": "d8d854ad230180372495d1aaa7ed2863a4ee0ea5d0da00c2e9dadafc65458445",
+    "output/pricing/latest_price_audit_path.txt": "311e0bf4d940c53fdc5aee3d515ab244602b37f259d397f1e11369c13e97b2d8",
+    "output/pricing/price_audit_2026-07-16_20260717_094728.json": "3515970a77a25faa27431a8a820a1304bd7bd1b481b6759f47ae1aa13e086ab6",
+    "output/run_manifests/latest_weekly_etf_run_manifest_path.txt": "3dddc6951ee4c8f9c33dc8356301633c4cfc9cedefdbe6381799113b2643fc1d",
+    "output/run_manifests/weekly_etf_run_manifest_2026-07-16_20260717_094728.json": "798a58f53529bdc94a84d92d5e5cf0f50aa20a84b5fef33c5db31ea526e69315",
+    "output/runtime/etf_report_state_20260716_20260717_094728_executed.json": "78f0ece8d434e6558cba0612aa6f02f8660ef1554280306dcc07b178237d65d3",
+    "output/runtime/latest_etf_report_state_path.txt": "04bc657a65486c9ef99bf61c5be71cf210f70857e079f878bb3e895305a1d635"
+  }
+}
