@@ -1,0 +1,100 @@
+from __future__ import annotations
+
+import argparse
+import csv
+import json
+import math
+from copy import deepcopy
+from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any
+
+import pandas as pd
+import yfinance as yf
+
+from runtime.position_count_contract import (
+    DEFAULT_MAX_ACTIVE_POSITIONS,
+    assess_position_count_transition,
+    count_active_positions,
+)
+
+EPS = 1e-9
+MIN_TRADE_PCT_NAV = 2.0
+BLOCKED_SURFACE_TERMS = ("shadow", "engine", "workflow", "override", "guarded", "release score")
+
+
+def num(value: Any, default: float = 0.0) -> float:
+    try:
+        if value in (None, ""):
+            return default
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def text(value: Any) -> str:
+    return str(value or "").strip()
+
+
+def lower(value: Any) -> str:
+    return text(value).lower()
+
+
+def clip(value: float, low: float, high: float) -> float:
+    return max(low, min(high, value))
+
+
+def read_json(path: Path) -> dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected object in {path}")
+    return payload
+
+
+def read_scorecard(path: Path) -> dict[str, dict[str, Any]]:
+    with path.open("r", encoding="utf-8-sig", newline="") as handle:
+        return {
+            text(row.get("ticker")).upper(): row
+            for row in csv.DictReader(handle)
+            if text(row.get("ticker"))
+        }
+
+
+def read_lane_scores(path: Path) -> dict[str, dict[str, Any]]:
+    payload = read_json(path)
+    rows: dict[str, dict[str, Any]] = {}
+    for lane in payload.get("assessed_lanes", []) or []:
+        for key in ("primary_etf", "alternative_etf"):
+            ticker = text(lane.get(key)).upper()
+            if ticker and ticker not in rows:
+                rows[ticker] = dict(lane)
+    return rows
+
+
+def active_positions(state: dict[str, Any]) -> list[dict[str, Any]]:
+    rows = [dict(row) for row in state.get("positions", []) or [] if num(row.get("shares")) > EPS]
+    if count_active_positions(rows) != len(rows):
+        raise ValueError("Official state contains duplicate or invalid active positions")
+    return rows
+
+
+def continuity_rows(
+    state: dict[str, Any],
+    scorecard: dict[str, dict[str, Any]],
+    lanes: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    result: dict[str, dict[str, Any]] = {}
+    for row in active_positions(state):
+        ticker = text(row.get("ticker")).upper()
+        card = scorecard.get(ticker, {})
+        lane = lanes.get(ticker, {})
+        total_score = num(row.get("total_score"), num(card.get("total_score"), num(lane.get("total_score"), 3.0)))
+        result[ticker] = {
+            "ticker": ticker,
+            "shares": int(round(num(row.get("shares")))),
+            "current_weight_pct": num(row.get("current_weight_pct")),
+            "portfolio_role": text(row.get("portfolio_role") or card.get("portfolio_role")),
+            "conviction_tier": text(row.get("conviction_tier") or card.get("conviction_tier")),
+            "total_score": round(total_score, 2),
+            "suggested_action": text(row.get("suggested_action") or card.get("suggested_action")),
+            "fresh_cash_test": text(row.get("fresh_cash_test") or card.get("fresh_cash_test")),
