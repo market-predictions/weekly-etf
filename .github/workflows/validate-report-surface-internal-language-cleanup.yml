@@ -79,13 +79,30 @@ jobs:
             tests/test_report_surface_internal_language_cleanup.py
 
       - name: Run focused report-surface regressions
+        id: focused_tests
+        continue-on-error: true
         run: |
-          pytest -q \
+          set -o pipefail
+          pytest -vv --tb=short \
             tests/test_report_surface_internal_language_cleanup.py \
             tests/test_deterministic_regime_client_surface_helper.py \
             tests/test_deterministic_regime_client_surface_validator.py \
             tests/test_deterministic_regime_report_surface_integration.py \
-            tests/test_wp16_report_surface_qa_contract.py
+            tests/test_wp16_report_surface_qa_contract.py \
+            2>&1 | tee /tmp/report-surface-language-tests.log
+
+      - name: Upload focused test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-surface-language-test-log-${{ github.run_id }}
+          path: /tmp/report-surface-language-tests.log
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce focused test result
+        if: steps.focused_tests.outcome != 'success'
+        run: exit 1
 
       - name: Validate supplementary regime surface contract
         run: python tools/validate_deterministic_regime_client_surface.py --self-test
