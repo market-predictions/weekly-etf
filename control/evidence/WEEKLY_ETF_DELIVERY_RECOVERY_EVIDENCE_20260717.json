@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "weekly_etf_delivery_recovery_evidence",
+  "date": "2026-07-17",
+  "repository": "market-predictions/weekly-etf",
+  "package": "WP_FRESH_WEEKLY_ETF_SEND_RECOVERY",
+  "status": "delivered_and_inbox_confirmed",
+  "source_run": {
+    "run_id": "20260717_154351",
+    "requested_close_date": "2026-07-16",
+    "report_token": "260716",
+    "initial_status": "workflow_failure_before_delivery",
+    "persisted_rotation": "XLU -> PAVE",
+    "repeat_portfolio_execution": false
+  },
+  "implementation": {
+    "language_fix_pr": 89,
+    "language_fix_merge": "68e8587ff6032c8cf3fe1c30019fb513cf57058f",
+    "recovery_workflow_pr": 90,
+    "recovery_workflow_merge": "de2464fc81cc1579437ffaad4a62f4add279d6f5",
+    "recovery_validation_run": 29596023922,
+    "recovery_validation_job": 87936494610,
+    "delivery_evidence_commit": "ddc745fddf0e80a31c4309658743f6435a4d486b"
+  },
+  "delivery": {
+    "manifest": "output/delivery/weekly_etf_delivery_manifest_2026-07-16_20260717_154351.json",
+    "status": "smtp_sendmail_returned_no_exception",
+    "generated_at_utc": "2026-07-17T16:28:05Z",
+    "language_count": 2,
+    "english": {
+      "report": "output/weekly_analysis_pro_260716_02.md",
+      "attachment_count": 4,
+      "attachments": [
+        "weekly_analysis_pro_260716_02.pdf",
+        "weekly_analysis_pro_260716_02_clean.md",
+        "weekly_analysis_pro_260716_02_delivery.html",
+        "weekly_analysis_pro_260716_02_equity_curve.png"
+      ]
+    },
+    "dutch": {
+      "report": "output/weekly_analysis_pro_nl_260716_02.md",
+      "attachment_count": 4,
+      "attachments": [
+        "weekly_analysis_pro_nl_260716_02.pdf",
+        "weekly_analysis_pro_nl_260716_02_clean.md",
+        "weekly_analysis_pro_nl_260716_02_delivery.html",
+        "weekly_analysis_pro_nl_260716_02_equity_curve.png"
+      ]
+    }
+  },
+  "inbox_receipt": {
+    "confirmed": true,
+    "mailbox": "mrkt.rprts@gmail.com",
+    "english_subject": "Weekly ETF Pro Review 2026-07-16",
+    "english_received_at": "2026-07-17T09:28:00-07:00",
+    "english_attachment_count": 4,
+    "dutch_subject": "Weekly ETF Pro Review | Nederlands 2026-07-16",
+    "dutch_received_at": "2026-07-17T09:28:02-07:00",
+    "dutch_attachment_count": 4
+  },
+  "final_run_manifest": {
+    "path": "output/run_manifests/weekly_etf_run_manifest_2026-07-16_20260717_154351.json",
+    "workflow_status": "workflow_success",
+    "workflow_conclusion": "success",
+    "pricing_lineage_status": "passed",
+    "report_authority_source": "portfolio_state_post_execution",
+    "total_portfolio_value_eur": 107117.94,
+    "cash_eur": 2534.36
+  },
+  "authority_contract": {
+    "whole_share_status": "compliant",
+    "second_portfolio_mutation": false,
+    "duplicate_trade_ledger_rows": false,
+    "protected_authority_hashes_unchanged_during_recovery": true,
+    "cockpit_front_page_english": 1,
+    "cockpit_front_page_dutch": 1,
+    "client_language_gate": "passed",
+    "macro_thesis_leakage_gate": "passed",
+    "pdf_visual_gate": "passed"
+  }
+}
