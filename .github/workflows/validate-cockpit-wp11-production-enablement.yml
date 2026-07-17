@@ -110,9 +110,11 @@ jobs:
           assert payload["production_feature"]["value"] == "enabled"
           assert payload["production_feature"]["rollback_value"] == "disabled"
           assert payload["exact_current_authority"]["whole_share_status"] == "compliant"
-          assert payload["exact_current_authority"]["position_count"] == 8
+          assert payload["exact_current_authority"]["position_count"] == 9
           assert payload["exact_current_authority"]["nav_eur"] == 107117.94
-          assert payload["exact_current_authority"]["cash_eur"] == 2519.05
+          assert payload["exact_current_authority"]["cash_eur"] == 2534.36
+          assert payload["languages"]["en"]["front_page_metrics"]["positions"] == "9"
+          assert payload["languages"]["nl"]["front_page_metrics"]["posities"] == "9"
           for language in ("en", "nl"):
               row = payload["languages"][language]
               assert row["disabled_front_page_count"] == 0
