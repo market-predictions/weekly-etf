@@ -1,0 +1,66 @@
+name: Recover Weekly ETF delivery 20260717
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/recover-weekly-etf-delivery-20260717.yml"
+      - ".github/workflows/deliver-weekly-etf-recovery-20260717.yml"
+      - "runtime/report_surface_language_contract.py"
+      - "runtime/client_facing_sanitizer.py"
+      - "tools/recover_weekly_etf_delivery_20260717.py"
+      - "tools/validate_etf_client_surface_clean.py"
+      - "tools/validate_etf_delivery_html_visible_language_contract.py"
+      - "tests/test_etf_delivery_html_visible_language_contract.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weekly-etf-delivery-recovery-validation-20260717-154351
+  cancel-in-progress: false
+
+jobs:
+  validate-recovery-package:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      MRKT_RPRTS_REPORT_MODE: pro
+      MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PDF system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcairo2 libpango-1.0-0 libgdk-pixbuf-2.0-0 libffi-dev shared-mime-info fonts-liberation fonts-dejavu-core fonts-lato poppler-utils
+
+      - name: Install focused dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest matplotlib mistune markdown weasyprint pyyaml pandas pillow beautifulsoup4 lxml premailer jsonschema
+
+      - name: Compile recovery implementation
+        run: |
+          python -m py_compile \
+            tools/recover_weekly_etf_delivery_20260717.py \
+            tools/validate_etf_delivery_html_visible_language_contract.py
+
+      - name: Test visible Dutch delivery language contract
+        run: pytest -q tests/test_etf_delivery_html_visible_language_contract.py
+
+      - name: Execute fail-closed prepare phase
+        run: python tools/recover_weekly_etf_delivery_20260717.py prepare
+
+      - name: Prove no send evidence was created by validation
+        run: |
+          test ! -f output/delivery/weekly_etf_delivery_manifest_2026-07-16_20260717_154351.json
+          test ! -f output/weekly_analysis_pro_260716_02_delivery_manifest.txt
+          test ! -f output/weekly_analysis_pro_nl_260716_02_delivery_manifest.txt
