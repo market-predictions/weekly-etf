@@ -5,12 +5,11 @@ from typing import Any
 
 REGIME_LABEL_NL = {
     "Risk-on growth": "Risk-on groei",
-    "Risk-on narrow leadership": "Risk-on met smalle leiderschap",
+    "Risk-on narrow leadership": "Risk-on met smal marktleiderschap",
     "Defensive / policy stress": "Defensief / beleidsstress",
     "Rate-hike repricing": "Renteherprijzing",
     "Policy transition / mixed regime": "Beleidstransitie / gemengd regime",
 }
-
 
 FALSE_AUTHORITY = {
     "client_facing_authority": False,
@@ -27,7 +26,7 @@ def confidence_band_en(confidence: float) -> str:
         return "low"
     if confidence < 0.72:
         return "moderate"
-    return "high but review-only"
+    return "high"
 
 
 def confidence_band_nl(confidence: float) -> str:
@@ -35,7 +34,7 @@ def confidence_band_nl(confidence: float) -> str:
         return "laag"
     if confidence < 0.72:
         return "gemiddeld"
-    return "hoog maar alleen ter review"
+    return "hoog"
 
 
 def _candidate_from(validation_evidence: dict[str, Any], comparison_evidence: dict[str, Any] | None) -> tuple[str, float]:
@@ -52,14 +51,14 @@ def _alignment_from(comparison_evidence: dict[str, Any] | None) -> tuple[str, st
     confidence_differs = bool(comparison.get("confidence_differs", False))
     if label_differs:
         return (
-            "not aligned with the legacy regime read and therefore review-only",
-            "niet in lijn met de bestaande regime-inschatting en daarom alleen ter review",
+            "differs from the primary regime view and therefore remains a supplementary cross-check",
+            "wijkt af van het primaire regimebeeld en blijft daarom een aanvullende controle",
             label_differs,
             confidence_differs,
         )
     return (
-        "broadly aligned with the legacy regime read",
-        "grotendeels in lijn met de bestaande regime-inschatting",
+        "broadly aligned with the primary regime view",
+        "grotendeels in lijn met het primaire regimebeeld",
         label_differs,
         confidence_differs,
     )
@@ -67,18 +66,18 @@ def _alignment_from(comparison_evidence: dict[str, Any] | None) -> tuple[str, st
 
 def _explanation_en(label_differs: bool, confidence_differs: bool) -> str:
     if label_differs:
-        return "The regime label differs from the legacy read, so this remains an internal review signal."
+        return "The secondary assessment differs from the primary view and should be treated as contextual evidence only."
     if confidence_differs:
-        return "The regime label is aligned, while confidence differs; this remains an internal review signal."
-    return "Current evidence is broadly consistent, but this remains an internal review signal."
+        return "The regime label is aligned while the confidence assessment differs; the comparison remains contextual."
+    return "The current evidence is broadly consistent across the primary and supplementary assessments."
 
 
 def _explanation_nl(label_differs: bool, confidence_differs: bool) -> str:
     if label_differs:
-        return "Het regime-label wijkt af van de bestaande inschatting; dit blijft daarom een intern reviewsignaal."
+        return "De tweede beoordeling wijkt af van het primaire beeld en geldt daarom uitsluitend als context."
     if confidence_differs:
-        return "Het regime-label is in lijn, terwijl de betrouwbaarheid verschilt; dit blijft een intern reviewsignaal."
-    return "Het huidige bewijs is grotendeels samenhangend, maar dit blijft een intern reviewsignaal."
+        return "Het regimebeeld is gelijk, maar de betrouwbaarheidsinschatting verschilt; de vergelijking blijft contextueel."
+    return "Het actuele bewijs is grotendeels consistent tussen de primaire en aanvullende beoordeling."
 
 
 def _join_sentences(first: str, second: str) -> str:
@@ -88,10 +87,9 @@ def _join_sentences(first: str, second: str) -> str:
 def render_deterministic_regime_surface_en(dto: dict[str, Any]) -> str:
     authority_sentence = _join_sentences(dto["authority_disclaimer_en"], dto["discipline_note_en"])
     return (
-        "Deterministic regime read — review-only: "
-        f"The shadow engine currently classifies the backdrop as {dto['regime_label_en']}, "
-        f"{dto['comparison_status_en']}. "
-        f"Confidence is {dto['confidence_band_en']}, reflecting evidence consistency rather than a forecast. "
+        "Supplementary regime cross-check: "
+        f"A secondary rules-based assessment indicates {dto['regime_label_en']} and is {dto['comparison_status_en']}. "
+        f"Confidence is {dto['confidence_band_en']}, reflecting consistency in the underlying evidence rather than a forecast. "
         f"{authority_sentence}"
     )
 
@@ -99,10 +97,9 @@ def render_deterministic_regime_surface_en(dto: dict[str, Any]) -> str:
 def render_deterministic_regime_surface_nl(dto: dict[str, Any]) -> str:
     authority_sentence = _join_sentences(dto["authority_disclaimer_nl"], dto["discipline_note_nl"])
     return (
-        "Deterministische regime-inschatting — alleen ter review: "
-        f"De shadow-engine classificeert de marktomgeving momenteel als {dto['regime_label_nl']}, "
-        f"{dto['comparison_status_nl']}. "
-        f"De betrouwbaarheid is {dto['confidence_band_nl']} en beschrijft samenhang in het bewijs, geen voorspelling. "
+        "Aanvullende regimecontrole: "
+        f"Een tweede regelgebaseerde beoordeling wijst op {dto['regime_label_nl']} en is {dto['comparison_status_nl']}. "
+        f"De betrouwbaarheid is {dto['confidence_band_nl']} en weerspiegelt consistentie in het onderliggende bewijs, niet een voorspelling. "
         f"{authority_sentence}"
     )
 
@@ -114,12 +111,12 @@ def build_deterministic_regime_client_surface(
     source_evidence_path: str,
     source_comparison_path: str,
 ) -> dict[str, Any]:
-    """Build the narrow WP21/WP22 safe-surface DTO.
+    """Build the narrow client-safe deterministic-regime DTO.
 
-    This helper intentionally drops raw shadow fields such as axes, scores,
-    macro evidence, workflow metadata and confidence decompositions.
+    Raw model fields, evidence arrays, workflow metadata and authority-bearing
+    fields remain excluded from the rendered surface. The false authority fields
+    stay explicit so the supplementary comparison cannot become action authority.
     """
-
     regime_en, confidence = _candidate_from(validation_evidence, comparison_evidence)
     regime_nl = REGIME_LABEL_NL.get(regime_en, regime_en)
     comparison_en, comparison_nl, label_differs, confidence_differs = _alignment_from(comparison_evidence)
@@ -139,10 +136,10 @@ def build_deterministic_regime_client_surface(
         "comparison_status_nl": comparison_nl,
         "short_explanation_en": _explanation_en(label_differs, confidence_differs),
         "short_explanation_nl": _explanation_nl(label_differs, confidence_differs),
-        "discipline_note_en": "The normal discipline gates remain decisive.",
-        "discipline_note_nl": "De normale discipline blijft leidend.",
-        "authority_disclaimer_en": "This does not authorize portfolio changes.",
-        "authority_disclaimer_nl": "Dit geeft geen autoriteit voor portefeuillewijzigingen.",
+        "discipline_note_en": "Pricing, relative strength and position discipline remain decisive.",
+        "discipline_note_nl": "Prijsbasis, relatieve sterkte en positiediscipline blijven leidend.",
+        "authority_disclaimer_en": "This supplementary check does not change portfolio actions.",
+        "authority_disclaimer_nl": "Deze aanvullende controle verandert de portefeuilleacties niet.",
         "prohibited_source_fields_confirmed_absent": True,
         **FALSE_AUTHORITY,
     }
