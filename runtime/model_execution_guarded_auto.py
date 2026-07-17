@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
@@ -108,7 +109,8 @@ def _whole_share_engine_patch():
         available_units = floor_whole_shares(source_row.get("shares"))
         requested_units = whole_shares_for_notional(actual, price, currency, fx)
         sell_units = min(available_units, requested_units)
-        rounded_notional = round(engine._eur_from_local(sell_units * price, currency, fx), 2) if sell_units else 0.0
+        exact_eur = engine._eur_from_local(sell_units * price, currency, fx) if sell_units else 0.0
+        rounded_notional = math.ceil(exact_eur * 100.0 - WHOLE_SHARE_TOLERANCE) / 100.0 if sell_units else 0.0
         whole_share_capped = requested - rounded_notional > 1.0
         if whole_share_capped and not cap_reason:
             cap_reason = "whole_share_rounding"
