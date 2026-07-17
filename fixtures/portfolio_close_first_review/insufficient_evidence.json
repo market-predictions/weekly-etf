@@ -1,0 +1,6 @@
+{
+  "scenario": "insufficient_evidence",
+  "freshness_status": "incomplete",
+  "expected_conclusion": "no_trade_insufficient_evidence",
+  "expected_projected_count": 9
+}
