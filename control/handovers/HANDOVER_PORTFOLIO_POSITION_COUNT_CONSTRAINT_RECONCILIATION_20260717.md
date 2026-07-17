@@ -3,8 +3,10 @@
 Date: 2026-07-17
 Repository: `market-predictions/weekly-etf`
 Package: `WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION`
-Status: implementation complete / validation green / merge pending
-Pull request: #91
+Status: closed / merged / claim released
+Implementation pull request: #91
+Implementation merge: `0bcb6af7e243775d876b59719ce9898fa97c690f`
+Closeout pull request: #92
 
 ## Current issue
 
@@ -29,6 +31,8 @@ maximum_active_positions: 8
 position_count_status: close_first
 ```
 
+No position, cash amount, ledger row or valuation record was changed by this package.
+
 ## Root cause
 
 The earlier whole-share contract correctly prevented fractional holdings, but the execution path did not separately test whether a partial source reduction plus a new destination increased the number of active tickers. Target-weight and whole-share correctness therefore coexisted with a position-count breach.
@@ -45,9 +49,10 @@ Stable rules:
 4. a no-trade run may preserve an above-limit state as `close_first`;
 5. any proposed trade while above the limit must reduce the active count and may not introduce a new ticker;
 6. at the limit, opening a new ticker requires another ticker to reach zero shares in the same projected whole-share transition;
-7. a partial reduction that leaves positive shares does not free a slot.
+7. a partial reduction that leaves positive shares does not free a slot;
+8. validation uses projected whole-share quantities, not target percentages alone.
 
-## Recommended change implemented
+## Change implemented
 
 ### Decision framework
 
@@ -55,7 +60,7 @@ Stable rules:
 
 ### Input/state contract
 
-`tools/validate_etf_persisted_valuation_state.py` now projects the intended post-trade whole-share portfolio before guarded mutation. A breach raises before `runtime.model_execution_guarded_auto` can write official state or ledger rows.
+`tools/validate_etf_persisted_valuation_state.py` projects the intended post-trade whole-share portfolio before guarded mutation. A breach raises before `runtime.model_execution_guarded_auto` can write official state or ledger rows.
 
 ### Output contract
 
@@ -63,9 +68,11 @@ Stable rules:
 
 ### Operational runbook
 
-The existing production sequence already invokes the persisted-valuation validator immediately before guarded execution. No new production step or separate mutation authority is introduced.
+The existing production sequence already invokes the persisted-valuation validator immediately before guarded execution. No separate execution authority or hidden mutation step was introduced.
 
-## Exact files changed
+The previously delivered 20260717 recovery workflow is now receipt-aware. Its PR validation detects the existing delivery receipt and validates it instead of attempting a second prepare/send path.
+
+## Exact implementation files
 
 ```text
 runtime/position_count_contract.py
@@ -76,6 +83,27 @@ tools/validate_etf_position_count_contract.py
 tests/test_etf_position_count_contract.py
 .github/workflows/validate-etf-position-count-contract.yml
 .github/workflows/recover-weekly-etf-delivery-20260717.yml
+.github/workflows/validate-cockpit-current-runtime.yml
+.github/workflows/validate-cockpit-wp08-evidence-review.yml
+.github/workflows/validate-cockpit-wp11-production-enablement.yml
+```
+
+The three cockpit workflows were rebased only from stale assertions to current authority:
+
+```text
+historical action: DFEN -> XLV
+current action: XLU -> PAVE
+historical source: unsuffixed 260716
+current source: delivered 260716_02
+historical position count: 8
+current position count: 9
+```
+
+No cockpit renderer or portfolio authority changed.
+
+## Governance files
+
+```text
 control/work_packages/WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_20260717.md
 control/work_package_claims/WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_20260717.md
 control/evidence/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_EVIDENCE_20260717.json
@@ -87,21 +115,39 @@ control/DECISION_LOG.md
 control/ETF_SESSION_CHANGELOG.md
 ```
 
-The closed recovery workflow was made receipt-aware because its historic package has already been delivered. PR validation now validates the existing receipt and cannot re-send it.
+The append-only decision log and changelog records were written by closeout workflow run `29618612112`; the temporary workflow, trigger and script were removed from the closeout branch before merge.
 
 ## Validation
 
+Focused contract proof:
+
 ```text
-validated_head: 07c4f32456d50a6f624f664cfa87970e9c8dec76
-primary_run: 29617207278
-primary_job: 88004737784
-primary_result: success
 focused_tests: 13 passed
 artifact_id: 8420903168
 artifact_digest: sha256:cf98f8d4b4d172bc4f463598a557e8490fd2f188bbd5ae3f0c34347ee1688b5b
-report_surface_regression_run: 29617207295 success
-closed_recovery_regression_run: 29617207264 success
-fresh_send_diagnostic_regression_run: 29617207249 success
+```
+
+Final implementation same-head proof on `c978153c2dadc2206130e82bb19228e11d494399`:
+
+```text
+position_count_run: 29618185729 success
+report_surface_run: 29618185736 success
+current_runtime_cockpit_run: 29618185701 success
+wp08_exact_current_run: 29618185711 success
+wp11_exact_current_run: 29618185709 success
+closed_recovery_run: 29618185751 success
+fresh_send_diagnostic_run: 29618185706 success
+```
+
+Closeout governance append:
+
+```text
+run: 29618612112
+job: 88008928719
+result: success
+decision_log_updated: true
+session_changelog_updated: true
+temporary_files_removed: true
 ```
 
 Proven:
@@ -120,43 +166,35 @@ portfolio execution: false
 email sent: false
 ```
 
-Persistent evidence:
-
-```text
-control/evidence/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_EVIDENCE_20260717.json
-control/decisions/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_DECISION_20260717.md
-```
-
 ## Current authority and operational meaning
 
-This package does not decide which holding should be closed. In particular, it does not automatically instruct a sale of the 14-share XLU residual. The next count-reducing action must use current pricing, scores, relative strength, role evidence and funding logic.
+This package does not decide which holding should be closed. In particular, it does not instruct a sale of the 14-share XLU residual. The next count-reducing decision must use fresh pricing, scores, relative strength, role evidence, liquidity and funding logic.
 
 Until the count is restored:
 
 ```text
 new_ticker_opening: blocked
 no-trade review: allowed
-trade into an existing holding with one full closure: allowed if otherwise authorized
-close to cash: allowed if otherwise authorized
+trade into an existing holding with one full closure: allowed only if separately authorized
+close to cash: allowed only if separately authorized
 partial reduction that preserves nine active positions: blocked
 ```
 
 ## Next action
 
-Create a separate explicitly scoped package:
-
 ```text
 WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW
 ```
 
-That package should use fresh evidence to choose whether and how to reduce the active count from nine to no more than eight. It must not assume XLU is the correct source solely because it is the smallest position. Any real mutation or report delivery requires separate explicit authorization and the normal manifest/receipt controls.
+That package must be separately claimed. It should first produce a no-mutation review using fresh evidence and must not assume XLU is the correct source solely because it is the smallest position. Any real mutation or report delivery requires separate explicit authorization and the normal whole-share, NAV, manifest and inbox-receipt controls.
 
-## Merge and claim closeout
+## Closure statement
 
-Before final closure:
-
-1. merge PR #91 after final same-head governance validation;
-2. record the exact merge commit in this handover;
-3. mark the work package closed;
-4. mark the claim closed/released;
-5. retain the official nine-position state unchanged until a separately authorized count-reducing package executes.
+```text
+implementation merged: yes
+work package closed: yes
+claim released: yes
+handover finalized: yes
+portfolio mutation: no
+email sent: no
+```

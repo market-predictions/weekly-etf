@@ -2,13 +2,13 @@
 
 Date: 2026-07-17
 Repository: `market-predictions/weekly-etf`
-Status: implementation_complete / validation_green / merge_pending
+Status: closed / merged / validated_no_send
 
 ## Current issue
 
 The official portfolio state contains nine non-zero whole-share positions, while the production constraint states a maximum of eight positions. The mismatch arose when guarded execution reduced `XLU` to 14 shares while opening `PAVE` with 107 shares.
 
-This package reconciles the decision rule and execution contract without silently changing current holdings and without sending a report.
+This package reconciled the decision rule and execution contract without silently changing current holdings and without sending a report.
 
 ## Decision framework
 
@@ -26,7 +26,7 @@ Consequences:
 8. When the portfolio is at the limit, opening a new ticker requires one existing source position to reach zero shares in the same projected whole-share execution.
 9. A partial reduction that leaves the source non-zero cannot free a position slot.
 
-The current nine-position state is not mutated by this package. It is recorded as a contract breach requiring count-reducing execution before another new ticker may be opened.
+The current nine-position state was not mutated by this package. It remains a contract breach requiring count-reducing execution before another new ticker may be opened.
 
 ## Input/state contract
 
@@ -76,21 +76,25 @@ Implemented:
 5. read-only evidence validator: `tools/validate_etf_position_count_contract.py`;
 6. 13 focused regressions in `tests/test_etf_position_count_contract.py`;
 7. GitHub Actions validation: `.github/workflows/validate-etf-position-count-contract.yml`;
-8. receipt-aware validation for the already-closed 20260717 delivery recovery workflow.
+8. receipt-aware validation for the already-closed 20260717 delivery recovery workflow;
+9. current-state rebasing of stale cockpit assertions to `_02`, `XLU -> PAVE` and nine active positions.
 
-## Validation evidence
+## Merge and validation evidence
 
 ```text
-pull_request: #91
-validated_head: 07c4f32456d50a6f624f664cfa87970e9c8dec76
-primary_run: 29617207278
-primary_job: 88004737784
+implementation_pull_request: #91
+implementation_merge: 0bcb6af7e243775d876b59719ce9898fa97c690f
+implementation_head: c978153c2dadc2206130e82bb19228e11d494399
 focused_tests: 13 passed
 artifact_id: 8420903168
 artifact_digest: sha256:cf98f8d4b4d172bc4f463598a557e8490fd2f188bbd5ae3f0c34347ee1688b5b
-report_surface_regression: 29617207295 success
-closed_recovery_regression: 29617207264 success
-fresh_send_diagnostic_regression: 29617207249 success
+final_position_count_run: 29618185729 success
+final_report_surface_run: 29618185736 success
+final_current_runtime_cockpit_run: 29618185701 success
+final_wp08_run: 29618185711 success
+final_wp11_run: 29618185709 success
+final_closed_recovery_run: 29618185751 success
+final_fresh_send_diagnostic_run: 29618185706 success
 current_state_status: close_first 9/8
 protected_authority_hashes: identical
 historical_report_hashes: identical
@@ -98,11 +102,14 @@ portfolio_execution: false
 email_sent: false
 ```
 
-Persistent evidence and decision:
+Persistent records:
 
 ```text
 control/evidence/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_EVIDENCE_20260717.json
 control/decisions/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_DECISION_20260717.md
+control/handovers/HANDOVER_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_20260717.md
+control/DECISION_LOG.md
+control/ETF_SESSION_CHANGELOG.md
 ```
 
 ## Non-goals and authority boundary
@@ -125,7 +132,15 @@ This package did not:
 - existing nine-position state classified `close_first` without mutation: complete;
 - focused tests and compatibility gates pass: complete;
 - protected authority hashes remain unchanged: complete;
-- persistent evidence and decision records written: complete;
-- PR merge: pending;
-- final claim release and handover closeout: pending merge;
+- persistent evidence, decision, decision-log and changelog records written: complete;
+- implementation PR merged: complete;
+- final claim release and handover closeout: complete in PR #92;
 - no report or email sent: confirmed.
+
+## Next package
+
+```text
+WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW
+```
+
+That package requires a separate claim and fresh evidence. It must not assume XLU is automatically the correct closure source, and it may not mutate the portfolio without separate explicit authorization.

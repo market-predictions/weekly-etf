@@ -97,8 +97,11 @@ Stable production rules:
 
 ```text
 package: WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION
-pull_request: #91
-status: implementation_complete_validation_green_merge_pending
+implementation_pull_request: #91
+implementation_merge: 0bcb6af7e243775d876b59719ce9898fa97c690f
+closeout_pull_request: #92
+status: closed_merged_validated_no_send
+claim_status: closed_released
 decision: every unique ticker with shares > 0 counts
 zero_share_positions_count: false
 generic_residual_exception: false
@@ -130,17 +133,20 @@ tests/test_etf_position_count_contract.py
 .github/workflows/validate-etf-position-count-contract.yml
 ```
 
-Validation:
+Final validation:
 
 ```text
-primary_run: 29617207278
-primary_job: 88004737784
 focused_tests: 13 passed
 artifact_id: 8420903168
 artifact_digest: sha256:cf98f8d4b4d172bc4f463598a557e8490fd2f188bbd5ae3f0c34347ee1688b5b
-report_surface_regression: 29617207295 success
-closed_recovery_regression: 29617207264 success
-fresh_send_diagnostic_regression: 29617207249 success
+position_count_run: 29618185729 success
+report_surface_run: 29618185736 success
+current_runtime_cockpit_run: 29618185701 success
+wp08_exact_current_run: 29618185711 success
+wp11_exact_current_run: 29618185709 success
+closed_recovery_run: 29618185751 success
+fresh_send_diagnostic_run: 29618185706 success
+governance_append_run: 29618612112 success
 protected_authority_hashes: identical
 historical_report_hashes: identical
 portfolio_execution: false
@@ -153,9 +159,11 @@ Persistent records:
 control/evidence/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_EVIDENCE_20260717.json
 control/decisions/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_DECISION_20260717.md
 control/handovers/HANDOVER_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_20260717.md
+control/DECISION_LOG.md
+control/ETF_SESSION_CHANGELOG.md
 ```
 
-This package does not choose which holding should be closed and does not authorize a sale of XLU or any other position.
+This package does not choose which holding should be closed and does not authorize a position change.
 
 ## Immediate next action
 
@@ -163,6 +171,6 @@ This package does not choose which holding should be closed and does not authori
 WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW
 ```
 
-The next package should use fresh pricing, current scores, relative strength, portfolio-role evidence and funding logic to identify a justified count-reducing path from nine positions to no more than eight. It must not assume that the smallest holding is automatically the correct source.
+The next package should be separately claimed and should first produce a no-mutation review using fresh pricing, current scores, relative strength, portfolio-role evidence, liquidity and funding logic. It must identify a justified count-reducing path from nine positions to no more than eight and must not assume that the smallest holding is automatically the correct source.
 
-A real portfolio mutation or report delivery requires separate explicit authorization and the normal whole-share, NAV, manifest and inbox-receipt controls.
+Any future portfolio change or report delivery requires separate explicit authorization and the normal whole-share, position-count, NAV, manifest and inbox-receipt controls.
