@@ -74,14 +74,23 @@ jobs:
           print("ETF_RECOVERY_RENDER_OK")
           PY
 
-      - name: Validate rerendered package
-        run: |
-          python tools/validate_etf_delivery_html_contract.py --output-dir output
-          python tools/validate_etf_client_surface_clean.py --output-dir output
-          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
-          python tools/validate_etf_pdf_visual_contract.py --output-dir output
-          python tools/validate_etf_whole_share_contract.py --portfolio-state output/etf_portfolio_state.json --artifact output/runtime/etf_model_execution_20260716_20260717_154351.json
-          python tools/validate_etf_trade_ledger_idempotency.py --trade-ledger output/etf_trade_ledger.csv
+      - name: Validate delivery HTML contract
+        run: python tools/validate_etf_delivery_html_contract.py --output-dir output
+
+      - name: Validate cleaned client surface
+        run: python tools/validate_etf_client_surface_clean.py --output-dir output
+
+      - name: Validate macro-thesis leakage
+        run: python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+
+      - name: Validate PDF visual contract
+        run: python tools/validate_etf_pdf_visual_contract.py --output-dir output
+
+      - name: Validate whole-share execution
+        run: python tools/validate_etf_whole_share_contract.py --portfolio-state output/etf_portfolio_state.json --artifact output/runtime/etf_model_execution_20260716_20260717_154351.json
+
+      - name: Validate ledger idempotency
+        run: python tools/validate_etf_trade_ledger_idempotency.py --trade-ledger output/etf_trade_ledger.csv
 
       - name: Verify cockpit and protected authority
         run: |
