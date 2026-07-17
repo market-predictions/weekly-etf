@@ -3,7 +3,9 @@
 Date: 2026-07-17
 Repository: `market-predictions/weekly-etf`
 Package: `WP_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP`
-Status: closed pending PR merge
+Status: closed and merged
+PR: `#88`
+Merge commit: `4571c4c045962908609b3a5e2f784199d4e3b142`
 
 ## Current issue closed
 
