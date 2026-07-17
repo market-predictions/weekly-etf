@@ -1,0 +1,50 @@
+    return sorted(ranked, key=lambda row: (-row["close_priority_score"], row["ticker"]))
+
+
+def _transition(current: list[dict[str, Any]], projected: list[dict[str, Any]]) -> dict[str, Any]:
+    return assess_position_count_transition(current, projected, max_active_positions=DEFAULT_MAX_ACTIVE_POSITIONS, trade_intents_present=True).to_dict()
+
+
+def decide(state: dict[str, Any], ranked: list[dict[str, Any]], snapshot: dict[str, Any]) -> dict[str, Any]:
+    current = active_positions(state)
+    cash = num(state.get("cash_eur"))
+    nav = num(state.get("nav_eur"))
+    no_change = assess_position_count_transition(current, current, max_active_positions=DEFAULT_MAX_ACTIVE_POSITIONS, trade_intents_present=False).to_dict()
+    if snapshot.get("freshness_status") != "complete" or len(ranked) != len(current):
+        return {"conclusion": "no_trade_insufficient_evidence", "selected_source": "", "selected_destination": "", "rationale_codes": ["fresh_market_evidence_incomplete"], "projected_positions": deepcopy(current), "projected_cash_eur": round(cash, 2), "proceeds_eur": 0.0, "destination_shares_added": 0, "transition": no_change}
+    top = ranked[0]
+    second = ranked[1]
+    margin = top["close_priority_score"] - second["close_priority_score"]
+    independent = top["issue_family_count"] >= 2 and (num(top.get("release_score")) >= 65 or any(token in lower(top.get("suggested_action")) for token in ("replace", "reduce", "close"))) and top["non_size_priority_score"] >= second["non_size_priority_score"] and margin >= 2.0
+    if not independent:
+        return {"conclusion": "no_trade_insufficient_evidence", "selected_source": "", "selected_destination": "", "rationale_codes": ["no_candidate_has_sufficient_independent_support", "small_position_size_not_used_as_sole_reason"], "projected_positions": deepcopy(current), "projected_cash_eur": round(cash, 2), "proceeds_eur": 0.0, "destination_shares_added": 0, "transition": no_change}
+    source = top["ticker"]
+    projected = deepcopy(current)
+    source_row = next(row for row in projected if text(row.get("ticker")).upper() == source)
+    eurusd = num(snapshot["rows"]["EURUSD=X"]["close"])
+    proceeds = num(source_row.get("shares")) * num(snapshot["rows"][source]["close"]) / eurusd
+    source_row["shares"] = 0
+    transition = _transition(current, projected)
+    destination = ""
+    destination_added = 0
+    conclusion = "close_to_cash_supported"
+    projected_cash = cash + proceeds
+    if nav > 0 and proceeds / nav * 100 >= MIN_TRADE_PCT_NAV:
+        candidates = [row for row in ranked if row["ticker"] != source and num(row.get("total_score")) >= 4.0 and num(row.get("current_weight_pct")) < 20 and num((row.get("market") or {}).get("rs_vs_spy_3m_pct")) > 0 and num((row.get("market") or {}).get("trend_quality")) >= 3.5 and lower(row.get("action_executed_this_run")) != "buy"]
+        candidates.sort(key=lambda row: (-num(row.get("total_score")), -num((row.get("market") or {}).get("rs_vs_spy_3m_pct")), row["ticker"]))
+        if candidates:
+            destination = candidates[0]["ticker"]
+            dest_row = next(row for row in projected if text(row.get("ticker")).upper() == destination)
+            dest_price_eur = num(snapshot["rows"][destination]["close"]) / eurusd
+            destination_added = int(math.floor(proceeds / dest_price_eur))
+            if destination_added > 0:
+                dest_row["shares"] = int(round(num(dest_row.get("shares")))) + destination_added
+                projected_cash -= destination_added * dest_price_eur
+                transition = _transition(current, projected)
+                conclusion = "close_and_reallocate_existing_supported"
+    return {"conclusion": conclusion, "selected_source": source, "selected_destination": destination, "rationale_codes": ["active_count_restored", "source_selected_on_multiple_independent_factors", "small_position_size_not_used_as_sole_reason"], "projected_positions": projected, "projected_cash_eur": round(projected_cash, 2), "proceeds_eur": round(proceeds, 2), "destination_shares_added": destination_added, "transition": transition}
+
+
+def render(evidence: dict[str, Any]) -> tuple[str, str]:
+    decision = evidence["decision"]
+    source = decision.get("selected_source") or "None"
