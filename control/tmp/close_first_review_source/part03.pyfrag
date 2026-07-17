@@ -1,0 +1,50 @@
+        total_score = num(row.get("total_score"), 3.0)
+        release_score = clip(num(row.get("release_score")), 0, 100)
+        release_points = release_score * 0.35
+        quality_points = clip((4.5 - total_score) * (20.0 / 1.5), 0, 20)
+        rs1 = num(market.get("rs_vs_spy_1m_pct"))
+        rs3 = num(market.get("rs_vs_spy_3m_pct"))
+        trend = num(market.get("trend_quality"), 2.5)
+        market_points = min((min(8.0, abs(rs1) * 0.5) if rs1 < 0 else 0) + (min(8.0, abs(rs3) * 0.33) if rs3 < 0 else 0) + (4.0 if trend < 2.5 else 2.0 if trend < 4.0 else 0), 20.0)
+        discipline_points, reasons, families = _discipline(row)
+        if rs1 < 0 or rs3 < 0 or trend < 4.0:
+            families.add("market")
+        preservation = 0.0
+        preservation_reasons: list[str] = []
+        if lower(row.get("action_executed_this_run")) == "buy":
+            preservation += 12; preservation_reasons.append("recently_added_position")
+        if "tier 1" in lower(row.get("conviction_tier")):
+            preservation += 6; preservation_reasons.append("highest_conviction_tier")
+        if "growth engine" in lower(row.get("portfolio_role")):
+            preservation += 6; preservation_reasons.append("core_growth_role")
+        if total_score >= 4.5:
+            preservation += 5; preservation_reasons.append("high_structural_score")
+        if rs3 > 10:
+            preservation += 5; preservation_reasons.append("strong_three_month_relative_strength")
+        if "strong positive" in lower(row.get("contribution_quality")):
+            preservation += 4; preservation_reasons.append("strong_positive_contribution")
+        weight = num(row.get("current_weight_pct"))
+        practicality = 5.0 if weight <= 1 else 3.0 if weight <= 2 else 1.0 if weight <= 5 else 0.0
+        non_size = clip(release_points + quality_points + market_points + discipline_points - preservation, 0, 100)
+        if release_score >= 65:
+            families.add("release")
+        if total_score < 3.75:
+            families.add("quality")
+        ranked.append({
+            **row,
+            "market": market,
+            "score_components": {
+                "release": round(release_points, 2),
+                "quality_weakness": round(quality_points, 2),
+                "market_weakness": round(market_points, 2),
+                "discipline": round(discipline_points, 2),
+                "preservation_credit": round(preservation, 2),
+                "implementation_practicality": round(practicality, 2),
+            },
+            "non_size_priority_score": round(non_size, 2),
+            "close_priority_score": round(clip(non_size + practicality, 0, 100), 2),
+            "independent_issue_families": sorted(families),
+            "issue_family_count": len(families),
+            "priority_reasons": reasons,
+            "preservation_reasons": preservation_reasons,
+        })
