@@ -6,7 +6,8 @@ Package: `WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION`
 Status: closed / merged / claim released
 Implementation pull request: #91
 Implementation merge: `0bcb6af7e243775d876b59719ce9898fa97c690f`
-Closeout pull request: #92
+Closeout pull request: #93
+Closeout merge: `9cfca787620c73e65a4302d2e4dc403a921f5ffb`
 
 ## Current issue
 
@@ -148,6 +149,8 @@ result: success
 decision_log_updated: true
 session_changelog_updated: true
 temporary_files_removed: true
+final_clean_copy_run: 29619454009 success
+final_clean_copy_job: 88011401148
 ```
 
 Proven:

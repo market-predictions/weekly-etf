@@ -134,7 +134,7 @@ This package did not:
 - protected authority hashes remain unchanged: complete;
 - persistent evidence, decision, decision-log and changelog records written: complete;
 - implementation PR merged: complete;
-- final claim release and handover closeout: complete in PR #92;
+- final claim release and handover closeout: complete in PR #93;
 - no report or email sent: confirmed.
 
 ## Next package
