@@ -3,21 +3,25 @@ name: Append position-count governance records
 on:
   push:
     branches:
-      - agent/position-count-constraint-reconciliation
+      - main
     paths:
       - "control/run_queue/append_position_count_governance_20260717.md"
 
 permissions:
   contents: write
 
+concurrency:
+  group: append-position-count-governance-20260717
+  cancel-in-progress: false
+
 jobs:
   append-and-clean:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out branch
+      - name: Check out main
         uses: actions/checkout@v4
         with:
-          ref: agent/position-count-constraint-reconciliation
+          ref: main
           fetch-depth: 0
 
       - name: Append stable decision and changelog entry
@@ -110,7 +114,7 @@ EOF
           rm -f .github/workflows/append-position-count-governance-20260717.yml
           rm -f control/run_queue/append_position_count_governance_20260717.md
 
-      - name: Commit governance records
+      - name: Commit governance records and self-cleanup
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -118,4 +122,4 @@ EOF
           git add -u .github/workflows/append-position-count-governance-20260717.yml control/run_queue/append_position_count_governance_20260717.md || true
           git diff --cached --quiet && { echo "No governance changes required"; exit 0; }
           git commit -m "Append ETF position-count governance records [skip ci]"
-          git push origin HEAD:agent/position-count-constraint-reconciliation
+          git push origin HEAD:main
