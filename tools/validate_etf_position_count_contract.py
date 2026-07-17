@@ -12,7 +12,10 @@ from runtime.position_count_contract import (
     assess_current_positions,
     client_breach_sentence,
 )
-from runtime.wp16_followup3_cleanup import _active_report_tickers, clean_text
+from runtime.position_count_report_surface import (
+    apply_position_count_surface,
+    report_active_tickers,
+)
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -52,8 +55,13 @@ def validate(
     }
 
     portfolio_state = _read_json(portfolio_state_path)
+    official_positions = [
+        dict(row)
+        for row in portfolio_state.get("positions", []) or []
+        if isinstance(row, dict)
+    ]
     assessment = assess_current_positions(
-        portfolio_state.get("positions", []) or [],
+        official_positions,
         max_active_positions=max_active_positions,
     )
     if not assessment.passed:
@@ -67,20 +75,30 @@ def validate(
     languages: dict[str, dict[str, Any]] = {}
     for language, path in (("en", english_report_path), ("nl", dutch_report_path)):
         original = path.read_text(encoding="utf-8")
-        report_tickers = _active_report_tickers(original, language)
+        report_tickers = report_active_tickers(original, language)
         if report_tickers != assessment.current_tickers:
             raise RuntimeError(
                 f"{language} report active tickers {report_tickers} do not match official state {assessment.current_tickers}"
             )
-        cleaned = clean_text(original, language=language)
+        cleaned = apply_position_count_surface(
+            original,
+            language=language,
+            official_positions=official_positions,
+            max_active_positions=max_active_positions,
+        )
         expected = client_breach_sentence(
             current_count=assessment.current_count,
             max_active_positions=max_active_positions,
             language=language,
         )
         if not expected or expected not in cleaned:
-            raise RuntimeError(f"{language} report cleanup did not expose the position-count breach")
-        if clean_text(cleaned, language=language) != cleaned:
+            raise RuntimeError(f"{language} report guard did not expose the position-count breach")
+        if apply_position_count_surface(
+            cleaned,
+            language=language,
+            official_positions=official_positions,
+            max_active_positions=max_active_positions,
+        ) != cleaned:
             raise RuntimeError(f"{language} position-count client surface is not idempotent")
         languages[language] = {
             "source_path": str(path),
@@ -88,9 +106,9 @@ def validate(
             "active_tickers": list(report_tickers),
             "active_position_count": len(report_tickers),
             "expected_client_sentence": expected,
-            "client_sentence_present_after_in_memory_cleanup": True,
+            "client_sentence_present_after_in_memory_guard": True,
             "source_file_mutated": False,
-            "cleanup_idempotent": True,
+            "guard_idempotent": True,
         }
 
     after_hashes = {str(path): _sha256(path) for path in protected}
