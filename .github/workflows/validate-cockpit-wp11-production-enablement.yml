@@ -1,0 +1,89 @@
+name: Validate cockpit WP11 production enablement
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/send-weekly-report.yml"
+      - ".github/workflows/validate-cockpit-wp11-production-enablement.yml"
+      - "control/work_packages/WP_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT_20260717.md"
+      - "control/handovers/HANDOVER_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT_20260717.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest pandas matplotlib seaborn markdown mistune beautifulsoup4 lxml premailer weasyprint pillow requests pyyaml jsonschema yfinance pypdf
+      - name: Verify exact production workflow enablement
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text = Path('.github/workflows/send-weekly-report.yml').read_text(encoding='utf-8')
+          needle = 'MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled'
+          assert text.count(needle) == 1, (needle, text.count(needle))
+          assert 'MRKT_RPRTS_COCKPIT_FRONT_PAGE: disabled' not in text
+          PY
+      - name: Snapshot protected authority files
+        run: |
+          set -euo pipefail
+          files=(output/etf_portfolio_state.json output/etf_trade_ledger.csv output/etf_valuation_history.csv output/etf_recommendation_scorecard.csv output/runtime/latest_etf_report_state_path.txt output/pricing/latest_price_audit_path.txt output/run_manifests/latest_weekly_etf_run_manifest_path.txt)
+          for pointer in output/runtime/latest_etf_report_state_path.txt output/pricing/latest_price_audit_path.txt output/run_manifests/latest_weekly_etf_run_manifest_path.txt; do
+            if [ -s "$pointer" ]; then target="$(cat "$pointer")"; [ ! -f "$target" ] || files+=("$target"); fi
+          done
+          printf '%s\n' "${files[@]}" | sort -u > /tmp/wp11-protected-files.txt
+          xargs -d '\n' sha256sum < /tmp/wp11-protected-files.txt > /tmp/wp11-before.sha256
+      - name: Run cockpit and production regressions
+        run: |
+          pytest -q tests/test_cockpit_wp10_additive_delivery_front_page.py tests/test_cockpit_front_page_preview.py tests/test_cockpit_visual_state_contracts.py tests/test_cockpit_current_runtime_authority.py tests/test_cockpit_wp08_evidence_review.py tests/test_cockpit_wp09_client_surface_refinement.py
+          python tools/validate_etf_delivery_html_contract.py --output-dir output
+          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+      - name: Build exact-current enabled bundle without send
+        run: |
+          rm -rf output/wp11_validation /tmp/weekly-etf-wp11
+          python tools/validate_cockpit_wp10_delivery_integration.py --repo-root . --work-root /tmp/weekly-etf-wp11 --evidence-dir output/wp11_validation
+      - name: Verify enabled evidence and no delivery
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path('output/wp11_validation/cockpit_wp10_additive_delivery_front_page_260714.json').read_text(encoding='utf-8'))
+          assert p['enabled_front_page_count'] == {'en': 1, 'nl': 1}
+          assert p['classic_report_body'] == 'preserved'
+          assert p['small_decision_cockpit_duplicate'] is False
+          assert p['delivery_directory_digest_unchanged'] is True
+          assert p['email_count_change'] is False
+          assert p['pdf_count_change'] is False
+          assert p['attachment_contract_change'] is False
+          assert p['manifest_contract_change'] is False
+          assert p['email_sent'] is False
+          PY
+      - name: Prove authority unchanged
+        run: |
+          set -euo pipefail
+          xargs -d '\n' sha256sum < /tmp/wp11-protected-files.txt > /tmp/wp11-after.sha256
+          diff -u /tmp/wp11-before.sha256 /tmp/wp11-after.sha256
+          sha256sum -c /tmp/wp11-before.sha256
+      - name: Upload validate-only evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cockpit-wp11-production-enablement-${{ github.run_id }}
+          path: |
+            output/wp11_validation/
+            /tmp/wp11-before.sha256
+            /tmp/wp11-after.sha256
+          if-no-files-found: error
+          retention-days: 14
