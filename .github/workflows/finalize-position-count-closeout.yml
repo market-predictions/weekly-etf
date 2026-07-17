@@ -1,0 +1,30 @@
+name: Finalize position-count closeout
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/finalize-position-count-closeout.yml"
+      - "tools/append_position_count_governance_20260717.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finalize-position-count-closeout-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out closeout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Copy final records and remove temporary files
+        run: python tools/append_position_count_governance_20260717.py
