@@ -25,7 +25,8 @@ inbox_receipt: confirmed_both_languages
 package: WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION
 implementation_pull_request: #91
 implementation_merge: 0bcb6af7e243775d876b59719ce9898fa97c690f
-closeout_pull_request: #92
+closeout_pull_request: #93
+closeout_merge: 9cfca787620c73e65a4302d2e4dc403a921f5ffb
 status: closed_merged_validated_no_send
 claim_status: closed_released
 decision: every non-zero whole-share position counts
