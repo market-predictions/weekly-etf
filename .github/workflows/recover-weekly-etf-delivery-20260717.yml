@@ -91,6 +91,7 @@ jobs:
           path: |
             /tmp/recovery-delivery-contract.log
             /tmp/recovery-delivery-contract.status
+            output/weekly_analysis_pro_nl_260716_02_delivery.html
           if-no-files-found: error
           retention-days: 7
 
