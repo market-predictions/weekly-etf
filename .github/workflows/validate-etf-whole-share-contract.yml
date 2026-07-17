@@ -34,4 +34,17 @@ jobs:
             tools/validate_etf_whole_share_contract.py \
             tools/validate_etf_model_execution.py
       - name: Run focused whole-share tests
-        run: pytest -q tests/test_etf_whole_share_contract.py
+        shell: bash
+        run: |
+          set +e
+          pytest -q tests/test_etf_whole_share_contract.py > whole-share-pytest.log 2>&1
+          status=$?
+          cat whole-share-pytest.log
+          exit "$status"
+      - name: Upload focused test log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: whole-share-pytest-log
+          path: whole-share-pytest.log
+          if-no-files-found: error
