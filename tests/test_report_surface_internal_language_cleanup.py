@@ -71,6 +71,21 @@ def test_html_delivery_sanitizer_applies_same_contract() -> None:
     assert "5.00%" in cleaned
 
 
+def test_generic_discipline_gate_language_is_cleaned_bilingually() -> None:
+    english = "<html><body><p>All discipline gates must clear before allocation.</p></body></html>"
+    dutch = "<html><body><p>Alle disciplinepoorten moeten vrijgeven vóór allocatie.</p></body></html>"
+
+    cleaned_en = sanitize_client_facing_html(english, md_text="## 1. Executive Summary", language="en")
+    cleaned_nl = sanitize_client_facing_html(dutch, md_text="## 1. Kernsamenvatting", language="nl")
+
+    assert client_language_findings(cleaned_en, language="en") == []
+    assert client_language_findings(cleaned_nl, language="nl") == []
+    assert "decision conditions" in cleaned_en
+    assert "beslisvoorwaarden" in cleaned_nl
+    assert normalize_client_language(cleaned_en, language="en") == cleaned_en
+    assert normalize_client_language(cleaned_nl, language="nl") == cleaned_nl
+
+
 def test_normalizer_preserves_unrelated_authority_text() -> None:
     source = "Portfolio state is authoritative. Pricing authority remains unchanged."
     assert normalize_client_language(source, language="en") == source
