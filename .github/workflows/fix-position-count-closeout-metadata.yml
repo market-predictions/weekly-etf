@@ -1,0 +1,30 @@
+name: Fix position-count closeout metadata
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/fix-position-count-closeout-metadata.yml"
+      - "tools/fix_position_count_closeout_metadata_20260717.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fix-position-count-closeout-metadata-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out metadata branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Correct closeout metadata and self-clean
+        run: python tools/fix_position_count_closeout_metadata_20260717.py
