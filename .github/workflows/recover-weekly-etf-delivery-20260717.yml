@@ -6,38 +6,28 @@ on:
       - main
     paths:
       - ".github/workflows/recover-weekly-etf-delivery-20260717.yml"
+      - ".github/workflows/deliver-weekly-etf-recovery-20260717.yml"
       - "runtime/report_surface_language_contract.py"
       - "runtime/client_facing_sanitizer.py"
+      - "tools/recover_weekly_etf_delivery_20260717.py"
       - "tools/validate_etf_client_surface_clean.py"
       - "tools/validate_etf_delivery_html_visible_language_contract.py"
       - "tests/test_etf_delivery_html_visible_language_contract.py"
-  push:
-    branches:
-      - main
-    paths:
-      - "control/run_queue/weekly_etf_delivery_recovery_request_20260717_154351.md"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: weekly-etf-delivery-recovery-20260717-154351
+  group: weekly-etf-delivery-recovery-validation-20260717-154351
   cancel-in-progress: false
 
 jobs:
   validate-recovery-package:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: .
       MRKT_RPRTS_REPORT_MODE: pro
       MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
-      MRKT_RPRTS_EXPLICIT_REPORT_PATH: output/weekly_analysis_pro_260716_02.md
-      MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL: output/weekly_analysis_pro_nl_260716_02.md
-      MRKT_RPRTS_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260716_20260717_154351_executed.json
-      ETF_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260716_20260717_154351_executed.json
-      MRKT_RPRTS_PRICING_AUDIT_PATH: output/pricing/price_audit_2026-07-16_20260717_154351.json
-      ETF_PRICING_AUDIT_PATH: output/pricing/price_audit_2026-07-16_20260717_154351.json
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -57,56 +47,20 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pytest matplotlib mistune markdown weasyprint pyyaml pandas pillow beautifulsoup4 lxml premailer jsonschema
 
-      - name: Snapshot protected authority
-        run: sha256sum output/etf_portfolio_state.json output/etf_trade_ledger.csv output/etf_valuation_history.csv > /tmp/recovery-authority-before.sha256
+      - name: Compile recovery implementation
+        run: |
+          python -m py_compile \
+            tools/recover_weekly_etf_delivery_20260717.py \
+            tools/validate_etf_delivery_html_visible_language_contract.py
 
       - name: Test visible Dutch delivery language contract
         run: pytest -q tests/test_etf_delivery_html_visible_language_contract.py
 
-      - name: Apply client cleanup before rerender
-        run: python tools/validate_etf_client_surface_clean.py --output-dir output
+      - name: Execute fail-closed prepare phase
+        run: python tools/recover_weekly_etf_delivery_20260717.py prepare
 
-      - name: Regenerate bilingual cockpit assets
+      - name: Prove no send evidence was created by validation
         run: |
-          python - <<'PY'
-          import os
-          from pathlib import Path
-          import send_report_runtime_html as srh
-          output_dir = Path("output")
-          report = Path(os.environ["MRKT_RPRTS_EXPLICIT_REPORT_PATH"])
-          bundle = srh.report_module.generate_delivery_assets_for_run(output_dir, report, mode="pro")
-          assert bundle.get("bilingual") is True
-          print("ETF_RECOVERY_RENDER_OK")
-          PY
-
-      - name: Validate delivery HTML on visible client language
-        run: python tools/validate_etf_delivery_html_visible_language_contract.py --output-dir output
-
-      - name: Validate cleaned client surface
-        run: python tools/validate_etf_client_surface_clean.py --output-dir output
-
-      - name: Validate macro-thesis leakage
-        run: python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
-
-      - name: Validate PDF visual contract
-        run: python tools/validate_etf_pdf_visual_contract.py --output-dir output
-
-      - name: Validate whole-share execution
-        run: python tools/validate_etf_whole_share_contract.py --portfolio-state output/etf_portfolio_state.json --artifact output/runtime/etf_model_execution_20260716_20260717_154351.json
-
-      - name: Validate ledger idempotency
-        run: python tools/validate_etf_trade_ledger_idempotency.py --trade-ledger output/etf_trade_ledger.csv
-
-      - name: Verify cockpit and protected authority
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          marker = 'data-cockpit-front-page="delivery"'
-          for path in [Path("output/weekly_analysis_pro_260716_02_delivery.html"), Path("output/weekly_analysis_pro_nl_260716_02_delivery.html")]:
-              count = path.read_text(encoding="utf-8").count(marker)
-              assert count == 1, f"{path}: expected one cockpit front page, found {count}"
-              print(f"ETF_COCKPIT_FRONT_PAGE_OK | file={path.name} | count={count}")
-          PY
-          sha256sum output/etf_portfolio_state.json output/etf_trade_ledger.csv output/etf_valuation_history.csv > /tmp/recovery-authority-after.sha256
-          diff -u /tmp/recovery-authority-before.sha256 /tmp/recovery-authority-after.sha256
-          git diff --exit-code -- output/etf_portfolio_state.json output/etf_trade_ledger.csv output/etf_valuation_history.csv
+          test ! -f output/delivery/weekly_etf_delivery_manifest_2026-07-16_20260717_154351.json
+          test ! -f output/weekly_analysis_pro_260716_02_delivery_manifest.txt
+          test ! -f output/weekly_analysis_pro_nl_260716_02_delivery_manifest.txt
