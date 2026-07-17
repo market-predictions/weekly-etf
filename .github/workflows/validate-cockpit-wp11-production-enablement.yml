@@ -8,6 +8,7 @@ on:
       - ".github/workflows/send-weekly-report.yml"
       - ".github/workflows/validate-cockpit-wp11-production-enablement.yml"
       - "tools/validate_cockpit_wp11_production_enablement.py"
+      - "tools/run_cockpit_wp11_production_enablement_validation.py"
       - "tests/test_cockpit_wp11_production_enablement.py"
       - "runtime/additive_cockpit_front_page.py"
       - "send_report_runtime_html.py"
@@ -68,6 +69,7 @@ jobs:
         run: |
           python -m py_compile \
             tools/validate_cockpit_wp11_production_enablement.py \
+            tools/run_cockpit_wp11_production_enablement_validation.py \
             tests/test_cockpit_wp11_production_enablement.py
 
       - name: Run focused WP11 tests
@@ -84,7 +86,7 @@ jobs:
           set +e
           rm -rf /tmp/weekly-etf-wp11 output/wp11_validation
           mkdir -p output/wp11_validation
-          python tools/validate_cockpit_wp11_production_enablement.py \
+          python tools/run_cockpit_wp11_production_enablement_validation.py \
             --repo-root . \
             --work-root /tmp/weekly-etf-wp11 \
             --evidence-dir output/wp11_validation \
