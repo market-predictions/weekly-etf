@@ -1,0 +1,61 @@
+name: Diagnose fresh Weekly ETF send recovery
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/diagnose-fresh-weekly-etf-send-recovery.yml"
+      - "tools/validate_etf_delivery_html_contract.py"
+      - "runtime/client_facing_sanitizer.py"
+      - "runtime/report_surface_language_contract.py"
+      - "runtime/wp16_followup3_cleanup.py"
+      - "control/work_packages/WP_FRESH_WEEKLY_ETF_SEND_RECOVERY_20260717.md"
+      - "control/work_package_claims/WP_FRESH_WEEKLY_ETF_SEND_RECOVERY_20260717.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      MRKT_RPRTS_EXPLICIT_REPORT_PATH: output/weekly_analysis_pro_260716_02.md
+      MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL: output/weekly_analysis_pro_nl_260716_02.md
+      MRKT_RPRTS_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260716_20260717_154351_executed.json
+      ETF_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260716_20260717_154351_executed.json
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install matplotlib mistune markdown weasyprint pyyaml pandas pillow beautifulsoup4 lxml premailer
+
+      - name: Reproduce delivery HTML contract
+        id: delivery_contract
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python tools/validate_etf_delivery_html_contract.py --output-dir output 2>&1 | tee /tmp/fresh-send-delivery-contract.log
+
+      - name: Upload diagnostic log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fresh-send-delivery-contract-${{ github.run_id }}
+          path: /tmp/fresh-send-delivery-contract.log
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce diagnostic result
+        if: steps.delivery_contract.outcome != 'success'
+        run: exit 1
