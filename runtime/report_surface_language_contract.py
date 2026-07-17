@@ -60,7 +60,6 @@ EXACT_REPLACEMENTS: dict[str, str] = {
     "Aanhouden met override": "Aanhouden — geen verdere wijziging in deze review",
     "override: rotation budget already used": "rotatielimiet bereikt voor deze review",
     "override min trade size not met": "positie te klein voor een efficiënte transactie",
-    "release score": "reviewprioriteit",
     "Bewaakte auto-uitvoering:": "Verwerkte wijziging:",
     "Rotatiebestemming": "Portefeuilleallocatie",
     "een toekomstige run alle disciplinepoorten vrijgeeft": "een toekomstige review de vereiste prijs-, relatieve-sterkte- en concentratievoorwaarden bevestigt",
@@ -78,7 +77,7 @@ REGEX_REPLACEMENTS: tuple[tuple[re.Pattern[str], str], ...] = (
     ),
     (
         re.compile(r"\breviewprioriteit\s+(\d+(?:\.\d+)?)", re.IGNORECASE),
-        r"reviewprioriteit \1",
+        r"review priority \1",
     ),
     (
         re.compile(r"\boverride:\s*rotation budget already used\b", re.IGNORECASE),
@@ -139,6 +138,8 @@ def normalize_client_language(text: str, *, language: str) -> str:
         cleaned = cleaned.replace(source, target)
     for pattern, replacement in REGEX_REPLACEMENTS:
         cleaned = pattern.sub(replacement, cleaned)
+    if language == "nl":
+        cleaned = re.sub(r"\breview priority\b", "reviewprioriteit", cleaned, flags=re.IGNORECASE)
     return cleaned
 
 
