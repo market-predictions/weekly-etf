@@ -9,6 +9,54 @@ This is the broad operating changelog for `market-predictions/weekly-etf` develo
 
 ---
 
+## 2026-07-17 — Whole-share official state contract implemented and reconciled
+
+The latest production state was found to violate the decision-framework rule `whole shares only`. Guarded model execution stored fractional positions and fractional Buy/Sell deltas, and a small leveraged `DFEN` remainder conflicted with the active no-leverage constraint.
+
+Implemented and merged under PR #85:
+
+```text
+runtime/whole_share_contract.py
+runtime/model_execution_guarded_auto.py
+tools/reconcile_etf_whole_share_state.py
+tools/validate_etf_whole_share_contract.py
+tools/validate_etf_model_execution.py
+tests/test_etf_whole_share_contract.py
+.github/workflows/validate-etf-whole-share-contract.yml
+.github/workflows/reconcile-etf-whole-share-state.yml
+```
+
+Validation:
+
+```text
+merge_commit: d5532ea15801a3888633ccb824797ab254305433
+workflow_run: 29580018310
+focused_tests: 4 passed
+compile: passed
+```
+
+The official state was then reconciled using the persisted 2026-07-16 runtime pricing and FX basis:
+
+```text
+request_commit: 3a54f5fb12be1c47420c0922ade4a82213bb3677
+result_commit: 50b93740efbed537ed9d0daed6e1d88ce912be1e
+artifact: output/runtime/etf_whole_share_reconciliation_20260716_20260717_094728.json
+adjusted_positions: 10
+ledger_rows_appended: 10
+DFEN: policy closed
+cash_released_eur: 582.53
+cash_after_eur: 2519.05
+nav_eur: 107117.94
+nav_drift_eur: 0.00
+whole_share_validation_errors: []
+```
+
+Current official holdings are eight whole-share positions: CIBR 253, GSG 374, IEFA 312, SMH 59, URNM 48, XBI 40, XLU 148 and XLV 37.
+
+No email was sent and cockpit production enablement remained disabled. WP11 may resume using the reconciled official state.
+
+---
+
 ## 2026-07-15 — Rotation current-run authority and alternative-candidate package validated
 
 The 2026-07-14 production output was audited after its no-mutation result. Fresh relative-strength data existed, but rotation still consumed stale recommendation-memory P/L and could not select alternative ETFs independently.
