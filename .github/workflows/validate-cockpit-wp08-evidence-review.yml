@@ -129,40 +129,40 @@ jobs:
           assert metadata["promotion_status"] == "not_promoted"
           assert metadata["review_conclusion"] == ("iteration_required" if blockers else "ready_for_promotion_decision")
           assert metadata["next_recommended_package"] == (
-              "WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT"
-              if blockers
-              else "WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW"
+            "WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT"
+            if blockers
+            else "WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW"
           )
 
           selected = metadata["selected_sources"]
-          assert selected["classic"]["en"]["markdown"] == "output/weekly_analysis_pro_260716.md"
-          assert selected["classic"]["nl"]["markdown"] == "output/weekly_analysis_pro_nl_260716.md"
-          assert selected["classic"]["en"]["html"] == "output/weekly_analysis_pro_260716_delivery.html"
-          assert selected["classic"]["nl"]["html"] == "output/weekly_analysis_pro_nl_260716_delivery.html"
+          assert selected["classic"]["en"]["markdown"] == "output/weekly_analysis_pro_260716_02.md"
+          assert selected["classic"]["nl"]["markdown"] == "output/weekly_analysis_pro_nl_260716_02.md"
+          assert selected["classic"]["en"]["html"] == "output/weekly_analysis_pro_260716_02_delivery.html"
+          assert selected["classic"]["nl"]["html"] == "output/weekly_analysis_pro_nl_260716_02_delivery.html"
           assert selected["cockpit"]["en"] == "output/cockpit_preview/weekly_analysis_pro_cockpit_260716_01.html"
           assert selected["cockpit"]["nl"] == "output/cockpit_preview/weekly_analysis_pro_nl_cockpit_260716_01.html"
 
           always_pass = {
-              "readability",
-              "density",
-              "visual_hierarchy",
-              "executed_action_clarity",
-              "current_weight_accuracy",
-              "performance_risk_accuracy",
-              "trust_provenance_clarity",
-              "audit_evidence_preservation",
+            "readability",
+            "density",
+            "visual_hierarchy",
+            "executed_action_clarity",
+            "current_weight_accuracy",
+            "performance_risk_accuracy",
+            "trust_provenance_clarity",
+            "audit_evidence_preservation",
           }
           for dimension in always_pass:
               assert findings[dimension]["status"] == "pass", (dimension, findings[dimension])
 
           transition_dimensions = {
-              "decision_clarity",
-              "bilingual_semantic_parity",
-              "premium_look_and_feel",
+            "decision_clarity",
+            "bilingual_semantic_parity",
+            "premium_look_and_feel",
           }
           payload = json.dumps(metadata, ensure_ascii=False)
-          assert "DFEN reduced" in payload
-          assert "XLV added" in payload
+          assert "XLU reduced" in payload
+          assert "PAVE added" in payload
           assert metadata["input_sha256"]
 
           if blockers:
