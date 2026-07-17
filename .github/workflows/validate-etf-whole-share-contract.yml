@@ -1,0 +1,37 @@
+name: Validate ETF whole-share contract
+
+on:
+  pull_request:
+    paths:
+      - "runtime/whole_share_contract.py"
+      - "runtime/model_execution_guarded_auto.py"
+      - "tools/reconcile_etf_whole_share_state.py"
+      - "tools/validate_etf_whole_share_contract.py"
+      - "tools/validate_etf_model_execution.py"
+      - "tests/test_etf_whole_share_contract.py"
+      - ".github/workflows/validate-etf-whole-share-contract.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test dependency
+        run: python -m pip install pytest
+      - name: Compile whole-share implementation
+        run: |
+          python -m py_compile \
+            runtime/whole_share_contract.py \
+            runtime/model_execution_guarded_auto.py \
+            tools/reconcile_etf_whole_share_state.py \
+            tools/validate_etf_whole_share_contract.py \
+            tools/validate_etf_model_execution.py
+      - name: Run focused whole-share tests
+        run: pytest -q tests/test_etf_whole_share_contract.py
