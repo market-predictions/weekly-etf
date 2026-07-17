@@ -45,7 +45,7 @@ def main() -> None:
     run("git", "config", "user.name", "github-actions[bot]")
     run("git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com")
     run("git", "add", *FILES)
-    run("git", "add", "-u", *(str(path) for path in TEMPORARY_FILES))
+    run("git", "add", "-u")
     run("git", "commit", "-m", "Finalize ETF position-count governance records [skip ci]")
     branch = os.environ.get("GITHUB_HEAD_REF") or os.environ.get("GITHUB_REF_NAME")
     if not branch:
