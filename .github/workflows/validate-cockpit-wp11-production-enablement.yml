@@ -79,13 +79,20 @@ jobs:
             --portfolio-state output/etf_portfolio_state.json
 
       - name: Build exact-current no-send production evidence
+        shell: bash
         run: |
+          set +e
           rm -rf /tmp/weekly-etf-wp11 output/wp11_validation
+          mkdir -p output/wp11_validation
           python tools/validate_cockpit_wp11_production_enablement.py \
             --repo-root . \
             --work-root /tmp/weekly-etf-wp11 \
             --evidence-dir output/wp11_validation \
-            --runtime-state output/runtime/etf_report_state_20260716_20260717_094728.json
+            --runtime-state output/runtime/etf_report_state_20260716_20260717_094728.json \
+            > output/wp11_validation/validator.log 2>&1
+          status=$?
+          cat output/wp11_validation/validator.log
+          exit "$status"
 
       - name: Verify WP11 evidence contract
         run: |
@@ -127,9 +134,10 @@ jobs:
             output/run_manifests/latest_weekly_etf_run_manifest_path.txt
 
       - name: Upload WP11 evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cockpit-wp11-production-enablement-${{ github.run_id }}
           path: output/wp11_validation/
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 30
