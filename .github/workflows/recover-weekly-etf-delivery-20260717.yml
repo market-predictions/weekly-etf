@@ -56,11 +56,30 @@ jobs:
       - name: Test visible Dutch delivery language contract
         run: pytest -q tests/test_etf_delivery_html_visible_language_contract.py
 
-      - name: Execute fail-closed prepare phase
+      - name: Detect closed recovery receipt
+        id: receipt
+        run: |
+          if test -f output/delivery/weekly_etf_delivery_manifest_2026-07-16_20260717_154351.json; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "ETF_RECOVERY_ALREADY_DELIVERED"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Execute fail-closed prepare phase before delivery
+        if: steps.receipt.outputs.exists != 'true'
         run: python tools/recover_weekly_etf_delivery_20260717.py prepare
 
-      - name: Prove no send evidence was created by validation
+      - name: Prove no send evidence was created by pre-delivery validation
+        if: steps.receipt.outputs.exists != 'true'
         run: |
           test ! -f output/delivery/weekly_etf_delivery_manifest_2026-07-16_20260717_154351.json
           test ! -f output/weekly_analysis_pro_260716_02_delivery_manifest.txt
           test ! -f output/weekly_analysis_pro_nl_260716_02_delivery_manifest.txt
+
+      - name: Validate existing closed recovery evidence
+        if: steps.receipt.outputs.exists == 'true'
+        run: |
+          python tools/validate_etf_manifest_evidence.py
+          python tools/validate_etf_delivery_html_visible_language_contract.py --output-dir output
+          echo "ETF_RECOVERY_CLOSED_RECEIPT_VALIDATION_OK"
