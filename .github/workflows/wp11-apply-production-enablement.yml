@@ -1,0 +1,57 @@
+name: Apply WP11 production enablement
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/wp11_apply_cockpit_enablement_main_*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out WP11 branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/cockpit-wp11-production-enablement
+          fetch-depth: 0
+
+      - name: Apply explicit production feature value
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path(".github/workflows/send-weekly-report.yml")
+          text = path.read_text(encoding="utf-8")
+          enabled = """jobs:
+  send-report:
+    runs-on: ubuntu-latest
+    env:
+      MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
+"""
+          if enabled not in text:
+              needle = """jobs:
+  send-report:
+    runs-on: ubuntu-latest
+"""
+              if text.count(needle) != 1:
+                  raise SystemExit(f"Expected one send-report job header; found {text.count(needle)}")
+              text = text.replace(needle, enabled, 1)
+              path.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Commit feature-branch workflow change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/send-weekly-report.yml
+          if git diff --cached --quiet; then
+            echo "No workflow change to commit."
+            exit 0
+          fi
+          git commit -m "Enable cockpit front page in production workflow"
+          git push origin HEAD:agent/cockpit-wp11-production-enablement
