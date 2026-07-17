@@ -397,3 +397,26 @@ A Stage-2 promotion review fixture set may prove pass/fail behavior for future r
 ### Consequence
 
 The fixture set is an input/state-contract, output-contract, and operational-runbook validation layer only. It may replay deterministic pass and planted-failure artifacts for schema/checklist behavior, but it must not create live review artifacts under output, production promotion artifacts, report wording, scoring, fundability, portfolio actions, delivery, execution, or historical output mutation.
+
+---
+
+## 2026-07-17 — Every non-zero ETF position counts toward the maximum
+
+### Decision
+
+Every unique ticker with `shares > 0` counts as one active position. Zero-share rows do not count, duplicate active ticker rows are invalid, and there is no generic residual-position exception. The default maximum is eight active positions.
+
+The current nine-position state is classified `close_first`. A no-trade review may preserve that state, but any proposed trade while above the limit must reduce the active count and may not open a new ticker. At exactly eight positions, opening a new ticker requires another ticker to reach zero shares in the same projected whole-share execution. A partial reduction that leaves positive shares does not free a slot.
+
+### Consequence
+
+The standard production preflight evaluates projected whole-share quantities before guarded mutation and fails closed on a count breach. Current matching English and Dutch report surfaces disclose the actual count; historical reports with a different ticker set remain unchanged.
+
+This decision does not select a holding to close and does not authorize portfolio mutation or delivery. A separately claimed, current-evidence close-first review is required before any count-reducing execution.
+
+Persistent decision and evidence:
+
+```text
+control/decisions/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_DECISION_20260717.md
+control/evidence/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_EVIDENCE_20260717.json
+```
