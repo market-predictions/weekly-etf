@@ -1,27 +1,29 @@
 name: Append position-count governance records
 
 on:
-  push:
+  pull_request:
     branches:
       - main
     paths:
       - "control/run_queue/append_position_count_governance_20260717.md"
+      - ".github/workflows/append-position-count-governance-20260717.yml"
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: append-position-count-governance-20260717
+  group: append-position-count-governance-20260717-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: false
 
 jobs:
   append-and-clean:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out main
+      - name: Check out target branch
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
 
       - name: Append stable decision and changelog entry
@@ -91,14 +93,15 @@ Validation:
 
 ```text
 PR: #91
-primary run: 29617207278
-primary job: 88004737784
+merge: 0bcb6af7e243775d876b59719ce9898fa97c690f
 focused tests: 13 passed
-artifact: 8420903168
-artifact digest: sha256:cf98f8d4b4d172bc4f463598a557e8490fd2f188bbd5ae3f0c34347ee1688b5b
-report-surface regression: 29617207295 success
-closed-recovery regression: 29617207264 success
-fresh-send diagnostic regression: 29617207249 success
+final position-count run: 29618185729 success
+final report-surface run: 29618185736 success
+final current-runtime cockpit run: 29618185701 success
+final WP08 run: 29618185711 success
+final WP11 run: 29618185709 success
+final recovery run: 29618185751 success
+final fresh-send diagnostic run: 29618185706 success
 protected authority hashes: identical
 historical report hashes: identical
 portfolio execution: false
@@ -122,4 +125,5 @@ EOF
           git add -u .github/workflows/append-position-count-governance-20260717.yml control/run_queue/append_position_count_governance_20260717.md || true
           git diff --cached --quiet && { echo "No governance changes required"; exit 0; }
           git commit -m "Append ETF position-count governance records [skip ci]"
-          git push origin HEAD:main
+          target_branch="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          git push origin HEAD:"$target_branch"
