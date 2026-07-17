@@ -10,7 +10,7 @@ from runtime.position_count_contract import (
     assess_position_count_transition,
     count_active_positions,
 )
-from runtime.wp16_followup3_cleanup import clean_text
+from runtime.position_count_report_surface import apply_position_count_surface
 from tools.validate_etf_persisted_valuation_state import _position_count_preflight
 
 
@@ -252,25 +252,40 @@ def _report(language: str, tickers: tuple[str, ...]) -> str:
 
 
 def test_english_breach_is_client_safe_and_idempotent() -> None:
-    source = _report("en", tuple("ABCDEFGHI"))
-    cleaned = clean_text(source, language="en")
+    tickers = tuple("ABCDEFGHI")
+    positions = _positions(*tickers)
+    source = _report("en", tickers)
+    cleaned = apply_position_count_surface(source, language="en", official_positions=positions)
     assert "Maximum active positions: 8. Current active positions: 9." in cleaned
     assert "No new position may be opened until the count is restored." in cleaned
     assert "soft target" not in cleaned
-    assert clean_text(cleaned, language="en") == cleaned
+    assert apply_position_count_surface(cleaned, language="en", official_positions=positions) == cleaned
 
 
 def test_dutch_breach_is_client_safe_and_idempotent() -> None:
-    source = _report("nl", tuple("ABCDEFGHI"))
-    cleaned = clean_text(source, language="nl")
+    tickers = tuple("ABCDEFGHI")
+    positions = _positions(*tickers)
+    source = _report("nl", tickers)
+    cleaned = apply_position_count_surface(source, language="nl", official_positions=positions)
     assert "Maximaal aantal actieve posities: 8. Huidig aantal actieve posities: 9." in cleaned
     assert "Er mag geen nieuwe positie worden geopend totdat het aantal is hersteld." in cleaned
     assert "zachte doelstelling" not in cleaned
-    assert clean_text(cleaned, language="nl") == cleaned
+    assert apply_position_count_surface(cleaned, language="nl", official_positions=positions) == cleaned
 
 
 def test_compliant_report_constraint_is_unchanged() -> None:
-    source = _report("en", tuple("ABCDEFGH"))
-    cleaned = clean_text(source, language="en")
-    assert "Current active positions" not in cleaned
-    assert "Max number of positions: 8 soft target" in cleaned
+    tickers = tuple("ABCDEFGH")
+    source = _report("en", tickers)
+    cleaned = apply_position_count_surface(source, language="en", official_positions=_positions(*tickers))
+    assert cleaned == source
+
+
+def test_historical_report_with_different_tickers_is_unchanged() -> None:
+    source = _report("en", tuple("ABCDEFGHIJK"))
+    current_positions = _positions(*tuple("ABCDEFGHI"))
+    cleaned = apply_position_count_surface(
+        source,
+        language="en",
+        official_positions=current_positions,
+    )
+    assert cleaned == source
