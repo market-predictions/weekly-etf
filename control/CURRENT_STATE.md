@@ -12,7 +12,9 @@ whole_share_status: compliant
 cash_eur: 2534.36
 invested_market_value_eur: 104583.58
 nav_eur: 107117.94
-position_count: 9
+active_position_count: 9
+maximum_active_positions: 8
+position_count_status: close_first
 ```
 
 Current whole-share positions:
@@ -29,7 +31,7 @@ XLU 14
 XLV 37
 ```
 
-The latest official rotation reduced `XLU` by 134 shares and added 107 shares of `PAVE`. A 14-share `XLU` residual remains. No second execution occurred during delivery recovery.
+The latest official rotation reduced `XLU` by 134 shares and added 107 shares of `PAVE`. A 14-share XLU residual remains. No second execution occurred during delivery recovery or position-count reconciliation.
 
 ## Latest successful production run
 
@@ -68,20 +70,9 @@ delivery_status: smtp_sendmail_returned_no_exception
 inbox_receipt: confirmed_both_languages
 ```
 
-Gmail receipt evidence:
-
-```text
-English subject: Weekly ETF Pro Review 2026-07-16
-English received: 2026-07-17T09:28:00-07:00
-English attachments: 4
-Dutch subject: Weekly ETF Pro Review | Nederlands 2026-07-16
-Dutch received: 2026-07-17T09:28:02-07:00
-Dutch attachments: 4
-```
-
 Each message contains the `_02` PDF, clean Markdown, full delivery HTML and equity-curve PNG.
 
-## Cockpit and client-language production status
+## Production surface status
 
 ```text
 cockpit_feature: MRKT_RPRTS_COCKPIT_FRONT_PAGE=enabled
@@ -93,45 +84,85 @@ macro_thesis_leakage_gate: passed
 pdf_visual_gate: passed
 ```
 
-The Dutch delivery-language contract now evaluates visible client text rather than CSS/class identifiers. Visible English remains forbidden; CSS identifiers do not create false failures.
+Stable production rules:
 
-## Delivery recovery closeout
+1. Future production runs add one cockpit front page per language.
+2. The full classic report remains the evidence layer behind that page.
+3. Invalid feature values or front-page render failure fail closed to the classic output.
+4. Internal implementation terms remain blocked from client surfaces.
+5. Historical reports remain immutable by default.
+6. Delivery success requires a real manifest and independent inbox receipt.
 
-```text
-package: WP_FRESH_WEEKLY_ETF_SEND_RECOVERY
-language_fix_PR: #89
-language_fix_merge: 68e8587ff6032c8cf3fe1c30019fb513cf57058f
-recovery_workflow_PR: #90
-recovery_workflow_merge: de2464fc81cc1579437ffaad4a62f4add279d6f5
-validation_run: 29596023922
-validation_job: 87936494610
-delivery_evidence_commit: ddc745fddf0e80a31c4309658743f6435a4d486b
-status: closed_delivered
-```
-
-Stable recovery rules:
-
-1. A failed post-execution delivery must reuse the persisted execution artifact and must not repeat portfolio mutation.
-2. Recovery `prepare` must pass whole-share, ledger, pricing-lineage, cockpit, language, leakage and PDF gates before SMTP.
-3. Existing sendreceipt artifacts fail closed against duplicate recovery delivery.
-4. Delivery success requires both a real delivery manifest and an independently confirmed inbox receipt.
-5. Portfolio state, trade ledger and valuation history must retain identical hashes throughout recovery.
-
-## Open portfolio-contract issue
-
-The current official state contains nine positions, while the delivered report lists a maximum of eight positions under its constraints. This arose because the rotation reduced `XLU` to a 14-share residual while adding `PAVE`.
-
-This does not invalidate delivery or whole-share compliance, but it requires a separate decision before the next portfolio mutation:
+## Position-count constraint status
 
 ```text
-option A: residual positions count toward the maximum and must be closed
-option B: sub-threshold residual positions receive an explicit temporary exception
+package: WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION
+pull_request: #91
+status: implementation_complete_validation_green_merge_pending
+decision: every unique ticker with shares > 0 counts
+zero_share_positions_count: false
+generic_residual_exception: false
+current_active_positions: 9
+maximum_active_positions: 8
+current_status: close_first
 ```
+
+Stable position-count rules:
+
+1. Every unique ticker with positive whole-share quantity counts as one active position.
+2. Duplicate active ticker rows are invalid.
+3. A no-trade run may preserve the current nine-position state while reporting `close_first`.
+4. Any proposed trade while above eight must reduce the active count and may not introduce a new ticker.
+5. At exactly eight positions, a new ticker requires another ticker to reach zero shares in the same projected whole-share execution.
+6. A partial source reduction that leaves positive shares does not free a slot.
+7. Transition validation uses projected whole-share quantities and runs before guarded mutation.
+8. Current matching EN/NL report surfaces disclose the actual count; non-current historical reports remain unchanged.
+
+Implementation:
+
+```text
+runtime/position_count_contract.py
+runtime/position_count_report_surface.py
+tools/validate_etf_persisted_valuation_state.py
+tools/validate_etf_client_surface_clean.py
+tools/validate_etf_position_count_contract.py
+tests/test_etf_position_count_contract.py
+.github/workflows/validate-etf-position-count-contract.yml
+```
+
+Validation:
+
+```text
+primary_run: 29617207278
+primary_job: 88004737784
+focused_tests: 13 passed
+artifact_id: 8420903168
+artifact_digest: sha256:cf98f8d4b4d172bc4f463598a557e8490fd2f188bbd5ae3f0c34347ee1688b5b
+report_surface_regression: 29617207295 success
+closed_recovery_regression: 29617207264 success
+fresh_send_diagnostic_regression: 29617207249 success
+protected_authority_hashes: identical
+historical_report_hashes: identical
+portfolio_execution: false
+email_sent: false
+```
+
+Persistent records:
+
+```text
+control/evidence/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_EVIDENCE_20260717.json
+control/decisions/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_DECISION_20260717.md
+control/handovers/HANDOVER_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_20260717.md
+```
+
+This package does not choose which holding should be closed and does not authorize a sale of XLU or any other position.
 
 ## Immediate next action
 
 ```text
-WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION
+WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW
 ```
 
-The next package should reconcile the nine-position official state with the eight-position constraint without silently changing holdings. It must define the decision rule, residual-position treatment, execution behavior and validation evidence before another rotation is allowed.
+The next package should use fresh pricing, current scores, relative strength, portfolio-role evidence and funding logic to identify a justified count-reducing path from nine positions to no more than eight. It must not assume that the smallest holding is automatically the correct source.
+
+A real portfolio mutation or report delivery requires separate explicit authorization and the normal whole-share, NAV, manifest and inbox-receipt controls.

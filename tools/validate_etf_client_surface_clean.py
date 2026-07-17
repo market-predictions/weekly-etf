@@ -10,6 +10,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from runtime.position_count_report_surface import apply_official_position_count_surface
 from runtime.wp16_followup3_cleanup import clean_text, failures as residual_failures
 from tools.validate_etf_pdf_polish_contract import latest_delivery_html, validate_en, validate_nl
 from tools.validate_etf_pricing_lineage_contract import _manifest_path as _pricing_lineage_manifest_path
@@ -103,6 +104,7 @@ def _scrub_file(path: Path) -> None:
     original = path.read_text(encoding="utf-8", errors="ignore")
     language = _language_for_path(path)
     cleaned = clean_text(original, language=language)
+    cleaned = apply_official_position_count_surface(cleaned, language=language)
     if path.suffix == ".md":
         cleaned = _move_chart_before_pricing_disclosure(cleaned, language)
     if cleaned != original:

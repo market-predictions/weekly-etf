@@ -11,21 +11,15 @@ official_portfolio_state: output/etf_portfolio_state.json
 whole_share_status: compliant
 nav_eur: 107117.94
 cash_eur: 2534.36
-position_count: 9
+active_position_count: 9
+maximum_active_positions: 8
+position_count_status: close_first
 cockpit_production_feature: enabled
 client_language_contract: active
 inbox_receipt: confirmed_both_languages
 ```
 
-The current delivered package is now the first real production proof combining:
-
-1. whole-share official state and integer trade deltas;
-2. one cockpit front page per language;
-3. preserved classic report bodies;
-4. the shared internal-language clean gate;
-5. passed pricing lineage and successful run manifest;
-6. a real delivery manifest;
-7. confirmed English and Dutch Gmail Inbox receipts.
+The current delivered package is the first real production proof combining whole-share official state, one cockpit page per language, preserved classic report bodies, client-language gates, passed pricing lineage, a real delivery manifest and confirmed English/Dutch Gmail receipts.
 
 ## Completed delivery recovery
 
@@ -35,85 +29,109 @@ source_run: 20260717_154351
 persisted_rotation: XLU -> PAVE
 repeat_portfolio_execution: false
 language_fix_PR: #89
-language_fix_merge: 68e8587ff6032c8cf3fe1c30019fb513cf57058f
 recovery_workflow_PR: #90
-recovery_workflow_merge: de2464fc81cc1579437ffaad4a62f4add279d6f5
-validation_run: 29596023922
-validation_job: 87936494610
 delivery_evidence_commit: ddc745fddf0e80a31c4309658743f6435a4d486b
 status: closed_delivered
 ```
 
-Persistent evidence:
+## Position-count reconciliation
 
 ```text
-control/evidence/WEEKLY_ETF_DELIVERY_RECOVERY_EVIDENCE_20260717.json
-output/delivery/weekly_etf_delivery_manifest_2026-07-16_20260717_154351.json
-output/run_manifests/weekly_etf_run_manifest_2026-07-16_20260717_154351.json
+package: WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION
+pull_request: #91
+status: implementation_complete_validation_green_merge_pending
+decision: every non-zero whole-share position counts
+generic_residual_exception: false
+current_status: close_first 9/8
+portfolio_mutation: false
+email_sent: false
+```
+
+The production preflight now evaluates projected whole-share positions before guarded mutation. While above eight positions, a proposed trade must reduce the active count and may not introduce a new ticker. At eight positions, a new ticker requires a full source close in the same transition. A no-trade review may preserve the current count while reporting `close_first`.
+
+Validation:
+
+```text
+primary_run: 29617207278 success
+primary_job: 88004737784
+focused_tests: 13 passed
+artifact_id: 8420903168
+report_surface_regression: 29617207295 success
+closed_recovery_regression: 29617207264 success
+fresh_send_diagnostic_regression: 29617207249 success
+protected_authority_hashes: identical
+historical_report_hashes: identical
+```
+
+Persistent records:
+
+```text
+control/evidence/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_EVIDENCE_20260717.json
+control/decisions/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_DECISION_20260717.md
+control/handovers/HANDOVER_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_20260717.md
 ```
 
 ## Immediate next package
 
-Create and claim:
+Create and claim only after PR #91 closeout:
 
 ```text
-WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION
+WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW
 ```
 
 ### Current issue
 
-The official portfolio contains nine whole-share positions:
-
-```text
-CIBR
-GSG
-IEFA
-PAVE
-SMH
-URNM
-XBI
-XLU
-XLV
-```
-
-The current report constraint says:
-
-```text
-Max number of positions: 8
-```
-
-The mismatch arose because `XLU` was reduced from 148 to 14 shares while `PAVE` was added at 107 shares. Whole-share compliance is intact, but maximum-position-count compliance is ambiguous.
+The official state remains at nine active positions. The reconciliation contract blocks a new ticker but deliberately does not choose which holding should be closed or reduced to zero.
 
 ### Required decision framework
 
-The package must choose and document one rule:
+The next package must:
 
-```text
-A. every non-zero position counts, so a rotation adding a ninth position must close a source position completely;
-B. sub-threshold residual positions may temporarily exceed the maximum under an explicit residual exception;
-C. another deterministic rule supported by portfolio and execution evidence.
-```
+1. use fresh pricing and current evidence rather than the historical size of a residual alone;
+2. compare all plausible closure/funding sources by portfolio role, score, relative strength, thesis validity, opportunity cost, liquidity and execution practicality;
+3. choose a path that reduces the active count from nine to no more than eight;
+4. avoid introducing a new ticker while the state remains above the maximum;
+5. distinguish clearly between:
+   - close to cash;
+   - close and reallocate to an already-held ticker;
+   - no-trade because evidence is insufficient;
+6. not assume that XLU is the correct source merely because it is the smallest position.
 
 ### Required input/state contract
 
-- official position count must be computed from `output/etf_portfolio_state.json`;
-- zero-share positions must never count;
-- residual thresholds, if allowed, must be explicit and machine-readable;
-- no holding may be changed during a planning or validation-only package.
+Use:
+
+```text
+output/etf_portfolio_state.json
+output/etf_trade_ledger.csv
+latest immutable pricing audit
+latest recommendation scorecard
+latest lane and relative-strength evidence
+latest macro/policy evidence with current authority rules
+```
+
+All quantities and projected deltas remain whole shares. The existing NAV-drift tolerance and no-leverage rule remain unchanged.
 
 ### Required output contract
 
-- the report constraint and actual official position count may not contradict each other;
-- any residual exception must be visible in client-safe language;
-- no raw override or workflow terminology may leak into the report.
+The review must state:
+
+- current active count and maximum;
+- whether a count-reducing action is supported;
+- the selected source and destination, if any;
+- why alternatives were rejected;
+- projected whole-share quantities, cash and active count;
+- client-safe EN/NL wording without internal implementation terms.
 
 ### Required operational runbook
 
-- fail closed before future guarded execution when the intended post-trade count breaches the selected rule;
-- prove integer shares and no NAV drift beyond the existing tolerance;
-- add focused tests for reduce-to-residual, full close, new add and already-over-limit state;
-- do not send a new report as part of this reconciliation package.
+- claim the package before implementation;
+- run a no-mutation review first;
+- use the position-count preflight on every proposed transition;
+- do not mutate state unless the user separately and explicitly authorizes execution;
+- do not claim delivery without a real manifest and inbox receipt;
+- create a handover and update control files after closure.
 
-## Later governance cleanup
+## Separate governance cleanup
 
-A separate governance-only package may still reconcile stale `planned` labels in `control/SYSTEM_INDEX.md`. Do not combine that documentation cleanup with position-count logic or portfolio execution.
+A later governance-only package may reconcile stale `planned` labels in `control/SYSTEM_INDEX.md`. Do not combine that documentation cleanup with portfolio execution.

@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "weekly_etf_position_count_constraint_reconciliation_evidence",
+  "date": "2026-07-17",
+  "repository": "market-predictions/weekly-etf",
+  "package": "WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION",
+  "status": "validated_no_send_merge_pending",
+  "decision": {
+    "every_non_zero_position_counts": true,
+    "zero_share_positions_count": false,
+    "generic_residual_exception": false,
+    "max_active_positions": 8,
+    "current_active_positions": 9,
+    "current_status": "close_first",
+    "new_ticker_while_over_limit": "blocked",
+    "new_ticker_at_limit": "requires_full_source_close_same_execution",
+    "current_holdings_mutated": false
+  },
+  "official_state": {
+    "path": "output/etf_portfolio_state.json",
+    "active_tickers": [
+      "CIBR",
+      "GSG",
+      "IEFA",
+      "PAVE",
+      "SMH",
+      "URNM",
+      "XBI",
+      "XLU",
+      "XLV"
+    ],
+    "warning": "position_count_close_first:9>8",
+    "portfolio_state_sha256": "b9ce2a358938f294948bdb0059de89578fb4704f4e9a8beafed499ddb3af1f01",
+    "trade_ledger_sha256": "5a76e9820123936d2a196430adc59f2823fa8601938843760f0d42054f68df94",
+    "valuation_history_sha256": "9f12613e136e25b7d597c0e40375079707daaf2cb366b004bbe80aa836d21255",
+    "protected_hashes_identical_before_after": true
+  },
+  "client_surfaces": {
+    "english": {
+      "source": "output/weekly_analysis_pro_260716_02.md",
+      "source_sha256": "7b5aa3e0a04b86f5dd77111710dd278c2e1ee3199ba49961d5b6972d4e03d50d",
+      "source_active_positions": 9,
+      "guard_sentence": "Maximum active positions: 8. Current active positions: 9. No new position may be opened until the count is restored.",
+      "guard_idempotent": true,
+      "source_mutated": false
+    },
+    "dutch": {
+      "source": "output/weekly_analysis_pro_nl_260716_02.md",
+      "source_sha256": "2612d4db66c20d28aee76aef750d0ab59335bbdd16fe8d909ddb7b77a87c38b8",
+      "source_active_positions": 9,
+      "guard_sentence": "Maximaal aantal actieve posities: 8. Huidig aantal actieve posities: 9. Er mag geen nieuwe positie worden geopend totdat het aantal is hersteld.",
+      "guard_idempotent": true,
+      "source_mutated": false
+    },
+    "historical_mismatch_behavior": "no_change_when_report_tickers_do_not_equal_current_official_tickers",
+    "historical_reports_byte_unchanged": true
+  },
+  "implementation": {
+    "pull_request": 91,
+    "head_sha": "07c4f32456d50a6f624f664cfa87970e9c8dec76",
+    "files": [
+      "runtime/position_count_contract.py",
+      "runtime/position_count_report_surface.py",
+      "tools/validate_etf_persisted_valuation_state.py",
+      "tools/validate_etf_client_surface_clean.py",
+      "tools/validate_etf_position_count_contract.py",
+      "tests/test_etf_position_count_contract.py",
+      ".github/workflows/validate-etf-position-count-contract.yml"
+    ]
+  },
+  "validation": {
+    "primary_workflow_run": 29617207278,
+    "primary_job": 88004737784,
+    "result": "success",
+    "focused_tests": 13,
+    "artifact_id": 8420903168,
+    "artifact_digest": "sha256:cf98f8d4b4d172bc4f463598a557e8490fd2f188bbd5ae3f0c34347ee1688b5b",
+    "report_surface_regression_run": 29617207295,
+    "report_surface_regression_result": "success",
+    "delivery_recovery_regression_run": 29617207264,
+    "delivery_recovery_regression_result": "success",
+    "fresh_send_diagnostic_regression_run": 29617207249,
+    "fresh_send_diagnostic_regression_result": "success",
+    "compile": "passed",
+    "current_state_validator": "passed",
+    "protected_authority_hashes": "identical",
+    "historical_report_hashes": "identical"
+  },
+  "authority_boundary": {
+    "portfolio_execution": false,
+    "portfolio_state_mutation": false,
+    "trade_ledger_mutation": false,
+    "valuation_history_mutation": false,
+    "historical_output_mutation": false,
+    "pricing_authority_change": false,
+    "email_sent": false
+  }
+}
