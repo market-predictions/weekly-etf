@@ -11,44 +11,70 @@ official_portfolio_state: output/etf_portfolio_state.json
 whole_share_status: compliant
 nav_eur: 107117.94
 cash_eur: 2519.05
+cockpit_production_feature: enabled
 ```
 
-The delivered report predates the later whole-share reconciliation. Current shares and cash come from the official portfolio state, not from the delivered report tables.
+The delivered report predates both the whole-share reconciliation and cockpit production enablement. Current shares and cash come from the official portfolio state, not from the delivered report tables. Historical reports remain immutable.
 
-## Completed blocker
+## Completed packages
+
+### Whole-share state contract
 
 ```text
 package: WP_ETF_WHOLE_SHARE_STATE_CONTRACT
 PR: #85
 merge_commit: d5532ea15801a3888633ccb824797ab254305433
 validation_run: 29580018310
-focused_tests: 4 passed
 reconciliation_commit: 50b93740efbed537ed9d0daed6e1d88ce912be1e
 nav_drift_eur: 0.00
 status: closed
 ```
 
-The official state now contains eight whole-share positions. `DFEN` is closed and €582.53 of fractional/policy-close value is held as cash. No report was resent and no cockpit feature was enabled.
+The official state contains eight whole-share positions. `DFEN` is closed and €582.53 of fractional/policy-close value was transferred to cash.
+
+### Cockpit production enablement
+
+```text
+package: WP_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT
+PR: #87
+feature: MRKT_RPRTS_COCKPIT_FRONT_PAGE=enabled
+rollback: MRKT_RPRTS_COCKPIT_FRONT_PAGE=disabled
+validation_run: 29582753816
+current_runtime_regression_run: 29582753774
+wp08_regression_run: 29582753837
+status: closed_no_send
+```
+
+The exact-current no-send replay proved one front page per language, one added PDF page per language, preserved classic report bodies, no duplicate small cockpit, whole-share official authority and identical protected hashes. No email was sent.
 
 ## Immediate next package
 
 Create and claim:
 
 ```text
-WP_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT
+WP_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP
 ```
 
 ### Layer
 
 ```text
-decision framework
 output contract
 operational runbook
 ```
 
 ### Purpose
 
-Decide whether the validated additive cockpit front page should be enabled in the real production workflow.
+Remove confirmed client-facing internal and workflow-derived language from future English and Dutch report surfaces without changing analytical conclusions or machine authority.
+
+Known targets include:
+
+```text
+shadow engine
+review-only process narration where it dominates client copy
+double punctuation in position review lines
+raw internal override/release terminology where a client-safe label exists
+stale pre-reconciliation wording that implies obsolete holdings authority
+```
 
 ### Required start sequence
 
@@ -58,55 +84,46 @@ Read:
 control/SYSTEM_INDEX.md
 control/CURRENT_STATE.md
 control/NEXT_ACTIONS.md
-control/decisions/COCKPIT_PROMOTION_DECISION_20260716.md
-control/work_packages/WP_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE_20260717.md
-control/handovers/HANDOVER_COCKPIT_SURFACE_10_ADDITIVE_DELIVERY_FRONT_PAGE_20260717.md
-control/evidence/COCKPIT_WP10_ADDITIVE_DELIVERY_FRONT_PAGE_EVIDENCE_20260717.json
-control/decisions/ETF_WHOLE_SHARE_STATE_CONTRACT_DECISION_20260717.md
-output/runtime/etf_whole_share_reconciliation_20260716_20260717_094728.json
-.github/workflows/send-weekly-report.yml
-send_report_runtime_html.py
-runtime/additive_cockpit_front_page.py
+control/decisions/COCKPIT_WP11_PRODUCTION_ENABLEMENT_DECISION_20260717.md
+control/handovers/HANDOVER_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT_20260717.md
+control/evidence/COCKPIT_WP11_PRODUCTION_ENABLEMENT_EVIDENCE_20260717.json
+PROMPT_MASTER_WEEKLY_ETF_REVIEW.md
+PROMPT_PRO_REPORT.md
+runtime/render_etf_report_from_state.py
+runtime/render_etf_report_nl_from_state.py
+runtime/scrub_etf_client_surface.py
+runtime/client_facing_sanitizer.py
 ```
 
-Check for an active WP11 claim before editing.
-
-### Decision options
-
-```text
-A. retain production default disabled
-B. enable the cockpit front page in the real production workflow
-C. require one more validate-only production-bundle replay
-```
-
-Technical evidence supports option B, but WP11 must make the explicit decision.
+Check for an active cleanup-package claim before editing.
 
 ### Required safeguards
 
 ```text
-use current whole-share-compliant official state
-no portfolio model execution during validation
-no official state or trade-ledger mutation
+no change to portfolio state or trade ledger
 no pricing-authority change
-validate-only exact-current enabled replay before any send
-one HTML body and one PDF per language preserved
-attachment and manifest contracts preserved
-rollback by MRKT_RPRTS_COCKPIT_FRONT_PAGE=disabled
-no send without separate explicit authorization
-no delivery-success claim without receipt or manifest
+no macro/thesis authority promotion
+no lane-scoring or fundability change
+no portfolio action or execution change
+no historical report mutation
+no email send
+preserve EN/NL numeric parity
+preserve clickable ticker and PDF/HTML contracts
+preserve enabled cockpit front page
 ```
 
-### Intended production change if enabled
+## Subsequent production proof
 
-```text
-MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
-```
+After the language-cleanup package closes, a fresh report and email require a separate explicit production request.
 
-The feature default remains disabled until WP11 closes. WP11 must not resend an older report package.
+That future run should prove in a real delivered package:
 
-## After WP11
+1. all holdings and guarded trade deltas remain integer;
+2. the cockpit front page appears once in English and once in Dutch;
+3. the full classic report remains attached and present in the HTML body;
+4. the report is generated from the whole-share official state;
+5. delivery is supported by an actual run manifest and receipt/evidence.
 
-1. Generate the next fresh report from the reconciled whole-share official state.
-2. Verify that all rendered holdings and trade deltas remain integer.
-3. Inspect client-facing wording for internal terms such as `shadow engine` in a separate report-surface cleanup package.
-4. Reconcile stale `planned` labels in `control/SYSTEM_INDEX.md` in a separate governance-only package.
+## Separate governance cleanup
+
+A later governance-only package may reconcile stale `planned` labels in `control/SYSTEM_INDEX.md`. Do not combine that documentation cleanup with report wording or production delivery.
