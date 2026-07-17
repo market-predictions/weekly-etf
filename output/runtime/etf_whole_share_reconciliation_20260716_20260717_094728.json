@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "etf_whole_share_reconciliation",
+  "created_at_utc": "2026-07-17T12:24:15.668954+00:00",
+  "status": "reconciled",
+  "report_date": "2026-07-16",
+  "run_id": "20260717_094728",
+  "source_runtime_state": "output/runtime/etf_report_state_20260716_20260717_094728.json",
+  "policy_closed_tickers": [
+    "DFEN"
+  ],
+  "adjustments": [
+    {
+      "ticker": "CIBR",
+      "reason": "fractional_remainder",
+      "shares_before": 253.936461,
+      "shares_after": 253,
+      "shares_delta": -0.936461,
+      "price_local": 91.89,
+      "currency": "USD",
+      "released_to_cash_eur": 75.2
+    },
+    {
+      "ticker": "DFEN",
+      "reason": "policy_close",
+      "shares_before": 2.11303,
+      "shares_after": 0,
+      "shares_delta": -2.11303,
+      "price_local": 68.36,
+      "currency": "USD",
+      "released_to_cash_eur": 126.23
+    },
+    {
+      "ticker": "GSG",
+      "reason": "fractional_remainder",
+      "shares_before": 374.293232,
+      "shares_after": 374,
+      "shares_delta": -0.293232,
+      "price_local": 30.89,
+      "currency": "USD",
+      "released_to_cash_eur": 7.92
+    },
+    {
+      "ticker": "IEFA",
+      "reason": "fractional_remainder",
+      "shares_before": 312.488617,
+      "shares_after": 312,
+      "shares_delta": -0.488617,
+      "price_local": 96.76,
+      "currency": "USD",
+      "released_to_cash_eur": 41.32
+    },
+    {
+      "ticker": "PAVE",
+      "reason": "fractional_remainder",
+      "shares_before": 0.714291,
+      "shares_after": 0,
+      "shares_delta": -0.714291,
+      "price_local": 56.78,
+      "currency": "USD",
+      "released_to_cash_eur": 35.44
+    },
+    {
+      "ticker": "SPY",
+      "reason": "fractional_remainder",
+      "shares_before": 0.046017,
+      "shares_after": 0,
+      "shares_delta": -0.046017,
+      "price_local": 750.71997,
+      "currency": "USD",
+      "released_to_cash_eur": 30.19
+    },
+    {
+      "ticker": "URNM",
+      "reason": "fractional_remainder",
+      "shares_before": 48.991039,
+      "shares_after": 48,
+      "shares_delta": -0.991039,
+      "price_local": 48.77,
+      "currency": "USD",
+      "released_to_cash_eur": 42.23
+    },
+    {
+      "ticker": "XBI",
+      "reason": "fractional_remainder",
+      "shares_before": 40.491749,
+      "shares_after": 40,
+      "shares_delta": -0.491749,
+      "price_local": 152.0,
+      "currency": "USD",
+      "released_to_cash_eur": 65.32
+    },
+    {
+      "ticker": "XLU",
+      "reason": "fractional_remainder",
+      "shares_before": 148.865578,
+      "shares_after": 148,
+      "shares_delta": -0.865578,
+      "price_local": 45.47,
+      "currency": "USD",
+      "released_to_cash_eur": 34.4
+    },
+    {
+      "ticker": "XLV",
+      "reason": "fractional_remainder",
+      "shares_before": 37.878924,
+      "shares_after": 37,
+      "shares_delta": -0.878924,
+      "price_local": 161.8,
+      "currency": "USD",
+      "released_to_cash_eur": 124.28
+    }
+  ],
+  "adjusted_position_count": 10,
+  "cash_before_eur": 1936.52,
+  "cash_after_eur": 2519.05,
+  "cash_released_eur": 582.53,
+  "invested_before_eur": 105181.42,
+  "invested_after_eur": 104598.89,
+  "nav_before_eur": 107117.94,
+  "nav_after_eur": 107117.94,
+  "nav_drift_eur": 0.0,
+  "whole_share_validation_errors": [],
+  "artifact_path": "output/runtime/etf_whole_share_reconciliation_20260716_20260717_094728.json",
+  "portfolio_state_path": "output/etf_portfolio_state.json",
+  "trade_ledger_path": "output/etf_trade_ledger.csv",
+  "dry_run": false,
+  "ledger_rows_appended": 10,
+  "portfolio_state_written": true,
+  "trade_ledger_written": true
+}
