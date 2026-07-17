@@ -279,3 +279,52 @@ Decision:
 ready_for_separate_integration_proposal
 production_report_integration=false
 ```
+
+---
+
+## 2026-07-17 — Position-count constraint reconciled with close-first enforcement
+
+`WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION` resolved the ambiguity between the official nine-position whole-share state and the eight-position maximum without changing holdings.
+
+Decision:
+
+```text
+every non-zero position counts
+generic residual exception: false
+current state: close_first 9/8
+new ticker while over limit: blocked
+new ticker at limit: full source close required in same whole-share transition
+```
+
+Implemented:
+
+```text
+runtime/position_count_contract.py
+runtime/position_count_report_surface.py
+tools/validate_etf_persisted_valuation_state.py
+tools/validate_etf_client_surface_clean.py
+tools/validate_etf_position_count_contract.py
+tests/test_etf_position_count_contract.py
+.github/workflows/validate-etf-position-count-contract.yml
+```
+
+Validation:
+
+```text
+PR: #91
+merge: 0bcb6af7e243775d876b59719ce9898fa97c690f
+focused tests: 13 passed
+final position-count run: 29618185729 success
+final report-surface run: 29618185736 success
+final current-runtime cockpit run: 29618185701 success
+final WP08 run: 29618185711 success
+final WP11 run: 29618185709 success
+final recovery run: 29618185751 success
+final fresh-send diagnostic run: 29618185706 success
+protected authority hashes: identical
+historical report hashes: identical
+portfolio execution: false
+email sent: false
+```
+
+The client output guard is current-state-aware: it discloses `9 / 8` only when the report ticker set exactly matches official state and leaves historical reports unchanged. The next package is `WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW`; it must use fresh evidence and must not assume XLU is automatically the correct closure source.
