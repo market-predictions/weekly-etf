@@ -39,11 +39,7 @@ def whole_shares_for_notional(notional_eur: float, price_local: float, currency:
     if notional_eur <= 0 or price_local <= 0:
         return 0
     local_notional = notional_eur if currency.upper() == "EUR" else notional_eur * fx_rate
-    raw_units = local_notional / price_local
-    nearest = round(raw_units)
-    if nearest >= 0 and abs(local_notional - nearest * price_local) <= 0.02:
-        return int(nearest)
-    return int(math.floor(raw_units + WHOLE_SHARE_TOLERANCE))
+    return int(math.floor(local_notional / price_local + WHOLE_SHARE_TOLERANCE))
 
 
 def eur_from_local(value_local: float, currency: str, fx_rate: float) -> float:
