@@ -9,6 +9,62 @@ This is the broad operating changelog for `market-predictions/weekly-etf` develo
 
 ---
 
+## 2026-07-17 — Internal workflow language removed from future client surfaces
+
+`WP_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP` introduced one shared bilingual output contract for future English/Dutch report Markdown and delivery HTML.
+
+Implemented:
+
+```text
+runtime/report_surface_language_contract.py
+runtime/wp16_followup3_cleanup.py
+runtime/deterministic_regime_client_surface.py
+tools/validate_deterministic_regime_client_surface.py
+tools/validate_report_surface_internal_language_cleanup.py
+fixtures/deterministic_regime_client_surface/safe_surface_fixture.json
+tests/test_report_surface_internal_language_cleanup.py
+tests/test_deterministic_regime_client_surface_helper.py
+tests/test_deterministic_regime_client_surface_validator.py
+tests/test_deterministic_regime_report_surface_integration.py
+.github/workflows/validate-report-surface-internal-language-cleanup.yml
+```
+
+The contract blocks client-visible implementation terms including `shadow engine`, `runtime macro pack`, `rotation engine status`, `guarded model rotation`, `guarded auto-execution`, `release score`, raw override wording, `review-only`, `runtime valuation`, `model/action weights`, churn/discipline-gate phrasing, `run(s)` and repeated punctuation.
+
+The supplementary deterministic regime surface now uses `Supplementary regime cross-check` / `Aanvullende regimecontrole`. All explicit false-authority fields remain false.
+
+Validation:
+
+```text
+workflow_run: 29590932038
+workflow_job: 87919550815
+result: success
+focused_tests: 30 passed
+artifact_id: 8411017345
+artifact_digest: sha256:8a7acad3c573ae2eaa9a82fcd92f295ae5c6b33cc6090ca6936b5cd1a7997a74
+EN findings: 18 -> 0
+NL findings: 6 -> 0
+EN numeric tokens: 635 preserved
+NL numeric tokens: 588 preserved
+EN markdown links: 234 preserved
+NL markdown links: 236 preserved
+cleanup_idempotent: true
+historical reports: byte unchanged
+email sent: false
+```
+
+Persistent records:
+
+```text
+control/evidence/REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP_EVIDENCE_20260717.json
+control/decisions/REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP_DECISION_20260717.md
+control/handovers/HANDOVER_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP_20260717.md
+```
+
+No report or email was sent. The next operational step is a separate explicitly authorized fresh production run.
+
+---
+
 ## 2026-07-17 — Additive cockpit front page enabled for future production runs
 
 WP11 selected and implemented option B: enable the validated additive English/Dutch cockpit front page in the real production workflow.
