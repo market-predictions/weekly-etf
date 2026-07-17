@@ -117,17 +117,23 @@ jobs:
           payload = json.loads(path.read_text(encoding="utf-8"))
           assert payload["schema_version"] == "cockpit_wp10_additive_delivery_front_page_evidence_v1"
           assert payload["implementation_status"] == "validated_ready_for_enablement_decision"
-          assert payload["feature_default"] == "disabled"
-          assert payload["disabled_html_byte_identical"] == {"en": True, "nl": True}
-          assert payload["enabled_front_page_count"] == {"en": 1, "nl": 1}
-          assert payload["front_page_pdf_pages"] == {"en": 1, "nl": 1}
-          assert payload["classic_report_body"] == "preserved"
-          assert payload["small_decision_cockpit_duplicate"] is False
-          assert payload["email_count_change"] is False
-          assert payload["pdf_count_change"] is False
-          assert payload["attachment_contract_change"] is False
-          assert payload["manifest_contract_change"] is False
-          assert payload["email_sent"] is False
+          assert payload["feature_gate"]["default"] == "disabled"
+          assert payload["feature_gate"]["accepted_values"] == ["disabled", "enabled"]
+          assert payload["disabled_mode"]["english_html_byte_identical"] is True
+          assert payload["disabled_mode"]["dutch_html_byte_identical"] is True
+          assert payload["disabled_mode"]["small_decision_cockpit_preserved"] is True
+          assert payload["enabled_mode"]["english_front_page_count"] == 1
+          assert payload["enabled_mode"]["dutch_front_page_count"] == 1
+          assert payload["enabled_mode"]["english_pdf_front_page_pages"] == 1
+          assert payload["enabled_mode"]["dutch_pdf_front_page_pages"] == 1
+          assert payload["enabled_mode"]["classic_report_body"] == "preserved"
+          assert payload["enabled_mode"]["small_decision_cockpit_duplicate"] is False
+          assert payload["delivery_contract"]["email_count_change"] is False
+          assert payload["delivery_contract"]["pdf_count_change"] is False
+          assert payload["delivery_contract"]["attachment_contract_change"] is False
+          assert payload["delivery_contract"]["manifest_contract_change"] is False
+          assert payload["delivery_contract"]["email_sent"] is False
+          assert payload["authority_contract"]["protected_hashes_before_after"] == "identical"
           assert payload["promotion_status"] == "not_promoted"
           PY
 
