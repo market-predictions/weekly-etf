@@ -9,10 +9,10 @@ Repository: `market-predictions/weekly-etf`
 portfolio_state: output/etf_portfolio_state.json
 trade_ledger: output/etf_trade_ledger.csv
 whole_share_status: compliant
-cash_eur: 2519.05
-invested_market_value_eur: 104598.89
+cash_eur: 2534.36
+invested_market_value_eur: 104583.58
 nav_eur: 107117.94
-position_count: 8
+position_count: 9
 ```
 
 Current whole-share positions:
@@ -21,148 +21,117 @@ Current whole-share positions:
 CIBR 253
 GSG 374
 IEFA 312
+PAVE 107
 SMH 59
 URNM 48
 XBI 40
-XLU 148
+XLU 14
 XLV 37
 ```
 
-`DFEN` was closed because current constraints prohibit leveraged ETFs. Residual fractional positions below one share were converted to cash.
+The latest official rotation reduced `XLU` by 134 shares and added 107 shares of `PAVE`. A 14-share `XLU` residual remains. No second execution occurred during delivery recovery.
 
-## Latest production report run
+## Latest successful production run
 
 ```text
 requested_close_date: 2026-07-16
-run_id: 20260717_094728
+run_id: 20260717_154351
 report_token: 260716
 pricing_lineage_status: passed
 workflow_status: workflow_success
-production_rotation: DFEN -> XLV
+workflow_conclusion: success
+report_authority_source: portfolio_state_post_execution
+production_rotation: XLU -> PAVE
 ```
 
-Authority files:
+Authority and evidence files:
 
 ```text
-output/pricing/price_audit_2026-07-16_20260717_094728.json
-output/runtime/etf_report_state_20260716_20260717_094728.json
-output/run_manifests/weekly_etf_run_manifest_2026-07-16_20260717_094728.json
-output/delivery/weekly_etf_delivery_manifest_2026-07-16_20260717_094728.json
+output/pricing/price_audit_2026-07-16_20260717_154351.json
+output/runtime/etf_report_state_20260716_20260717_154351_executed.json
+output/runtime/etf_model_execution_20260716_20260717_154351.json
+output/run_manifests/weekly_etf_run_manifest_2026-07-16_20260717_154351.json
+output/delivery/weekly_etf_delivery_manifest_2026-07-16_20260717_154351.json
+control/evidence/WEEKLY_ETF_DELIVERY_RECOVERY_EVIDENCE_20260717.json
 ```
 
 ## Latest delivered client package
 
 ```text
-output/weekly_analysis_pro_260716.md
-output/weekly_analysis_pro_260716.pdf
-output/weekly_analysis_pro_nl_260716.md
-output/weekly_analysis_pro_nl_260716.pdf
-delivery_layer_status: smtp_sendmail_returned_no_exception
+English Markdown: output/weekly_analysis_pro_260716_02.md
+English PDF: output/weekly_analysis_pro_260716_02.pdf
+English HTML: output/weekly_analysis_pro_260716_02_delivery.html
+Dutch Markdown: output/weekly_analysis_pro_nl_260716_02.md
+Dutch PDF: output/weekly_analysis_pro_nl_260716_02.pdf
+Dutch HTML: output/weekly_analysis_pro_nl_260716_02_delivery.html
+delivery_status: smtp_sendmail_returned_no_exception
+inbox_receipt: confirmed_both_languages
 ```
 
-The delivered package predates the later whole-share reconciliation, cockpit production enablement and internal-language cleanup. It remains historical delivery evidence, but current holdings and cash must be read from `output/etf_portfolio_state.json`. Historical files are not retrofitted.
-
-## Whole-share package
+Gmail receipt evidence:
 
 ```text
-package: WP_ETF_WHOLE_SHARE_STATE_CONTRACT
-implementation_PR: #85
-merge_commit: d5532ea15801a3888633ccb824797ab254305433
-validation_run: 29580018310
-focused_tests: 4 passed
-reconciliation_commit: 50b93740efbed537ed9d0daed6e1d88ce912be1e
-reconciliation_artifact: output/runtime/etf_whole_share_reconciliation_20260716_20260717_094728.json
-adjusted_positions: 10
-ledger_rows_appended: 10
-cash_released_eur: 582.53
-nav_drift_eur: 0.00
-email_sent: false
-status: closed
+English subject: Weekly ETF Pro Review 2026-07-16
+English received: 2026-07-17T09:28:00-07:00
+English attachments: 4
+Dutch subject: Weekly ETF Pro Review | Nederlands 2026-07-16
+Dutch received: 2026-07-17T09:28:02-07:00
+Dutch attachments: 4
 ```
 
-Stable whole-share rules:
+Each message contains the `_02` PDF, clean Markdown, full delivery HTML and equity-curve PNG.
 
-1. Official positions and future guarded Buy/Sell deltas use whole shares.
-2. Long-only quantities are floored, never rounded upward.
-3. Unspent proceeds remain explicit EUR cash.
-4. Guarded execution fails closed on fractional official state.
-5. NAV drift may not exceed EUR 0.05.
-
-## Cockpit production status
+## Cockpit and client-language production status
 
 ```text
-WP01-WP09: merged
-promotion decision: additive delivery front page
-WP10 PR: #83
-WP10 merge: 23328a9494fb5a2183eacd328365310dbf583af6
-WP11 PR: #87
-feature: MRKT_RPRTS_COCKPIT_FRONT_PAGE
-production_feature_value: enabled
-rollback_value: disabled
-production_enablement: true
-promotion_status: production_enabled_no_send
+cockpit_feature: MRKT_RPRTS_COCKPIT_FRONT_PAGE=enabled
+English cockpit front pages: 1
+Dutch cockpit front pages: 1
+classic report body: preserved
+client_language_gate: passed
+macro_thesis_leakage_gate: passed
+pdf_visual_gate: passed
 ```
 
-WP11 exact-current validation:
+The Dutch delivery-language contract now evaluates visible client text rather than CSS/class identifiers. Visible English remains forbidden; CSS identifiers do not create false failures.
+
+## Delivery recovery closeout
 
 ```text
-validation_run: 29582753816
-validation_job: 87892175344
-current_runtime_regression_run: 29582753774
-wp08_regression_run: 29582753837
-evidence: control/evidence/COCKPIT_WP11_PRODUCTION_ENABLEMENT_EVIDENCE_20260717.json
-whole_share_overlay: passed
-EN_front_page_count: 1
-NL_front_page_count: 1
-EN_PDF_page_delta: +1
-NL_PDF_page_delta: +1
-classic_report_body: preserved
-small_decision_cockpit_duplicate: false
-protected_authority_hashes: identical
-email_sent: false
+package: WP_FRESH_WEEKLY_ETF_SEND_RECOVERY
+language_fix_PR: #89
+language_fix_merge: 68e8587ff6032c8cf3fe1c30019fb513cf57058f
+recovery_workflow_PR: #90
+recovery_workflow_merge: de2464fc81cc1579437ffaad4a62f4add279d6f5
+validation_run: 29596023922
+validation_job: 87936494610
+delivery_evidence_commit: ddc745fddf0e80a31c4309658743f6435a4d486b
+status: closed_delivered
 ```
 
-Stable cockpit rules:
+Stable recovery rules:
 
-1. Future production runs add one cockpit front page per language.
-2. The full classic report remains the evidence layer behind that page.
-3. Invalid values or front-page render failure fail closed to the unchanged classic output.
-4. Operational rollback is `MRKT_RPRTS_COCKPIT_FRONT_PAGE=disabled`.
-5. WP11 did not send or mutate portfolio, ledger, valuation, pricing or historical reports.
-6. A real delivery claim requires a separate production run and real manifest/receipt evidence.
+1. A failed post-execution delivery must reuse the persisted execution artifact and must not repeat portfolio mutation.
+2. Recovery `prepare` must pass whole-share, ledger, pricing-lineage, cockpit, language, leakage and PDF gates before SMTP.
+3. Existing sendreceipt artifacts fail closed against duplicate recovery delivery.
+4. Delivery success requires both a real delivery manifest and an independently confirmed inbox receipt.
+5. Portfolio state, trade ledger and valuation history must retain identical hashes throughout recovery.
 
-## Client-language output contract
+## Open portfolio-contract issue
+
+The current official state contains nine positions, while the delivered report lists a maximum of eight positions under its constraints. This arose because the rotation reduced `XLU` to a 14-share residual while adding `PAVE`.
+
+This does not invalidate delivery or whole-share compliance, but it requires a separate decision before the next portfolio mutation:
 
 ```text
-package: WP_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP
-PR: #88
-merge_commit: 4571c4c045962908609b3a5e2f784199d4e3b142
-status: closed_merged
-validation_run: 29590932038
-validation_job: 87919550815
-focused_tests: 30 passed
-evidence: control/evidence/REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP_EVIDENCE_20260717.json
-EN_internal_findings: 18 -> 0
-NL_internal_findings: 6 -> 0
-numeric_parity: preserved
-markdown_link_parity: preserved
-cleanup_idempotent: true
-historical_reports: byte_unchanged
-email_sent: false
+option A: residual positions count toward the maximum and must be closed
+option B: sub-threshold residual positions receive an explicit temporary exception
 ```
-
-Stable client-language rules:
-
-1. Future English and Dutch Markdown/HTML surfaces use one shared internal-language contract.
-2. Implementation terms such as `shadow engine`, `runtime macro pack`, `release score`, raw override text and guarded-execution wording are blocked from client surfaces.
-3. The supplementary deterministic regime comparison uses client-safe wording while all false-authority fields remain false.
-4. Language cleanup may not change numbers, percentages, ticker links, portfolio decisions or authority.
-5. Historical reports remain immutable and may be used only as read-only validation input.
 
 ## Immediate next action
 
 ```text
-separate explicit fresh Weekly ETF production request
+WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION
 ```
 
-No additional development package is required before the next run. A fresh report and email must be separately authorized. That production run should prove the enabled cockpit front page, whole-share holdings and trade deltas, the internal-language clean gate, a real delivery manifest and inbox receipt confirmation.
+The next package should reconcile the nine-position official state with the eight-position constraint without silently changing holdings. It must define the decision rule, residual-position treatment, execution behavior and validation evidence before another rotation is allowed.
