@@ -76,6 +76,14 @@ REGEX_REPLACEMENTS: tuple[tuple[re.Pattern[str], str], ...] = (
         "portfolio rotation",
     ),
     (
+        re.compile(r"\bdiscipline gates\b", re.IGNORECASE),
+        "decision conditions",
+    ),
+    (
+        re.compile(r"\bdisciplinepoorten\b", re.IGNORECASE),
+        "beslisvoorwaarden",
+    ),
+    (
         re.compile(r"\brelease score\s+(\d+(?:\.\d+)?)", re.IGNORECASE),
         r"review priority \1",
     ),
@@ -148,7 +156,7 @@ def normalize_client_language(text: str, *, language: str) -> str:
 
 
 def client_language_findings(text: str, *, language: str) -> list[str]:
-    del language  # Reserved for future language-specific gates.
+    del language
     findings: list[str] = []
     for code, pattern in FORBIDDEN_PATTERNS:
         if pattern.search(text):
