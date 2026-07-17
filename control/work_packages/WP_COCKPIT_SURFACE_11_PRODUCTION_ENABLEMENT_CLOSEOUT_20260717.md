@@ -3,23 +3,15 @@
 Date: 2026-07-17
 Repository: `market-predictions/weekly-etf`
 Layer: decision framework + output contract + operational runbook
-Status: active
+Status: closed / production enabled / no send
 
 ## Current issue
 
-WP10 implemented and validated an additive English/Dutch cockpit front page, but the real production workflow still leaves `MRKT_RPRTS_COCKPIT_FRONT_PAGE` unset and therefore defaults to `disabled`.
-
-The official portfolio state was subsequently reconciled to whole shares. WP11 must therefore validate enablement against the current whole-share-compliant authority rather than against stale pre-reconciliation holdings.
+WP10 implemented and validated an additive English/Dutch cockpit front page, but the real production workflow still defaulted to `disabled`. The official portfolio state was subsequently reconciled to whole shares, so enablement also required exact-current validation against the post-reconciliation authority.
 
 ## Decision
 
-Select option B:
-
-```text
-enable the cockpit front page in the real production workflow
-```
-
-The only intended production behavior change is:
+Option B was selected and implemented:
 
 ```text
 MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
@@ -31,22 +23,73 @@ Rollback remains:
 MRKT_RPRTS_COCKPIT_FRONT_PAGE: disabled
 ```
 
-## Required validation
+## Implemented change
 
-1. Build a temporary exact-current runtime overlay from:
-   - latest persisted runtime context;
-   - current `output/etf_portfolio_state.json` positions, cash and NAV.
-2. Render fresh EN/NL report markdown in a temporary worktree only.
-3. Generate disabled and enabled HTML/PDF bundles without email.
-4. Prove exactly one enabled front page per language.
-5. Prove one added PDF page per language.
-6. Prove the classic body remains present and the smaller decision cockpit is not duplicated.
-7. Prove front-page NAV, cash, position count and largest position match current official state.
-8. Prove all official positions remain whole shares.
-9. Prove protected portfolio, ledger, pricing, valuation and pointer files are byte-identical before and after validation.
-10. Persist machine-readable validation evidence.
+The `send-report` job in `.github/workflows/send-weekly-report.yml` now carries the explicit job-level feature value. No other production workflow behavior was intentionally changed.
 
-## Safety boundary
+The package also added:
+
+```text
+tools/validate_cockpit_wp11_production_enablement.py
+tools/run_cockpit_wp11_production_enablement_validation.py
+tests/test_cockpit_wp11_production_enablement.py
+.github/workflows/validate-cockpit-wp11-production-enablement.yml
+control/evidence/COCKPIT_WP11_PRODUCTION_ENABLEMENT_EVIDENCE_20260717.json
+control/decisions/COCKPIT_WP11_PRODUCTION_ENABLEMENT_DECISION_20260717.md
+```
+
+Two stale cockpit workflows were rebased from the old `260714 / URNM → XBI` fixture to the current `260716 / DFEN → XLV` baseline:
+
+```text
+.github/workflows/validate-cockpit-current-runtime.yml
+.github/workflows/validate-cockpit-wp08-evidence-review.yml
+```
+
+## Exact-current validation
+
+WP11 built a temporary non-persisted overlay from:
+
+```text
+base runtime: output/runtime/etf_report_state_20260716_20260717_094728.json
+official state: output/etf_portfolio_state.json
+whole-share status: compliant
+NAV EUR: 107117.94
+cash EUR: 2519.05
+position count: 8
+largest position: SMH
+```
+
+Fresh English and Dutch report markdown and disabled/enabled HTML/PDF bundles were rendered only in temporary validation storage.
+
+## Validation evidence
+
+```text
+validated_head_sha: 1c02bb4ad5cda51f26011ccde03e49bd0291e99a
+WP11 validation run: 29582753816
+WP11 validation job: 87892175344
+WP11 artifact: 8407711197
+WP11 artifact digest: sha256:b483b7157a69939e66c9a7b3624b2401a2211c5ba2db1367b97374aa1b0899a9
+current-runtime regression run: 29582753774
+WP08 evidence regression run: 29582753837
+focused WP11 tests: 3 passed
+```
+
+Measured result:
+
+```text
+EN disabled front pages: 0
+EN enabled front pages: 1
+EN PDF pages: 16 -> 17
+NL disabled front pages: 0
+NL enabled front pages: 1
+NL PDF pages: 17 -> 18
+classic report body: preserved
+small decision cockpit duplicate: false
+protected authority hashes: identical
+email sent: false
+```
+
+## Safety boundary result
 
 ```text
 production_send: false
@@ -59,29 +102,16 @@ attachment_count_change: false
 manifest_contract_change: false
 ```
 
-## Exact files
+## Stable operating rules
 
-```text
-.github/workflows/send-weekly-report.yml
-tools/validate_cockpit_wp11_production_enablement.py
-.github/workflows/validate-cockpit-wp11-production-enablement.yml
-tests/test_cockpit_wp11_production_enablement.py
-control/evidence/COCKPIT_WP11_PRODUCTION_ENABLEMENT_EVIDENCE_20260717.json
-```
+1. The additive cockpit front page is enabled for future real production runs.
+2. The full classic English/Dutch report remains the underlying evidence layer.
+3. Rollback is one explicit feature value: `disabled`.
+4. Invalid values or render failures fail closed to the classic output.
+5. A future email send requires a separate explicit production request.
+6. No delivery claim is valid without a real manifest and receipt/evidence.
+7. Historical delivered reports remain immutable and are not retrofitted with the cockpit front page.
 
-## Acceptance criteria
+## Closeout
 
-```text
-production_workflow_feature_value: enabled
-exact_current_whole_share_overlay: passed
-front_page_count_EN: 1
-front_page_count_NL: 1
-PDF_page_delta_EN: +1
-PDF_page_delta_NL: +1
-classic_report_body: preserved
-small_decision_cockpit_duplicate: false
-protected_authority_hashes: identical
-email_sent: false
-rollback_value: disabled
-status: production_enabled_no_send
-```
+All decision, output-contract, exact-current, whole-share, rollback, bilingual, PDF-page, classic-body, regression and authority-immutability gates passed. The package is closed. No email was sent.
