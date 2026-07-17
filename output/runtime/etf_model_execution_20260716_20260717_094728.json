@@ -1,19 +1,66 @@
 {
-  "schema_version": "2.0-runtime",
-  "portfolio_mode": "client_long_only_thematic",
-  "base_currency": "EUR",
-  "valuation_source": "guarded_model_execution_v1",
-  "pricing_audit_file": "output/pricing/price_audit_2026-07-16_20260717_094728.json",
-  "trade_ledger_file": "etf_trade_ledger.csv",
-  "recommendation_scorecard_file": "etf_recommendation_scorecard.csv",
-  "inception_date": "2026-03-28",
-  "starting_capital_eur": 100000.0,
-  "cash_eur": 1936.52,
-  "invested_market_value_eur": 105181.42,
-  "nav_eur": 107117.94,
-  "peak_nav_eur": 112376.1,
-  "max_drawdown_pct": -7.4587,
-  "positions": [
+  "schema_version": "1.0",
+  "created_at_utc": "2026-07-17T09:54:17.698405+00:00",
+  "execution_mode": "guarded_auto",
+  "execution_status": "executed",
+  "run_id": "20260717_094728",
+  "report_date": "2026-07-16",
+  "requested_close_date": "2026-07-16",
+  "source_files": {
+    "runtime_state": "output/runtime/etf_report_state_20260716_20260717_094728.json",
+    "portfolio_state": "output/etf_portfolio_state.json",
+    "trade_ledger": "output/etf_trade_ledger.csv",
+    "pricing_audit": "output/pricing/price_audit_2026-07-16_20260717_094728.json",
+    "rotation_plan": "output/runtime/etf_rotation_plan_260716_20260717_094728.json"
+  },
+  "policy_checks": {
+    "passed": true,
+    "errors": [],
+    "warnings": [],
+    "mode_note": "Guarded auto-execution writes official model trade-ledger and portfolio-state changes when all hard gates pass."
+  },
+  "pre_trade_portfolio": {
+    "cash_eur": 1936.52,
+    "total_portfolio_value_eur": 107117.94,
+    "base_currency": "EUR"
+  },
+  "post_trade_shadow_portfolio": {
+    "cash_eur": 1936.52,
+    "invested_market_value_eur": 105181.42,
+    "nav_eur": 107117.94,
+    "nav_drift_eur": 0.0
+  },
+  "proposed_ledger_rows": [
+    {
+      "trade_id": "shadow-2026-07-16-20260717_094728-01-DFEN-XLV",
+      "trade_date": "2026-07-16",
+      "execution_mode": "shadow",
+      "source_ticker": "DFEN",
+      "destination_ticker": "XLV",
+      "action": "replace_partial",
+      "source_delta_weight_pct": -5.0,
+      "destination_delta_weight_pct": 5.0,
+      "estimated_notional_eur": 5355.9,
+      "requested_notional_eur": 5355.9,
+      "source_previous_weight_pct": 5.12,
+      "source_target_weight_pct": 0.12,
+      "destination_target_weight_pct": 5.0,
+      "source_price_status": "fresh_exact_unverified",
+      "destination_price_status": "fresh_exact_unverified",
+      "notional_capped": false,
+      "notional_capped_to_source_value": false,
+      "notional_cap_reason": "",
+      "reason_codes": [
+        "failed_fresh_cash_test",
+        "replaceable_status",
+        "review_age_ge_2",
+        "better_alternative_exists",
+        "role_impaired",
+        "destination_score_100"
+      ]
+    }
+  ],
+  "shadow_positions": [
     {
       "suggested_action": "hold",
       "conviction_tier": "Tier 2",
@@ -99,7 +146,7 @@
       "previous_weight_pct": 0.12,
       "weight_change_pct": -5.0,
       "shares_delta_this_run": -89.654914,
-      "action_executed_this_run": "Sell",
+      "action_executed_this_run": "Shadow reduce",
       "funding_source_note": "Shadow execution from rotation intent.",
       "previous_price_local": 68.36,
       "previous_market_value_local": 144.45,
@@ -639,7 +686,7 @@
     {
       "shares_delta_this_run": 37.878924,
       "weight_change_pct": 5.0,
-      "action_executed_this_run": "Buy",
+      "action_executed_this_run": "Shadow buy",
       "funding_source_note": "Shadow buy funded by DFEN.",
       "ticker": "XLV",
       "suggested_action": "Add from rotation",
@@ -665,31 +712,44 @@
       "target_weight_pct": 5.0
     }
   ],
-  "last_report": {
-    "date": "2026-07-16",
-    "source_report": "weekly_analysis_pro_260716.md",
-    "position_count": 10
-  },
-  "last_valuation": {
-    "date": "2026-07-16",
-    "nav_eur": 107117.94,
-    "invested_market_value_eur": 105181.42,
-    "cash_eur": 1936.52,
-    "since_inception_return_pct": 7.1179,
-    "daily_return_pct": -2.8187,
-    "drawdown_pct": -4.6791,
-    "eurusd_used": 1.1443,
-    "equity_curve_state": "Below prior high",
-    "valuation_notes": "Runtime valuation repriced from official portfolio-state shares"
-  },
-  "last_successful_runtime_state_file": "output/runtime/etf_report_state_20260716_20260717_094728.json",
-  "last_state_persisted_at_utc": "2026-07-17T09:54:17.518918+00:00",
-  "last_model_execution": {
-    "date": "2026-07-16",
-    "run_id": "20260717_094728",
-    "runtime_state": "output/runtime/etf_report_state_20260716_20260717_094728.json",
-    "mode": "guarded_auto",
-    "trade_count": 1,
-    "executed_at_utc": "2026-07-17T09:54:17.698724+00:00"
+  "artifact_path": "output/runtime/etf_model_execution_20260716_20260717_094728.json",
+  "guarded_auto_result": {
+    "official_ledger_rows": [
+      {
+        "trade_id": "model-2026-07-16-20260717_094728-01-DFEN-SELL",
+        "trade_date": "2026-07-16",
+        "source_report": "runtime:etf_report_state_20260716_20260717_094728.json",
+        "ticker": "DFEN",
+        "action": "Sell",
+        "shares_delta": "-89.654914",
+        "previous_weight_pct": "5.1200",
+        "new_weight_pct": "0.1200",
+        "weight_change_pct": "-5.0000",
+        "target_weight_pct": "0.1200",
+        "conviction_tier": "Tier 3",
+        "portfolio_role": "Rotation destination",
+        "funding_source_note": "Guarded auto-execution: reduce DFEN to fund XLV."
+      },
+      {
+        "trade_id": "model-2026-07-16-20260717_094728-01-XLV-BUY",
+        "trade_date": "2026-07-16",
+        "source_report": "runtime:etf_report_state_20260716_20260717_094728.json",
+        "ticker": "XLV",
+        "action": "Buy",
+        "shares_delta": "37.878924",
+        "previous_weight_pct": "0.0000",
+        "new_weight_pct": "5.0000",
+        "weight_change_pct": "5.0000",
+        "target_weight_pct": "5.0000",
+        "conviction_tier": "",
+        "portfolio_role": "Rotation destination",
+        "funding_source_note": "Guarded auto-execution: buy XLV funded by DFEN."
+      }
+    ],
+    "portfolio_state_written": true,
+    "trade_ledger_written": true,
+    "post_trade_nav_eur": 107117.94,
+    "post_trade_invested_market_value_eur": 105181.42,
+    "post_trade_cash_eur": 1936.52
   }
 }

@@ -91,7 +91,7 @@
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
 | Cybersecurity resilience | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [BUG](https://www.tradingview.com/chart/?symbol=BUG) | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure exposure with less direct semiconductor cyclicality. | 3-12 months |
-| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Actionable now | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
+| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
 | Biotech innovation / therapeutic platforms | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [IBB](https://www.tradingview.com/chart/?symbol=IBB) | Biotech remains a long-duration innovation lane but needs risk appetite. | 4 | 3 | Watchlist / under review | Can become attractive if breadth improves and rates ease. | 3-12 months |
 | Healthcare quality and defensive growth | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [VHT](https://www.tradingview.com/chart/?symbol=VHT) | Healthcare quality can provide defensive growth without speculative biotech beta. | 3 | 3 | Watchlist / under review | More useful if broad equity leadership narrows further. | 3-12 months |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Power demand, grid bottlenecks and reshoring capex support infrastructure spend. Macro filter: AI power demand and infrastructure policy support the grid lane; funding still depends on [PAVE](https://www.tradingview.com/chart/?symbol=PAVE)-vs-[GRID](https://www.tradingview.com/chart/?symbol=GRID) duel evidence. | 5 | 4 | Watchlist / under review | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) remains useful, but [GRID](https://www.tradingview.com/chart/?symbol=GRID) is the cleaner thematic challenger. | 3-12 months |
@@ -142,7 +142,7 @@
 - Since inception return (%): 10.22
 - Equity-curve state: Reconciled to Section 15 with full valuation history
 - EUR/USD used: 1.1421
-- Notes: Section 7 uses `output/etf_valuation_history.csv` plus the current runtime NAV; Section 15 is rendered from the same normalized runtime state.
+- Notes: Section 7 uses the validated valuation history plus the current portfolio NAV; Section 15 is rendered from the same reconciled portfolio state.
 
 | Date | Portfolio value (EUR) | Comment |
 |---|---:|---|
@@ -243,7 +243,7 @@ The position review separates thesis quality, ETF implementation quality, fresh-
 ### [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) — Hold — Score 4.97 — Fresh cash: Hold / monitor — release score 10
 Role: Rotation destination. Required next action: Monitor relative strength and portfolio concentration..
 
-### [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) — Hold with override — Score 3.10 — Fresh cash: No / under review — release score 70; override no_fundable_destination
+### [DFEN](https://www.tradingview.com/chart/?symbol=DFEN) — Hold with override — Score 3.10 — Fresh cash: No / under review — release score 70; override no fundable destination
 Role: Rotation destination. Required next action: Review defense vehicle fit versus [ITA](https://www.tradingview.com/chart/?symbol=ITA)/[PPA](https://www.tradingview.com/chart/?symbol=PPA) and leverage constraints..
 
 ### [GSG](https://www.tradingview.com/chart/?symbol=GSG) — Hold — Score 3.59 — Fresh cash: Hold / monitor — release score 10
@@ -252,13 +252,13 @@ Role: Rotation destination. Required next action: Monitor commodity breadth and 
 ### [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) — Hold — Score 3.52 — Fresh cash: Hold / monitor — release score 10
 Role: Rotation destination. Required next action: Monitor non-U.S. breadth and [SPY](https://www.tradingview.com/chart/?symbol=SPY)-relative performance..
 
-### [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) — Hold with override — Score 3.68 — Fresh cash: Smaller / under review — release score 85; override churn_budget_used
+### [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) — Hold with override — Score 3.68 — Fresh cash: Smaller / under review — release score 85; override: rotation budget already used
 Role: Real-asset capex. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
-### [SMH](https://www.tradingview.com/chart/?symbol=SMH) — Hold with override — Score 4.28 — Fresh cash: Smaller / under review — release score 70; override churn_budget_used
+### [SMH](https://www.tradingview.com/chart/?symbol=SMH) — Hold with override — Score 4.28 — Fresh cash: Smaller / under review — release score 70; override: rotation budget already used
 Role: Growth engine. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
-### [SPY](https://www.tradingview.com/chart/?symbol=SPY) — Hold with override — Score 3.53 — Fresh cash: Smaller / under review — release score 85; override churn_budget_used
+### [SPY](https://www.tradingview.com/chart/?symbol=SPY) — Hold with override — Score 3.53 — Fresh cash: Smaller / under review — release score 85; override: rotation budget already used
 Role: Core beta. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
 ### [URNM](https://www.tradingview.com/chart/?symbol=URNM) — Reduce — executed — Score 3.70 — Fresh cash: Hold — release score 90; destination [XBI](https://www.tradingview.com/chart/?symbol=XBI)
@@ -267,12 +267,12 @@ Role: Strategic energy. Required next action: Hold.
 ### [XBI](https://www.tradingview.com/chart/?symbol=XBI) — Add — executed — Score 4.36 — Fresh cash: Hold / monitor
 Role: Rotation destination. Required next action: Can become attractive if breadth improves and rates ease..
 
-### [XLU](https://www.tradingview.com/chart/?symbol=XLU) — Hold with override — Score 3.00 — Fresh cash: No / under review — release score 70; override no_fundable_destination
+### [XLU](https://www.tradingview.com/chart/?symbol=XLU) — Hold with override — Score 3.00 — Fresh cash: No / under review — release score 70; override no fundable destination
 Role: Rotation destination. Required next action: Review defensive ballast role versus [BIL](https://www.tradingview.com/chart/?symbol=BIL)/SHV and opportunity cost..
 
 ## 11. Best New Opportunities
 
-- [SMH](https://www.tradingview.com/chart/?symbol=SMH) remains the leading funded growth exposure, subject to the max-position rule.
+- [SMH](https://www.tradingview.com/chart/?symbol=SMH) remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap.
 - Executed rotation: Guarded model rotation executed and persisted: reduced [URNM](https://www.tradingview.com/chart/?symbol=URNM) from 7.01% to 2.01% of NAV; added [XBI](https://www.tradingview.com/chart/?symbol=XBI) at 5.00% of NAV.
 - [XBI](https://www.tradingview.com/chart/?symbol=XBI) / [IBB](https://www.tradingview.com/chart/?symbol=IBB): Biotech remains a long-duration innovation lane but needs risk appetite.
 - [XLV](https://www.tradingview.com/chart/?symbol=XLV) / [VHT](https://www.tradingview.com/chart/?symbol=VHT): Healthcare quality can provide defensive growth without speculative biotech beta.
@@ -298,7 +298,7 @@ Hold-with-override note: The model would normally force reduce/replace review, b
 | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Existing | 9.22 | 9.47 | Hold | Tier 2 | 3.59 | Rotation destination | No | Added as current commodity-breadth hedge exposure after the prior gold-sleeve exit. |
 | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Existing | 24.05 | 24.46 | Hold | Tier 3 | 3.52 | Rotation destination | No | Diversifies U.S. factor concentration but still needs relative-strength confirmation. |
 | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Existing | 0.03 | 0.03 | Hold with override | Tier 2 | 3.68 | Real-asset capex | Yes | Valid but [GRID](https://www.tradingview.com/chart/?symbol=GRID) is the named challenger |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Existing | 28.13 | 27.56 | Hold with override | Tier 1 | 4.28 | Growth engine | No | Best earned use of cash, capped below max position size |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Existing | 28.13 | 27.56 | Hold with override | Tier 1 | 4.28 | Growth engine | No | Best earned exposure, but no fresh cash while above the 25% cap |
 | [SPY](https://www.tradingview.com/chart/?symbol=SPY) | SPDR S&P 500 ETF Trust | Existing | 0.03 | 0.03 | Hold with override | Tier 2 | 3.53 | Core beta | Yes | Useful but overlaps with [SMH](https://www.tradingview.com/chart/?symbol=SMH); no fresh cash add |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Existing | 7.01 | 2.01 | Reduce — executed | Tier 2 | 3.70 | Strategic energy | No | Valid, but not better than [SMH](https://www.tradingview.com/chart/?symbol=SMH) for new cash today |
 | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | New | 0.00 | 5.00 | Add — executed | Tier 2 | 4.36 | Rotation destination | No | Biotech remains a long-duration innovation lane but needs risk appetite. |
@@ -361,7 +361,7 @@ Hold-with-override note: The model would normally force reduce/replace review, b
 ### Watchlist / dynamic radar memory
 | Theme | Primary ETF | Alternative ETF | Why I’m considering it | Current status |
 |---|---|---|---|---|
-| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Strongest secular growth exposure. | Active |
+| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Strongest secular growth exposure. | Active / capped |
 | Defense innovation / sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructure capex remains valid. | Duel required |
 | Commodity-breadth hedge review | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [DBC](https://www.tradingview.com/chart/?symbol=DBC) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Current commodity-breadth hedge role must be proven against cash and broad commodity alternatives. | Under review |
@@ -372,8 +372,8 @@ Hold-with-override note: The model would normally force reduce/replace review, b
 - Replacement challengers: not fundable without completed duel.
 
 ### Constraints
-- Max position size: 25%
-- Max number of positions: 8
+- Max position size: 25% soft cap; current inherited overweights require no-fresh-cash and review/trim discipline
+- Max number of positions: 8 soft target; current inherited count may exceed this until guarded rotation reduces it
 - UCITS only: No
 - Leverage ETFs allowed: No
 - Drawdown tolerance: Moderate
