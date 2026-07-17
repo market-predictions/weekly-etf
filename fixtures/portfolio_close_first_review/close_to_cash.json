@@ -1,0 +1,10 @@
+{
+  "scenario": "close_to_cash",
+  "top_source": "XLU",
+  "source_shares": 14,
+  "source_price_usd": 45.0,
+  "eurusd": 1.1,
+  "nav_eur": 100000.0,
+  "expected_conclusion": "close_to_cash_supported",
+  "expected_projected_count": 8
+}
