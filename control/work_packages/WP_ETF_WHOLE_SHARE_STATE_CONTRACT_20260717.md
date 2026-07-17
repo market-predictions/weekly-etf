@@ -3,34 +3,34 @@
 Date: 2026-07-17
 Repository: `market-predictions/weekly-etf`
 Layer: input/state contract + operational runbook
-Status: implementation complete / validation pending
+Status: closed
 
 ## Current issue
 
-The production masterprompt requires whole shares, but the official portfolio state and guarded model-execution path historically stored fractional share quantities. The latest production run persisted fractional holdings and fractional Buy/Sell deltas. This creates a direct conflict between the decision framework and the machine-readable state contract.
-
-The current state also retains a small `DFEN` position although the current constraints state that leveraged ETFs are not allowed.
+The production framework required whole shares, while official state and guarded model execution stored fractional quantities. The latest state also retained a leveraged `DFEN` remainder despite the active no-leverage constraint.
 
 ## Root cause
 
-1. `runtime/model_execution_engine.py` converts EUR notional directly to shares.
-2. `_mark_position()` stores the resulting quantity at six decimal places.
-3. Guarded execution kept cash unchanged because source and destination notionals were identical before share rounding.
-4. No validator rejected fractional official positions or fractional guarded Buy/Sell deltas.
-5. Legacy fractional positions had no explicit migration path.
+1. Notional was converted directly to fractional shares.
+2. Execution persisted six-decimal quantities.
+3. No residual-cash contract reconciled whole-unit source and destination values.
+4. No validator blocked fractional official state or guarded Buy/Sell deltas.
+5. Legacy fractional state had no explicit migration path.
 
-## Required change
+## Implemented change
 
-1. Add a reusable whole-share state contract.
-2. Block guarded execution when the official pre-trade state is fractional.
-3. Round source sales and destination purchases down to executable whole units.
-4. Preserve pre-trade NAV by transferring the difference to residual EUR cash.
-5. Validate official positions, guarded artifacts and official Buy/Sell deltas.
-6. Add an explicit, idempotent reconciliation tool for legacy fractional positions.
-7. Close `DFEN` during the one-time reconciliation because it conflicts with the current no-leverage constraint.
-8. Record every legacy adjustment in the official trade ledger and a machine-readable reconciliation artifact.
+1. Added `runtime/whole_share_contract.py`.
+2. Guarded execution now blocks fractional pre-trade official state.
+3. Source sales and destination purchases are floored to whole units.
+4. Unspent proceeds become explicit EUR cash.
+5. Guarded NAV drift is limited to EUR 0.05.
+6. Added official-state and execution-artifact validators.
+7. Added an idempotent one-time reconciliation tool and request-file workflow.
+8. Added focused tests covering migration, idempotency, FX rounding, integer deltas, residual cash and NAV preservation.
+9. Reconciled the official state using the persisted 2026-07-16 pricing and FX basis.
+10. Closed `DFEN` under the active no-leverage policy.
 
-## Exact files
+## Files
 
 ```text
 runtime/whole_share_contract.py
@@ -43,37 +43,50 @@ tests/test_etf_whole_share_contract.py
 .github/workflows/reconcile-etf-whole-share-state.yml
 ```
 
-## Authority rules
-
-- Whole-share compliance applies to official portfolio state and new guarded Buy/Sell mutations.
-- Legacy fractional remainders may appear only in one-time reconciliation ledger rows.
-- Long-only legacy fractions are floored, never rounded up.
-- Explicit policy-forbidden tickers may be fully closed by the reconciliation run.
-- Released value and unspent rotation proceeds become EUR cash.
-- NAV drift must remain within EUR 0.05.
-- The reconciliation workflow may mutate portfolio state and trade ledger only after explicit request-file authorization.
-- The package may not send email, rewrite a delivered report or enable the cockpit front page.
-
-## Acceptance criteria
+## Validation evidence
 
 ```text
-focused tests: pass
-Python compile: pass
-legacy reconciliation idempotent: true
-post-reconciliation official shares: integers
-new guarded Buy/Sell deltas: integers
-NAV drift tolerance: <= EUR 0.05
-DFEN after one-time reconciliation: absent
+implementation_PR: #85
+implementation_merge: d5532ea15801a3888633ccb824797ab254305433
+validation_run: 29580018310
+compile: passed
+focused_tests: 4 passed
+reconciliation_request_commit: 3a54f5fb12be1c47420c0922ade4a82213bb3677
+reconciliation_commit: 50b93740efbed537ed9d0daed6e1d88ce912be1e
+reconciliation_artifact: output/runtime/etf_whole_share_reconciliation_20260716_20260717_094728.json
+```
+
+Reconciliation result:
+
+```text
+status: reconciled
+adjusted_position_count: 10
+ledger_rows_appended: 10
+policy_closed_tickers: DFEN
+cash_before_eur: 1936.52
+cash_after_eur: 2519.05
+cash_released_eur: 582.53
+invested_before_eur: 105181.42
+invested_after_eur: 104598.89
+nav_before_eur: 107117.94
+nav_after_eur: 107117.94
+nav_drift_eur: 0.00
+whole_share_validation_errors: []
+portfolio_state_written: true
+trade_ledger_written: true
 email_sent: false
 cockpit_enablement_changed: false
 ```
 
-## Execution sequence
+## Stable authority rules
 
-1. Merge implementation after focused validation.
-2. Create `control/run_queue/etf_whole_share_reconciliation_request_*.md` on `main`.
-3. Reconcile using runtime state `output/runtime/etf_report_state_20260716_20260717_094728.json`.
-4. Close `DFEN` explicitly.
-5. Validate and commit official state, trade ledger and reconciliation artifact.
-6. Update `control/CURRENT_STATE.md`, `control/NEXT_ACTIONS.md` and the decision log.
-7. Resume WP11 only after whole-share evidence is persisted.
+- Official positions and future guarded Buy/Sell mutations use whole shares.
+- Long-only quantities are floored and never rounded upward beyond funded or available capacity.
+- Released value and unspent proceeds remain explicit EUR cash.
+- Guarded execution fails closed when official state is fractional.
+- Legacy fractional deltas remain historical reconciliation evidence only.
+- NAV drift after reconciliation or guarded execution may not exceed EUR 0.05.
+
+## Closeout
+
+All implementation, validation, migration, ledger-evidence, state-persistence and NAV-preservation gates are satisfied. The package is closed. WP11 cockpit production enablement may resume using the reconciled official state.
