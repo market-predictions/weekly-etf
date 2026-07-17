@@ -111,7 +111,7 @@ jobs:
         run: |
           rm -rf output/cockpit_preview output/cockpit_review
           python -m runtime.render_cockpit_front_page --output-dir output --language both --html-only
-          python -m runtime.build_cockpit_side_by_side_review --output-dir output --token 260714
+          python -m runtime.build_cockpit_side_by_side_review --output-dir output --token 260716
 
       - name: Verify exact current WP08 conclusion
         run: |
@@ -120,7 +120,7 @@ jobs:
           from pathlib import Path
 
           root = Path("output/cockpit_review")
-          metadata = json.loads((root / "weekly_etf_cockpit_side_by_side_review_260714.json").read_text(encoding="utf-8"))
+          metadata = json.loads((root / "weekly_etf_cockpit_side_by_side_review_260716.json").read_text(encoding="utf-8"))
           findings = {row["dimension"]: row for row in metadata["findings"]}
           blockers = set(metadata["blocking_findings"])
 
@@ -135,12 +135,12 @@ jobs:
           )
 
           selected = metadata["selected_sources"]
-          assert selected["classic"]["en"]["markdown"] == "output/weekly_analysis_pro_260714_04.md"
-          assert selected["classic"]["nl"]["markdown"] == "output/weekly_analysis_pro_nl_260714_04.md"
-          assert selected["classic"]["en"]["html"] == "output/weekly_analysis_pro_260714_04_delivery.html"
-          assert selected["classic"]["nl"]["html"] == "output/weekly_analysis_pro_nl_260714_04_delivery.html"
-          assert selected["cockpit"]["en"] == "output/cockpit_preview/weekly_analysis_pro_cockpit_260714_01.html"
-          assert selected["cockpit"]["nl"] == "output/cockpit_preview/weekly_analysis_pro_nl_cockpit_260714_01.html"
+          assert selected["classic"]["en"]["markdown"] == "output/weekly_analysis_pro_260716.md"
+          assert selected["classic"]["nl"]["markdown"] == "output/weekly_analysis_pro_nl_260716.md"
+          assert selected["classic"]["en"]["html"] == "output/weekly_analysis_pro_260716_delivery.html"
+          assert selected["classic"]["nl"]["html"] == "output/weekly_analysis_pro_nl_260716_delivery.html"
+          assert selected["cockpit"]["en"] == "output/cockpit_preview/weekly_analysis_pro_cockpit_260716_01.html"
+          assert selected["cockpit"]["nl"] == "output/cockpit_preview/weekly_analysis_pro_nl_cockpit_260716_01.html"
 
           always_pass = {
               "readability",
@@ -161,8 +161,8 @@ jobs:
               "premium_look_and_feel",
           }
           payload = json.dumps(metadata, ensure_ascii=False)
-          assert "URNM reduced" in payload
-          assert "XBI added" in payload
+          assert "DFEN reduced" in payload
+          assert "XLV added" in payload
           assert metadata["input_sha256"]
 
           if blockers:
@@ -179,8 +179,8 @@ jobs:
               assert "hybrid_labels=none" in payload
 
           for path in [
-              root / "weekly_etf_cockpit_side_by_side_review_260714.html",
-              root / "weekly_etf_cockpit_side_by_side_review_nl_260714.html",
+              root / "weekly_etf_cockpit_side_by_side_review_260716.html",
+              root / "weekly_etf_cockpit_side_by_side_review_nl_260716.html",
           ]:
               html = path.read_text(encoding="utf-8")
               assert "<pre>" not in html

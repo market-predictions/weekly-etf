@@ -9,6 +9,62 @@ This is the broad operating changelog for `market-predictions/weekly-etf` develo
 
 ---
 
+## 2026-07-17 — Additive cockpit front page enabled for future production runs
+
+WP11 selected and implemented option B: enable the validated additive English/Dutch cockpit front page in the real production workflow.
+
+Production feature:
+
+```text
+MRKT_RPRTS_COCKPIT_FRONT_PAGE=enabled
+rollback: MRKT_RPRTS_COCKPIT_FRONT_PAGE=disabled
+```
+
+The last delivered `260716` report predates the whole-share reconciliation. WP11 therefore built a temporary exact-current overlay from the latest persisted runtime pricing/macro/lane context plus the current whole-share official portfolio state. The overlay and generated reports were not persisted to production.
+
+Validation:
+
+```text
+validation_run: 29582753816
+validation_job: 87892175344
+current_runtime_regression_run: 29582753774
+wp08_regression_run: 29582753837
+artifact_id: 8407711197
+artifact_digest: sha256:b483b7157a69939e66c9a7b3624b2401a2211c5ba2db1367b97374aa1b0899a9
+focused_tests: 3 passed
+```
+
+Measured output:
+
+```text
+current NAV EUR: 107117.94
+current cash EUR: 2519.05
+current position count: 8
+largest position: SMH
+EN front pages: 0 disabled / 1 enabled
+EN PDF pages: 16 -> 17
+NL front pages: 0 disabled / 1 enabled
+NL PDF pages: 17 -> 18
+classic report body: preserved
+small decision cockpit duplicate: false
+protected authority hashes: identical
+email sent: false
+```
+
+The old current-runtime and WP08 workflow assertions were also rebased from the historical `260714 / URNM → XBI` fixture to the current `260716 / DFEN → XLV` baseline. Both regressions passed.
+
+Persistent evidence:
+
+```text
+control/evidence/COCKPIT_WP11_PRODUCTION_ENABLEMENT_EVIDENCE_20260717.json
+control/decisions/COCKPIT_WP11_PRODUCTION_ENABLEMENT_DECISION_20260717.md
+control/handovers/HANDOVER_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT_20260717.md
+```
+
+No report or email was sent. The next package is a separate future-report language cleanup for internal terms such as `shadow engine`.
+
+---
+
 ## 2026-07-17 — Whole-share official state contract implemented and reconciled
 
 The latest production state was found to violate the decision-framework rule `whole shares only`. Guarded model execution stored fractional positions and fractional Buy/Sell deltas, and a small leveraged `DFEN` remainder conflicted with the active no-leverage constraint.

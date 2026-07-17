@@ -127,10 +127,10 @@ jobs:
         run: |
           python -m runtime.render_cockpit_front_page --output-dir output --language both --html-only
           python -m runtime.build_cockpit_side_by_side_review --output-dir output
-          grep -R "URNM reduced" output/cockpit_preview/
-          grep -R "XBI added" output/cockpit_preview/
-          grep -R "URNM afgebouwd" output/cockpit_preview/
-          grep -R "XBI toegevoegd" output/cockpit_preview/
+          grep -R "DFEN reduced" output/cockpit_preview/
+          grep -R "XLV added" output/cockpit_preview/
+          grep -R "DFEN afgebouwd" output/cockpit_preview/
+          grep -R "XLV toegevoegd" output/cockpit_preview/
           grep -R 'promotion_status.*not_promoted' output/cockpit_review/
 
       - name: Prove authority files unchanged
