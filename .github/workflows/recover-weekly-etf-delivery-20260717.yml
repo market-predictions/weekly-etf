@@ -74,8 +74,28 @@ jobs:
           print("ETF_RECOVERY_RENDER_OK")
           PY
 
-      - name: Validate delivery HTML contract
-        run: python tools/validate_etf_delivery_html_contract.py --output-dir output
+      - name: Capture delivery HTML contract result
+        run: |
+          set +e
+          python tools/validate_etf_delivery_html_contract.py --output-dir output > /tmp/recovery-delivery-contract.log 2>&1
+          status=$?
+          echo "$status" > /tmp/recovery-delivery-contract.status
+          cat /tmp/recovery-delivery-contract.log
+          exit 0
+
+      - name: Upload delivery contract diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recovery-delivery-contract-${{ github.run_id }}
+          path: |
+            /tmp/recovery-delivery-contract.log
+            /tmp/recovery-delivery-contract.status
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce delivery HTML contract
+        run: test "$(cat /tmp/recovery-delivery-contract.status)" = "0"
 
       - name: Validate cleaned client surface
         run: python tools/validate_etf_client_surface_clean.py --output-dir output
