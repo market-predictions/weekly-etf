@@ -12,7 +12,7 @@ whole_share_status: compliant
 nav_eur: 107117.94
 cash_eur: 2519.05
 cockpit_production_feature: enabled
-client_language_contract: active_pending_PR88_merge
+client_language_contract: active_merged_PR88
 ```
 
 The delivered report predates the whole-share reconciliation, cockpit production enablement and internal-language cleanup. Current shares and cash come from the official portfolio state, not from historical report tables. Historical reports remain immutable.
@@ -38,6 +38,7 @@ The official state contains eight whole-share positions. `DFEN` is closed and â‚
 ```text
 package: WP_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT
 PR: #87
+merge_commit: 90a1f129826245e7667cfa434a7b35575f87598c
 feature: MRKT_RPRTS_COCKPIT_FRONT_PAGE=enabled
 rollback: MRKT_RPRTS_COCKPIT_FRONT_PAGE=disabled
 validation_run: 29582753816
@@ -51,6 +52,7 @@ The exact-current no-send replay proved one front page per language, one added P
 ```text
 package: WP_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP
 PR: #88
+merge_commit: 4571c4c045962908609b3a5e2f784199d4e3b142
 validation_run: 29590932038
 validation_job: 87919550815
 focused_tests: 30 passed
@@ -60,7 +62,7 @@ numeric_parity: preserved
 markdown_link_parity: preserved
 historical_reports: byte_unchanged
 email_sent: false
-status: closed_pending_merge
+status: closed_merged
 ```
 
 Persistent evidence:
@@ -73,7 +75,7 @@ control/evidence/REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP_EVIDENCE_20260717.json
 
 No new development package is required before production proof.
 
-A fresh report and email require a separate explicit user authorization. Do not create a run-queue request as part of PR #88.
+A fresh report and email require a separate explicit user authorization. No run-queue request was created by PR #88 or its closeout updates.
 
 When authorized, the fresh production run should prove:
 
