@@ -4,7 +4,7 @@
   "date": "2026-07-17",
   "repository": "market-predictions/weekly-etf",
   "package": "WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION",
-  "status": "validated_no_send_merge_pending",
+  "status": "closed_merged_validated_no_send",
   "decision": {
     "every_non_zero_position_counts": true,
     "zero_share_positions_count": false,
@@ -12,7 +12,9 @@
     "max_active_positions": 8,
     "current_active_positions": 9,
     "current_status": "close_first",
+    "no_trade_review_while_over_limit": "allowed",
     "new_ticker_while_over_limit": "blocked",
+    "trade_while_over_limit": "must_reduce_active_count",
     "new_ticker_at_limit": "requires_full_source_close_same_execution",
     "current_holdings_mutated": false
   },
@@ -57,7 +59,9 @@
   },
   "implementation": {
     "pull_request": 91,
-    "head_sha": "07c4f32456d50a6f624f664cfa87970e9c8dec76",
+    "head_sha": "c978153c2dadc2206130e82bb19228e11d494399",
+    "merge_commit": "0bcb6af7e243775d876b59719ce9898fa97c690f",
+    "closeout_pull_request": 92,
     "files": [
       "runtime/position_count_contract.py",
       "runtime/position_count_report_surface.py",
@@ -65,26 +69,47 @@
       "tools/validate_etf_client_surface_clean.py",
       "tools/validate_etf_position_count_contract.py",
       "tests/test_etf_position_count_contract.py",
-      ".github/workflows/validate-etf-position-count-contract.yml"
+      ".github/workflows/validate-etf-position-count-contract.yml",
+      ".github/workflows/recover-weekly-etf-delivery-20260717.yml",
+      ".github/workflows/validate-cockpit-current-runtime.yml",
+      ".github/workflows/validate-cockpit-wp08-evidence-review.yml",
+      ".github/workflows/validate-cockpit-wp11-production-enablement.yml"
     ]
   },
   "validation": {
-    "primary_workflow_run": 29617207278,
-    "primary_job": 88004737784,
-    "result": "success",
     "focused_tests": 13,
     "artifact_id": 8420903168,
     "artifact_digest": "sha256:cf98f8d4b4d172bc4f463598a557e8490fd2f188bbd5ae3f0c34347ee1688b5b",
-    "report_surface_regression_run": 29617207295,
-    "report_surface_regression_result": "success",
-    "delivery_recovery_regression_run": 29617207264,
-    "delivery_recovery_regression_result": "success",
-    "fresh_send_diagnostic_regression_run": 29617207249,
-    "fresh_send_diagnostic_regression_result": "success",
+    "final_position_count_run": 29618185729,
+    "final_position_count_result": "success",
+    "final_report_surface_run": 29618185736,
+    "final_report_surface_result": "success",
+    "final_current_runtime_cockpit_run": 29618185701,
+    "final_current_runtime_cockpit_result": "success",
+    "final_wp08_run": 29618185711,
+    "final_wp08_result": "success",
+    "final_wp11_run": 29618185709,
+    "final_wp11_result": "success",
+    "final_delivery_recovery_run": 29618185751,
+    "final_delivery_recovery_result": "success",
+    "final_fresh_send_diagnostic_run": 29618185706,
+    "final_fresh_send_diagnostic_result": "success",
     "compile": "passed",
     "current_state_validator": "passed",
     "protected_authority_hashes": "identical",
     "historical_report_hashes": "identical"
+  },
+  "governance_closeout": {
+    "decision_log_updated": true,
+    "session_changelog_updated": true,
+    "append_workflow_run": 29618612112,
+    "append_workflow_job": 88008928719,
+    "append_workflow_result": "success",
+    "temporary_workflow_removed_from_closeout_branch": true,
+    "temporary_trigger_removed_from_closeout_branch": true,
+    "temporary_script_removed_from_closeout_branch": true,
+    "claim_status": "closed_released",
+    "handover_status": "finalized"
   },
   "authority_boundary": {
     "portfolio_execution": false,
@@ -94,5 +119,6 @@
     "historical_output_mutation": false,
     "pricing_authority_change": false,
     "email_sent": false
-  }
+  },
+  "next_package": "WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW"
 }
