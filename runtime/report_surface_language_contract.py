@@ -72,6 +72,10 @@ EXACT_REPLACEMENTS: dict[str, str] = {
 
 REGEX_REPLACEMENTS: tuple[tuple[re.Pattern[str], str], ...] = (
     (
+        re.compile(r"\bguarded model rotation\b", re.IGNORECASE),
+        "portfolio rotation",
+    ),
+    (
         re.compile(r"\brelease score\s+(\d+(?:\.\d+)?)", re.IGNORECASE),
         r"review priority \1",
     ),
