@@ -1,0 +1,86 @@
+{
+  "schema_version": "cockpit_wp10_additive_delivery_front_page_evidence_v1",
+  "date": "2026-07-17",
+  "repository": "market-predictions/weekly-etf",
+  "report_token": "260714",
+  "implementation_status": "validated_ready_for_enablement_decision",
+  "validated_code_head": "b2ca4b032793f23f13b0d4557a919623366dc501",
+  "final_validation_run": "29541727393",
+  "visual_artifact_run": "29542004498",
+  "visual_artifact_id": "8392637794",
+  "visual_artifact_digest": "sha256:c18cc4281efae34237aa90f2bcdb28bae4d85e1e73f32e3a76bed71e0b3917b8",
+  "feature_gate": {
+    "name": "MRKT_RPRTS_COCKPIT_FRONT_PAGE",
+    "default": "disabled",
+    "accepted_values": [
+      "disabled",
+      "enabled"
+    ],
+    "production_enablement": false,
+    "failure_behavior": "unchanged_classic_output_with_small_decision_cockpit"
+  },
+  "disabled_mode": {
+    "english_html_byte_identical": true,
+    "dutch_html_byte_identical": true,
+    "small_decision_cockpit_preserved": true
+  },
+  "enabled_mode": {
+    "english_front_page_count": 1,
+    "dutch_front_page_count": 1,
+    "english_pdf_front_page_pages": 1,
+    "dutch_pdf_front_page_pages": 1,
+    "english_pdf_pages": {
+      "disabled": 18,
+      "enabled": 19
+    },
+    "dutch_pdf_pages": {
+      "disabled": 20,
+      "enabled": 21
+    },
+    "classic_report_body": "preserved",
+    "small_decision_cockpit_duplicate": false,
+    "standalone_equity_embed": "passed",
+    "email_equity_cid": "passed"
+  },
+  "delivery_contract": {
+    "email_count_change": false,
+    "pdf_count_change": false,
+    "attachment_contract_change": false,
+    "manifest_contract_change": false,
+    "delivery_directory_digest_unchanged": true,
+    "email_sent": false
+  },
+  "authority_contract": {
+    "protected_hashes_before_after": "identical",
+    "portfolio_model_execution": false,
+    "pricing_authority_change": false,
+    "official_state_mutation": false,
+    "official_trade_ledger_mutation": false
+  },
+  "review_contract": {
+    "wp08_review_conclusion": "ready_for_promotion_decision",
+    "blocking_findings": [],
+    "all_eleven_dimensions": "pass"
+  },
+  "visual_review": {
+    "renderer": "PDF rendered to PNG at 180 DPI",
+    "english_page_1": "passed",
+    "dutch_page_1": "passed",
+    "classic_report_starts_cleanly_on_page_2": true,
+    "clipped_text": false,
+    "overlap": false,
+    "broken_glyphs": false,
+    "readability": "passed",
+    "premium_layout": "passed"
+  },
+  "artifact_sha256": {
+    "disabled_en_html": "b46e9dd7e195d713aaa6ca04a6fe97d374ef93ed634ee6049ebbd28d83a3ee5e",
+    "disabled_nl_html": "8580accf4495942f88a9aea582a7139e86f715cc5239a2da8a3fe0c330834dac",
+    "enabled_en_html": "3e560447e19c0c6ee51818e749bf4b54ee91dcb48910c151159ac83a212b2ed1",
+    "enabled_nl_html": "976f820e26cf39efa374eda54b8d99958531b52ebe67f489d7781ac5cf900a7b",
+    "enabled_en_pdf": "99e046cb705c9cb060f243476225c003fced885b06a4c4b1a73c0abb184783ee",
+    "enabled_nl_pdf": "f10fa65d930fb26db2dbbd5a63eb50d759746c7f6381a1018f8b5713dd456425"
+  },
+  "promotion_status": "not_promoted",
+  "next_package": "WP_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT"
+}
