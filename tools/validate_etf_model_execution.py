@@ -12,7 +12,9 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from runtime.finalize_executed_etf_report import finalize_from_artifact
+from runtime.whole_share_contract import WHOLE_SHARE_TOLERANCE, validate_whole_share_positions
 from tools.validate_etf_execution_state_authority import validate_execution_artifact, validate_runtime_state_authority
+from tools.validate_etf_whole_share_contract import validate_portfolio_state
 
 POINTER = Path("output/runtime/latest_etf_model_execution_path.txt")
 
@@ -66,6 +68,28 @@ def _is_no_trade_intents(payload: dict[str, Any], expected_mode: str) -> bool:
     return payload.get("execution_mode") == expected_mode and payload.get("execution_status") == "no_trade_intents"
 
 
+def _validate_guarded_whole_share_contract(payload: dict[str, Any]) -> list[str]:
+    errors = validate_whole_share_positions(
+        payload.get("shadow_positions") or [], context="guarded_execution_artifact"
+    )
+    result = payload.get("guarded_auto_result") or {}
+    for row in result.get("official_ledger_rows") or []:
+        action = _text(row.get("action"))
+        shares_delta = _float(row.get("shares_delta"))
+        if action in {"Buy", "Sell"} and abs(shares_delta - round(shares_delta)) > WHOLE_SHARE_TOLERANCE:
+            errors.append(
+                f"guarded_execution_artifact:fractional_trade_delta:{row.get('ticker')}:{shares_delta}"
+            )
+    portfolio_path = Path(
+        _text((payload.get("source_files") or {}).get("portfolio_state"), "output/etf_portfolio_state.json")
+    )
+    if portfolio_path.exists():
+        errors.extend(validate_portfolio_state(portfolio_path))
+    else:
+        errors.append(f"guarded_execution_artifact:portfolio_state_missing:{portfolio_path}")
+    return errors
+
+
 def validate(path: Path, *, expected_mode: str, finalize_report: bool = True) -> None:
     payload = _read_json(path)
     errors: list[str] = []
@@ -86,7 +110,8 @@ def validate(path: Path, *, expected_mode: str, finalize_report: bool = True) ->
     if not shadow_positions:
         errors.append("no_shadow_positions")
     post = payload.get("post_trade_shadow_portfolio") or {}
-    if abs(_float(post.get("nav_drift_eur"))) > 1.0:
+    drift_tolerance = 0.05 if expected_mode == "guarded_auto" else 1.0
+    if abs(_float(post.get("nav_drift_eur"))) > drift_tolerance:
         errors.append(f"nav_drift_too_large:{post.get('nav_drift_eur')}")
 
     errors.extend(validate_execution_artifact(path, expected_mode=expected_mode, raise_on_error=False))
@@ -101,6 +126,7 @@ def validate(path: Path, *, expected_mode: str, finalize_report: bool = True) ->
         if _float(row.get("destination_delta_weight_pct")) <= 0:
             errors.append("ledger_row_destination_delta_not_positive")
     if expected_mode == "guarded_auto":
+        errors.extend(_validate_guarded_whole_share_contract(payload))
         status = payload.get("execution_status")
         if status not in {"executed", "already_executed", "no_trade_intents"}:
             errors.append(f"guarded_auto_not_executed:{status}")
@@ -129,8 +155,16 @@ def validate(path: Path, *, expected_mode: str, finalize_report: bool = True) ->
             if result.get("portfolio_state_written") is True or result.get("trade_ledger_written") is True:
                 errors.append("no_trade_intents_must_not_write_state_or_ledger")
     if errors:
-        raise RuntimeError("ETF model execution validation failed for " + path.name + ": " + "; ".join(sorted(set(errors))))
-    print(f"ETF_MODEL_EXECUTION_VALIDATION_OK | artifact={path.name} | mode={expected_mode} | status={payload.get('execution_status')} | trades={len(rows)} | positions={len(shadow_positions)}")
+        raise RuntimeError(
+            "ETF model execution validation failed for "
+            + path.name
+            + ": "
+            + "; ".join(sorted(set(errors)))
+        )
+    print(
+        f"ETF_MODEL_EXECUTION_VALIDATION_OK | artifact={path.name} | mode={expected_mode} | "
+        f"status={payload.get('execution_status')} | trades={len(rows)} | positions={len(shadow_positions)}"
+    )
     if expected_mode == "guarded_auto" and finalize_report:
         finalization = finalize_from_artifact(path)
         runtime_state = finalization.get("runtime_state") if isinstance(finalization, dict) else None
@@ -144,7 +178,11 @@ def main() -> None:
     parser.add_argument("--expected-mode", default="shadow", choices=["shadow", "guarded_auto"])
     parser.add_argument("--no-finalize-report", action="store_true")
     args = parser.parse_args()
-    validate(_resolve(args.artifact), expected_mode=args.expected_mode, finalize_report=not args.no_finalize_report)
+    validate(
+        _resolve(args.artifact),
+        expected_mode=args.expected_mode,
+        finalize_report=not args.no_finalize_report,
+    )
 
 
 if __name__ == "__main__":
