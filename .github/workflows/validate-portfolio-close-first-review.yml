@@ -1,0 +1,137 @@
+name: Validate portfolio close-first execution review
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/validate-portfolio-close-first-review.yml"
+      - "runtime/build_portfolio_close_first_review.py"
+      - "runtime/position_count_contract.py"
+      - "tools/validate_portfolio_close_first_review.py"
+      - "tests/test_portfolio_close_first_review.py"
+      - "fixtures/portfolio_close_first_review/**"
+      - "control/work_packages/WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_20260718.md"
+      - "control/work_package_claims/WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_20260718.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      REVIEW_CLOSE_DATE: "2026-07-17"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest pandas yfinance
+
+      - name: Snapshot protected authority and historical files
+        run: |
+          set -euo pipefail
+          files=(
+            output/etf_portfolio_state.json
+            output/etf_trade_ledger.csv
+            output/etf_valuation_history.csv
+            output/etf_recommendation_scorecard.csv
+            output/runtime/latest_etf_report_state_path.txt
+            output/pricing/latest_price_audit_path.txt
+            output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+            output/weekly_analysis_pro_260716_02.md
+            output/weekly_analysis_pro_260716_02.pdf
+            output/weekly_analysis_pro_260716_02_delivery.html
+            output/weekly_analysis_pro_nl_260716_02.md
+            output/weekly_analysis_pro_nl_260716_02.pdf
+            output/weekly_analysis_pro_nl_260716_02_delivery.html
+          )
+          for pointer in \
+            output/runtime/latest_etf_report_state_path.txt \
+            output/pricing/latest_price_audit_path.txt \
+            output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+          do
+            if [ -s "$pointer" ]; then
+              target="$(cat "$pointer")"
+              [ -f "$target" ] && files+=("$target")
+            fi
+          done
+          for path in "${files[@]}"; do [ -f "$path" ] || { echo "Missing protected file: $path"; exit 1; }; done
+          printf '%s\n' "${files[@]}" | sort -u > /tmp/close-first-protected-files.txt
+          xargs -d '\n' sha256sum < /tmp/close-first-protected-files.txt > /tmp/close-first-before.sha256
+
+      - name: Compile implementation and validator
+        run: |
+          python -m py_compile \
+            runtime/build_portfolio_close_first_review.py \
+            tools/validate_portfolio_close_first_review.py \
+            tests/test_portfolio_close_first_review.py
+
+      - name: Run focused fixture regressions
+        run: |
+          set -o pipefail
+          pytest -vv --tb=short tests/test_portfolio_close_first_review.py 2>&1 | tee /tmp/close-first-tests.log
+
+      - name: Build fresh completed-close review evidence
+        run: |
+          rm -rf /tmp/portfolio-close-first-review
+          python runtime/build_portfolio_close_first_review.py \
+            --requested-close-date "$REVIEW_CLOSE_DATE" \
+            --output-dir /tmp/portfolio-close-first-review \
+            2>&1 | tee /tmp/close-first-builder.log
+
+      - name: Validate review evidence and bilingual surfaces
+        run: |
+          python tools/validate_portfolio_close_first_review.py \
+            --evidence /tmp/portfolio-close-first-review/portfolio_close_first_execution_review_evidence.json \
+            --english /tmp/portfolio-close-first-review/portfolio_close_first_execution_review_en.md \
+            --dutch /tmp/portfolio-close-first-review/portfolio_close_first_execution_review_nl.md \
+            --expected-close-date "$REVIEW_CLOSE_DATE" \
+            2>&1 | tee /tmp/close-first-validator.log
+
+      - name: Prove protected authority and historical files unchanged
+        run: |
+          set -euo pipefail
+          xargs -d '\n' sha256sum < /tmp/close-first-protected-files.txt > /tmp/close-first-after.sha256
+          diff -u /tmp/close-first-before.sha256 /tmp/close-first-after.sha256
+          sha256sum -c /tmp/close-first-before.sha256
+          git diff --exit-code -- \
+            output/etf_portfolio_state.json \
+            output/etf_trade_ledger.csv \
+            output/etf_valuation_history.csv \
+            output/etf_recommendation_scorecard.csv \
+            output/runtime/latest_etf_report_state_path.txt \
+            output/pricing/latest_price_audit_path.txt \
+            output/run_manifests/latest_weekly_etf_run_manifest_path.txt \
+            output/weekly_analysis_pro_260716_02.md \
+            output/weekly_analysis_pro_260716_02.pdf \
+            output/weekly_analysis_pro_260716_02_delivery.html \
+            output/weekly_analysis_pro_nl_260716_02.md \
+            output/weekly_analysis_pro_nl_260716_02.pdf \
+            output/weekly_analysis_pro_nl_260716_02_delivery.html
+
+      - name: Upload no-mutation review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-close-first-review-${{ github.run_id }}
+          path: |
+            /tmp/portfolio-close-first-review/
+            /tmp/close-first-tests.log
+            /tmp/close-first-builder.log
+            /tmp/close-first-validator.log
+            /tmp/close-first-protected-files.txt
+            /tmp/close-first-before.sha256
+            /tmp/close-first-after.sha256
+          if-no-files-found: warn
+          retention-days: 30
