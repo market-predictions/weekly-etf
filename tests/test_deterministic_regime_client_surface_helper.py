@@ -15,7 +15,6 @@ from tools.validate_deterministic_regime_client_surface import validate_surface_
 VALIDATION = Path("output/macro/validation/latest_macro_regime_shadow_validation.json")
 COMPARISON = Path("output/macro/validation/latest_macro_regime_shadow_comparison.json")
 
-
 RAW_BLOCKED_KEYS = {
     "deterministic_regime_shadow",
     "macro_axes",
@@ -47,10 +46,10 @@ def test_confidence_band_boundaries() -> None:
     assert confidence_band_en(0.54) == "low"
     assert confidence_band_en(0.55) == "moderate"
     assert confidence_band_en(0.71) == "moderate"
-    assert confidence_band_en(0.72) == "high but review-only"
+    assert confidence_band_en(0.72) == "high"
     assert confidence_band_nl(0.54) == "laag"
     assert confidence_band_nl(0.55) == "gemiddeld"
-    assert confidence_band_nl(0.72) == "hoog maar alleen ter review"
+    assert confidence_band_nl(0.72) == "hoog"
 
 
 def test_build_surface_from_latest_shadow_evidence_passes_validator() -> None:
@@ -70,12 +69,24 @@ def test_helper_does_not_copy_raw_shadow_fields_into_dto() -> None:
         assert key not in dto
 
 
-def test_helper_does_not_leak_raw_shadow_terms_into_safe_text() -> None:
+def test_helper_does_not_leak_raw_or_internal_terms_into_safe_text() -> None:
     dto = _dto()
     text = dto["safe_surface_en"] + "\n" + dto["safe_surface_nl"]
 
-    for term in ["macro_axes", "macro_axis_scores", "macro_evidence", "confidence_decomposition", "output/macro", ".json"]:
-        assert term not in text
+    for term in [
+        "macro_axes",
+        "macro_axis_scores",
+        "macro_evidence",
+        "confidence_decomposition",
+        "output/macro",
+        ".json",
+        "shadow engine",
+        "shadow-engine",
+        "review-only",
+        "alleen ter review",
+        "legacy regime read",
+    ]:
+        assert term not in text.lower()
 
 
 def test_render_functions_are_deterministic_for_same_dto() -> None:
