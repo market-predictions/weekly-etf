@@ -108,12 +108,30 @@ jobs:
         run: python tools/validate_deterministic_regime_client_surface.py --self-test
 
       - name: Build read-only bilingual cleanup evidence
+        id: full_report_validation
+        continue-on-error: true
         run: |
+          set -o pipefail
           rm -rf output/report_surface_language_validation
+          mkdir -p output/report_surface_language_validation
           python tools/validate_report_surface_internal_language_cleanup.py \
             --english-report output/weekly_analysis_pro_260716.md \
             --dutch-report output/weekly_analysis_pro_nl_260716.md \
-            --evidence-dir output/report_surface_language_validation
+            --evidence-dir output/report_surface_language_validation \
+            2>&1 | tee output/report_surface_language_validation/validator.log
+
+      - name: Upload full-report validator diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-surface-language-validator-log-${{ github.run_id }}
+          path: output/report_surface_language_validation/validator.log
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce full-report validation result
+        if: steps.full_report_validation.outcome != 'success'
+        run: exit 1
 
       - name: Verify evidence contract
         run: |
