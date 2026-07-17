@@ -19,27 +19,15 @@ client_language_contract: active
 inbox_receipt: confirmed_both_languages
 ```
 
-The current delivered package is the first real production proof combining whole-share official state, one cockpit page per language, preserved classic report bodies, client-language gates, passed pricing lineage, a real delivery manifest and confirmed English/Dutch Gmail receipts.
-
-## Completed delivery recovery
-
-```text
-package: WP_FRESH_WEEKLY_ETF_SEND_RECOVERY
-source_run: 20260717_154351
-persisted_rotation: XLU -> PAVE
-repeat_portfolio_execution: false
-language_fix_PR: #89
-recovery_workflow_PR: #90
-delivery_evidence_commit: ddc745fddf0e80a31c4309658743f6435a4d486b
-status: closed_delivered
-```
-
-## Position-count reconciliation
+## Completed position-count reconciliation
 
 ```text
 package: WP_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION
-pull_request: #91
-status: implementation_complete_validation_green_merge_pending
+implementation_pull_request: #91
+implementation_merge: 0bcb6af7e243775d876b59719ce9898fa97c690f
+closeout_pull_request: #92
+status: closed_merged_validated_no_send
+claim_status: closed_released
 decision: every non-zero whole-share position counts
 generic_residual_exception: false
 current_status: close_first 9/8
@@ -47,18 +35,21 @@ portfolio_mutation: false
 email_sent: false
 ```
 
-The production preflight now evaluates projected whole-share positions before guarded mutation. While above eight positions, a proposed trade must reduce the active count and may not introduce a new ticker. At eight positions, a new ticker requires a full source close in the same transition. A no-trade review may preserve the current count while reporting `close_first`.
+The production preflight now evaluates projected whole-share positions before guarded execution. While the official state remains above eight positions, a proposed transition must lower the active count and cannot introduce another ticker. At eight positions, a new ticker requires another position to reach zero shares in the same projected transition. A no-change review may preserve `close_first`.
 
-Validation:
+Final evidence:
 
 ```text
-primary_run: 29617207278 success
-primary_job: 88004737784
 focused_tests: 13 passed
 artifact_id: 8420903168
-report_surface_regression: 29617207295 success
-closed_recovery_regression: 29617207264 success
-fresh_send_diagnostic_regression: 29617207249 success
+position_count_run: 29618185729 success
+report_surface_run: 29618185736 success
+current_runtime_cockpit_run: 29618185701 success
+wp08_exact_current_run: 29618185711 success
+wp11_exact_current_run: 29618185709 success
+closed_recovery_run: 29618185751 success
+fresh_send_diagnostic_run: 29618185706 success
+governance_append_run: 29618612112 success
 protected_authority_hashes: identical
 historical_report_hashes: identical
 ```
@@ -69,68 +60,28 @@ Persistent records:
 control/evidence/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_EVIDENCE_20260717.json
 control/decisions/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_DECISION_20260717.md
 control/handovers/HANDOVER_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_20260717.md
+control/DECISION_LOG.md
+control/ETF_SESSION_CHANGELOG.md
 ```
 
 ## Immediate next package
 
-Create and claim only after PR #91 closeout:
+Create and claim only as a separate, explicitly authorized package:
 
 ```text
 WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW
 ```
 
-### Current issue
+That package must first perform a no-mutation review using fresh pricing, current scores, relative strength, portfolio-role evidence, liquidity and implementation practicality. It must compare all plausible count-reducing paths and must not assume that the smallest holding is automatically the correct source.
 
-The official state remains at nine active positions. The reconciliation contract blocks a new ticker but deliberately does not choose which holding should be closed or reduced to zero.
+Required boundaries:
 
-### Required decision framework
-
-The next package must:
-
-1. use fresh pricing and current evidence rather than the historical size of a residual alone;
-2. compare all plausible closure/funding sources by portfolio role, score, relative strength, thesis validity, opportunity cost, liquidity and execution practicality;
-3. choose a path that reduces the active count from nine to no more than eight;
-4. avoid introducing a new ticker while the state remains above the maximum;
-5. distinguish clearly between:
-   - close to cash;
-   - close and reallocate to an already-held ticker;
-   - no-trade because evidence is insufficient;
-6. not assume that XLU is the correct source merely because it is the smallest position.
-
-### Required input/state contract
-
-Use:
-
-```text
-output/etf_portfolio_state.json
-output/etf_trade_ledger.csv
-latest immutable pricing audit
-latest recommendation scorecard
-latest lane and relative-strength evidence
-latest macro/policy evidence with current authority rules
-```
-
-All quantities and projected deltas remain whole shares. The existing NAV-drift tolerance and no-leverage rule remain unchanged.
-
-### Required output contract
-
-The review must state:
-
-- current active count and maximum;
-- whether a count-reducing action is supported;
-- the selected source and destination, if any;
-- why alternatives were rejected;
-- projected whole-share quantities, cash and active count;
-- client-safe EN/NL wording without internal implementation terms.
-
-### Required operational runbook
-
-- claim the package before implementation;
-- run a no-mutation review first;
-- use the position-count preflight on every proposed transition;
-- do not mutate state unless the user separately and explicitly authorizes execution;
-- do not claim delivery without a real manifest and inbox receipt;
-- create a handover and update control files after closure.
+1. use current authority files and fresh evidence;
+2. preserve whole-share, position-count, no-leverage and NAV controls;
+3. identify whether a justified path from nine positions to no more than eight exists;
+4. keep official state unchanged unless separately authorized;
+5. record a new claim, evidence and handover;
+6. require a real manifest and inbox receipt for any later delivery claim.
 
 ## Separate governance cleanup
 
