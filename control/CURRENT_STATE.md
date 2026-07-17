@@ -136,7 +136,8 @@ Stable cockpit rules:
 ```text
 package: WP_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP
 PR: #88
-status: closed_pending_merge
+merge_commit: 4571c4c045962908609b3a5e2f784199d4e3b142
+status: closed_merged
 validation_run: 29590932038
 validation_job: 87919550815
 focused_tests: 30 passed
