@@ -3,11 +3,11 @@
 Date: 2026-07-17
 Repository: `market-predictions/weekly-etf`
 Layer: output contract + operational runbook
-Status: active
+Status: closed
 
 ## Current issue
 
-The latest delivered English/Dutch report is analytically valid, but future client surfaces can still expose internal workflow language such as:
+The latest delivered English/Dutch report was analytically valid, but future client surfaces could expose internal workflow language such as:
 
 ```text
 shadow engine
@@ -21,19 +21,20 @@ diagnostic-only authority narration
 run(s)
 ```
 
-The same surface also contains repeated punctuation in position-review lines and process-heavy wording that obscures the actual client decision.
+The same surface contained repeated punctuation and process-heavy wording that obscured the client decision.
 
 ## Root cause
 
-Client cleanup is distributed across multiple legacy sanitizers. Existing gates remove snake_case, stale holdings language and several localization defects, but they do not share one explicit bilingual internal-language contract.
+Client cleanup was distributed across multiple legacy sanitizers. Existing gates removed snake_case, stale holdings language and several localization defects, but they did not share one explicit bilingual internal-language contract.
 
-## Recommended change
+## Implemented change
 
-1. Add a shared deterministic bilingual client-language normalizer and finding scanner.
-2. Apply it through the existing Markdown/HTML cleanup path used before delivery.
-3. Rewrite the supplementary deterministic regime surface at source so it no longer says `shadow engine`, `legacy regime read` or `review-only`, while preserving all false-authority fields.
-4. Extend the existing pre-send clean gate to fail on forbidden internal phrases.
-5. Add a no-send evidence replay against the immutable `260716` English/Dutch reports in memory only.
+1. Added a shared deterministic bilingual client-language normalizer and forbidden-term scanner.
+2. Applied it through the existing Markdown/HTML cleanup path used before delivery.
+3. Rewrote the supplementary deterministic regime surface at source so it no longer says `shadow engine`, `legacy regime read`, `review-only` or `alleen ter review`.
+4. Preserved all deterministic-regime false-authority fields.
+5. Extended the existing pre-send clean gate through the shared scanner.
+6. Added a no-send evidence replay against immutable `260716` English/Dutch reports in memory only.
 
 ## Exact files
 
@@ -50,9 +51,30 @@ tests/test_deterministic_regime_client_surface_helper.py
 tests/test_deterministic_regime_client_surface_validator.py
 tests/test_deterministic_regime_report_surface_integration.py
 .github/workflows/validate-report-surface-internal-language-cleanup.yml
+control/evidence/REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP_EVIDENCE_20260717.json
 ```
 
-## Required safeguards
+## Validation
+
+```text
+workflow_run: 29590932038
+workflow_job: 87919550815
+result: success
+focused_tests: 30 passed
+artifact_id: 8411017345
+artifact_digest: sha256:8a7acad3c573ae2eaa9a82fcd92f295ae5c6b33cc6090ca6936b5cd1a7997a74
+EN findings: 18 -> 0
+NL findings: 6 -> 0
+EN numeric tokens: 635 preserved
+NL numeric tokens: 588 preserved
+EN markdown links: 234 preserved
+NL markdown links: 236 preserved
+cleanup_idempotent: true
+historical_report_files: byte_unchanged
+email_sent: false
+```
+
+## Safeguards confirmed
 
 ```text
 portfolio_state_mutation: false
@@ -77,8 +99,9 @@ double_punctuation_after_cleanup: 0
 numeric_multiset_before_after: identical
 markdown_link_multiset_before_after: identical
 cleanup_idempotent: true
-deterministic_regime_false_authority_fields: unchanged
+deterministic_regime_false_authority_fields: unchanged_false
 existing_client_surface_gate: enforces_new_contract
 historical_report_files: byte_unchanged
 email_sent: false
+status: closed
 ```
