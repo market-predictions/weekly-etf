@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 
+from runtime.position_count_contract import client_breach_sentence
 from runtime.report_surface_language_contract import (
     client_language_findings,
     normalize_client_language,
@@ -31,11 +32,66 @@ DUTCH_MEMORY_PATTERNS = [
     ),
 ]
 
+_SECTION_MARKERS = {
+    "en": ("## 15. Current Portfolio Holdings and Cash", "## 16. Continuity Input for Next Run"),
+    "nl": ("## 15. Huidige posities en cash", "## 16. Input voor de volgende run"),
+}
+_SYMBOL_RE = re.compile(r"symbol=([A-Z][A-Z0-9./_-]{0,14})", re.IGNORECASE)
+_EN_LIMIT_RE = re.compile(r"Max number of positions:\s*(\d+)", re.IGNORECASE)
+_NL_LIMIT_RE = re.compile(r"Maximaal aantal posities:\s*(\d+)", re.IGNORECASE)
+_EN_CONSTRAINT_LINE_RE = re.compile(
+    r"^(?P<prefix>\s*(?:[-*]\s*)?)Max number of positions:\s*\d+.*$",
+    re.IGNORECASE | re.MULTILINE,
+)
+_NL_CONSTRAINT_LINE_RE = re.compile(
+    r"^(?P<prefix>\s*(?:[-*]\s*)?)Maximaal aantal posities:\s*\d+.*$",
+    re.IGNORECASE | re.MULTILINE,
+)
+
 
 def _repair_product_names(text: str) -> str:
     for source, target in PRODUCT_NAME_REPAIRS.items():
         text = text.replace(source, target)
     return text
+
+
+def _section(text: str, language: str) -> str:
+    start_marker, end_marker = _SECTION_MARKERS[language]
+    start = text.find(start_marker)
+    if start < 0:
+        return ""
+    end = text.find(end_marker, start + len(start_marker))
+    return text[start : end if end >= 0 else len(text)]
+
+
+def _active_report_tickers(text: str, language: str) -> tuple[str, ...]:
+    section = _section(text, language)
+    if not section:
+        return ()
+    tickers = {match.group(1).upper() for match in _SYMBOL_RE.finditer(section)}
+    tickers.discard("CASH")
+    return tuple(sorted(tickers))
+
+
+def _apply_position_count_surface(text: str, language: str) -> str:
+    tickers = _active_report_tickers(text, language)
+    if not tickers:
+        return text
+    limit_re = _NL_LIMIT_RE if language == "nl" else _EN_LIMIT_RE
+    match = limit_re.search(text)
+    if not match:
+        return text
+    maximum = int(match.group(1))
+    current = len(tickers)
+    sentence = client_breach_sentence(
+        current_count=current,
+        max_active_positions=maximum,
+        language=language,
+    )
+    if not sentence:
+        return text
+    line_re = _NL_CONSTRAINT_LINE_RE if language == "nl" else _EN_CONSTRAINT_LINE_RE
+    return line_re.sub(lambda found: f"{found.group('prefix')}{sentence}", text, count=1)
 
 
 def clean_text(text: str, *, language: str) -> str:
@@ -45,6 +101,7 @@ def clean_text(text: str, *, language: str) -> str:
         for pattern, target in DUTCH_MEMORY_PATTERNS:
             text = pattern.sub(target, text)
         text = _repair_product_names(text)
+    text = _apply_position_count_surface(text, language)
     return normalize_client_language(text, language=language)
 
 
