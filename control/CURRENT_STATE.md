@@ -60,7 +60,7 @@ output/weekly_analysis_pro_nl_260716.pdf
 delivery_layer_status: smtp_sendmail_returned_no_exception
 ```
 
-The delivered package predates the later whole-share reconciliation and cockpit production enablement. It remains historical delivery evidence, but current holdings and cash must be read from `output/etf_portfolio_state.json`. Historical files are not retrofitted.
+The delivered package predates the later whole-share reconciliation, cockpit production enablement and internal-language cleanup. It remains historical delivery evidence, but current holdings and cash must be read from `output/etf_portfolio_state.json`. Historical files are not retrofitted.
 
 ## Whole-share package
 
@@ -131,12 +131,37 @@ Stable cockpit rules:
 5. WP11 did not send or mutate portfolio, ledger, valuation, pricing or historical reports.
 6. A real delivery claim requires a separate production run and real manifest/receipt evidence.
 
+## Client-language output contract
+
+```text
+package: WP_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP
+PR: #88
+status: closed_pending_merge
+validation_run: 29590932038
+validation_job: 87919550815
+focused_tests: 30 passed
+evidence: control/evidence/REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP_EVIDENCE_20260717.json
+EN_internal_findings: 18 -> 0
+NL_internal_findings: 6 -> 0
+numeric_parity: preserved
+markdown_link_parity: preserved
+cleanup_idempotent: true
+historical_reports: byte_unchanged
+email_sent: false
+```
+
+Stable client-language rules:
+
+1. Future English and Dutch Markdown/HTML surfaces use one shared internal-language contract.
+2. Implementation terms such as `shadow engine`, `runtime macro pack`, `release score`, raw override text and guarded-execution wording are blocked from client surfaces.
+3. The supplementary deterministic regime comparison uses client-safe wording while all false-authority fields remain false.
+4. Language cleanup may not change numbers, percentages, ticker links, portfolio decisions or authority.
+5. Historical reports remain immutable and may be used only as read-only validation input.
+
 ## Immediate next action
 
 ```text
-WP_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP
+separate explicit fresh Weekly ETF production request
 ```
 
-The next package should remove confirmed client-facing internal terms such as `shadow engine`, repeated punctuation and workflow-derived phrasing from future English/Dutch report surfaces. It must preserve the whole-share state contract, macro/thesis leakage firewall, pricing authority, portfolio execution, delivery contracts and historical-output immutability.
-
-After that cleanup, a new report and email require a separate explicit production request. That future run should prove the enabled cockpit front page in a real delivered whole-share package.
+No additional development package is required before the next run. A fresh report and email must be separately authorized. That production run should prove the enabled cockpit front page, whole-share holdings and trade deltas, the internal-language clean gate, a real delivery manifest and inbox receipt confirmation.

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Validate a deterministic-regime client-safe surface fixture.
+"""Validate the deterministic-regime supplementary client surface.
 
-WP22 scope: validator/helper-only. This tool does not render production reports
-and does not promote deterministic macro/regime authority.
+This validator preserves the no-authority contract. It checks a narrow, client-safe
+comparison surface and does not promote deterministic macro/regime authority.
 """
 
 from __future__ import annotations
@@ -49,6 +49,9 @@ REQUIRED_FIELDS = [
 ]
 BLOCKED_TEXT_PATTERNS: tuple[tuple[str, str], ...] = (
     ("raw_shadow_payload", r"\bdeterministic_regime_shadow\b"),
+    ("shadow_engine", r"\bshadow[- ]engine\b"),
+    ("review_only", r"\breview-only\b|\balleen ter review\b"),
+    ("legacy_regime", r"\blegacy regime read\b"),
     ("raw_macro_axes", r"\bmacro_axes\b"),
     ("raw_macro_axis_scores", r"\bmacro_axis_scores\b"),
     ("raw_macro_evidence", r"\bmacro_evidence\b"),
@@ -60,8 +63,8 @@ BLOCKED_TEXT_PATTERNS: tuple[tuple[str, str], ...] = (
     ("source_path", r"\b(?:output/macro|fixtures/|\.json)\b"),
     ("numeric_confidence", r"\bconfidence\s+(?:is|=|:)?\s*\d+(?:\.\d+)?\s*%?"),
 )
-REQUIRED_EN_PHRASES = ["review-only", "not authorize", "discipline"]
-REQUIRED_NL_PHRASES = ["alleen ter review", "geen autoriteit", "discipline"]
+REQUIRED_EN_PHRASES = ["supplementary regime cross-check", "does not change portfolio actions", "pricing"]
+REQUIRED_NL_PHRASES = ["aanvullende regimecontrole", "verandert de portefeuilleacties niet", "prijsbasis"]
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -145,8 +148,11 @@ def run_self_test() -> None:
     bad["portfolio_action_authority"] = True
     bad_cases["authority_true"] = bad
     bad = dict(safe)
-    bad["safe_surface_en"] = "Deterministic regime read — review-only: confidence 82% and output/macro/latest.json are visible."
+    bad["safe_surface_en"] = "Supplementary regime cross-check: confidence 82% and output/macro/latest.json are visible."
     bad_cases["numeric_and_path"] = bad
+    bad = dict(safe)
+    bad["safe_surface_en"] += " The shadow engine remains visible."
+    bad_cases["shadow_engine"] = bad
     for name, payload in bad_cases.items():
         try:
             validate_surface_payload(payload)

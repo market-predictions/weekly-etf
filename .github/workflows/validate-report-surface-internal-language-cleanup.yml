@@ -1,0 +1,182 @@
+name: Validate report-surface internal language cleanup
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "runtime/report_surface_language_contract.py"
+      - "runtime/wp16_followup3_cleanup.py"
+      - "runtime/deterministic_regime_client_surface.py"
+      - "runtime/client_facing_sanitizer.py"
+      - "tools/validate_deterministic_regime_client_surface.py"
+      - "tools/validate_etf_client_surface_clean.py"
+      - "tools/validate_report_surface_internal_language_cleanup.py"
+      - "fixtures/deterministic_regime_client_surface/safe_surface_fixture.json"
+      - "tests/test_report_surface_internal_language_cleanup.py"
+      - "tests/test_deterministic_regime_client_surface_helper.py"
+      - "tests/test_deterministic_regime_client_surface_validator.py"
+      - "tests/test_deterministic_regime_report_surface_integration.py"
+      - "tests/test_wp16_report_surface_qa_contract.py"
+      - ".github/workflows/validate-report-surface-internal-language-cleanup.yml"
+      - "control/work_packages/WP_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP_20260717.md"
+      - "control/work_package_claims/WP_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP_20260717.md"
+      - "control/CURRENT_STATE.md"
+      - "control/NEXT_ACTIONS.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            pytest \
+            pandas \
+            matplotlib \
+            markdown \
+            mistune \
+            beautifulsoup4 \
+            lxml \
+            premailer \
+            weasyprint \
+            pillow \
+            requests \
+            pyyaml \
+            jsonschema \
+            yfinance
+
+      - name: Snapshot immutable representative reports
+        run: |
+          sha256sum \
+            output/weekly_analysis_pro_260716.md \
+            output/weekly_analysis_pro_nl_260716.md \
+            > /tmp/report-surface-language-before.sha256
+
+      - name: Compile implementation and validators
+        run: |
+          python -m py_compile \
+            runtime/report_surface_language_contract.py \
+            runtime/wp16_followup3_cleanup.py \
+            runtime/deterministic_regime_client_surface.py \
+            tools/validate_deterministic_regime_client_surface.py \
+            tools/validate_report_surface_internal_language_cleanup.py \
+            tests/test_report_surface_internal_language_cleanup.py
+
+      - name: Run focused report-surface regressions
+        id: focused_tests
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          pytest -vv --tb=short \
+            tests/test_report_surface_internal_language_cleanup.py \
+            tests/test_deterministic_regime_client_surface_helper.py \
+            tests/test_deterministic_regime_client_surface_validator.py \
+            tests/test_deterministic_regime_report_surface_integration.py \
+            tests/test_wp16_report_surface_qa_contract.py \
+            2>&1 | tee /tmp/report-surface-language-tests.log
+
+      - name: Upload focused test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-surface-language-test-log-${{ github.run_id }}
+          path: /tmp/report-surface-language-tests.log
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce focused test result
+        if: steps.focused_tests.outcome != 'success'
+        run: exit 1
+
+      - name: Validate supplementary regime surface contract
+        run: python tools/validate_deterministic_regime_client_surface.py --self-test
+
+      - name: Build read-only bilingual cleanup evidence
+        id: full_report_validation
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          rm -rf output/report_surface_language_validation
+          mkdir -p output/report_surface_language_validation
+          python tools/validate_report_surface_internal_language_cleanup.py \
+            --english-report output/weekly_analysis_pro_260716.md \
+            --dutch-report output/weekly_analysis_pro_nl_260716.md \
+            --evidence-dir output/report_surface_language_validation \
+            2>&1 | tee output/report_surface_language_validation/validator.log
+
+      - name: Upload full-report validator diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-surface-language-validator-log-${{ github.run_id }}
+          path: output/report_surface_language_validation/validator.log
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce full-report validation result
+        if: steps.full_report_validation.outcome != 'success'
+        run: exit 1
+
+      - name: Verify evidence contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("output/report_surface_language_validation/report_surface_internal_language_cleanup_evidence.json")
+          payload = json.loads(path.read_text(encoding="utf-8"))
+          assert payload["schema_version"] == "report_surface_internal_language_cleanup_evidence_v1"
+          assert payload["status"] == "validated_no_send"
+          for language in ("en", "nl"):
+              row = payload["languages"][language]
+              assert row["before_findings"]
+              assert row["after_findings"] == []
+              assert row["numeric_multiset_preserved"] is True
+              assert row["markdown_link_multiset_preserved"] is True
+              assert row["idempotent"] is True
+              assert row["source_bytes_unchanged"] is True
+          assert payload["contract"]["historical_report_mutation"] is False
+          assert payload["contract"]["email_sent"] is False
+          PY
+
+      - name: Prove historical reports unchanged
+        run: |
+          sha256sum \
+            output/weekly_analysis_pro_260716.md \
+            output/weekly_analysis_pro_nl_260716.md \
+            > /tmp/report-surface-language-after.sha256
+          diff -u /tmp/report-surface-language-before.sha256 /tmp/report-surface-language-after.sha256
+          git diff --exit-code -- \
+            output/weekly_analysis_pro_260716.md \
+            output/weekly_analysis_pro_nl_260716.md \
+            output/etf_portfolio_state.json \
+            output/etf_trade_ledger.csv \
+            output/etf_valuation_history.csv
+
+      - name: Upload cleanup evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-surface-internal-language-cleanup-${{ github.run_id }}
+          path: |
+            output/report_surface_language_validation/
+            /tmp/report-surface-language-before.sha256
+            /tmp/report-surface-language-after.sha256
+          if-no-files-found: warn
+          retention-days: 30

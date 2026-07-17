@@ -12,9 +12,10 @@ whole_share_status: compliant
 nav_eur: 107117.94
 cash_eur: 2519.05
 cockpit_production_feature: enabled
+client_language_contract: active_pending_PR88_merge
 ```
 
-The delivered report predates both the whole-share reconciliation and cockpit production enablement. Current shares and cash come from the official portfolio state, not from the delivered report tables. Historical reports remain immutable.
+The delivered report predates the whole-share reconciliation, cockpit production enablement and internal-language cleanup. Current shares and cash come from the official portfolio state, not from historical report tables. Historical reports remain immutable.
 
 ## Completed packages
 
@@ -40,90 +41,51 @@ PR: #87
 feature: MRKT_RPRTS_COCKPIT_FRONT_PAGE=enabled
 rollback: MRKT_RPRTS_COCKPIT_FRONT_PAGE=disabled
 validation_run: 29582753816
-current_runtime_regression_run: 29582753774
-wp08_regression_run: 29582753837
 status: closed_no_send
 ```
 
-The exact-current no-send replay proved one front page per language, one added PDF page per language, preserved classic report bodies, no duplicate small cockpit, whole-share official authority and identical protected hashes. No email was sent.
+The exact-current no-send replay proved one front page per language, one added PDF page per language, preserved classic report bodies, no duplicate small cockpit, whole-share official authority and identical protected hashes.
 
-## Immediate next package
-
-Create and claim:
+### Report-surface internal-language cleanup
 
 ```text
-WP_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP
+package: WP_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP
+PR: #88
+validation_run: 29590932038
+validation_job: 87919550815
+focused_tests: 30 passed
+EN findings: 18 -> 0
+NL findings: 6 -> 0
+numeric_parity: preserved
+markdown_link_parity: preserved
+historical_reports: byte_unchanged
+email_sent: false
+status: closed_pending_merge
 ```
 
-### Layer
+Persistent evidence:
 
 ```text
-output contract
-operational runbook
+control/evidence/REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP_EVIDENCE_20260717.json
 ```
 
-### Purpose
+## Immediate next action
 
-Remove confirmed client-facing internal and workflow-derived language from future English and Dutch report surfaces without changing analytical conclusions or machine authority.
+No new development package is required before production proof.
 
-Known targets include:
+A fresh report and email require a separate explicit user authorization. Do not create a run-queue request as part of PR #88.
 
-```text
-shadow engine
-review-only process narration where it dominates client copy
-double punctuation in position review lines
-raw internal override/release terminology where a client-safe label exists
-stale pre-reconciliation wording that implies obsolete holdings authority
-```
+When authorized, the fresh production run should prove:
 
-### Required start sequence
-
-Read:
-
-```text
-control/SYSTEM_INDEX.md
-control/CURRENT_STATE.md
-control/NEXT_ACTIONS.md
-control/decisions/COCKPIT_WP11_PRODUCTION_ENABLEMENT_DECISION_20260717.md
-control/handovers/HANDOVER_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT_20260717.md
-control/evidence/COCKPIT_WP11_PRODUCTION_ENABLEMENT_EVIDENCE_20260717.json
-PROMPT_MASTER_WEEKLY_ETF_REVIEW.md
-PROMPT_PRO_REPORT.md
-runtime/render_etf_report_from_state.py
-runtime/render_etf_report_nl_from_state.py
-runtime/scrub_etf_client_surface.py
-runtime/client_facing_sanitizer.py
-```
-
-Check for an active cleanup-package claim before editing.
-
-### Required safeguards
-
-```text
-no change to portfolio state or trade ledger
-no pricing-authority change
-no macro/thesis authority promotion
-no lane-scoring or fundability change
-no portfolio action or execution change
-no historical report mutation
-no email send
-preserve EN/NL numeric parity
-preserve clickable ticker and PDF/HTML contracts
-preserve enabled cockpit front page
-```
-
-## Subsequent production proof
-
-After the language-cleanup package closes, a fresh report and email require a separate explicit production request.
-
-That future run should prove in a real delivered package:
-
-1. all holdings and guarded trade deltas remain integer;
-2. the cockpit front page appears once in English and once in Dutch;
-3. the full classic report remains attached and present in the HTML body;
-4. the report is generated from the whole-share official state;
-5. delivery is supported by an actual run manifest and receipt/evidence.
+1. all official holdings and guarded trade deltas remain integer;
+2. the cockpit front page appears exactly once in English and once in Dutch;
+3. the full classic report remains present behind the front page;
+4. the new internal-language clean gate passes for Markdown and delivery HTML;
+5. numbers, percentages and ticker links remain coherent across EN/NL output;
+6. pricing lineage and run manifests pass;
+7. a delivery manifest is written;
+8. inbox receipt is confirmed before claiming delivery success.
 
 ## Separate governance cleanup
 
-A later governance-only package may reconcile stale `planned` labels in `control/SYSTEM_INDEX.md`. Do not combine that documentation cleanup with report wording or production delivery.
+A later governance-only package may reconcile stale `planned` labels in `control/SYSTEM_INDEX.md`. Do not combine that documentation cleanup with production delivery.

@@ -1,0 +1,90 @@
+{
+  "schema_version": "report_surface_internal_language_cleanup_evidence_v1",
+  "date": "2026-07-17",
+  "repository": "market-predictions/weekly-etf",
+  "package": "WP_REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP",
+  "status": "validated_no_send",
+  "validated_head_sha": "964b86b5a31812bd1a8b32ad4c3bc91c22c27d17",
+  "validation_run_id": 29590932038,
+  "validation_job_id": 87919550815,
+  "artifact_id": 8411017345,
+  "artifact_digest": "sha256:8a7acad3c573ae2eaa9a82fcd92f295ae5c6b33cc6090ca6936b5cd1a7997a74",
+  "representative_report_token": "260716",
+  "languages": {
+    "en": {
+      "source_path": "output/weekly_analysis_pro_260716.md",
+      "source_sha256": "7ce86e28320f5b298d0cc2a2b180c07d7360862a3bc8e21d57f213bca5b37dec",
+      "before_findings_count": 18,
+      "before_findings": [
+        "shadow_engine",
+        "runtime_macro_pack",
+        "rotation_engine_status",
+        "guarded_model_rotation",
+        "guarded_auto_execution",
+        "release_score",
+        "hold_with_override",
+        "raw_override",
+        "review_only",
+        "legacy_regime",
+        "diagnostic_only",
+        "lane_scoring_authority",
+        "runtime_valuation",
+        "model_action_weights",
+        "rotation_budget",
+        "churn_budget",
+        "discipline_gates",
+        "double_period"
+      ],
+      "after_findings": [],
+      "numeric_token_count": 635,
+      "numeric_multiset_preserved": true,
+      "markdown_link_count": 234,
+      "markdown_link_multiset_preserved": true,
+      "cleanup_idempotent": true,
+      "source_bytes_unchanged": true,
+      "clean_preview_sha256": "fb8faf99ccac903367ba52525d85df685ea2973f79ecf907d490c3db7e33ad05"
+    },
+    "nl": {
+      "source_path": "output/weekly_analysis_pro_nl_260716.md",
+      "source_sha256": "7b61216ab1b4e6a0c8e5ec77f7111dd54cfba3dfa672af71dd430bfda36f8058",
+      "before_findings_count": 6,
+      "before_findings": [
+        "shadow_engine",
+        "dutch_hold_with_override",
+        "review_only",
+        "runtime_valuation",
+        "churn_budget",
+        "discipline_gates"
+      ],
+      "after_findings": [],
+      "numeric_token_count": 588,
+      "numeric_multiset_preserved": true,
+      "markdown_link_count": 236,
+      "markdown_link_multiset_preserved": true,
+      "cleanup_idempotent": true,
+      "source_bytes_unchanged": true,
+      "clean_preview_sha256": "2b522a4b9ebd6c55995808f34a01e91c1031c0b6ea5705f8831f3975900d2034"
+    }
+  },
+  "focused_tests": {
+    "passed": 30,
+    "failed": 0
+  },
+  "contract": {
+    "forbidden_internal_terms_after_cleanup": 0,
+    "double_punctuation_after_cleanup": 0,
+    "numeric_multiset_before_after": "identical",
+    "markdown_link_multiset_before_after": "identical",
+    "cleanup_idempotent": true,
+    "deterministic_regime_false_authority_fields": "unchanged_false",
+    "historical_report_mutation": false,
+    "portfolio_state_mutation": false,
+    "trade_ledger_mutation": false,
+    "pricing_authority_change": false,
+    "macro_thesis_authority_promotion": false,
+    "lane_scoring_change": false,
+    "fundability_change": false,
+    "portfolio_execution_change": false,
+    "email_sent": false
+  }
+}

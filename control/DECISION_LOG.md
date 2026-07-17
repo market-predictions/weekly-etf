@@ -4,6 +4,29 @@ Use this file to capture stable architecture decisions so future sessions do not
 
 ---
 
+## 2026-07-17 — Future client surfaces use one shared internal-language contract
+
+### Decision
+
+Future English and Dutch ETF report Markdown and delivery HTML must pass one shared deterministic internal-language contract before delivery.
+
+The contract removes implementation-layer wording such as `shadow engine`, `runtime macro pack`, raw rotation/execution terminology, `release score`, raw override reasons, `review-only`, runtime-valuation wording, churn/discipline-gate language, `run(s)` and repeated punctuation.
+
+### Consequence
+
+The language contract is output-contract authority only. It may improve wording and fail the pre-send gate, but it must not change numbers, percentages, ticker links, portfolio decisions, pricing authority, macro/thesis authority, lane scoring, fundability, execution or historical artifacts.
+
+The supplementary deterministic regime comparison may use client-safe language, but all explicit false-authority fields remain false. Historical reports remain immutable and may be replayed only as read-only validation input.
+
+Persistent decision and evidence:
+
+```text
+control/decisions/REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP_DECISION_20260717.md
+control/evidence/REPORT_SURFACE_INTERNAL_LANGUAGE_CLEANUP_EVIDENCE_20260717.json
+```
+
+---
+
 ## 2026-03-28 — Adopt Project + GitHub + Actions architecture
 
 ### Decision

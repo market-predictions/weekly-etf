@@ -2,6 +2,11 @@ from __future__ import annotations
 
 import re
 
+from runtime.report_surface_language_contract import (
+    client_language_findings,
+    normalize_client_language,
+)
+
 NON_US_REPLACEMENTS = {
     "Watchlist only; non-U.S. exposure remains a diversification gap.": "IEFA now provides non-U.S. developed-market exposure, but broader allocation still requires relative-strength confirmation.",
     "Non-U.S. equity exposure remains a diversification gap.": "Non-U.S. developed exposure has been increased through IEFA, but breadth and relative-strength confirmation remain required.",
@@ -40,7 +45,7 @@ def clean_text(text: str, *, language: str) -> str:
         for pattern, target in DUTCH_MEMORY_PATTERNS:
             text = pattern.sub(target, text)
         text = _repair_product_names(text)
-    return text
+    return normalize_client_language(text, language=language)
 
 
 def failures(text: str, *, language: str) -> list[str]:
@@ -56,4 +61,4 @@ def failures(text: str, *, language: str) -> list[str]:
         checks.append("risk-on growth has persisted")
     else:
         checks.append("risk-on groei houdt")
-    return [item for item in checks if item in lower]
+    return sorted(set([item for item in checks if item in lower] + client_language_findings(text, language=language)))

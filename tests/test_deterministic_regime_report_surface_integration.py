@@ -37,19 +37,19 @@ def _state() -> dict:
     }
 
 
-def test_report_surface_includes_review_only_deterministic_en_and_nl() -> None:
+def test_report_surface_includes_client_safe_supplementary_regime_en_and_nl() -> None:
     state = _state()
 
     en = dashboard_en(state)
     nl = dashboard_nl(state)
 
-    assert "Deterministic regime read — review-only" in en
-    assert "Deterministische regime-inschatting — alleen ter review" in nl
-    assert "This does not authorize portfolio changes" in en
-    assert "Dit geeft geen autoriteit voor portefeuillewijzigingen" in nl
+    assert "Supplementary regime cross-check" in en
+    assert "Aanvullende regimecontrole" in nl
+    assert "This supplementary check does not change portfolio actions" in en
+    assert "Deze aanvullende controle verandert de portefeuilleacties niet" in nl
 
 
-def test_report_surface_dto_passes_wp22_validator() -> None:
+def test_report_surface_dto_passes_validator() -> None:
     dto = deterministic_regime_surface_dto(_state())
 
     assert dto is not None
@@ -57,7 +57,7 @@ def test_report_surface_dto_passes_wp22_validator() -> None:
     assert result["status"] == "passed"
 
 
-def test_report_surface_does_not_leak_raw_shadow_fields() -> None:
+def test_report_surface_does_not_leak_raw_or_internal_terms() -> None:
     state = _state()
     text = dashboard_en(state) + "\n" + dashboard_nl(state)
 
@@ -70,8 +70,13 @@ def test_report_surface_does_not_leak_raw_shadow_fields() -> None:
         "commit_sha",
         "output/macro/validation",
         ".json",
+        "shadow engine",
+        "shadow-engine",
+        "review-only",
+        "alleen ter review",
+        "legacy regime read",
     ]:
-        assert blocked not in text
+        assert blocked not in text.lower()
 
 
 def test_deterministic_confidence_is_banded_not_numeric() -> None:
@@ -79,25 +84,25 @@ def test_deterministic_confidence_is_banded_not_numeric() -> None:
     dto = deterministic_regime_surface_dto(state)
 
     assert dto is not None
-    assert dto["confidence_band_en"] == "high but review-only"
-    assert dto["confidence_band_nl"] == "hoog maar alleen ter review"
+    assert dto["confidence_band_en"] == "high"
+    assert dto["confidence_band_nl"] == "hoog"
     assert "0.72" not in dto["safe_surface_en"]
     assert "72%" not in dto["safe_surface_en"]
     assert "0.72" not in dto["safe_surface_nl"]
     assert "72%" not in dto["safe_surface_nl"]
 
 
-def test_review_only_surface_has_clean_client_facing_punctuation() -> None:
+def test_supplementary_surface_has_clean_client_facing_punctuation() -> None:
     dto = deterministic_regime_surface_dto(_state())
 
     assert dto is not None
     assert ".;" not in dto["safe_surface_en"]
     assert ".;" not in dto["safe_surface_nl"]
-    assert "changes. The normal discipline gates remain decisive." in dto["safe_surface_en"]
-    assert "wijzigingen. De normale discipline blijft leidend." in dto["safe_surface_nl"]
+    assert "actions. Pricing, relative strength and position discipline remain decisive." in dto["safe_surface_en"]
+    assert "portefeuilleacties niet. Prijsbasis, relatieve sterkte en positiediscipline blijven leidend." in dto["safe_surface_nl"]
 
 
-def test_legacy_macro_regime_remains_present_and_deterministic_surface_is_additive() -> None:
+def test_primary_macro_regime_remains_present_and_supplementary_surface_is_additive() -> None:
     state = _state()
     en = dashboard_en(state)
     nl = dashboard_nl(state)
