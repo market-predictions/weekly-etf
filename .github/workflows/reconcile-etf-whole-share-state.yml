@@ -1,0 +1,98 @@
+name: Reconcile ETF whole-share state
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/etf_whole_share_reconciliation_request_*.md"
+  workflow_dispatch:
+    inputs:
+      runtime_state:
+        description: Runtime state path used for current pricing and FX
+        required: true
+        type: string
+      close_tickers:
+        description: Comma-separated policy-forbidden tickers to close
+        required: false
+        default: "DFEN"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Resolve reconciliation request
+        id: request
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            runtime_state='${{ inputs.runtime_state }}'
+            close_tickers='${{ inputs.close_tickers }}'
+          else
+            request_file="$(ls -1t control/run_queue/etf_whole_share_reconciliation_request_*.md | head -1)"
+            runtime_state="$(sed -n 's/^runtime_state:[[:space:]]*//p' "$request_file" | tail -1)"
+            close_tickers="$(sed -n 's/^close_tickers:[[:space:]]*//p' "$request_file" | tail -1)"
+          fi
+          test -n "$runtime_state"
+          test -f "$runtime_state"
+          echo "runtime_state=$runtime_state" >> "$GITHUB_OUTPUT"
+          echo "close_tickers=$close_tickers" >> "$GITHUB_OUTPUT"
+      - name: Run explicit state reconciliation
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(
+            --runtime-state "${{ steps.request.outputs.runtime_state }}"
+            --portfolio-state output/etf_portfolio_state.json
+            --trade-ledger output/etf_trade_ledger.csv
+            --output-dir output/runtime
+          )
+          IFS=',' read -ra tickers <<< "${{ steps.request.outputs.close_tickers }}"
+          for ticker in "${tickers[@]}"; do
+            ticker="$(echo "$ticker" | xargs)"
+            if [ -n "$ticker" ]; then
+              args+=(--close-ticker "$ticker")
+            fi
+          done
+          python tools/reconcile_etf_whole_share_state.py "${args[@]}"
+      - name: Validate reconciled authority
+        run: |
+          artifact="$(cat output/runtime/latest_etf_whole_share_reconciliation_path.txt)"
+          python tools/validate_etf_whole_share_contract.py \
+            --portfolio-state output/etf_portfolio_state.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("output/runtime/latest_etf_whole_share_reconciliation_path.txt").read_text().strip()
+          payload = json.loads(Path(path).read_text())
+          assert payload["status"] in {"reconciled", "already_compliant"}
+          assert abs(float(payload["nav_drift_eur"])) <= 0.05
+          assert payload["whole_share_validation_errors"] == []
+          print(f"ETF_WHOLE_SHARE_RECONCILIATION_EVIDENCE_OK | artifact={path}")
+          PY
+      - name: Commit reconciliation evidence and official state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            output/etf_portfolio_state.json \
+            output/etf_trade_ledger.csv \
+            output/runtime/etf_whole_share_reconciliation_*.json \
+            output/runtime/latest_etf_whole_share_reconciliation_path.txt
+          if git diff --cached --quiet; then
+            echo "No whole-share state changes to commit."
+            exit 0
+          fi
+          git commit -m "Reconcile ETF portfolio to whole shares [skip ci]"
+          git push origin HEAD:main
