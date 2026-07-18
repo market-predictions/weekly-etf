@@ -365,3 +365,15 @@ historical report hashes: identical
 ```
 
 The next package is `WP_PORTFOLIO_CLOSE_FIRST_EXECUTION`, but it requires separate explicit approval and fresh implementation-time revalidation.
+
+## 2026-07-18 — WP_COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX
+
+- Confirmed from the received-email screenshot that the cockpit front page was correctly designed in PDF but collapsed to largely unstyled text in email HTML.
+- Identified the root cause: essential cockpit presentation existed only in a separate head stylesheet that the mail client did not reliably retain or apply.
+- Added `runtime/cockpit_email_safe_surface.py` with inline styles and presentation-table layout for `render_mode=email`.
+- Preserved the existing class-based PDF/browser renderer, print stylesheet and SVG sparkline.
+- Added focused EN/NL tests and a degradation gate that removes every `<style>` element before validating the cockpit.
+- Restored the existing `.etf-cockpit-chart-caption` selector for WP11 exact-current compatibility.
+- Final same-head gates passed: email-inline `29640677887`, WP10 `29640677890`, current-runtime `29640677892`, WP08 `29640677898`, WP11 `29640677882`.
+- Artifact `8428508030`, digest `sha256:df5c3daae4e82b386bdc868aaeb53d8be00cdeb4da1a6f87decd9b62037e8a34`.
+- Protected authority hashes remained identical; historical reports unchanged; no production report generated; no email sent.

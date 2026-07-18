@@ -172,6 +172,39 @@ control/handovers/HANDOVER_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_20260718.md
 
 The official portfolio remains unchanged at nine active positions and retains `close_first` status until a separately approved implementation succeeds.
 
+## Cockpit email HTML rendering status
+
+```text
+package: WP_COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX
+pull_request: #98
+status: implementation_complete_validation_green_merge_pending
+root_cause: cockpit presentation depended on a head stylesheet not reliably applied by the mail client
+email_layout: inline_styles_and_presentation_tables
+email_head_css_required: false
+EN_style_strip_test: passed
+NL_style_strip_test: passed
+PDF_renderer: existing_class_based_surface_preserved
+classic_report_body: preserved
+protected_authority_hashes: identical
+historical_report_mutation: false
+email_sent: false
+```
+
+Future generated email HTML uses a dedicated table-based cockpit with essential styling inline. The PDF/browser route retains the existing premium class-based cockpit, print rules and SVG sparkline. The historical `260716_02` package remains immutable and was not resent.
+
+Validation:
+
+```text
+validated_head: 72841c3bbedfea19122269f2f7c78168676955cb
+email_inline_run: 29640677887 success
+wp10_run: 29640677890 success
+current_runtime_run: 29640677892 success
+wp08_run: 29640677898 success
+wp11_run: 29640677882 success
+artifact_id: 8428508030
+artifact_digest: sha256:df5c3daae4e82b386bdc868aaeb53d8be00cdeb4da1a6f87decd9b62037e8a34
+```
+
 ## Immediate next action
 
 No official portfolio change is authorized by this review package.
