@@ -7,7 +7,7 @@ claimed_by: ChatGPT
 claimed_at_utc: 2026-07-18T09:20:00Z
 branch: agent/cockpit-email-html-inline-style-fix
 pull_request: 98
-status: implementation_complete / compatibility_rerun
+status: implementation_complete / validation_green / merge_pending
 scope: email-safe inline cockpit rendering, degradation validation, compatibility tests, governance closeout
 ```
 
@@ -21,11 +21,22 @@ Confirmed boundaries:
 - no email sent;
 - PDF cockpit design preserved.
 
-Validation status:
+Final same-head validation:
 
-- initial Python syntax issue corrected;
-- dedicated email-inline gate passed;
-- WP10, current-runtime and WP08 gates passed;
-- WP11 found that the email caption needed the existing `.etf-cockpit-chart-caption` compatibility class;
-- that class is restored without changing content or appearance;
-- final same-head validation is pending.
+```text
+validated_head: 72841c3bbedfea19122269f2f7c78168676955cb
+email_inline_run: 29640677887 success
+email_inline_job: 88070568127
+wp10_run: 29640677890 success
+current_runtime_run: 29640677892 success
+wp08_run: 29640677898 success
+wp11_run: 29640677882 success
+artifact_id: 8428508030
+artifact_digest: sha256:df5c3daae4e82b386bdc868aaeb53d8be00cdeb4da1a6f87decd9b62037e8a34
+EN_style_strip_test: passed
+NL_style_strip_test: passed
+protected_authority_hashes: identical
+email_sent: false
+```
+
+The claim remains held through merge and exact post-merge governance closeout.
