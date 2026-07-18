@@ -2,11 +2,11 @@
 
 Date: 2026-07-19
 Repository: `market-predictions/weekly-etf`
-Status: implementation complete / validated / ready for merge
+Status: closed / merged / validated
 
 ## Current issue
 
-The client cockpit correctly identifies the executed PAVE/XLU rotation, but its supporting before-and-after line can show identical weights, for example `PAVE 4.9% → 4.9%; XLU 0.5% → 0.5%`.
+The client cockpit correctly identified the executed PAVE/XLU rotation, but its supporting before-and-after line showed identical weights, for example `PAVE 4.9% → 4.9%; XLU 0.5% → 0.5%`.
 
 ## Root cause
 
@@ -49,15 +49,17 @@ The headline remains:
 PAVE added · XLU reduced
 ```
 
-## Validation
+## Validation and merge
 
 ```text
 implementation_pull_request: 109
-validated_head: 81e61a5039d28a60a9056156054dec84a8691d29
-trade_lineage_and_whole_share_run: 29665973984 success
-trade_lineage_and_whole_share_job: 88136341408 success
-report_request_authority_run: 29665973971 success
-report_request_authority_job: 88136341429 success
+implementation_merge: 85d82930e40d37c145727d14468dc8914e041e00
+merged_at_utc: 2026-07-18T23:56:26Z
+validated_head: 5aefd9237bbbace490bda3aad0dcb722acd0b05d
+trade_lineage_and_whole_share_run: 29666054365 success
+trade_lineage_and_whole_share_job: 88136546831 success
+report_request_authority_run: 29666054332 success
+report_request_authority_job: 88136546755 success
 compile_gate: passed
 focused_whole_share_and_trade_lineage_tests: passed
 protected_execution_authority: unchanged
@@ -84,6 +86,8 @@ Focused regression coverage includes:
 - current NAV uses current market value after lineage restoration: passed;
 - EN/NL renderer compatibility preserved: passed by shared numeric input contract;
 - protected authority gate: passed;
+- implementation merged to `main`: passed;
+- claim released: passed;
 - report generation or delivery performed: false.
 
 ## Authority boundary
