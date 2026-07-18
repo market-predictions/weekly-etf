@@ -1,0 +1,279 @@
+name: Recover Weekly ETF delivery
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/weekly_etf_delivery_recovery_*.md"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  recover-delivery:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      MRKT_RPRTS_REPORT_MODE: pro
+      MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
+      MRKT_RPRTS_OUTPUT_DIR: output
+      MRKT_RPRTS_RUN_ID: 20260718_140601
+      ETF_PRICING_RUN_ID: 20260718_140601
+      REQUESTED_CLOSE_DATE: 2026-07-17
+      REPORT_TOKEN: 260717
+      ETF_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260717_20260718_140601.json
+      MRKT_RPRTS_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260717_20260718_140601.json
+      ETF_PRICING_AUDIT_PATH: output/pricing/price_audit_2026-07-17_20260718_140601.json
+      MRKT_RPRTS_PRICING_AUDIT_PATH: output/pricing/price_audit_2026-07-17_20260718_140601.json
+      MRKT_RPRTS_EXPLICIT_REPORT_PATH: output/weekly_analysis_pro_260717_02.md
+      MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL: output/weekly_analysis_pro_nl_260717_02.md
+      ETF_RUN_MANIFEST_PATH: output/run_manifests/weekly_etf_run_manifest_2026-07-17_20260718_140601.json
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system packages for PDF rendering
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2 \
+            libpango-1.0-0 \
+            libgdk-pixbuf-2.0-0 \
+            libffi-dev \
+            shared-mime-info \
+            fonts-liberation \
+            fonts-dejavu-core \
+            fonts-lato \
+            poppler-utils
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install matplotlib mistune weasyprint pyyaml pandas yfinance
+
+      - name: Validate recovery authority and source run
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          request = Path("control/run_queue/weekly_etf_delivery_recovery_20260718_182700.md")
+          manifest = Path("output/run_manifests/weekly_etf_run_manifest_2026-07-17_20260718_140601.json")
+          en = Path("output/weekly_analysis_pro_260717_02.md")
+          nl = Path("output/weekly_analysis_pro_nl_260717_02.md")
+          runtime = Path("output/runtime/etf_report_state_20260717_20260718_140601.json")
+          pricing = Path("output/pricing/price_audit_2026-07-17_20260718_140601.json")
+
+          for path in (request, manifest, en, nl, runtime, pricing):
+              if not path.exists():
+                  raise RuntimeError(f"Delivery recovery blocked: missing source file {path}")
+
+          text = request.read_text(encoding="utf-8").lower()
+          required = {
+              "delivery_authorized: true",
+              "portfolio_execution_authorized: false",
+              "broker_execution_authorized: false",
+              "prior_delivery_manifest_written: false",
+              "prior_inbox_receipt_found: false",
+          }
+          missing = sorted(item for item in required if item not in text)
+          if missing:
+              raise RuntimeError(f"Delivery recovery authority incomplete: {missing}")
+
+          payload = json.loads(manifest.read_text(encoding="utf-8"))
+          if payload.get("run_id") != "20260718_140601":
+              raise RuntimeError(f"Unexpected source run id: {payload.get('run_id')}")
+          if payload.get("requested_close_date") != "2026-07-17":
+              raise RuntimeError(f"Unexpected close date: {payload.get('requested_close_date')}")
+          if payload.get("delivery_manifest_path"):
+              raise RuntimeError("Delivery recovery blocked: source run already has a delivery manifest")
+          if payload.get("workflow_conclusion") != "failure":
+              raise RuntimeError(f"Source run is not an unresolved failure: {payload.get('workflow_conclusion')}")
+          print("ETF_DELIVERY_RECOVERY_AUTHORITY_OK")
+          PY
+
+      - name: Snapshot protected portfolio and ledger
+        run: |
+          sha256sum output/etf_portfolio_state.json > /tmp/etf_portfolio_state.before.sha256
+          sha256sum output/etf_trade_ledger.csv > /tmp/etf_trade_ledger.before.sha256
+          cp output/etf_portfolio_state.json /tmp/etf_portfolio_state.before.json
+          cp output/etf_trade_ledger.csv /tmp/etf_trade_ledger.before.csv
+
+      - name: Validate persisted valuation and execution authority
+        run: |
+          python tools/validate_etf_persisted_valuation_state.py \
+            --runtime-state "$ETF_RUNTIME_STATE_PATH" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --valuation-history output/etf_valuation_history.csv
+          python tools/validate_etf_trade_ledger_idempotency.py \
+            --trade-ledger output/etf_trade_ledger.csv
+          rm -rf /tmp/etf-delivery-recovery-guarded
+          execution_log="$(python -m runtime.model_execution_guarded_auto \
+            --runtime-state "$ETF_RUNTIME_STATE_PATH" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --trade-ledger output/etf_trade_ledger.csv \
+            --output-dir /tmp/etf-delivery-recovery-guarded)"
+          echo "$execution_log"
+          artifact="$(printf '%s\n' "$execution_log" | sed -n 's/^ETF_MODEL_EXECUTION_OK | artifact=\([^|]*\) |.*/\1/p' | xargs)"
+          test -n "$artifact"
+          test -f "$artifact"
+          python tools/validate_etf_model_execution.py \
+            --artifact "$artifact" \
+            --expected-mode guarded_auto
+          python - "$artifact" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          result = payload.get("guarded_auto_result") or {}
+          if result.get("authorization_status") != "not_authorized":
+              raise RuntimeError(f"Unexpected execution authorization: {result.get('authorization_status')}")
+          if result.get("portfolio_state_written") is not False:
+              raise RuntimeError("Delivery recovery attempted a portfolio-state write")
+          if result.get("trade_ledger_written") is not False:
+              raise RuntimeError("Delivery recovery attempted a trade-ledger write")
+          if payload.get("proposed_ledger_rows"):
+              raise RuntimeError("Delivery recovery emitted proposed ledger rows")
+          print("ETF_DELIVERY_RECOVERY_NO_TRADE_OK")
+          PY
+
+      - name: Prepare and validate client delivery assets
+        run: |
+          python -m runtime.scrub_etf_client_surface --output-dir output
+          python -m runtime.link_runtime_report_tickers --output-dir output
+          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+          python tools/validate_etf_trade_ledger_idempotency.py --trade-ledger output/etf_trade_ledger.csv
+          python validate_lane_breadth.py
+          python validate_replacement_duels.py
+          python - <<'PY'
+          from pathlib import Path
+          import send_report_runtime_html as srh
+
+          sr = srh.report_module
+          output_dir = Path("output")
+          en = Path("output/weekly_analysis_pro_260717_02.md")
+          sr.validate_bilingual_pair(en)
+          bundle = sr.generate_delivery_assets_for_run(output_dir, en, mode="pro")
+          if not bundle.get("bilingual"):
+              raise RuntimeError("Delivery recovery did not produce a bilingual bundle")
+          print(
+              "ETF_DELIVERY_RECOVERY_RENDER_OK | "
+              f"en={bundle['en']['report_path']} | nl={bundle['nl']['report_path']}"
+          )
+          PY
+          python tools/validate_etf_pdf_visual_contract.py --output-dir output
+          python tools/validate_etf_delivery_html_contract.py --output-dir output
+          python tools/validate_etf_client_surface_clean.py --output-dir output
+          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+          python tools/write_etf_minimum_state.py --output-dir output --mode pro --check-only
+          python tools/write_etf_trade_ledger.py --output-dir output --check-only
+          python tools/write_etf_recommendation_scorecard.py --output-dir output --mode pro --check-only
+
+      - name: Prove protected authority unchanged before send
+        run: |
+          cmp --silent /tmp/etf_portfolio_state.before.json output/etf_portfolio_state.json
+          cmp --silent /tmp/etf_trade_ledger.before.csv output/etf_trade_ledger.csv
+          sha256sum -c /tmp/etf_portfolio_state.before.sha256
+          sha256sum -c /tmp/etf_trade_ledger.before.sha256
+
+      - name: Send recovered bilingual email
+        env:
+          MRKT_RPRTS_SUBJECT_PREFIX: Weekly ETF Pro Review
+          MRKT_RPRTS_SUBJECT_PREFIX_NL: Weekly ETF Pro Review | Nederlands
+          MRKT_RPRTS_SMTP_HOST: ${{ secrets.MRKT_RPRTS_SMTP_HOST }}
+          MRKT_RPRTS_SMTP_PORT: ${{ secrets.MRKT_RPRTS_SMTP_PORT }}
+          MRKT_RPRTS_SMTP_USER: ${{ secrets.MRKT_RPRTS_SMTP_USER }}
+          MRKT_RPRTS_SMTP_PASS: ${{ secrets.MRKT_RPRTS_SMTP_PASS }}
+          MRKT_RPRTS_MAIL_FROM: ${{ secrets.MRKT_RPRTS_MAIL_FROM }}
+          MRKT_RPRTS_MAIL_TO: ${{ secrets.MRKT_RPRTS_MAIL_TO }}
+          MRKT_RPRTS_MAIL_TO_NL: ${{ secrets.MRKT_RPRTS_MAIL_TO_NL }}
+        run: python send_report_runtime_html.py
+
+      - name: Write delivery and completed run manifests
+        run: |
+          delivery_log="$(python tools/write_etf_delivery_manifest_summary.py \
+            --run-id "$ETF_PRICING_RUN_ID" \
+            --requested-close-date "$REQUESTED_CLOSE_DATE" \
+            --report-token "$REPORT_TOKEN" \
+            --english-report "$MRKT_RPRTS_EXPLICIT_REPORT_PATH" \
+            --dutch-report "$MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL")"
+          echo "$delivery_log"
+          delivery_path="$(printf '%s\n' "$delivery_log" | sed -n 's/.* manifest=\([^ ]*\).*/\1/p' | tail -1)"
+          test -n "$delivery_path"
+          test -f "$delivery_path"
+          echo "ETF_DELIVERY_MANIFEST_PATH=$delivery_path" >> "$GITHUB_ENV"
+          python tools/write_weekly_etf_run_manifest.py \
+            --manifest-path "$ETF_RUN_MANIFEST_PATH" \
+            --run-id "$ETF_PRICING_RUN_ID" \
+            --requested-close-date "$REQUESTED_CLOSE_DATE" \
+            --report-token "$REPORT_TOKEN" \
+            --pricing-audit "$ETF_PRICING_AUDIT_PATH" \
+            --runtime-state "$ETF_RUNTIME_STATE_PATH" \
+            --english-report "$MRKT_RPRTS_EXPLICIT_REPORT_PATH" \
+            --dutch-report "$MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --valuation-history output/etf_valuation_history.csv \
+            --delivery-manifest "$delivery_path" \
+            --status passed \
+            --conclusion success \
+            --notes "Bilingual delivery recovered after pre-transport workflow failure."
+          python tools/write_weekly_etf_run_manifest.py \
+            --manifest-path "$ETF_RUN_MANIFEST_PATH" \
+            --run-id "$ETF_PRICING_RUN_ID" \
+            --requested-close-date "$REQUESTED_CLOSE_DATE" \
+            --report-token "$REPORT_TOKEN" \
+            --pricing-audit "$ETF_PRICING_AUDIT_PATH" \
+            --runtime-state "$ETF_RUNTIME_STATE_PATH" \
+            --english-report "$MRKT_RPRTS_EXPLICIT_REPORT_PATH" \
+            --dutch-report "$MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --valuation-history output/etf_valuation_history.csv \
+            --delivery-manifest "$delivery_path" \
+            --status workflow_success \
+            --conclusion success \
+            --notes "Bilingual delivery recovered after pre-transport workflow failure."
+          python tools/validate_etf_manifest_evidence.py
+
+      - name: Prove protected authority unchanged after send
+        run: |
+          cmp --silent /tmp/etf_portfolio_state.before.json output/etf_portfolio_state.json
+          cmp --silent /tmp/etf_trade_ledger.before.csv output/etf_trade_ledger.csv
+          sha256sum -c /tmp/etf_portfolio_state.before.sha256
+          sha256sum -c /tmp/etf_trade_ledger.before.sha256
+
+      - name: Commit recovery delivery evidence to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            output/weekly_analysis_pro_260717_02.md \
+            output/weekly_analysis_pro_nl_260717_02.md \
+            output/weekly_analysis_pro_260717_02_clean.md \
+            output/weekly_analysis_pro_nl_260717_02_clean.md \
+            output/weekly_analysis_pro_260717_02_delivery.html \
+            output/weekly_analysis_pro_nl_260717_02_delivery.html \
+            output/weekly_analysis_pro_260717_02.pdf \
+            output/weekly_analysis_pro_nl_260717_02.pdf \
+            output/weekly_analysis_pro_260717_02_equity_curve.png \
+            output/weekly_analysis_pro_nl_260717_02_equity_curve.png \
+            output/delivery/*.json \
+            output/delivery/*.txt \
+            output/run_manifests/*.json \
+            output/run_manifests/*.txt || true
+          if git diff --cached --quiet; then
+            echo "No recovery delivery evidence to commit."
+            exit 0
+          fi
+          git commit -m "Persist recovered Weekly ETF delivery evidence [skip ci]"
+          git push origin HEAD:main
