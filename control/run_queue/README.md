@@ -21,6 +21,9 @@ requested_at_utc: YYYY-MM-DDTHH:MM:SSZ
 requested_by: ChatGPT
 mode: fresh-runtime-production
 repository: market-predictions/weekly-etf
+requested_close_date: YYYY-MM-DD
+portfolio_execution_authorized: false
+delivery_authorized: true
 note: User requested a fresh Weekly ETF Pro Review from ChatGPT.
 ```
 
@@ -59,3 +62,14 @@ control/run_queue/weekly_etf_report_request_*.md
 ```
 
 The production send workflow should be triggered either by `workflow_dispatch`, by a real production report file, or by a safe request file in this run queue.
+
+## Execution authorization boundary
+
+Every new report request must state `portfolio_execution_authorized` explicitly.
+
+- `false` generates, validates and delivers the fresh report without writing model trades to the official portfolio state or trade ledger.
+- `true` permits the existing guarded model-portfolio execution path, subject to every normal policy, pricing, whole-share and position-count gate.
+- missing or malformed authorization fails closed to `false`.
+
+`delivery_authorized` records the user's delivery instruction. The production send workflow must only be triggered by a request that explicitly authorizes delivery.
+

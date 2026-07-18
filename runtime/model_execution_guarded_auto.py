@@ -72,6 +72,39 @@ def _existing_pairs(path: Path) -> set[tuple[str, str, str]]:
     return out
 
 
+REPORT_REQUEST_GLOB = "weekly_etf_report_request_*.md"
+TRUTHY = {"1", "true", "yes", "y", "on"}
+FALSEY = {"0", "false", "no", "n", "off"}
+
+
+def _request_values(path: Path) -> dict[str, str]:
+    values: dict[str, str] = {}
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        values[key.strip().lower().replace("-", "_")] = value.strip().strip('"').strip("'")
+    return values
+
+
+def _latest_report_request(run_queue_dir: Path = Path("control/run_queue")) -> Path | None:
+    files = sorted(run_queue_dir.glob(REPORT_REQUEST_GLOB))
+    return files[-1] if files else None
+
+
+def _portfolio_execution_authorized(run_queue_dir: Path = Path("control/run_queue")) -> bool:
+    request = _latest_report_request(run_queue_dir)
+    if request is None:
+        return False
+    raw = _request_values(request).get("portfolio_execution_authorized", "").strip().lower()
+    if raw in TRUTHY:
+        return True
+    if raw in FALSEY:
+        return False
+    return False
+
+
 def _positions_from_portfolio_state(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
@@ -258,11 +291,88 @@ def _build_already_executed_artifact(
     return artifact
 
 
+def _build_execution_not_authorized_artifact(
+    runtime_state_path: Path,
+    portfolio_state_path: Path,
+    trade_ledger_path: Path,
+    output_dir: Path,
+) -> dict[str, Any]:
+    _assert_official_state_is_whole_share(portfolio_state_path)
+    state = _read_json(runtime_state_path)
+    prepared = engine._prepare_runtime_state(state, portfolio_state_path)
+    positions = [engine._clear_run_fields(dict(row)) for row in prepared.get("positions", []) or []]
+    portfolio = dict(prepared.get("portfolio") or {})
+    cash = round(float(portfolio.get("cash_eur") or 0.0), 2)
+    nav = round(float(portfolio.get("total_portfolio_value_eur") or 0.0), 2)
+    invested = round(sum(engine._market_value_eur(row) for row in positions), 2)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    report_token = str(state.get("report_date") or state.get("requested_close_date") or "unknown").replace("-", "")
+    run_id = str(state.get("run_id") or datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S"))
+    out_path = output_dir / f"etf_model_execution_{report_token}_{run_id}_not_authorized.json"
+    source_files = dict(state.get("source_files") or {})
+    artifact = {
+        "schema_version": "1.0",
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "execution_mode": "guarded_auto",
+        "execution_status": "no_trade_intents",
+        "run_id": state.get("run_id"),
+        "report_date": state.get("report_date"),
+        "requested_close_date": state.get("requested_close_date"),
+        "source_files": {
+            "runtime_state": str(runtime_state_path),
+            "portfolio_state": str(portfolio_state_path),
+            "trade_ledger": str(trade_ledger_path),
+            "pricing_audit": source_files.get("pricing_audit"),
+            "rotation_plan": source_files.get("rotation_plan"),
+            "lane_assessment": source_files.get("lane_assessment"),
+        },
+        "policy_checks": {
+            "passed": True,
+            "errors": [],
+            "warnings": ["portfolio_execution_not_authorized_by_latest_report_request"],
+            "mode_note": "Fresh report generation and delivery were authorized; portfolio mutation was not authorized.",
+        },
+        "pre_trade_portfolio": {
+            "cash_eur": cash,
+            "total_portfolio_value_eur": nav,
+            "base_currency": "EUR",
+        },
+        "post_trade_shadow_portfolio": {
+            "cash_eur": cash,
+            "invested_market_value_eur": invested,
+            "nav_eur": nav,
+            "nav_drift_eur": 0.0,
+        },
+        "proposed_ledger_rows": [],
+        "shadow_positions": positions,
+        "guarded_auto_result": {
+            "official_ledger_rows": [],
+            "portfolio_state_written": False,
+            "trade_ledger_written": False,
+            "idempotency_status": "execution_not_authorized",
+            "authorization_status": "not_authorized",
+            "matched_pairs": [],
+            "post_trade_nav_eur": nav,
+            "post_trade_invested_market_value_eur": invested,
+            "post_trade_cash_eur": cash,
+            "whole_share_contract_status": "compliant",
+        },
+        "artifact_path": str(out_path),
+    }
+    _write_json(out_path, artifact)
+    (output_dir / "latest_etf_model_execution_path.txt").write_text(str(out_path) + "\n", encoding="utf-8")
+    return artifact
+
+
 def build_guarded_artifact(
     runtime_state_path: Path, portfolio_state_path: Path, trade_ledger_path: Path, output_dir: Path
 ) -> dict[str, Any]:
     _assert_official_state_is_whole_share(portfolio_state_path)
     state = _read_json(runtime_state_path)
+    if not _portfolio_execution_authorized():
+        return _build_execution_not_authorized_artifact(
+            runtime_state_path, portfolio_state_path, trade_ledger_path, output_dir
+        )
     trade_date = _trade_date(state)
     existing = _existing_pairs(trade_ledger_path)
     requested: list[tuple[str, str, str]] = []
