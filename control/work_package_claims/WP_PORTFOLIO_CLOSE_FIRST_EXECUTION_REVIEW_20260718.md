@@ -9,8 +9,9 @@ implementation_branch: agent/portfolio-close-first-execution-review
 implementation_pull_request: 95
 implementation_merge: 2895bbb5940ead8526ab4c10d0ce3687f8aca423
 closeout_branch: agent/portfolio-close-first-execution-review-closeout
-closeout_pull_request: pending
-status: implementation_merged / closeout_active
+closeout_pull_request: 96
+closeout_merge: pending
+status: closeout_ready / release_effective_on_merge
 scope: read-only evidence review, deterministic source comparison, transition validation, governance closeout
 ```
 
@@ -54,4 +55,4 @@ protected_authority_hashes: identical
 historical_report_hashes: identical
 ```
 
-The claim remains held only until the governance-closeout PR is merged and the exact closeout merge is recorded.
+The claim is released when PR #96 merges. The exact closeout merge will then be recorded in a metadata-only closeout correction.
