@@ -111,7 +111,7 @@ jobs:
         run: |
           rm -rf output/cockpit_preview output/cockpit_review
           python -m runtime.render_cockpit_front_page --output-dir output --language both --html-only
-          python -m runtime.build_cockpit_side_by_side_review --output-dir output --token 260716
+          python -m runtime.build_cockpit_side_by_side_review --output-dir output --token 260717
 
       - name: Verify exact current WP08 conclusion
         run: |
@@ -120,7 +120,7 @@ jobs:
           from pathlib import Path
 
           root = Path("output/cockpit_review")
-          metadata = json.loads((root / "weekly_etf_cockpit_side_by_side_review_260716.json").read_text(encoding="utf-8"))
+          metadata = json.loads((root / "weekly_etf_cockpit_side_by_side_review_260717.json").read_text(encoding="utf-8"))
           findings = {row["dimension"]: row for row in metadata["findings"]}
           blockers = set(metadata["blocking_findings"])
 
@@ -129,36 +129,36 @@ jobs:
           assert metadata["promotion_status"] == "not_promoted"
           assert metadata["review_conclusion"] == ("iteration_required" if blockers else "ready_for_promotion_decision")
           assert metadata["next_recommended_package"] == (
-            "WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT"
-            if blockers
-            else "WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW"
+              "WP_COCKPIT_SURFACE_09_CURRENT_RUNTIME_CLIENT_SURFACE_REFINEMENT"
+              if blockers
+              else "WP_COCKPIT_SURFACE_PROMOTION_DECISION_REVIEW"
           )
 
           selected = metadata["selected_sources"]
-          assert selected["classic"]["en"]["markdown"] == "output/weekly_analysis_pro_260716_02.md"
-          assert selected["classic"]["nl"]["markdown"] == "output/weekly_analysis_pro_nl_260716_02.md"
-          assert selected["classic"]["en"]["html"] == "output/weekly_analysis_pro_260716_02_delivery.html"
-          assert selected["classic"]["nl"]["html"] == "output/weekly_analysis_pro_nl_260716_02_delivery.html"
-          assert selected["cockpit"]["en"] == "output/cockpit_preview/weekly_analysis_pro_cockpit_260716_01.html"
-          assert selected["cockpit"]["nl"] == "output/cockpit_preview/weekly_analysis_pro_nl_cockpit_260716_01.html"
+          assert selected["classic"]["en"]["markdown"] == "output/weekly_analysis_pro_260717_02.md"
+          assert selected["classic"]["nl"]["markdown"] == "output/weekly_analysis_pro_nl_260717_02.md"
+          assert selected["classic"]["en"]["html"] == "output/weekly_analysis_pro_260717_02_delivery.html"
+          assert selected["classic"]["nl"]["html"] == "output/weekly_analysis_pro_nl_260717_02_delivery.html"
+          assert selected["cockpit"]["en"] == "output/cockpit_preview/weekly_analysis_pro_cockpit_260717_01.html"
+          assert selected["cockpit"]["nl"] == "output/cockpit_preview/weekly_analysis_pro_nl_cockpit_260717_01.html"
 
           always_pass = {
-            "readability",
-            "density",
-            "visual_hierarchy",
-            "executed_action_clarity",
-            "current_weight_accuracy",
-            "performance_risk_accuracy",
-            "trust_provenance_clarity",
-            "audit_evidence_preservation",
+              "readability",
+              "density",
+              "visual_hierarchy",
+              "executed_action_clarity",
+              "current_weight_accuracy",
+              "performance_risk_accuracy",
+              "trust_provenance_clarity",
+              "audit_evidence_preservation",
           }
           for dimension in always_pass:
               assert findings[dimension]["status"] == "pass", (dimension, findings[dimension])
 
           transition_dimensions = {
-            "decision_clarity",
-            "bilingual_semantic_parity",
-            "premium_look_and_feel",
+              "decision_clarity",
+              "bilingual_semantic_parity",
+              "premium_look_and_feel",
           }
           payload = json.dumps(metadata, ensure_ascii=False)
           assert "XLU reduced" in payload
@@ -179,8 +179,8 @@ jobs:
               assert "hybrid_labels=none" in payload
 
           for path in [
-              root / "weekly_etf_cockpit_side_by_side_review_260716.html",
-              root / "weekly_etf_cockpit_side_by_side_review_nl_260716.html",
+              root / "weekly_etf_cockpit_side_by_side_review_260717.html",
+              root / "weekly_etf_cockpit_side_by_side_review_nl_260717.html",
           ]:
               html = path.read_text(encoding="utf-8")
               assert "<pre>" not in html
