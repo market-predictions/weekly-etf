@@ -1,0 +1,97 @@
+name: Diagnose fresh report delivery failure
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/diagnose-fresh-report-delivery-failure.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      RUNTIME_STATE: output/runtime/etf_report_state_20260717_20260718_134258.json
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: python -m pip install pyyaml
+
+      - name: Validate persisted valuation state
+        id: valuation
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python tools/validate_etf_persisted_valuation_state.py \
+            --runtime-state "$RUNTIME_STATE" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --valuation-history output/etf_valuation_history.csv \
+            2>&1 | tee /tmp/01-valuation.txt
+
+      - name: Validate trade ledger idempotency
+        id: ledger
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python tools/validate_etf_trade_ledger_idempotency.py \
+            --trade-ledger output/etf_trade_ledger.csv \
+            2>&1 | tee /tmp/02-ledger.txt
+
+      - name: Build report-only guarded artifact
+        id: guarded
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          rm -rf /tmp/guarded-runtime
+          python -m runtime.model_execution_guarded_auto \
+            --runtime-state "$RUNTIME_STATE" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --trade-ledger output/etf_trade_ledger.csv \
+            --output-dir /tmp/guarded-runtime \
+            2>&1 | tee /tmp/03-guarded.txt
+          find /tmp/guarded-runtime -maxdepth 2 -type f -print >> /tmp/03-guarded.txt || true
+
+      - name: Validate guarded artifact
+        id: guarded_validation
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          artifact="$(cat /tmp/guarded-runtime/latest_etf_model_execution_path.txt 2>/dev/null || true)"
+          if [ -z "$artifact" ] || [ ! -f "$artifact" ]; then
+            echo "GUARDED_ARTIFACT_MISSING path=$artifact" | tee /tmp/04-guarded-validation.txt
+            exit 1
+          fi
+          python tools/validate_etf_model_execution.py \
+            --artifact "$artifact" \
+            --expected-mode guarded_auto \
+            2>&1 | tee /tmp/04-guarded-validation.txt
+
+      - name: Write diagnostic summary
+        if: always()
+        run: |
+          cat > /tmp/00-summary.txt <<EOF
+          valuation=${{ steps.valuation.outcome }}
+          ledger=${{ steps.ledger.outcome }}
+          guarded=${{ steps.guarded.outcome }}
+          guarded_validation=${{ steps.guarded_validation.outcome }}
+          EOF
+          cat /tmp/00-summary.txt
+
+      - name: Upload diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fresh-report-failure-diagnostic-${{ github.run_id }}
+          path: /tmp/*.txt
+          if-no-files-found: error
