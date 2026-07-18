@@ -26,6 +26,13 @@ jobs:
       - name: Apply deterministic patch
         run: python tools/patch_fresh_report_delivery_request_authority.py
 
+      - name: Keep workflow changes outside bot commit
+        run: |
+          git checkout HEAD -- \
+            .github/workflows/patch-fresh-report-delivery-request-authority.yml \
+            tools/patch_fresh_report_delivery_request_authority.py
+          rm -f .github/workflows/validate-report-request-execution-authority.yml
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -60,11 +67,17 @@ jobs:
         if: steps.authority_tests.outcome != 'success'
         run: exit 1
 
-      - name: Commit validated patch to implementation branch
+      - name: Commit validated code and request
         if: steps.authority_tests.outcome == 'success'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add \
+            runtime/model_execution_guarded_auto.py \
+            tests/test_model_execution_request_authority.py \
+            control/run_queue/README.md \
+            control/run_queue/weekly_etf_report_request_20260718_125324.md \
+            control/work_packages/WP_FRESH_REPORT_DELIVERY_REQUEST_AUTHORITY_20260718.md \
+            control/work_package_claims/WP_FRESH_REPORT_DELIVERY_REQUEST_AUTHORITY_20260718.md
           git commit -m "Add report-request execution authority gate" || exit 0
           git push origin HEAD:agent/fresh-report-delivery-authority-pr
