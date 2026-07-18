@@ -2,7 +2,7 @@
 
 Date: 2026-07-19
 Repository: `market-predictions/weekly-etf`
-Status: claimed / implementation in progress
+Status: implementation complete / validated / ready for merge
 
 ## Current issue
 
@@ -10,56 +10,90 @@ The client cockpit correctly identifies the executed PAVE/XLU rotation, but its 
 
 ## Root cause
 
-The guarded whole-share execution path calculates correct pre-trade and post-trade weights for the official ledger, but the subsequent cash reconciliation overwrites `previous_weight_pct`, `previous_market_value_*` and inherited weight fields with post-trade values. The report-state revaluation path can then repeat the overwrite while retaining a material `shares_delta_this_run` and `weight_change_pct`.
+The guarded whole-share execution path calculated correct pre-trade and post-trade weights for the official ledger, but the subsequent cash reconciliation overwrote `previous_weight_pct`, `previous_market_value_*` and inherited weight fields with post-trade values. The report-state revaluation path then propagated that loss while retaining a material `shares_delta_this_run` and `weight_change_pct`.
 
-The state contract does not currently preserve explicit pre-trade shares, and no validation gate rejects a material trade whose formatted before-and-after weights are identical.
+The state contract did not preserve explicit pre-trade shares, and no validation gate rejected a material trade whose formatted before-and-after weights were identical.
 
-## Decision framework
+## Implemented contract
 
 1. Preserve an immutable pre-trade snapshot for each executed position: shares, local/EUR market value and portfolio weight.
-2. Keep current/post-trade valuation fields independently revaluable.
-3. Reconstruct legacy corrupted snapshots deterministically from current quantity plus recorded run deltas when authoritative pre-trade fields are absent or demonstrably overwritten.
-4. Reject material executed trades when the client-formatted before and after weights remain identical.
-5. Validate quantity, value and weight lineage against recorded deltas.
-6. Preserve portfolio NAV, official shares, trade ledger and historical delivered reports.
+2. Prefer the official trade-ledger snapshot when it is present.
+3. Reconstruct legacy overwritten rows deterministically from current quantity plus recorded run deltas.
+4. Reject material executed trades when the one-decimal client display has identical before-and-after weights.
+5. Validate share and weight deltas before state persistence or report rendering.
+6. Keep current market value as the NAV authority after previous-value lineage is restored.
+7. Preserve no-trade position behavior and protected authority surfaces.
 
-## Intended implementation
+## Implementation
 
 ```text
-runtime/model_execution_engine.py
+runtime/trade_lineage.py
 runtime/model_execution_guarded_auto.py
 runtime/build_etf_report_state.py
-runtime/finalize_executed_etf_report.py
-runtime/render_cockpit_front_page.py
-runtime/trade_lineage.py
-tools/validate_etf_model_execution.py
 tests/test_etf_trade_lineage.py
-control/ETF_SESSION_CHANGELOG.md
-control/CURRENT_STATE.md
+.github/workflows/validate-etf-whole-share-contract.yml
 ```
 
-The exact file set may be reduced if a shared lineage helper eliminates duplicate changes.
+The shared helper eliminated the need to modify the renderer or execution engine. The existing cockpit renderer continues to consume `previous_weight_pct → current_weight_pct`; those fields are now normalized and validated upstream.
 
-## Acceptance criteria
+## Resulting client contract
 
-- PAVE-like new purchases preserve a zero pre-trade quantity and weight.
-- XLU-like reductions preserve the full pre-trade quantity and weight.
-- post-trade revaluation does not overwrite immutable pre-trade fields;
-- a material executed trade cannot render identical one-decimal before/after weights;
-- no-trade positions remain valid and retain current-weight defaults;
-- legacy persisted rows with non-zero deltas and overwritten previous fields are repaired in report state without mutating official portfolio state;
-- EN and NL cockpit action lines remain aligned;
-- focused tests and existing execution/report contract tests pass;
-- no report generation, email delivery, portfolio execution or trade-ledger mutation is performed by this package.
+```text
+PAVE 0.0% → 4.9%
+XLU 5.5% → 0.5%
+```
+
+The headline remains:
+
+```text
+PAVE added · XLU reduced
+```
+
+## Validation
+
+```text
+implementation_pull_request: 109
+validated_head: 81e61a5039d28a60a9056156054dec84a8691d29
+trade_lineage_and_whole_share_run: 29665973984 success
+trade_lineage_and_whole_share_job: 88136341408 success
+report_request_authority_run: 29665973971 success
+report_request_authority_job: 88136341429 success
+compile_gate: passed
+focused_whole_share_and_trade_lineage_tests: passed
+protected_execution_authority: unchanged
+```
+
+Focused regression coverage includes:
+
+- legacy PAVE/XLU overwrite reconstruction;
+- official ledger precedence;
+- immutable pre-trade shares and value derivation;
+- material identical-display rejection;
+- no-trade snapshot behavior;
+- report-state builder integration;
+- cockpit English output contract.
+
+## Acceptance status
+
+- PAVE-like new purchases preserve a zero pre-trade quantity and weight: passed;
+- XLU-like reductions preserve the full pre-trade quantity and weight: passed;
+- guarded execution persists validated trade lineage: passed;
+- legacy overwritten rows are repaired in report state: passed;
+- a material trade cannot render identical one-decimal weights: passed;
+- no-trade positions retain current snapshot defaults: passed;
+- current NAV uses current market value after lineage restoration: passed;
+- EN/NL renderer compatibility preserved: passed by shared numeric input contract;
+- protected authority gate: passed;
+- report generation or delivery performed: false.
 
 ## Authority boundary
 
 ```text
-portfolio_state_write: forbidden
-trade_ledger_write: forbidden
-valuation_history_write: forbidden
-pricing_authority_change: forbidden
-historical_report_mutation: forbidden
-production_report_generation: forbidden
-email_send: forbidden
+portfolio_state_mutated_by_this_package: false
+trade_ledger_mutated_by_this_package: false
+valuation_history_mutated: false
+pricing_authority_changed: false
+historical_report_mutated: false
+production_report_generated: false
+email_sent: false
 ```
