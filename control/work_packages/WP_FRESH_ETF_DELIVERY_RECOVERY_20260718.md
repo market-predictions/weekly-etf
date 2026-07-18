@@ -2,50 +2,115 @@
 
 Date: 2026-07-18
 Repository: `market-predictions/weekly-etf`
-Status: active / delivery recovery authorized
+Status: closed / delivered / inbox confirmed
 
 ## Current issue
 
-Production runs `20260718_134258` and `20260718_140601` generated and persisted fresh 2026-07-17 report evidence but stopped before email transport. Neither run wrote a delivery manifest and Gmail contains no matching English or Dutch message.
+Production runs `20260718_134258` and `20260718_140601` generated fresh 2026-07-17 report evidence but stopped before email transport. The guarded recovery runs then reached the render chain but failed at the client-surface gate on residual internal labels in the English report.
 
-## Root cause boundary
+## Root cause
 
-The deterministic report, valuation, whole-share, position-count, bilingual, HTML, PDF and client-language gates have passed in exact-current replay. Recovery must therefore remain isolated to the output contract and delivery runbook. It must not rerun or authorize portfolio execution.
+GitHub Actions credits were not the cause. Hosted runners were allocated and executed the pricing, render, PDF and validation steps. The blocking exception was:
+
+```text
+ETF client-surface clean gate failed:
+weekly_analysis_pro_260717_02.md: raw_override, release_score
+weekly_analysis_pro_260717_02_delivery.html: raw_override, release_score
+```
+
+The language normalizer handled `release score <number>` and several override phrases, but did not cover:
+
+- the bare table header `Release score`;
+- the plural phrase `release scores`;
+- `System override: Minimum trade size was not met`;
+- the `Override status` table header.
 
 ## Decision framework
 
-A delivery recovery is permitted only when:
+A delivery recovery was permitted only because:
 
-- the source reports and runtime state are immutable and identified;
-- the prior run manifest has no delivery manifest;
-- no receiving-inbox message exists;
-- portfolio and trade-ledger hashes remain unchanged;
-- both language editions are sent exactly once;
-- success is claimed only after a delivery manifest and independent inbox receipts exist.
+- the source run and reports were immutable and identified;
+- no prior delivery manifest existed;
+- no matching inbox receipt existed;
+- portfolio and trade-ledger writes were explicitly unauthorized;
+- both language editions had to pass the same downstream gates;
+- delivery success required both a manifest and independent inbox receipts.
 
 ## Input/state contract
 
-Source run: `20260718_140601`
-Close date: `2026-07-17`
-English report: `output/weekly_analysis_pro_260717_02.md`
-Dutch report: `output/weekly_analysis_pro_nl_260717_02.md`
-Runtime state: `output/runtime/etf_report_state_20260717_20260718_140601.json`
-Run manifest: `output/run_manifests/weekly_etf_run_manifest_2026-07-17_20260718_140601.json`
+```text
+source_run_id: 20260718_140601
+requested_close_date: 2026-07-17
+report_token: 260717
+english_report: output/weekly_analysis_pro_260717_02.md
+dutch_report: output/weekly_analysis_pro_nl_260717_02.md
+runtime_state: output/runtime/etf_report_state_20260717_20260718_140601.json
+pricing_audit: output/pricing/price_audit_2026-07-17_20260718_140601.json
+portfolio_execution_authorized: false
+broker_execution_authorized: false
+```
 
-## Output contract
+## Implemented change
 
-- validated EN/NL HTML and PDF delivery assets;
-- successful bilingual SMTP transport;
-- delivery manifest linked to the existing run manifest;
-- unchanged official portfolio shares and trade ledger;
-- inbox receipts before delivery success is reported.
+PR #105 expanded `runtime/report_surface_language_contract.py` and its regression tests so the failing internal labels are rewritten to client-safe review-priority and execution-constraint wording. The language-cleanup workflow and exact-current delivery diagnostic both passed.
 
-## Operational runbook
+```text
+implementation_pr: 105
+implementation_merge: bfba7c2e038eaba9a071008fc33fe09832dd4f5c
+language_validation_run: 29659315302 success
+exact_current_diagnostic_run: 29659315297 success
+```
 
-1. validate the source run and absence of a prior delivery manifest;
-2. snapshot official portfolio and ledger hashes;
-3. rerun downstream client-surface, bilingual, render and explicit-state gates only;
-4. send English and Dutch editions;
-5. write delivery and completed run manifests;
-6. persist delivery assets and receipts;
-7. independently verify both inbox messages.
+PR #106 then added a new transport-only recovery trigger.
+
+```text
+retrigger_pr: 106
+retrigger_merge: ba558abf9c79ecd2066ebe8fc57db41a9c9c44ee
+delivery_evidence_commit: a1e5dad7a5a1957ddbe9f1bc750a9c33c45384ea
+```
+
+## Output contract result
+
+```text
+run_manifest: output/run_manifests/weekly_etf_run_manifest_2026-07-17_20260718_140601.json
+workflow_status: workflow_success
+workflow_conclusion: success
+pricing_lineage_status: passed
+delivery_manifest: output/delivery/weekly_etf_delivery_manifest_2026-07-17_20260718_140601.json
+delivery_status: smtp_sendmail_returned_no_exception
+language_count: 2
+attachments_per_language: 4
+```
+
+Independent Gmail receipts:
+
+```text
+English subject: Weekly ETF Pro Review 2026-07-17
+English received: 2026-07-18 22:19:41 Europe/Amsterdam
+Dutch subject: Weekly ETF Pro Review | Nederlands 2026-07-17
+Dutch received: 2026-07-18 22:19:43 Europe/Amsterdam
+English attachment count: 4
+Dutch attachment count: 4
+```
+
+## Authority result
+
+- no broker order was placed;
+- no new model trade was executed;
+- official share quantities were not changed by the recovery;
+- the trade ledger was not changed by the recovery;
+- the current 9-position `close_first` state remains authoritative;
+- delivery success is now confirmed by both GitHub manifests and Gmail receipts.
+
+## Acceptance criteria
+
+- [x] work package and claim existed before recovery work;
+- [x] root cause distinguished from GitHub billing or credit exhaustion;
+- [x] client-surface residuals fixed with regression coverage;
+- [x] downstream render, PDF, HTML and language gates passed;
+- [x] transport-only recovery executed;
+- [x] successful run manifest persisted;
+- [x] successful bilingual delivery manifest persisted;
+- [x] English inbox receipt confirmed;
+- [x] Dutch inbox receipt confirmed;
+- [x] handover and control closeout recorded.
