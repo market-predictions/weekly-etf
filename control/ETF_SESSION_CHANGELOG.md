@@ -328,3 +328,40 @@ email sent: false
 ```
 
 The client output guard is current-state-aware: it discloses `9 / 8` only when the report ticker set exactly matches official state and leaves historical reports unchanged. The next package is `WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW`; it must use fresh evidence and must not assume XLU is automatically the correct closure source.
+
+---
+
+## 2026-07-18 — Portfolio close-first execution review
+
+`WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW` performed a fresh no-change comparison of all nine official holdings after the portfolio entered `close_first 9/8` status.
+
+Result:
+
+```text
+evidence close: 2026-07-17
+selected review source: URNM
+reviewed quantity: 48 whole shares
+destination: cash
+estimated proceeds_eur: 2022.23
+projected cash_eur: 4556.59
+projected active count: 8
+new ticker: none
+portfolio change applied: false
+email sent: false
+```
+
+The package added a deterministic builder, validator, seven focused tests, three outcome fixtures and a read-only GitHub Actions gate. Holding quality and current lane quality are recorded separately; the lower score forms the decision-quality floor.
+
+Validation:
+
+```text
+PR: #95
+run: 29622365939 success
+job: 88019775095
+artifact: 8422627986
+artifact digest: sha256:9f0b833f6d9dd5bb7b7558afe598c20246e67707fc5cff974e1bfc661479851a
+protected authority hashes: identical
+historical report hashes: identical
+```
+
+The next package is `WP_PORTFOLIO_CLOSE_FIRST_EXECUTION`, but it requires separate explicit approval and fresh implementation-time revalidation.

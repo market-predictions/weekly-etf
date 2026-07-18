@@ -1,0 +1,11 @@
+{
+  "scenario": "reallocate_existing",
+  "top_source": "URNM",
+  "source_shares": 1000,
+  "source_price_usd": 50.0,
+  "eurusd": 1.1,
+  "nav_eur": 100000.0,
+  "preferred_existing_destination": "CIBR",
+  "expected_conclusion": "close_and_reallocate_existing_supported",
+  "expected_projected_count": 8
+}

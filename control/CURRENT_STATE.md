@@ -1,6 +1,6 @@
 # ETF Review OS — Current State
 
-Date: 2026-07-17
+Date: 2026-07-18
 Repository: `market-predictions/weekly-etf`
 
 ## Official portfolio authority
@@ -31,7 +31,7 @@ XLU 14
 XLV 37
 ```
 
-The latest official rotation reduced `XLU` by 134 shares and added 107 shares of `PAVE`. A 14-share XLU residual remains. No second execution occurred during delivery recovery or position-count reconciliation.
+The latest official rotation reduced `XLU` by 134 shares and added 107 shares of `PAVE`. A 14-share XLU residual remains. No later review package changed the official portfolio.
 
 ## Latest successful production run
 
@@ -115,63 +115,69 @@ Stable position-count rules:
 
 1. Every unique ticker with positive whole-share quantity counts as one active position.
 2. Duplicate active ticker rows are invalid.
-3. A no-trade run may preserve the current nine-position state while reporting `close_first`.
-4. Any proposed trade while above eight must reduce the active count and may not introduce a new ticker.
-5. At exactly eight positions, a new ticker requires another ticker to reach zero shares in the same projected whole-share execution.
+3. A no-change review may preserve the current nine-position state while reporting `close_first`.
+4. Any proposed change while above eight must reduce the active count and may not introduce a new ticker.
+5. At exactly eight positions, a new ticker requires another ticker to reach zero shares in the same projected whole-share transition.
 6. A partial source reduction that leaves positive shares does not free a slot.
-7. Transition validation uses projected whole-share quantities and runs before guarded mutation.
+7. Transition validation uses projected whole-share quantities before official writes.
 8. Current matching EN/NL report surfaces disclose the actual count; non-current historical reports remain unchanged.
 
-Implementation:
+## Portfolio close-first execution review
 
 ```text
-runtime/position_count_contract.py
-runtime/position_count_report_surface.py
-tools/validate_etf_persisted_valuation_state.py
-tools/validate_etf_client_surface_clean.py
-tools/validate_etf_position_count_contract.py
-tests/test_etf_position_count_contract.py
-.github/workflows/validate-etf-position-count-contract.yml
+package: WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW
+pull_request: #95
+status: implementation_complete_validation_green_merge_pending
+review_evidence_date: 2026-07-17
+review_freshness: complete
+selected_review_source: URNM
+reviewed_quantity: 48 whole shares
+selected_destination: cash
+estimated_proceeds_eur: 2022.23
+projected_cash_eur: 4556.59
+projected_active_positions: 8
+portfolio_change_applied: false
+email_sent: false
 ```
 
-Final validation:
+The review compared all nine holdings under one deterministic rubric. URNM ranked first even after removing position-size and practicality points. Its holding score was 3.70, current lane score 2.96, one-month relative strength versus SPY -15.64 percentage points, three-month relative strength -33.97 percentage points and trend score 0.0.
+
+XLU ranked second. The smallest position was therefore not selected automatically.
+
+Validation:
 
 ```text
-focused_tests: 13 passed
-artifact_id: 8420903168
-artifact_digest: sha256:cf98f8d4b4d172bc4f463598a557e8490fd2f188bbd5ae3f0c34347ee1688b5b
-position_count_run: 29618185729 success
-report_surface_run: 29618185736 success
-current_runtime_cockpit_run: 29618185701 success
-wp08_exact_current_run: 29618185711 success
-wp11_exact_current_run: 29618185709 success
-closed_recovery_run: 29618185751 success
-fresh_send_diagnostic_run: 29618185706 success
-governance_append_run: 29618612112 success
+workflow_run: 29622365939 success
+workflow_job: 88019775095
+focused_tests: 7 passed
+artifact_id: 8422627986
+artifact_digest: sha256:9f0b833f6d9dd5bb7b7558afe598c20246e67707fc5cff974e1bfc661479851a
 protected_authority_hashes: identical
 historical_report_hashes: identical
-portfolio_execution: false
-email_sent: false
 ```
 
 Persistent records:
 
 ```text
-control/evidence/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_EVIDENCE_20260717.json
-control/decisions/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_DECISION_20260717.md
-control/handovers/HANDOVER_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_20260717.md
-control/DECISION_LOG.md
-control/ETF_SESSION_CHANGELOG.md
+control/evidence/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_EVIDENCE_20260718.json
+control/decisions/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_DECISION_20260718.md
+control/reviews/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_EN_20260718.md
+control/reviews/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_NL_20260718.md
+control/handovers/HANDOVER_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_20260718.md
 ```
 
-This package does not choose which holding should be closed and does not authorize a position change.
+The official portfolio remains unchanged at nine active positions and retains `close_first` status until a separately approved implementation succeeds.
 
 ## Immediate next action
 
+No official portfolio change is authorized by this review package.
+
+A separate explicit approval may create and claim:
+
 ```text
-WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW
+WP_PORTFOLIO_CLOSE_FIRST_EXECUTION
 ```
 
-The next package should be separately claimed and should first produce a no-mutation review using fresh pricing, current scores, relative strength, portfolio-role evidence, liquidity and funding logic. It must identify a justified count-reducing path from nine positions to no more than eight and must not assume that the smallest holding is automatically the correct source.
+That package must refresh URNM and EUR/USD pricing, rerun the source-selection rubric, use whole shares, open no new ticker, and complete position-count and NAV reconciliation before official writes. If the current evidence no longer supports URNM, it must stop without changes.
 
-Any future portfolio change or report delivery requires separate explicit authorization and the normal whole-share, position-count, NAV, manifest and inbox-receipt controls.
+Report generation and delivery require separate approval and the normal manifest and inbox-receipt controls.

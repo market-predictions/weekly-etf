@@ -420,3 +420,28 @@ Persistent decision and evidence:
 control/decisions/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_DECISION_20260717.md
 control/evidence/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_EVIDENCE_20260717.json
 ```
+
+---
+
+## 2026-07-18 — Close-first review selects URNM-to-cash as a review option
+
+### Decision
+
+The no-mutation close-first review uses fresh completed-close data, current lane quality, holding continuity, relative strength, contribution, portfolio-role evidence, liquidity and preservation credits to compare all nine active positions.
+
+For the 2026-07-17 evidence date, URNM is the supported review source. The reviewed path closes all 48 URNM shares, opens no new ticker, restores the active count from nine to eight and retains the estimated proceeds as cash.
+
+URNM remains first when position-size and implementation-practicality points are removed. XLU ranks second. Position size is therefore not the selection authority.
+
+### Consequence
+
+This is review evidence only. It does not change the official portfolio or grant implementation authority. A separate explicitly approved package must refresh prices, rerun the same rubric and stop without changes if the source or evidence changes materially.
+
+Persistent records:
+
+```text
+control/evidence/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_EVIDENCE_20260718.json
+control/decisions/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_DECISION_20260718.md
+control/reviews/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_EN_20260718.md
+control/reviews/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_NL_20260718.md
+```
