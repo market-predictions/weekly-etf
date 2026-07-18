@@ -13,6 +13,7 @@ metadata_branch: agent/cockpit-email-html-inline-style-metadata
 metadata_pull_request: 100
 status: closed / released
 released_at_utc: 2026-07-18T10:37:00Z
+metadata_validation_status: pending_on_this_head
 ```
 
 Confirmed at release:
@@ -23,7 +24,7 @@ Confirmed at release:
 - production report generated: false;
 - email sent: false.
 
-Final validation:
+Final implementation validation:
 
 ```text
 validated_head: 7e9706b6019f4e4eb6debc5a2ff95fe0ed70399c
