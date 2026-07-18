@@ -19,14 +19,16 @@ Boundaries:
 - valuation refresh and immutable run/delivery evidence are allowed;
 - delivery success requires a manifest and independent inbox receipt.
 
-Validation:
+Final implementation validation:
 
 ```text
-validated_head: 6e85cef34a5ee8ca5aa6054c9bcac6e4e550d1f3
-request_authority_run: 29646313346 success
-whole_share_run: 29646313337 success
+validated_head: 1ae719b3c5ddf1e110013fe66447b174e99d6c27
+request_authority_run: 29646502090 success
+whole_share_run: 29646502094 success
+position_count_run: 29646502091 success
 portfolio_execution_authorized: false
 delivery_authorized: true
+broker_execution_authorized: false
 ```
 
 The claim remains active until the production workflow, delivery manifest and both inbox receipts are complete.
