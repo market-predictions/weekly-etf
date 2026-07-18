@@ -12,6 +12,7 @@ closeout_branch: agent/portfolio-close-first-execution-review-closeout
 closeout_pull_request: 96
 closeout_merge: b2d32e327023ea515c1c78ccbc66f69b69afab45
 metadata_pull_request: 97
+metadata_merge: ff27a6a5d1f4740df08641cfb822798bdc5ce823
 status: closed / released
 released_at_utc: 2026-07-18T00:29:29Z
 scope: read-only evidence review, deterministic source comparison, transition validation, governance closeout
@@ -40,10 +41,10 @@ projected_active_count: 8
 portfolio_change_applied: false
 ```
 
-Final validation:
+Implementation and closeout validation:
 
 ```text
-validated_head: bbf03f8966c93d714ff750c9d177917bcc0eef9d
+implementation_validated_head: bbf03f8966c93d714ff750c9d177917bcc0eef9d
 implementation_review_run: 29622792895 success
 closeout_review_run: 29623131524 success
 closeout_position_count_run: 29623131491 success
@@ -58,16 +59,24 @@ protected_authority_hashes: identical
 historical_report_hashes: identical
 ```
 
-Metadata finalization:
+Metadata finalization and final control validation:
 
 ```text
-workflow_run: 29623285033
-workflow_job: 88022491451
-result: success
+metadata_workflow_run: 29623285033 success
+metadata_workflow_job: 88022491451
+metadata_head: ea5a267e5e42f35435e3bcc3f2afa1711cbae516
+final_review_run: 29623325499 success
+final_position_count_run: 29623325500 success
+final_report_language_run: 29623325480 success
+final_current_runtime_cockpit_run: 29623325457 success
+final_wp08_run: 29623325516 success
+final_wp11_run: 29623325437 success
+final_artifact_id: 8422948645
+final_artifact_digest: sha256:2c53ec7b14489dcdc418033766650f410bd3c218cd420b7764ef667cf18e8369
 closeout_merge_recorded: true
 claim_released: true
 temporary_files_removed: true
-final_control_validation: pending_on_this_head
+final_control_validation: success
 ```
 
 The claim is closed and released. A future `WP_PORTFOLIO_CLOSE_FIRST_EXECUTION` requires a new claim and separate explicit approval.
