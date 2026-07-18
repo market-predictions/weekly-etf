@@ -16,4 +16,5 @@ portfolio_execution_authorized: false
 broker_execution_authorized: false
 prior_delivery_manifest_written: false
 prior_inbox_receipt_found: false
+recovery_workflow_ready: true
 scope: render, send, write delivery manifest, complete existing run manifest, verify inbox receipt
