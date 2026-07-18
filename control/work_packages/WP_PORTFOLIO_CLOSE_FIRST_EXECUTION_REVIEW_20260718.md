@@ -2,7 +2,7 @@
 
 Date: 2026-07-18
 Repository: `market-predictions/weekly-etf`
-Status: closed_on_closeout_merge / implementation_merged / validated_no_change
+Status: closed / merged / validated_no_change
 
 ## Current issue
 
@@ -92,7 +92,8 @@ implementation_pull_request: #95
 implementation_merge: 2895bbb5940ead8526ab4c10d0ce3687f8aca423
 implementation_head: bbf03f8966c93d714ff750c9d177917bcc0eef9d
 closeout_pull_request: #96
-closeout_merge: pending
+closeout_merge: b2d32e327023ea515c1c78ccbc66f69b69afab45
+metadata_pull_request: #97
 primary_review_run: 29622365939 success
 primary_review_job: 88019775095
 primary_artifact_id: 8422627986
@@ -134,8 +135,8 @@ email_sent: false
 - review evidence, decision record, bilingual surfaces and handover persisted: complete;
 - focused and compatibility validation passed: complete;
 - implementation PR merged: complete;
-- governance-closeout PR: ready for merge;
-- claim release: effective on closeout merge;
+- governance-closeout PR merged: complete;
+- claim release: complete;
 - no portfolio change, report delivery or email: confirmed.
 
 ## Next package

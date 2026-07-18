@@ -4,7 +4,7 @@
   "date": "2026-07-18",
   "repository": "market-predictions/weekly-etf",
   "package": "WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW",
-  "status": "validated_no_mutation_review",
+  "status": "closed_merged_validated_no_change",
   "market_snapshot": {
     "source": "yfinance",
     "fetched_at_utc": "2026-07-18T00:07:26.817450+00:00",
@@ -379,7 +379,8 @@
   },
   "governance_closeout": {
     "pull_request": 96,
-    "merge_commit": "pending",
-    "claim_release": "effective_on_merge"
+    "merge_commit": "b2d32e327023ea515c1c78ccbc66f69b69afab45",
+    "claim_release": "closed_released",
+    "metadata_pull_request": 97
   }
 }

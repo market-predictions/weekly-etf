@@ -11,7 +11,7 @@ implementation_merge: 2895bbb5940ead8526ab4c10d0ce3687f8aca423
 closeout_branch: agent/portfolio-close-first-execution-review-closeout
 closeout_pull_request: 96
 closeout_merge: b2d32e327023ea515c1c78ccbc66f69b69afab45
-metadata_pull_request: pending
+metadata_pull_request: 97
 status: closed / released
 released_at_utc: 2026-07-18T00:29:29Z
 scope: read-only evidence review, deterministic source comparison, transition validation, governance closeout
