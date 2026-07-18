@@ -1,10 +1,11 @@
 name: Patch fresh report delivery request authority
 
 on:
-  push:
+  pull_request:
     branches:
       - main
     paths:
+      - ".github/workflows/patch-fresh-report-delivery-request-authority.yml"
       - "tools/patch_fresh_report_delivery_request_authority.py"
 
 permissions:
@@ -16,10 +17,10 @@ jobs:
     env:
       PYTHONPATH: .
     steps:
-      - name: Check out main
+      - name: Check out implementation branch
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: agent/fresh-report-delivery-authority-pr
           fetch-depth: 0
 
       - name: Apply deterministic patch
@@ -42,10 +43,10 @@ jobs:
             tests/test_model_execution_request_authority.py \
             tests/test_model_no_trade_gate.py
 
-      - name: Commit patched files
+      - name: Commit validated patch to implementation branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Add report-request execution authority gate" || exit 0
-          git push origin HEAD:main
+          git push origin HEAD:agent/fresh-report-delivery-authority-pr
