@@ -1,0 +1,55 @@
+name: Patch report-authority CLI boundary
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/patch-report-authority-cli-boundary.yml"
+      - "tools/patch_report_authority_cli_boundary.py"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+    steps:
+      - name: Check out implementation branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/fresh-report-delivery-authority-pr
+          fetch-depth: 0
+
+      - name: Apply CLI boundary patch
+        run: python tools/patch_report_authority_cli_boundary.py
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: python -m pip install pytest pyyaml
+
+      - name: Run authority and whole-share regressions
+        run: |
+          python -m py_compile \
+            runtime/model_execution_guarded_auto.py \
+            tests/test_model_execution_request_authority.py
+          pytest -q \
+            tests/test_model_execution_request_authority.py \
+            tests/test_model_no_trade_gate.py \
+            tests/test_etf_whole_share_contract.py
+
+      - name: Commit validated code patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            runtime/model_execution_guarded_auto.py \
+            tests/test_model_execution_request_authority.py
+          git commit -m "Scope report-request authority to production CLI" || exit 0
+          git push origin HEAD:agent/fresh-report-delivery-authority-pr
