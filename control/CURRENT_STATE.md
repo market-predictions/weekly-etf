@@ -177,7 +177,9 @@ The official portfolio remains unchanged at nine active positions and retains `c
 ```text
 package: WP_COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX
 pull_request: #98
-status: implementation_complete_validation_green_merge_pending
+cockpit_email_fix_implementation_merge: 467726f2449b3a409008075812c761c4dc48c3f3
+cockpit_email_fix_closeout_pull_request: #99
+status: closed_on_governance_closeout_merge
 root_cause: cockpit presentation depended on a head stylesheet not reliably applied by the mail client
 email_layout: inline_styles_and_presentation_tables
 email_head_css_required: false
