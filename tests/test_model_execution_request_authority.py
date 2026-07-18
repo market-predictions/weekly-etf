@@ -69,7 +69,9 @@ def test_unauthorized_report_request_writes_no_portfolio_or_ledger(tmp_path: Pat
 
     portfolio_before = portfolio.read_bytes()
     ledger_before = ledger.read_bytes()
-    artifact = build_guarded_artifact(runtime, portfolio, ledger, output)
+    artifact = build_guarded_artifact(
+        runtime, portfolio, ledger, output, enforce_request_authority=True
+    )
 
     assert artifact["execution_mode"] == "guarded_auto"
     assert artifact["execution_status"] == "no_trade_intents"

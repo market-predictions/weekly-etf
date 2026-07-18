@@ -365,11 +365,16 @@ def _build_execution_not_authorized_artifact(
 
 
 def build_guarded_artifact(
-    runtime_state_path: Path, portfolio_state_path: Path, trade_ledger_path: Path, output_dir: Path
+    runtime_state_path: Path,
+    portfolio_state_path: Path,
+    trade_ledger_path: Path,
+    output_dir: Path,
+    *,
+    enforce_request_authority: bool = False,
 ) -> dict[str, Any]:
     _assert_official_state_is_whole_share(portfolio_state_path)
     state = _read_json(runtime_state_path)
-    if not _portfolio_execution_authorized():
+    if enforce_request_authority and not _portfolio_execution_authorized():
         return _build_execution_not_authorized_artifact(
             runtime_state_path, portfolio_state_path, trade_ledger_path, output_dir
         )
@@ -413,7 +418,11 @@ def main() -> None:
     parser.add_argument("--output-dir", default="output/runtime")
     args = parser.parse_args()
     artifact = build_guarded_artifact(
-        Path(args.runtime_state), Path(args.portfolio_state), Path(args.trade_ledger), Path(args.output_dir)
+        Path(args.runtime_state),
+        Path(args.portfolio_state),
+        Path(args.trade_ledger),
+        Path(args.output_dir),
+        enforce_request_authority=True,
     )
     print(
         "ETF_MODEL_EXECUTION_OK | "
