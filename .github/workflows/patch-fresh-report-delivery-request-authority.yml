@@ -6,6 +6,7 @@ on:
       - agent/fresh-report-delivery-request-authority
     paths:
       - "tools/patch_fresh_report_delivery_request_authority.py"
+      - "control/run_queue/patch_fresh_report_delivery_request_authority_trigger_*.md"
 
 permissions:
   contents: write
