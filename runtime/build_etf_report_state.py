@@ -9,6 +9,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from runtime.trade_lineage import normalize_and_validate_trade_lineage
+
 RUNTIME_DIR = Path("output/runtime")
 PRICING_DIR = Path("output/pricing")
 LANE_DIR = Path("output/lane_reviews")
@@ -19,6 +21,7 @@ PRICED_CLOSE_STATUSES = {"fresh_close", "fresh_fallback_source", "fresh_exact_cl
 # the official portfolio-state quantity/valuation contract.
 POSITION_AUTHORITY_FIELDS = {
     "shares",
+    "previous_shares",
     "current_price_local",
     "previous_price_local",
     "continuity_current_price_local",
@@ -379,7 +382,7 @@ def _enrich_positions(
         row.setdefault("previous_weight_pct", row["current_weight_pct"])
         row.setdefault("weight_inherited_pct", row["current_weight_pct"])
         row.setdefault("target_weight_pct", row["current_weight_pct"])
-    return holdings
+    return normalize_and_validate_trade_lineage(holdings, context="runtime_report_state")
 
 
 def _build_replacement_duels(portfolio_state: dict[str, Any], lane_assessment: dict[str, Any], pricing_audit: dict[str, Any]) -> list[dict[str, Any]]:
@@ -402,7 +405,7 @@ def build_runtime_state(
     rotation_plan = load_json_if_exists(sources.rotation_plan) if sources.rotation_plan else {}
 
     holdings = _enrich_positions(portfolio_state, pricing_audit, recommendation_scorecard, lane_assessment, rotation_plan)
-    total_market_value = round(sum((_to_float(p.get("previous_market_value_eur")) or 0.0) for p in holdings), 2)
+    total_market_value = round(sum((_to_float(p.get("market_value_eur")) or _to_float(p.get("previous_market_value_eur")) or 0.0) for p in holdings), 2)
     total_portfolio_value_eur = round(total_market_value + (_to_float(portfolio_state.get("cash_eur")) or 0.0), 2)
     prices = list(_index_price_results(pricing_audit).values())
     fx_basis = pricing_audit.get("fx_basis") or {}
@@ -427,6 +430,8 @@ def build_runtime_state(
         "rotation_plan_present": bool(rotation_plan),
         "rotation_plan_source": str(sources.rotation_plan) if sources.rotation_plan else None,
         "rotation_warning_mode": bool(rotation_plan),
+        "trade_lineage_valid": True,
+        "material_trade_display_gate": "passed",
     }
 
     return {
