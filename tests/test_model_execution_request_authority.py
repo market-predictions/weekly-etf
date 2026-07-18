@@ -81,3 +81,39 @@ def test_unauthorized_report_request_writes_no_portfolio_or_ledger(tmp_path: Pat
     assert artifact["proposed_ledger_rows"] == []
     assert portfolio.read_bytes() == portfolio_before
     assert ledger.read_bytes() == ledger_before
+
+
+def test_report_only_position_count_preflight_does_not_project_rotation(tmp_path: Path, monkeypatch) -> None:
+    from tools.validate_etf_persisted_valuation_state import _position_count_preflight
+
+    monkeypatch.chdir(tmp_path)
+    _request(tmp_path / "control/run_queue", "false")
+    positions = [{"ticker": ticker, "shares": 1} for ticker in "ABCDEFGHI"]
+    portfolio = {"positions": positions}
+    portfolio_path = tmp_path / "output/etf_portfolio_state.json"
+    portfolio_path.parent.mkdir(parents=True, exist_ok=True)
+    portfolio_path.write_text(json.dumps(portfolio), encoding="utf-8")
+    runtime = {
+        "positions": positions,
+        "rotation_plan": {
+            "policy": {"max_active_positions": 8},
+            "trade_intents": [{
+                "source_ticker": "A",
+                "destination_ticker": "NEW",
+                "action_code": "replace_partial",
+            }],
+        },
+    }
+
+    assessment = _position_count_preflight(
+        runtime,
+        portfolio,
+        portfolio_path,
+        enforce_request_authority=True,
+    )
+
+    assert assessment.status == "close_first"
+    assert assessment.current_count == 9
+    assert assessment.projected_count == 9
+    assert assessment.opened_tickers == ()
+

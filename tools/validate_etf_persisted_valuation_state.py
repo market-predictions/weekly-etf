@@ -7,7 +7,10 @@ from pathlib import Path
 from typing import Any
 
 from runtime import model_execution_engine as execution_engine
-from runtime.model_execution_guarded_auto import _whole_share_engine_patch
+from runtime.model_execution_guarded_auto import (
+    _portfolio_execution_authorized,
+    _whole_share_engine_patch,
+)
 from runtime.position_count_contract import (
     PositionCountAssessment,
     assess_current_positions,
@@ -71,6 +74,8 @@ def _position_count_preflight(
     runtime_state: dict[str, Any],
     portfolio_state: dict[str, Any],
     portfolio_state_path: Path,
+    *,
+    enforce_request_authority: bool = False,
 ) -> PositionCountAssessment:
     maximum = resolve_max_active_positions(runtime_state)
     current_positions = portfolio_state.get("positions", []) or []
@@ -80,6 +85,9 @@ def _position_count_preflight(
             "ETF position-count contract rejected official state: "
             + "; ".join(current.errors)
         )
+
+    if enforce_request_authority and not _portfolio_execution_authorized():
+        return current
 
     intents = _trade_intents(runtime_state)
     if not intents:
@@ -162,6 +170,7 @@ def main() -> None:
         runtime_state,
         portfolio_state,
         portfolio_state_path,
+        enforce_request_authority=True,
     )
 
     print(
