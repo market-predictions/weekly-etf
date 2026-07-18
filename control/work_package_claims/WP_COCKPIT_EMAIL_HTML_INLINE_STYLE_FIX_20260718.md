@@ -7,18 +7,25 @@ claimed_by: ChatGPT
 claimed_at_utc: 2026-07-18T09:20:00Z
 branch: agent/cockpit-email-html-inline-style-fix
 pull_request: 98
-status: implementation_active / validation_retry
+status: implementation_complete / compatibility_rerun
 scope: email-safe inline cockpit rendering, degradation validation, compatibility tests, governance closeout
 ```
 
-Authority boundary:
+Confirmed boundaries:
 
-- official portfolio state remains unchanged;
-- trade ledger and valuation history remain unchanged;
-- pricing and runtime pointers remain unchanged;
-- historical delivered HTML/PDF files remain unchanged;
-- no report generation for delivery;
-- no email send or resend;
-- PDF cockpit design remains the current authority for print rendering.
+- portfolio state unchanged;
+- trade ledger and valuation history unchanged;
+- pricing and runtime pointers unchanged;
+- historical delivered HTML/PDF files unchanged;
+- no production report generated;
+- no email sent;
+- PDF cockpit design preserved.
 
-The first validation attempt stopped at Python compilation because of an f-string syntax error in the new email renderer. The renderer was corrected before any functional test or repository-authority mutation occurred. The full validation suite is rerun on the corrected head.
+Validation status:
+
+- initial Python syntax issue corrected;
+- dedicated email-inline gate passed;
+- WP10, current-runtime and WP08 gates passed;
+- WP11 found that the email caption needed the existing `.etf-cockpit-chart-caption` compatibility class;
+- that class is restored without changing content or appearance;
+- final same-head validation is pending.
