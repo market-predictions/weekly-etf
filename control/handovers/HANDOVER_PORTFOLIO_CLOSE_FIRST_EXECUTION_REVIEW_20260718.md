@@ -3,8 +3,11 @@
 Date: 2026-07-18
 Repository: `market-predictions/weekly-etf`
 Package: `WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW`
-Status: implementation complete / validation green / merge pending
-Pull request: #95
+Status: closed on governance-closeout merge / claim release effective on merge
+Implementation pull request: #95
+Implementation merge: `2895bbb5940ead8526ab4c10d0ce3687f8aca423`
+Governance-closeout pull request: #96
+Governance-closeout merge: pending
 
 ## Current issue
 
@@ -132,6 +135,23 @@ historical_report_hashes: identical
 ```
 
 Test coverage includes close-to-cash, reallocation to an existing holding, insufficient-evidence fail-closed behavior, smallest-position non-selection, input immutability, client-surface hygiene and lane-quality flooring.
+
+
+## Final same-head validation
+
+```text
+validated_head: bbf03f8966c93d714ff750c9d177917bcc0eef9d
+review_run: 29622792895 success
+position_count_run: 29622792864 success
+report_language_run: 29622792867 success
+current_runtime_cockpit_run: 29622792888 success
+wp08_run: 29622792861 success
+wp11_run: 29622792862 success
+artifact_id: 8422761924
+artifact_digest: sha256:1526642d997b2c9055554a3bab969ba84d1bafdf103285af00056fb7f96eae29
+protected_authority_hashes: identical
+historical_report_hashes: identical
+```
 
 ## Authority boundary
 

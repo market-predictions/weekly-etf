@@ -17,7 +17,17 @@
     "maximum": 8,
     "cash_eur": 2534.36,
     "nav_eur": 107117.94,
-    "tickers": ["CIBR", "GSG", "IEFA", "PAVE", "SMH", "URNM", "XBI", "XLU", "XLV"]
+    "tickers": [
+      "CIBR",
+      "GSG",
+      "IEFA",
+      "PAVE",
+      "SMH",
+      "URNM",
+      "XBI",
+      "XLU",
+      "XLV"
+    ]
   },
   "ranking": [
     {
@@ -34,8 +44,21 @@
       "rs_vs_spy_1m_pct": -15.64,
       "rs_vs_spy_3m_pct": -33.97,
       "trend_quality": 0.0,
-      "issue_families": ["contribution", "discipline", "loss", "market", "quality", "release", "role"],
-      "priority_reasons": ["hold_requires_exception", "material_performance_drag", "portfolio_role_failed", "loss_exceeds_twenty_percent"],
+      "issue_families": [
+        "contribution",
+        "discipline",
+        "loss",
+        "market",
+        "quality",
+        "release",
+        "role"
+      ],
+      "priority_reasons": [
+        "hold_requires_exception",
+        "material_performance_drag",
+        "portfolio_role_failed",
+        "loss_exceeds_twenty_percent"
+      ],
       "preservation_reasons": []
     },
     {
@@ -52,8 +75,22 @@
       "rs_vs_spy_1m_pct": 2.02,
       "rs_vs_spy_3m_pct": -4.71,
       "trend_quality": 3.5,
-      "issue_families": ["discipline", "fresh_cash", "market", "quality", "release", "replaceability", "role"],
-      "priority_reasons": ["action_calls_for_reduction_or_replacement", "failed_fresh_cash_test", "replaceable_under_review", "replaceability_review_age", "portfolio_role_impaired"],
+      "issue_families": [
+        "discipline",
+        "fresh_cash",
+        "market",
+        "quality",
+        "release",
+        "replaceability",
+        "role"
+      ],
+      "priority_reasons": [
+        "action_calls_for_reduction_or_replacement",
+        "failed_fresh_cash_test",
+        "replaceable_under_review",
+        "replaceability_review_age",
+        "portfolio_role_impaired"
+      ],
       "preservation_reasons": []
     },
     {
@@ -70,8 +107,16 @@
       "rs_vs_spy_1m_pct": -0.61,
       "rs_vs_spy_3m_pct": -2.79,
       "trend_quality": 3.5,
-      "issue_families": ["contribution", "market", "quality", "role"],
-      "priority_reasons": ["opportunity_cost_review", "portfolio_role_impaired"],
+      "issue_families": [
+        "contribution",
+        "market",
+        "quality",
+        "role"
+      ],
+      "priority_reasons": [
+        "opportunity_cost_review",
+        "portfolio_role_impaired"
+      ],
       "preservation_reasons": []
     },
     {
@@ -88,8 +133,16 @@
       "rs_vs_spy_1m_pct": 6.79,
       "rs_vs_spy_3m_pct": -6.94,
       "trend_quality": 2.5,
-      "issue_families": ["contribution", "market", "quality", "role"],
-      "priority_reasons": ["opportunity_cost_review", "portfolio_role_impaired"],
+      "issue_families": [
+        "contribution",
+        "market",
+        "quality",
+        "role"
+      ],
+      "priority_reasons": [
+        "opportunity_cost_review",
+        "portfolio_role_impaired"
+      ],
       "preservation_reasons": []
     },
     {
@@ -106,9 +159,23 @@
       "rs_vs_spy_1m_pct": -15.2,
       "rs_vs_spy_3m_pct": 13.93,
       "trend_quality": 1.5,
-      "issue_families": ["fresh_cash", "market", "replaceability", "role"],
-      "priority_reasons": ["fresh_cash_only_smaller_or_review", "replaceable_under_review", "portfolio_role_impaired"],
-      "preservation_reasons": ["highest_conviction_tier", "core_growth_role", "strong_three_month_relative_strength", "strong_positive_contribution"]
+      "issue_families": [
+        "fresh_cash",
+        "market",
+        "replaceability",
+        "role"
+      ],
+      "priority_reasons": [
+        "fresh_cash_only_smaller_or_review",
+        "replaceable_under_review",
+        "portfolio_role_impaired"
+      ],
+      "preservation_reasons": [
+        "highest_conviction_tier",
+        "core_growth_role",
+        "strong_three_month_relative_strength",
+        "strong_positive_contribution"
+      ]
     },
     {
       "rank": 6,
@@ -124,9 +191,14 @@
       "rs_vs_spy_1m_pct": -3.23,
       "rs_vs_spy_3m_pct": -3.74,
       "trend_quality": 2.5,
-      "issue_families": ["market", "quality"],
+      "issue_families": [
+        "market",
+        "quality"
+      ],
       "priority_reasons": [],
-      "preservation_reasons": ["recently_added_position"]
+      "preservation_reasons": [
+        "recently_added_position"
+      ]
     },
     {
       "rank": 7,
@@ -142,8 +214,15 @@
       "rs_vs_spy_1m_pct": 10.19,
       "rs_vs_spy_3m_pct": 7.37,
       "trend_quality": 3.5,
-      "issue_families": ["contribution", "market", "role"],
-      "priority_reasons": ["opportunity_cost_review", "portfolio_role_impaired"],
+      "issue_families": [
+        "contribution",
+        "market",
+        "role"
+      ],
+      "priority_reasons": [
+        "opportunity_cost_review",
+        "portfolio_role_impaired"
+      ],
       "preservation_reasons": []
     },
     {
@@ -160,8 +239,14 @@
       "rs_vs_spy_1m_pct": 8.76,
       "rs_vs_spy_3m_pct": 5.04,
       "trend_quality": 5.0,
-      "issue_families": ["contribution", "role"],
-      "priority_reasons": ["opportunity_cost_review", "portfolio_role_impaired"],
+      "issue_families": [
+        "contribution",
+        "role"
+      ],
+      "priority_reasons": [
+        "opportunity_cost_review",
+        "portfolio_role_impaired"
+      ],
       "preservation_reasons": []
     },
     {
@@ -178,9 +263,18 @@
       "rs_vs_spy_1m_pct": 9.8,
       "rs_vs_spy_3m_pct": 30.02,
       "trend_quality": 5.0,
-      "issue_families": ["contribution", "role"],
-      "priority_reasons": ["opportunity_cost_review", "portfolio_role_impaired"],
-      "preservation_reasons": ["high_structural_score", "strong_three_month_relative_strength"]
+      "issue_families": [
+        "contribution",
+        "role"
+      ],
+      "priority_reasons": [
+        "opportunity_cost_review",
+        "portfolio_role_impaired"
+      ],
+      "preservation_reasons": [
+        "high_structural_score",
+        "strong_three_month_relative_strength"
+      ]
     }
   ],
   "decision": {
@@ -190,25 +284,60 @@
     "proceeds_eur": 2022.23,
     "projected_cash_eur": 4556.59,
     "destination_shares_added": 0,
-    "rationale_codes": ["active_count_restored", "source_selected_on_multiple_independent_factors", "small_position_size_not_used_as_sole_reason"],
+    "rationale_codes": [
+      "active_count_restored",
+      "source_selected_on_multiple_independent_factors",
+      "small_position_size_not_used_as_sole_reason"
+    ],
     "transition": {
       "passed": true,
       "status": "compliant",
       "max_active_positions": 8,
       "current_count": 9,
       "projected_count": 8,
-      "current_tickers": ["CIBR", "GSG", "IEFA", "PAVE", "SMH", "URNM", "XBI", "XLU", "XLV"],
-      "projected_tickers": ["CIBR", "GSG", "IEFA", "PAVE", "SMH", "XBI", "XLU", "XLV"],
+      "current_tickers": [
+        "CIBR",
+        "GSG",
+        "IEFA",
+        "PAVE",
+        "SMH",
+        "URNM",
+        "XBI",
+        "XLU",
+        "XLV"
+      ],
+      "projected_tickers": [
+        "CIBR",
+        "GSG",
+        "IEFA",
+        "PAVE",
+        "SMH",
+        "XBI",
+        "XLU",
+        "XLV"
+      ],
       "opened_tickers": [],
-      "closed_tickers": ["URNM"],
+      "closed_tickers": [
+        "URNM"
+      ],
       "errors": [],
-      "warnings": ["position_count_close_first:9>8"]
+      "warnings": [
+        "position_count_close_first:9>8"
+      ]
     }
   },
   "selection_proof": {
     "smallest_position_not_automatic": true,
     "selected_source": "URNM",
-    "selected_source_issue_families": ["contribution", "discipline", "loss", "market", "quality", "release", "role"],
+    "selected_source_issue_families": [
+      "contribution",
+      "discipline",
+      "loss",
+      "market",
+      "quality",
+      "release",
+      "role"
+    ],
     "selected_source_remains_top_without_size_points": true
   },
   "validation": {
@@ -221,7 +350,18 @@
     "artifact_id": 8422627986,
     "artifact_digest": "sha256:9f0b833f6d9dd5bb7b7558afe598c20246e67707fc5cff974e1bfc661479851a",
     "protected_authority_hashes": "identical",
-    "historical_report_hashes": "identical"
+    "historical_report_hashes": "identical",
+    "implementation_pull_request": 95,
+    "implementation_merge": "2895bbb5940ead8526ab4c10d0ce3687f8aca423",
+    "final_validated_head": "bbf03f8966c93d714ff750c9d177917bcc0eef9d",
+    "final_review_run": 29622792895,
+    "final_position_count_run": 29622792864,
+    "final_report_language_run": 29622792867,
+    "final_current_runtime_cockpit_run": 29622792888,
+    "final_wp08_run": 29622792861,
+    "final_wp11_run": 29622792862,
+    "final_artifact_id": 8422761924,
+    "final_artifact_digest": "sha256:1526642d997b2c9055554a3bab969ba84d1bafdf103285af00056fb7f96eae29"
   },
   "authority_boundary": {
     "portfolio_execution": false,
@@ -236,5 +376,10 @@
   "surfaces": {
     "english": "control/reviews/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_EN_20260718.md",
     "dutch": "control/reviews/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_NL_20260718.md"
+  },
+  "governance_closeout": {
+    "pull_request": 96,
+    "merge_commit": "pending",
+    "claim_release": "effective_on_merge"
   }
 }
