@@ -102,6 +102,20 @@ Dutch attachment count: 4
 - the current 9-position `close_first` state remains authoritative;
 - delivery success is now confirmed by both GitHub manifests and Gmail receipts.
 
+## Final governance closeout
+
+```text
+closeout_pull_request: 107
+closeout_merge: f5c8ab979ee227f0adbdd556d100537ede6c50d6
+validated_closeout_head: 96f05bccf895a96f32b3a8db68654944393b442c
+current_runtime_run: 29659883734 success
+wp08_run: 29659883741 success
+wp11_run: 29659883739 success
+email_inline_run: 29659883756 success
+client_language_run: 29659883732 success
+position_count_run: 29659883737 success
+```
+
 ## Acceptance criteria
 
 - [x] work package and claim existed before recovery work;
@@ -113,4 +127,5 @@ Dutch attachment count: 4
 - [x] successful bilingual delivery manifest persisted;
 - [x] English inbox receipt confirmed;
 - [x] Dutch inbox receipt confirmed;
-- [x] handover and control closeout recorded.
+- [x] handover and control closeout recorded;
+- [x] final governance closeout merged and exact receipt recorded.
