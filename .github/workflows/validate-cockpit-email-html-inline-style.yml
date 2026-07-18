@@ -1,0 +1,156 @@
+name: Validate cockpit email HTML inline style
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "runtime/additive_cockpit_front_page.py"
+      - "runtime/cockpit_email_safe_surface.py"
+      - "tests/test_cockpit_email_html_inline_style.py"
+      - "tests/test_cockpit_wp10_additive_delivery_front_page.py"
+      - "tools/validate_cockpit_email_html_inline_style.py"
+      - ".github/workflows/validate-cockpit-email-html-inline-style.yml"
+      - "control/work_packages/WP_COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX_20260718.md"
+      - "control/work_package_claims/WP_COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX_20260718.md"
+      - "control/decisions/COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX_DECISION_20260718.md"
+      - "control/evidence/COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX_EVIDENCE_20260718.json"
+      - "control/handovers/HANDOVER_COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX_20260718.md"
+      - "control/CURRENT_STATE.md"
+      - "control/NEXT_ACTIONS.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install render and validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            pytest \
+            pandas \
+            matplotlib \
+            seaborn \
+            markdown \
+            mistune \
+            beautifulsoup4 \
+            lxml \
+            premailer \
+            weasyprint \
+            pillow \
+            requests \
+            pyyaml \
+            jsonschema \
+            yfinance \
+            pypdf
+
+      - name: Snapshot protected authority files
+        run: |
+          set -euo pipefail
+          files=(
+            output/etf_portfolio_state.json
+            output/etf_trade_ledger.csv
+            output/etf_valuation_history.csv
+            output/etf_recommendation_scorecard.csv
+            output/runtime/latest_etf_report_state_path.txt
+            output/pricing/latest_price_audit_path.txt
+            output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+          )
+          for pointer in \
+            output/runtime/latest_etf_report_state_path.txt \
+            output/pricing/latest_price_audit_path.txt \
+            output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+          do
+            target="$(cat "$pointer")"
+            files+=("$target")
+          done
+          printf '%s\n' "${files[@]}" | sort -u > /tmp/cockpit-email-protected-files.txt
+          xargs -d '\n' sha256sum < /tmp/cockpit-email-protected-files.txt > /tmp/cockpit-email-protected-before.sha256
+
+      - name: Compile implementation and validator
+        run: |
+          python -m py_compile \
+            runtime/additive_cockpit_front_page.py \
+            runtime/cockpit_email_safe_surface.py \
+            tools/validate_cockpit_email_html_inline_style.py \
+            tests/test_cockpit_email_html_inline_style.py
+
+      - name: Run focused cockpit regressions
+        run: |
+          pytest -q \
+            tests/test_cockpit_email_html_inline_style.py \
+            tests/test_cockpit_wp10_additive_delivery_front_page.py
+
+      - name: Validate inline email degradation contract
+        run: |
+          mkdir -p /tmp/cockpit-email-inline
+          python tools/validate_cockpit_email_html_inline_style.py \
+            --repo-root . \
+            --evidence-path /tmp/cockpit-email-inline/evidence.json
+
+      - name: Verify evidence contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path('/tmp/cockpit-email-inline/evidence.json').read_text(encoding='utf-8'))
+          assert payload['schema_version'] == 'cockpit_email_html_inline_style_fix_v1'
+          assert payload['status'] == 'validated_no_send'
+          assert payload['implementation']['email_head_css_required'] is False
+          assert payload['implementation']['pdf_layout'] == 'existing_class_based_surface_preserved'
+          for language in ('en', 'nl'):
+              email = payload['languages'][language]['email']
+              pdf = payload['languages'][language]['pdf']
+              assert email['head_style_dependency'] is False
+              assert email['style_strip_degradation_test'] == 'passed'
+              assert email['front_page_count'] == 1
+              assert email['classic_body_preserved'] is True
+              assert pdf['class_based_stylesheet_preserved'] is True
+              assert pdf['print_rules_preserved'] is True
+              assert pdf['svg_sparkline_preserved'] is True
+          assert payload['authority']['protected_hashes_before_after'] == 'identical'
+          assert payload['authority']['email_sent'] is False
+          PY
+
+      - name: Prove protected authority unchanged
+        run: |
+          set -euo pipefail
+          xargs -d '\n' sha256sum < /tmp/cockpit-email-protected-files.txt > /tmp/cockpit-email-protected-after.sha256
+          diff -u /tmp/cockpit-email-protected-before.sha256 /tmp/cockpit-email-protected-after.sha256
+          sha256sum -c /tmp/cockpit-email-protected-before.sha256
+          git diff --exit-code -- \
+            output/etf_portfolio_state.json \
+            output/etf_trade_ledger.csv \
+            output/etf_valuation_history.csv \
+            output/etf_recommendation_scorecard.csv \
+            output/runtime/latest_etf_report_state_path.txt \
+            output/pricing/latest_price_audit_path.txt \
+            output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+
+      - name: Upload no-send validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cockpit-email-inline-style-${{ github.run_id }}
+          path: |
+            /tmp/cockpit-email-inline/evidence.json
+            /tmp/cockpit-email-protected-files.txt
+            /tmp/cockpit-email-protected-before.sha256
+            /tmp/cockpit-email-protected-after.sha256
+          if-no-files-found: error
+          retention-days: 30
