@@ -6,7 +6,8 @@ repository: market-predictions/weekly-etf
 claimed_by: ChatGPT
 claimed_at_utc: 2026-07-18T23:39:00Z
 branch: agent/fix-trade-weight-lineage
-status: active
+implementation_pull_request: 109
+status: active / implementation PR open
 ```
 
 Scope is limited to preserving and validating pre-trade quantity/value/weight lineage for executed ETF report actions and correcting the resulting cockpit before/after presentation.
