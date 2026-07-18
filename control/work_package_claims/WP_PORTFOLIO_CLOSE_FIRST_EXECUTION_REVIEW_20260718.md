@@ -7,19 +7,19 @@ claimed_by: ChatGPT
 claimed_at_utc: 2026-07-17T23:38:20Z
 branch: agent/portfolio-close-first-execution-review
 pull_request: 95
-status: implementation_active / final_same_head_validation_pending
-scope: no-mutation fresh-evidence review, deterministic closure-source comparison, projected transition validation, governance closeout
+status: final_validation_pending
+scope: read-only fresh-evidence review, deterministic source comparison, projected transition validation, governance closeout
 ```
 
-Authority boundary:
+Boundaries:
 
 - official portfolio state remains unchanged;
 - trade ledger and valuation history remain unchanged;
-- official pricing pointers and historical reports remain unchanged;
-- no trade execution;
-- no production report generation;
-- no email delivery;
-- no new ticker may be proposed while the portfolio remains above eight active positions;
-- any supported count-reducing transition remains review evidence only until separately authorized.
+- pricing pointers and historical reports remain unchanged;
+- no transaction is performed;
+- no production report is generated;
+- no email is sent;
+- no new ticker is introduced while the portfolio remains above eight positions;
+- any supported count-reducing option requires separate user approval.
 
-The review records holding quality and current lane/thesis quality separately. The lower of those two scores forms the deterministic decision-quality floor, so a stale or stronger holding score cannot conceal weaker current thesis evidence.
+The review stores holding quality and current lane quality separately. The lower score forms the decision-quality floor. Bilingual surfaces use client-readable conclusions and state that the official portfolio remains unchanged.
