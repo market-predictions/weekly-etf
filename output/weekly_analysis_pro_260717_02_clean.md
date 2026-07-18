@@ -335,15 +335,15 @@ Execution note: The model would normally force reduce/replace review, but the po
 ### Portfolio table
 | Ticker | ETF Name | Direction | Weight % | Avg Entry | Current Price | P/L % | Original Thesis | Role |
 |---|---|---:|---:|---:|---:|---:|---|---|
-| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Long | 19.16 |  | 92.36 | -1.48 |  | Portfolio allocation |
+| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Long | 19.16 | | 92.36 | -1.48 | | Portfolio allocation |
 | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Long | 9.63 | 31.80 | 31.40 | -1.26 | Portfolio allocation | Portfolio allocation |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Long | 24.62 |  | 96.25 | -0.74 |  | Portfolio allocation |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Long | 4.94 |  | 56.30 | -0.85 |  | Portfolio allocation |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Long | 24.62 | | 96.25 | -0.74 | | Portfolio allocation |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Long | 4.94 | | 56.30 | -0.85 | | Portfolio allocation |
 | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Long | 26.92 | 420.13 | 556.53 | 32.47 | AI compute / semiconductor leadership | Growth engine |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Long | 1.90 | 67.50 | 48.22 | -28.56 | Nuclear and uranium cycle exposure | Strategic energy |
-| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | Long | 5.06 |  | 154.26 | -0.77 |  | Portfolio allocation |
-| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Long | 0.52 |  | 45.17 | 2.89 |  | Portfolio allocation |
-| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | Long | 4.89 |  | 161.09 | -0.44 |  | Portfolio allocation |
+| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | Long | 5.06 | | 154.26 | -0.77 | | Portfolio allocation |
+| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Long | 0.52 | | 45.17 | 2.89 | | Portfolio allocation |
+| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | Long | 4.89 | | 161.09 | -0.44 | | Portfolio allocation |
 
 ### Available cash
 - Cash %: 2.38
