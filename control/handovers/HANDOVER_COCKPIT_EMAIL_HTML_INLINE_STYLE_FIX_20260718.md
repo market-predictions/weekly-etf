@@ -3,8 +3,10 @@
 Date: 2026-07-18
 Repository: `market-predictions/weekly-etf`
 Package: `WP_COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX`
-Status: implementation complete / validation green / merge pending
-Pull request: #98
+Status: closed on governance-closeout merge / claim release effective on merge
+Implementation pull request: #98
+Implementation merge: `467726f2449b3a409008075812c761c4dc48c3f3`
+Governance-closeout pull request: #99
 
 ## Current issue
 
@@ -127,3 +129,22 @@ email_sent: false
 ## Next action
 
 After merge, future production-generated email HTML will use the inline/table cockpit. A real mail-client receipt can only be proven by a separately authorized fresh report delivery. Do not resend or rewrite the historical `260716_02` package as part of this fix.
+
+## Final same-head receipt
+
+```text
+validated_head: 7e9706b6019f4e4eb6debc5a2ff95fe0ed70399c
+email_inline_run: 29640892996 success
+wp10_run: 29640893034 success
+wp11_run: 29640892992 success
+current_runtime_run: 29640892988 success
+wp08_run: 29640893022 success
+report_language_run: 29640893008 success
+position_count_run: 29640893026 success
+artifact_id: 8428574798
+artifact_digest: sha256:87a73c4c03d491105d7fcb8b2df1775410113b3e4547f159684027a714fb0319
+protected_authority_hashes: identical
+historical_reports: unchanged
+production_report_generated: false
+email_sent: false
+```

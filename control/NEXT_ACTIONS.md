@@ -89,7 +89,9 @@ control/handovers/HANDOVER_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_20260718.md
 ```text
 package: WP_COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX
 pull_request: #98
-status: implementation_complete_validation_green_merge_pending
+cockpit_email_fix_implementation_merge: 467726f2449b3a409008075812c761c4dc48c3f3
+cockpit_email_fix_closeout_pull_request: #99
+status: closed_on_governance_closeout_merge
 email_layout: inline_styles_and_presentation_tables
 head_style_dependency: false
 style_strip_degradation_test: passed_both_languages

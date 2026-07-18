@@ -9,8 +9,8 @@ implementation_branch: agent/cockpit-email-html-inline-style-fix
 implementation_pull_request: 98
 implementation_merge: 467726f2449b3a409008075812c761c4dc48c3f3
 closeout_branch: agent/cockpit-email-html-inline-style-closeout
-closeout_pull_request: pending
-status: implementation_merged / closeout_active
+closeout_pull_request: 99
+status: closeout_ready / release_effective_on_merge
 scope: email-safe inline cockpit rendering, degradation validation, compatibility tests, governance closeout
 ```
 
@@ -42,4 +42,4 @@ historical_reports: unchanged
 email_sent: false
 ```
 
-The claim remains held until the governance-closeout PR merges and the exact closeout merge is recorded.
+The claim is released when PR #99 merges. The exact closeout merge is then recorded in the final receipt.

@@ -2,7 +2,7 @@
 
 Date: 2026-07-18
 Repository: `market-predictions/weekly-etf`
-Status: implementation_complete / validation_green / merge_pending
+Status: closed_on_closeout_merge / merged / validated_no_send
 
 ## Current issue
 
@@ -75,15 +75,20 @@ The new validator explicitly removes every `<style>` element from generated EN/N
 ## Validation
 
 ```text
-validated_head: 72841c3bbedfea19122269f2f7c78168676955cb
-email_inline_run: 29640677887 success
+implementation_pull_request: #98
+implementation_merge: 467726f2449b3a409008075812c761c4dc48c3f3
+closeout_pull_request: #99
+validated_head: 7e9706b6019f4e4eb6debc5a2ff95fe0ed70399c
+email_inline_run: 29640892996 success
 email_inline_job: 88070568127
-wp10_run: 29640677890 success
-current_runtime_run: 29640677892 success
-wp08_run: 29640677898 success
-wp11_run: 29640677882 success
-artifact_id: 8428508030
-artifact_digest: sha256:df5c3daae4e82b386bdc868aaeb53d8be00cdeb4da1a6f87decd9b62037e8a34
+wp10_run: 29640893034 success
+current_runtime_run: 29640892988 success
+wp08_run: 29640893022 success
+wp11_run: 29640892992 success
+report_language_run: 29640893008 success
+position_count_run: 29640893026 success
+artifact_id: 8428574798
+artifact_digest: sha256:87a73c4c03d491105d7fcb8b2df1775410113b3e4547f159684027a714fb0319
 EN_style_strip_test: passed
 NL_style_strip_test: passed
 protected_authority_hashes: identical
@@ -113,6 +118,6 @@ The historical `260716_02` email and files remain immutable. The correction appl
 - classic report body preserved: complete;
 - exact-current WP11 compatibility: complete;
 - protected authority hashes unchanged: complete;
-- PR merge: pending;
-- claim release and final handover closeout: pending merge;
+- implementation PR #98 merged: complete;
+- governance-closeout PR #99 and claim release: effective on merge;
 - email sent: false.
