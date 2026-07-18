@@ -1,0 +1,37 @@
+name: Patch cockpit email inline style
+
+on:
+  push:
+    branches:
+      - agent/cockpit-email-html-inline-style-fix
+    paths:
+      - tools/patch_cockpit_email_inline_style.py
+      - .github/workflows/patch-cockpit-email-inline-style.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/cockpit-email-html-inline-style-fix
+          fetch-depth: 0
+      - name: Apply and compile patch
+        run: |
+          python tools/patch_cockpit_email_inline_style.py
+          python -m py_compile runtime/additive_cockpit_front_page.py runtime/cockpit_email_safe_surface.py
+      - name: Remove temporary patch inputs
+        run: |
+          rm tools/patch_cockpit_email_inline_style.py
+          rm .github/workflows/patch-cockpit-email-inline-style.yml
+      - name: Commit patched renderer and self-cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add runtime/additive_cockpit_front_page.py runtime/cockpit_email_safe_surface.py tools/patch_cockpit_email_inline_style.py .github/workflows/patch-cockpit-email-inline-style.yml
+          git commit -m "Apply email-safe cockpit renderer [skip ci]"
+          git push origin HEAD:agent/cockpit-email-html-inline-style-fix
