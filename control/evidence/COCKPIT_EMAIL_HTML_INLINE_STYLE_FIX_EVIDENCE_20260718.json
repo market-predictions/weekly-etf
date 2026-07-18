@@ -1,0 +1,73 @@
+{
+  "schema_version": "cockpit_email_html_inline_style_fix_v1",
+  "date": "2026-07-18",
+  "repository": "market-predictions/weekly-etf",
+  "package": "WP_COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX",
+  "status": "validated_no_send",
+  "root_cause": "cockpit depended on a separate head stylesheet that the mail client did not reliably retain or apply",
+  "implementation": {
+    "email_layout": "inline_styles_and_presentation_tables",
+    "email_head_css_required": false,
+    "pdf_layout": "existing_class_based_surface_preserved"
+  },
+  "languages": {
+    "en": {
+      "email": {
+        "front_page_count": 1,
+        "inline_selector_count": 15,
+        "presentation_table_count": 8,
+        "head_style_dependency": false,
+        "style_strip_degradation_test": "passed",
+        "classic_body_preserved": true,
+        "html_sha256": "fc3eab00fb120b6562bf2ed4900ba196a946c68305e77e619596484a5d164ee2"
+      },
+      "pdf": {
+        "class_based_stylesheet_preserved": true,
+        "print_rules_preserved": true,
+        "svg_sparkline_preserved": true,
+        "html_sha256": "8698e56a6af0eee419355b401c8f6b77945ba24ae97505add7d94a23ac75fd2a",
+        "css_sha256": "a80bb8039b339ce005325e340333ceaebf6eeb0d2008282ddb794f1aaedb7b78"
+      }
+    },
+    "nl": {
+      "email": {
+        "front_page_count": 1,
+        "inline_selector_count": 15,
+        "presentation_table_count": 8,
+        "head_style_dependency": false,
+        "style_strip_degradation_test": "passed",
+        "classic_body_preserved": true,
+        "html_sha256": "77fb5d6546c65e352503908494e3db3cee3f5490deebf585e2efce09c4e0ba15"
+      },
+      "pdf": {
+        "class_based_stylesheet_preserved": true,
+        "print_rules_preserved": true,
+        "svg_sparkline_preserved": true,
+        "html_sha256": "2a0d0b0f017bd05c0dc110b38968d534ffbd0fb53f94177f3601eaace6f3d3ba",
+        "css_sha256": "a80bb8039b339ce005325e340333ceaebf6eeb0d2008282ddb794f1aaedb7b78"
+      }
+    }
+  },
+  "validation": {
+    "validated_head": "72841c3bbedfea19122269f2f7c78168676955cb",
+    "email_inline_run": 29640677887,
+    "email_inline_job": 88070568127,
+    "wp10_run": 29640677890,
+    "current_runtime_run": 29640677892,
+    "wp08_run": 29640677898,
+    "wp11_run": 29640677882,
+    "artifact_id": 8428508030,
+    "artifact_digest": "sha256:df5c3daae4e82b386bdc868aaeb53d8be00cdeb4da1a6f87decd9b62037e8a34",
+    "all_final_gates": "success"
+  },
+  "authority": {
+    "protected_hashes_before_after": "identical",
+    "portfolio_state_mutation": false,
+    "trade_ledger_mutation": false,
+    "valuation_history_mutation": false,
+    "pricing_authority_change": false,
+    "historical_report_mutation": false,
+    "production_report_generated": false,
+    "email_sent": false
+  }
+}

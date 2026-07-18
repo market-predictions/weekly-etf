@@ -84,6 +84,22 @@ control/reviews/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_NL_20260718.md
 control/handovers/HANDOVER_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_20260718.md
 ```
 
+## Completed cockpit email HTML correction
+
+```text
+package: WP_COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX
+pull_request: #98
+status: implementation_complete_validation_green_merge_pending
+email_layout: inline_styles_and_presentation_tables
+head_style_dependency: false
+style_strip_degradation_test: passed_both_languages
+PDF_surface: preserved
+classic_report_body: preserved
+email_sent: false
+```
+
+The screenshot-identified defect is corrected for future generated email HTML. A real receiving-mail-client proof requires a separately authorized fresh production delivery with the normal manifest and inbox-receipt controls. Do not rewrite or resend the historical `260716_02` package as part of this correction.
+
 ## Immediate next package
 
 Create and claim only after separate explicit approval:
