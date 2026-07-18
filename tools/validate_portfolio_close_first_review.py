@@ -90,6 +90,7 @@ def validate(evidence: dict[str, Any], en: str, nl: str, expected_close_date: st
         assert surface.strip()
         leaked = [term for term in BLOCKED_SURFACE_TERMS if term in surface.lower()]
         assert not leaked, (language, leaked)
+        assert conclusion not in surface, (language, conclusion)
     assert "Official portfolio state was not changed" in en
     assert "De officiële portefeuille is niet gewijzigd" in nl
 

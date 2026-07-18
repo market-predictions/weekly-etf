@@ -209,6 +209,10 @@ def test_render_rejects_internal_terms_by_contract() -> None:
         ],
     }
     en, nl = render(evidence)
+    assert "Current evidence is insufficient" in en
+    assert "Het huidige bewijs is onvoldoende" in nl
+    assert "no_trade_insufficient_evidence" not in en
+    assert "no_trade_insufficient_evidence" not in nl
     assert "separate authorization" in en
     assert "afzonderlijke toestemming" in nl
 
