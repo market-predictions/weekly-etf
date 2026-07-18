@@ -1,0 +1,26 @@
+name: Append close-first review governance
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/append-close-first-review-governance.yml"
+      - "tools/append_close_first_review_governance.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  append:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Append records and self-clean
+        run: python tools/append_close_first_review_governance.py
