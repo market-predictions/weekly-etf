@@ -88,14 +88,21 @@ def continuity_rows(
         ticker = text(row.get("ticker")).upper()
         card = scorecard.get(ticker, {})
         lane = lanes.get(ticker, {})
-        total_score = num(row.get("total_score"), num(card.get("total_score"), num(lane.get("total_score"), 3.0)))
+        holding_score = num(row.get("total_score"), num(card.get("total_score"), 3.0))
+        lane_score = num(lane.get("total_score"), holding_score)
+        decision_quality_score = min(holding_score, lane_score)
         result[ticker] = {
             "ticker": ticker,
             "shares": int(round(num(row.get("shares")))),
             "current_weight_pct": num(row.get("current_weight_pct")),
             "portfolio_role": text(row.get("portfolio_role") or card.get("portfolio_role")),
             "conviction_tier": text(row.get("conviction_tier") or card.get("conviction_tier")),
-            "total_score": round(total_score, 2),
+            "holding_score": round(holding_score, 2),
+            "lane_score": round(lane_score, 2),
+            "total_score": round(decision_quality_score, 2),
+            "lane_evidence_summary": text(lane.get("evidence_summary")),
+            "lane_why_now": text(lane.get("why_now")),
+            "macro_freshness_note": text(lane.get("macro_freshness_note")),
             "suggested_action": text(row.get("suggested_action") or card.get("suggested_action")),
             "fresh_cash_test": text(row.get("fresh_cash_test") or card.get("fresh_cash_test")),
             "replaceable_status": text(row.get("replaceable_status") or card.get("replaceable_status")),
@@ -350,8 +357,8 @@ def render(evidence: dict[str, Any]) -> tuple[str, str]:
     source = decision.get("selected_source") or "None"
     destination = decision.get("selected_destination") or "cash"
     rows = "\n".join(f"| {index} | {row['ticker']} | {row['close_priority_score']:.2f} | {row['total_score']:.2f} | {row['market'].get('rs_vs_spy_3m_pct')} | {row['current_weight_pct']:.2f}% |" for index, row in enumerate(evidence["ranking"], start=1))
-    en = f"""# Portfolio count-restoration review\n\n**Evidence date:** {evidence['market_snapshot']['requested_close_date']}  \n**Current active positions:** {evidence['current_state']['active_count']}  \n**Maximum active positions:** {evidence['current_state']['maximum']}  \n**Conclusion:** {decision['conclusion']}  \n**Selected source:** {source}  \n**Destination:** {destination}  \n\nThe comparison considered portfolio role, recommendation quality, relative strength, contribution, liquidity, concentration and implementation practicality. Position size was not sufficient on its own to select a source.\n\n| Rank | Ticker | Close priority | Continuity score | 3-month relative strength vs SPY | Current weight |\n|---:|---|---:|---:|---:|---:|\n{rows}\n\nProjected active positions: {decision['transition']['projected_count']}. Projected cash: EUR {decision['projected_cash_eur']:.2f}. Official portfolio state was not changed. Any implementation requires separate authorization.\n"""
-    nl = f"""# Beoordeling voor herstel van het positieaantal\n\n**Bewijsdatum:** {evidence['market_snapshot']['requested_close_date']}  \n**Huidig aantal actieve posities:** {evidence['current_state']['active_count']}  \n**Maximaal aantal actieve posities:** {evidence['current_state']['maximum']}  \n**Conclusie:** {decision['conclusion']}  \n**Geselecteerde bron:** {source}  \n**Bestemming:** {'cash' if destination == 'cash' else destination}  \n\nDe vergelijking omvatte portefeuillerol, aanbevelingskwaliteit, relatieve sterkte, bijdrage, liquiditeit, concentratie en uitvoerbaarheid. De omvang van een positie was op zichzelf niet voldoende om een bron te selecteren.\n\n| Rang | Ticker | Prioriteit voor sluiting | Continuiteitsscore | Relatieve sterkte over drie maanden versus SPY | Huidig gewicht |\n|---:|---|---:|---:|---:|---:|\n{rows}\n\nVerwacht aantal actieve posities: {decision['transition']['projected_count']}. Verwachte cash: EUR {decision['projected_cash_eur']:.2f}. De officiële portefeuille is niet gewijzigd. Voor uitvoering is afzonderlijke toestemming vereist.\n"""
+    en = f"""# Portfolio count-restoration review\n\n**Evidence date:** {evidence['market_snapshot']['requested_close_date']}  \n**Current active positions:** {evidence['current_state']['active_count']}  \n**Maximum active positions:** {evidence['current_state']['maximum']}  \n**Conclusion:** {decision['conclusion']}  \n**Selected source:** {source}  \n**Destination:** {destination}  \n\nThe comparison considered portfolio role, recommendation quality, relative strength, contribution, liquidity, concentration and implementation practicality. Position size was not sufficient on its own to select a source.\n\n| Rank | Ticker | Close priority | Decision quality | 3-month relative strength vs SPY | Current weight |\n|---:|---|---:|---:|---:|---:|\n{rows}\n\nProjected active positions: {decision['transition']['projected_count']}. Projected cash: EUR {decision['projected_cash_eur']:.2f}. Official portfolio state was not changed. Any implementation requires separate authorization.\n"""
+    nl = f"""# Beoordeling voor herstel van het positieaantal\n\n**Bewijsdatum:** {evidence['market_snapshot']['requested_close_date']}  \n**Huidig aantal actieve posities:** {evidence['current_state']['active_count']}  \n**Maximaal aantal actieve posities:** {evidence['current_state']['maximum']}  \n**Conclusie:** {decision['conclusion']}  \n**Geselecteerde bron:** {source}  \n**Bestemming:** {'cash' if destination == 'cash' else destination}  \n\nDe vergelijking omvatte portefeuillerol, aanbevelingskwaliteit, relatieve sterkte, bijdrage, liquiditeit, concentratie en uitvoerbaarheid. De omvang van een positie was op zichzelf niet voldoende om een bron te selecteren.\n\n| Rang | Ticker | Prioriteit voor sluiting | Besliskwaliteit | Relatieve sterkte over drie maanden versus SPY | Huidig gewicht |\n|---:|---|---:|---:|---:|---:|\n{rows}\n\nVerwacht aantal actieve posities: {decision['transition']['projected_count']}. Verwachte cash: EUR {decision['projected_cash_eur']:.2f}. De officiële portefeuille is niet gewijzigd. Voor uitvoering is afzonderlijke toestemming vereist.\n"""
     for surface in (en, nl):
         leaked = [term for term in BLOCKED_SURFACE_TERMS if term in surface.lower()]
         if leaked:

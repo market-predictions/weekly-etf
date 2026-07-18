@@ -211,3 +211,31 @@ def test_render_rejects_internal_terms_by_contract() -> None:
     en, nl = render(evidence)
     assert "separate authorization" in en
     assert "afzonderlijke toestemming" in nl
+
+def test_current_lane_score_sets_decision_quality_floor() -> None:
+    from runtime.build_portfolio_close_first_review import continuity_rows
+
+    state = {
+        "positions": [
+            {
+                "ticker": "URNM",
+                "shares": 48,
+                "current_weight_pct": 1.9,
+                "total_score": 3.7,
+            }
+        ]
+    }
+    lanes = {
+        "URNM": {
+            "total_score": 2.96,
+            "evidence_summary": "Nuclear fuel security remains structural.",
+            "why_now": "Timing is less urgent.",
+            "macro_freshness_note": "Strategic but weakly confirmed.",
+        }
+    }
+    row = continuity_rows(state, {}, lanes)["URNM"]
+    assert row["holding_score"] == 3.7
+    assert row["lane_score"] == 2.96
+    assert row["total_score"] == 2.96
+    assert row["lane_why_now"] == "Timing is less urgent."
+
