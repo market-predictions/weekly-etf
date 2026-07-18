@@ -1,0 +1,41 @@
+name: Patch close-first review thesis quality
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/patch-close-first-review-thesis-quality.yml"
+      - "tools/patch_close_first_review_thesis_quality.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Apply thesis-quality refinement
+        run: |
+          set -euo pipefail
+          python tools/patch_close_first_review_thesis_quality.py
+          python -m py_compile runtime/build_portfolio_close_first_review.py tests/test_portfolio_close_first_review.py
+          rm -f tools/patch_close_first_review_thesis_quality.py
+          rm -f .github/workflows/patch-close-first-review-thesis-quality.yml
+
+      - name: Commit refinement and self-cleanup
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add runtime/build_portfolio_close_first_review.py tests/test_portfolio_close_first_review.py
+          git add -u tools/patch_close_first_review_thesis_quality.py .github/workflows/patch-close-first-review-thesis-quality.yml
+          git commit -m "Refine close-first review thesis quality [skip ci]"
+          git push origin HEAD:${{ github.head_ref || github.ref_name }}
