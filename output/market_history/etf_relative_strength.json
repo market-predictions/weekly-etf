@@ -2,7 +2,7 @@
   "source": "yfinance",
   "is_live_refresh": true,
   "fallback_used": false,
-  "fetched_at_utc": "2026-07-18T13:45:04.092314+00:00",
+  "fetched_at_utc": "2026-07-18T14:07:24.907320+00:00",
   "period": "6mo",
   "config": "config/etf_discovery_universe.yml",
   "macro_context": "config/etf_macro_fundamental_context.yml",
