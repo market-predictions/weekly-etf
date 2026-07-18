@@ -1,0 +1,73 @@
+name: Validate report-request execution authority
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "runtime/model_execution_guarded_auto.py"
+      - "tests/test_model_execution_request_authority.py"
+      - "control/run_queue/README.md"
+      - "control/run_queue/weekly_etf_report_request_*.md"
+      - ".github/workflows/validate-report-request-execution-authority.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: python -m pip install pytest pyyaml
+
+      - name: Snapshot protected execution authority
+        run: |
+          sha256sum \
+            output/etf_portfolio_state.json \
+            output/etf_trade_ledger.csv \
+            > /tmp/report-authority-before.sha256
+
+      - name: Compile authority gate
+        run: |
+          python -m py_compile \
+            runtime/model_execution_guarded_auto.py \
+            tests/test_model_execution_request_authority.py
+
+      - name: Run focused authority regressions
+        run: |
+          pytest -q \
+            tests/test_model_execution_request_authority.py \
+            tests/test_model_no_trade_gate.py
+
+      - name: Verify current fresh request boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("control/run_queue/weekly_etf_report_request_20260718_125324.md")
+          text = path.read_text(encoding="utf-8")
+          assert "requested_close_date: 2026-07-17" in text
+          assert "portfolio_execution_authorized: false" in text
+          assert "delivery_authorized: true" in text
+          assert "broker_execution_authorized: false" in text
+          print("REPORT_REQUEST_AUTHORITY_OK")
+          PY
+
+      - name: Prove protected execution authority unchanged
+        run: |
+          sha256sum -c /tmp/report-authority-before.sha256
+          git diff --exit-code -- \
+            output/etf_portfolio_state.json \
+            output/etf_trade_ledger.csv
