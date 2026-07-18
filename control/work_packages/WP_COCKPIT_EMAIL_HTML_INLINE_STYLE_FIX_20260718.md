@@ -2,7 +2,7 @@
 
 Date: 2026-07-18
 Repository: `market-predictions/weekly-etf`
-Status: closed_on_closeout_merge / merged / validated_no_send
+Status: closed / merged / validated_no_send
 
 ## Current issue
 
@@ -78,6 +78,8 @@ The new validator explicitly removes every `<style>` element from generated EN/N
 implementation_pull_request: #98
 implementation_merge: 467726f2449b3a409008075812c761c4dc48c3f3
 closeout_pull_request: #99
+closeout_merge: 720c2e47e51ec59329fdb1eac4d5d69edd22e176
+metadata_pull_request: #100
 validated_head: 7e9706b6019f4e4eb6debc5a2ff95fe0ed70399c
 email_inline_run: 29640892996 success
 email_inline_job: 88070568127
@@ -119,5 +121,5 @@ The historical `260716_02` email and files remain immutable. The correction appl
 - exact-current WP11 compatibility: complete;
 - protected authority hashes unchanged: complete;
 - implementation PR #98 merged: complete;
-- governance-closeout PR #99 and claim release: effective on merge;
+- governance-closeout PR #99 merged and claim released: complete;
 - email sent: false.

@@ -1,5 +1,6 @@
 {
   "authority": {
+    "claim_released": true,
     "email_sent": false,
     "historical_report_mutation": false,
     "portfolio_state_mutation": false,
@@ -11,10 +12,12 @@
   },
   "date": "2026-07-18",
   "implementation": {
+    "closeout_merge": "720c2e47e51ec59329fdb1eac4d5d69edd22e176",
     "closeout_pull_request": 99,
     "email_head_css_required": false,
     "email_layout": "inline_styles_and_presentation_tables",
     "merge_commit": "467726f2449b3a409008075812c761c4dc48c3f3",
+    "metadata_pull_request": 100,
     "pdf_layout": "existing_class_based_surface_preserved",
     "pull_request": 98
   },
@@ -60,7 +63,7 @@
   "repository": "market-predictions/weekly-etf",
   "root_cause": "cockpit depended on a separate head stylesheet that the mail client did not reliably retain or apply",
   "schema_version": "cockpit_email_html_inline_style_fix_v1",
-  "status": "closed_on_closeout_merge_validated_no_send",
+  "status": "closed_merged_validated_no_send",
   "validation": {
     "all_final_gates": "success",
     "artifact_digest": "sha256:87a73c4c03d491105d7fcb8b2df1775410113b3e4547f159684027a714fb0319",

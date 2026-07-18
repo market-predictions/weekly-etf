@@ -5,24 +5,24 @@ package: WP_COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX
 repository: market-predictions/weekly-etf
 claimed_by: ChatGPT
 claimed_at_utc: 2026-07-18T09:20:00Z
-implementation_branch: agent/cockpit-email-html-inline-style-fix
 implementation_pull_request: 98
 implementation_merge: 467726f2449b3a409008075812c761c4dc48c3f3
-closeout_branch: agent/cockpit-email-html-inline-style-closeout
 closeout_pull_request: 99
-status: closeout_ready / release_effective_on_merge
-scope: email-safe inline cockpit rendering, degradation validation, compatibility tests, governance closeout
+closeout_merge: 720c2e47e51ec59329fdb1eac4d5d69edd22e176
+metadata_branch: agent/cockpit-email-html-inline-style-metadata
+metadata_pull_request: 100
+status: closed / released
+released_at_utc: 2026-07-18T10:37:00Z
+metadata_validation_status: pending_on_this_head
 ```
 
-Confirmed boundaries:
+Confirmed at release:
 
-- portfolio state unchanged;
-- trade ledger and valuation history unchanged;
-- pricing and runtime pointers unchanged;
-- historical delivered HTML/PDF files unchanged;
-- no production report generated;
-- no email sent;
-- PDF cockpit design preserved.
+- portfolio state, ledger, valuation history and pricing pointers unchanged;
+- historical delivered HTML and PDF unchanged;
+- PDF cockpit design preserved;
+- production report generated: false;
+- email sent: false.
 
 Final implementation validation:
 
@@ -37,9 +37,8 @@ report_language_run: 29640893008 success
 position_count_run: 29640893026 success
 artifact_id: 8428574798
 artifact_digest: sha256:87a73c4c03d491105d7fcb8b2df1775410113b3e4547f159684027a714fb0319
+closeout_email_inline_run: 29641088177 success
 protected_authority_hashes: identical
-historical_reports: unchanged
-email_sent: false
 ```
 
-The claim is released when PR #99 merges. The exact closeout merge is then recorded in the final receipt.
+The claim is closed and released. A real receiving-mail-client proof requires a separately authorized fresh production delivery with a delivery manifest and inbox receipt.
