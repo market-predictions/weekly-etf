@@ -82,7 +82,7 @@ def test_delivery_table_residuals_are_rewritten_without_numeric_drift() -> None:
     assert set(client_language_findings(source, language="en")) == {"raw_override", "release_score"}
     assert client_language_findings(cleaned, language="en") == []
     assert "weakest capital-efficiency profile" in cleaned
-    assert "Review priority" in cleaned
+    assert "review priority" in cleaned
     assert "Execution constraint status" in cleaned
     assert "Execution constraint: position too small for an efficient trade" in cleaned
     assert numeric_multiset(cleaned) == numeric_multiset(source)
