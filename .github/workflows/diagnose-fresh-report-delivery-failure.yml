@@ -16,6 +16,13 @@ jobs:
     env:
       PYTHONPATH: .
       RUNTIME_STATE: output/runtime/etf_report_state_20260717_20260718_134258.json
+      ETF_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260717_20260718_134258.json
+      MRKT_RPRTS_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260717_20260718_134258.json
+      MRKT_RPRTS_EXPLICIT_REPORT_PATH: output/weekly_analysis_pro_260717.md
+      MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL: output/weekly_analysis_pro_nl_260717.md
+      MRKT_RPRTS_OUTPUT_DIR: output
+      MRKT_RPRTS_REPORT_MODE: pro
+      MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -25,8 +32,15 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install focused dependencies
-        run: python -m pip install pyyaml
+      - name: Install system packages for PDF rendering
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2 libpango-1.0-0 libgdk-pixbuf-2.0-0 libffi-dev \
+            shared-mime-info fonts-liberation fonts-dejavu-core fonts-lato poppler-utils
+
+      - name: Install production render dependencies
+        run: python -m pip install matplotlib mistune weasyprint pyyaml pandas yfinance
 
       - name: Validate persisted valuation state
         id: valuation
@@ -53,29 +67,105 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail
-          rm -rf /tmp/guarded-runtime
           python -m runtime.model_execution_guarded_auto \
             --runtime-state "$RUNTIME_STATE" \
             --portfolio-state output/etf_portfolio_state.json \
             --trade-ledger output/etf_trade_ledger.csv \
-            --output-dir /tmp/guarded-runtime \
+            --output-dir output/runtime \
             2>&1 | tee /tmp/03-guarded.txt
-          find /tmp/guarded-runtime -maxdepth 2 -type f -print >> /tmp/03-guarded.txt || true
 
       - name: Validate guarded artifact
         id: guarded_validation
         continue-on-error: true
         run: |
           set -o pipefail
-          artifact="$(cat /tmp/guarded-runtime/latest_etf_model_execution_path.txt 2>/dev/null || true)"
-          if [ -z "$artifact" ] || [ ! -f "$artifact" ]; then
-            echo "GUARDED_ARTIFACT_MISSING path=$artifact" | tee /tmp/04-guarded-validation.txt
-            exit 1
-          fi
+          artifact="$(cat output/runtime/latest_etf_model_execution_path.txt 2>/dev/null || true)"
+          echo "artifact=$artifact" | tee /tmp/04-guarded-validation.txt
           python tools/validate_etf_model_execution.py \
             --artifact "$artifact" \
             --expected-mode guarded_auto \
-            2>&1 | tee /tmp/04-guarded-validation.txt
+            2>&1 | tee -a /tmp/04-guarded-validation.txt
+
+      - name: Scrub and relink client report surface
+        id: scrub
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          {
+            python -m runtime.scrub_etf_client_surface --output-dir output
+            python -m runtime.link_runtime_report_tickers --output-dir output
+            python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+            python tools/validate_etf_trade_ledger_idempotency.py --trade-ledger output/etf_trade_ledger.csv
+          } 2>&1 | tee /tmp/05-scrub.txt
+
+      - name: Validate lane and replacement evidence
+        id: evidence
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          {
+            python validate_lane_breadth.py
+            python validate_replacement_duels.py
+          } 2>&1 | tee /tmp/06-evidence.txt
+
+      - name: Validate bilingual report pair
+        id: bilingual
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python - <<'PY' 2>&1 | tee /tmp/07-bilingual.txt
+          from pathlib import Path
+          import send_report_runtime_html as srh
+          sr = srh.report_module
+          output_dir = Path("output")
+          latest = sr.latest_report_file(output_dir, mode="pro")
+          if sr.has_matching_dutch_report(latest):
+              sr.validate_bilingual_pair(latest)
+              print(f"BILINGUAL_PAIR_OK | en={latest.name} | nl={sr.matching_dutch_report_path(latest).name}")
+          else:
+              raise RuntimeError(f"No matching Dutch report for {latest}")
+          PY
+
+      - name: Render HTML and PDF assets
+        id: render
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          {
+            python - <<'PY'
+          from pathlib import Path
+          import send_report_runtime_html as srh
+          sr = srh.report_module
+          output_dir = Path("output")
+          latest = sr.latest_report_file(output_dir, mode="pro")
+          bundle = sr.generate_delivery_assets_for_run(output_dir, latest, mode="pro")
+          print(bundle)
+          PY
+            python tools/validate_etf_pdf_visual_contract.py --output-dir output
+            python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+          } 2>&1 | tee /tmp/08-render.txt
+
+      - name: Validate delivery HTML and client language
+        id: html
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          {
+            python tools/validate_etf_delivery_html_contract.py --output-dir output
+            python tools/validate_etf_client_surface_clean.py --output-dir output
+            python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+          } 2>&1 | tee /tmp/09-html.txt
+
+      - name: Validate explicit state derivation
+        id: state
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          {
+            python tools/write_etf_minimum_state.py --output-dir output --mode pro --check-only
+            python tools/write_etf_trade_ledger.py --output-dir output --check-only
+            python tools/write_etf_recommendation_scorecard.py --output-dir output --mode pro --check-only
+          } 2>&1 | tee /tmp/10-state.txt
 
       - name: Write diagnostic summary
         if: always()
@@ -85,6 +175,12 @@ jobs:
           ledger=${{ steps.ledger.outcome }}
           guarded=${{ steps.guarded.outcome }}
           guarded_validation=${{ steps.guarded_validation.outcome }}
+          scrub=${{ steps.scrub.outcome }}
+          evidence=${{ steps.evidence.outcome }}
+          bilingual=${{ steps.bilingual.outcome }}
+          render=${{ steps.render.outcome }}
+          html=${{ steps.html.outcome }}
+          state=${{ steps.state.outcome }}
           EOF
           cat /tmp/00-summary.txt
 
