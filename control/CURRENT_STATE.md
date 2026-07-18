@@ -129,8 +129,9 @@ package: WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW
 pull_request: #95
 implementation_merge: 2895bbb5940ead8526ab4c10d0ce3687f8aca423
 closeout_pull_request: #96
-closeout_merge: pending
-status: closed_on_closeout_merge
+closeout_merge: b2d32e327023ea515c1c78ccbc66f69b69afab45
+metadata_pull_request: #97
+status: closed_merged_validated_no_change
 review_evidence_date: 2026-07-17
 review_freshness: complete
 selected_review_source: URNM

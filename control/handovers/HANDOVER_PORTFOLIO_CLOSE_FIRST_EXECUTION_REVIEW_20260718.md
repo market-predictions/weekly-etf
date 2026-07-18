@@ -3,11 +3,12 @@
 Date: 2026-07-18
 Repository: `market-predictions/weekly-etf`
 Package: `WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW`
-Status: closed on governance-closeout merge / claim release effective on merge
+Status: closed / merged / claim released
 Implementation pull request: #95
 Implementation merge: `2895bbb5940ead8526ab4c10d0ce3687f8aca423`
 Governance-closeout pull request: #96
-Governance-closeout merge: pending
+Governance-closeout merge: `b2d32e327023ea515c1c78ccbc66f69b69afab45`
+Metadata finalization pull request: #97
 
 ## Current issue
 
