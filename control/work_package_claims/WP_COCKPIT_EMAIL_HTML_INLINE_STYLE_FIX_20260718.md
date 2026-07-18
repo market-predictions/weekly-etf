@@ -10,7 +10,7 @@ implementation_merge: 467726f2449b3a409008075812c761c4dc48c3f3
 closeout_pull_request: 99
 closeout_merge: 720c2e47e51ec59329fdb1eac4d5d69edd22e176
 metadata_branch: agent/cockpit-email-html-inline-style-metadata
-metadata_pull_request: pending
+metadata_pull_request: 100
 status: closed / released
 released_at_utc: 2026-07-18T10:37:00Z
 ```

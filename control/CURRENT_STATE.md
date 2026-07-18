@@ -179,7 +179,9 @@ package: WP_COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX
 pull_request: #98
 cockpit_email_fix_implementation_merge: 467726f2449b3a409008075812c761c4dc48c3f3
 cockpit_email_fix_closeout_pull_request: #99
-status: closed_on_governance_closeout_merge
+cockpit_email_fix_closeout_merge: 720c2e47e51ec59329fdb1eac4d5d69edd22e176
+cockpit_email_fix_metadata_pull_request: #100
+status: closed_merged_validated_no_send
 root_cause: cockpit presentation depended on a head stylesheet not reliably applied by the mail client
 email_layout: inline_styles_and_presentation_tables
 email_head_css_required: false

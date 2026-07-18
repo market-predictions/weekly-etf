@@ -3,10 +3,12 @@
 Date: 2026-07-18
 Repository: `market-predictions/weekly-etf`
 Package: `WP_COCKPIT_EMAIL_HTML_INLINE_STYLE_FIX`
-Status: closed on governance-closeout merge / claim release effective on merge
+Status: closed / merged / claim released
 Implementation pull request: #98
 Implementation merge: `467726f2449b3a409008075812c761c4dc48c3f3`
 Governance-closeout pull request: #99
+Governance-closeout merge: `720c2e47e51ec59329fdb1eac4d5d69edd22e176`
+Metadata pull request: #100
 
 ## Current issue
 
@@ -145,6 +147,21 @@ artifact_id: 8428574798
 artifact_digest: sha256:87a73c4c03d491105d7fcb8b2df1775410113b3e4547f159684027a714fb0319
 protected_authority_hashes: identical
 historical_reports: unchanged
+production_report_generated: false
+email_sent: false
+```
+
+## Final closeout receipt
+
+```text
+implementation_pull_request: #98
+implementation_merge: 467726f2449b3a409008075812c761c4dc48c3f3
+closeout_pull_request: #99
+closeout_merge: 720c2e47e51ec59329fdb1eac4d5d69edd22e176
+metadata_pull_request: #100
+claim_status: closed / released
+portfolio_state_changed: false
+historical_report_changed: false
 production_report_generated: false
 email_sent: false
 ```
