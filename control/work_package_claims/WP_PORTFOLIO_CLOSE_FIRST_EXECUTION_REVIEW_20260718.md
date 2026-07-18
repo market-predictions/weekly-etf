@@ -10,12 +10,14 @@ implementation_pull_request: 95
 implementation_merge: 2895bbb5940ead8526ab4c10d0ce3687f8aca423
 closeout_branch: agent/portfolio-close-first-execution-review-closeout
 closeout_pull_request: 96
-closeout_merge: pending
-status: closeout_complete / final_validation_pending / release_effective_on_merge
+closeout_merge: b2d32e327023ea515c1c78ccbc66f69b69afab45
+metadata_pull_request: pending
+status: closed / released
+released_at_utc: 2026-07-18T00:29:29Z
 scope: read-only evidence review, deterministic source comparison, transition validation, governance closeout
 ```
 
-Confirmed boundaries:
+Confirmed boundaries at release:
 
 - official portfolio state unchanged;
 - trade ledger unchanged;
@@ -38,16 +40,17 @@ projected_active_count: 8
 portfolio_change_applied: false
 ```
 
-Implementation validation:
+Final validation:
 
 ```text
 validated_head: bbf03f8966c93d714ff750c9d177917bcc0eef9d
-review_run: 29622792895 success
-position_count_run: 29622792864 success
-report_language_run: 29622792867 success
-current_runtime_cockpit_run: 29622792888 success
-wp08_run: 29622792861 success
-wp11_run: 29622792862 success
+implementation_review_run: 29622792895 success
+closeout_review_run: 29623131524 success
+closeout_position_count_run: 29623131491 success
+closeout_report_language_run: 29623131513 success
+closeout_current_runtime_cockpit_run: 29623131518 success
+closeout_wp08_run: 29623131503 success
+closeout_wp11_run: 29623131496 success
 focused_tests: 7 passed
 artifact_id: 8422761924
 artifact_digest: sha256:1526642d997b2c9055554a3bab969ba84d1bafdf103285af00056fb7f96eae29
@@ -55,17 +58,4 @@ protected_authority_hashes: identical
 historical_report_hashes: identical
 ```
 
-Closeout preparation:
-
-```text
-workflow_run: 29623092093
-workflow_job: 88021910078
-result: success
-implementation_merge_recorded: true
-handover_updated: true
-evidence_updated: true
-control_status_updated: true
-temporary_files_removed: true
-```
-
-The claim is released when PR #96 merges. The exact closeout merge will then be recorded in a metadata-only correction.
+The claim is closed and released. A future `WP_PORTFOLIO_CLOSE_FIRST_EXECUTION` requires a new claim and separate explicit approval.
