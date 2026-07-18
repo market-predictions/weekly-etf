@@ -7,7 +7,7 @@ claimed_by: ChatGPT
 claimed_at_utc: 2026-07-17T23:38:20Z
 branch: agent/portfolio-close-first-execution-review
 pull_request: 95
-status: implementation_complete / validation_green / merge_pending
+status: implementation_complete / governance_complete / final_same_head_validation_pending
 scope: read-only evidence review, deterministic source comparison, transition validation, governance closeout
 ```
 
@@ -36,6 +36,17 @@ reviewed_quantity: 48 whole shares
 destination: cash
 projected_active_count: 8
 portfolio_change_applied: false
+```
+
+Governance append:
+
+```text
+workflow_run: 29622757159
+workflow_job: 88020896962
+result: success
+decision_log_updated: true
+session_changelog_updated: true
+temporary_files_removed: true
 ```
 
 Holding quality and current lane quality are stored separately; the lower score forms the decision-quality floor. The claim remains held through merge and exact post-merge handover recording.
