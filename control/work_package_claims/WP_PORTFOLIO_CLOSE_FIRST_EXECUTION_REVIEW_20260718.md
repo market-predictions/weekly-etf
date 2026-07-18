@@ -11,7 +11,7 @@ implementation_merge: 2895bbb5940ead8526ab4c10d0ce3687f8aca423
 closeout_branch: agent/portfolio-close-first-execution-review-closeout
 closeout_pull_request: 96
 closeout_merge: pending
-status: closeout_ready / release_effective_on_merge
+status: closeout_complete / final_validation_pending / release_effective_on_merge
 scope: read-only evidence review, deterministic source comparison, transition validation, governance closeout
 ```
 
@@ -38,7 +38,7 @@ projected_active_count: 8
 portfolio_change_applied: false
 ```
 
-Final same-head validation:
+Implementation validation:
 
 ```text
 validated_head: bbf03f8966c93d714ff750c9d177917bcc0eef9d
@@ -55,4 +55,17 @@ protected_authority_hashes: identical
 historical_report_hashes: identical
 ```
 
-The claim is released when PR #96 merges. The exact closeout merge will then be recorded in a metadata-only closeout correction.
+Closeout preparation:
+
+```text
+workflow_run: 29623092093
+workflow_job: 88021910078
+result: success
+implementation_merge_recorded: true
+handover_updated: true
+evidence_updated: true
+control_status_updated: true
+temporary_files_removed: true
+```
+
+The claim is released when PR #96 merges. The exact closeout merge will then be recorded in a metadata-only correction.
