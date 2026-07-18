@@ -7,18 +7,29 @@ claimed_by: ChatGPT
 claimed_at_utc: 2026-07-18T23:39:00Z
 branch: agent/fix-trade-weight-lineage
 implementation_pull_request: 109
-status: active / implementation PR open
+implementation_merge: 85d82930e40d37c145727d14468dc8914e041e00
+merged_at_utc: 2026-07-18T23:56:26Z
+status: closed / released
 ```
 
-Scope is limited to preserving and validating pre-trade quantity/value/weight lineage for executed ETF report actions and correcting the resulting cockpit before/after presentation.
+Scope was limited to preserving and validating pre-trade quantity/value/weight lineage for executed ETF report actions and correcting the cockpit before/after presentation.
 
-Protected authority surfaces are not to be mutated by this package:
+Validation completed before release:
 
-- `output/etf_portfolio_state.json`;
-- `output/etf_trade_ledger.csv`;
-- `output/etf_valuation_history.csv`;
-- pricing and runtime pointers;
-- historical delivered HTML/PDF/Markdown;
-- delivery manifests.
+```text
+trade_lineage_and_whole_share_run: 29666054365 success
+trade_lineage_and_whole_share_job: 88136546831 success
+report_request_authority_run: 29666054332 success
+report_request_authority_job: 88136546755 success
+```
 
-No report generation, portfolio execution, broker execution or email delivery is authorized.
+Confirmed at release:
+
+- implementation PR #109 merged to `main`;
+- PAVE-like purchases preserve zero pre-trade shares and weight;
+- XLU-like reductions preserve full pre-trade shares and weight;
+- material identical before/after client weights fail validation;
+- current NAV remains based on current market value;
+- protected execution authority remained unchanged;
+- no production report was generated or sent;
+- no historical delivered package was changed.
