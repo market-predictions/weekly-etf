@@ -58,4 +58,16 @@ protected_authority_hashes: identical
 historical_report_hashes: identical
 ```
 
+Metadata finalization:
+
+```text
+workflow_run: 29623285033
+workflow_job: 88022491451
+result: success
+closeout_merge_recorded: true
+claim_released: true
+temporary_files_removed: true
+final_control_validation: pending_on_this_head
+```
+
 The claim is closed and released. A future `WP_PORTFOLIO_CLOSE_FIRST_EXECUTION` requires a new claim and separate explicit approval.
