@@ -18,14 +18,16 @@ def _style(**items: str) -> str:
 
 
 def _sparkline_text(points: Iterable[tuple[str, float]]) -> str:
-    values = [float(value) for _, value in points]
+    point_list = list(points)
+    values = [float(value) for _, value in point_list]
     if not values:
         return "—"
     if len(values) > 44:
         step = max(1, len(values) // 44)
         values = values[::step]
-        if values[-1] != list(points)[-1][1]:
-            values.append(float(list(points)[-1][1]))
+        final_value = float(point_list[-1][1])
+        if values[-1] != final_value:
+            values.append(final_value)
     low = min(values)
     high = max(values)
     bars = "▁▂▃▄▅▆▇█"
@@ -163,8 +165,12 @@ def render_email_safe_cockpit_front_page(
             f'<div class="etf-cockpit-evidence-value" style="font-family:Courier New,monospace;font-size:10px;line-height:1.35;color:#211C16;padding-top:4px">{escape(value)}</div>'
             '</td>'
         )
+    empty_evidence_cell = '<td style="width:50%"></td>'
     evidence_rows_html = "".join(
-        f"<tr>{evidence_cells[index]}{evidence_cells[index + 1] if index + 1 < len(evidence_cells) else '<td style=\"width:50%\"></td>'}</tr>"
+        "<tr>"
+        + evidence_cells[index]
+        + (evidence_cells[index + 1] if index + 1 < len(evidence_cells) else empty_evidence_cell)
+        + "</tr>"
         for index in range(0, len(evidence_cells), 2)
     )
 
