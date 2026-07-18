@@ -32,25 +32,40 @@ claim_status: closed_released
 decision: every non-zero whole-share position counts
 generic_residual_exception: false
 current_status: close_first 9/8
-portfolio_mutation: false
+portfolio_change_applied: false
 email_sent: false
 ```
 
-The production preflight now evaluates projected whole-share positions before guarded execution. While the official state remains above eight positions, a proposed transition must lower the active count and cannot introduce another ticker. At eight positions, a new ticker requires another position to reach zero shares in the same projected transition. A no-change review may preserve `close_first`.
+The position-count preflight evaluates projected whole-share positions before official writes. While the official state remains above eight positions, a proposed transition must lower the active count and cannot introduce another ticker.
 
-Final evidence:
+## Completed close-first execution review
 
 ```text
-focused_tests: 13 passed
-artifact_id: 8420903168
-position_count_run: 29618185729 success
-report_surface_run: 29618185736 success
-current_runtime_cockpit_run: 29618185701 success
-wp08_exact_current_run: 29618185711 success
-wp11_exact_current_run: 29618185709 success
-closed_recovery_run: 29618185751 success
-fresh_send_diagnostic_run: 29618185706 success
-governance_append_run: 29618612112 success
+package: WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW
+pull_request: #95
+status: implementation_complete_validation_green_merge_pending
+evidence_close_date: 2026-07-17
+freshness_status: complete
+selected_review_source: URNM
+reviewed_quantity: 48 whole shares
+selected_review_destination: cash
+estimated_proceeds_eur: 2022.23
+projected_cash_eur: 4556.59
+projected_active_count: 8
+portfolio_change_applied: false
+email_sent: false
+```
+
+The no-change review compared all nine holdings. URNM remained the top source after removing size and implementation-practicality points. XLU ranked second, proving that the smallest position was not selected automatically.
+
+Evidence and validation:
+
+```text
+workflow_run: 29622365939 success
+workflow_job: 88019775095
+focused_tests: 7 passed
+artifact_id: 8422627986
+artifact_digest: sha256:9f0b833f6d9dd5bb7b7558afe598c20246e67707fc5cff974e1bfc661479851a
 protected_authority_hashes: identical
 historical_report_hashes: identical
 ```
@@ -58,32 +73,32 @@ historical_report_hashes: identical
 Persistent records:
 
 ```text
-control/evidence/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_EVIDENCE_20260717.json
-control/decisions/PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_DECISION_20260717.md
-control/handovers/HANDOVER_PORTFOLIO_POSITION_COUNT_CONSTRAINT_RECONCILIATION_20260717.md
-control/DECISION_LOG.md
-control/ETF_SESSION_CHANGELOG.md
+control/evidence/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_EVIDENCE_20260718.json
+control/decisions/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_DECISION_20260718.md
+control/reviews/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_EN_20260718.md
+control/reviews/PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_NL_20260718.md
+control/handovers/HANDOVER_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW_20260718.md
 ```
 
 ## Immediate next package
 
-Create and claim only as a separate, explicitly authorized package:
+Create and claim only after separate explicit approval:
 
 ```text
-WP_PORTFOLIO_CLOSE_FIRST_EXECUTION_REVIEW
+WP_PORTFOLIO_CLOSE_FIRST_EXECUTION
 ```
-
-That package must first perform a no-mutation review using fresh pricing, current scores, relative strength, portfolio-role evidence, liquidity and implementation practicality. It must compare all plausible count-reducing paths and must not assume that the smallest holding is automatically the correct source.
 
 Required boundaries:
 
-1. use current authority files and fresh evidence;
-2. preserve whole-share, position-count, no-leverage and NAV controls;
-3. identify whether a justified path from nine positions to no more than eight exists;
-4. keep official state unchanged unless separately authorized;
-5. record a new claim, evidence and handover;
-6. require a real manifest and inbox receipt for any later delivery claim.
+1. refresh URNM and EUR/USD prices at the implementation reference time;
+2. rerun the same nine-holding source-selection rubric;
+3. stop without changes if URNM is no longer selected or evidence is incomplete;
+4. use whole shares and introduce no new ticker;
+5. pass the position-count transition contract and NAV reconciliation before official writes;
+6. persist portfolio state, ledger and valuation evidence only after all gates pass;
+7. do not generate or deliver a report unless separately approved;
+8. do not claim delivery without a real manifest and inbox receipt.
 
 ## Separate governance cleanup
 
-A later governance-only package may reconcile stale `planned` labels in `control/SYSTEM_INDEX.md`. Do not combine that documentation cleanup with portfolio execution.
+A later governance-only package may reconcile stale `planned` labels in `control/SYSTEM_INDEX.md`. Do not combine that documentation cleanup with portfolio implementation.
