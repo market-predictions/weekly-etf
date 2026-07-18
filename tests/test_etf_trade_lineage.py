@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from runtime.build_etf_report_state import _enrich_positions
 from runtime.render_cockpit_front_page import _action_surface
 from runtime.trade_lineage import (
     normalize_and_validate_trade_lineage,
@@ -123,6 +124,48 @@ def test_no_trade_position_uses_current_snapshot() -> None:
     assert rows[0]["previous_weight_pct"] == pytest.approx(26.92)
     assert rows[0]["previous_market_value_eur"] == pytest.approx(28707.93)
     assert validate_trade_lineage_rows(rows) == []
+
+
+def test_report_state_builder_repairs_legacy_rotation_rows() -> None:
+    positions = _enrich_positions(
+        {
+            "cash_eur": 100824.44,
+            "positions": _legacy_rotation_rows(),
+        },
+        {
+            "fx_basis": {"rate": 1.14377},
+            "price_results": [
+                {
+                    "symbol": "PAVE",
+                    "selected_close": 56.30,
+                    "currency": "USD",
+                    "status": "fresh_exact_unverified",
+                    "pricing_tier": "valuation_grade",
+                    "selected_close_type": "raw_close",
+                    "returned_close_date": "2026-07-17",
+                    "source": "test",
+                },
+                {
+                    "symbol": "XLU",
+                    "selected_close": 45.17,
+                    "currency": "USD",
+                    "status": "fresh_exact_unverified",
+                    "pricing_tier": "valuation_grade",
+                    "selected_close_type": "raw_close",
+                    "returned_close_date": "2026-07-17",
+                    "source": "test",
+                },
+            ],
+        },
+        [],
+        {"assessed_lanes": []},
+        {},
+    )
+    by_ticker = {row["ticker"]: row for row in positions}
+    assert by_ticker["PAVE"]["previous_shares"] == pytest.approx(0.0)
+    assert by_ticker["PAVE"]["previous_weight_pct"] == pytest.approx(0.0)
+    assert by_ticker["XLU"]["previous_shares"] == pytest.approx(148.0)
+    assert by_ticker["XLU"]["previous_weight_pct"] == pytest.approx(5.4908)
 
 
 def test_cockpit_action_surface_is_intuitive_after_normalization() -> None:
