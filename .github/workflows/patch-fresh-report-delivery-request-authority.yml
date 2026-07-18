@@ -3,10 +3,9 @@ name: Patch fresh report delivery request authority
 on:
   push:
     branches:
-      - agent/fresh-report-delivery-request-authority
+      - main
     paths:
       - "tools/patch_fresh_report_delivery_request_authority.py"
-      - "control/run_queue/patch_fresh_report_delivery_request_authority_trigger_*.md"
 
 permissions:
   contents: write
@@ -14,15 +13,34 @@ permissions:
 jobs:
   patch:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
     steps:
-      - name: Check out branch
+      - name: Check out main
         uses: actions/checkout@v4
         with:
-          ref: agent/fresh-report-delivery-request-authority
+          ref: main
           fetch-depth: 0
 
       - name: Apply deterministic patch
         run: python tools/patch_fresh_report_delivery_request_authority.py
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused test dependency
+        run: python -m pip install pytest
+
+      - name: Compile and validate authority patch
+        run: |
+          python -m py_compile \
+            runtime/model_execution_guarded_auto.py \
+            tests/test_model_execution_request_authority.py
+          pytest -q \
+            tests/test_model_execution_request_authority.py \
+            tests/test_model_no_trade_gate.py
 
       - name: Commit patched files
         run: |
@@ -30,4 +48,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Add report-request execution authority gate" || exit 0
-          git push origin HEAD:agent/fresh-report-delivery-request-authority
+          git push origin HEAD:main
