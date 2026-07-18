@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 import runtime.model_execution_engine as engine
+from runtime.trade_lineage import normalize_and_validate_trade_lineage
 from runtime.whole_share_contract import (
     WHOLE_SHARE_TOLERANCE,
     floor_whole_shares,
@@ -186,6 +187,13 @@ def _reconcile_guarded_cash(
         if row.get("action_executed_this_run") in {"Buy", "Sell"}:
             row["target_weight_pct"] = weight
 
+    official_rows = (artifact.get("guarded_auto_result") or {}).get("official_ledger_rows") or []
+    positions = normalize_and_validate_trade_lineage(
+        positions,
+        official_ledger_rows=official_rows,
+        context="post_guarded_execution",
+    )
+
     state.update(
         {
             "cash_eur": cash,
@@ -199,6 +207,7 @@ def _reconcile_guarded_cash(
                 "execution_mode": "guarded_auto",
                 "residual_cash_eur": cash,
                 "nav_drift_eur": round(nav - pre_trade_nav, 2),
+                "trade_lineage_status": "passed",
             },
         }
     )
@@ -218,6 +227,7 @@ def _reconcile_guarded_cash(
             "post_trade_invested_market_value_eur": invested,
             "post_trade_cash_eur": cash,
             "whole_share_contract_status": "compliant",
+            "trade_lineage_status": "passed",
         }
     )
     _write_json(Path(artifact["artifact_path"]), artifact)
