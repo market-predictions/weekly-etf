@@ -7,7 +7,7 @@ claimed_by: ChatGPT
 claimed_at_utc: 2026-07-18T09:20:00Z
 branch: agent/cockpit-email-html-inline-style-fix
 pull_request: 98
-status: implementation_complete / validation_green / merge_pending
+status: implementation_complete / governance_complete / final_same_head_validation_pending
 scope: email-safe inline cockpit rendering, degradation validation, compatibility tests, governance closeout
 ```
 
@@ -21,7 +21,7 @@ Confirmed boundaries:
 - no email sent;
 - PDF cockpit design preserved.
 
-Final same-head validation:
+Implementation validation:
 
 ```text
 validated_head: 72841c3bbedfea19122269f2f7c78168676955cb
@@ -39,4 +39,4 @@ protected_authority_hashes: identical
 email_sent: false
 ```
 
-The claim remains held through merge and exact post-merge governance closeout.
+The implementation and governance records are complete. The claim remains held through the final same-head cycle, merge and exact post-merge closeout.
