@@ -90,7 +90,7 @@ jobs:
             --repo-root . \
             --work-root /tmp/weekly-etf-wp11 \
             --evidence-dir output/wp11_validation \
-            --runtime-state output/runtime/etf_report_state_20260716_20260717_094728.json \
+            --runtime-state output/runtime/etf_report_state_20260717_20260718_140601.json \
             > output/wp11_validation/validator.log 2>&1
           status=$?
           cat output/wp11_validation/validator.log
@@ -111,7 +111,7 @@ jobs:
           assert payload["production_feature"]["rollback_value"] == "disabled"
           assert payload["exact_current_authority"]["whole_share_status"] == "compliant"
           assert payload["exact_current_authority"]["position_count"] == 9
-          assert payload["exact_current_authority"]["nav_eur"] == 107117.94
+          assert payload["exact_current_authority"]["nav_eur"] == 106644.21
           assert payload["exact_current_authority"]["cash_eur"] == 2534.36
           assert payload["languages"]["en"]["front_page_metrics"]["positions"] == "9"
           assert payload["languages"]["nl"]["front_page_metrics"]["posities"] == "9"
