@@ -38,6 +38,10 @@ EXACT_REPLACEMENTS: dict[str, str] = {
     "Hold with override": "Hold — no further change this review",
     "model/action weights": "target allocation weights",
     "override handling": "execution constraints",
+    "Override status": "Execution constraint status",
+    "System override: Minimum trade size was not met": "Execution constraint: position too small for an efficient trade",
+    "Holdings with high release scores require reduce/replace/override discipline.":
+        "Holdings with the weakest capital-efficiency profile require explicit reduction-or-replacement review.",
     "Force alternative duel; upgrade, reduce, replace, or close.":
         "Reassess against the named alternative and retain only if the current ETF remains superior.",
     "Required next action: None.": "Next review: Maintain and reassess when new evidence arrives.",
@@ -88,8 +92,16 @@ REGEX_REPLACEMENTS: tuple[tuple[re.Pattern[str], str], ...] = (
         r"review priority \1",
     ),
     (
+        re.compile(r"\brelease scores?\b", re.IGNORECASE),
+        "review priority",
+    ),
+    (
         re.compile(r"\breviewprioriteit\s+(\d+(?:\.\d+)?)", re.IGNORECASE),
         r"review priority \1",
+    ),
+    (
+        re.compile(r"\bsystem override:\s*minimum trade size was not met\b", re.IGNORECASE),
+        "Execution constraint: position too small for an efficient trade",
     ),
     (
         re.compile(r"\boverride:\s*rotation budget already used\b", re.IGNORECASE),

@@ -71,6 +71,24 @@ def test_html_delivery_sanitizer_applies_same_contract() -> None:
     assert "5.00%" in cleaned
 
 
+def test_delivery_table_residuals_are_rewritten_without_numeric_drift() -> None:
+    source = """- Holdings with high release scores require reduce/replace/override discipline.
+| Ticker | Release score | Override status |
+|---|---:|---|
+| URNM | 90.00 | System override: Minimum trade size was not met |
+"""
+    cleaned = clean_text(source, language="en")
+
+    assert set(client_language_findings(source, language="en")) == {"raw_override", "release_score"}
+    assert client_language_findings(cleaned, language="en") == []
+    assert "weakest capital-efficiency profile" in cleaned
+    assert "review priority" in cleaned
+    assert "Execution constraint status" in cleaned
+    assert "Execution constraint: position too small for an efficient trade" in cleaned
+    assert numeric_multiset(cleaned) == numeric_multiset(source)
+    assert clean_text(cleaned, language="en") == cleaned
+
+
 def test_generic_discipline_gate_language_is_cleaned_bilingually() -> None:
     english = "<html><body><p>All discipline gates must clear before allocation.</p></body></html>"
     dutch = "<html><body><p>Alle disciplinepoorten moeten vrijgeven vóór allocatie.</p></body></html>"
