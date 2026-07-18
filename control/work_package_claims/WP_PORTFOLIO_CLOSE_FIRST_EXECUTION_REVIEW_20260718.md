@@ -6,7 +6,8 @@ repository: market-predictions/weekly-etf
 claimed_by: ChatGPT
 claimed_at_utc: 2026-07-17T23:38:20Z
 branch: agent/portfolio-close-first-execution-review
-status: active
+pull_request: 95
+status: implementation_active / final_same_head_validation_pending
 scope: no-mutation fresh-evidence review, deterministic closure-source comparison, projected transition validation, governance closeout
 ```
 
@@ -20,3 +21,5 @@ Authority boundary:
 - no email delivery;
 - no new ticker may be proposed while the portfolio remains above eight active positions;
 - any supported count-reducing transition remains review evidence only until separately authorized.
+
+The review records holding quality and current lane/thesis quality separately. The lower of those two scores forms the deterministic decision-quality floor, so a stale or stronger holding score cannot conceal weaker current thesis evidence.
