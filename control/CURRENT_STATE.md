@@ -32,13 +32,13 @@ XLU 14
 XLV 37
 ```
 
-The latest official rotation reduced `XLU` by 134 shares and added 107 shares of `PAVE`. A 14-share XLU residual remains. The fresh 2026-07-17 report and its delivery recovery did not change official share quantities or the trade ledger.
+The latest official rotation reduced `XLU` by 134 shares and added 107 shares of `PAVE`. A 14-share XLU residual remains. The fresh 2026-07-17 report and its fix-verification delivery did not repeat portfolio execution or change official share quantities or the trade ledger.
 
 ## Latest successful production run
 
 ```text
 requested_close_date: 2026-07-17
-run_id: 20260718_140601
+run_id: 20260719_002755
 report_token: 260717
 pricing_lineage_status: passed
 workflow_status: workflow_success
@@ -51,25 +51,25 @@ broker_execution_authorized: false
 Authority and evidence files:
 
 ```text
-output/pricing/price_audit_2026-07-17_20260718_140601.json
-output/runtime/etf_report_state_20260717_20260718_140601.json
-output/run_manifests/weekly_etf_run_manifest_2026-07-17_20260718_140601.json
-output/delivery/weekly_etf_delivery_manifest_2026-07-17_20260718_140601.json
-control/evidence/FRESH_ETF_DELIVERY_RECOVERY_EVIDENCE_20260718.json
+output/pricing/price_audit_2026-07-17_20260719_002755.json
+output/runtime/etf_report_state_20260717_20260719_002755.json
+output/run_manifests/weekly_etf_run_manifest_2026-07-17_20260719_002755.json
+output/delivery/weekly_etf_delivery_manifest_2026-07-17_20260719_002755.json
+control/evidence/WEEKLY_ETF_FIX_VERIFICATION_DELIVERY_EVIDENCE_20260719.json
 ```
 
 ## Latest delivered client package
 
 ```text
-English Markdown: output/weekly_analysis_pro_260717_02.md
-English PDF: output/weekly_analysis_pro_260717_02.pdf
-English HTML: output/weekly_analysis_pro_260717_02_delivery.html
-Dutch Markdown: output/weekly_analysis_pro_nl_260717_02.md
-Dutch PDF: output/weekly_analysis_pro_nl_260717_02.pdf
-Dutch HTML: output/weekly_analysis_pro_nl_260717_02_delivery.html
+English Markdown: output/weekly_analysis_pro_260717_04.md
+English PDF: output/weekly_analysis_pro_260717_04.pdf
+English HTML: output/weekly_analysis_pro_260717_04_delivery.html
+Dutch Markdown: output/weekly_analysis_pro_nl_260717_04.md
+Dutch PDF: output/weekly_analysis_pro_nl_260717_04.pdf
+Dutch HTML: output/weekly_analysis_pro_nl_260717_04_delivery.html
 delivery_status: smtp_sendmail_returned_no_exception
 inbox_receipt: confirmed_both_languages
-received_at_europe_amsterdam: 2026-07-18 22:19
+received_at_europe_amsterdam: 2026-07-19 02:55
 attachments_per_language: 4
 ```
 
@@ -105,7 +105,7 @@ Stable delivery rules:
 2. A transport-only recovery may proceed only when no delivery manifest and no inbox receipt exist.
 3. Recovery may not change official shares or the trade ledger.
 4. Delivery success requires a completed run manifest, bilingual delivery manifest and independent inbox receipts.
-5. This source run is now closed against further automatic resends.
+5. A delivered source run is closed against further automatic resends.
 
 ## Production surface status
 
@@ -176,7 +176,7 @@ style_strip_degradation_test: passed_both_languages
 PDF_surface: preserved
 ```
 
-The 2026-07-17 inbox delivery is the first real receiving-mail-client receipt after this correction.
+The receiving-mail-client body continues to show the styled cockpit structure in both languages.
 
 ## Cockpit trade-weight lineage correction
 
@@ -184,21 +184,37 @@ The 2026-07-17 inbox delivery is the first real receiving-mail-client receipt af
 package: WP_COCKPIT_TRADE_WEIGHT_LINEAGE_FIX
 implementation_pull_request: #109
 implementation_merge: 85d82930e40d37c145727d14468dc8914e041e00
+compatibility_closeout_pull_request: #110
+compatibility_closeout_merge: 612ddea1cf43df4f717dff2b20d4fc509632f58a
 status: closed_merged_validated
 claim_status: closed_released
-trade_lineage_and_whole_share_run: 29666054365 success
-report_request_authority_run: 29666054332 success
 material_identical_display_gate: passed
 ```
 
-The cockpit action detail now receives validated pre-trade and current weights. For the latest rotation, the future generated surface resolves to:
+The state contract preserves or reconstructs pre-trade shares, values and weights, prefers the official ledger when available, and rejects material trades whose one-decimal before/after weights are identical. Current NAV remains based on current market values.
+
+## Fix-verification delivery closeout
 
 ```text
-PAVE 0.0% → 4.9%
-XLU 5.5% → 0.5%
+package: WP_WEEKLY_ETF_FIX_VERIFICATION_DELIVERY
+implementation_pull_request: #111
+implementation_merge: d3d4960b3611fe54f5db6d5ef2d3608fc2f6ac34
+delivery_authorization_commit: 58f16df50309e30b5d5f3c3b5e2f4b37200c50ce
+delivery_evidence_commit: 8ae50d7ccfe931dd9be5a9008b41570d32f4fdff
+no_send_recovery_validation_run: 29667585209 success
+full_render_boundary_run: 29667585181 success
+status: closed_delivered_inbox_confirmed
+claim_status: closed_released
 ```
 
-The state contract preserves or reconstructs pre-trade shares, values and weights, prefers the official ledger when available, and rejects material trades whose one-decimal before/after weights are identical. Current NAV remains based on current market values. No report was generated or sent as part of this correction, and the already delivered 2026-07-17 package remains unchanged.
+The actual received email bodies show:
+
+```text
+English: PAVE 0.0% → 4.9%; XLU 5.5% → 0.5%.
+Dutch:   PAVE 0,0% → 4,9%; XLU 5,5% → 0,5%.
+```
+
+The fix is therefore verified in the receiving mail client and the attached package, not only in unit tests or preview rendering. The source run is closed against automatic resend.
 
 ## Immediate next action
 
@@ -211,5 +227,3 @@ WP_PORTFOLIO_CLOSE_FIRST_EXECUTION
 ```
 
 It must refresh URNM and EUR/USD pricing, rerun the full nine-holding source-selection rubric, stop if URNM is no longer selected, use whole shares, open no new ticker and reconcile NAV and position count before official writes.
-
-A separate output-quality package may audit wording as extracted by the actual receiving mail client. It must not resend the delivered 2026-07-17 package without explicit authorization.
