@@ -252,7 +252,6 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 |---|---|---:|---:|---:|---:|---:|---|
 | Geen | Geen | n.v.t. | n.v.t. | n.v.t. | n.v.t. | n.v.t. | Geen vervangingsedge-diagnostiek beschikbaar deze run. |
 
-
 ## 12. Rotatieplan portefeuille
 
 | Sluiten | Verlagen | Aanhouden | Aanhouden — geen verdere wijziging in deze review | Toevoegen / bestemming | Vervangen |
@@ -312,15 +311,15 @@ Override-toelichting: Het model dwingt normaal een verklein-/vervangingsreview a
 ### Portefeuilletabel
 | Ticker | ETF-naam | Richting | Gewicht % | Gem. instap | Huidige prijs | P/L % | Oorspronkelijke thesis | Rol |
 |---|---|---|---:|---:|---:|---:|---|---|
-| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Longpositie | 19.16 |  | 92.36 | -1.48 | Portefeuilleblootstelling | Portefeuilleallocatie |
+| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Longpositie | 19.16 | | 92.36 | -1.48 | Portefeuilleblootstelling | Portefeuilleallocatie |
 | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | iShares S&P GSCI Commodity-Indexed Trust | Longpositie | 9.63 | 31.80 | 31.40 | -1.26 | Brede grondstoffen- en inflatiegevoelige hedgepositie | Portefeuilleallocatie |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Longpositie | 24.62 |  | 96.25 | -0.74 | Portefeuilleblootstelling | Portefeuilleallocatie |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Longpositie | 4.94 |  | 56.30 | -0.85 | Netwerk- en infrastructuurcapex | Portefeuilleallocatie |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Longpositie | 24.62 | | 96.25 | -0.74 | Portefeuilleblootstelling | Portefeuilleallocatie |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Longpositie | 4.94 | | 56.30 | -0.85 | Netwerk- en infrastructuurcapex | Portefeuilleallocatie |
 | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Longpositie | 26.92 | 420.13 | 556.53 | 32.47 | AI-rekenkracht en semiconductorleiderschap | Groeimotor |
 | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Longpositie | 1.90 | 67.50 | 48.22 | -28.56 | Kernenergie- en uraniumcyclus | Strategische energie |
-| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | Longpositie | 5.06 |  | 154.26 | -0.77 | Portefeuilleblootstelling | Portefeuilleallocatie |
-| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Longpositie | 0.52 |  | 45.17 | 2.89 | Portefeuilleblootstelling | Portefeuilleallocatie |
-| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | Longpositie | 4.89 |  | 161.09 | -0.44 | Portefeuilleblootstelling | Portefeuilleallocatie |
+| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | Longpositie | 5.06 | | 154.26 | -0.77 | Portefeuilleblootstelling | Portefeuilleallocatie |
+| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Longpositie | 0.52 | | 45.17 | 2.89 | Portefeuilleblootstelling | Portefeuilleallocatie |
+| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | Longpositie | 4.89 | | 161.09 | -0.44 | Portefeuilleblootstelling | Portefeuilleallocatie |
 
 ### Beschikbare cash
 - Cash %: 2.38

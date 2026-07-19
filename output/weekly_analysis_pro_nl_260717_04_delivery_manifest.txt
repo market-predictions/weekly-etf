@@ -1,0 +1,7 @@
+timestamp_utc=2026-07-19T00:55:55Z
+mode=pro
+report=weekly_analysis_pro_nl_260717_04.md
+recipient=mrkt.rprts@gmail.com
+html_body=full_report
+pdf_attached=yes
+attachments=weekly_analysis_pro_nl_260717_04.pdf, weekly_analysis_pro_nl_260717_04_clean.md, weekly_analysis_pro_nl_260717_04_delivery.html, weekly_analysis_pro_nl_260717_04_equity_curve.png
