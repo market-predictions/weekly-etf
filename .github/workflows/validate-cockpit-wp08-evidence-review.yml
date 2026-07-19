@@ -120,9 +120,18 @@ jobs:
           from pathlib import Path
 
           root = Path("output/cockpit_review")
+          output = Path("output")
           metadata = json.loads((root / "weekly_etf_cockpit_side_by_side_review_260717.json").read_text(encoding="utf-8"))
           findings = {row["dimension"]: row for row in metadata["findings"]}
           blockers = set(metadata["blocking_findings"])
+
+          def latest(pattern: str, *, exclude_clean: bool = False) -> str:
+              candidates = sorted(output.glob(pattern))
+              if exclude_clean:
+                  candidates = [path for path in candidates if "_clean" not in path.stem]
+              if not candidates:
+                  raise AssertionError(f"No current source found for {pattern}")
+              return str(candidates[-1])
 
           assert metadata["schema_version"] == "cockpit_side_by_side_review_v2"
           assert metadata["review_type"] == "evidence_based_side_by_side_preview_only"
@@ -135,10 +144,18 @@ jobs:
           )
 
           selected = metadata["selected_sources"]
-          assert selected["classic"]["en"]["markdown"] == "output/weekly_analysis_pro_260717_02.md"
-          assert selected["classic"]["nl"]["markdown"] == "output/weekly_analysis_pro_nl_260717_02.md"
-          assert selected["classic"]["en"]["html"] == "output/weekly_analysis_pro_260717_02_delivery.html"
-          assert selected["classic"]["nl"]["html"] == "output/weekly_analysis_pro_nl_260717_02_delivery.html"
+          assert selected["classic"]["en"]["markdown"] == latest(
+              "weekly_analysis_pro_260717*.md", exclude_clean=True
+          )
+          assert selected["classic"]["nl"]["markdown"] == latest(
+              "weekly_analysis_pro_nl_260717*.md", exclude_clean=True
+          )
+          assert selected["classic"]["en"]["html"] == latest(
+              "weekly_analysis_pro_260717*_delivery.html"
+          )
+          assert selected["classic"]["nl"]["html"] == latest(
+              "weekly_analysis_pro_nl_260717*_delivery.html"
+          )
           assert selected["cockpit"]["en"] == "output/cockpit_preview/weekly_analysis_pro_cockpit_260717_01.html"
           assert selected["cockpit"]["nl"] == "output/cockpit_preview/weekly_analysis_pro_nl_cockpit_260717_01.html"
 

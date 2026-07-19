@@ -1,0 +1,51 @@
+{
+  "schema_version": "weekly_etf_fix_verification_delivery_v1",
+  "date": "2026-07-19",
+  "repository": "market-predictions/weekly-etf",
+  "package": "WP_WEEKLY_ETF_FIX_VERIFICATION_DELIVERY",
+  "status": "delivered_inbox_confirmed",
+  "source_run": {
+    "run_id": "20260719_002755",
+    "requested_close_date": "2026-07-17",
+    "report_token": "260717",
+    "runtime_state": "output/runtime/etf_report_state_20260717_20260719_002755.json",
+    "pricing_audit": "output/pricing/price_audit_2026-07-17_20260719_002755.json"
+  },
+  "implementation": {
+    "pull_request": 111,
+    "merge": "d3d4960b3611fe54f5db6d5ef2d3608fc2f6ac34",
+    "delivery_authorization_commit": "58f16df50309e30b5d5f3c3b5e2f4b37200c50ce",
+    "delivery_evidence_commit": "8ae50d7ccfe931dd9be5a9008b41570d32f4fdff"
+  },
+  "validation": {
+    "no_send_recovery_run": 29667585209,
+    "no_send_recovery_status": "success",
+    "full_render_boundary_run": 29667585181,
+    "full_render_boundary_status": "success",
+    "pricing_lineage_status": "passed",
+    "workflow_status": "workflow_success"
+  },
+  "delivery": {
+    "manifest": "output/delivery/weekly_etf_delivery_manifest_2026-07-17_20260719_002755.json",
+    "status": "smtp_sendmail_returned_no_exception",
+    "generated_at_utc": "2026-07-19T00:55:56Z",
+    "language_count": 2,
+    "attachments_per_language": 4,
+    "english_inbox_receipt": true,
+    "dutch_inbox_receipt": true,
+    "received_at_europe_amsterdam": "2026-07-19T02:55:53+02:00"
+  },
+  "cockpit_contract": {
+    "english": "PAVE 0.0% → 4.9%; XLU 5.5% → 0.5%.",
+    "dutch": "PAVE 0,0% → 4,9%; XLU 5,5% → 0,5%.",
+    "english_received": true,
+    "dutch_received": true
+  },
+  "authority": {
+    "repeat_portfolio_execution": false,
+    "broker_execution_authorized": false,
+    "portfolio_state_mutated_by_recovery": false,
+    "trade_ledger_mutated_by_recovery": false,
+    "valuation_history_mutated_by_recovery": false
+  }
+}
