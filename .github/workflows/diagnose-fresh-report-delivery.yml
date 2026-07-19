@@ -69,22 +69,57 @@ jobs:
         run: python tools/validate_etf_trade_ledger_idempotency.py --trade-ledger output/etf_trade_ledger.csv
 
       - name: Build guarded no-execution artifact on temporary copies
+        id: guarded_diagnostic
+        shell: bash
         run: |
+          set +e
           mkdir -p "$RUNNER_TEMP/etf-diagnostic/output"
           cp output/etf_portfolio_state.json "$RUNNER_TEMP/etf-diagnostic/portfolio.json"
           cp output/etf_trade_ledger.csv "$RUNNER_TEMP/etf-diagnostic/ledger.csv"
-          python -m runtime.model_execution_guarded_auto \
-            --runtime-state "$RUNTIME_STATE" \
-            --portfolio-state "$RUNNER_TEMP/etf-diagnostic/portfolio.json" \
-            --trade-ledger "$RUNNER_TEMP/etf-diagnostic/ledger.csv" \
-            --output-dir "$RUNNER_TEMP/etf-diagnostic/output"
-          artifact="$(cat "$RUNNER_TEMP/etf-diagnostic/output/latest_etf_model_execution_path.txt")"
-          python tools/validate_etf_model_execution.py \
-            --artifact "$artifact" \
-            --expected-mode guarded_auto \
-            --no-finalize-report
+          {
+            echo "=== guarded wrapper ==="
+            python -m runtime.model_execution_guarded_auto \
+              --runtime-state "$RUNTIME_STATE" \
+              --portfolio-state "$RUNNER_TEMP/etf-diagnostic/portfolio.json" \
+              --trade-ledger "$RUNNER_TEMP/etf-diagnostic/ledger.csv" \
+              --output-dir "$RUNNER_TEMP/etf-diagnostic/output"
+            wrapper_status=$?
+            echo "wrapper_status=$wrapper_status"
+            if [ "$wrapper_status" -eq 0 ]; then
+              artifact="$(cat "$RUNNER_TEMP/etf-diagnostic/output/latest_etf_model_execution_path.txt")"
+              echo "artifact=$artifact"
+              echo "=== guarded artifact validation ==="
+              python tools/validate_etf_model_execution.py \
+                --artifact "$artifact" \
+                --expected-mode guarded_auto \
+                --no-finalize-report
+              validator_status=$?
+            else
+              validator_status=99
+            fi
+            echo "validator_status=$validator_status"
+            if [ "$wrapper_status" -ne 0 ]; then
+              exit "$wrapper_status"
+            fi
+            exit "$validator_status"
+          } > "$RUNNER_TEMP/etf-diagnostic/diagnostic.log" 2>&1
+          status=$?
+          cat "$RUNNER_TEMP/etf-diagnostic/diagnostic.log"
+          exit "$status"
+
+      - name: Upload guarded diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fresh-report-delivery-gate-diagnostic
+          path: |
+            ${{ runner.temp }}/etf-diagnostic/diagnostic.log
+            ${{ runner.temp }}/etf-diagnostic/output/*.json
+            ${{ runner.temp }}/etf-diagnostic/output/*.txt
+          if-no-files-found: warn
 
       - name: Prove canonical authority files unchanged
+        if: always()
         run: |
           git diff --exit-code -- \
             output/etf_portfolio_state.json \
