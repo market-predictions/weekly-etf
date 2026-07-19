@@ -1,19 +1,39 @@
 {
-  "schema_version": "2.0-runtime",
-  "portfolio_mode": "client_long_only_thematic",
-  "base_currency": "EUR",
-  "valuation_source": "runtime_pricing_lineage_official_shares_v1",
-  "pricing_audit_file": "output/pricing/price_audit_2026-07-17_20260719_001444.json",
-  "trade_ledger_file": "etf_trade_ledger.csv",
-  "recommendation_scorecard_file": "etf_recommendation_scorecard.csv",
-  "inception_date": "2026-03-28",
-  "starting_capital_eur": 100000.0,
-  "cash_eur": 2534.36,
-  "invested_market_value_eur": 104109.85,
-  "nav_eur": 106644.21,
-  "peak_nav_eur": 112376.1,
-  "max_drawdown_pct": -7.4587,
-  "positions": [
+  "schema_version": "1.0",
+  "created_at_utc": "2026-07-19T00:21:45.753499+00:00",
+  "execution_mode": "shadow",
+  "execution_status": "no_trade_intents",
+  "run_id": "20260719_001444",
+  "report_date": "2026-07-17",
+  "requested_close_date": "2026-07-17",
+  "source_files": {
+    "runtime_state": "output/runtime/etf_report_state_20260717_20260719_001444.json",
+    "portfolio_state": "output/etf_portfolio_state.json",
+    "trade_ledger": "output/etf_trade_ledger.csv",
+    "pricing_audit": "output/pricing/price_audit_2026-07-17_20260719_001444.json",
+    "rotation_plan": "output/runtime/etf_rotation_plan_260717_20260719_001444.json"
+  },
+  "policy_checks": {
+    "passed": true,
+    "errors": [],
+    "warnings": [
+      "no_trade_intents"
+    ],
+    "mode_note": "Shadow mode writes no official portfolio-state or trade-ledger changes."
+  },
+  "pre_trade_portfolio": {
+    "cash_eur": 2534.36,
+    "total_portfolio_value_eur": 106644.21,
+    "base_currency": "EUR"
+  },
+  "post_trade_shadow_portfolio": {
+    "cash_eur": 2534.36,
+    "invested_market_value_eur": 104109.85,
+    "nav_eur": 106644.21,
+    "nav_drift_eur": 0.0
+  },
+  "proposed_ledger_rows": [],
+  "shadow_positions": [
     {
       "suggested_action": "hold",
       "conviction_tier": "Tier 2",
@@ -204,13 +224,18 @@
       "trade_lineage_source": "current_snapshot_no_trade"
     },
     {
-      "shares_delta_this_run": 107.0,
-      "weight_change_pct": 4.9708,
-      "action_executed_this_run": "Buy",
-      "funding_source_note": "Shadow buy funded by XLU.",
-      "ticker": "PAVE",
       "suggested_action": "hold",
+      "conviction_tier": "Tier 2",
       "portfolio_role": "Rotation destination",
+      "better_alternative_exists": "Yes",
+      "short_reason": "Infrastructure thesis remains attractive, but GRID is the clean challenger.",
+      "required_next_action": "Complete PAVE-versus-GRID implementation duel.",
+      "fresh_cash_test": "Smaller / under review",
+      "shares_delta_this_run": 0.0,
+      "weight_change_pct": 0.0,
+      "action_executed_this_run": "None",
+      "funding_source_note": "No model trade executed this run.",
+      "ticker": "PAVE",
       "pricing_source": "twelve_data",
       "pricing_status": "fresh_exact_unverified",
       "pricing_tier": "valuation_grade",
@@ -230,11 +255,6 @@
       "previous_weight_pct": 4.94,
       "weight_inherited_pct": 4.94,
       "target_weight_pct": 4.96,
-      "conviction_tier": "Tier 2",
-      "better_alternative_exists": "Yes",
-      "short_reason": "Infrastructure thesis remains attractive, but GRID is the clean challenger.",
-      "required_next_action": "Complete PAVE-versus-GRID implementation duel.",
-      "fresh_cash_test": "Smaller / under review",
       "report_date": "2026-07-17",
       "pnl_pct": "-0.85",
       "replaceable_status": "Hold under review",
@@ -495,10 +515,10 @@
       "pnl_pct": "2.89",
       "original_thesis": null,
       "previous_weight_pct": 0.52,
-      "weight_change_pct": -4.9708,
-      "shares_delta_this_run": -134.0,
-      "action_executed_this_run": "Sell",
-      "funding_source_note": "Shadow execution capped to available source value.",
+      "weight_change_pct": 0.0,
+      "shares_delta_this_run": 0.0,
+      "action_executed_this_run": "None",
+      "funding_source_note": "No model trade executed this run.",
       "previous_price_local": 45.17,
       "previous_market_value_local": 632.38,
       "previous_market_value_eur": 552.89,
@@ -594,38 +614,5 @@
       "trade_lineage_source": "current_snapshot_no_trade"
     }
   ],
-  "last_report": {
-    "date": "2026-07-17",
-    "source_report": "weekly_analysis_pro_260717_03.md",
-    "position_count": 9
-  },
-  "last_valuation": {
-    "date": "2026-07-17",
-    "nav_eur": 106644.21,
-    "invested_market_value_eur": 104109.85,
-    "cash_eur": 2534.36,
-    "since_inception_return_pct": 6.6442,
-    "daily_return_pct": -0.4423,
-    "drawdown_pct": -5.1006,
-    "eurusd_used": 1.1438,
-    "equity_curve_state": "Below prior high",
-    "valuation_notes": "Runtime valuation repriced from official portfolio-state shares"
-  },
-  "last_successful_runtime_state_file": "output/runtime/etf_report_state_20260717_20260719_001444.json",
-  "last_state_persisted_at_utc": "2026-07-19T00:21:49.378778+00:00",
-  "last_model_execution": {
-    "date": "2026-07-16",
-    "run_id": "20260717_154351",
-    "runtime_state": "output/runtime/etf_report_state_20260716_20260717_154351.json",
-    "mode": "guarded_auto",
-    "trade_count": 1,
-    "executed_at_utc": "2026-07-17T15:45:30.891136+00:00"
-  },
-  "whole_share_contract": {
-    "status": "compliant",
-    "validated_at_utc": "2026-07-17T15:45:30.893489+00:00",
-    "execution_mode": "guarded_auto",
-    "residual_cash_eur": 2534.36,
-    "nav_drift_eur": 0.0
-  }
+  "artifact_path": "output/runtime/etf_model_execution_20260717_20260719_001444.json"
 }
