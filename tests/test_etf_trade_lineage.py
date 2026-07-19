@@ -21,6 +21,8 @@ def _legacy_rotation_rows() -> list[dict[str, object]]:
             "current_weight_pct": 4.94,
             "previous_weight_pct": 4.94,
             "weight_change_pct": 4.9708,
+            "current_price_local": 56.30,
+            "previous_price_local": 56.30,
             "market_value_local": 6024.10,
             "previous_market_value_local": 6024.10,
             "market_value_eur": 5266.88,
@@ -34,6 +36,8 @@ def _legacy_rotation_rows() -> list[dict[str, object]]:
             "current_weight_pct": 0.52,
             "previous_weight_pct": 0.52,
             "weight_change_pct": -4.9708,
+            "current_price_local": 45.17,
+            "previous_price_local": 45.17,
             "market_value_local": 632.38,
             "previous_market_value_local": 632.38,
             "market_value_eur": 552.89,
@@ -50,14 +54,20 @@ def test_legacy_overwritten_rotation_is_reconstructed() -> None:
 
     pave = by_ticker["PAVE"]
     assert pave["previous_shares"] == pytest.approx(0.0)
+    assert pave["pre_trade_shares"] == pytest.approx(0.0)
     assert pave["previous_weight_pct"] == pytest.approx(0.0)
-    assert pave["previous_market_value_eur"] == pytest.approx(0.0)
+    assert pave["pre_trade_weight_pct"] == pytest.approx(0.0)
+    assert pave["pre_trade_market_value_eur"] == pytest.approx(0.0)
+    assert pave["previous_market_value_eur"] == pytest.approx(5266.88)
     assert pave["trade_lineage_source"] == "derived_from_recorded_delta"
 
     xlu = by_ticker["XLU"]
     assert xlu["previous_shares"] == pytest.approx(148.0)
+    assert xlu["pre_trade_shares"] == pytest.approx(148.0)
     assert xlu["previous_weight_pct"] == pytest.approx(5.4908)
-    assert xlu["previous_market_value_eur"] == pytest.approx(5844.83, abs=0.02)
+    assert xlu["pre_trade_weight_pct"] == pytest.approx(5.4908)
+    assert xlu["pre_trade_market_value_eur"] == pytest.approx(5844.83, abs=0.02)
+    assert xlu["previous_market_value_eur"] == pytest.approx(552.89)
     assert xlu["trade_lineage_source"] == "derived_from_recorded_delta"
 
 
@@ -84,7 +94,9 @@ def test_official_ledger_snapshot_takes_precedence() -> None:
     )
     by_ticker = {row["ticker"]: row for row in rows}
     assert by_ticker["PAVE"]["previous_weight_pct"] == pytest.approx(0.0)
+    assert by_ticker["PAVE"]["pre_trade_weight_pct"] == pytest.approx(0.0)
     assert by_ticker["XLU"]["previous_weight_pct"] == pytest.approx(5.49)
+    assert by_ticker["XLU"]["pre_trade_weight_pct"] == pytest.approx(5.49)
     assert by_ticker["PAVE"]["trade_lineage_source"] == "official_trade_ledger"
     assert by_ticker["XLU"]["trade_lineage_source"] == "official_trade_ledger"
 
@@ -94,13 +106,16 @@ def test_material_trade_with_identical_client_weights_is_rejected() -> None:
         "ticker": "PAVE",
         "shares": 107.0,
         "previous_shares": 0.0,
+        "pre_trade_shares": 0.0,
         "shares_delta_this_run": 107.0,
         "action_executed_this_run": "Buy",
         "current_weight_pct": 4.94,
         "previous_weight_pct": 4.94,
+        "pre_trade_weight_pct": 4.94,
         "weight_change_pct": 4.97,
         "market_value_eur": 5266.88,
-        "previous_market_value_eur": 0.0,
+        "previous_market_value_eur": 5266.88,
+        "pre_trade_market_value_eur": 0.0,
     }
     errors = validate_trade_lineage_rows([row], context="display_gate")
     assert any("material_trade_identical_display_weight:PAVE" in error for error in errors)
@@ -121,12 +136,15 @@ def test_no_trade_position_uses_current_snapshot() -> None:
         ]
     )
     assert rows[0]["previous_shares"] == pytest.approx(59.0)
+    assert rows[0]["pre_trade_shares"] == pytest.approx(59.0)
     assert rows[0]["previous_weight_pct"] == pytest.approx(26.92)
+    assert rows[0]["pre_trade_weight_pct"] == pytest.approx(26.92)
     assert rows[0]["previous_market_value_eur"] == pytest.approx(28707.93)
+    assert rows[0]["pre_trade_market_value_eur"] == pytest.approx(28707.93)
     assert validate_trade_lineage_rows(rows) == []
 
 
-def test_report_state_builder_repairs_legacy_rotation_rows() -> None:
+def test_report_state_builder_repairs_lineage_without_replacing_current_valuation() -> None:
     positions = _enrich_positions(
         {
             "cash_eur": 100824.44,
@@ -163,8 +181,14 @@ def test_report_state_builder_repairs_legacy_rotation_rows() -> None:
     )
     by_ticker = {row["ticker"]: row for row in positions}
     assert by_ticker["PAVE"]["previous_shares"] == pytest.approx(0.0)
+    assert by_ticker["PAVE"]["pre_trade_market_value_eur"] == pytest.approx(0.0)
+    assert by_ticker["PAVE"]["market_value_eur"] == pytest.approx(5266.88)
+    assert by_ticker["PAVE"]["previous_market_value_eur"] == pytest.approx(5266.88)
     assert by_ticker["PAVE"]["previous_weight_pct"] == pytest.approx(0.0)
     assert by_ticker["XLU"]["previous_shares"] == pytest.approx(148.0)
+    assert by_ticker["XLU"]["pre_trade_market_value_eur"] == pytest.approx(5844.83, abs=0.02)
+    assert by_ticker["XLU"]["market_value_eur"] == pytest.approx(552.89)
+    assert by_ticker["XLU"]["previous_market_value_eur"] == pytest.approx(552.89)
     assert by_ticker["XLU"]["previous_weight_pct"] == pytest.approx(5.4908)
 
 

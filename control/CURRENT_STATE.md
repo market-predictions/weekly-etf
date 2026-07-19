@@ -1,6 +1,6 @@
 # ETF Review OS — Current State
 
-Date: 2026-07-18
+Date: 2026-07-19
 Repository: `market-predictions/weekly-etf`
 
 ## Official portfolio authority
@@ -177,6 +177,28 @@ PDF_surface: preserved
 ```
 
 The 2026-07-17 inbox delivery is the first real receiving-mail-client receipt after this correction.
+
+## Cockpit trade-weight lineage correction
+
+```text
+package: WP_COCKPIT_TRADE_WEIGHT_LINEAGE_FIX
+implementation_pull_request: #109
+implementation_merge: 85d82930e40d37c145727d14468dc8914e041e00
+status: closed_merged_validated
+claim_status: closed_released
+trade_lineage_and_whole_share_run: 29666054365 success
+report_request_authority_run: 29666054332 success
+material_identical_display_gate: passed
+```
+
+The cockpit action detail now receives validated pre-trade and current weights. For the latest rotation, the future generated surface resolves to:
+
+```text
+PAVE 0.0% → 4.9%
+XLU 5.5% → 0.5%
+```
+
+The state contract preserves or reconstructs pre-trade shares, values and weights, prefers the official ledger when available, and rejects material trades whose one-decimal before/after weights are identical. Current NAV remains based on current market values. No report was generated or sent as part of this correction, and the already delivered 2026-07-17 package remains unchanged.
 
 ## Immediate next action
 

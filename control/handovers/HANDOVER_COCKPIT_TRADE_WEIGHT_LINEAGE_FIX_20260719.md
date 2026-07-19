@@ -4,7 +4,8 @@ Date: 2026-07-19
 Repository: `market-predictions/weekly-etf`
 Work package: `WP_COCKPIT_TRADE_WEIGHT_LINEAGE_FIX`
 Implementation PR: #109
-Status: implementation complete / validated / awaiting merge
+Implementation merge: `85d82930e40d37c145727d14468dc8914e041e00`
+Status: closed / merged / validated / claim released
 
 ## Problem resolved
 
@@ -30,14 +31,16 @@ PAVE added · XLU reduced
 PAVE 0.0% → 4.9%; XLU 5.5% → 0.5%.
 ```
 
-## Validation evidence
+## Final validation evidence
 
 ```text
-validated_head: 81e61a5039d28a60a9056156054dec84a8691d29
-trade_lineage_and_whole_share_run: 29665973984 success
-trade_lineage_and_whole_share_job: 88136341408 success
-report_request_authority_run: 29665973971 success
-report_request_authority_job: 88136341429 success
+validated_head: 5aefd9237bbbace490bda3aad0dcb722acd0b05d
+trade_lineage_and_whole_share_run: 29666054365 success
+trade_lineage_and_whole_share_job: 88136546831 success
+report_request_authority_run: 29666054332 success
+report_request_authority_job: 88136546755 success
+implementation_merge: 85d82930e40d37c145727d14468dc8914e041e00
+merged_at_utc: 2026-07-18T23:56:26Z
 ```
 
 Regression coverage includes helper behavior, official-ledger precedence, legacy reconstruction, report-state integration, no-trade positions, the identical-display failure gate and cockpit output.
@@ -46,9 +49,6 @@ Regression coverage includes helper behavior, official-ledger precedence, legacy
 
 No production report was generated or sent. The package did not intentionally mutate the official portfolio state, trade ledger, valuation history, pricing authority, runtime pointers, historical report files or delivery manifests.
 
-## Follow-up after merge
+## Operational status
 
-1. Record the implementation merge SHA and CI results in the claim and work package.
-2. Release the claim through a governance-only closeout.
-3. Do not regenerate or resend the already delivered 2026-07-17 package without separate authorization.
-4. The corrected lineage contract applies automatically to future report generation.
+The corrected lineage contract is active on `main` and applies automatically to future report generation. The already delivered 2026-07-17 package remains immutable and must not be regenerated or resent without separate authorization.
