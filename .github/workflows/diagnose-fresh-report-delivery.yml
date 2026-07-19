@@ -1,0 +1,92 @@
+name: Diagnose fresh report delivery gate
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/diagnose-fresh-report-delivery.yml"
+      - "runtime/trade_lineage.py"
+      - "runtime/persist_etf_valuation_state.py"
+      - "tools/validate_etf_persisted_valuation_state.py"
+      - "tools/validate_etf_trade_ledger_idempotency.py"
+      - "control/work_packages/WP_FRESH_REPORT_DELIVERY_GATE_DIAGNOSTIC_20260719.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      RUNTIME_STATE: output/runtime/etf_report_state_20260717_20260719_002755.json
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile diagnostic boundary
+        run: |
+          python -m py_compile \
+            runtime/trade_lineage.py \
+            runtime/model_execution_guarded_auto.py \
+            tools/validate_etf_persisted_valuation_state.py \
+            tools/validate_etf_trade_ledger_idempotency.py \
+            tools/validate_etf_model_execution.py
+
+      - name: Assert corrected trade lineage in runtime state
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          state = json.loads(Path("output/runtime/etf_report_state_20260717_20260719_002755.json").read_text())
+          by_ticker = {row["ticker"]: row for row in state["positions"]}
+          expected = {
+              "PAVE": (0.0, 4.94),
+              "XLU": (5.4908, 0.52),
+          }
+          for ticker, (before, after) in expected.items():
+              row = by_ticker[ticker]
+              actual = (float(row["previous_weight_pct"]), float(row["current_weight_pct"]))
+              if abs(actual[0] - before) > 0.0001 or abs(actual[1] - after) > 0.0001:
+                  raise RuntimeError(f"trade lineage mismatch for {ticker}: {actual} != {(before, after)}")
+          print("TRADE_LINEAGE_RUNTIME_OK | PAVE=0.0->4.94 | XLU=5.4908->0.52")
+          PY
+
+      - name: Validate persisted valuation state
+        run: |
+          python tools/validate_etf_persisted_valuation_state.py \
+            --runtime-state "$RUNTIME_STATE" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --valuation-history output/etf_valuation_history.csv
+
+      - name: Validate trade ledger idempotency
+        run: python tools/validate_etf_trade_ledger_idempotency.py --trade-ledger output/etf_trade_ledger.csv
+
+      - name: Build guarded no-execution artifact on temporary copies
+        run: |
+          mkdir -p "$RUNNER_TEMP/etf-diagnostic/output"
+          cp output/etf_portfolio_state.json "$RUNNER_TEMP/etf-diagnostic/portfolio.json"
+          cp output/etf_trade_ledger.csv "$RUNNER_TEMP/etf-diagnostic/ledger.csv"
+          python -m runtime.model_execution_guarded_auto \
+            --runtime-state "$RUNTIME_STATE" \
+            --portfolio-state "$RUNNER_TEMP/etf-diagnostic/portfolio.json" \
+            --trade-ledger "$RUNNER_TEMP/etf-diagnostic/ledger.csv" \
+            --output-dir "$RUNNER_TEMP/etf-diagnostic/output"
+          artifact="$(cat "$RUNNER_TEMP/etf-diagnostic/output/latest_etf_model_execution_path.txt")"
+          python tools/validate_etf_model_execution.py \
+            --artifact "$artifact" \
+            --expected-mode guarded_auto \
+            --no-finalize-report
+
+      - name: Prove canonical authority files unchanged
+        run: |
+          git diff --exit-code -- \
+            output/etf_portfolio_state.json \
+            output/etf_trade_ledger.csv \
+            output/etf_valuation_history.csv
