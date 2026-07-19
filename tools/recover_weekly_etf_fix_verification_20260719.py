@@ -204,24 +204,26 @@ def _build_guarded_no_execution_artifact() -> None:
 
 def _check_front_pages_and_weights() -> None:
     marker = 'data-cockpit-front-page="delivery"'
-    required_tokens = {
-        "PAVE": ("PAVE 0.0%", "4.9%"),
-        "XLU": ("XLU 5.5%", "0.5%"),
+    required_by_path = {
+        EN_REPORT.with_name(f"{EN_REPORT.stem}_delivery.html"): (
+            "PAVE 0.0%",
+            "4.9%",
+            "XLU 5.5%",
+            "0.5%",
+        ),
+        NL_REPORT.with_name(f"{NL_REPORT.stem}_delivery.html"): (
+            "PAVE 0,0%",
+            "4,9%",
+            "XLU 5,5%",
+            "0,5%",
+        ),
     }
-    for path in (
-        EN_REPORT.with_name(f"{EN_REPORT.stem}_delivery.html"),
-        NL_REPORT.with_name(f"{NL_REPORT.stem}_delivery.html"),
-    ):
+    for path, required_tokens in required_by_path.items():
         text = path.read_text(encoding="utf-8")
         count = text.count(marker)
         if count != 1:
             raise RuntimeError(f"{path}: expected one cockpit front page, found {count}")
-        missing = [
-            token
-            for pair in required_tokens.values()
-            for token in pair
-            if token not in text
-        ]
+        missing = [token for token in required_tokens if token not in text]
         if missing:
             raise RuntimeError(f"{path}: corrected cockpit trade weights missing: {missing}")
         print(f"ETF_FIX_VERIFICATION_COCKPIT_OK | file={path.name} | count={count}")
