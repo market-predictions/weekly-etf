@@ -1,0 +1,275 @@
+name: Diagnose fresh report delivery gate
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/diagnose-fresh-report-delivery.yml"
+      - "runtime/trade_lineage.py"
+      - "runtime/persist_etf_valuation_state.py"
+      - "tools/validate_etf_persisted_valuation_state.py"
+      - "tools/validate_etf_trade_ledger_idempotency.py"
+      - "control/work_packages/WP_FRESH_REPORT_DELIVERY_GATE_DIAGNOSTIC_20260719.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      RUNTIME_STATE: output/runtime/etf_report_state_20260717_20260719_002755.json
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install production-compatible diagnostic dependency
+        run: python -m pip install pyyaml
+
+      - name: Compile diagnostic boundary
+        run: |
+          python -m py_compile \
+            runtime/trade_lineage.py \
+            runtime/model_execution_guarded_auto.py \
+            tools/validate_etf_persisted_valuation_state.py \
+            tools/validate_etf_trade_ledger_idempotency.py \
+            tools/validate_etf_model_execution.py
+
+      - name: Assert corrected trade lineage in runtime state
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          state = json.loads(Path("output/runtime/etf_report_state_20260717_20260719_002755.json").read_text())
+          by_ticker = {row["ticker"]: row for row in state["positions"]}
+          expected = {"PAVE": (0.0, 4.94), "XLU": (5.4908, 0.52)}
+          for ticker, (before, after) in expected.items():
+              row = by_ticker[ticker]
+              actual = (float(row["previous_weight_pct"]), float(row["current_weight_pct"]))
+              if abs(actual[0] - before) > 0.0001 or abs(actual[1] - after) > 0.0001:
+                  raise RuntimeError(f"trade lineage mismatch for {ticker}: {actual} != {(before, after)}")
+          print("TRADE_LINEAGE_RUNTIME_OK | PAVE=0.0->4.94 | XLU=5.4908->0.52")
+          PY
+
+      - name: Validate persisted valuation state
+        run: |
+          python tools/validate_etf_persisted_valuation_state.py \
+            --runtime-state "$RUNTIME_STATE" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --valuation-history output/etf_valuation_history.csv
+
+      - name: Validate trade ledger idempotency
+        run: python tools/validate_etf_trade_ledger_idempotency.py --trade-ledger output/etf_trade_ledger.csv
+
+      - name: Build guarded no-execution artifact on temporary copies
+        id: guarded_diagnostic
+        shell: bash
+        run: |
+          set +e
+          mkdir -p "$RUNNER_TEMP/etf-diagnostic/output"
+          cp output/etf_portfolio_state.json "$RUNNER_TEMP/etf-diagnostic/portfolio.json"
+          cp output/etf_trade_ledger.csv "$RUNNER_TEMP/etf-diagnostic/ledger.csv"
+          {
+            echo "=== guarded wrapper ==="
+            python -m runtime.model_execution_guarded_auto \
+              --runtime-state "$RUNTIME_STATE" \
+              --portfolio-state "$RUNNER_TEMP/etf-diagnostic/portfolio.json" \
+              --trade-ledger "$RUNNER_TEMP/etf-diagnostic/ledger.csv" \
+              --output-dir "$RUNNER_TEMP/etf-diagnostic/output"
+            wrapper_status=$?
+            echo "wrapper_status=$wrapper_status"
+            if [ "$wrapper_status" -eq 0 ]; then
+              artifact="$(cat "$RUNNER_TEMP/etf-diagnostic/output/latest_etf_model_execution_path.txt")"
+              echo "artifact=$artifact"
+              echo "=== guarded artifact validation ==="
+              python tools/validate_etf_model_execution.py \
+                --artifact "$artifact" \
+                --expected-mode guarded_auto \
+                --no-finalize-report
+              validator_status=$?
+            else
+              validator_status=99
+            fi
+            echo "validator_status=$validator_status"
+            if [ "$wrapper_status" -ne 0 ]; then
+              exit "$wrapper_status"
+            fi
+            exit "$validator_status"
+          } > "$RUNNER_TEMP/etf-diagnostic/diagnostic.log" 2>&1
+          status=$?
+          cat "$RUNNER_TEMP/etf-diagnostic/diagnostic.log"
+          exit "$status"
+
+      - name: Upload guarded diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fresh-report-delivery-gate-diagnostic
+          path: |
+            ${{ runner.temp }}/etf-diagnostic/diagnostic.log
+            ${{ runner.temp }}/etf-diagnostic/output/*.json
+            ${{ runner.temp }}/etf-diagnostic/output/*.txt
+          if-no-files-found: warn
+
+      - name: Prove canonical authority files unchanged
+        if: always()
+        run: |
+          git diff --exit-code -- \
+            output/etf_portfolio_state.json \
+            output/etf_trade_ledger.csv \
+            output/etf_valuation_history.csv
+
+  render_boundary:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      MRKT_RPRTS_REPORT_MODE: pro
+      MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
+      ETF_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260717_20260719_002755.json
+      MRKT_RPRTS_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260717_20260719_002755.json
+      MRKT_RPRTS_EXPLICIT_REPORT_PATH: output/weekly_analysis_pro_260717_04.md
+      MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL: output/weekly_analysis_pro_nl_260717_04.md
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system packages for PDF rendering
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2 \
+            libpango-1.0-0 \
+            libgdk-pixbuf-2.0-0 \
+            libffi-dev \
+            shared-mime-info \
+            fonts-liberation \
+            fonts-dejavu-core \
+            fonts-lato \
+            poppler-utils
+
+      - name: Install production Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install matplotlib mistune weasyprint pyyaml pandas yfinance
+
+      - name: Create isolated production replica
+        run: |
+          mkdir -p "$RUNNER_TEMP/etf-repro"
+          cp -a "$GITHUB_WORKSPACE/." "$RUNNER_TEMP/etf-repro/"
+
+      - name: Replay guarded validation with finalization enabled
+        run: |
+          cd "$RUNNER_TEMP/etf-repro"
+          python tools/validate_etf_trade_ledger_idempotency.py --trade-ledger output/etf_trade_ledger.csv
+          execution_log="$(python -m runtime.model_execution_guarded_auto \
+            --runtime-state "$ETF_RUNTIME_STATE_PATH" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --trade-ledger output/etf_trade_ledger.csv \
+            --output-dir output/runtime)"
+          echo "$execution_log"
+          artifact="$(printf '%s\n' "$execution_log" | sed -n 's/^ETF_MODEL_EXECUTION_OK | artifact=\([^|]*\) |.*/\1/p' | xargs)"
+          test -n "$artifact" -a -f "$artifact"
+          python tools/validate_etf_model_execution.py --artifact "$artifact" --expected-mode guarded_auto
+
+      - name: Validate lane breadth proof before render
+        run: |
+          cd "$RUNNER_TEMP/etf-repro"
+          python validate_lane_breadth.py
+
+      - name: Validate replacement duel pricing proof before render
+        run: |
+          cd "$RUNNER_TEMP/etf-repro"
+          python validate_replacement_duels.py
+
+      - name: Validate bilingual report pair
+        run: |
+          cd "$RUNNER_TEMP/etf-repro"
+          python - <<'PY'
+          from pathlib import Path
+          import send_report_runtime_html as srh
+          sr = srh.report_module
+          output_dir = Path("output")
+          latest = sr.latest_report_file(output_dir, mode="pro")
+          if not sr.has_matching_dutch_report(latest):
+              raise RuntimeError(f"No matching Dutch report for {latest}")
+          sr.validate_bilingual_pair(latest)
+          print(f"BILINGUAL_PAIR_OK | en={latest.name} | nl={sr.matching_dutch_report_path(latest).name}")
+          PY
+
+      - name: Render HTML and PDF without sending
+        run: |
+          cd "$RUNNER_TEMP/etf-repro"
+          python - <<'PY'
+          from pathlib import Path
+          import send_report_runtime_html as srh
+          sr = srh.report_module
+          output_dir = Path("output")
+          latest = sr.latest_report_file(output_dir, mode="pro")
+          bundle = sr.generate_delivery_assets_for_run(output_dir, latest, mode="pro")
+          print(f"RENDER_OK | bilingual={bundle.get('bilingual')} | en={bundle['en']['report_path'].name}")
+          PY
+          python tools/validate_etf_pdf_visual_contract.py --output-dir output
+          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+
+      - name: Validate delivery HTML and client surface
+        run: |
+          cd "$RUNNER_TEMP/etf-repro"
+          python tools/validate_etf_delivery_html_contract.py --output-dir output
+          python tools/validate_etf_client_surface_clean.py --output-dir output
+          python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+
+      - name: Validate explicit state derivation
+        run: |
+          cd "$RUNNER_TEMP/etf-repro"
+          python tools/write_etf_minimum_state.py --output-dir output --mode pro --check-only
+          python tools/write_etf_trade_ledger.py --output-dir output --check-only
+          python tools/write_etf_recommendation_scorecard.py --output-dir output --mode pro --check-only
+
+      - name: Assert rendered cockpit trade weights
+        run: |
+          cd "$RUNNER_TEMP/etf-repro"
+          python - <<'PY'
+          from pathlib import Path
+
+          files = sorted(Path("output").glob("weekly_analysis_pro_260717_04_delivery.html"))
+          if not files:
+              raise RuntimeError("Expected English delivery HTML was not generated")
+          text = files[-1].read_text(encoding="utf-8")
+          required = ["PAVE 0.0%", "4.9%", "XLU 5.5%", "0.5%"]
+          missing = [token for token in required if token not in text]
+          if missing:
+              raise RuntimeError(f"Rendered cockpit is missing corrected trade weights: {missing}")
+          print("COCKPIT_RENDERED_LINEAGE_OK | PAVE=0.0%->4.9% | XLU=5.5%->0.5%")
+          PY
+
+      - name: Upload no-send rendered evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fresh-report-render-boundary-evidence
+          path: |
+            ${{ runner.temp }}/etf-repro/output/weekly_analysis_pro_260717_04_delivery.html
+            ${{ runner.temp }}/etf-repro/output/weekly_analysis_pro_nl_260717_04_delivery.html
+            ${{ runner.temp }}/etf-repro/output/weekly_analysis_pro_260717_04.pdf
+            ${{ runner.temp }}/etf-repro/output/weekly_analysis_pro_nl_260717_04.pdf
+          if-no-files-found: warn
+
+      - name: Prove checked-out canonical files unchanged
+        if: always()
+        run: |
+          git diff --exit-code -- \
+            output/etf_portfolio_state.json \
+            output/etf_trade_ledger.csv \
+            output/etf_valuation_history.csv

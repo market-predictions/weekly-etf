@@ -1,0 +1,125 @@
+name: Deliver Weekly ETF fix verification package 20260719
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/weekly_etf_fix_verification_delivery_request_20260719_002755.md"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-etf-fix-verification-delivery-20260719-002755
+  cancel-in-progress: false
+
+jobs:
+  deliver:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      MRKT_RPRTS_REPORT_MODE: pro
+      MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
+      MRKT_RPRTS_SUBJECT_PREFIX: Weekly ETF Pro Review
+      MRKT_RPRTS_SUBJECT_PREFIX_NL: Weekly ETF Pro Review | Nederlands
+      MRKT_RPRTS_EXPLICIT_REPORT_PATH: output/weekly_analysis_pro_260717_04.md
+      MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL: output/weekly_analysis_pro_nl_260717_04.md
+      MRKT_RPRTS_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260717_20260719_002755.json
+      ETF_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260717_20260719_002755.json
+      MRKT_RPRTS_PRICING_AUDIT_PATH: output/pricing/price_audit_2026-07-17_20260719_002755.json
+      ETF_PRICING_AUDIT_PATH: output/pricing/price_audit_2026-07-17_20260719_002755.json
+      ETF_MODEL_EXECUTION_PATH: output/runtime/etf_model_execution_20260717_20260719_002755_not_authorized.json
+      MRKT_RPRTS_MODEL_EXECUTION_PATH: output/runtime/etf_model_execution_20260717_20260719_002755_not_authorized.json
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify explicit delivery authorization
+        run: |
+          request="control/run_queue/weekly_etf_fix_verification_delivery_request_20260719_002755.md"
+          test -f "$request"
+          grep -F "authorized: true" "$request"
+          grep -F "run_id: 20260719_002755" "$request"
+          grep -F "requested_close_date: 2026-07-17" "$request"
+          grep -F "repeat_portfolio_execution: false" "$request"
+          grep -F "broker_execution_authorized: false" "$request"
+          grep -F "delivery_authorized: true" "$request"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install rendering dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2 \
+            libpango-1.0-0 \
+            libgdk-pixbuf-2.0-0 \
+            libffi-dev \
+            shared-mime-info \
+            fonts-liberation \
+            fonts-dejavu-core \
+            fonts-lato \
+            poppler-utils
+          python -m pip install --upgrade pip
+          python -m pip install \
+            matplotlib \
+            mistune \
+            markdown \
+            weasyprint \
+            pyyaml \
+            pandas \
+            pillow \
+            beautifulsoup4 \
+            lxml \
+            premailer \
+            jsonschema
+
+      - name: Prepare persisted fix-verification package
+        run: python tools/recover_weekly_etf_fix_verification_20260719.py prepare
+
+      - name: Send bilingual package
+        env:
+          MRKT_RPRTS_SMTP_HOST: ${{ secrets.MRKT_RPRTS_SMTP_HOST }}
+          MRKT_RPRTS_SMTP_PORT: ${{ secrets.MRKT_RPRTS_SMTP_PORT }}
+          MRKT_RPRTS_SMTP_USER: ${{ secrets.MRKT_RPRTS_SMTP_USER }}
+          MRKT_RPRTS_SMTP_PASS: ${{ secrets.MRKT_RPRTS_SMTP_PASS }}
+          MRKT_RPRTS_MAIL_FROM: ${{ secrets.MRKT_RPRTS_MAIL_FROM }}
+          MRKT_RPRTS_MAIL_TO: ${{ secrets.MRKT_RPRTS_MAIL_TO }}
+          MRKT_RPRTS_MAIL_TO_NL: ${{ secrets.MRKT_RPRTS_MAIL_TO_NL }}
+        run: python send_report_runtime_html.py
+
+      - name: Finalize delivery evidence
+        run: python tools/recover_weekly_etf_fix_verification_20260719.py finalize
+
+      - name: Commit fix-verification delivery artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            output/weekly_analysis_pro_260717_04.md \
+            output/weekly_analysis_pro_260717_04_clean.md \
+            output/weekly_analysis_pro_260717_04_delivery.html \
+            output/weekly_analysis_pro_260717_04.pdf \
+            output/weekly_analysis_pro_260717_04_equity_curve.png \
+            output/weekly_analysis_pro_nl_260717_04.md \
+            output/weekly_analysis_pro_nl_260717_04_clean.md \
+            output/weekly_analysis_pro_nl_260717_04_delivery.html \
+            output/weekly_analysis_pro_nl_260717_04.pdf \
+            output/weekly_analysis_pro_nl_260717_04_equity_curve.png \
+            output/weekly_analysis_pro_260717_04_delivery_manifest.txt \
+            output/weekly_analysis_pro_nl_260717_04_delivery_manifest.txt \
+            output/runtime/etf_model_execution_20260717_20260719_002755_not_authorized.json \
+            output/runtime/latest_etf_model_execution_path.txt \
+            output/delivery/weekly_etf_delivery_manifest_2026-07-17_20260719_002755.json \
+            output/delivery/latest_weekly_etf_delivery_manifest_path.txt \
+            output/run_manifests/weekly_etf_run_manifest_2026-07-17_20260719_002755.json \
+            output/run_manifests/latest_weekly_etf_run_manifest_path.txt
+          git diff --cached --quiet && { echo "No delivery evidence was produced"; exit 1; }
+          git commit -m "Persist Weekly ETF fix-verification delivery evidence [skip ci]"
+          git push origin HEAD:main

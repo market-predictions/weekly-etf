@@ -1,0 +1,108 @@
+name: Validate Weekly ETF fix verification delivery
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/validate-weekly-etf-fix-verification-delivery.yml"
+      - ".github/workflows/deliver-weekly-etf-fix-verification-20260719.yml"
+      - "tools/recover_weekly_etf_fix_verification_20260719.py"
+      - "runtime/trade_lineage.py"
+      - "runtime/additive_cockpit_front_page.py"
+      - "runtime/cockpit_email_safe_surface.py"
+      - "control/work_packages/WP_FRESH_REPORT_DELIVERY_GATE_DIAGNOSTIC_20260719.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weekly-etf-fix-verification-delivery-validation-20260719-002755
+  cancel-in-progress: false
+
+jobs:
+  validate-recovery-package:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      MRKT_RPRTS_REPORT_MODE: pro
+      MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
+      MRKT_RPRTS_EXPLICIT_REPORT_PATH: output/weekly_analysis_pro_260717_04.md
+      MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL: output/weekly_analysis_pro_nl_260717_04.md
+      MRKT_RPRTS_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260717_20260719_002755.json
+      ETF_RUNTIME_STATE_PATH: output/runtime/etf_report_state_20260717_20260719_002755.json
+      MRKT_RPRTS_PRICING_AUDIT_PATH: output/pricing/price_audit_2026-07-17_20260719_002755.json
+      ETF_PRICING_AUDIT_PATH: output/pricing/price_audit_2026-07-17_20260719_002755.json
+      ETF_MODEL_EXECUTION_PATH: output/runtime/etf_model_execution_20260717_20260719_002755_not_authorized.json
+      MRKT_RPRTS_MODEL_EXECUTION_PATH: output/runtime/etf_model_execution_20260717_20260719_002755_not_authorized.json
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PDF system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2 \
+            libpango-1.0-0 \
+            libgdk-pixbuf-2.0-0 \
+            libffi-dev \
+            shared-mime-info \
+            fonts-liberation \
+            fonts-dejavu-core \
+            fonts-lato \
+            poppler-utils
+
+      - name: Install focused dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            matplotlib \
+            mistune \
+            markdown \
+            weasyprint \
+            pyyaml \
+            pandas \
+            pillow \
+            beautifulsoup4 \
+            lxml \
+            premailer \
+            jsonschema
+
+      - name: Compile recovery implementation
+        run: python -m py_compile tools/recover_weekly_etf_fix_verification_20260719.py
+
+      - name: Execute fail-closed prepare phase
+        run: python tools/recover_weekly_etf_fix_verification_20260719.py prepare
+
+      - name: Prove no delivery receipt was created
+        run: |
+          test ! -f output/delivery/weekly_etf_delivery_manifest_2026-07-17_20260719_002755.json
+          test ! -f output/weekly_analysis_pro_260717_04_delivery_manifest.txt
+          test ! -f output/weekly_analysis_pro_nl_260717_04_delivery_manifest.txt
+
+      - name: Prove protected authority files unchanged
+        run: |
+          git diff --exit-code -- \
+            output/etf_portfolio_state.json \
+            output/etf_trade_ledger.csv \
+            output/etf_valuation_history.csv
+
+      - name: Upload no-send verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-etf-fix-verification-delivery-preview
+          path: |
+            output/weekly_analysis_pro_260717_04_delivery.html
+            output/weekly_analysis_pro_nl_260717_04_delivery.html
+            output/weekly_analysis_pro_260717_04.pdf
+            output/weekly_analysis_pro_nl_260717_04.pdf
+            output/runtime/etf_model_execution_20260717_20260719_002755_not_authorized.json
+          if-no-files-found: error
