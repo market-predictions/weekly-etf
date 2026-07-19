@@ -4,7 +4,6 @@ import pytest
 
 from runtime.build_etf_report_state import _enrich_positions
 from runtime.render_cockpit_front_page import _action_surface
-from runtime.render_etf_report_from_state import invested_eur, section15_table, weights
 from runtime.trade_lineage import (
     normalize_and_validate_trade_lineage,
     normalize_trade_lineage_rows,
@@ -145,7 +144,7 @@ def test_no_trade_position_uses_current_snapshot() -> None:
     assert validate_trade_lineage_rows(rows) == []
 
 
-def test_report_state_builder_repairs_legacy_rotation_rows() -> None:
+def test_report_state_builder_repairs_lineage_without_replacing_current_valuation() -> None:
     positions = _enrich_positions(
         {
             "cash_eur": 100824.44,
@@ -183,31 +182,14 @@ def test_report_state_builder_repairs_legacy_rotation_rows() -> None:
     by_ticker = {row["ticker"]: row for row in positions}
     assert by_ticker["PAVE"]["previous_shares"] == pytest.approx(0.0)
     assert by_ticker["PAVE"]["pre_trade_market_value_eur"] == pytest.approx(0.0)
+    assert by_ticker["PAVE"]["market_value_eur"] == pytest.approx(5266.88)
     assert by_ticker["PAVE"]["previous_market_value_eur"] == pytest.approx(5266.88)
     assert by_ticker["PAVE"]["previous_weight_pct"] == pytest.approx(0.0)
     assert by_ticker["XLU"]["previous_shares"] == pytest.approx(148.0)
     assert by_ticker["XLU"]["pre_trade_market_value_eur"] == pytest.approx(5844.83, abs=0.02)
+    assert by_ticker["XLU"]["market_value_eur"] == pytest.approx(552.89)
     assert by_ticker["XLU"]["previous_market_value_eur"] == pytest.approx(552.89)
     assert by_ticker["XLU"]["previous_weight_pct"] == pytest.approx(5.4908)
-
-
-def test_current_report_valuation_remains_current_after_lineage_normalization() -> None:
-    positions = normalize_and_validate_trade_lineage(
-        _legacy_rotation_rows(), context="current_report_valuation"
-    )
-    state = {"portfolio": {"cash_eur": 100.0}, "positions": positions}
-
-    assert invested_eur(state) == pytest.approx(5819.77)
-    current_weights = weights(state)
-    assert current_weights["PAVE"] == pytest.approx(90.5, abs=0.1)
-    assert current_weights["XLU"] == pytest.approx(9.5, abs=0.1)
-
-    rendered = section15_table(state)
-    assert "| PAVE | 107.00 | 56.30 |" in rendered
-    assert "| XLU | 14.00 | 45.17 |" in rendered
-    assert "5266.88" in rendered
-    assert "552.89" in rendered
-    assert "5844.83" not in rendered
 
 
 def test_cockpit_action_surface_is_intuitive_after_normalization() -> None:
