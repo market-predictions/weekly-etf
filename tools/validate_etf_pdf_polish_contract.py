@@ -9,6 +9,10 @@ EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?_delivery\.html$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?_delivery\.html$")
 SECTION_LABEL_RE = re.compile(r"<span\s+class=['\"]section-label['\"]>\s*(.*?)\s*</span>", re.I | re.S)
 MARKDOWN_HEADING_RE = re.compile(r"<h[1-6][^>]*>\s*(.*?)\s*</h[1-6]>", re.I | re.S)
+EN_REFLECTED_HEADING = "Position Changes Reflected in Official State"
+EN_PROPOSED_HEADING = "Proposed Position Changes / Rotation Trade Intents"
+NL_REFLECTED_HEADING = "Positiewijzigingen verwerkt in de officiële portefeuillestaat"
+NL_PROPOSED_HEADING = "Voorgestelde positiewijzigingen / rotatie-intenties"
 
 
 def _explicit_delivery_html(output_dir: Path, *, language: str) -> Path | None:
@@ -82,6 +86,10 @@ def has_stale_section_number(html: str, title: str) -> bool:
     return bool(pattern.search(html))
 
 
+def _has_valid_change_heading(text: str, *, reflected: str, proposed: str) -> bool:
+    return reflected in text or proposed in text
+
+
 def validate_en(path: Path) -> list[str]:
     html = path.read_text(encoding="utf-8")
     text = plain(html)
@@ -94,8 +102,8 @@ def validate_en(path: Path) -> list[str]:
         failures.append(f"{path.name}: stale replacement-duel section number 11 remains")
     if "Position Changes Executed This Run" in text:
         failures.append(f"{path.name}: idempotent execution heading still says executed this run")
-    if "Position Changes Reflected in Official State" not in text:
-        failures.append(f"{path.name}: missing reflected-position-change heading")
+    if not _has_valid_change_heading(text, reflected=EN_REFLECTED_HEADING, proposed=EN_PROPOSED_HEADING):
+        failures.append(f"{path.name}: missing reflected-or-proposed position-change heading")
     return failures
 
 
@@ -111,8 +119,8 @@ def validate_nl(path: Path) -> list[str]:
         failures.append(f"{path.name}: stale replacement-duel section number 11 remains")
     if "Positiewijzigingen in deze run" in text:
         failures.append(f"{path.name}: idempotent execution heading still says in deze run")
-    if "Positiewijzigingen verwerkt in de officiële portefeuillestaat" not in text:
-        failures.append(f"{path.name}: missing reflected-position-change heading")
+    if not _has_valid_change_heading(text, reflected=NL_REFLECTED_HEADING, proposed=NL_PROPOSED_HEADING):
+        failures.append(f"{path.name}: missing reflected-or-proposed position-change heading")
     if "Guarded auto-execution" in text:
         failures.append(f"{path.name}: Dutch execution note still contains English Guarded auto-execution")
     if "reduce PPA to fund CIBR" in text or "buy CIBR funded by PPA" in text:
