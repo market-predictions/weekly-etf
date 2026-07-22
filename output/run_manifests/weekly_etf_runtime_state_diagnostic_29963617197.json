@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "created_at_utc": "2026-07-22T22:39:49.147912+00:00",
+  "github_run_id": "29963617197",
+  "pricing_audit": "output/pricing/price_audit_2026-07-22_20260722_223651.json",
+  "lane_artifact": "output/lane_reviews/etf_lane_assessment_260722.json",
+  "rotation_plan": "output/runtime/etf_rotation_plan_260722_20260722_223651.json",
+  "return_code": 1,
+  "state_produced": false,
+  "output": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/home/runner/work/weekly-etf/weekly-etf/runtime/build_etf_report_state.py\", line 506, in <module>\n    main()\n  File \"/home/runner/work/weekly-etf/weekly-etf/runtime/build_etf_report_state.py\", line 475, in main\n    runtime_state = build_runtime_state(\n                    ^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/weekly-etf/weekly-etf/runtime/build_etf_report_state.py\", line 407, in build_runtime_state\n    holdings = _enrich_positions(portfolio_state, pricing_audit, recommendation_scorecard, lane_assessment, rotation_plan)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/weekly-etf/weekly-etf/runtime/build_etf_report_state.py\", line 385, in _enrich_positions\n    return normalize_and_validate_trade_lineage(holdings, context=\"runtime_report_state\")\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/weekly-etf/weekly-etf/runtime/trade_lineage.py\", line 226, in normalize_and_validate_trade_lineage\n    raise RuntimeError(\"ETF trade-lineage validation failed: \" + \"; \".join(sorted(set(errors))))\nRuntimeError: ETF trade-lineage validation failed: runtime_report_state:material_trade_identical_display_weight:PAVE:4.9400->4.9000; runtime_report_state:weight_delta_mismatch:PAVE:4.9400->4.9000!=4.9708\n"
+}
