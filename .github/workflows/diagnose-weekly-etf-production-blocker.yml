@@ -1,0 +1,108 @@
+name: Diagnose Weekly ETF production blocker
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/weekly_etf_rotation_diagnostic_*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run deterministic blocker diagnostics
+        id: diagnose
+        shell: bash
+        run: |
+          set +e
+          mkdir -p output/run_manifests
+          PRICING_AUDIT="$(tr -d '\r\n' < output/pricing/latest_price_audit_path.txt)"
+          LANE_ARTIFACT="$(find output/lane_reviews -maxdepth 1 -type f -name 'etf_lane_assessment_*.json' | sort | tail -n 1)"
+          DIAGNOSTIC_JSON="output/run_manifests/weekly_etf_rotation_diagnostic_${GITHUB_RUN_ID}.json"
+          FUNDABILITY_LOG="$(mktemp)"
+          ROTATION_LOG="$(mktemp)"
+
+          python tools/validate_etf_challenger_fundability_contract.py \
+            --lane-artifact "$LANE_ARTIFACT" \
+            --pricing-audit "$PRICING_AUDIT" \
+            >"$FUNDABILITY_LOG" 2>&1
+          FUNDABILITY_RC=$?
+
+          python -m runtime.portfolio_rotation_engine \
+            --portfolio-state output/etf_portfolio_state.json \
+            --scorecard output/etf_recommendation_scorecard.csv \
+            --pricing-audit "$PRICING_AUDIT" \
+            --lane-artifact "$LANE_ARTIFACT" \
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --run-id "diagnostic_${GITHUB_RUN_ID}" \
+            --dry-run \
+            >"$ROTATION_LOG" 2>&1
+          ROTATION_RC=$?
+
+          python - "$DIAGNOSTIC_JSON" "$PRICING_AUDIT" "$LANE_ARTIFACT" "$FUNDABILITY_RC" "$ROTATION_RC" "$FUNDABILITY_LOG" "$ROTATION_LOG" <<'PY'
+          import json
+          import sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          out, pricing, lane, fund_rc, rotation_rc, fund_log, rotation_log = sys.argv[1:]
+          payload = {
+              "schema_version": "1.0",
+              "created_at_utc": datetime.now(timezone.utc).isoformat(),
+              "github_run_id": "${GITHUB_RUN_ID}",
+              "pricing_audit": pricing,
+              "lane_artifact": lane,
+              "fundability_return_code": int(fund_rc),
+              "rotation_return_code": int(rotation_rc),
+              "fundability_output": Path(fund_log).read_text(encoding="utf-8", errors="replace"),
+              "rotation_output": Path(rotation_log).read_text(encoding="utf-8", errors="replace"),
+          }
+          Path(out).write_text(json.dumps(payload, indent=2), encoding="utf-8")
+          PY
+
+          echo "diagnostic_json=$DIAGNOSTIC_JSON" >> "$GITHUB_OUTPUT"
+          echo "fundability_rc=$FUNDABILITY_RC" >> "$GITHUB_OUTPUT"
+          echo "rotation_rc=$ROTATION_RC" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Persist diagnostic evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f "${{ steps.diagnose.outputs.diagnostic_json }}"
+          if git diff --cached --quiet; then
+            echo "No diagnostic evidence to commit"
+            exit 0
+          fi
+          git commit -m "Persist Weekly ETF production blocker diagnostic [skip ci]"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            git pull --rebase origin main
+          done
+          exit 1
+
+      - name: Fail when blocker is reproduced
+        if: steps.diagnose.outputs.fundability_rc != '0' || steps.diagnose.outputs.rotation_rc != '0'
+        shell: bash
+        run: |
+          echo "Fundability rc=${{ steps.diagnose.outputs.fundability_rc }}"
+          echo "Rotation rc=${{ steps.diagnose.outputs.rotation_rc }}"
+          exit 1
