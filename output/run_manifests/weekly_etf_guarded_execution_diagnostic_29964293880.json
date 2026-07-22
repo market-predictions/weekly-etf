@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "created_at_utc": "2026-07-22T22:51:55.577829+00:00",
+  "github_run_id": "29964293880",
+  "runtime_state": "output/runtime/etf_report_state_20260722_20260722_224833.json",
+  "return_code": 0,
+  "artifacts": [
+    "/tmp/etf-guarded-runtime/etf_model_execution_20260722_20260722_224833_not_authorized.json"
+  ],
+  "output": "ETF_MODEL_EXECUTION_OK | artifact=/tmp/etf-guarded-runtime/etf_model_execution_20260722_20260722_224833_not_authorized.json | mode=guarded_auto | trades=0 | status=no_trade_intents\n"
+}
