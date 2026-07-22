@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "created_at_utc": "2026-07-22T22:35:30.019590+00:00",
+  "github_run_id": "29963376811",
+  "pricing_audit": "output/pricing/price_audit_2026-07-22_20260722_222526.json",
+  "return_code": 0,
+  "output": "::warning title=Replacement Duel Pricing::canonical duel row missing: GLD->BIL\n::warning title=Replacement Duel Pricing::canonical duel row missing: GLD->GSG\n::warning title=Replacement Duel Pricing::canonical duel row missing: PPA->ITA\n::warning title=Replacement Duel Pricing::canonical duel row missing: SPY->EFA\n::warning title=Replacement Duel Pricing::canonical duel row missing: SPY->IEFA\n::warning title=Replacement Duel Pricing::canonical duel row missing: SPY->IWM\n::warning title=Replacement Duel Pricing::canonical duel row missing: SPY->QUAL\nREPLACEMENT_DUEL_PRICING_CONTRACT_OK | canonical_pairs=10 | rows=10 | warnings=7\n"
+}
