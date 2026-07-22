@@ -24,7 +24,7 @@ EXACT_REPLACEMENTS: dict[str, str] = {
     "De betrouwbaarheid is hoog maar alleen ter review": "De betrouwbaarheid is hoog",
     "Dit geeft geen autoriteit voor portefeuillewijzigingen.": "Deze aanvullende controle verandert de portefeuilleacties niet.",
     "De normale discipline blijft leidend.": "Prijsbasis, relatieve sterkte en positiediscipline blijven leidend.",
-    "Rotation engine status": "Implemented portfolio change",
+    "Rotation engine status": "Portfolio decision status",
     "Guarded model rotation executed and persisted:": "Portfolio rotation completed:",
     "guarded model rotation executed and persisted:": "portfolio rotation completed:",
     "The one-major-rotation budget is consumed for this run; another mutation requires a future validated run.":
@@ -63,7 +63,6 @@ EXACT_REPLACEMENTS: dict[str, str] = {
     "Bewaakte modelrotatie": "Portefeuillerotatie",
     "Aanhouden met override": "Aanhouden — geen verdere wijziging in deze review",
     "override: rotation budget already used": "rotatielimiet bereikt voor deze review",
-    "override min trade size not met": "positie te klein voor een efficiënte transactie",
     "Bewaakte auto-uitvoering:": "Verwerkte wijziging:",
     "Rotatiebestemming": "Portefeuilleallocatie",
     "een toekomstige run alle disciplinepoorten vrijgeeft": "een toekomstige review de vereiste prijs-, relatieve-sterkte- en concentratievoorwaarden bevestigt",
@@ -106,10 +105,6 @@ REGEX_REPLACEMENTS: tuple[tuple[re.Pattern[str], str], ...] = (
     (
         re.compile(r"\boverride:\s*rotation budget already used\b", re.IGNORECASE),
         "weekly rotation limit reached",
-    ),
-    (
-        re.compile(r"\boverride\s+min trade size not met\b", re.IGNORECASE),
-        "position too small for an efficient trade",
     ),
     (
         re.compile(r"\bRisk-on growth has persisted for (\d+) run\(s\)", re.IGNORECASE),
@@ -158,6 +153,17 @@ MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\([^\)]+\)")
 
 def normalize_client_language(text: str, *, language: str) -> str:
     cleaned = text
+    min_trade_phrase = (
+        "positie te klein voor een efficiënte transactie"
+        if language == "nl"
+        else "position too small for an efficient trade"
+    )
+    cleaned = re.sub(
+        r"\boverride\s+min trade size not met\b",
+        min_trade_phrase,
+        cleaned,
+        flags=re.IGNORECASE,
+    )
     for source, target in sorted(EXACT_REPLACEMENTS.items(), key=lambda item: len(item[0]), reverse=True):
         cleaned = cleaned.replace(source, target)
     for pattern, replacement in REGEX_REPLACEMENTS:
