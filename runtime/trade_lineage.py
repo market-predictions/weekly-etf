@@ -34,6 +34,20 @@ def _ticker(value: Any) -> str:
     return str(value or "").strip().upper() or "UNKNOWN"
 
 
+def _execution_fields_are_stale(row: dict[str, Any]) -> bool:
+    """Return true when persisted per-run execution fields predate this valuation.
+
+    Portfolio state intentionally retains the last executed mutation for audit history. A
+    later pricing-only report must not reinterpret those historical ``*_this_run`` fields
+    as a new trade. ``report_date`` identifies the run that wrote the execution fields,
+    while ``price_date`` is refreshed by the current valuation pass.
+    """
+
+    execution_date = str(row.get("report_date") or "").strip()
+    valuation_date = str(row.get("price_date") or "").strip()
+    return bool(execution_date and valuation_date and execution_date != valuation_date)
+
+
 def is_executed_trade(row: dict[str, Any]) -> bool:
     action = str(row.get("action_executed_this_run") or row.get("action") or "").strip().lower()
     return abs(_float(row.get("shares_delta_this_run", row.get("shares_delta")))) > SHARE_TOLERANCE or action in EXECUTED_ACTIONS
@@ -84,6 +98,12 @@ def normalize_trade_lineage_rows(
     normalized: list[dict[str, Any]] = []
     for raw in rows:
         item = dict(raw)
+        if _execution_fields_are_stale(item):
+            item["shares_delta_this_run"] = 0.0
+            item["weight_change_pct"] = 0.0
+            item["action_executed_this_run"] = "None"
+            item["funding_source_note"] = "No model trade executed this run."
+
         current_shares = max(0.0, _float(item.get("shares")))
         current_weight = max(0.0, _float(item.get("current_weight_pct")))
 
