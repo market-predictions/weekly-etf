@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "created_at_utc": "2026-07-22T22:54:08.887672+00:00",
+  "github_run_id": "29964414287",
+  "runtime_state": "output/runtime/etf_report_state_20260722_20260722_224833.json",
+  "return_code": 1,
+  "output": "Traceback (most recent call last):\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_persisted_valuation_state.py\", line 9, in <module>\n    from runtime import model_execution_engine as execution_engine\nModuleNotFoundError: No module named 'runtime'\n"
+}
