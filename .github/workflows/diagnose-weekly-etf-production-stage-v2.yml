@@ -1,0 +1,131 @@
+name: Diagnose Weekly ETF production stage v2
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/weekly_etf_production_stage_diagnostic_*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install diagnostic dependency
+        run: python -m pip install pyyaml
+
+      - name: Reproduce final lane and persistent rotation stages
+        id: diagnose
+        shell: bash
+        run: |
+          set +e
+          mkdir -p output/run_manifests /tmp/etf-runtime
+          PRICING_AUDIT="$(tr -d '\r\n' < output/pricing/latest_price_audit_path.txt)"
+          SOURCE_LANE="$(find output/lane_reviews -maxdepth 1 -type f -name 'etf_lane_assessment_*.json' | sort | tail -n 1)"
+          cp "$SOURCE_LANE" /tmp/etf-lane.json
+          cp output/etf_recommendation_scorecard.csv /tmp/etf-scorecard.csv
+          DIAGNOSTIC_JSON="output/run_manifests/weekly_etf_production_stage_diagnostic_${GITHUB_RUN_ID}.json"
+          QUALITY_LOG="$(mktemp)"
+          FUNDABILITY_LOG="$(mktemp)"
+          ROTATION_LOG="$(mktemp)"
+          CONTRACT_LOG="$(mktemp)"
+
+          python -m runtime.augment_lane_artifact_with_quality_filters \
+            --lane-artifact /tmp/etf-lane.json \
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --macro-context config/etf_macro_fundamental_context.yml \
+            >"$QUALITY_LOG" 2>&1
+          QUALITY_RC=$?
+
+          python tools/validate_etf_challenger_fundability_contract.py \
+            --lane-artifact /tmp/etf-lane.json \
+            --pricing-audit "$PRICING_AUDIT" \
+            >"$FUNDABILITY_LOG" 2>&1
+          FUNDABILITY_RC=$?
+
+          python -m runtime.portfolio_rotation_engine \
+            --portfolio-state output/etf_portfolio_state.json \
+            --scorecard /tmp/etf-scorecard.csv \
+            --pricing-audit "$PRICING_AUDIT" \
+            --lane-artifact /tmp/etf-lane.json \
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --run-id "diagnostic_${GITHUB_RUN_ID}" \
+            --output-dir /tmp/etf-runtime \
+            >"$ROTATION_LOG" 2>&1
+          ROTATION_RC=$?
+
+          ROTATION_PLAN="$(find /tmp/etf-runtime -maxdepth 1 -type f -name 'etf_rotation_plan_*.json' | sort | tail -n 1)"
+          if [ -n "$ROTATION_PLAN" ]; then
+            python tools/validate_etf_rotation_output_contract.py --plan "$ROTATION_PLAN" >"$CONTRACT_LOG" 2>&1
+            CONTRACT_RC=$?
+          else
+            echo "No persistent rotation plan produced" >"$CONTRACT_LOG"
+            CONTRACT_RC=99
+          fi
+
+          python - "$DIAGNOSTIC_JSON" "$PRICING_AUDIT" "$SOURCE_LANE" "$QUALITY_RC" "$FUNDABILITY_RC" "$ROTATION_RC" "$CONTRACT_RC" "$QUALITY_LOG" "$FUNDABILITY_LOG" "$ROTATION_LOG" "$CONTRACT_LOG" "$ROTATION_PLAN" <<'PY'
+          import json
+          import os
+          import sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          (out, pricing, lane, quality_rc, fund_rc, rotation_rc, contract_rc,
+           quality_log, fund_log, rotation_log, contract_log, rotation_plan) = sys.argv[1:]
+          payload = {
+              "schema_version": "2.0",
+              "created_at_utc": datetime.now(timezone.utc).isoformat(),
+              "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+              "pricing_audit": pricing,
+              "source_lane_artifact": lane,
+              "quality_return_code": int(quality_rc),
+              "fundability_return_code": int(fund_rc),
+              "persistent_rotation_return_code": int(rotation_rc),
+              "rotation_contract_return_code": int(contract_rc),
+              "rotation_plan_produced": bool(rotation_plan),
+              "rotation_plan": rotation_plan or None,
+              "quality_output": Path(quality_log).read_text(encoding="utf-8", errors="replace"),
+              "fundability_output": Path(fund_log).read_text(encoding="utf-8", errors="replace"),
+              "persistent_rotation_output": Path(rotation_log).read_text(encoding="utf-8", errors="replace"),
+              "rotation_contract_output": Path(contract_log).read_text(encoding="utf-8", errors="replace"),
+          }
+          Path(out).write_text(json.dumps(payload, indent=2), encoding="utf-8")
+          PY
+
+          echo "diagnostic_json=$DIAGNOSTIC_JSON" >> "$GITHUB_OUTPUT"
+          echo "quality_rc=$QUALITY_RC" >> "$GITHUB_OUTPUT"
+          echo "fundability_rc=$FUNDABILITY_RC" >> "$GITHUB_OUTPUT"
+          echo "rotation_rc=$ROTATION_RC" >> "$GITHUB_OUTPUT"
+          echo "contract_rc=$CONTRACT_RC" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Persist diagnostic evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f "${{ steps.diagnose.outputs.diagnostic_json }}"
+          git commit -m "Persist Weekly ETF production-stage diagnostic [skip ci]"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            git pull --rebase origin main
+          done
+          exit 1
+
+      - name: Fail when blocker is reproduced
+        if: steps.diagnose.outputs.quality_rc != '0' || steps.diagnose.outputs.fundability_rc != '0' || steps.diagnose.outputs.rotation_rc != '0' || steps.diagnose.outputs.contract_rc != '0'
+        run: exit 1
