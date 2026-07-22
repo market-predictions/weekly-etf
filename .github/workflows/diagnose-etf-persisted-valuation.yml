@@ -1,0 +1,68 @@
+name: Diagnose ETF persisted valuation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/weekly_etf_persisted_valuation_diagnostic_*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run exact persisted valuation validator
+        id: diagnose
+        shell: bash
+        run: |
+          set +e
+          mkdir -p output/run_manifests
+          STATE="$(tr -d '\r\n' < output/runtime/latest_etf_report_state_path.txt)"
+          LOG="$(mktemp)"
+          python tools/validate_etf_persisted_valuation_state.py \
+            --runtime-state "$STATE" \
+            --portfolio-state output/etf_portfolio_state.json \
+            --valuation-history output/etf_valuation_history.csv \
+            >"$LOG" 2>&1
+          RC=$?
+          OUT="output/run_manifests/weekly_etf_persisted_valuation_diagnostic_${GITHUB_RUN_ID}.json"
+          python - "$OUT" "$STATE" "$RC" "$LOG" <<'PY'
+          import json, os, sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+          out, state, rc, log = sys.argv[1:]
+          Path(out).write_text(json.dumps({
+            "schema_version": "1.0",
+            "created_at_utc": datetime.now(timezone.utc).isoformat(),
+            "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+            "runtime_state": state,
+            "return_code": int(rc),
+            "output": Path(log).read_text(encoding='utf-8', errors='replace')
+          }, indent=2), encoding='utf-8')
+          PY
+          echo "out=$OUT" >> "$GITHUB_OUTPUT"
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Persist diagnostic
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f "${{ steps.diagnose.outputs.out }}"
+          git commit -m "Persist ETF valuation diagnostic [skip ci]"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            git pull --rebase origin main
+          done
+          exit 1
+      - name: Reproduce status
+        if: steps.diagnose.outputs.rc != '0'
+        run: exit 1
