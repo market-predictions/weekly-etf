@@ -332,7 +332,7 @@ Override-toelichting: Het model dwingt normaal een verklein-/vervangingsreview a
 ### Volglijst / dynamisch radargeheugen
 | Thema | Primaire ETF | Alternatieve ETF | Waarom op de radar | Status |
 |---|---|---|---|---|
-| AI-rekenkrachtinfrastructuur | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Sterkste structurele groeiblootstelling. | Actief |
+| AI-rekenkrachtinfrastructuur | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Sterkste structurele groeiblootstelling. | Actief / begrensd |
 | Defensie-innovatie / strategische weerbaarheid | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defensiethesis is valide, maar ETF-implementatie staat onder herbeoordeling. | Vervangingsanalyse vereist |
 | Netuitbreiding / elektrificatie | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructuurcapex blijft valide. | Vervangingsanalyse vereist |
 | Hedge- en grondstoffenbreedte | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [BIL](https://www.tradingview.com/chart/?symbol=BIL) / [DBC](https://www.tradingview.com/chart/?symbol=DBC) | Hedgefunctie en grondstoffenbreedte moeten periodiek worden bevestigd. | Onder herbeoordeling |

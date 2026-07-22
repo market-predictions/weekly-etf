@@ -94,7 +94,7 @@
 | Theme | Primary ETF | Alternative ETF | Why it matters | Structural fit | Macro timing | Status | What needs to happen | Time horizon |
 |---|---|---|---|---:|---:|---|---|---|
 | Cybersecurity resilience | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [BUG](https://www.tradingview.com/chart/?symbol=BUG) | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure exposure with less direct semiconductor cyclicality. | 3-12 months |
-| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Actionable now | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
+| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
 | Healthcare quality and defensive growth | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [VHT](https://www.tradingview.com/chart/?symbol=VHT) | Healthcare quality can provide defensive growth without speculative biotech beta. | 3 | 3 | Watchlist / under review | More useful if broad equity leadership narrows further. | 3-12 months |
 | Biotech innovation / therapeutic platforms | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [IBB](https://www.tradingview.com/chart/?symbol=IBB) | Biotech remains a long-duration innovation lane but needs risk appetite. | 4 | 3 | Watchlist / under review | Can become attractive if breadth improves and rates ease. | 3-12 months |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Power demand, grid bottlenecks and reshoring capex support infrastructure spend. Macro filter: AI power demand and infrastructure policy support the grid lane; funding still depends on [PAVE](https://www.tradingview.com/chart/?symbol=PAVE)-vs-[GRID](https://www.tradingview.com/chart/?symbol=GRID) duel evidence. | 5 | 4 | Watchlist / under review | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) remains useful, but [GRID](https://www.tradingview.com/chart/?symbol=GRID) is the cleaner thematic challenger. | 3-12 months |
@@ -272,7 +272,7 @@ Role: Rotation destination. Required next action: More useful if broad equity le
 
 ## 11. Best New Opportunities
 
-- [SMH](https://www.tradingview.com/chart/?symbol=SMH) remains the leading funded growth exposure, subject to the max-position rule.
+- [SMH](https://www.tradingview.com/chart/?symbol=SMH) remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap.
 - [MOO](https://www.tradingview.com/chart/?symbol=MOO) / VEGI: Agriculture inputs and food security remain structurally relevant but timing is not yet superior.
 - Replacement candidates remain evidence-gated: pricing basis and duel status must be visible before funding.
 
@@ -353,7 +353,7 @@ Hold-with-override note: The model would normally force reduce/replace review, b
 ### Watchlist / dynamic radar memory
 | Theme | Primary ETF | Alternative ETF | Why I’m considering it | Current status |
 |---|---|---|---|---|
-| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Strongest secular growth exposure. | Active |
+| AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Strongest secular growth exposure. | Active / capped |
 | Defense innovation / sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructure capex remains valid. | Duel required |
 | Commodity-breadth hedge review | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [DBC](https://www.tradingview.com/chart/?symbol=DBC) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Current commodity-breadth hedge role must be proven against cash and broad commodity alternatives. | Under review |

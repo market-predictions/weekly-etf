@@ -1,4 +1,4 @@
-# Weekly ETF Pro Review 2026-07-17
+# Weekly ETF Pro Review 2026-07-22
 
 > *This report is for informational and educational purposes only; please see the disclaimer at the end.*
 
@@ -14,16 +14,16 @@
 ## 2. Portfolio Action Snapshot
 
 ### Add / destination
-- None
+- [MOO](https://www.tradingview.com/chart/?symbol=MOO)
 
 ### Hold
-- [SMH](https://www.tradingview.com/chart/?symbol=SMH), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [CIBR](https://www.tradingview.com/chart/?symbol=CIBR), [GSG](https://www.tradingview.com/chart/?symbol=GSG), [IEFA](https://www.tradingview.com/chart/?symbol=IEFA), [XBI](https://www.tradingview.com/chart/?symbol=XBI), [XLV](https://www.tradingview.com/chart/?symbol=XLV)
+- [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [CIBR](https://www.tradingview.com/chart/?symbol=CIBR), [GSG](https://www.tradingview.com/chart/?symbol=GSG), [IEFA](https://www.tradingview.com/chart/?symbol=IEFA), [XBI](https://www.tradingview.com/chart/?symbol=XBI), [XLV](https://www.tradingview.com/chart/?symbol=XLV)
 
 ### Hold with override
 - [XLU](https://www.tradingview.com/chart/?symbol=XLU), [URNM](https://www.tradingview.com/chart/?symbol=URNM)
 
 ### Proposed replace / reduce
-- None
+- [SMH](https://www.tradingview.com/chart/?symbol=SMH)→[MOO](https://www.tradingview.com/chart/?symbol=MOO)
 
 ### Close
 - None
@@ -33,21 +33,21 @@
 - Trade intents are proposed rotation output while the engine is in warning mode; they are not executed trades until the ledger and portfolio state record execution.
 
 ### Best replacements to fund
-- No proposed rotation trade intent was generated this run.
+- reduce [SMH](https://www.tradingview.com/chart/?symbol=SMH) by 2.00% NAV and allocate 2.00% NAV to [MOO](https://www.tradingview.com/chart/?symbol=MOO), pending execution and portfolio-state persistence.
 
 ### Replacement pricing and duel status
 
 <!-- ETF_REPLACEMENT_DUEL_V2_EMBEDDED -->
 | Current holding | Challenger | 1m edge | 3m edge | Pricing basis | Decision | Required trigger |
 |---|---|---:|---:|---|---|---|
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | -3.46% | -5.55% | Current and challenger closes validated on 2026-07-17 / 2026-07-17. | Current holding still leads; no replacement. | Needs sustained relative outperformance. |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [URA](https://www.tradingview.com/chart/?symbol=URA) | -2.62% | +0.71% | Current and challenger closes validated on 2026-07-17 / 2026-07-17. | Challenger improving; keep duel active. | Needs repeat 3m edge and capital source. |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | -2.09% | +6.23% | Current and challenger closes validated on 2026-07-17 / 2026-07-17. | Replacement trigger watch - challenger leading over 3m. | Confirm thesis fit, liquidity and funding source. |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | +4.47% | -6.69% | Current and challenger closes validated on 2026-07-17 / 2026-07-17. | Early 1m improvement only; wait for 3m confirmation. | Needs 3m confirmation. |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [VPU](https://www.tradingview.com/chart/?symbol=VPU) | +4.32% | -6.76% | Current and challenger closes validated on 2026-07-17 / 2026-07-17. | Early 1m improvement only; wait for 3m confirmation. | Needs 3m confirmation. |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [NLR](https://www.tradingview.com/chart/?symbol=NLR) | +0.10% | +2.28% | Current and challenger closes validated on 2026-07-17 / 2026-07-17. | Challenger improving; keep duel active. | Needs repeat 3m edge and capital source. |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [NUCL](https://www.tradingview.com/chart/?symbol=NUCL) | -24.04% | -23.38% | Current and challenger closes validated on 2026-07-17 / 2026-07-17. | Current holding still leads; no replacement. | Needs sustained relative outperformance. |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [IRBO](https://www.tradingview.com/chart/?symbol=IRBO) | -3.18% | -8.81% | Current and challenger closes validated on 2026-07-17 / 2026-07-10. | Current holding still leads; no replacement. | Needs sustained relative outperformance. |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | -3.97% | -2.36% | Current and challenger closes validated on 2026-07-22 / 2026-07-22. | Current holding still leads; no replacement. | Needs sustained relative outperformance. |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [URA](https://www.tradingview.com/chart/?symbol=URA) | -3.38% | +0.10% | Current and challenger closes validated on 2026-07-22 / 2026-07-22. | Challenger improving; keep duel active. | Needs repeat 3m edge and capital source. |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | -2.93% | +5.80% | Current and challenger closes validated on 2026-07-22 / 2026-07-22. | Replacement trigger watch - challenger leading over 3m. | Confirm thesis fit, liquidity and funding source. |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | +7.00% | +0.19% | Current and challenger closes validated on 2026-07-22 / 2026-07-22. | Challenger improving; keep duel active. | Needs repeat 3m edge and capital source. |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [VPU](https://www.tradingview.com/chart/?symbol=VPU) | +6.81% | +0.08% | Current and challenger closes validated on 2026-07-22 / 2026-07-22. | Challenger improving; keep duel active. | Needs repeat 3m edge and capital source. |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [NLR](https://www.tradingview.com/chart/?symbol=NLR) | -1.49% | +3.61% | Current and challenger closes validated on 2026-07-22 / 2026-07-22. | Challenger improving; keep duel active. | Needs repeat 3m edge and capital source. |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [NUCL](https://www.tradingview.com/chart/?symbol=NUCL) | -30.08% | -14.72% | Current and challenger closes validated on 2026-07-22 / 2026-07-22. | Current holding still leads; no replacement. | Needs sustained relative outperformance. |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [IRBO](https://www.tradingview.com/chart/?symbol=IRBO) | -5.36% | -15.66% | Current and challenger closes validated on 2026-07-22 / 2026-07-17. | Current holding still leads; no replacement. | Needs sustained relative outperformance. |
 
 > Diagnostic-only: these notes grant no allocation authority, fundability authority, lane-scoring authority, production recommendation authority, execution authority or portfolio mutation authority.
 
@@ -69,7 +69,7 @@
 - Current regime: Risk-on growth.
 - Confidence: 66%.
 - Supplementary regime cross-check: A secondary rules-based assessment indicates Risk-on growth and is broadly aligned with the primary regime view. Confidence is high, reflecting consistency in the underlying evidence rather than a forecast. This supplementary check does not change portfolio actions. Pricing, relative strength and position discipline remain decisive.
-- Regime memory: Risk-on growth has persisted for 67 run(s); transition state is stable, breadth is improving, and cross-asset confirmation is mixed.
+- Regime memory: Risk-on growth has persisted for 73 run(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed.
 - Decision rule: Do not rotate aggressively unless a regime shift persists for at least two runs or cross-asset confirmation becomes broad.
 
 ### Policy and geopolitical status
@@ -96,9 +96,9 @@
 | Cybersecurity resilience | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [BUG](https://www.tradingview.com/chart/?symbol=BUG) | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure exposure with less direct semiconductor cyclicality. | 3-12 months |
 | AI compute infrastructure | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [SOXX](https://www.tradingview.com/chart/?symbol=SOXX) | Semiconductor and AI capex remains the cleanest funded structural growth lane. Macro filter: Regime and price leadership still support AI compute exposure, but concentration discipline applies. | 5 | 5 | Structurally actionable, but no fresh capital while above cap | AI infrastructure leadership remains persistent, but position-size discipline matters. | 3-12 months |
 | Healthcare quality and defensive growth | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [VHT](https://www.tradingview.com/chart/?symbol=VHT) | Healthcare quality can provide defensive growth without speculative biotech beta. | 3 | 3 | Watchlist / under review | More useful if broad equity leadership narrows further. | 3-12 months |
-| Biotech innovation / therapeutic platforms | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [IBB](https://www.tradingview.com/chart/?symbol=IBB) | Biotech remains a long-duration innovation lane but needs risk appetite. | 4 | 3 | Watchlist / under review | Can become attractive if breadth improves and rates ease. | 3-12 months |
-| Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Power demand, grid bottlenecks and reshoring capex support infrastructure spend. Macro filter: AI power demand and infrastructure policy support the grid lane; funding still depends on [PAVE](https://www.tradingview.com/chart/?symbol=PAVE)-vs-[GRID](https://www.tradingview.com/chart/?symbol=GRID) duel evidence. | 5 | 4 | Watchlist / under review | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) remains useful, but [GRID](https://www.tradingview.com/chart/?symbol=GRID) is the cleaner thematic challenger. | 3-12 months |
+| Power infrastructure and utilities capex | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [VPU](https://www.tradingview.com/chart/?symbol=VPU) | AI data-center power demand can also support regulated utilities and transmission spend. | 3 | 3 | Watchlist / under review | Offers a more defensive grid-adjacent expression if cyclicals weaken. | 3-12 months |
 | Food security / agriculture inputs | [MOO](https://www.tradingview.com/chart/?symbol=MOO) | VEGI | Agriculture inputs and food security remain structurally relevant but timing is not yet superior. | 4 | 3 | Watchlist / under review | Becomes more relevant if energy, fertilizer or crop stress rises. | 3-12 months |
+| Biotech innovation / therapeutic platforms | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [IBB](https://www.tradingview.com/chart/?symbol=IBB) | Biotech remains a long-duration innovation lane but needs risk appetite. | 4 | 3 | Watchlist / under review | Can become attractive if breadth improves and rates ease. | 3-12 months |
 
 ### Best structural opportunities not yet actionable
 - Food security / agriculture inputs
@@ -109,10 +109,10 @@
 
 | Theme | Primary ETF | Why not promoted | What would change that |
 |---|---|---|---|
-| Water infrastructure / treatment | [FIW](https://www.tradingview.com/chart/?symbol=FIW) | Scored below the live radar cutoff versus stronger funded and challenger lanes. | Moves up if relative strength improves versus [PAVE](https://www.tradingview.com/chart/?symbol=PAVE)/[GRID](https://www.tradingview.com/chart/?symbol=GRID). |
 | Broad commodity inflation hedge | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Scored below the live radar cutoff versus stronger funded and challenger lanes. | Useful only if commodity breadth confirms. |
+| Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Scored below the live radar cutoff versus stronger funded and challenger lanes. | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) remains useful, but [GRID](https://www.tradingview.com/chart/?symbol=GRID) is the cleaner thematic challenger. |
 | Agricultural commodities | [DBA](https://www.tradingview.com/chart/?symbol=DBA) | Scored below the live radar cutoff versus stronger funded and challenger lanes. | Useful only if commodity stress becomes visible. |
-| Water utilities / defensive infrastructure | [PHO](https://www.tradingview.com/chart/?symbol=PHO) | Scored below the live radar cutoff versus stronger funded and challenger lanes. | More useful if equity beta weakens and defensive infrastructure improves. |
+| Non-U.S. developed market diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Existing funded position; no additional lane promotion was granted this run. | Reassess only if relative strength, factor concentration or the funding case changes materially. |
 | Defense innovation / sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | Scored below the live radar cutoff versus stronger funded and challenger lanes. | The lane remains relevant, but [PPA](https://www.tradingview.com/chart/?symbol=PPA) must justify itself versus [ITA](https://www.tradingview.com/chart/?symbol=ITA). |
 
 ## 4A. Short Opportunity Radar
@@ -129,7 +129,7 @@
 - [SPY](https://www.tradingview.com/chart/?symbol=SPY) plus [SMH](https://www.tradingview.com/chart/?symbol=SMH) creates high U.S. tech / AI factor overlap.
 - Hedge and defensive sleeves must justify their capital allocation through role validity, pricing and relative-strength evidence.
 - [PPA](https://www.tradingview.com/chart/?symbol=PPA) and [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) remain replaceable until their ETF implementation quality is proven.
-- [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) now provides a material non-U.S. developed-market allocation (24.62%); further expansion still requires relative-strength and concentration confirmation.
+- [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) now provides a material non-U.S. developed-market allocation (24.49%); further expansion still requires relative-strength and concentration confirmation.
 
 ## 6. Bottom Line
 
@@ -141,10 +141,10 @@
 ## 7. Equity Curve and Portfolio Development
 
 - Starting capital (EUR): 100000.00
-- Current portfolio value (EUR): 106644.21
-- Since inception return (%): 6.64
+- Current portfolio value (EUR): 108370.97
+- Since inception return (%): 8.37
 - Equity-curve state: Reconciled to Section 15 with full valuation history
-- EUR/USD used: 1.1438
+- EUR/USD used: 1.1413
 - Notes: Section 7 uses the validated valuation history plus the current portfolio NAV; Section 15 is rendered from the same reconciled portfolio state.
 
 | Date | Portfolio value (EUR) | Comment |
@@ -176,27 +176,28 @@
 | 2026-07-01 | 110493.44 | Runtime valuation repriced from official portfolio-state shares |
 | 2026-07-14 | 110224.86 | Runtime-derived valuation from pricing audit and explicit portfolio state |
 | 2026-07-16 | 107117.94 | Runtime valuation repriced from official portfolio-state shares |
-| 2026-07-17 | 106644.21 | Latest portfolio valuation based on confirmed closing prices and current holdings |
+| 2026-07-17 | 106644.21 | Runtime valuation repriced from official portfolio-state shares |
+| 2026-07-22 | 108370.97 | Latest portfolio valuation based on confirmed closing prices and current holdings |
 
 ### Closing prices used in this report
 
-The portfolio valuation above is based on the per-position closes shown here. Requested close date: **2026-07-17**. The source column shows the market-data layer that supplied the close, not internal resolver names.
+The portfolio valuation above is based on the per-position closes shown here. Requested close date: **2026-07-22**. The source column shows the market-data layer that supplied the close, not internal resolver names.
 
 | Holding | Requested close | Close date used | Close used | Currency | Market-data source | Status |
 |---|---|---|---:|---|---|---|
-| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 2026-07-17 | 2026-07-17 | 92.36 | USD | Twelve Data | Fresh exact close, unverified |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 2026-07-17 | 2026-07-17 | 31.40 | USD | Twelve Data | Fresh exact close, unverified |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 2026-07-17 | 2026-07-17 | 96.25 | USD | Twelve Data | Fresh exact close, unverified |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 2026-07-17 | 2026-07-17 | 56.30 | USD | Twelve Data | Fresh exact close, unverified |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 2026-07-17 | 2026-07-17 | 556.53 | USD | Twelve Data | Fresh exact close, unverified |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 2026-07-17 | 2026-07-17 | 48.22 | USD | Twelve Data | Fresh exact close, unverified |
-| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | 2026-07-17 | 2026-07-17 | 154.26 | USD | Twelve Data | Fresh exact close, unverified |
-| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 2026-07-17 | 2026-07-17 | 45.17 | USD | Twelve Data | Fresh exact close, unverified |
-| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | 2026-07-17 | 2026-07-17 | 161.09 | USD | Twelve Data | Fresh exact close, unverified |
+| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 2026-07-22 | 2026-07-22 | 89.33 | USD | Twelve Data | Fresh exact close, unverified |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 2026-07-22 | 2026-07-22 | 32.45 | USD | Twelve Data | Fresh exact close, unverified |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 2026-07-22 | 2026-07-22 | 97.09 | USD | Twelve Data | Fresh exact close, unverified |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 2026-07-22 | 2026-07-22 | 56.60 | USD | Twelve Data | Fresh exact close, unverified |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 2026-07-22 | 2026-07-22 | 586.93 | USD | Twelve Data | Fresh exact close, unverified |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 2026-07-22 | 2026-07-22 | 51.08 | USD | Twelve Data | Fresh exact close, unverified |
+| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | 2026-07-22 | 2026-07-22 | 152.08 | USD | Twelve Data | Fresh exact close, unverified |
+| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 2026-07-22 | 2026-07-22 | 45.94 | USD | Twelve Data | Fresh exact close, unverified |
+| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | 2026-07-22 | 2026-07-22 | 159.38 | USD | Twelve Data | Fresh exact close, unverified |
 
 | FX basis | Requested date | Date used | Rate | Source | Status |
 |---|---|---|---:|---|---|
-| EUR/USD | 2026-07-17 | 2026-07-17 | 1.1438 | Twelve Data | Fresh exact close, unverified |
+| EUR/USD | 2026-07-22 | 2026-07-22 | 1.1413 | Twelve Data | Fresh exact close, unverified |
 
 `EQUITY_CURVE_CHART_PLACEHOLDER`
 
@@ -206,22 +207,22 @@ Performance is calculated on the current ETF holdings using the latest validated
 
 | Portfolio sleeve | Investment thesis | Tradable ETF | Weight % | 1w return | 1m return | 3m return | Since-entry | P/L EUR | Contribution % |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|
-| Rotation destination | Cybersecurity resilience | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 19.16% | +0.52% | +8.65% | +40.23% | +0.14% | 28.30 | +0.03% |
-| Rotation destination | Commodity-breadth hedge exposure | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 9.63% | +6.59% | +5.87% | -0.41% | -1.26% | -130.79 | -0.13% |
-| Rotation destination | Non-U.S. developed-market diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 24.62% | -1.00% | -1.07% | +1.71% | +0.39% | 102.26 | +0.10% |
-| Rotation destination | Grid and infrastructure capex | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 4.94% | -0.69% | -3.59% | +4.77% | -0.80% | -42.40 | -0.04% |
-| Growth engine | AI compute / semiconductor leadership | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 26.92% | -8.92% | -9.65% | +22.37% | +32.47% | 7,036.03 | +7.04% |
-| Strategic energy | Nuclear and uranium cycle exposure | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 1.90% | -9.51% | -16.47% | -30.64% | -28.56% | -809.12 | -0.81% |
-| Rotation destination | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | 5.06% | -3.00% | +14.09% | +13.99% | -0.91% | -49.52 | -0.05% |
-| Rotation destination | Defensive utilities / rate-sensitive ballast | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 0.52% | -0.53% | +0.88% | -1.92% | +4.64% | 24.51 | +0.02% |
-| Rotation destination | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | 4.89% | +0.16% | +5.79% | +10.36% | -0.39% | -20.49 | -0.02% |
+| Rotation destination | Cybersecurity resilience | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 18.27% | -4.04% | +6.97% | +31.40% | -2.94% | -598.82 | -0.60% |
+| Rotation destination | Commodity-breadth hedge exposure | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 9.81% | +4.07% | +10.94% | +2.20% | +2.04% | 213.01 | +0.21% |
+| Rotation destination | Non-U.S. developed-market diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 24.49% | -0.46% | -0.31% | +3.95% | +1.49% | 389.18 | +0.39% |
+| Rotation destination | Grid and infrastructure capex | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 4.90% | -0.07% | -4.29% | +2.64% | -0.05% | -2.78 | -0.00% |
+| Growth engine | AI compute / semiconductor leadership | [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 28.00% | -0.65% | -12.26% | +26.31% | +39.70% | 8,622.95 | +8.62% |
+| Strategic energy | Nuclear and uranium cycle exposure | [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 1.98% | +0.39% | -9.08% | -23.86% | -24.33% | -690.60 | -0.69% |
+| Rotation destination | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | 4.92% | -2.63% | +4.28% | +11.64% | -2.10% | -114.15 | -0.11% |
+| Rotation destination | Defensive utilities / rate-sensitive ballast | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 0.52% | +1.57% | +2.71% | +2.83% | +6.65% | 35.16 | +0.04% |
+| Rotation destination | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | 4.77% | +0.72% | +6.24% | +9.74% | -1.23% | -64.56 | -0.06% |
 
 ## 8. Asset Allocation Map
 
 | Bucket | Stance | Reason |
 |---|---|---|
 | US equities | Neutral | Investable but concentration risk is explicit. |
-| Europe equities | Neutral | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) already represents 24.62% of the portfolio; further expansion is not automatic and remains relative-strength and concentration gated. |
+| Europe equities | Neutral | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) already represents 24.49% of the portfolio; further expansion is not automatic and remains relative-strength and concentration gated. |
 | EM equities | Underweight | USD and oil sensitivity remain headwinds. |
 | large cap | Neutral | Quality leadership still works. |
 | small cap | Underweight | Rates and refinancing remain difficult. |
@@ -229,7 +230,7 @@ Performance is calculated on the current ETF holdings using the latest validated
 | quality | Overweight | Earnings durability remains valuable. |
 | defensive ballast | Neutral | Hedge and cash-like roles remain under opportunity-cost review. |
 | industrials / defense | Overweight | Structural thesis valid; vehicle under review. |
-| non-USD assets | Watchlist | The portfolio already carries 24.62% non-U.S. developed-market exposure through [IEFA](https://www.tradingview.com/chart/?symbol=IEFA); currency and regional concentration therefore require active monitoring. |
+| non-USD assets | Watchlist | The portfolio already carries 24.49% non-U.S. developed-market exposure through [IEFA](https://www.tradingview.com/chart/?symbol=IEFA); currency and regional concentration therefore require active monitoring. |
 
 ## 9. Second-Order Effects Map
 
@@ -243,7 +244,7 @@ Performance is calculated on the current ETF holdings using the latest validated
 ## 10. Current Position Review
 
 The position review separates thesis quality, ETF implementation quality, fresh-cash test and rotation-engine decision. Existing holdings are not treated as automatic default holds. Where a position-discipline score is not yet available after a rotation, the report shows the live lane score if available; otherwise it flags that the current score is pending.
-### [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) — Hold — Score 4.97 — Fresh cash: Hold / monitor — release score 10
+### [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) — Hold — Score 4.97 — Fresh cash: Hold / monitor — release score 20
 Role: Rotation destination. Required next action: Monitor relative strength and portfolio concentration..
 
 ### [GSG](https://www.tradingview.com/chart/?symbol=GSG) — Hold — Score 3.59 — Fresh cash: Hold / monitor — release score 10
@@ -255,7 +256,7 @@ Role: Rotation destination. Required next action: Monitor non-U.S. breadth and [
 ### [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) — Hold — Score 4.18 — Fresh cash: Smaller / under review — release score 57
 Role: Rotation destination. Required next action: Complete [PAVE](https://www.tradingview.com/chart/?symbol=PAVE)-versus-[GRID](https://www.tradingview.com/chart/?symbol=GRID) implementation duel..
 
-### [SMH](https://www.tradingview.com/chart/?symbol=SMH) — Hold — Score 4.28 — Fresh cash: Smaller / under review — release score 60
+### [SMH](https://www.tradingview.com/chart/?symbol=SMH) — Replace partial — Score 4.28 — Fresh cash: Smaller / under review — release score 70; destination [MOO](https://www.tradingview.com/chart/?symbol=MOO)
 Role: Growth engine. Required next action: Force alternative duel; upgrade, reduce, replace, or close.
 
 ### [URNM](https://www.tradingview.com/chart/?symbol=URNM) — Hold with override — Score 3.70 — Fresh cash: Hold — release score 90; override min trade size not met
@@ -273,6 +274,8 @@ Role: Rotation destination. Required next action: More useful if broad equity le
 ## 11. Best New Opportunities
 
 - [SMH](https://www.tradingview.com/chart/?symbol=SMH) remains the best earned exposure, but no fresh capital is added while it is above the 25% max-position cap.
+- Proposed rotation: reduce [SMH](https://www.tradingview.com/chart/?symbol=SMH) by 2.00% NAV and allocate 2.00% NAV to [MOO](https://www.tradingview.com/chart/?symbol=MOO), pending execution and portfolio-state persistence.
+- [XLU](https://www.tradingview.com/chart/?symbol=XLU) / [VPU](https://www.tradingview.com/chart/?symbol=VPU): AI data-center power demand can also support regulated utilities and transmission spend.
 - [MOO](https://www.tradingview.com/chart/?symbol=MOO) / VEGI: Agriculture inputs and food security remain structurally relevant but timing is not yet superior.
 - Replacement candidates remain evidence-gated: pricing basis and duel status must be visible before funding.
 
@@ -280,7 +283,7 @@ Role: Rotation destination. Required next action: More useful if broad equity le
 
 | Close | Reduce | Hold | Hold with override | Add / destination | Replace |
 |---|---|---|---|---|---|
-| None | None | [SMH](https://www.tradingview.com/chart/?symbol=SMH), [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [CIBR](https://www.tradingview.com/chart/?symbol=CIBR), [GSG](https://www.tradingview.com/chart/?symbol=GSG), [IEFA](https://www.tradingview.com/chart/?symbol=IEFA), [XBI](https://www.tradingview.com/chart/?symbol=XBI), [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLU](https://www.tradingview.com/chart/?symbol=XLU), [URNM](https://www.tradingview.com/chart/?symbol=URNM) | None | None |
+| None | None | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE), [CIBR](https://www.tradingview.com/chart/?symbol=CIBR), [GSG](https://www.tradingview.com/chart/?symbol=GSG), [IEFA](https://www.tradingview.com/chart/?symbol=IEFA), [XBI](https://www.tradingview.com/chart/?symbol=XBI), [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLU](https://www.tradingview.com/chart/?symbol=XLU), [URNM](https://www.tradingview.com/chart/?symbol=URNM) | [MOO](https://www.tradingview.com/chart/?symbol=MOO) | [SMH](https://www.tradingview.com/chart/?symbol=SMH)->[MOO](https://www.tradingview.com/chart/?symbol=MOO) |
 
 ## 13. Final Action Table
 
@@ -290,43 +293,44 @@ Hold-with-override note: The model would normally force reduce/replace review, b
 
 | Ticker | ETF | Current weight | Target weight | Delta weight | Action | Capital destination | Release score | Decision rationale | Override status |
 |---|---|---:|---:|---:|---|---|---:|---|---|
-| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 19.16 | 19.16 | 0.00 | Hold | - | 10.00 | Role under review | No |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 9.63 | 9.63 | 0.00 | Hold | - | 10.00 | Role under review | No |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 24.62 | 24.62 | 0.00 | Hold | - | 10.00 | Role under review | No |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | 4.94 | 4.94 | 0.00 | Hold | - | 57.00 | Fresh capital only after review or at smaller size; Position is under replacement review; A stronger alternative is available for comparison; Role under review | No |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | 26.92 | 26.92 | 0.00 | Hold | - | 60.00 | Fresh capital only after review or at smaller size; Position is under replacement review; Review has persisted for multiple report cycles; Role under review | No |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | 1.90 | 1.90 | 0.00 | Hold with override | - | 90.00 | Position has become a material performance drag; Position has become a large performance drag; Negative pnl gt 20; Loss and sub4 forced reunderwrite | System override: Minimum trade size was not met |
-| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | 5.06 | 5.06 | 0.00 | Hold | - | 10.00 | Role under review | No |
-| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 5.49 | 0.52 | -4.97 | Hold with override | - | 90.00 | Position does not pass the fresh-capital test; Position is under replacement review; Review has persisted for multiple report cycles; Review has persisted for several report cycles | System override: Minimum trade size was not met |
-| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | 4.89 | 4.89 | 0.00 | Hold | - | 10.00 | Role under review | No |
+| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 18.27 | 18.27 | 0.00 | Hold | - | 20.00 | Portfolio contribution is negative; Role under review | No |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 9.81 | 9.81 | 0.00 | Hold | - | 10.00 | Role under review | No |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 24.49 | 24.49 | 0.00 | Hold | - | 10.00 | Role under review | No |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | 4.90 | 4.90 | 0.00 | Hold | - | 57.00 | Fresh capital only after review or at smaller size; Position is under replacement review; A stronger alternative is available for comparison; Role under review | No |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | 28.00 | 26.00 | -2.00 | Partial replacement | [MOO](https://www.tradingview.com/chart/?symbol=MOO) | 70.00 | Fresh capital only after review or at smaller size; Position is under replacement review; Review has persisted for multiple report cycles; Review has persisted for several report… | No |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | 1.98 | 1.98 | 0.00 | Hold with override | - | 90.00 | Position has become a material performance drag; Position has become a large performance drag; Negative pnl gt 20; Loss and sub4 forced reunderwrite | System override: Minimum trade size was not met |
+| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | 4.92 | 4.92 | 0.00 | Hold | - | 10.00 | Role under review | No |
+| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 0.52 | 0.52 | 0.00 | Hold with override | - | 90.00 | Position does not pass the fresh-capital test; Position is under replacement review; Review has persisted for multiple report cycles; Review has persisted for several report cycles | System override: Minimum trade size was not met |
+| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | 4.77 | 4.77 | 0.00 | Hold | - | 10.00 | Role under review | No |
+| [MOO](https://www.tradingview.com/chart/?symbol=MOO) | [MOO](https://www.tradingview.com/chart/?symbol=MOO) | 0.00 | 2.00 | 2.00 | Add from rotation | - | - | Proposed destination from the rotation plan | No |
 
-## 14. Position Changes Executed This Run
+## 14. Proposed Position Changes / Rotation Trade Intents
 
 | Source | Destination | Source delta % | Destination delta % | Estimated notional EUR | Intent status | Rationale |
 |---|---|---:|---:|---:|---|---|
-| None | None | 0.00 | 0.00 | 0.00 | No proposed rotation | No actionable rotation proposal was generated this run. |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | [MOO](https://www.tradingview.com/chart/?symbol=MOO) | -2.00 | 2.00 | 2167.42 | proposed | - |
 
 ## 15. Current Portfolio Holdings and Cash
 
 - Starting capital (EUR): 100000.00
-- Invested market value (EUR): 104109.85
+- Invested market value (EUR): 105836.61
 - Cash (EUR): 2534.36
-- Total portfolio value (EUR): 106644.21
-- Since inception return (%): 6.64
-- EUR/USD used: 1.1438
+- Total portfolio value (EUR): 108370.97
+- Since inception return (%): 8.37
+- EUR/USD used: 1.1413
 
 | Ticker | Shares | Price (local) | Currency | Market value (local) | Market value (EUR) | Weight % |
 |---|---:|---:|---|---:|---:|---:|
-| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 253.00 | 92.36 | USD | 23367.08 | 20429.88 | 19.16 |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 374.00 | 31.40 | USD | 11743.60 | 10267.45 | 9.63 |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 312.00 | 96.25 | USD | 30030.00 | 26255.28 | 24.62 |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 107.00 | 56.30 | USD | 6024.10 | 5266.88 | 4.94 |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 59.00 | 556.53 | USD | 32835.27 | 28707.93 | 26.92 |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 48.00 | 48.22 | USD | 2314.56 | 2023.62 | 1.90 |
-| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | 40.00 | 154.26 | USD | 6170.40 | 5394.79 | 5.06 |
-| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 14.00 | 45.17 | USD | 632.38 | 552.89 | 0.52 |
-| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | 37.00 | 161.09 | USD | 5960.33 | 5211.13 | 4.89 |
-| CASH | - | 1.00 | EUR | 2534.36 | 2534.36 | 2.38 |
+| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | 253.00 | 89.33 | USD | 22600.49 | 19802.76 | 18.27 |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | 374.00 | 32.45 | USD | 12136.30 | 10633.94 | 9.81 |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | 312.00 | 97.09 | USD | 30292.08 | 26542.20 | 24.49 |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | 107.00 | 56.60 | USD | 6056.20 | 5306.50 | 4.90 |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | 59.00 | 586.93 | USD | 34628.87 | 30342.13 | 28.00 |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | 48.00 | 51.08 | USD | 2451.84 | 2148.32 | 1.98 |
+| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | 40.00 | 152.08 | USD | 6083.20 | 5330.16 | 4.92 |
+| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | 14.00 | 45.94 | USD | 643.16 | 563.54 | 0.52 |
+| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | 37.00 | 159.38 | USD | 5897.06 | 5167.06 | 4.77 |
+| CASH | - | 1.00 | EUR | 2534.36 | 2534.36 | 2.34 |
 
 ## 16. Continuity Input for Next Run
 
@@ -335,18 +339,18 @@ Hold-with-override note: The model would normally force reduce/replace review, b
 ### Portfolio table
 | Ticker | ETF Name | Direction | Weight % | Avg Entry | Current Price | P/L % | Original Thesis | Role |
 |---|---|---:|---:|---:|---:|---:|---|---|
-| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Long | 19.16 |  | 92.36 | -1.48 |  | Rotation destination |
-| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Long | 9.63 | 31.80 | 31.40 | -1.26 | Rotation destination | Rotation destination |
-| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Long | 24.62 |  | 96.25 | -0.74 |  | Rotation destination |
-| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Long | 4.94 |  | 56.30 | -0.85 |  | Rotation destination |
-| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Long | 26.92 | 420.13 | 556.53 | 32.47 | AI compute / semiconductor leadership | Growth engine |
-| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Long | 1.90 | 67.50 | 48.22 | -28.56 | Nuclear and uranium cycle exposure | Strategic energy |
-| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | Long | 5.06 |  | 154.26 | -0.77 |  | Rotation destination |
-| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Long | 0.52 |  | 45.17 | 2.89 |  | Rotation destination |
-| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | Long | 4.89 |  | 161.09 | -0.44 |  | Rotation destination |
+| [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | [CIBR](https://www.tradingview.com/chart/?symbol=CIBR) | Long | 18.27 | | 89.33 | -4.71 | | Rotation destination |
+| [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | Long | 9.81 | 31.80 | 32.45 | 2.04 | Rotation destination | Rotation destination |
+| [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | Long | 24.49 | | 97.09 | 0.13 | | Rotation destination |
+| [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | Global X U.S. Infrastructure Development ETF | Long | 4.90 | | 56.60 | -0.32 | | Rotation destination |
+| [SMH](https://www.tradingview.com/chart/?symbol=SMH) | VanEck Semiconductor ETF | Long | 28.00 | 420.13 | 586.93 | 39.70 | AI compute / semiconductor leadership | Growth engine |
+| [URNM](https://www.tradingview.com/chart/?symbol=URNM) | Sprott Uranium Miners ETF | Long | 1.98 | 67.50 | 51.08 | -24.33 | Nuclear and uranium cycle exposure | Strategic energy |
+| [XBI](https://www.tradingview.com/chart/?symbol=XBI) | [XBI](https://www.tradingview.com/chart/?symbol=XBI) | Long | 4.92 | | 152.08 | -2.17 | | Rotation destination |
+| [XLU](https://www.tradingview.com/chart/?symbol=XLU) | [XLU](https://www.tradingview.com/chart/?symbol=XLU) | Long | 0.52 | | 45.94 | 4.65 | | Rotation destination |
+| [XLV](https://www.tradingview.com/chart/?symbol=XLV) | [XLV](https://www.tradingview.com/chart/?symbol=XLV) | Long | 4.77 | | 159.38 | -1.50 | | Rotation destination |
 
 ### Available cash
-- Cash %: 2.38
+- Cash %: 2.34
 - Margin usage %: 0.00
 - Leverage allowed: No
 
@@ -357,7 +361,7 @@ Hold-with-override note: The model would normally force reduce/replace review, b
 | Defense innovation / sovereign resilience | [PPA](https://www.tradingview.com/chart/?symbol=PPA) | [ITA](https://www.tradingview.com/chart/?symbol=ITA) | Defense thesis valid but vehicle under review. | Duel required |
 | Grid buildout / electrification | [PAVE](https://www.tradingview.com/chart/?symbol=PAVE) | [GRID](https://www.tradingview.com/chart/?symbol=GRID) | Infrastructure capex remains valid. | Duel required |
 | Commodity-breadth hedge review | [GSG](https://www.tradingview.com/chart/?symbol=GSG) | [DBC](https://www.tradingview.com/chart/?symbol=DBC) / [BIL](https://www.tradingview.com/chart/?symbol=BIL) | Current commodity-breadth hedge role must be proven against cash and broad commodity alternatives. | Under review |
-| Non-U.S. developed diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) already provides a material non-U.S. developed-market allocation (24.62%); further changes require relative-strength and concentration evidence. | Watchlist |
+| Non-U.S. developed diversification | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) | [EFA](https://www.tradingview.com/chart/?symbol=EFA) | [IEFA](https://www.tradingview.com/chart/?symbol=IEFA) already provides a material non-U.S. developed-market allocation (24.49%); further changes require relative-strength and concentration evidence. | Watchlist |
 
 ### Recommendation discipline continuity
 - Rotation execution: active.
@@ -373,8 +377,8 @@ Hold-with-override note: The model would normally force reduce/replace review, b
 
 ### Changes since last review
 - Added: runtime-rendered markdown generation layer.
-- Reduced: None unless explicit state says otherwise.
-- Closed: None.
+- Proposed rotation: reduce [SMH](https://www.tradingview.com/chart/?symbol=SMH) by 2.00% NAV and allocate 2.00% NAV to [MOO](https://www.tradingview.com/chart/?symbol=MOO), pending execution and portfolio-state persistence.
+- Executed reductions/closures: none unless separately recorded in the trade ledger and persisted portfolio state.
 - Thesis changes: No structural thesis was abandoned; implementation, macro-regime and rotation discipline are materially tighter.
 
 ## 17. Disclaimer
