@@ -340,6 +340,15 @@ def _enrich_positions(
     lane_by_ticker = _index_lanes_by_ticker(lane_assessment)
     rotation_by_ticker = {str(r.get("ticker", "")).upper(): r for r in (rotation_plan or {}).get("rotation_decisions", []) or []}
     target_by_ticker = {str(r.get("ticker", "")).upper(): r for r in (rotation_plan or {}).get("target_weights", []) or []}
+    current_run_id = str(pricing_audit.get("run_id") or "").strip()
+    last_execution_run_id = str(
+        ((portfolio_state.get("last_model_execution") or {}).get("run_id") or "")
+    ).strip()
+    reset_historical_execution_fields = bool(
+        current_run_id
+        and last_execution_run_id
+        and current_run_id != last_execution_run_id
+    )
     holdings = []
     total_value = 0.0
     for raw in portfolio_state.get("positions", []):
@@ -348,6 +357,11 @@ def _enrich_positions(
             continue
         row = dict(_semantic_defaults(ticker))
         row.update(raw)
+        if reset_historical_execution_fields:
+            row["shares_delta_this_run"] = 0.0
+            row["weight_change_pct"] = 0.0
+            row["action_executed_this_run"] = "None"
+            row["funding_source_note"] = "No model trade executed this run."
         row = _revalue_holding_from_price(row, price_results.get(ticker), pricing_audit)
         score = score_by_ticker.get(ticker, {})
         if score:
