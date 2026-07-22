@@ -1,0 +1,75 @@
+name: Diagnose ETF post-render gates
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/weekly_etf_post_render_diagnostic_*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: python -m pip install matplotlib mistune weasyprint pyyaml pandas yfinance
+      - name: Run post-render gates independently
+        id: diagnose
+        shell: bash
+        run: |
+          set +e
+          mkdir -p output/run_manifests
+          OUT="output/run_manifests/weekly_etf_post_render_diagnostic_${GITHUB_RUN_ID}.json"
+          python - "$OUT" <<'PY'
+          import json, os, subprocess, sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          commands = [
+              [sys.executable, 'tools/validate_etf_pdf_visual_contract.py', '--output-dir', 'output'],
+              [sys.executable, 'tools/validate_etf_macro_thesis_surface_leakage.py', '--output-dir', 'output'],
+              [sys.executable, 'tools/validate_etf_delivery_html_contract.py', '--output-dir', 'output'],
+              [sys.executable, 'tools/validate_etf_client_surface_clean.py', '--output-dir', 'output'],
+              [sys.executable, 'tools/write_etf_minimum_state.py', '--output-dir', 'output', '--mode', 'pro', '--check-only'],
+              [sys.executable, 'tools/write_etf_trade_ledger.py', '--output-dir', 'output', '--check-only'],
+              [sys.executable, 'tools/write_etf_recommendation_scorecard.py', '--output-dir', 'output', '--mode', 'pro', '--check-only'],
+          ]
+          results = []
+          for command in commands:
+              proc = subprocess.run(command, text=True, capture_output=True)
+              results.append({
+                  'command': command,
+                  'return_code': proc.returncode,
+                  'stdout': proc.stdout,
+                  'stderr': proc.stderr,
+              })
+          payload = {
+              'schema_version': '1.0',
+              'created_at_utc': datetime.now(timezone.utc).isoformat(),
+              'github_run_id': os.environ.get('GITHUB_RUN_ID'),
+              'results': results,
+              'first_failure': next((row for row in results if row['return_code'] != 0), None),
+          }
+          Path(sys.argv[1]).write_text(json.dumps(payload, indent=2), encoding='utf-8')
+          PY
+          echo "out=$OUT" >> "$GITHUB_OUTPUT"
+      - name: Persist diagnostic
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f "${{ steps.diagnose.outputs.out }}"
+          git commit -m "Persist ETF post-render diagnostic [skip ci]"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            git pull --rebase origin main
+          done
+          exit 1
