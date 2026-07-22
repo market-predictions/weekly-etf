@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "created_at_utc": "2026-07-22T22:55:28.174271+00:00",
+  "github_run_id": "29964486881",
+  "runtime_state": "output/runtime/etf_report_state_20260722_20260722_224833.json",
+  "return_code": 0,
+  "output": "ETF_PERSISTED_VALUATION_STATE_OK | date=2026-07-22 | nav=108370.97 | cash=2534.36 | invested=105836.61 | positions=9 | position_count_status=close_first | projected_positions=9/8 | portfolio_state=output/etf_portfolio_state.json | valuation_history=output/etf_valuation_history.csv\n"
+}
