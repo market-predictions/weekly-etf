@@ -1,0 +1,17 @@
+{
+  "schema_version": "2.0",
+  "created_at_utc": "2026-07-22T22:30:13.600989+00:00",
+  "github_run_id": "29963063136",
+  "pricing_audit": "output/pricing/price_audit_2026-07-22_20260722_222526.json",
+  "source_lane_artifact": "output/lane_reviews/etf_lane_assessment_260722.json",
+  "quality_return_code": 0,
+  "fundability_return_code": 0,
+  "persistent_rotation_return_code": 0,
+  "rotation_contract_return_code": 0,
+  "rotation_plan_produced": true,
+  "rotation_plan": "/tmp/etf-runtime/etf_rotation_plan_260722_20260722_222526.json",
+  "quality_output": "ETF_LANE_QUALITY_FILTERS_OK | artifact=/tmp/etf-lane.json | promoted=6\n",
+  "fundability_output": "::warning title=ETF Challenger Fundability::DFEN: challenger remains research/radar only; valuation-grade pricing not available\n::warning title=ETF Challenger Fundability::INDA: challenger remains research/radar only; valuation-grade pricing not available\n::warning title=ETF Challenger Fundability::COPX: challenger remains research/radar only; valuation-grade pricing not available\n::warning title=ETF Challenger Fundability::MCHI: challenger remains research/radar only; valuation-grade pricing not available\n::warning title=ETF Challenger Fundability::REMX: challenger remains research/radar only; valuation-grade pricing not available\n::warning title=ETF Challenger Fundability::KWEB: challenger remains research/radar only; valuation-grade pricing not available\nETF_CHALLENGER_FUNDABILITY_CONTRACT_OK | lanes=25 | warnings=6 | lane_artifact=/tmp/etf-lane.json | pricing_audit=output/pricing/price_audit_2026-07-22_20260722_222526.json\n",
+  "persistent_rotation_output": "ETF_ROTATION_PLAN_OK | plan=/tmp/etf-runtime/etf_rotation_plan_260722_20260722_222526.json | decisions=9 | trade_intents=0 | requested_close=2026-07-22 | state_authority=current_run_validated\n",
+  "rotation_contract_output": "ETF_ROTATION_OUTPUT_CONTRACT_OK | plan=etf_rotation_plan_260722_20260722_222526.json | decisions=9 | target_weights=9 | trade_intents=0\n"
+}
