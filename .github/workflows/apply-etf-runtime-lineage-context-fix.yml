@@ -1,0 +1,150 @@
+name: Apply ETF runtime lineage context fix
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/weekly_etf_lineage_context_fix_*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Apply minimal run-identity fix and regression
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('runtime/build_etf_report_state.py')
+          text = path.read_text(encoding='utf-8')
+          needle = '''    rotation_by_ticker = {str(r.get("ticker", "")).upper(): r for r in (rotation_plan or {}).get("rotation_decisions", []) or []}
+    target_by_ticker = {str(r.get("ticker", "")).upper(): r for r in (rotation_plan or {}).get("target_weights", []) or []}
+    holdings = []
+'''
+          replacement = '''    rotation_by_ticker = {str(r.get("ticker", "")).upper(): r for r in (rotation_plan or {}).get("rotation_decisions", []) or []}
+    target_by_ticker = {str(r.get("ticker", "")).upper(): r for r in (rotation_plan or {}).get("target_weights", []) or []}
+    current_run_id = str(pricing_audit.get("run_id") or "").strip()
+    last_execution_run_id = str(
+        ((portfolio_state.get("last_model_execution") or {}).get("run_id") or "")
+    ).strip()
+    reset_historical_execution_fields = bool(
+        current_run_id
+        and last_execution_run_id
+        and current_run_id != last_execution_run_id
+    )
+    holdings = []
+'''
+          if needle not in text:
+              raise SystemExit('Expected _enrich_positions run-context insertion point not found')
+          text = text.replace(needle, replacement, 1)
+
+          needle = '''        row = dict(_semantic_defaults(ticker))
+        row.update(raw)
+        row = _revalue_holding_from_price(row, price_results.get(ticker), pricing_audit)
+'''
+          replacement = '''        row = dict(_semantic_defaults(ticker))
+        row.update(raw)
+        if reset_historical_execution_fields:
+            row["shares_delta_this_run"] = 0.0
+            row["weight_change_pct"] = 0.0
+            row["action_executed_this_run"] = "None"
+            row["funding_source_note"] = "No model trade executed this run."
+        row = _revalue_holding_from_price(row, price_results.get(ticker), pricing_audit)
+'''
+          if needle not in text:
+              raise SystemExit('Expected _enrich_positions row insertion point not found')
+          path.write_text(text.replace(needle, replacement, 1), encoding='utf-8')
+
+          test = Path('tests/test_etf_runtime_lineage_context.py')
+          test.write_text('''from __future__ import annotations
+
+import pytest
+
+from runtime.build_etf_report_state import _enrich_positions
+from runtime.render_cockpit_front_page import _action_surface
+
+
+def test_runtime_state_resets_previous_execution_by_run_identity() -> None:
+    positions = _enrich_positions(
+        {
+            "cash_eur": 1000.0,
+            "last_model_execution": {"run_id": "20260717_154351"},
+            "positions": [
+                {
+                    "ticker": "PAVE",
+                    "shares": 107.0,
+                    "shares_delta_this_run": 107.0,
+                    "action_executed_this_run": "Buy",
+                    "weight_change_pct": 4.9708,
+                    "current_weight_pct": 4.94,
+                    "previous_weight_pct": 0.0,
+                    "report_date": "2026-07-17",
+                    "market_value_local": 6024.10,
+                    "market_value_eur": 5266.88,
+                }
+            ],
+        },
+        {
+            "run_id": "20260722_223651",
+            "requested_close_date": "2026-07-22",
+            "fx_basis": {"rate": 1.14128},
+            "price_results": [
+                {
+                    "symbol": "PAVE",
+                    "selected_close": 56.60,
+                    "currency": "USD",
+                    "status": "fresh_exact_unverified",
+                    "pricing_tier": "valuation_grade",
+                    "selected_close_type": "raw_close",
+                    "returned_close_date": "2026-07-22",
+                    "source": "test",
+                }
+            ],
+        },
+        [{"ticker": "PAVE", "report_date": "2026-07-22", "total_score": "3.83"}],
+        {"assessed_lanes": []},
+        {"rotation_decisions": [], "target_weights": [], "trade_intents": []},
+    )
+
+    row = positions[0]
+    assert row["shares_delta_this_run"] == pytest.approx(0.0)
+    assert row["weight_change_pct"] == pytest.approx(0.0)
+    assert row["action_executed_this_run"] == "None"
+    assert row["previous_shares"] == pytest.approx(107.0)
+    assert row["previous_weight_pct"] == pytest.approx(row["current_weight_pct"])
+    assert row["trade_lineage_source"] == "current_snapshot_no_trade"
+
+    title, _note = _action_surface({"positions": positions}, "en")
+    assert title == "No portfolio action"
+''', encoding='utf-8')
+          PY
+      - name: Run focused validation
+        run: |
+          python -m pip install pytest
+          python -m py_compile runtime/build_etf_report_state.py runtime/trade_lineage.py
+          python -m pytest -q \
+            tests/test_etf_trade_lineage.py \
+            tests/test_etf_stale_trade_lineage_reset.py \
+            tests/test_etf_runtime_lineage_context.py
+      - name: Commit validated fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add runtime/build_etf_report_state.py tests/test_etf_runtime_lineage_context.py
+          git commit -m "Fix ETF runtime lineage across report runs"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            git pull --rebase origin main
+          done
+          exit 1
