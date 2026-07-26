@@ -1,0 +1,71 @@
+name: Validate ETF report integrity exact replay
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/etf_report_integrity_validation_*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: pip install pytest pyyaml
+
+      - name: Run exact replay and persist diagnostics
+        run: |
+          set +e
+          mkdir -p output/run_manifests
+          : > /tmp/etf_integrity.log
+          python -m py_compile \
+            runtime/report_portfolio_integrity_contract.py \
+            runtime/link_runtime_report_tickers.py \
+            tools/validate_etf_report_portfolio_integrity.py >> /tmp/etf_integrity.log 2>&1
+          compile_status=$?
+          python -m pytest tests/test_etf_report_portfolio_integrity.py -q >> /tmp/etf_integrity.log 2>&1
+          exact_status=$?
+          python -m pytest tests/test_report_freshness_and_html_equity.py -q >> /tmp/etf_integrity.log 2>&1
+          freshness_status=$?
+          python -m pytest tests/test_etf_runtime_lineage_context.py -q >> /tmp/etf_integrity.log 2>&1
+          lineage_status=$?
+          python - <<PY
+          import json
+          from pathlib import Path
+          statuses = {
+              "compile": $compile_status,
+              "exact_integrity_tests": $exact_status,
+              "freshness_tests": $freshness_status,
+              "runtime_lineage_tests": $lineage_status,
+          }
+          log = Path('/tmp/etf_integrity.log').read_text(encoding='utf-8', errors='replace')
+          payload = {
+              "artifact_type": "weekly_etf_report_integrity_exact_validation",
+              "status": "completed" if all(value == 0 for value in statuses.values()) else "failed",
+              "statuses": statuses,
+              "log_tail": log[-12000:],
+          }
+          out = Path('output/run_manifests/weekly_etf_report_integrity_exact_validation.json')
+          out.write_text(json.dumps(payload, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps(payload, indent=2))
+          PY
+
+      - name: Commit validation evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/run_manifests/weekly_etf_report_integrity_exact_validation.json
+          git commit -m "Persist ETF report-integrity exact validation [skip ci]"
+          git push origin HEAD:main
