@@ -14,6 +14,19 @@ NON_US_REPLACEMENTS = {
     "Niet-Amerikaanse aandelenblootstelling blijft een diversificatiekloof.": "Blootstelling aan ontwikkelde markten buiten de VS is via IEFA verhoogd, maar blijft onder bevestiging in relatieve sterkte.",
 }
 
+DECISION_STATUS_REPLACEMENTS = {
+    "Rotation execution status": "Portfolio decision status",
+    "rotation execution status": "portfolio decision status",
+    "Status rotatie-uitvoering": "Status portefeuillebesluit",
+    "status rotatie-uitvoering": "status portefeuillebesluit",
+    "portfolio rotation is already reflected in the official portfolio state and trade ledger; this run performed no duplicate state or ledger mutation.":
+        "The official portfolio state and trade ledger are authoritative for this report; this run performed no duplicate state or ledger mutation.",
+    "Portfolio rotation is already reflected in the official portfolio state and trade ledger; this run performed no duplicate state or ledger mutation.":
+        "The official portfolio state and trade ledger are authoritative for this report; this run performed no duplicate state or ledger mutation.",
+    "De bewaakte modelrotatie is al verwerkt in de officiële portefeuillestaat en het handelslogboek; deze run heeft geen dubbele staat- of handelslogboekmutatie uitgevoerd.":
+        "De officiële portefeuillestaat en het handelslogboek zijn leidend voor dit rapport; deze run heeft geen dubbele staat- of handelslogboekmutatie uitgevoerd.",
+}
+
 PRODUCT_NAME_REPAIRS = {
     "iAantal aandelen": "iShares",
     "iAantal aandelen S&P GSCI Commodity-Indexed Trust": "iShares S&P GSCI Commodity-Indexed Trust",
@@ -57,15 +70,27 @@ def _repair_rotation_limit_language(text: str, *, language: str) -> str:
     return text
 
 
+def _repair_decision_status_language(text: str) -> str:
+    for source, target in sorted(
+        DECISION_STATUS_REPLACEMENTS.items(),
+        key=lambda item: len(item[0]),
+        reverse=True,
+    ):
+        text = text.replace(source, target)
+    return text
+
+
 def clean_text(text: str, *, language: str) -> str:
     for source, target in NON_US_REPLACEMENTS.items():
         text = text.replace(source, target)
     text = _repair_rotation_limit_language(text, language=language)
+    text = _repair_decision_status_language(text)
     if language == "nl":
         for pattern, target in DUTCH_MEMORY_PATTERNS:
             text = pattern.sub(target, text)
         text = _repair_product_names(text)
-    return normalize_client_language(text, language=language)
+    text = normalize_client_language(text, language=language)
+    return _repair_decision_status_language(text)
 
 
 def failures(text: str, *, language: str) -> list[str]:
@@ -76,10 +101,19 @@ def failures(text: str, *, language: str) -> list[str]:
         "niet-amerikaanse aandelenblootstelling blijft een diversificatiekloof",
         "wp16-nl-equity-curve-guard",
         "iaantal aandelen",
+        "rotation execution status",
+        "status rotatie-uitvoering",
+        "portfolio rotation is already reflected in the official portfolio state and trade ledger",
+        "de bewaakte modelrotatie is al verwerkt in de officiële portefeuillestaat en het handelslogboek",
     ]
     if language == "nl":
         checks.append("risk-on growth has persisted")
     else:
         checks.append("risk-on groei houdt")
         checks.append("rotatielimiet bereikt voor deze review")
-    return sorted(set([item for item in checks if item in lower] + client_language_findings(text, language=language)))
+    return sorted(
+        set(
+            [item for item in checks if item in lower]
+            + client_language_findings(text, language=language)
+        )
+    )
