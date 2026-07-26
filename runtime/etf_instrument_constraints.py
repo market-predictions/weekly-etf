@@ -41,29 +41,68 @@ def load_instrument_constraints(path: Path = DEFAULT_CONSTRAINTS_PATH) -> dict[s
     return payload
 
 
+def instrument_rule(symbol: str, constraints: dict[str, Any]) -> dict[str, Any]:
+    return dict((constraints.get("instruments") or {}).get(_ticker(symbol)) or {})
+
+
 def instrument_eligibility(symbol: str, constraints: dict[str, Any]) -> tuple[bool, str]:
-    rule = dict((constraints.get("instruments") or {}).get(_ticker(symbol)) or {})
+    rule = instrument_rule(symbol, constraints)
     eligible = bool(rule.get("portfolio_eligible", True))
     reason = str(rule.get("reason") or "")
     return eligible, reason
 
 
+def _eligible_research_replacement(
+    symbol: str, constraints: dict[str, Any]
+) -> str:
+    rule = instrument_rule(symbol, constraints)
+    replacement = _ticker(rule.get("eligible_research_replacement"))
+    if not replacement:
+        return ""
+    eligible, _ = instrument_eligibility(replacement, constraints)
+    return replacement if eligible else ""
+
+
 def normalize_lane_instruments(
     lane: dict[str, Any], constraints: dict[str, Any]
 ) -> dict[str, Any]:
-    """Put an eligible vehicle first without deleting research-only alternatives."""
+    """Lead with eligible vehicles and remove ineligible client-facing alternatives."""
     item = dict(lane)
     primary = _ticker(item.get("primary_etf"))
     alternative = _ticker(item.get("alternative_etf"))
+    original_primary = primary
+    original_alternative = alternative
     primary_eligible, primary_reason = instrument_eligibility(primary, constraints)
-    alternative_eligible, alternative_reason = instrument_eligibility(alternative, constraints)
+    alternative_eligible, alternative_reason = instrument_eligibility(
+        alternative, constraints
+    )
 
     if primary and not primary_eligible and alternative and alternative_eligible:
         primary, alternative = alternative, primary
-        primary_eligible, alternative_eligible = alternative_eligible, primary_eligible
+        primary_eligible, alternative_eligible = (
+            alternative_eligible,
+            primary_eligible,
+        )
         primary_reason, alternative_reason = alternative_reason, primary_reason
         item["instrument_order_adjusted"] = True
-        item["instrument_order_adjustment_reason"] = "eligible_vehicle_promoted_over_ineligible_vehicle"
+        item[
+            "instrument_order_adjustment_reason"
+        ] = "eligible_vehicle_promoted_over_ineligible_vehicle"
+
+    if alternative and not alternative_eligible:
+        replacement = _eligible_research_replacement(alternative, constraints)
+        item["excluded_research_vehicle"] = alternative
+        item["excluded_research_vehicle_reason"] = alternative_reason
+        if replacement and replacement != primary:
+            alternative = replacement
+            alternative_eligible, alternative_reason = instrument_eligibility(
+                alternative, constraints
+            )
+            item["eligible_research_replacement_applied"] = True
+        else:
+            alternative = ""
+            alternative_eligible = True
+            alternative_reason = ""
 
     item["primary_etf"] = primary
     item["alternative_etf"] = alternative
@@ -71,6 +110,8 @@ def normalize_lane_instruments(
     item["primary_ineligibility_reason"] = primary_reason
     item["alternative_portfolio_eligible"] = alternative_eligible
     item["alternative_ineligibility_reason"] = alternative_reason
+    item["configured_primary_etf"] = original_primary
+    item["configured_alternative_etf"] = original_alternative
     return item
 
 
@@ -82,7 +123,9 @@ def _current_weight_index(plan: dict[str, Any]) -> dict[str, float]:
     }
 
 
-def _projected_weight_index(plan: dict[str, Any], current: dict[str, float]) -> dict[str, float]:
+def _projected_weight_index(
+    plan: dict[str, Any], current: dict[str, float]
+) -> dict[str, float]:
     projected = dict(current)
     for row in plan.get("target_weights", []) or []:
         ticker = _ticker(row.get("ticker"))
@@ -111,10 +154,18 @@ def _reset_invalid_trade_intents(
             _num(decision.get("delta_weight_pct"), 0.0) != 0.0
             or _ticker(decision.get("destination_ticker"))
             or str(decision.get("action_code") or "")
-            in {"replace_partial", "replace_full", "reduce", "close", "add_from_cash"}
+            in {
+                "replace_partial",
+                "replace_full",
+                "reduce",
+                "close",
+                "add_from_cash",
+            }
         ):
             decision["action_code"] = "hold_with_override"
-            decision["target_weight_pct"] = round(current.get(ticker, 0.0), 2)
+            decision["target_weight_pct"] = round(
+                current.get(ticker, 0.0), 2
+            )
             decision["delta_weight_pct"] = 0.0
             decision["destination_ticker"] = ""
             decision["override_status"] = "engine"
@@ -136,7 +187,9 @@ def apply_rotation_policy_constraints(
 ) -> dict[str, Any]:
     plan = deepcopy(raw_plan)
     policy = dict(constraints.get("portfolio_policy") or {})
-    max_active = int(policy.get("max_active_positions", DEFAULT_MAX_ACTIVE_POSITIONS))
+    max_active = int(
+        policy.get("max_active_positions", DEFAULT_MAX_ACTIVE_POSITIONS)
+    )
     instrument_rules = dict(constraints.get("instruments") or {})
 
     blocked_candidates: list[str] = []
@@ -155,11 +208,12 @@ def apply_rotation_policy_constraints(
                 reasons.append(marker)
             candidate["destination_reasons"] = reasons
 
+    blocked_set = set(blocked_candidates)
     invalid_destinations = sorted(
         {
             _ticker(intent.get("destination_ticker"))
             for intent in plan.get("trade_intents", []) or []
-            if _ticker(intent.get("destination_ticker")) in set(blocked_candidates)
+            if _ticker(intent.get("destination_ticker")) in blocked_set
         }
     )
 
@@ -202,7 +256,9 @@ def apply_rotation_policy_constraints(
         "block_reason": block_reason or None,
         "initial_position_count_assessment": initial_assessment.to_dict(),
         "final_position_count_assessment": final_assessment.to_dict(),
-        "trade_intents_after_constraints": len(plan.get("trade_intents", []) or []),
+        "trade_intents_after_constraints": len(
+            plan.get("trade_intents", []) or []
+        ),
     }
     plan.setdefault("validation_flags", {}).update(
         {
