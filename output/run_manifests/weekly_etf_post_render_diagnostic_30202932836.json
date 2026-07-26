@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0",
+  "created_at_utc": "2026-07-26T12:53:34.485739+00:00",
+  "github_run_id": "30202932836",
+  "results": [
+    {
+      "command": [
+        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "tools/validate_etf_pdf_visual_contract.py",
+        "--output-dir",
+        "output"
+      ],
+      "return_code": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_pdf_visual_contract.py\", line 123, in <module>\n    main()\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_pdf_visual_contract.py\", line 119, in main\n    validate(Path(args.output_dir))\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_pdf_visual_contract.py\", line 111, in validate\n    validate_pdf(_latest_pdf(output_dir, \"en\"), language=\"en\")\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_pdf_visual_contract.py\", line 96, in validate_pdf\n    _require_poppler()\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_pdf_visual_contract.py\", line 28, in _require_poppler\n    raise RuntimeError(\nRuntimeError: PDF visual contract failed: missing Poppler tool(s): pdftotext, pdftoppm. Install poppler-utils in the workflow before this validator runs.\n"
+    },
+    {
+      "command": [
+        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "tools/validate_etf_macro_thesis_surface_leakage.py",
+        "--output-dir",
+        "output"
+      ],
+      "return_code": 0,
+      "stdout": "ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK | files=weekly_analysis_pro_260724_03.md,weekly_analysis_pro_260724_03_clean.md,weekly_analysis_pro_260724_03_delivery.html,weekly_analysis_pro_nl_260724_03.md,weekly_analysis_pro_nl_260724_03_clean.md,weekly_analysis_pro_nl_260724_03_delivery.html\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "tools/validate_etf_delivery_html_contract.py",
+        "--output-dir",
+        "output"
+      ],
+      "return_code": 0,
+      "stdout": "COCKPIT_FRONT_PAGE | status=disabled | feature=disabled | front_page_count=0 | diagnostic=feature_disabled\nETF_DELIVERY_HTML_CONTRACT_OK | report=weekly_analysis_pro_260724_03.md | dynamic_holdings=CIBR,GSG,IEFA,PAVE,SMH,URNM,XBI,XLU,XLV | post_execution=False\nCOCKPIT_FRONT_PAGE | status=disabled | feature=disabled | front_page_count=0 | diagnostic=feature_disabled\nETF_DELIVERY_HTML_CONTRACT_OK | report=weekly_analysis_pro_nl_260724_03.md | dynamic_holdings=CIBR,GSG,IEFA,PAVE,SMH,URNM,XBI,XLU,XLV | post_execution=False\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "tools/validate_etf_client_surface_clean.py",
+        "--output-dir",
+        "output"
+      ],
+      "return_code": 1,
+      "stdout": "ETF_ACTION_SURFACE_CONSISTENCY_OK | files=weekly_analysis_pro_260724_03.md,weekly_analysis_pro_nl_260724_03.md\n",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_client_surface_clean.py\", line 292, in <module>\n    main()\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_client_surface_clean.py\", line 288, in main\n    validate(Path(args.output_dir))\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_client_surface_clean.py\", line 272, in validate\n    raise RuntimeError(\nRuntimeError: ETF client-surface clean gate failed: weekly_analysis_pro_260724_03.md: raw_override | weekly_analysis_pro_260724_03_delivery.html: raw_override\n"
+    },
+    {
+      "command": [
+        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "tools/write_etf_minimum_state.py",
+        "--output-dir",
+        "output",
+        "--mode",
+        "pro",
+        "--check-only"
+      ],
+      "return_code": 0,
+      "stdout": "ETF_STATE_DERIVATION_OK | source=runtime | state=etf_portfolio_state.json | history_rows=30 | positions=9\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "tools/write_etf_trade_ledger.py",
+        "--output-dir",
+        "output",
+        "--check-only"
+      ],
+      "return_code": 0,
+      "stdout": "ETF_TRADE_LEDGER_DERIVATION_OK | source=runtime | ledger=etf_trade_ledger.csv | rows=47\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "tools/write_etf_recommendation_scorecard.py",
+        "--output-dir",
+        "output",
+        "--mode",
+        "pro",
+        "--check-only"
+      ],
+      "return_code": 0,
+      "stdout": "ETF_RECOMMENDATION_SCORECARD_DERIVATION_OK | source=runtime | rows=9 | flagged=4 | scorecard=etf_recommendation_scorecard.csv\n",
+      "stderr": ""
+    }
+  ],
+  "first_failure": {
+    "command": [
+      "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+      "tools/validate_etf_pdf_visual_contract.py",
+      "--output-dir",
+      "output"
+    ],
+    "return_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_pdf_visual_contract.py\", line 123, in <module>\n    main()\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_pdf_visual_contract.py\", line 119, in main\n    validate(Path(args.output_dir))\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_pdf_visual_contract.py\", line 111, in validate\n    validate_pdf(_latest_pdf(output_dir, \"en\"), language=\"en\")\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_pdf_visual_contract.py\", line 96, in validate_pdf\n    _require_poppler()\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_pdf_visual_contract.py\", line 28, in _require_poppler\n    raise RuntimeError(\nRuntimeError: PDF visual contract failed: missing Poppler tool(s): pdftotext, pdftoppm. Install poppler-utils in the workflow before this validator runs.\n"
+  }
+}
