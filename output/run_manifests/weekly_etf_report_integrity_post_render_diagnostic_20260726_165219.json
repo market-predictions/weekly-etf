@@ -1,0 +1,51 @@
+{
+  "artifact_type": "weekly_etf_report_integrity_post_render_diagnostic",
+  "source_run_id": "20260726_165219",
+  "status": "failed",
+  "results": {
+    "bilingual_pair": {
+      "exit_code": 0,
+      "log_tail": "RUNTIME_SECTION15_OK | positions=9 | invested_eur=104655.43 | cash_eur=2534.36 | total_nav=107189.79\nRUNTIME_EQUITY_CURVE_OK | latest_nav=107189.79\nRUNTIME_SECTION15_OK | positions=9 | invested_eur=104655.43 | cash_eur=2534.36 | total_nav=107189.79\nRUNTIME_EQUITY_CURVE_OK | latest_nav=107189.79\nBILINGUAL_PAIR_OK\n"
+    },
+    "client_surface": {
+      "exit_code": 1,
+      "log_tail": "ETF_ACTION_SURFACE_CONSISTENCY_OK | files=weekly_analysis_pro_260724_07.md,weekly_analysis_pro_nl_260724_07.md\nTraceback (most recent call last):\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_client_surface_clean.py\", line 292, in <module>\n    main()\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_client_surface_clean.py\", line 288, in main\n    validate(Path(args.output_dir))\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_client_surface_clean.py\", line 272, in validate\n    raise RuntimeError(\nRuntimeError: ETF client-surface clean gate failed: weekly_analysis_pro_nl_260724_07.md: risk-on growth has persisted | weekly_analysis_pro_nl_260724_07_delivery.html: risk-on growth has persisted\n"
+    },
+    "delivery_html": {
+      "exit_code": 0,
+      "log_tail": "COCKPIT_FRONT_PAGE | status=enabled | feature=enabled | front_page_count=1 | diagnostic=front_page_injected\nETF_DELIVERY_HTML_CONTRACT_OK | report=weekly_analysis_pro_260724_07.md | dynamic_holdings=CIBR,GSG,IEFA,PAVE,SMH,URNM,XBI,XLU,XLV | post_execution=False\nCOCKPIT_FRONT_PAGE | status=enabled | feature=enabled | front_page_count=1 | diagnostic=front_page_injected\nETF_DELIVERY_HTML_CONTRACT_OK | report=weekly_analysis_pro_nl_260724_07.md | dynamic_holdings=CIBR,GSG,IEFA,PAVE,SMH,URNM,XBI,XLU,XLV | post_execution=False\n"
+    },
+    "lane_breadth": {
+      "exit_code": 0,
+      "log_tail": "BREADTH_OK | report=weekly_analysis_pro_260724_07.md | artifact=etf_lane_assessment_260724.json\n"
+    },
+    "macro_leakage": {
+      "exit_code": 0,
+      "log_tail": "ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK | files=weekly_analysis_pro_260724_07.md,weekly_analysis_pro_260724_07_clean.md,weekly_analysis_pro_260724_07_delivery.html,weekly_analysis_pro_nl_260724_07.md,weekly_analysis_pro_nl_260724_07_clean.md,weekly_analysis_pro_nl_260724_07_delivery.html\n"
+    },
+    "pdf_visual": {
+      "exit_code": 0,
+      "log_tail": "ETF_PDF_VISUAL_CONTRACT_OK | pdf=weekly_analysis_pro_260724_07.pdf | language=en | equity_page=8 | blue_pixels=4287\nETF_PDF_VISUAL_CONTRACT_OK | pdf=weekly_analysis_pro_nl_260724_07.pdf | language=nl | equity_page=8 | blue_pixels=4652\n"
+    },
+    "portfolio_integrity": {
+      "exit_code": 1,
+      "log_tail": "Traceback (most recent call last):\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_report_portfolio_integrity.py\", line 9, in <module>\n    from runtime.report_portfolio_integrity_contract import validate_report_portfolio_integrity\nModuleNotFoundError: No module named 'runtime'\n"
+    },
+    "replacement_duels": {
+      "exit_code": 0,
+      "log_tail": "REPLACEMENT_DUELS_OK | report=weekly_analysis_pro_260724_07.md\n"
+    },
+    "state_ledger": {
+      "exit_code": 0,
+      "log_tail": "ETF_TRADE_LEDGER_DERIVATION_OK | source=runtime | ledger=etf_trade_ledger.csv | rows=47\n"
+    },
+    "state_minimum": {
+      "exit_code": 0,
+      "log_tail": "ETF_STATE_DERIVATION_OK | source=runtime | state=etf_portfolio_state.json | history_rows=30 | positions=9\n"
+    },
+    "state_scorecard": {
+      "exit_code": 0,
+      "log_tail": "ETF_RECOMMENDATION_SCORECARD_DERIVATION_OK | source=runtime | rows=9 | flagged=4 | scorecard=etf_recommendation_scorecard.csv\n"
+    }
+  }
+}
