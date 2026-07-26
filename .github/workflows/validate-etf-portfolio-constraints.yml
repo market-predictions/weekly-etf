@@ -1,0 +1,134 @@
+name: Validate ETF portfolio constraints
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/weekly_etf_portfolio_constraint_validation_*.md"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest pyyaml
+
+      - name: Compile constraint implementation
+        run: |
+          python -m py_compile \
+            runtime/etf_instrument_constraints.py \
+            runtime/discover_etf_lanes.py \
+            runtime/portfolio_rotation_engine.py \
+            tests/test_etf_instrument_constraints.py
+
+      - name: Run focused regressions
+        run: |
+          pytest -q \
+            tests/test_etf_instrument_constraints.py \
+            tests/test_etf_position_count_contract.py
+
+      - name: Rebuild exact July 24 lane artifact
+        run: |
+          python -m runtime.discover_etf_lanes \
+            --config config/etf_discovery_universe.yml \
+            --instrument-constraints config/etf_instrument_constraints.yml \
+            --portfolio-state output/etf_portfolio_state.json \
+            --pricing-audit output/pricing/price_audit_2026-07-24_20260726_121721.json \
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --macro-policy-pack output/macro/latest.json
+
+      - name: Build exact constrained dry-run plan
+        run: |
+          python -m runtime.portfolio_rotation_engine \
+            --portfolio-state output/etf_portfolio_state.json \
+            --scorecard output/etf_recommendation_scorecard.csv \
+            --pricing-audit output/pricing/price_audit_2026-07-24_20260726_121721.json \
+            --lane-artifact output/lane_reviews/etf_lane_assessment_260724.json \
+            --relative-strength output/market_history/etf_relative_strength.json \
+            --instrument-constraints config/etf_instrument_constraints.yml \
+            --run-id constraint_validation \
+            --dry-run > /tmp/etf_constraint_plan.json
+
+      - name: Assert eligibility and close-first authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          lane = json.loads(Path("output/lane_reviews/etf_lane_assessment_260724.json").read_text(encoding="utf-8"))
+          europe = next(row for row in lane["assessed_lanes"] if row.get("taxonomy_tag") == "europe_defense_industry")
+          assert europe["primary_etf"] == "NATO", europe
+          assert europe["primary_portfolio_eligible"] is True, europe
+          assert europe["alternative_etf"] == "DFEN", europe
+          assert europe["alternative_portfolio_eligible"] is False, europe
+
+          plan = json.loads(Path("/tmp/etf_constraint_plan.json").read_text(encoding="utf-8"))
+          assert plan["trade_intents"] == [], plan["trade_intents"]
+          assert all(row.get("destination_ticker") != "DFEN" for row in plan["rotation_decisions"])
+          dfen = [row for row in plan["candidate_reviews"] if row.get("candidate") == "DFEN"]
+          assert dfen and all(row.get("is_fundable_candidate") is False for row in dfen), dfen
+          validation = plan["portfolio_constraint_validation"]
+          assert validation["block_reason"] == "position_count_close_first", validation
+          assert validation["initial_position_count_assessment"]["current_count"] == 9, validation
+          assert validation["initial_position_count_assessment"]["max_active_positions"] == 8, validation
+          assert validation["final_position_count_assessment"]["passed"] is True, validation
+          assert plan["validation_flags"]["leveraged_etf_constraint_enforced"] is True
+          assert plan["validation_flags"]["position_count_transition_enforced"] is True
+          print("ETF_PORTFOLIO_CONSTRAINTS_OK | DFEN=blocked | radar_primary=NATO | position_count=9/8 | trade_intents=0")
+          PY
+
+      - name: Persist validation evidence
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          plan_path = Path("/tmp/etf_constraint_plan.json")
+          plan = json.loads(plan_path.read_text(encoding="utf-8")) if plan_path.exists() else {}
+          payload = {
+              "schema_version": "1.0",
+              "artifact_type": "weekly_etf_portfolio_constraint_validation",
+              "created_at_utc": datetime.now(timezone.utc).isoformat(),
+              "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+              "status": "completed" if plan else "incomplete",
+              "instrument_constraints": "config/etf_instrument_constraints.yml",
+              "source_pricing_audit": "output/pricing/price_audit_2026-07-24_20260726_121721.json",
+              "portfolio_constraint_validation": plan.get("portfolio_constraint_validation"),
+              "trade_intents": plan.get("trade_intents"),
+              "validation_flags": plan.get("validation_flags"),
+          }
+          out = Path(f"output/run_manifests/weekly_etf_portfolio_constraint_validation_{os.environ.get('GITHUB_RUN_ID', 'unknown')}.json")
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          print(f"ETF_PORTFOLIO_CONSTRAINT_EVIDENCE_WRITTEN | path={out}")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/run_manifests/weekly_etf_portfolio_constraint_validation_*.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Persist ETF portfolio constraint validation [skip ci]"
+          git push origin HEAD:main
