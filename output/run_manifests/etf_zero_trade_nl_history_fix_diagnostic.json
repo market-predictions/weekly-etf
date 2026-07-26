@@ -1,0 +1,13 @@
+{
+  "artifact_type": "etf_zero_trade_nl_history_fix_diagnostic",
+  "status": "completed",
+  "statuses": {
+    "patch": 0,
+    "compile": 0,
+    "focused": 0,
+    "constraints": 0,
+    "integrity": 0
+  },
+  "log_head": "ETF_ZERO_TRADE_AND_NL_HISTORY_FIX_OK\n...                                                                      [100%]\n3 passed in 0.06s\n...                                                                      [100%]\n3 passed in 0.04s\n......                                                                   [100%]\n6 passed in 0.78s\n",
+  "log_tail": "ETF_ZERO_TRADE_AND_NL_HISTORY_FIX_OK\n...                                                                      [100%]\n3 passed in 0.06s\n...                                                                      [100%]\n3 passed in 0.04s\n......                                                                   [100%]\n6 passed in 0.78s\n"
+}
