@@ -9,6 +9,11 @@ from typing import Any
 
 import yaml
 
+from runtime.etf_instrument_constraints import (
+    DEFAULT_CONSTRAINTS_PATH,
+    load_instrument_constraints,
+    normalize_lane_instruments,
+)
 from runtime.score_etf_lanes import (
     LaneContext,
     apply_promotion_flags,
@@ -52,7 +57,12 @@ def report_date_from_pricing(pricing_audit: dict[str, Any]) -> str:
 def prior_lane_artifact(current_report_suffix: str | None = None) -> dict[str, Any] | None:
     artifacts = sorted(LANE_DIR.glob("etf_lane_assessment_*.json"))
     if current_report_suffix:
-        artifacts = [p for p in artifacts if not p.name.endswith(f"_{current_report_suffix}.json") and current_report_suffix not in p.name]
+        artifacts = [
+            p
+            for p in artifacts
+            if not p.name.endswith(f"_{current_report_suffix}.json")
+            and current_report_suffix not in p.name
+        ]
     if not artifacts:
         return None
     return load_json(artifacts[-1])
@@ -70,7 +80,9 @@ def held_tickers_from_portfolio_state(path: Path) -> set[str]:
     return tickers
 
 
-def pricing_context(pricing_audit: dict[str, Any]) -> tuple[dict[str, str], set[str], dict[str, str], dict[str, str]]:
+def pricing_context(
+    pricing_audit: dict[str, Any],
+) -> tuple[dict[str, str], set[str], dict[str, str], dict[str, str]]:
     status_by_symbol: dict[str, str] = {}
     priced: set[str] = set()
     tier_by_symbol: dict[str, str] = {}
@@ -126,13 +138,19 @@ def validate_discovery_payload(payload: dict[str, Any]) -> None:
     buckets = {lane.get("bucket") for lane in lanes}
     missing = required_buckets - buckets
     if missing:
-        raise RuntimeError("Lane discovery missing required buckets: " + ", ".join(sorted(missing)))
+        raise RuntimeError(
+            "Lane discovery missing required buckets: " + ", ".join(sorted(missing))
+        )
     challengers = [lane for lane in lanes if lane.get("challenger") is True]
     if len(challengers) < 4:
-        raise RuntimeError(f"Lane discovery produced too few challengers: {len(challengers)}")
+        raise RuntimeError(
+            f"Lane discovery produced too few challengers: {len(challengers)}"
+        )
     promoted = [lane for lane in lanes if lane.get("promoted_to_live_radar") is True]
     if not (5 <= len(promoted) <= 8):
-        raise RuntimeError(f"Lane discovery promoted invalid number of lanes: {len(promoted)}")
+        raise RuntimeError(
+            f"Lane discovery promoted invalid number of lanes: {len(promoted)}"
+        )
 
 
 def build_lane_artifact(
@@ -141,17 +159,23 @@ def build_lane_artifact(
     pricing_audit_path: Path,
     relative_strength_path: Path = RS_PATH,
     macro_policy_pack_path: Path = MACRO_POLICY_PACK_PATH,
+    instrument_constraints_path: Path = DEFAULT_CONSTRAINTS_PATH,
 ) -> tuple[dict[str, Any], Path]:
     config = load_yaml(config_path)
+    constraints = load_instrument_constraints(instrument_constraints_path)
     pricing_audit = load_json(pricing_audit_path)
     report_date = report_date_from_pricing(pricing_audit)
     suffix = report_suffix_from_date(report_date)
     report_filename = f"weekly_analysis_pro_{suffix}.md"
     prior = prior_lane_artifact(suffix)
 
-    status_by_symbol, priced_symbols, tier_by_symbol, source_by_symbol = pricing_context(pricing_audit)
+    status_by_symbol, priced_symbols, tier_by_symbol, source_by_symbol = pricing_context(
+        pricing_audit
+    )
     rs_metrics = relative_strength_metrics(relative_strength_path)
-    macro_policy_pack = load_json(macro_policy_pack_path) if macro_policy_pack_path.exists() else {}
+    macro_policy_pack = (
+        load_json(macro_policy_pack_path) if macro_policy_pack_path.exists() else {}
+    )
 
     context = LaneContext(
         held_tickers=held_tickers_from_portfolio_state(portfolio_state_path),
@@ -165,26 +189,45 @@ def build_lane_artifact(
         macro_policy_pack=macro_policy_pack,
     )
 
-    lanes = [score_lane(lane, context) for lane in config.get("lanes", [])]
-    lanes = sorted(lanes, key=lambda lane: float(lane.get("total_score", 0.0)), reverse=True)
-    promoted = select_promoted_lanes(lanes, list(config.get("required_breadth_buckets", [])))
+    configured_lanes = [
+        normalize_lane_instruments(dict(lane), constraints)
+        for lane in config.get("lanes", [])
+    ]
+    lanes = [score_lane(lane, context) for lane in configured_lanes]
+    lanes = sorted(
+        lanes, key=lambda lane: float(lane.get("total_score", 0.0)), reverse=True
+    )
+    promoted = select_promoted_lanes(
+        lanes, list(config.get("required_breadth_buckets", []))
+    )
     lanes = apply_promotion_flags(lanes, promoted)
 
     payload = {
         "report_date": report_date,
         "report_filename": report_filename,
         "prior_report_filename": (prior or {}).get("report_filename"),
-        "discovery_engine_version": "lane_discovery_v4_valuation_grade_fundability",
+        "discovery_engine_version": "lane_discovery_v5_instrument_eligibility",
         "macro_regime": (macro_policy_pack.get("regime") or {}).get("current"),
         "discovery_inputs": {
             "config": str(config_path),
+            "instrument_constraints": str(instrument_constraints_path),
             "portfolio_state": str(portfolio_state_path),
             "pricing_audit": str(pricing_audit_path),
-            "relative_strength": str(relative_strength_path) if relative_strength_path.exists() else None,
-            "macro_policy_pack": str(macro_policy_pack_path) if macro_policy_pack_path.exists() else None,
+            "relative_strength": (
+                str(relative_strength_path)
+                if relative_strength_path.exists()
+                else None
+            ),
+            "macro_policy_pack": (
+                str(macro_policy_pack_path)
+                if macro_policy_pack_path.exists()
+                else None
+            ),
             "prior_lane_artifact": "latest_available" if prior else None,
         },
-        "required_breadth_buckets": list(config.get("required_breadth_buckets", [])),
+        "required_breadth_buckets": list(
+            config.get("required_breadth_buckets", [])
+        ),
         "assessed_lanes": lanes,
     }
     validate_discovery_payload(payload)
@@ -198,28 +241,50 @@ def build_lane_artifact(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="config/etf_discovery_universe.yml")
-    parser.add_argument("--portfolio-state", default="output/etf_portfolio_state.json")
+    parser.add_argument(
+        "--instrument-constraints", default=str(DEFAULT_CONSTRAINTS_PATH)
+    )
+    parser.add_argument(
+        "--portfolio-state", default="output/etf_portfolio_state.json"
+    )
     parser.add_argument("--pricing-audit", default=None)
     parser.add_argument("--relative-strength", default=str(RS_PATH))
-    parser.add_argument("--macro-policy-pack", default=str(MACRO_POLICY_PACK_PATH))
+    parser.add_argument(
+        "--macro-policy-pack", default=str(MACRO_POLICY_PACK_PATH)
+    )
     args = parser.parse_args()
 
-    pricing_audit_path = Path(args.pricing_audit) if args.pricing_audit else latest_file(PRICING_DIR, "price_audit_*.json")
+    pricing_audit_path = (
+        Path(args.pricing_audit)
+        if args.pricing_audit
+        else latest_file(PRICING_DIR, "price_audit_*.json")
+    )
     payload, out_path = build_lane_artifact(
         Path(args.config),
         Path(args.portfolio_state),
         pricing_audit_path,
         Path(args.relative_strength),
         Path(args.macro_policy_pack),
+        Path(args.instrument_constraints),
     )
-    promoted = [lane for lane in payload["assessed_lanes"] if lane.get("promoted_to_live_radar")]
-    challengers = [lane for lane in payload["assessed_lanes"] if lane.get("challenger")]
-    fundable = [lane for lane in promoted if lane.get("is_fundable_candidate")]
+    promoted = [
+        lane
+        for lane in payload["assessed_lanes"]
+        if lane.get("promoted_to_live_radar")
+    ]
+    challengers = [
+        lane for lane in payload["assessed_lanes"] if lane.get("challenger")
+    ]
+    fundable = [
+        lane for lane in promoted if lane.get("is_fundable_candidate")
+    ]
     rs_used = bool(payload.get("discovery_inputs", {}).get("relative_strength"))
     print(
         "ETF_LANE_DISCOVERY_OK | "
-        f"report={payload['report_filename']} | regime={payload.get('macro_regime')} | lanes={len(payload['assessed_lanes'])} | "
-        f"promoted={len(promoted)} | challengers={len(challengers)} | fundable={len(fundable)} | rs_used={rs_used} | artifact={out_path}"
+        f"report={payload['report_filename']} | regime={payload.get('macro_regime')} | "
+        f"lanes={len(payload['assessed_lanes'])} | promoted={len(promoted)} | "
+        f"challengers={len(challengers)} | fundable={len(fundable)} | "
+        f"rs_used={rs_used} | artifact={out_path}"
     )
 
 
