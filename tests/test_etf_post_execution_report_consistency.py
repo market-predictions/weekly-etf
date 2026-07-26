@@ -11,6 +11,8 @@ from runtime.post_execution_report_surface import (
     main_takeaway_nl,
     position_action_label_en,
     position_action_label_nl,
+    proposed_rotation_summary_en,
+    proposed_rotation_summary_nl,
     rotation_plan_table_en,
     rotation_plan_table_nl,
     validate_post_execution_report_consistency,
@@ -80,9 +82,37 @@ def state() -> dict:
                 "target_weight_pct": 5.0,
             },
         ],
-        "portfolio": {"cash_eur": 1936.52, "total_portfolio_value_eur": 110224.85},
-        "execution_context": {"report_phase": "post_execution", "execution_status": "executed"},
+        "portfolio": {
+            "cash_eur": 1936.52,
+            "total_portfolio_value_eur": 110224.85,
+        },
+        "execution_context": {
+            "report_phase": "post_execution",
+            "execution_status": "executed",
+        },
         "validation_flags": {"post_execution_report": True},
+    }
+
+
+def proposed_state() -> dict:
+    return {
+        "positions": [
+            {
+                "ticker": "SMH",
+                "suggested_action": "Replace partial",
+                "rotation_action_code": "replace_partial",
+                "better_alternative_exists": "Yes",
+            }
+        ],
+        "trade_intents": [
+            {
+                "source_ticker": "SMH",
+                "destination_ticker": "DFEN",
+                "delta_weight_pct": -2.0,
+                "destination_delta_weight_pct": 2.0,
+            }
+        ],
+        "executed_model_changes": [],
     }
 
 
@@ -152,6 +182,87 @@ def _dutch_report() -> str:
 """
 
 
+def _proposed_english_report() -> str:
+    current = proposed_state()
+    return f"""## 1. Executive Summary
+
+- **Main takeaway:** **{main_takeaway_en(current)}**
+
+{decision_cockpit_en(current)}
+
+## 2. Portfolio Action Snapshot
+
+### Add / destination
+- DFEN
+
+### Proposed replace / reduce
+- SMH → DFEN
+
+## 3. Regime Dashboard
+
+## 12. Portfolio Rotation Plan
+
+| Close | Reduce | Hold | Add / destination | Replace |
+|---|---|---|---|---|
+| None | SMH | None | DFEN | SMH->DFEN |
+
+## 13. Final Action Table
+
+| Ticker | Current weight | Target weight | Delta weight | Action |
+|---|---:|---:|---:|---|
+| SMH | 27.00 | 25.00 | -2.00 | Partial replacement |
+| DFEN | 0.00 | 2.00 | 2.00 | Add from rotation |
+
+## 14. Proposed Position Changes / Rotation Trade Intents
+
+| Source | Destination | Source delta % | Destination delta % |
+|---|---|---:|---:|
+| SMH | DFEN | -2.00 | 2.00 |
+
+## 15. Current Portfolio Holdings and Cash
+"""
+
+
+def _proposed_dutch_report() -> str:
+    current = proposed_state()
+    return f"""## 1. Kernsamenvatting
+
+- **Belangrijkste conclusie:** {main_takeaway_nl(current)}
+
+{decision_cockpit_nl(current)}
+
+## 2. Portefeuille-acties
+
+| Advies | Tickers / toelichting |
+|---|---|
+| Toevoegen | DFEN |
+| Verlagen | SMH |
+
+## 3. Regime-dashboard
+
+## 12. Rotatieplan portefeuille
+
+| Sluiten | Verlagen | Aanhouden | Toevoegen | Vervangen |
+|---|---|---|---|---|
+| Geen | SMH | Geen | DFEN | SMH->DFEN |
+
+## 13. Definitieve actietabel
+
+| Ticker | Huidig gewicht | Doelgewicht | Verschil | Actie |
+|---|---:|---:|---:|---|
+| SMH | 27.00 | 25.00 | -2.00 | Gedeeltelijk vervangen |
+| DFEN | 0.00 | 2.00 | 2.00 | Toevoegen vanuit rotatie |
+
+## 14. Voorgestelde positiewijzigingen / rotatie-intenties
+
+| Bron | Bestemming | Verschil bron % | Verschil bestemming % |
+|---|---|---:|---:|
+| SMH | DFEN | -2.00 | 2.00 |
+
+## 15. Huidige posities en cash
+"""
+
+
 def test_action_buckets_exclude_changed_positions_from_hold() -> None:
     buckets = action_buckets(state())
     assert buckets["reduce"] == ["URNM"]
@@ -179,14 +290,35 @@ def test_dynamic_takeaway_and_cockpit_describe_execution() -> None:
     assert "uitgevoerd en verwerkt" in decision_cockpit_nl(current)
 
 
+def test_proposed_takeaway_and_cockpit_name_both_legs() -> None:
+    current = proposed_state()
+    assert proposed_rotation_summary_en(current).startswith(
+        "Proposed — not executed"
+    )
+    assert "SMH" in main_takeaway_en(current)
+    assert "DFEN" in main_takeaway_en(current)
+    assert "Proposed — not executed" in decision_cockpit_en(current)
+    assert "Voorgesteld — niet uitgevoerd" in decision_cockpit_nl(current)
+    assert "SMH" in proposed_rotation_summary_nl(current)
+    assert "DFEN" in proposed_rotation_summary_nl(current)
+
+
 def test_final_action_tables_use_executed_labels() -> None:
     current = state()
     english = final_action_table(current)
     dutch = final_action_table_nl(current)
-    urnm_en = next(line for line in english.splitlines() if line.startswith("| URNM |"))
-    xbi_en = next(line for line in english.splitlines() if line.startswith("| XBI |"))
-    urnm_nl = next(line for line in dutch.splitlines() if line.startswith("| URNM |"))
-    xbi_nl = next(line for line in dutch.splitlines() if line.startswith("| XBI |"))
+    urnm_en = next(
+        line for line in english.splitlines() if line.startswith("| URNM |")
+    )
+    xbi_en = next(
+        line for line in english.splitlines() if line.startswith("| XBI |")
+    )
+    urnm_nl = next(
+        line for line in dutch.splitlines() if line.startswith("| URNM |")
+    )
+    xbi_nl = next(
+        line for line in dutch.splitlines() if line.startswith("| XBI |")
+    )
     assert "Reduce — executed" in urnm_en
     assert "Add — executed" in xbi_en
     assert "Verlagen — uitgevoerd" in urnm_nl
@@ -195,8 +327,22 @@ def test_final_action_tables_use_executed_labels() -> None:
 
 def test_consistency_validator_accepts_coherent_english_and_dutch() -> None:
     current = state()
-    validate_post_execution_report_consistency(_english_report(), current, language="en")
-    validate_post_execution_report_consistency(_dutch_report(), current, language="nl")
+    validate_post_execution_report_consistency(
+        _english_report(), current, language="en"
+    )
+    validate_post_execution_report_consistency(
+        _dutch_report(), current, language="nl"
+    )
+
+
+def test_consistency_validator_accepts_coherent_proposals() -> None:
+    current = proposed_state()
+    validate_post_execution_report_consistency(
+        _proposed_english_report(), current, language="en"
+    )
+    validate_post_execution_report_consistency(
+        _proposed_dutch_report(), current, language="nl"
+    )
 
 
 def test_consistency_validator_rejects_no_action_wording() -> None:
@@ -205,14 +351,44 @@ def test_consistency_validator_rejects_no_action_wording() -> None:
         "Guarded model rotation executed and persisted", "No portfolio action"
     )
     with pytest.raises(RuntimeError, match="forbidden_no_action_phrase"):
-        validate_post_execution_report_consistency(defective, current, language="en")
+        validate_post_execution_report_consistency(
+            defective, current, language="en"
+        )
+
+
+def test_proposed_consistency_rejects_front_page_no_action_mismatch() -> None:
+    current = proposed_state()
+    defective = _proposed_english_report().replace(
+        proposed_rotation_summary_en(current),
+        "No portfolio action was executed.",
+    )
+    with pytest.raises(
+        RuntimeError,
+        match="forbidden_no_action_phrase|front_page_proposal_marker_missing",
+    ):
+        validate_post_execution_report_consistency(
+            defective, current, language="en"
+        )
+
+
+def test_proposed_consistency_rejects_missing_destination_on_front_page() -> None:
+    current = proposed_state()
+    defective = _proposed_english_report().replace("DFEN", "DEST", 2)
+    with pytest.raises(RuntimeError, match="proposed_front_page_mismatch"):
+        validate_post_execution_report_consistency(
+            defective, current, language="en"
+        )
 
 
 def test_consistency_validator_rejects_wrong_action_bucket() -> None:
     current = state()
-    defective = _dutch_report().replace("| Verlagen | URNM |", "| Verlagen | Geen |")
+    defective = _dutch_report().replace(
+        "| Verlagen | URNM |", "| Verlagen | Geen |"
+    )
     with pytest.raises(RuntimeError, match="action_snapshot_mismatch:URNM:reduce"):
-        validate_post_execution_report_consistency(defective, current, language="nl")
+        validate_post_execution_report_consistency(
+            defective, current, language="nl"
+        )
 
 
 def test_consistency_validator_accepts_linkified_final_action_tickers() -> None:
