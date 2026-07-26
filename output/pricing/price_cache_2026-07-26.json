@@ -594,6 +594,39 @@
         "status": "not_checked"
       }
     },
+    "twelve_data:EUAD:2026-07-24": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "high",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "is_final_eod_bar": true,
+      "metadata": {
+        "endpoint": "time_series",
+        "provider": "twelve_data"
+      },
+      "price": 42.97,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": "CBOE",
+      "provider_symbol": "EUAD",
+      "provider_timestamp": null,
+      "provider_timezone": "provider_daily_bar",
+      "raw_close": 42.97,
+      "requested_close_date": "2026-07-24",
+      "returned_close_date": "2026-07-24",
+      "selected_close": 42.97,
+      "selected_close_type": "raw_close",
+      "source": "twelve_data",
+      "source_detail": "time_series",
+      "status": "fresh_exact_unverified",
+      "symbol": "EUAD",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
     "twelve_data:FIW:2026-07-24": {
       "adjusted_close": null,
       "asset_role": "challenger",
@@ -1048,6 +1081,39 @@
       "source_detail": "time_series",
       "status": "fresh_exact_unverified",
       "symbol": "PAVE",
+      "verification": {
+        "source": null,
+        "status": "not_checked"
+      }
+    },
+    "twelve_data:PHO:2026-07-24": {
+      "adjusted_close": null,
+      "asset_role": "challenger",
+      "carried_forward": false,
+      "confidence": "high",
+      "currency": "USD",
+      "error": null,
+      "field_used": "close",
+      "is_final_eod_bar": true,
+      "metadata": {
+        "endpoint": "time_series",
+        "provider": "twelve_data"
+      },
+      "price": 68.43,
+      "pricing_tier": "valuation_grade",
+      "provider_exchange": "NASDAQ",
+      "provider_symbol": "PHO",
+      "provider_timestamp": null,
+      "provider_timezone": "provider_daily_bar",
+      "raw_close": 68.43,
+      "requested_close_date": "2026-07-24",
+      "returned_close_date": "2026-07-24",
+      "selected_close": 68.43,
+      "selected_close_type": "raw_close",
+      "source": "twelve_data",
+      "source_detail": "time_series",
+      "status": "fresh_exact_unverified",
+      "symbol": "PHO",
       "verification": {
         "source": null,
         "status": "not_checked"
