@@ -78,6 +78,8 @@ def _clean_runtime_artifacts(text: str) -> str:
     text = text.replace("portfolio_state_pricing_audit", "gevalideerde prijsbasis")
     text = text.replace("pricing_audit", "gevalideerde prijsbasis")
     text = text.replace("twelve_data", "externe slotkoersbron")
+    text = text.replace("Portfolio valuation based on confirmed prices and official holdings", "Waardering op basis van bevestigde slotkoersen en officiële posities")
+    text = text.replace("Portfolio valuation based on confirmed closing prices and official holdings", "Waardering op basis van bevestigde slotkoersen en officiële posities")
     return text
 
 

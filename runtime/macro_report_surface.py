@@ -29,6 +29,7 @@ STANCE_NL = {
     "Restrictive / data-dependent": "Restrictief / datagedreven",
     "Neutral / transition": "Neutraal / overgangsfase",
     "Tightening / inflation-sensitive": "Verkrappend / inflatiegevoelig",
+    "On hold after June tightening / data-dependent": "Ongewijzigd na de verkrapping in juni / datagedreven",
     "Gradual normalization risk": "Geleidelijke normalisatierisico's",
     "Supportive but credibility-sensitive": "Ondersteunend maar geloofwaardigheidsgevoelig",
 }
@@ -37,6 +38,7 @@ POLICY_AREA_NL = {
     "AI infrastructure and semiconductor supply chains": "AI-infrastructuur en semiconductor-toeleveringsketens",
     "Defense and sovereign resilience": "Defensie en strategische weerbaarheid",
     "ECB rate-policy tightening": "ECB-renteverkrapping",
+    "ECB rate-policy hold": "ECB-rente ongewijzigd",
     "Energy security and nuclear policy": "Energiezekerheid en nucleair beleid",
     "China stimulus and platform regulation": "Chinese stimulering en platformregulering",
 }
@@ -70,6 +72,7 @@ NL_TEXT_REPLACEMENTS = {
     "Gold hedge behavior remains under review rather than automatic ballast.": "Het gedrag van goud als hedge blijft onder herbeoordeling en is geen automatische stabilisator.",
     "Macro status informs selectivity; it does not override pricing, risk or portfolio-discipline gates.": "Het macrobeeld ondersteunt selectiviteit, maar vervangt geen koers-, risico- of portefeuillediscipline.",
     "Do not rotate aggressively unless a regime shift persists for at least two runs or cross-asset confirmation becomes broad.": "Roteer niet agressief tenzij een regimeverschuiving minstens twee runs aanhoudt of cross-asset bevestiging breed wordt.",
+    "Do not rotate aggressively unless a regime shift persists across at least two distinct report dates or cross-asset confirmation becomes broad.": "Roteer niet agressief tenzij een regimeverschuiving op minstens twee afzonderlijke rapportdatums aanhoudt of cross-assetbevestiging breed wordt.",
     "Regime memory is available but has no report summary.": "Regimegeheugen is beschikbaar, maar bevat geen rapportsamenvatting.",
     "The macro pack is present, but no specific regime change was recorded.": "De macro-pack is aanwezig, maar er is geen specifieke regimewijziging vastgelegd.",
     "Portfolio actions still require pricing, relative strength and position discipline.": "Portefeuilleacties vereisen nog steeds koersbevestiging, relatieve sterkte en positiediscipline.",
@@ -77,12 +80,24 @@ NL_TEXT_REPLACEMENTS = {
     "Prefer quality, profitable growth and cash discipline over weak balance-sheet beta.": "Geef voorkeur aan kwaliteit, winstgevende groei en kasdiscipline boven zwakke balans-bèta.",
     "Non-U.S. developed exposure remains watchlist, not automatic add.": "Blootstelling aan ontwikkelde markten buiten de VS blijft op de volglijst en is geen automatische toevoeging.",
     "IEFA exposure is now present, but further non-U.S. developed allocations still require relative-strength, pricing and portfolio-discipline confirmation.": "IEFA-blootstelling is nu aanwezig, maar verdere allocaties naar ontwikkelde markten buiten de VS vragen nog bevestiging in relatieve sterkte, prijsbasis en portefeuillediscipline.",
+    "IEFA exposure is already material; further allocation still requires relative-strength, pricing and portfolio-concentration confirmation.": "IEFA is al een materiële positie; verdere allocatie vraagt nog bevestiging in relatieve sterkte, prijsbasis en portefeuilleconcentratie.",
     "Capital spending and strategic supply-chain policy continue to support semiconductor and infrastructure lanes.": "Kapitaaluitgaven en strategisch toeleveringsbeleid blijven semiconductor- en infrastructuurthema’s ondersteunen.",
     "Defense-budget durability remains a structural support, but ETF vehicle choice still matters.": "De duurzaamheid van defensiebudgetten blijft een structurele steun, maar de ETF-keuze blijft belangrijk.",
     "The ECB raised rates this week in response to renewed inflation pressure; this raises the hurdle for rate-sensitive and non-U.S. developed-market exposure but does not override pricing, relative-strength or portfolio-discipline gates.": "De ECB verhoogde deze week de rente vanwege hernieuwde inflatiedruk; dit verhoogt de toetsingsdrempel voor rentegevoelige en niet-Amerikaanse ontwikkelde-marktenblootstelling, maar vervangt geen koers-, relatieve-sterkte- of portefeuillediscipline.",
+    "The ECB kept its key interest rates unchanged on 23 July 2026 and retained a data-dependent, meeting-by-meeting approach; this is descriptive policy context and does not override portfolio gates.": "De ECB hield de beleidsrentes op 23 juli 2026 ongewijzigd en bleef per vergadering datagedreven beslissen; dit is beschrijvende beleidscontext en vervangt geen portefeuillevoorwaarden.",
+    "The ECB kept its key interest rates unchanged on 23 July 2026 and retained a meeting-by-meeting, data-dependent approach.": "De ECB hield de beleidsrentes op 23 juli 2026 ongewijzigd en bleef per vergadering datagedreven beslissen.",
+    "Renewed inflation pressure or weaker growth can change the relative-strength hurdle for developed-market exposure outside the United States.": "Hernieuwde inflatiedruk of zwakkere groei kan de relatieve-sterktedrempel voor ontwikkelde markten buiten de Verenigde Staten veranderen.",
 }
 
 NL_REGEX_REPLACEMENTS = [
+    (
+        re.compile(r"\bRisk-on growth has persisted across (\d+) weekly observation\(s\); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed\.?,?", re.IGNORECASE),
+        lambda m: f"Risk-on groei houdt al {m.group(1)} wekelijkse observaties aan; de overgangsfase is stabiel, de marktbreedte is gemengd en cross-assetbevestiging blijft gemengd.",
+    ),
+    (
+        re.compile(r"\bRisk-on narrow leadership has persisted across (\d+) weekly observation\(s\); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed\.?,?", re.IGNORECASE),
+        lambda m: f"Risk-on met smal marktleiderschap houdt al {m.group(1)} wekelijkse observaties aan; de overgangsfase is stabiel, de marktbreedte is gemengd en cross-assetbevestiging blijft gemengd.",
+    ),
     (
         re.compile(r"\bRisk-on growth has persisted for (\d+) run\(s\); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed\.?,?", re.IGNORECASE),
         lambda m: f"Risk-on groei houdt al {m.group(1)} runs aan; de overgangsfase is stabiel, de marktbreedte is gemengd en cross-asset bevestiging blijft gemengd.",

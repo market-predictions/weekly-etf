@@ -4,7 +4,12 @@ import argparse
 import json
 import os
 import re
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from runtime.report_portfolio_integrity_contract import validate_report_portfolio_integrity
 
