@@ -34,12 +34,15 @@ EXACT_REPLACEMENTS: dict[str, str] = {
     "The position review separates thesis quality, ETF implementation quality, fresh-cash test and rotation-engine decision. Existing holdings are not treated as automatic default holds. Where a position-discipline score is not yet available after a rotation, the report shows the live lane score if available; otherwise it flags that the current score is pending.":
         "The position review assesses thesis quality, ETF fit, new-capital attractiveness and the next decision trigger. Existing holdings must continue to justify their place against current evidence and alternatives.",
     "Guarded auto-execution:": "Implemented change:",
-    "Hold-with-override note:": "Execution note:",
+    "Hold-with-override note:": "Execution-constraint note:",
     "Hold with override": "Hold — no further change this review",
     "model/action weights": "target allocation weights",
     "override handling": "execution constraints",
     "Override status": "Execution constraint status",
     "System override: Minimum trade size was not met": "Execution constraint: position too small for an efficient trade",
+    "System override: Portfolio constraint blocks action": "Execution constraint: portfolio capacity blocks action",
+    "Operator override: Portfolio constraint blocks action": "Execution constraint: portfolio capacity blocks action",
+    "override portfolio constraint blocked": "portfolio capacity constraint active",
     "Holdings with high release scores require reduce/replace/override discipline.":
         "Holdings with the weakest capital-efficiency profile require explicit reduction-or-replacement review.",
     "Force alternative duel; upgrade, reduce, replace, or close.":
@@ -62,13 +65,21 @@ EXACT_REPLACEMENTS: dict[str, str] = {
     "Bewaakte modelrotatie uitgevoerd en verwerkt:": "Portefeuillerotatie voltooid:",
     "Bewaakte modelrotatie": "Portefeuillerotatie",
     "Aanhouden met override": "Aanhouden — geen verdere wijziging in deze review",
+    "Aanhouden met onderbouwde override": "Aanhouden — geen verdere wijziging in deze review",
     "override: rotation budget already used": "rotatielimiet bereikt voor deze review",
     "Bewaakte auto-uitvoering:": "Verwerkte wijziging:",
     "Rotatiebestemming": "Portefeuilleallocatie",
     "een toekomstige run alle disciplinepoorten vrijgeeft": "een toekomstige review de vereiste prijs-, relatieve-sterkte- en concentratievoorwaarden bevestigt",
     "beschikbare churnruimte": "ruimte binnen de wekelijkse transactielimiet",
     "bewijs- en churnbegrensd": "afhankelijk van nieuwe prijs-, relatieve-sterkte- en concentratiebevestiging",
-    "Systeemoverride: rotatiebudget is al gebruikt": "Rotatielimiet bereikt voor deze review",
+    "Systeemoverride: rotatiebudget is al gebruikt": "Uitvoeringsbeperking: rotatielimiet bereikt voor deze review",
+    "Systeemoverride: Rotatiebudget voor deze run is al gebruikt": "Uitvoeringsbeperking: rotatielimiet bereikt voor deze review",
+    "Systeemoverride: Portefeuillerandvoorwaarde blokkeert actie": "Uitvoeringsbeperking: portefeuillecapaciteit blokkeert actie",
+    "Systeemoverride: Minimale transactiegrootte is niet gehaald": "Uitvoeringsbeperking: positie te klein voor een efficiënte transactie",
+    "Operatoroverride: Portefeuillerandvoorwaarde blokkeert actie": "Uitvoeringsbeperking: portefeuillecapaciteit blokkeert actie",
+    "Override-toelichting:": "Toelichting uitvoeringsbeperking:",
+    "Override-status": "Status uitvoeringsbeperking",
+    "override-verwerking": "uitvoeringsbeperkingen",
     "rotatiebudget is al gebruikt": "rotatielimiet bereikt voor deze review",
     "Voer de vervangingsanalyse tegenover": "Herbeoordeel tegenover",
 }
@@ -103,8 +114,28 @@ REGEX_REPLACEMENTS: tuple[tuple[re.Pattern[str], str], ...] = (
         "Execution constraint: position too small for an efficient trade",
     ),
     (
+        re.compile(r"\b(?:system|operator)\s+override:\s*portfolio constraint blocks action\b", re.IGNORECASE),
+        "Execution constraint: portfolio capacity blocks action",
+    ),
+    (
+        re.compile(r"\boverride\s+portfolio constraint blocked\b", re.IGNORECASE),
+        "portfolio capacity constraint active",
+    ),
+    (
+        re.compile(r"\b(?:system|operator)\s+override:\s*", re.IGNORECASE),
+        "Execution constraint: ",
+    ),
+    (
         re.compile(r"\boverride:\s*rotation budget already used\b", re.IGNORECASE),
         "weekly rotation limit reached",
+    ),
+    (
+        re.compile(r"\bSysteemoverride:\s*", re.IGNORECASE),
+        "Uitvoeringsbeperking: ",
+    ),
+    (
+        re.compile(r"\bOperatoroverride:\s*", re.IGNORECASE),
+        "Uitvoeringsbeperking: ",
     ),
     (
         re.compile(r"\bRisk-on growth has persisted for (\d+) run\(s\)", re.IGNORECASE),
@@ -132,8 +163,8 @@ FORBIDDEN_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("guarded_auto_execution", re.compile(r"\bguarded auto-execution\b", re.IGNORECASE)),
     ("release_score", re.compile(r"\brelease score\b", re.IGNORECASE)),
     ("hold_with_override", re.compile(r"\bhold with override\b", re.IGNORECASE)),
-    ("dutch_hold_with_override", re.compile(r"\baanhouden met override\b", re.IGNORECASE)),
-    ("raw_override", re.compile(r"\boverride(?::|\s+min trade size)", re.IGNORECASE)),
+    ("dutch_hold_with_override", re.compile(r"\baanhouden met (?:onderbouwde )?override\b", re.IGNORECASE)),
+    ("raw_override", re.compile(r"\boverride(?::|\s+min trade size|\s+portfolio constraint|[- ]status|[- ]toelichting|[- ]verwerking)", re.IGNORECASE)),
     ("review_only", re.compile(r"\breview-only\b|\balleen ter review\b", re.IGNORECASE)),
     ("legacy_regime", re.compile(r"\blegacy regime read\b", re.IGNORECASE)),
     ("diagnostic_only", re.compile(r"\bdiagnostic-only\b", re.IGNORECASE)),
@@ -164,12 +195,19 @@ def normalize_client_language(text: str, *, language: str) -> str:
         cleaned,
         flags=re.IGNORECASE,
     )
-    for source, target in sorted(EXACT_REPLACEMENTS.items(), key=lambda item: len(item[0]), reverse=True):
+    for source, target in sorted(
+        EXACT_REPLACEMENTS.items(), key=lambda item: len(item[0]), reverse=True
+    ):
         cleaned = cleaned.replace(source, target)
     for pattern, replacement in REGEX_REPLACEMENTS:
         cleaned = pattern.sub(replacement, cleaned)
     if language == "nl":
-        cleaned = re.sub(r"\breview priority\b", "reviewprioriteit", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(
+            r"\breview priority\b",
+            "reviewprioriteit",
+            cleaned,
+            flags=re.IGNORECASE,
+        )
     return cleaned
 
 
@@ -190,14 +228,27 @@ def markdown_link_multiset(text: str) -> Counter[str]:
     return Counter(MARKDOWN_LINK_RE.findall(text))
 
 
-def evidence_summary(original: str, cleaned: str, *, language: str) -> dict[str, Any]:
+def evidence_summary(
+    original: str, cleaned: str, *, language: str
+) -> dict[str, Any]:
     return {
         "language": language,
-        "before_findings": client_language_findings(original, language=language),
-        "after_findings": client_language_findings(cleaned, language=language),
-        "numeric_multiset_preserved": numeric_multiset(original) == numeric_multiset(cleaned),
-        "markdown_link_multiset_preserved": markdown_link_multiset(original) == markdown_link_multiset(cleaned),
-        "idempotent": normalize_client_language(cleaned, language=language) == cleaned,
+        "before_findings": client_language_findings(
+            original, language=language
+        ),
+        "after_findings": client_language_findings(
+            cleaned, language=language
+        ),
+        "numeric_multiset_preserved": (
+            numeric_multiset(original) == numeric_multiset(cleaned)
+        ),
+        "markdown_link_multiset_preserved": (
+            markdown_link_multiset(original)
+            == markdown_link_multiset(cleaned)
+        ),
+        "idempotent": (
+            normalize_client_language(cleaned, language=language) == cleaned
+        ),
         "before_chars": len(original),
         "after_chars": len(cleaned),
     }
