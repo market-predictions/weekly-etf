@@ -12,6 +12,41 @@ from runtime.etf_instrument_constraints import (
 from runtime.portfolio_rotation_engine_v2 import *  # noqa: F401,F403
 
 
+def _validate_constrained_plan(plan: dict) -> None:
+    validation = plan.get("portfolio_constraint_validation") or {}
+    final_assessment = validation.get("final_position_count_assessment") or {}
+    if final_assessment.get("passed") is not True:
+        raise RuntimeError(
+            "ETF rotation plan blocked: final position-count assessment did not pass"
+        )
+    blocked = set(validation.get("blocked_candidates") or [])
+    invalid = sorted(
+        {
+            str(row.get("destination_ticker") or "").strip().upper()
+            for row in plan.get("trade_intents", []) or []
+            if str(row.get("destination_ticker") or "").strip().upper() in blocked
+        }
+    )
+    if invalid:
+        raise RuntimeError(
+            "ETF rotation plan blocked: portfolio-ineligible destination(s): "
+            + ",".join(invalid)
+        )
+    flags = plan.get("validation_flags") or {}
+    required_flags = (
+        "instrument_eligibility_enforced",
+        "leveraged_etf_constraint_enforced",
+        "position_count_transition_enforced",
+        "portfolio_constraint_validation_passed",
+    )
+    missing = [name for name in required_flags if flags.get(name) is not True]
+    if missing:
+        raise RuntimeError(
+            "ETF rotation plan blocked: missing portfolio-constraint flags: "
+            + ",".join(missing)
+        )
+
+
 def build_rotation_plan(
     args: argparse.Namespace, *, persist_scorecard: bool = True
 ) -> dict:
@@ -22,7 +57,9 @@ def build_rotation_plan(
         getattr(args, "instrument_constraints", "") or DEFAULT_CONSTRAINTS_PATH
     )
     constraints = load_instrument_constraints(constraints_path)
-    return apply_rotation_policy_constraints(raw_plan, constraints)
+    plan = apply_rotation_policy_constraints(raw_plan, constraints)
+    _validate_constrained_plan(plan)
+    return plan
 
 
 def main() -> None:
