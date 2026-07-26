@@ -7,6 +7,10 @@ from pathlib import Path
 
 from runtime.polish_runtime_reports import DECISION_COCKPIT_EN, DECISION_COCKPIT_NL
 from runtime.report_freshness_contract import apply_report_freshness_contract, load_runtime_state
+from runtime.report_portfolio_integrity_contract import (
+    apply_report_portfolio_integrity,
+    validate_report_portfolio_integrity,
+)
 
 EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
 NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
@@ -76,7 +80,6 @@ def linkify_segment(segment: str) -> str:
     return "".join(chunk if protected else _linkify_plain_chunk(chunk) for chunk, protected in _split_protected_spans(segment))
 
 
-
 def _is_dutch_report(text: str) -> bool:
     lower = text.lower()
     markers = [
@@ -116,6 +119,7 @@ def ensure_visible_decision_cockpit(text: str) -> str:
         return text.replace(insertion_heading, cockpit + "\n\n" + insertion_heading, 1)
 
     return cockpit + "\n\n" + text
+
 
 def _is_executive_summary_heading(line: str) -> bool:
     stripped = line.strip().lower()
@@ -170,12 +174,18 @@ def main() -> None:
     for pattern, language in ((EN_RE, "en"), (NL_RE, "nl")):
         report_path = latest_report(output_dir, pattern)
         text = report_path.read_text(encoding="utf-8")
+        text = ensure_visible_decision_cockpit(text)
         if state:
             text = apply_report_freshness_contract(text, state, language)
-        report_path.write_text(linkify_report(text), encoding="utf-8")
+            text = apply_report_portfolio_integrity(text, state, language)
+        text = linkify_report(text)
+        if state:
+            validate_report_portfolio_integrity(text, state, language)
+        report_path.write_text(text, encoding="utf-8")
         print(
             f"ETF_LINKIFY_OK | report={report_path.name} | "
-            f"freshness_contract={'applied' if state else 'skipped_no_runtime_state'}"
+            f"freshness_contract={'applied' if state else 'skipped_no_runtime_state'} | "
+            f"portfolio_integrity_contract={'applied' if state else 'skipped_no_runtime_state'}"
         )
 
 
