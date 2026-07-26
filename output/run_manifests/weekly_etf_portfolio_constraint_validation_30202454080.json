@@ -1,0 +1,110 @@
+{
+  "artifact_type": "weekly_etf_portfolio_constraint_validation",
+  "created_at_utc": "2026-07-26T12:38:25.356334+00:00",
+  "github_run_id": "30202454080",
+  "instrument_constraints": "config/etf_instrument_constraints.yml",
+  "portfolio_constraint_validation": {
+    "block_reason": "position_count_close_first",
+    "blocked_candidates": [],
+    "constraint_schema_version": "1.1",
+    "final_position_count_assessment": {
+      "closed_tickers": [],
+      "current_count": 9,
+      "current_tickers": [
+        "CIBR",
+        "GSG",
+        "IEFA",
+        "PAVE",
+        "SMH",
+        "URNM",
+        "XBI",
+        "XLU",
+        "XLV"
+      ],
+      "errors": [],
+      "max_active_positions": 8,
+      "opened_tickers": [],
+      "passed": true,
+      "projected_count": 9,
+      "projected_tickers": [
+        "CIBR",
+        "GSG",
+        "IEFA",
+        "PAVE",
+        "SMH",
+        "URNM",
+        "XBI",
+        "XLU",
+        "XLV"
+      ],
+      "status": "close_first_progress",
+      "warnings": [
+        "position_count_close_first:9>8"
+      ]
+    },
+    "initial_position_count_assessment": {
+      "closed_tickers": [],
+      "current_count": 9,
+      "current_tickers": [
+        "CIBR",
+        "GSG",
+        "IEFA",
+        "PAVE",
+        "SMH",
+        "URNM",
+        "XBI",
+        "XLU",
+        "XLV"
+      ],
+      "errors": [
+        "close_first_new_ticker_blocked:PPA",
+        "close_first_trade_must_reduce_active_count:9->10"
+      ],
+      "max_active_positions": 8,
+      "opened_tickers": [
+        "PPA"
+      ],
+      "passed": false,
+      "projected_count": 10,
+      "projected_tickers": [
+        "CIBR",
+        "GSG",
+        "IEFA",
+        "PAVE",
+        "PPA",
+        "SMH",
+        "URNM",
+        "XBI",
+        "XLU",
+        "XLV"
+      ],
+      "status": "blocked",
+      "warnings": [
+        "position_count_close_first:9>8"
+      ]
+    },
+    "instrument_constraint_count": 1,
+    "invalid_trade_destinations": [],
+    "trade_intents_after_constraints": 0
+  },
+  "schema_version": "1.0",
+  "source_pricing_audit": "output/pricing/price_audit_2026-07-24_20260726_121721.json",
+  "status": "completed",
+  "trade_intents": [],
+  "validation_flags": {
+    "average_entry_history_reconstruction_is_blocking": true,
+    "current_run_pnl_recomputed": true,
+    "current_run_scorecard_refreshed_before_rotation": true,
+    "current_run_valuation_used": true,
+    "destination_tie_break_uses_quality_evidence": true,
+    "instrument_eligibility_enforced": true,
+    "leveraged_etf_constraint_enforced": true,
+    "portfolio_constraint_validation_passed": true,
+    "position_count_transition_enforced": true,
+    "primary_and_alternative_candidates_independently_selectable": true,
+    "stale_scorecard_or_pnl_mismatch_is_blocking": true,
+    "ticker_agnostic_rules": true,
+    "trade_intents_canonical": true,
+    "warning_mode_initial": true
+  }
+}
