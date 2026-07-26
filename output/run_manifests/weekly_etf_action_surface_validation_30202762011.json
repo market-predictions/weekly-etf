@@ -1,0 +1,17 @@
+{
+  "artifact_type": "weekly_etf_action_surface_consistency_validation",
+  "contract": {
+    "corrected_surface_passed": true,
+    "front_page_distinguishes_executed_proposed_and_none": true,
+    "old_mismatch_rejected": true,
+    "pre_send_gate_integrated": true,
+    "proposed_source_and_destination_required_on_front_page": true
+  },
+  "created_at_utc": "2026-07-26T12:48:02.448686+00:00",
+  "github_run_id": "30202762011",
+  "schema_version": "1.0",
+  "source_dutch_report": "output/weekly_analysis_pro_nl_260724_02.md",
+  "source_english_report": "output/weekly_analysis_pro_260724_02.md",
+  "source_runtime_state": "output/runtime/etf_report_state_20260724_20260726_121721.json",
+  "status": "completed"
+}
