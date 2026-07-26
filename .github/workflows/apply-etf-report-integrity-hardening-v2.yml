@@ -1,0 +1,57 @@
+name: Apply ETF report integrity hardening v2
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/etf_report_integrity_patch_v2_*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: pip install pytest pyyaml
+
+      - name: Apply deterministic source patch
+        run: python tools/apply_etf_report_integrity_source_patch.py
+
+      - name: Compile changed modules
+        run: |
+          python -m py_compile \
+            runtime/report_portfolio_integrity_contract.py \
+            runtime/link_runtime_report_tickers.py \
+            runtime/regime_memory.py \
+            runtime/build_macro_policy_pack.py \
+            runtime/persist_etf_valuation_state.py \
+            tools/validate_etf_report_portfolio_integrity.py
+
+      - name: Run focused regressions
+        run: |
+          python -m pytest tests/test_etf_report_portfolio_integrity.py
+          python -m pytest tests/test_report_freshness_and_html_equity.py
+          python -m pytest tests/test_etf_runtime_lineage_context.py
+
+      - name: Commit hardening
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            runtime/report_portfolio_integrity_contract.py \
+            runtime/regime_memory.py \
+            runtime/build_macro_policy_pack.py \
+            runtime/persist_etf_valuation_state.py
+          git commit -m "Harden ETF report state, policy and regime integrity"
+          git push origin HEAD:main
