@@ -1,0 +1,9 @@
+{
+  "artifact_type": "weekly_etf_final_integrity_closeout_validation",
+  "status": "completed",
+  "contracts": {
+    "zero_trade_churn_status_removed": true,
+    "july14_history_comment_normalized": true,
+    "portfolio_watchlist_integrity_regressions_passed": true
+  }
+}
