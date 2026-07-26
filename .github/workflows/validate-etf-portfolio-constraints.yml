@@ -78,14 +78,15 @@ jobs:
           europe = next(row for row in lane["assessed_lanes"] if row.get("taxonomy_tag") == "europe_defense_industry")
           assert europe["primary_etf"] == "NATO", europe
           assert europe["primary_portfolio_eligible"] is True, europe
-          assert europe["alternative_etf"] == "DFEN", europe
-          assert europe["alternative_portfolio_eligible"] is False, europe
+          assert europe["alternative_etf"] == "EUAD", europe
+          assert europe["alternative_portfolio_eligible"] is True, europe
+          assert europe["excluded_research_vehicle"] == "DFEN", europe
+          assert europe["excluded_research_vehicle_reason"] == "daily_leveraged_3x", europe
 
           plan = json.loads(Path("/tmp/etf_constraint_plan.json").read_text(encoding="utf-8"))
           assert plan["trade_intents"] == [], plan["trade_intents"]
           assert all(row.get("destination_ticker") != "DFEN" for row in plan["rotation_decisions"])
-          dfen = [row for row in plan["candidate_reviews"] if row.get("candidate") == "DFEN"]
-          assert dfen and all(row.get("is_fundable_candidate") is False for row in dfen), dfen
+          assert not [row for row in plan["candidate_reviews"] if row.get("candidate") == "DFEN"]
           validation = plan["portfolio_constraint_validation"]
           assert validation["block_reason"] == "position_count_close_first", validation
           assert validation["initial_position_count_assessment"]["current_count"] == 9, validation
@@ -93,7 +94,7 @@ jobs:
           assert validation["final_position_count_assessment"]["passed"] is True, validation
           assert plan["validation_flags"]["leveraged_etf_constraint_enforced"] is True
           assert plan["validation_flags"]["position_count_transition_enforced"] is True
-          print("ETF_PORTFOLIO_CONSTRAINTS_OK | DFEN=blocked | radar_primary=NATO | position_count=9/8 | trade_intents=0")
+          print("ETF_PORTFOLIO_CONSTRAINTS_OK | DFEN=excluded | radar=NATO/EUAD | position_count=9/8 | trade_intents=0")
           PY
 
       - name: Persist validation evidence
