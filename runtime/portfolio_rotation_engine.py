@@ -12,6 +12,47 @@ from runtime.etf_instrument_constraints import (
 from runtime.portfolio_rotation_engine_v2 import *  # noqa: F401,F403
 
 
+def _normalize_blocked_zero_trade_overrides(plan: dict) -> dict:
+    """Remove stale rotation-budget claims after constraints erase all trades.
+
+    The unconstrained engine processes incumbent reviews sequentially and may mark
+    later reviews as ``churn_budget_used`` after selecting one provisional
+    rotation. Portfolio constraints can subsequently reject that provisional
+    transition and clear every trade intent. In that final zero-trade state, a
+    consumed-rotation label is no longer true and must inherit the actual
+    portfolio block instead.
+    """
+    trades = plan.get("trade_intents") or []
+    validation = plan.get("portfolio_constraint_validation") or {}
+    block_reason = str(validation.get("block_reason") or "").strip()
+    if trades or not block_reason:
+        return plan
+
+    normalized = 0
+    for decision in plan.get("rotation_decisions", []) or []:
+        if str(decision.get("override_reason_code") or "") != "churn_budget_used":
+            continue
+        decision["action_code"] = "hold_with_override"
+        decision["override_status"] = "engine"
+        decision["override_reason_code"] = "portfolio_constraint_blocked"
+        decision["destination_ticker"] = ""
+        decision["delta_weight_pct"] = 0.0
+        decision["target_weight_pct"] = decision.get("current_weight_pct", 0.0)
+        reasons = list(decision.get("reason_codes") or [])
+        if block_reason not in reasons:
+            reasons.append(block_reason)
+        decision["reason_codes"] = reasons
+        normalized += 1
+
+    plan.setdefault("validation_flags", {})[
+        "zero_trade_stale_churn_status_removed"
+    ] = True
+    plan.setdefault("portfolio_constraint_validation", {})[
+        "stale_churn_overrides_normalized"
+    ] = normalized
+    return plan
+
+
 def _validate_constrained_plan(plan: dict) -> None:
     validation = plan.get("portfolio_constraint_validation") or {}
     final_assessment = validation.get("final_position_count_assessment") or {}
@@ -32,6 +73,17 @@ def _validate_constrained_plan(plan: dict) -> None:
             "ETF rotation plan blocked: portfolio-ineligible destination(s): "
             + ",".join(invalid)
         )
+    if not (plan.get("trade_intents") or []):
+        stale = sorted(
+            str(row.get("ticker") or "").strip().upper()
+            for row in plan.get("rotation_decisions", []) or []
+            if str(row.get("override_reason_code") or "") == "churn_budget_used"
+        )
+        if stale:
+            raise RuntimeError(
+                "ETF rotation plan blocked: zero-trade plan retains stale "
+                "churn-budget status for " + ",".join(stale)
+            )
     flags = plan.get("validation_flags") or {}
     required_flags = (
         "instrument_eligibility_enforced",
@@ -58,6 +110,7 @@ def build_rotation_plan(
     )
     constraints = load_instrument_constraints(constraints_path)
     plan = apply_rotation_policy_constraints(raw_plan, constraints)
+    plan = _normalize_blocked_zero_trade_overrides(plan)
     _validate_constrained_plan(plan)
     return plan
 
