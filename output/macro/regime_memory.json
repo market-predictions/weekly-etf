@@ -4,7 +4,7 @@
   "cross_asset_confirmation": "mixed",
   "current_confidence": 0.66,
   "current_regime": "Risk-on growth",
-  "decision_rule": "Do not rotate aggressively unless a regime shift persists for at least two runs or cross-asset confirmation becomes broad.",
+  "decision_rule": "Do not rotate aggressively unless a regime shift persists across at least two distinct report dates or cross-asset confirmation becomes broad.",
   "failed_rotation_count": 0,
   "last_major_shift": "2026-06-03",
   "previous_confidence": 0.66,
@@ -14,9 +14,9 @@
   "report_transfer": {
     "max_lines": 2,
     "show_in_report": true,
-    "summary": "Risk-on growth has persisted for 81 run(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed."
+    "summary": "Risk-on growth has persisted across 8 weekly observation(s); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed."
   },
   "transition_state": "stable",
-  "updated_at_utc": "2026-07-26T13:28:56.197737Z",
-  "weeks_in_regime": 81
+  "updated_at_utc": "2026-07-26T16:53:44.915021Z",
+  "weeks_in_regime": 8
 }
