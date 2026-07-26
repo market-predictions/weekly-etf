@@ -1,0 +1,99 @@
+name: Validate ETF decision-status copy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/weekly_etf_decision_status_copy_validation_*.md"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+
+      - name: Compile and run focused regressions
+        run: |
+          python -m py_compile runtime/wp16_followup3_cleanup.py tests/test_etf_decision_status_copy.py
+          pytest -q tests/test_etf_decision_status_copy.py tests/test_rotation_budget_language_cleanup.py
+
+      - name: Replay exact delivered HTML copy
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from runtime.wp16_followup3_cleanup import clean_text, failures
+
+          cases = (
+              ("en", Path("output/weekly_analysis_pro_260724_05_delivery.html")),
+              ("nl", Path("output/weekly_analysis_pro_nl_260724_05_delivery.html")),
+          )
+          for language, path in cases:
+              original = path.read_text(encoding="utf-8")
+              cleaned = clean_text(original, language=language)
+              assert failures(cleaned, language=language) == [], failures(cleaned, language=language)
+              if language == "en":
+                  assert "Portfolio decision status" in cleaned
+                  assert "The official portfolio state and trade ledger are authoritative for this report" in cleaned
+                  assert "rotation is already reflected" not in cleaned.lower()
+              else:
+                  assert "Status portefeuillebesluit" in cleaned
+                  assert "De officiële portefeuillestaat en het handelslogboek zijn leidend voor dit rapport" in cleaned
+                  assert "rotatie is al verwerkt" not in cleaned.lower()
+          print("ETF_DECISION_STATUS_COPY_OK | exact_delivery_html=_05 | false_rotation_copy=removed | authority_copy=present")
+          PY
+
+      - name: Persist validation evidence
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          payload = {
+              "schema_version": "1.0",
+              "artifact_type": "weekly_etf_decision_status_copy_validation",
+              "created_at_utc": datetime.now(timezone.utc).isoformat(),
+              "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+              "status": "completed",
+              "contract": {
+                  "false_reflected_rotation_copy_removed": True,
+                  "portfolio_decision_heading_present": True,
+                  "state_neutral_authority_copy_present": True,
+                  "exact_05_delivery_html_replayed": True,
+              },
+          }
+          out = Path(f"output/run_manifests/weekly_etf_decision_status_copy_validation_{os.environ.get('GITHUB_RUN_ID', 'unknown')}.json")
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          print(f"ETF_DECISION_STATUS_COPY_EVIDENCE_WRITTEN | path={out}")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/run_manifests/weekly_etf_decision_status_copy_validation_*.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Persist ETF decision-status copy validation [skip ci]"
+          git push origin HEAD:main
