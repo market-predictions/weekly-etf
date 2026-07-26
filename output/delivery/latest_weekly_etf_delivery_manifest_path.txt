@@ -1,1 +1,1 @@
-output/delivery/weekly_etf_delivery_manifest_2026-07-24_20260726_131557.json
+output/delivery/weekly_etf_delivery_manifest_2026-07-24_20260726_132731.json
