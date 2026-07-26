@@ -1,0 +1,44 @@
+name: Apply ETF Dutch macro integrity fix
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/etf_nl_macro_integrity_fix_*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: pip install pytest pyyaml
+
+      - name: Apply Dutch macro-integrity source fix
+        run: python tools/apply_etf_nl_macro_integrity_fix.py
+
+      - name: Compile and test
+        run: |
+          python -m py_compile runtime/macro_report_surface.py runtime/apply_nl_localization.py tools/validate_etf_report_portfolio_integrity.py
+          python -m pytest tests/test_etf_nl_macro_integrity.py
+          python -m pytest tests/test_etf_report_portfolio_integrity.py
+          python tools/validate_macro_report_surface.py
+
+      - name: Commit validated fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add runtime/macro_report_surface.py runtime/apply_nl_localization.py tools/validate_etf_report_portfolio_integrity.py
+          git commit -m "Localize ETF regime and ECB macro surface in Dutch"
+          git push origin HEAD:main
