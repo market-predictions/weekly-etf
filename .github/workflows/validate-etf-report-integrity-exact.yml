@@ -61,6 +61,7 @@ jobs:
               "artifact_type": "weekly_etf_report_integrity_exact_validation",
               "status": "completed" if all(value == 0 for value in statuses.values()) else "failed",
               "statuses": statuses,
+              "log_head": log[:5000],
               "log_tail": log[-16000:],
           }
           out = Path('output/run_manifests/weekly_etf_report_integrity_exact_validation.json')
