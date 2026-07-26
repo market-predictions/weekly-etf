@@ -1,0 +1,150 @@
+name: Close ETF report integrity work package
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/close_etf_report_integrity_workpackage_*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Update control layer
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          current = Path('control/CURRENT_STATE.md')
+          current_text = current.read_text(encoding='utf-8')
+          marker = '## Current authoritative update — 2026-07-26'
+          section = '''## Current authoritative update — 2026-07-26
+
+```text
+latest_report_close: 2026-07-24
+latest_report_run_id: 20260726_172505
+latest_delivered_report: output/weekly_analysis_pro_260724_09.md
+latest_delivered_report_nl: output/weekly_analysis_pro_nl_260724_09.md
+run_manifest: output/run_manifests/weekly_etf_run_manifest_2026-07-24_20260726_172505.json
+delivery_manifest: output/delivery/weekly_etf_delivery_manifest_2026-07-24_20260726_172505.json
+workflow_status: workflow_success
+pricing_lineage_status: passed
+inbox_receipt: confirmed_both_languages
+nav_eur: 107189.79
+cash_eur: 2534.36
+active_position_count: 9
+maximum_active_positions: 8
+position_count_status: close_first
+portfolio_execution_authorized: false
+portfolio_change_applied: false
+```
+
+The `_09` English and Dutch packages supersede every earlier 24 July version. Portfolio/watchlist classification, continuity P/L lineage, fresh valuation wording, regime-memory counting, ECB policy wording, Dutch reason-code localization and zero-trade action consistency were validated before delivery.
+
+'''
+          if marker not in current_text:
+              first_break = current_text.find('\n', current_text.find('# '))
+              current_text = current_text[:first_break+1] + '\n' + section + current_text[first_break+1:]
+              current.write_text(current_text, encoding='utf-8')
+
+          next_actions = Path('control/NEXT_ACTIONS.md')
+          next_text = next_actions.read_text(encoding='utf-8')
+          marker = '## Current authoritative baseline — 2026-07-26'
+          section = '''## Current authoritative baseline — 2026-07-26
+
+```text
+latest_report_close: 2026-07-24
+latest_report_run_id: 20260726_172505
+latest_delivered_report: output/weekly_analysis_pro_260724_09.md
+latest_delivered_report_nl: output/weekly_analysis_pro_nl_260724_09.md
+workflow_status: workflow_success
+pricing_lineage_status: passed
+delivery_status: smtp_sendmail_returned_no_exception
+inbox_receipt: confirmed_both_languages
+portfolio_change_applied: false
+position_count_status: close_first 9/8
+```
+
+No report resend or delivery recovery is pending. The next portfolio action remains separately authorized only: a close-first execution package may reduce the active count, but it may not open a new ticker while the portfolio remains above eight positions.
+
+Separate operational cleanup remains: remove or archive the one-shot integrity diagnostic and patch workflows after confirming they are no longer needed for regression evidence.
+
+'''
+          if marker not in next_text:
+              first_break = next_text.find('\n', next_text.find('# '))
+              next_text = next_text[:first_break+1] + '\n' + section + next_text[first_break+1:]
+              next_actions.write_text(next_text, encoding='utf-8')
+
+          wp = Path('control/work_packages/WP_REPORT_PORTFOLIO_INTEGRITY_AND_STALE_SURFACE_20260726.md')
+          wp_text = wp.read_text(encoding='utf-8')
+          wp_text = wp_text.replace('Status: claimed / implementation active', 'Status: closed / delivered / inbox confirmed')
+          closeout = '''
+## Closeout
+
+```text
+final_run_id: 20260726_172505
+final_package: output/weekly_analysis_pro_260724_09.md
+final_package_nl: output/weekly_analysis_pro_nl_260724_09.md
+workflow_status: workflow_success
+pricing_coverage: 9/9 fresh holdings
+portfolio_execution: not authorized / not applied
+smtp_delivery: completed without exception
+inbox_receipts: confirmed English and Dutch
+```
+
+The final report distinguishes holdings from benchmarks, challengers and watchlist instruments; reconciles continuity P/L to the ledger-derived basis; removes stale current-run execution and turnover labels; localizes Dutch history and macro fields; and preserves the close-first 9/8 portfolio constraint.
+'''
+          if '## Closeout' not in wp_text:
+              wp_text += closeout
+          wp.write_text(wp_text, encoding='utf-8')
+
+          decision_log = Path('control/DECISION_LOG.md')
+          if decision_log.exists():
+              decisions = decision_log.read_text(encoding='utf-8')
+          else:
+              decisions = '# ETF Review OS — Decision Log\n\n'
+          marker = '## 2026-07-26 — Portfolio/watchlist and zero-trade integrity'
+          entry = '''## 2026-07-26 — Portfolio/watchlist and zero-trade integrity
+
+1. Holdings-oriented sections may describe only official active positions as held, replaceable, reducible, closable or current portfolio risks.
+2. Non-held instruments must be explicitly labelled as benchmarks, challengers, alternatives, short candidates or watchlist instruments.
+3. Continuity P/L and the position-performance section must use the same ledger-derived attribution basis.
+4. A constrained final plan with zero trade intents may not retain a consumed rotation/turnover-budget status from a rejected provisional transition.
+5. Repeated production reruns for one report date do not count as separate weekly regime observations.
+6. Dutch valuation history, action reasons and macro-policy fields must be natively localized before delivery.
+7. Delivery success requires the run manifest, bilingual delivery manifest and independent inbox receipts.
+
+'''
+          if marker not in decisions:
+              decisions += entry
+              decision_log.write_text(decisions, encoding='utf-8')
+
+          closeout_file = Path('control/handover/ETF_REPORT_INTEGRITY_CLOSEOUT_20260726.md')
+          closeout_file.parent.mkdir(parents=True, exist_ok=True)
+          closeout_file.write_text('''# ETF Report Integrity Closeout — 2026-07-26
+
+Final authoritative package: `_09`, report close 2026-07-24, run `20260726_172505`.
+
+- Workflow and pricing lineage passed.
+- Nine of nine holdings used fresh prices.
+- No portfolio trade was proposed or executed.
+- PPA and ITA are non-held watchlist instruments; SPY is a benchmark.
+- The 9/8 close-first constraint remains active.
+- English and Dutch delivery receipts are confirmed.
+- Earlier 24 July report versions are superseded.
+''', encoding='utf-8')
+          PY
+      - name: Commit closeout
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add control/CURRENT_STATE.md control/NEXT_ACTIONS.md control/DECISION_LOG.md control/work_packages/WP_REPORT_PORTFOLIO_INTEGRITY_AND_STALE_SURFACE_20260726.md control/handover/ETF_REPORT_INTEGRITY_CLOSEOUT_20260726.md
+          git commit -m "Close ETF report integrity work package"
+          git push origin HEAD:main
