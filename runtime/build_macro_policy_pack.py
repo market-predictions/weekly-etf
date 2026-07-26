@@ -22,6 +22,7 @@ MACRO_AUDIT_POINTER = Path("output/macro/latest_macro_data_audit_path.txt")
 MACRO_SOURCE_CONFIG = Path("config/macro_data_sources.yml")
 CB_CALENDAR_PATH = Path("config/cb_calendar.yml")
 ECB_JUNE_2026_HIKE_DATE = "2026-06-11"
+ECB_JULY_2026_HOLD_DATE = "2026-07-23"
 
 
 def latest_file(directory: Path, pattern: str) -> Path:
@@ -128,6 +129,12 @@ def _ecb_june_2026_hike_applies(report_date: str | None) -> bool:
     return bool(report and hike and report >= hike)
 
 
+def _ecb_july_2026_hold_applies(report_date: str | None) -> bool:
+    report = _date_or_none(report_date)
+    hold = _date_or_none(ECB_JULY_2026_HOLD_DATE)
+    return bool(report and hold and report >= hold)
+
+
 def _event_is_in_report_week(report_date: str | None, event_date: str | None, lookback_days: int = 6) -> bool:
     report = _date_or_none(report_date)
     event = _date_or_none(event_date)
@@ -170,7 +177,17 @@ def central_banks_for_regime(regime: str, report_date: str | None = None) -> dic
         "etf_implication": "Non-U.S. developed exposure remains watchlist, not automatic add.",
         "confidence": 0.55,
     }
-    if _ecb_june_2026_hike_applies(report_date):
+    if _ecb_july_2026_hold_applies(report_date):
+        ecb = {
+            "stance": "On hold after June tightening / data-dependent",
+            "likely_direction": "The ECB kept its key interest rates unchanged on 23 July 2026 and retained a meeting-by-meeting, data-dependent approach.",
+            "main_risk": "Renewed inflation pressure or weaker growth can change the relative-strength hurdle for developed-market exposure outside the United States.",
+            "etf_implication": "IEFA exposure is already material; further allocation still requires relative-strength, pricing and portfolio-concentration confirmation.",
+            "confidence": 0.75,
+            "event_date": ECB_JULY_2026_HOLD_DATE,
+            "event_status": "verified_latest_policy_decision",
+        }
+    elif _ecb_june_2026_hike_applies(report_date):
         ecb = {
             "stance": "Tightening / inflation-sensitive",
             "likely_direction": "Following the 11 June 2026 rate increase, the next step remains data- and inflation-dependent.",
@@ -178,7 +195,7 @@ def central_banks_for_regime(regime: str, report_date: str | None = None) -> dic
             "etf_implication": "IEFA exposure is now present, but further non-U.S. developed allocations still require relative-strength, pricing and portfolio-discipline confirmation.",
             "confidence": 0.70,
             "event_date": ECB_JUNE_2026_HIKE_DATE,
-            "event_status": "verified_report_week_policy_event",
+            "event_status": "verified_historical_policy_event",
         }
     return {
         "fed": {"stance": restrictive_note if regime != "Rate-cut anticipation" else neutral_note, "likely_direction": "Hold-to-ease path, but timing remains data-dependent", "main_risk": "Real-rate repricing or delayed easing can pressure duration and speculative beta.", "etf_implication": "Prefer quality, profitable growth and cash discipline over weak balance-sheet beta.", "confidence": 0.65},
@@ -196,7 +213,22 @@ def policy_catalysts(metrics: dict[str, Any], report_date: str | None = None) ->
         {"policy_area": "Energy security and nuclear policy", "latest_signal": "Energy-security policy keeps uranium and nuclear infrastructure relevant, but timing remains price-confirmation dependent.", "affected_lanes": ["Uranium / nuclear fuel cycle"], "direction": "supportive but cyclical", "time_horizon": "6-24 months", "confidence": 0.60, "transfer_to_report": False},
         {"policy_area": "China stimulus and platform regulation", "latest_signal": "Support remains watchlist-relevant, but confidence and earnings confirmation are still required.", "affected_lanes": ["China platform beta", "EM equity beta"], "direction": "mixed", "time_horizon": "1-6 months", "confidence": 0.52, "transfer_to_report": False},
     ]
-    if _event_is_in_report_week(report_date, ECB_JUNE_2026_HIKE_DATE):
+    if _event_is_in_report_week(report_date, ECB_JULY_2026_HOLD_DATE):
+        catalysts.insert(
+            0,
+            {
+                "policy_area": "ECB rate-policy hold",
+                "latest_signal": "The ECB kept its key interest rates unchanged on 23 July 2026 and retained a data-dependent, meeting-by-meeting approach; this is descriptive policy context and does not override portfolio gates.",
+                "affected_lanes": ["Non-U.S. developed diversification", "Rate-sensitive small caps", "Long-duration bonds"],
+                "direction": "on hold / data-dependent",
+                "time_horizon": "1-6 months",
+                "confidence": 0.75,
+                "event_date": ECB_JULY_2026_HOLD_DATE,
+                "event_status": "verified_report_week_policy_event",
+                "transfer_to_report": True,
+            },
+        )
+    elif _event_is_in_report_week(report_date, ECB_JUNE_2026_HIKE_DATE):
         catalysts.insert(
             0,
             {

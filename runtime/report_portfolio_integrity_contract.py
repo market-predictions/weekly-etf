@@ -285,6 +285,24 @@ def _risk_section(state: dict[str, Any], language: str) -> str:
 
 
 def _conclusion_section(state: dict[str, Any], language: str) -> str:
+    if not _no_action(state):
+        if language == "nl":
+            return "\n".join(
+                [
+                    "- **Portefeuillehouding:** voorgestelde of uitgevoerde wijzigingen worden uitsluitend door de autoritatieve actietabellen bepaald.",
+                    "- **Best onderbouwde blootstelling:** SMH blijft structureel sterk, maar concentratie- en positielimieten blijven bindend.",
+                    "- **Belangrijkste disciplinepunt:** iedere mutatie moet de positiecapaciteit verbeteren en de prijs-, relatieve-sterkte- en thesistoets doorstaan.",
+                    "- **Volglijstscheiding:** PPA en ITA blijven niet-aangehouden defensie-instrumenten totdat een afzonderlijke, geldige allocatiebeslissing bestaat.",
+                ]
+            )
+        return "\n".join(
+            [
+                "- **Portfolio stance:** proposed or executed changes are determined only by the authoritative action tables.",
+                "- **Best-supported exposure:** SMH remains structurally strong, but concentration and position limits remain binding.",
+                "- **Main discipline point:** every transition must improve portfolio capacity and pass pricing, relative-strength and thesis review.",
+                "- **Watchlist separation:** PPA and ITA remain non-held defense instruments until a separate valid allocation decision exists.",
+            ]
+        )
     if language == "nl":
         return "\n".join(
             [
@@ -497,6 +515,73 @@ def _normalize_action_language(text: str, state: dict[str, Any], language: str) 
         }
     for old, new in replacements.items():
         text = text.replace(old, new)
+    if language == "nl":
+        text = text.replace(
+            "SPY-relative performance",
+            "prestaties tegenover de SPY-marktbenchmark",
+        )
+        text = text.replace(
+            "SPY-relatieve performance",
+            "prestaties tegenover de SPY-marktbenchmark",
+        )
+    else:
+        text = text.replace(
+            "SPY-relative performance",
+            "performance versus the SPY market benchmark",
+        )
+
+    spy_link = r"(?:\[SPY\]\([^\)]+\)|SPY)"
+    if language == "nl":
+        text = re.sub(
+            spy_link + r"-relative performance",
+            "prestaties tegenover de SPY-marktbenchmark",
+            text,
+            flags=re.IGNORECASE,
+        )
+    else:
+        text = re.sub(
+            spy_link + r"-relative performance",
+            "performance versus the SPY market benchmark",
+            text,
+            flags=re.IGNORECASE,
+        )
+
+    text = text.replace(
+        "Monitor commodity breadth and hedge contribution after execution.",
+        "Monitor commodity breadth and hedge contribution in the current portfolio.",
+    )
+    text = text.replace(
+        "Monitor grondstoffenbreedte en bijdrage aan de hedgefunctie na uitvoering.",
+        "Monitor grondstoffenbreedte en bijdrage aan de hedgefunctie in de huidige portefeuille.",
+    )
+    text = text.replace(
+        "A stronger alternative is available for…",
+        "A stronger alternative is available; complete the PAVE-versus-GRID review",
+    )
+    text = text.replace(
+        "Sterker alternatief is beschikbaar voor…",
+        "Sterker alternatief beschikbaar; rond de PAVE-versus-GRID-review af",
+    )
+    text = re.sub(
+        r"Review has persisted for multiple report cycles;\s*Review has persisted for several report(?: cycles)?…?",
+        "Review has persisted for multiple report cycles",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(
+        r"Review loopt al meerdere rapportcycli;\s*Review loopt al meerdere rapport(?:cycli)?…?",
+        "Review loopt al meerdere rapportcycli",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = text.replace(
+        "- PPA / ITA: Defense spending remains structurally durable, but vehicle selection must be proven.",
+        "- PPA / ITA (non-held watchlist comparison): Defense spending remains structurally durable, but vehicle selection must be proven.",
+    )
+    text = text.replace(
+        "- PPA / ITA: Defensie-uitgaven blijven structureel ondersteund, maar ETF-keuze blijft belangrijk.",
+        "- PPA / ITA (niet-aangehouden volglijstvergelijking): Defensie-uitgaven blijven structureel ondersteund, maar ETF-keuze blijft belangrijk.",
+    )
 
     duplicate_patterns = [
         r"(Review has persisted for multiple report cycles;\s*)\1+",

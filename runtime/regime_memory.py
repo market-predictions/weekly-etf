@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -83,6 +83,17 @@ def _breadth_trend(pack: dict[str, Any]) -> str:
     return "mixed"
 
 
+def _calendar_observations(last_major_shift: Any, report_date: str) -> int:
+    try:
+        start = date.fromisoformat(str(last_major_shift)[:10])
+        end = date.fromisoformat(report_date[:10])
+    except (TypeError, ValueError):
+        return 1
+    if end < start:
+        return 1
+    return max((end - start).days // 7 + 1, 1)
+
+
 def _cross_asset_status(pack: dict[str, Any]) -> str:
     signals = pack.get("macro_signals") or {}
     duration = ((signals.get("duration") or {}).get("signal") or "").lower()
@@ -114,13 +125,18 @@ def update_regime_memory(pack: dict[str, Any], path: Path = REGIME_MEMORY_PATH) 
     weeks_in_regime = int(previous.get("weeks_in_regime") or 0)
 
     regime_changed = previous_regime not in {"", "Unknown"} and previous_regime != current_regime
+    previous_report_date = str(previous.get("report_date") or "")
     if regime_changed:
         new_weeks = 1
         last_major_shift = report_date
         failed_rotation_count = int(previous.get("failed_rotation_count") or 0)
     else:
-        new_weeks = weeks_in_regime + 1 if weeks_in_regime else 1
         last_major_shift = previous.get("last_major_shift") or report_date
+        calendar_count = _calendar_observations(last_major_shift, report_date)
+        if previous_report_date == report_date:
+            new_weeks = min(weeks_in_regime or 1, calendar_count)
+        else:
+            new_weeks = calendar_count
         failed_rotation_count = int(previous.get("failed_rotation_count") or 0)
 
     memory = {
@@ -139,7 +155,7 @@ def update_regime_memory(pack: dict[str, Any], path: Path = REGIME_MEMORY_PATH) 
         "last_major_shift": last_major_shift,
         "failed_rotation_count": failed_rotation_count,
         "decision_rule": (
-            "Do not rotate aggressively unless a regime shift persists for at least two runs or cross-asset confirmation becomes broad."
+            "Do not rotate aggressively unless a regime shift persists across at least two distinct report dates or cross-asset confirmation becomes broad."
         ),
         "report_transfer": {
             "show_in_report": True,
@@ -161,6 +177,6 @@ def regime_memory_summary(memory: dict[str, Any]) -> str:
     breadth = _client_label(memory.get("breadth_trend", "mixed"), BREADTH_LABELS)
     cross = _client_label(memory.get("cross_asset_confirmation", "mixed"), CROSS_ASSET_LABELS)
     return (
-        f"{regime} has persisted for {weeks} run(s); transition state is {transition}, "
+        f"{regime} has persisted across {weeks} weekly observation(s); transition state is {transition}, "
         f"breadth is {breadth}, and cross-asset confirmation is {cross}."
     )

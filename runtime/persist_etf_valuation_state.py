@@ -163,6 +163,11 @@ def _build_authoritative_positions(existing_state: dict[str, Any], runtime_state
     price_map = _position_price_map(runtime_state)
     runtime_by_ticker = _runtime_position_map(runtime_state)
     fx = _fx_rate_full(runtime_state)
+    current_run_id = _text(runtime_state.get("run_id"))
+    last_execution_run_id = _text((existing_state.get("last_model_execution") or {}).get("run_id"))
+    reset_historical_execution_fields = bool(
+        current_run_id and last_execution_run_id and current_run_id != last_execution_run_id
+    )
     cash = round(_float(existing_state.get("cash_eur"), _float((runtime_state.get("portfolio") or {}).get("cash_eur"))), 2)
 
     positions: list[dict[str, Any]] = []
@@ -189,6 +194,12 @@ def _build_authoritative_positions(existing_state: dict[str, Any], runtime_state
 
         market_value_local = round(shares * price, 2)
         market_value_eur = round(_value_eur_from_local(market_value_local, currency, fx), 2)
+        if reset_historical_execution_fields:
+            item["shares_delta_this_run"] = 0.0
+            item["weight_change_pct"] = 0.0
+            item["action_executed_this_run"] = "None"
+            item["funding_source_note"] = "No model trade executed this run."
+
         item.update(
             {
                 "ticker": ticker,
@@ -255,6 +266,23 @@ def _build_history_row(
     drawdown_pct = 0.0 if peak == 0 else round((nav / peak - 1.0) * 100.0, 4)
     eurusd = _fx_rate(runtime_state)
 
+    pricing_statuses = {
+        str(row.get("pricing_status") or "")
+        for row in (runtime_state.get("positions") or [])
+        if str(row.get("ticker") or "").upper() != "CASH"
+    }
+    all_fresh = bool(pricing_statuses) and pricing_statuses.issubset({
+        "fresh_close",
+        "fresh_fallback_source",
+        "fresh_exact_close",
+        "fresh_exact_unverified",
+    })
+    valuation_comment = (
+        "Portfolio valuation based on confirmed closing prices and official holdings"
+        if all_fresh
+        else "Portfolio valuation based on official holdings with unresolved prices carried under the pricing contract"
+    )
+
     return {
         "date": report_date,
         "nav_eur": round(nav, 2),
@@ -264,7 +292,7 @@ def _build_history_row(
         "since_inception_return_pct": since_inception_pct,
         "drawdown_pct": drawdown_pct,
         "eurusd_used": "" if eurusd is None else eurusd,
-        "comment": "Runtime valuation repriced from official portfolio-state shares",
+        "comment": valuation_comment,
         "source_report": source_report,
     }
 
