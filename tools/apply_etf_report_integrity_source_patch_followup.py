@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from tools.apply_etf_report_integrity_source_patch import apply as apply_base
+from apply_etf_report_integrity_source_patch import apply as apply_base
 
 
 def replace_once(path: str, old: str, new: str) -> None:
