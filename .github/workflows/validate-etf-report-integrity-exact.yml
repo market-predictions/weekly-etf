@@ -30,7 +30,7 @@ jobs:
           set +e
           mkdir -p output/run_manifests
           : > /tmp/etf_integrity.log
-          python tools/apply_etf_report_integrity_source_patch.py >> /tmp/etf_integrity.log 2>&1
+          python tools/apply_etf_report_integrity_source_patch_followup.py >> /tmp/etf_integrity.log 2>&1
           patch_status=$?
           python -m py_compile \
             runtime/report_portfolio_integrity_contract.py \
