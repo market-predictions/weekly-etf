@@ -1,0 +1,31 @@
+name: Commit ETF zero-trade and Dutch-history fix
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/commit_etf_zero_trade_nl_history_fix_*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Apply already validated patch
+        run: python tools/apply_etf_zero_trade_and_nl_history_fix.py
+      - name: Commit source changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add runtime/etf_instrument_constraints.py runtime/render_etf_report_nl_from_state.py tools/validate_etf_rotation_output_contract.py .github/workflows/send-weekly-report.yml
+          git commit -m "Remove stale zero-trade status and localize ETF history"
+          git push origin HEAD:main
