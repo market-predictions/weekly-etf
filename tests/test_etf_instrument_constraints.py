@@ -5,7 +5,7 @@ from runtime.etf_instrument_constraints import (
 
 
 CONSTRAINTS = {
-    "schema_version": "1.0",
+    "schema_version": "1.1",
     "portfolio_policy": {
         "max_active_positions": 8,
         "leveraged_etfs_allowed": False,
@@ -14,12 +14,13 @@ CONSTRAINTS = {
         "DFEN": {
             "portfolio_eligible": False,
             "reason": "daily_leveraged_3x",
+            "eligible_research_replacement": "EUAD",
         }
     },
 }
 
 
-def test_ineligible_primary_is_demoted_behind_eligible_alternative() -> None:
+def test_ineligible_primary_is_replaced_by_eligible_vehicles() -> None:
     lane = {
         "lane_name": "Europe defense",
         "primary_etf": "DFEN",
@@ -29,10 +30,12 @@ def test_ineligible_primary_is_demoted_behind_eligible_alternative() -> None:
     normalized = normalize_lane_instruments(lane, CONSTRAINTS)
 
     assert normalized["primary_etf"] == "NATO"
-    assert normalized["alternative_etf"] == "DFEN"
+    assert normalized["alternative_etf"] == "EUAD"
     assert normalized["primary_portfolio_eligible"] is True
-    assert normalized["alternative_portfolio_eligible"] is False
-    assert normalized["alternative_ineligibility_reason"] == "daily_leveraged_3x"
+    assert normalized["alternative_portfolio_eligible"] is True
+    assert normalized["excluded_research_vehicle"] == "DFEN"
+    assert normalized["excluded_research_vehicle_reason"] == "daily_leveraged_3x"
+    assert normalized["eligible_research_replacement_applied"] is True
 
 
 def test_close_first_state_blocks_partial_new_ticker_rotation() -> None:
@@ -66,7 +69,12 @@ def test_close_first_state_blocks_partial_new_ticker_rotation() -> None:
         ],
         "target_weights": [
             *[
-                {"ticker": row["ticker"], "target_weight_pct": 8.0 if row["ticker"] == "A" else 10.0}
+                {
+                    "ticker": row["ticker"],
+                    "target_weight_pct": (
+                        8.0 if row["ticker"] == "A" else 10.0
+                    ),
+                }
                 for row in incumbents
             ],
             {"ticker": "NATO", "target_weight_pct": 2.0},
@@ -85,13 +93,23 @@ def test_close_first_state_blocks_partial_new_ticker_rotation() -> None:
     constrained = apply_rotation_policy_constraints(plan, CONSTRAINTS)
 
     assert constrained["trade_intents"] == []
-    assert all(row["ticker"] != "NATO" for row in constrained["target_weights"])
+    assert all(
+        row["ticker"] != "NATO" for row in constrained["target_weights"]
+    )
     decision = constrained["rotation_decisions"][0]
     assert decision["action_code"] == "hold_with_override"
     assert decision["target_weight_pct"] == 10.0
     assert decision["override_reason_code"] == "portfolio_constraint_blocked"
-    assert constrained["portfolio_constraint_validation"]["block_reason"] == "position_count_close_first"
-    assert constrained["validation_flags"]["portfolio_constraint_validation_passed"] is True
+    assert (
+        constrained["portfolio_constraint_validation"]["block_reason"]
+        == "position_count_close_first"
+    )
+    assert (
+        constrained["validation_flags"][
+            "portfolio_constraint_validation_passed"
+        ]
+        is True
+    )
 
 
 def test_ineligible_destination_is_blocked_even_when_position_count_is_compliant() -> None:
@@ -143,5 +161,11 @@ def test_ineligible_destination_is_blocked_even_when_position_count_is_compliant
     constrained = apply_rotation_policy_constraints(plan, CONSTRAINTS)
 
     assert constrained["trade_intents"] == []
-    assert constrained["candidate_reviews"][0]["is_fundable_candidate"] is False
-    assert constrained["portfolio_constraint_validation"]["block_reason"] == "portfolio_ineligible_destination"
+    assert (
+        constrained["candidate_reviews"][0]["is_fundable_candidate"]
+        is False
+    )
+    assert (
+        constrained["portfolio_constraint_validation"]["block_reason"]
+        == "portfolio_ineligible_destination"
+    )
