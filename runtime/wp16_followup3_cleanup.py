@@ -31,6 +31,11 @@ DUTCH_MEMORY_PATTERNS = [
     ),
 ]
 
+ROTATION_LIMIT_RE = re.compile(
+    r"\b(?:system\s+)?override:\s*rotation budget(?:\s+for this run is)?\s+already used\b",
+    re.IGNORECASE,
+)
+
 
 def _repair_product_names(text: str) -> str:
     for source, target in PRODUCT_NAME_REPAIRS.items():
@@ -38,9 +43,24 @@ def _repair_product_names(text: str) -> str:
     return text
 
 
+def _repair_rotation_limit_language(text: str, *, language: str) -> str:
+    replacement = (
+        "Uitvoeringsbeperking: rotatielimiet bereikt voor deze review"
+        if language == "nl"
+        else "Execution constraint: weekly rotation limit reached"
+    )
+    text = ROTATION_LIMIT_RE.sub(replacement, text)
+    if language == "nl":
+        text = text.replace("weekly rotation limit reached", "rotatielimiet bereikt voor deze review")
+    else:
+        text = text.replace("rotatielimiet bereikt voor deze review", "weekly rotation limit reached")
+    return text
+
+
 def clean_text(text: str, *, language: str) -> str:
     for source, target in NON_US_REPLACEMENTS.items():
         text = text.replace(source, target)
+    text = _repair_rotation_limit_language(text, language=language)
     if language == "nl":
         for pattern, target in DUTCH_MEMORY_PATTERNS:
             text = pattern.sub(target, text)
@@ -61,4 +81,5 @@ def failures(text: str, *, language: str) -> list[str]:
         checks.append("risk-on growth has persisted")
     else:
         checks.append("risk-on groei houdt")
+        checks.append("rotatielimiet bereikt voor deze review")
     return sorted(set([item for item in checks if item in lower] + client_language_findings(text, language=language)))
