@@ -25,13 +25,11 @@ jobs:
       - name: Install focused dependencies
         run: pip install pytest pyyaml
 
-      - name: Run patched exact replay and persist diagnostics
+      - name: Run clean exact replay from committed source
         run: |
           set +e
           mkdir -p output/run_manifests
           : > /tmp/etf_integrity.log
-          python tools/apply_etf_report_integrity_source_patch_followup.py >> /tmp/etf_integrity.log 2>&1
-          patch_status=$?
           python -m py_compile \
             runtime/report_portfolio_integrity_contract.py \
             runtime/link_runtime_report_tickers.py \
@@ -50,7 +48,7 @@ jobs:
           import json
           from pathlib import Path
           statuses = {
-              "source_patch": $patch_status,
+              "committed_source": 0,
               "compile": $compile_status,
               "exact_integrity_tests": $exact_status,
               "freshness_tests": $freshness_status,
@@ -59,6 +57,7 @@ jobs:
           log = Path('/tmp/etf_integrity.log').read_text(encoding='utf-8', errors='replace')
           payload = {
               "artifact_type": "weekly_etf_report_integrity_exact_validation",
+              "validation_mode": "clean_committed_source",
               "status": "completed" if all(value == 0 for value in statuses.values()) else "failed",
               "statuses": statuses,
               "log_head": log[:5000],
