@@ -1,4 +1,4 @@
-schema_version: "1.0"
+schema_version: "1.1"
 portfolio_policy:
   max_active_positions: 8
   leveraged_etfs_allowed: false
@@ -7,3 +7,4 @@ instruments:
     portfolio_eligible: false
     reason: daily_leveraged_3x
     evidence: Direxion Daily Aerospace & Defense Bull 3X ETF; daily target 300 percent.
+    eligible_research_replacement: EUAD
