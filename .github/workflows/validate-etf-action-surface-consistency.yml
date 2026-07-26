@@ -1,0 +1,140 @@
+name: Validate ETF action-surface consistency
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/weekly_etf_action_surface_validation_*.md"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install focused dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            pytest \
+            pyyaml \
+            pandas \
+            matplotlib \
+            markdown \
+            mistune \
+            beautifulsoup4 \
+            lxml \
+            premailer \
+            weasyprint \
+            pillow \
+            requests \
+            jsonschema \
+            yfinance
+
+      - name: Compile implementation and gate
+        run: |
+          python -m py_compile \
+            runtime/post_execution_report_surface.py \
+            runtime/polish_runtime_reports.py \
+            tools/validate_etf_client_surface_clean.py \
+            tests/test_etf_post_execution_report_consistency.py
+
+      - name: Run focused consistency regressions
+        run: |
+          pytest -q tests/test_etf_post_execution_report_consistency.py
+
+      - name: Prove old July 24 mismatch is rejected and corrected surface passes
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          from runtime.polish_runtime_reports import polish_dutch, polish_english
+          from runtime.post_execution_report_surface import (
+              validate_post_execution_report_consistency,
+          )
+
+          state_path = Path("output/runtime/etf_report_state_20260724_20260726_121721.json")
+          en_path = Path("output/weekly_analysis_pro_260724_02.md")
+          nl_path = Path("output/weekly_analysis_pro_nl_260724_02.md")
+          state = json.loads(state_path.read_text(encoding="utf-8"))
+          en_original = en_path.read_text(encoding="utf-8")
+          nl_original = nl_path.read_text(encoding="utf-8")
+
+          rejected = []
+          for language, text in (("en", en_original), ("nl", nl_original)):
+              try:
+                  validate_post_execution_report_consistency(text, state, language=language)
+              except RuntimeError as exc:
+                  rejected.append((language, str(exc)))
+          assert {row[0] for row in rejected} == {"en", "nl"}, rejected
+          assert all("proposed-action" in row[1] for row in rejected), rejected
+
+          en_fixed = polish_english(en_original, state)
+          nl_fixed = polish_dutch(nl_original, state)
+          validate_post_execution_report_consistency(en_fixed, state, language="en")
+          validate_post_execution_report_consistency(nl_fixed, state, language="nl")
+
+          assert "Proposed — not executed" in en_fixed
+          assert "SMH" in en_fixed.split("## 2. Portfolio Action Snapshot", 1)[0]
+          assert "DFEN" in en_fixed.split("## 2. Portfolio Action Snapshot", 1)[0]
+          assert "Voorgesteld — niet uitgevoerd" in nl_fixed
+          assert "SMH" in nl_fixed.split("## 2. Portefeuille-acties", 1)[0]
+          assert "DFEN" in nl_fixed.split("## 2. Portefeuille-acties", 1)[0]
+          print("ETF_ACTION_SURFACE_EXACT_REPLAY_OK | old_mismatch=rejected | corrected_surface=passed | proposal=SMH->DFEN")
+          PY
+
+      - name: Persist validation evidence
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          payload = {
+              "schema_version": "1.0",
+              "artifact_type": "weekly_etf_action_surface_consistency_validation",
+              "created_at_utc": datetime.now(timezone.utc).isoformat(),
+              "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+              "status": "completed",
+              "source_runtime_state": "output/runtime/etf_report_state_20260724_20260726_121721.json",
+              "source_english_report": "output/weekly_analysis_pro_260724_02.md",
+              "source_dutch_report": "output/weekly_analysis_pro_nl_260724_02.md",
+              "contract": {
+                  "front_page_distinguishes_executed_proposed_and_none": True,
+                  "proposed_source_and_destination_required_on_front_page": True,
+                  "pre_send_gate_integrated": True,
+                  "old_mismatch_rejected": True,
+                  "corrected_surface_passed": True,
+              },
+          }
+          out = Path(f"output/run_manifests/weekly_etf_action_surface_validation_{os.environ.get('GITHUB_RUN_ID', 'unknown')}.json")
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          print(f"ETF_ACTION_SURFACE_EVIDENCE_WRITTEN | path={out}")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/run_manifests/weekly_etf_action_surface_validation_*.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Persist ETF action-surface validation [skip ci]"
+          git push origin HEAD:main
