@@ -49,7 +49,7 @@ jobs:
         run: |
           python runtime/build_shared_strategy_state.py --output output/shared/etf_shared_strategy_state_ci_second.json
           python runtime/build_shared_portfolio_target.py \
-            --shared-strategy-state output/shared/etf_shared_strategy_state_ci_second.json \
+            --shared-strategy-state output/shared/etf_shared_strategy_state_ci.json \
             --output output/shared/etf_shared_portfolio_target_ci_second.json
           python - <<'PY'
           import json
