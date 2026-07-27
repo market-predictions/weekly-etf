@@ -1,0 +1,54 @@
+name: Validate shared ETF strategy state
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "runtime/build_shared_strategy_state.py"
+      - "tools/validate_shared_strategy_state.py"
+      - "schemas/etf_shared_strategy_state.schema.json"
+      - ".github/workflows/validate-shared-strategy-state.yml"
+      - "control/work_packages/WP_SYNC_00_01_SHARED_STRATEGY_STATE_20260727.md"
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build latest shared strategy state
+        run: |
+          mkdir -p output/shared
+          python runtime/build_shared_strategy_state.py --output output/shared/etf_shared_strategy_state_ci.json
+
+      - name: Validate shared strategy state
+        run: |
+          python tools/validate_shared_strategy_state.py output/shared/etf_shared_strategy_state_ci.json
+
+      - name: Prove builder is deterministic apart from generated timestamp
+        run: |
+          python runtime/build_shared_strategy_state.py --output output/shared/etf_shared_strategy_state_ci_second.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          first = json.loads(Path("output/shared/etf_shared_strategy_state_ci.json").read_text())
+          second = json.loads(Path("output/shared/etf_shared_strategy_state_ci_second.json").read_text())
+          first.pop("generated_at_utc", None)
+          second.pop("generated_at_utc", None)
+          if first != second:
+              raise SystemExit("Shared strategy state is not deterministic")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: etf-shared-strategy-state-shadow
+          path: output/shared/etf_shared_strategy_state_ci.json
+          if-no-files-found: error
