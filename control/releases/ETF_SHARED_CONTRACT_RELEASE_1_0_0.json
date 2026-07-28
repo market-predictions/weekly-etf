@@ -1,0 +1,71 @@
+{
+  "schema_version": "etf_shared_contract_release_manifest_v1",
+  "contract_release_id": "weekly_etf_shared_contract_v1_0_0",
+  "semantic_version": "1.0.0",
+  "promotion_status": "stable_on_merge",
+  "source_repository": "market-predictions/weekly-etf",
+  "promotion_pull_request": 113,
+  "promotion_branch": "sync/shared-strategy-state",
+  "stable_branch": "main",
+  "policy_path": "control/ETF_SHARED_CONTRACT_PROMOTION_POLICY_V1.md",
+  "artifacts": {
+    "shared_strategy_state": {
+      "schema_version": "etf_shared_strategy_state_v1",
+      "artifact_type": "etf_shared_strategy_decision_state",
+      "schema_path": "schemas/etf_shared_strategy_state.schema.json",
+      "builder_path": "runtime/build_shared_strategy_state.py",
+      "validator_path": "tools/validate_shared_strategy_state.py"
+    },
+    "shared_portfolio_target": {
+      "schema_version": "etf_shared_portfolio_target_v1",
+      "artifact_type": "etf_shared_exposure_portfolio_target",
+      "schema_path": "schemas/etf_shared_portfolio_target.schema.json",
+      "builder_path": "runtime/build_shared_portfolio_target.py",
+      "validator_path": "tools/validate_shared_portfolio_target.py"
+    }
+  },
+  "consumer_contract": {
+    "pinning_required": true,
+    "allowed_refs": [
+      "immutable_merge_commit_sha",
+      "tag_resolving_to_accepted_commit"
+    ],
+    "mutable_feature_branch_allowed": false,
+    "validated_shadow_consumer": {
+      "repository": "market-predictions/weekly-etf-eu",
+      "pull_request": 66,
+      "consumer_state_schema": "etf_eu_strategy_sync_shadow_v1"
+    },
+    "local_instrument_remapping_required": true,
+    "local_pricing_and_implementation_controls_required": true
+  },
+  "compatibility": {
+    "major": 1,
+    "backward_compatible_with": [],
+    "consumer_must_reject_unknown_major": true,
+    "optional_additions_require_minor_release": true,
+    "required_field_or_semantic_changes_require_major_release": true
+  },
+  "authority": {
+    "strategy_research_authority": true,
+    "portfolio_reference_authority": true,
+    "portfolio_mutation": false,
+    "funding_authority": false,
+    "execution_authority": false,
+    "broker_execution_authority": false,
+    "production_delivery_authority": false
+  },
+  "promotion_gates": {
+    "deterministic_builds_required": true,
+    "artifact_validation_required": true,
+    "release_manifest_validation_required": true,
+    "downstream_shadow_validation_required": true,
+    "required_ci_green": true,
+    "official_portfolio_mutation_allowed": false
+  },
+  "rollback": {
+    "method": "repin_consumer_to_last_accepted_immutable_donor_commit",
+    "automatic_portfolio_mutation": false,
+    "automatic_trade_reversal": false
+  }
+}
