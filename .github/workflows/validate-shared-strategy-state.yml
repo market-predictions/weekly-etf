@@ -8,8 +8,11 @@ on:
       - "runtime/build_shared_portfolio_target.py"
       - "tools/validate_shared_strategy_state.py"
       - "tools/validate_shared_portfolio_target.py"
+      - "tools/validate_shared_contract_release.py"
       - "schemas/etf_shared_strategy_state.schema.json"
       - "schemas/etf_shared_portfolio_target.schema.json"
+      - "control/ETF_SHARED_CONTRACT_PROMOTION_POLICY_V1.md"
+      - "control/releases/ETF_SHARED_CONTRACT_RELEASE_1_0_0.json"
       - ".github/workflows/validate-shared-strategy-state.yml"
       - "control/work_packages/WP_SYNC_00_01_SHARED_STRATEGY_STATE_20260727.md"
 
@@ -25,6 +28,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Validate shared contract release manifest
+        run: |
+          python tools/validate_shared_contract_release.py \
+            control/releases/ETF_SHARED_CONTRACT_RELEASE_1_0_0.json
 
       - name: Build latest shared strategy state
         run: |
@@ -72,6 +80,7 @@ jobs:
         with:
           name: etf-shared-strategy-state-shadow
           path: |
+            control/releases/ETF_SHARED_CONTRACT_RELEASE_1_0_0.json
             output/shared/etf_shared_strategy_state_ci.json
             output/shared/etf_shared_portfolio_target_ci.json
           if-no-files-found: error
