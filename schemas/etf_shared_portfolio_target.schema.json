@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/market-predictions/weekly-etf/schemas/etf_shared_portfolio_target.schema.json",
+  "title": "ETF Shared Exposure Portfolio Target",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "generated_at_utc",
+    "report_date",
+    "source_repository",
+    "source_run_id",
+    "authority",
+    "source_files",
+    "portfolio_summary",
+    "position_targets",
+    "exposure_targets",
+    "constraints",
+    "validation"
+  ],
+  "properties": {
+    "schema_version": {"const": "etf_shared_portfolio_target_v1"},
+    "artifact_type": {"const": "etf_shared_exposure_portfolio_target"},
+    "generated_at_utc": {"type": "string", "minLength": 10},
+    "report_date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "source_repository": {"const": "market-predictions/weekly-etf"},
+    "source_run_id": {"type": "string", "minLength": 1},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["portfolio_reference_authority", "portfolio_mutation", "funding_authority", "execution_authority", "consumer_must_remap_instruments"],
+      "properties": {
+        "portfolio_reference_authority": {"const": true},
+        "portfolio_mutation": {"const": false},
+        "funding_authority": {"const": false},
+        "execution_authority": {"const": false},
+        "consumer_must_remap_instruments": {"const": true}
+      }
+    },
+    "source_files": {"type": "object", "additionalProperties": {"type": "string"}},
+    "portfolio_summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["nav_eur", "cash_eur", "cash_weight_pct", "position_count", "target_weight_total_pct"]
+    },
+    "position_targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["ticker", "exposure_id", "current_weight_pct", "target_weight_pct", "action_code", "mapping_status"]
+      }
+    },
+    "exposure_targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["exposure_id", "current_weight_pct", "target_weight_pct", "source_tickers", "actions"]
+      }
+    },
+    "constraints": {"type": "object", "additionalProperties": true},
+    "validation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["position_count", "mapped_position_count", "unmapped_tickers", "weight_reconciliation_status"]
+    }
+  }
+}
