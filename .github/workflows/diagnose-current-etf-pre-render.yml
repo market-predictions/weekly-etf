@@ -1,0 +1,119 @@
+name: Diagnose current ETF pre-render gates
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "control/run_queue/weekly_etf_pre_render_diagnostic_*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    env:
+      MRKT_RPRTS_REPORT_MODE: pro
+      ETF_PRICING_AUDIT_PATH: output/pricing/price_audit_2026-07-29_20260729_212005.json
+      MRKT_RPRTS_PRICING_AUDIT_PATH: output/pricing/price_audit_2026-07-29_20260729_212005.json
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install production-compatible dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install matplotlib mistune weasyprint pyyaml pandas yfinance
+
+      - name: Run pre-render gates independently
+        id: diagnose
+        shell: bash
+        run: |
+          set +e
+          mkdir -p output/run_manifests /tmp/etf_pre_render
+          OUT="output/run_manifests/weekly_etf_pre_render_diagnostic_${GITHUB_RUN_ID}.json"
+
+          run_gate() {
+            name="$1"
+            shift
+            "$@" > "/tmp/etf_pre_render/${name}.stdout" 2> "/tmp/etf_pre_render/${name}.stderr"
+            echo $? > "/tmp/etf_pre_render/${name}.status"
+          }
+
+          run_gate pricing_basis python tools/validate_etf_pricing_basis_disclosure.py --output-dir output
+          run_gate ticker_links python tools/validate_etf_ticker_links.py --output-dir output
+          run_gate equity_curve python tools/validate_etf_equity_curve_history.py --output-dir output --min-points 3
+          run_gate position_performance python tools/validate_etf_position_performance_section.py --output-dir output
+          run_gate report_content python tools/validate_etf_report_content_contract.py --output-dir output
+          run_gate macro_leakage python tools/validate_etf_macro_thesis_surface_leakage.py --output-dir output
+          run_gate nl_terminology python tools/validate_nl_terminology_contract.py
+          run_gate nl_language_quality python tools/validate_etf_dutch_language_quality.py --output-dir output
+          run_gate nl_client_surface python tools/validate_etf_dutch_client_surface_clean.py --output-dir output
+          run_gate persisted_audit python pricing/validate_persisted_audit.py
+
+          python - "$OUT" <<'PY'
+          import json
+          import os
+          import sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          root = Path('/tmp/etf_pre_render')
+          ordered = [
+              'pricing_basis',
+              'ticker_links',
+              'equity_curve',
+              'position_performance',
+              'report_content',
+              'macro_leakage',
+              'nl_terminology',
+              'nl_language_quality',
+              'nl_client_surface',
+              'persisted_audit',
+          ]
+          results = []
+          for name in ordered:
+              status_path = root / f'{name}.status'
+              stdout_path = root / f'{name}.stdout'
+              stderr_path = root / f'{name}.stderr'
+              code = int(status_path.read_text().strip()) if status_path.exists() else 99
+              results.append({
+                  'name': name,
+                  'return_code': code,
+                  'stdout': stdout_path.read_text(encoding='utf-8', errors='replace') if stdout_path.exists() else '',
+                  'stderr': stderr_path.read_text(encoding='utf-8', errors='replace') if stderr_path.exists() else '',
+              })
+          payload = {
+              'schema_version': '1.0',
+              'created_at_utc': datetime.now(timezone.utc).isoformat(),
+              'github_run_id': os.environ.get('GITHUB_RUN_ID'),
+              'source_run_id': '20260729_212005',
+              'english_report': 'output/weekly_analysis_pro_260729.md',
+              'dutch_report': 'output/weekly_analysis_pro_nl_260729.md',
+              'results': results,
+              'first_failure': next((row for row in results if row['return_code'] != 0), None),
+          }
+          Path(sys.argv[1]).write_text(json.dumps(payload, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps(payload, indent=2))
+          PY
+          echo "out=$OUT" >> "$GITHUB_OUTPUT"
+
+      - name: Persist diagnostic evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f "${{ steps.diagnose.outputs.out }}"
+          git commit -m "Persist Weekly ETF pre-render diagnostic [skip ci]"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            git pull --rebase origin main
+          done
+          exit 1
