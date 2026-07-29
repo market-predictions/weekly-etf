@@ -260,7 +260,6 @@ De positiereview scheidt drie vragen: is de thesis nog geldig, is de ETF nog het
 |---|---|---:|---:|---:|---:|---:|---|
 | Geen | Geen | n.v.t. | n.v.t. | n.v.t. | n.v.t. | n.v.t. | Geen vervangingsedge-diagnostiek beschikbaar deze run. |
 
-
 ## 12. Rotatieplan portefeuille
 
 | Sluiten | Verlagen | Aanhouden | Aanhouden — geen verdere wijziging in deze review | Toevoegen / bestemming | Vervangen |
