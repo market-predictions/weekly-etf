@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "created_at_utc": "2026-07-29T21:32:33.089807+00:00",
+  "github_run_id": "30492740820",
+  "source_run_id": "20260729_212005",
+  "english_report": "output/weekly_analysis_pro_260729.md",
+  "dutch_report": "output/weekly_analysis_pro_nl_260729.md",
+  "results": [
+    {
+      "name": "pricing_basis",
+      "return_code": 0,
+      "stdout": "ETF_PRICING_BASIS_DISCLOSURE_OK | en=weekly_analysis_pro_260729.md | nl=weekly_analysis_pro_nl_260729.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "ticker_links",
+      "return_code": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_ticker_links.py\", line 108, in <module>\n    main()\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_ticker_links.py\", line 103, in main\n    validate_report(latest_report(output_dir, EN_RE))\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_ticker_links.py\", line 94, in validate_report\n    raise RuntimeError(\"ETF ticker link validation failed for \" + path.name + \": \" + \"; \".join(failures[:20]))\nRuntimeError: ETF ticker link validation failed for weekly_analysis_pro_260729.md: line 97: CIBR: | Cybersecurity resilience | CIBR | BUG | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure expo; line 97: BUG: | Cybersecurity resilience | CIBR | BUG | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure expo; line 98: XLV: | Healthcare quality and defensive growth | XLV | VHT | Healthcare quality can provide defensive growth without speculative biotech beta. | 3 | 3 | Watchlist / under review | More ; line 98: VHT: | Healthcare quality and defensive growth | XLV | VHT | Healthcare quality can provide defensive growth without speculative biotech beta. | 3 | 3 | Watchlist / under review | More ; line 99: MOO: | Food security / agriculture inputs | MOO | VEGI | Agriculture inputs and food security remain structurally relevant but timing is not yet superior. | 4 | 3 | Watchlist / under re; line 100: FIW: | Water infrastructure / treatment | FIW | PHO | Water scarcity and treatment capex remain durable, but near-term leadership is modest. | 4 | 3 | Watchlist / under review | Moves u; line 100: PHO: | Water infrastructure / treatment | FIW | PHO | Water scarcity and treatment capex remain durable, but near-term leadership is modest. | 4 | 3 | Watchlist / under review | Moves u; line 100: PAVE: | Water infrastructure / treatment | FIW | PHO | Water scarcity and treatment capex remain durable, but near-term leadership is modest. | 4 | 3 | Watchlist / under review | Moves u; line 101: PHO: | Water utilities / defensive infrastructure | PHO | CGW | Water utilities provide a defensive variant of infrastructure exposure. | 4 | 2 | Watchlist / under review | More useful ; line 101: CGW: | Water utilities / defensive infrastructure | PHO | CGW | Water utilities provide a defensive variant of infrastructure exposure. | 4 | 2 | Watchlist / under review | More useful ; line 102: PPA: | Defense innovation / sovereign resilience | PPA | ITA | Defense spending remains structurally durable, but vehicle selection must be proven. Macro filter: Policy support is durab; line 102: ITA: | Defense innovation / sovereign resilience | PPA | ITA | Defense spending remains structurally durable, but vehicle selection must be proven. Macro filter: Policy support is durab; line 102: PPA: | Defense innovation / sovereign resilience | PPA | ITA | Defense spending remains structurally durable, but vehicle selection must be proven. Macro filter: Policy support is durab; line 102: ITA: | Defense innovation / sovereign resilience | PPA | ITA | Defense spending remains structurally durable, but vehicle selection must be proven. Macro filter: Policy support is durab; line 113: GSG: | Broad commodity inflation hedge | GSG | Scored below the live radar cutoff versus stronger funded and challenger lanes. | Useful only if commodity breadth confirms. |; line 114: NATO: | Europe defense and security rearmament | NATO | Scored below the live radar cutoff versus stronger funded and challenger lanes. | If European fiscal defense commitments accelerat; line 114: PPA: | Europe defense and security rearmament | NATO | Scored below the live radar cutoff versus stronger funded and challenger lanes. | If European fiscal defense commitments accelerat; line 115: IEFA: | Non-U.S. developed market diversification | IEFA | Scored below the live radar cutoff versus stronger funded and challenger lanes. | Becomes fundable if U.S. factor concentration; line 116: SMH: | AI compute infrastructure | SMH | Scored below the live radar cutoff versus stronger funded and challenger lanes. | AI infrastructure leadership remains persistent, but position-; line 117: KCE: | Financial infrastructure and market plumbing | KCE | Scored below the live radar cutoff versus stronger funded and challenger lanes. | Useful diversifier if financial infrastruct\n"
+    },
+    {
+      "name": "equity_curve",
+      "return_code": 0,
+      "stdout": "ETF_EQUITY_CURVE_HISTORY_OK | report=weekly_analysis_pro_260729.md | points=31 | latest_date=2026-07-29 | latest_nav=102875.57\n",
+      "stderr": ""
+    },
+    {
+      "name": "position_performance",
+      "return_code": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_position_performance_section.py\", line 177, in <module>\n    main()\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_position_performance_section.py\", line 173, in main\n    validate(_latest_report(Path(args.output_dir)))\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_position_performance_section.py\", line 161, in validate\n    raise RuntimeError(\nRuntimeError: ETF position performance validation failed for weekly_analysis_pro_260729.md: ticker-only thesis cells remain: XBI, XLV\n"
+    },
+    {
+      "name": "report_content",
+      "return_code": 0,
+      "stdout": "ETF_CLIENT_SURFACE_SCRUBBED_BEFORE_CONTENT_VALIDATION | report=weekly_analysis_pro_260729.md\nETF_FINAL_ACTION_TABLE_CONTRACT_OK | mode=rotation_v1 | report=weekly_analysis_pro_260729.md\nETF_REPORT_CONTENT_CONTRACT_OK | report=weekly_analysis_pro_260729.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "macro_leakage",
+      "return_code": 0,
+      "stdout": "ETF_MACRO_THESIS_SURFACE_LEAKAGE_OK | files=weekly_analysis_pro_260729.md,weekly_analysis_pro_nl_260729.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "nl_terminology",
+      "return_code": 0,
+      "stdout": "ETF_NL_TERMINOLOGY_CONTRACT_OK | source=runtime.nl_terminology\n",
+      "stderr": ""
+    },
+    {
+      "name": "nl_language_quality",
+      "return_code": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_dutch_language_quality.py\", line 92, in <module>\n    main()\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_dutch_language_quality.py\", line 88, in main\n    validate_report(latest_nl_report(Path(args.output_dir)))\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_dutch_language_quality.py\", line 80, in validate_report\n    raise RuntimeError(\"Dutch language quality validation failed for \" + path.name + \": \" + \"; \".join(failures))\nRuntimeError: Dutch language quality validation failed for weekly_analysis_pro_nl_260729.md: PDF-audit forbidden English or low-quality token: Latest 4 May; PDF-audit forbidden English or low-quality token: Non-U.S.\n"
+    },
+    {
+      "name": "nl_client_surface",
+      "return_code": 0,
+      "stdout": "ETF_DUTCH_CLIENT_SURFACE_SCRUBBED_BEFORE_VALIDATION | report=weekly_analysis_pro_nl_260729.md\nETF_DUTCH_CLIENT_SURFACE_CLEAN_OK | report=weekly_analysis_pro_nl_260729.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "persisted_audit",
+      "return_code": 0,
+      "stdout": "PRICING_AUDIT_OK | report=weekly_analysis_pro_260729.md | audit=price_audit_2026-07-29_20260729_212005.json | run_date=2026-07-29 | requested_close=2026-07-29 | report_close=2026-07-29 | decision=update_covered_holdings_carry_unresolved | fresh_holdings=9/9 | coverage_count_pct=100.0 | invested_weight_coverage_pct=97.63\n",
+      "stderr": ""
+    }
+  ],
+  "first_failure": {
+    "name": "ticker_links",
+    "return_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_ticker_links.py\", line 108, in <module>\n    main()\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_ticker_links.py\", line 103, in main\n    validate_report(latest_report(output_dir, EN_RE))\n  File \"/home/runner/work/weekly-etf/weekly-etf/tools/validate_etf_ticker_links.py\", line 94, in validate_report\n    raise RuntimeError(\"ETF ticker link validation failed for \" + path.name + \": \" + \"; \".join(failures[:20]))\nRuntimeError: ETF ticker link validation failed for weekly_analysis_pro_260729.md: line 97: CIBR: | Cybersecurity resilience | CIBR | BUG | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure expo; line 97: BUG: | Cybersecurity resilience | CIBR | BUG | Cyber spend is linked to AI, cloud, data-center and geopolitical resilience. | 4 | 4 | Actionable now | Offers digital-infrastructure expo; line 98: XLV: | Healthcare quality and defensive growth | XLV | VHT | Healthcare quality can provide defensive growth without speculative biotech beta. | 3 | 3 | Watchlist / under review | More ; line 98: VHT: | Healthcare quality and defensive growth | XLV | VHT | Healthcare quality can provide defensive growth without speculative biotech beta. | 3 | 3 | Watchlist / under review | More ; line 99: MOO: | Food security / agriculture inputs | MOO | VEGI | Agriculture inputs and food security remain structurally relevant but timing is not yet superior. | 4 | 3 | Watchlist / under re; line 100: FIW: | Water infrastructure / treatment | FIW | PHO | Water scarcity and treatment capex remain durable, but near-term leadership is modest. | 4 | 3 | Watchlist / under review | Moves u; line 100: PHO: | Water infrastructure / treatment | FIW | PHO | Water scarcity and treatment capex remain durable, but near-term leadership is modest. | 4 | 3 | Watchlist / under review | Moves u; line 100: PAVE: | Water infrastructure / treatment | FIW | PHO | Water scarcity and treatment capex remain durable, but near-term leadership is modest. | 4 | 3 | Watchlist / under review | Moves u; line 101: PHO: | Water utilities / defensive infrastructure | PHO | CGW | Water utilities provide a defensive variant of infrastructure exposure. | 4 | 2 | Watchlist / under review | More useful ; line 101: CGW: | Water utilities / defensive infrastructure | PHO | CGW | Water utilities provide a defensive variant of infrastructure exposure. | 4 | 2 | Watchlist / under review | More useful ; line 102: PPA: | Defense innovation / sovereign resilience | PPA | ITA | Defense spending remains structurally durable, but vehicle selection must be proven. Macro filter: Policy support is durab; line 102: ITA: | Defense innovation / sovereign resilience | PPA | ITA | Defense spending remains structurally durable, but vehicle selection must be proven. Macro filter: Policy support is durab; line 102: PPA: | Defense innovation / sovereign resilience | PPA | ITA | Defense spending remains structurally durable, but vehicle selection must be proven. Macro filter: Policy support is durab; line 102: ITA: | Defense innovation / sovereign resilience | PPA | ITA | Defense spending remains structurally durable, but vehicle selection must be proven. Macro filter: Policy support is durab; line 113: GSG: | Broad commodity inflation hedge | GSG | Scored below the live radar cutoff versus stronger funded and challenger lanes. | Useful only if commodity breadth confirms. |; line 114: NATO: | Europe defense and security rearmament | NATO | Scored below the live radar cutoff versus stronger funded and challenger lanes. | If European fiscal defense commitments accelerat; line 114: PPA: | Europe defense and security rearmament | NATO | Scored below the live radar cutoff versus stronger funded and challenger lanes. | If European fiscal defense commitments accelerat; line 115: IEFA: | Non-U.S. developed market diversification | IEFA | Scored below the live radar cutoff versus stronger funded and challenger lanes. | Becomes fundable if U.S. factor concentration; line 116: SMH: | AI compute infrastructure | SMH | Scored below the live radar cutoff versus stronger funded and challenger lanes. | AI infrastructure leadership remains persistent, but position-; line 117: KCE: | Financial infrastructure and market plumbing | KCE | Scored below the live radar cutoff versus stronger funded and challenger lanes. | Useful diversifier if financial infrastruct\n"
+  }
+}
