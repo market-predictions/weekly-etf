@@ -3,8 +3,8 @@ from __future__ import annotations
 """Guarded ticker-link entrypoint with narrow historical replay cleanup.
 
 Imported callers receive the preserved implementation. Direct execution applies
-the exact non-held watchlist normalization both before and inside the portfolio-
-integrity transformation boundary, then invokes the unchanged linker/validator.
+exact replay-state compatibility at the portfolio-integrity transformation
+boundary, then invokes the unchanged linker and fail-closed validator.
 """
 
 import os
@@ -18,12 +18,14 @@ if __name__ != "__main__":
     sys.modules[__name__] = _legacy
 else:
     import runtime.report_portfolio_integrity_contract as _integrity
+    from runtime.executed_replay_state_contract import executed_model_change_present
     from runtime.nonheld_watchlist_replay_cleanup import (
         normalize_nonheld_watchlist_file,
         normalize_nonheld_watchlist_text,
     )
 
     original_normalize_radar_rows = _integrity._normalize_radar_rows
+    original_current_execution_present = _integrity._current_execution_present
 
     def normalize_radar_rows_with_nonheld_boundary(
         text: str,
@@ -33,7 +35,11 @@ else:
         transformed = original_normalize_radar_rows(text, state, language)
         return normalize_nonheld_watchlist_text(transformed, language)
 
+    def current_execution_present_with_replay_contract(state: dict) -> bool:
+        return original_current_execution_present(state) or executed_model_change_present(state)
+
     _integrity._normalize_radar_rows = normalize_radar_rows_with_nonheld_boundary
+    _integrity._current_execution_present = current_execution_present_with_replay_contract
 
     candidates: list[tuple[Path, str]] = []
     explicit_en = os.environ.get("MRKT_RPRTS_EXPLICIT_REPORT_PATH", "").strip()
