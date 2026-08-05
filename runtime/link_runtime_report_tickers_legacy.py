@@ -1,0 +1,193 @@
+from __future__ import annotations
+
+import argparse
+import os
+import re
+from pathlib import Path
+
+from runtime.polish_runtime_reports import DECISION_COCKPIT_EN, DECISION_COCKPIT_NL
+from runtime.report_freshness_contract import apply_report_freshness_contract, load_runtime_state
+from runtime.report_portfolio_integrity_contract import (
+    apply_report_portfolio_integrity,
+    validate_report_portfolio_integrity,
+)
+
+EN_RE = re.compile(r"^weekly_analysis_pro_\d{6}(?:_\d{2})?\.md$")
+NL_RE = re.compile(r"^weekly_analysis_pro_nl_\d{6}(?:_\d{2})?\.md$")
+
+TICKERS = {
+    "SPY", "SMH", "PPA", "PAVE", "URNM", "GLD",
+    "SOXX", "ITA", "GRID", "URA", "IEFA", "EFA",
+    "IWM", "KWEB", "TLT", "ICLN", "QUAL", "GSG", "BIL",
+    "MOO", "FIW", "INDA", "XBI", "FINX", "CIBR", "BUG",
+    "REMX", "PICK", "XLU", "VPU", "NLR", "NUCL", "DBA",
+    "CORN", "PHO", "CGW", "MCHI", "FXI", "EPI", "IBB",
+    "XLV", "VHT", "KCE", "IAI", "BOTZ", "ROBO", "IRBO",
+    "COPX", "DBC", "DFEN", "NATO",
+}
+
+PROTECTED_TICKERS = {"CASH"}
+
+TICKER_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9_])\b(" + "|".join(sorted(TICKERS - PROTECTED_TICKERS, key=len, reverse=True)) + r")\b(?![A-Za-z0-9_])"
+)
+LINK_OR_URL_RE = re.compile(r"\[[^\]]+\]\([^\)]+\)|https?://\S+|`[^`]*`")
+
+
+def latest_report(output_dir: Path, pattern: re.Pattern[str]) -> Path:
+    for env_name in ("MRKT_RPRTS_EXPLICIT_REPORT_PATH", "MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL"):
+        raw = os.environ.get(env_name, "").strip()
+        if not raw:
+            continue
+        path = Path(raw)
+        if pattern.match(path.name):
+            if not path.exists():
+                raise RuntimeError(f"Explicit report path from {env_name} does not exist: {path}")
+            return path
+
+    reports = sorted(path for path in output_dir.glob("weekly_analysis_pro*.md") if pattern.match(path.name))
+    if not reports:
+        raise RuntimeError(f"No matching report found in {output_dir} for {pattern.pattern}")
+    return reports[-1]
+
+
+def tv_url(ticker: str) -> str:
+    return f"https://www.tradingview.com/chart/?symbol={ticker}"
+
+
+def md_link(ticker: str) -> str:
+    return f"[{ticker}]({tv_url(ticker)})"
+
+
+def _split_protected_spans(text: str) -> list[tuple[str, bool]]:
+    spans: list[tuple[str, bool]] = []
+    last = 0
+    for match in LINK_OR_URL_RE.finditer(text):
+        if match.start() > last:
+            spans.append((text[last:match.start()], False))
+        spans.append((match.group(0), True))
+        last = match.end()
+    if last < len(text):
+        spans.append((text[last:], False))
+    return spans
+
+
+def _linkify_plain_chunk(chunk: str) -> str:
+    return TICKER_PATTERN.sub(lambda match: md_link(match.group(1)), chunk)
+
+
+def linkify_segment(segment: str) -> str:
+    return "".join(chunk if protected else _linkify_plain_chunk(chunk) for chunk, protected in _split_protected_spans(segment))
+
+
+def _is_dutch_report(text: str) -> bool:
+    lower = text.lower()
+    markers = [
+        "# wekelijkse etf-review",
+        "## 1. kernsamenvatting",
+        "## 2. portefeuille-acties",
+    ]
+    return sum(marker in lower for marker in markers) >= 2
+
+
+def _remove_inline_decision_cockpit(text: str, marker: str, next_heading: str) -> str:
+    start = text.find(marker)
+    if start == -1:
+        return text
+    end = text.find("\n\n" + next_heading, start)
+    if end == -1:
+        end = text.find(next_heading, start)
+    if end == -1:
+        return text
+    return text[:start].rstrip() + "\n\n" + text[end:].lstrip()
+
+
+def ensure_visible_decision_cockpit(text: str) -> str:
+    if "## 2A. Decision cockpit" in text or "## 2A. Besliscockpit" in text:
+        return text
+
+    if _is_dutch_report(text):
+        text = _remove_inline_decision_cockpit(text, "### Besliscockpit", "## 2. Portefeuille-acties")
+        cockpit = DECISION_COCKPIT_NL.strip().replace("### Besliscockpit", "## 2A. Besliscockpit", 1)
+        insertion_heading = "## 3. Regime-dashboard"
+    else:
+        text = _remove_inline_decision_cockpit(text, "### Decision cockpit", "## 2. Portfolio Action Snapshot")
+        cockpit = DECISION_COCKPIT_EN.strip().replace("### Decision cockpit", "## 2A. Decision cockpit", 1)
+        insertion_heading = "## 3. Regime Dashboard"
+
+    if insertion_heading in text:
+        return text.replace(insertion_heading, cockpit + "\n\n" + insertion_heading, 1)
+
+    return cockpit + "\n\n" + text
+
+
+def _is_executive_summary_heading(line: str) -> bool:
+    stripped = line.strip().lower()
+    return stripped.startswith("## 1.") and (
+        "executive summary" in stripped
+        or "kernsamenvatting" in stripped
+    )
+
+
+def _is_next_major_section(line: str) -> bool:
+    return line.strip().startswith("## 2.")
+
+
+def linkify_report(text: str) -> str:
+    """Linkify ETF tickers in body tables/lists, but preserve the executive summary.
+
+    The final report should make tickers clickable in tables and bullets where a
+    reader is likely to research an instrument. The top executive summary/hero
+    cards should keep a calm boardroom look and therefore must not carry ticker
+    hyperlinks.
+    """
+    text = ensure_visible_decision_cockpit(text)
+    out: list[str] = []
+    in_fenced_code = False
+    in_executive_summary = False
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_fenced_code = not in_fenced_code
+            out.append(line)
+            continue
+        if _is_executive_summary_heading(line):
+            in_executive_summary = True
+            out.append(line)
+            continue
+        if in_executive_summary and _is_next_major_section(line):
+            in_executive_summary = False
+        if in_fenced_code or in_executive_summary:
+            out.append(line)
+            continue
+        out.append(linkify_segment(line))
+    return "\n".join(out) + ("\n" if text.endswith("\n") else "")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output-dir", default="output")
+    args = parser.parse_args()
+
+    output_dir = Path(args.output_dir)
+    state = load_runtime_state()
+    for pattern, language in ((EN_RE, "en"), (NL_RE, "nl")):
+        report_path = latest_report(output_dir, pattern)
+        text = report_path.read_text(encoding="utf-8")
+        text = ensure_visible_decision_cockpit(text)
+        if state:
+            text = apply_report_freshness_contract(text, state, language)
+            text = apply_report_portfolio_integrity(text, state, language)
+        text = linkify_report(text)
+        if state:
+            validate_report_portfolio_integrity(text, state, language)
+        report_path.write_text(text, encoding="utf-8")
+        print(
+            f"ETF_LINKIFY_OK | report={report_path.name} | "
+            f"freshness_contract={'applied' if state else 'skipped_no_runtime_state'} | "
+            f"portfolio_integrity_contract={'applied' if state else 'skipped_no_runtime_state'}"
+        )
+
+
+if __name__ == "__main__":
+    main()
