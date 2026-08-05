@@ -26,7 +26,14 @@ EXACT_REPLACEMENTS = contract.CLIENT_SURFACE_EXACT_REPLACEMENTS
 # translation pass over prose; it is a deterministic runtime-label alias map.
 NATIVE_STATE_LABEL_REPLACEMENTS = contract.NATIVE_STATE_LABEL_REPLACEMENTS
 
-NATIVE_REGEX_REPLACEMENTS = contract.NATIVE_REGEX_REPLACEMENTS
+# Historical executed-artifact replay can surface one exact English state label
+# inside otherwise native Dutch output. Keep the forbidden-token guard active and
+# normalize only this phrase before validation; do not introduce broad prose
+# translation into native reports.
+NATIVE_REGEX_REPLACEMENTS = [
+    *contract.NATIVE_REGEX_REPLACEMENTS,
+    (re.compile(r"\bpassive holds\b", re.I), "passief aangehouden posities"),
+]
 
 REGEX_REPLACEMENTS = [
     *[(re.compile(pattern, re.I), replacement) for pattern, replacement in contract.REGEX_CLIENT_LANGUAGE_REPLACEMENTS],
