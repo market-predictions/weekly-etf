@@ -6,13 +6,13 @@ canonical_standard_location=https://github.com/market-predictions/control-plane/
 canonical_location_status=CANONICAL_ACTIVE
 project_repository=market-predictions/weekly-etf
 project_risk_class=financial_report_delivery_and_portfolio_state
-adoption_status=documented
-enforcement_maturity=LEVEL_1_CHECKLIST
+adoption_status=enforced
+enforcement_maturity=LEVEL_3_HARD_CI_GATE
 target_enforcement_maturity=LEVEL_4_POST_ACTION_INDEPENDENT_CONFIRMATION
 implementation_role=implementation_operations
 assurance_role=governance_release_assurance
 project_specific_assurance_contract=control/ETF_RELEASE_ASSURANCE_CONTRACT_V1.md
-project_specific_assurance_contract_status=PLANNED
+project_specific_assurance_contract_status=ENFORCED
 production_action=bilingual_report_generation_and_email_delivery
 post_action_confirmation=delivery_manifest_and_independent_bilingual_inbox_receipt
 ```
@@ -21,24 +21,23 @@ post_action_confirmation=delivery_manifest_and_independent_bilingual_inbox_recei
 
 The user gives one Weekly ETF instruction and receives one consolidated project status. The user does not separately coordinate the implementation and assurance roles.
 
-## Current adoption boundary
+## Enforced pre-send assurance
 
-This file adopts the shared role separation and status semantics. It does not yet claim that Weekly ETF has a machine-generated independent assurance record or a hard governance gate before delivery.
+The production delivery entrypoint reconstructs and validates a release-assurance record before transport. It binds the source SHA, run/date/token identity, pricing audit, runtime state, run manifest, official portfolio state, trade ledger, English and Dutch report/render artifacts, bilingual table-number parity, and exact SHA-256 identities.
 
-The existing pricing-lineage, rendering, language, manifest, and receipt controls remain active. They are implementation and closeout evidence, but they must not be described as independent release assurance until the planned project-specific contract and CI gate exist.
+A failed or incomplete record prevents the delivery entrypoint from calling the SMTP transport layer.
 
-## Required project-specific extension
+The hard gate is implemented by:
 
-The planned `control/ETF_RELEASE_ASSURANCE_CONTRACT_V1.md` should independently verify at least:
+- `control/ETF_RELEASE_ASSURANCE_CONTRACT_V1.md`
+- `tools/etf_release_assurance.py`
+- `send_report_runtime_html.py`
+- `tests/test_etf_release_assurance.py`
+- `.github/workflows/validate-etf-release-assurance.yml`
 
-- source SHA and immutable run identity;
-- requested close date and pricing audit identity;
-- portfolio-state, trade-ledger, valuation-history, and report consistency;
-- English and Dutch numeric and section parity;
-- exact Markdown, HTML, PDF, and equity-chart artifact hashes;
-- delivery authorization scope;
-- delivery manifest;
-- independent bilingual inbox receipt before confirmed completion.
+## Remaining LEVEL 4 boundary
+
+The project is not recorded at LEVEL 4 until the delivery manifest and independent receiving-system confirmation for both languages are machine-bound to the same release identity and artifact hashes. SMTP return without exception remains `TRANSPORT_SENT_UNVERIFIED`.
 
 ## Session read rule
 
