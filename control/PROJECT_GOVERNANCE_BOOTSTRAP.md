@@ -2,8 +2,8 @@
 
 ```text
 standard_id=CROSS_PROJECT_TWO_ROLE_GOVERNANCE_V1
-canonical_standard_location=https://github.com/market-predictions/weekly-etf-eu/blob/main/control/CROSS_PROJECT_TWO_ROLE_GOVERNANCE_STANDARD_V1.md
-canonical_location_status=INTERIM_PENDING_CONTROL_PLANE_REPOSITORY
+canonical_standard_location=https://github.com/market-predictions/control-plane/blob/main/control/CROSS_PROJECT_TWO_ROLE_GOVERNANCE_STANDARD_V1.md
+canonical_location_status=CANONICAL_ACTIVE
 project_repository=market-predictions/weekly-etf
 project_risk_class=financial_report_delivery_and_portfolio_state
 adoption_status=documented
