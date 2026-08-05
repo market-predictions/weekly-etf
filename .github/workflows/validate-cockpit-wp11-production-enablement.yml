@@ -12,6 +12,7 @@ on:
       - "tests/test_cockpit_wp11_production_enablement.py"
       - "runtime/additive_cockpit_front_page.py"
       - "send_report_runtime_html.py"
+      - "send_report_runtime_html_legacy.py"
       - "control/work_packages/WP_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT_20260717.md"
       - "control/work_package_claims/WP_COCKPIT_SURFACE_11_PRODUCTION_ENABLEMENT_CLOSEOUT_20260717.md"
       - "control/evidence/COCKPIT_WP11_PRODUCTION_ENABLEMENT_EVIDENCE_20260717.json"
@@ -96,25 +97,28 @@ jobs:
           cat output/wp11_validation/validator.log
           exit "$status"
 
-      - name: Verify WP11 evidence contract
+      - name: Verify WP11 evidence contract against official current state
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
 
-          path = Path("output/wp11_validation/cockpit_wp11_production_enablement_evidence.json")
-          payload = json.loads(path.read_text(encoding="utf-8"))
+          evidence_path = Path("output/wp11_validation/cockpit_wp11_production_enablement_evidence.json")
+          payload = json.loads(evidence_path.read_text(encoding="utf-8"))
+          official = json.loads(Path("output/etf_portfolio_state.json").read_text(encoding="utf-8"))
+          active_positions = sum(1 for row in official.get("positions", []) if float(row.get("shares", 0) or 0) > 0)
+
           assert payload["schema_version"] == "cockpit_wp11_production_enablement_evidence_v1"
           assert payload["status"] == "validated_ready_for_production_enablement_merge"
           assert payload["selected_option"] == "B_enable_additive_delivery_front_page"
           assert payload["production_feature"]["value"] == "enabled"
           assert payload["production_feature"]["rollback_value"] == "disabled"
           assert payload["exact_current_authority"]["whole_share_status"] == "compliant"
-          assert payload["exact_current_authority"]["position_count"] == 9
-          assert payload["exact_current_authority"]["nav_eur"] == 106644.21
-          assert payload["exact_current_authority"]["cash_eur"] == 2534.36
-          assert payload["languages"]["en"]["front_page_metrics"]["positions"] == "9"
-          assert payload["languages"]["nl"]["front_page_metrics"]["posities"] == "9"
+          assert payload["exact_current_authority"]["position_count"] == active_positions
+          assert abs(float(payload["exact_current_authority"]["nav_eur"]) - float(official["nav_eur"])) < 0.01
+          assert abs(float(payload["exact_current_authority"]["cash_eur"]) - float(official["cash_eur"])) < 0.01
+          assert payload["languages"]["en"]["front_page_metrics"]["positions"] == str(active_positions)
+          assert payload["languages"]["nl"]["front_page_metrics"]["posities"] == str(active_positions)
           for language in ("en", "nl"):
               row = payload["languages"][language]
               assert row["disabled_front_page_count"] == 0
@@ -124,6 +128,10 @@ jobs:
               assert row["pdf_page_delta"] == 1
           assert payload["delivery_contract"]["email_sent"] is False
           assert payload["authority_contract"]["protected_hashes_before_after"] == "identical"
+          print(
+              "COCKPIT_WP11_CURRENT_AUTHORITY_OK | "
+              f"positions={active_positions} | nav_eur={official['nav_eur']} | cash_eur={official['cash_eur']}"
+          )
           PY
 
       - name: Prove repository authority unchanged

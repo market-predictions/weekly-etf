@@ -1,0 +1,35 @@
+name: Validate Weekly ETF release assurance
+
+on:
+  pull_request:
+    paths:
+      - "control/ETF_RELEASE_ASSURANCE_CONTRACT_V1.md"
+      - "control/PROJECT_GOVERNANCE_BOOTSTRAP.md"
+      - "tools/etf_release_assurance.py"
+      - "tests/test_etf_release_assurance.py"
+      - "send_report_runtime_html.py"
+      - "send_report_runtime_html_legacy.py"
+      - ".github/workflows/validate-etf-release-assurance.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  assurance-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile assurance implementation
+        run: |
+          python -m py_compile tools/etf_release_assurance.py send_report_runtime_html.py send_report_runtime_html_legacy.py
+
+      - name: Run positive and planted-failure contract tests
+        run: python -m unittest tests.test_etf_release_assurance -v

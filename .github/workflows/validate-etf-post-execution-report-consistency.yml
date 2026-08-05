@@ -12,9 +12,16 @@ on:
       - "runtime/render_etf_report_from_state.py"
       - "runtime/render_etf_report_nl_from_state.py"
       - "runtime/fix_executed_report_contract.py"
+      - "runtime/scrub_nl_client_language.py"
+      - "runtime/nonheld_watchlist_replay_cleanup.py"
+      - "runtime/link_runtime_report_tickers.py"
+      - "runtime/link_runtime_report_tickers_legacy.py"
       - "send_report_runtime_html.py"
+      - "send_report_runtime_html_legacy.py"
       - "tests/test_etf_post_execution_report_consistency.py"
       - "tests/test_etf_decision_cockpit_html.py"
+      - "tests/test_nl_replay_phrase_cleanup.py"
+      - "tests/test_nonheld_watchlist_replay_cleanup.py"
       - ".github/workflows/validate-etf-post-execution-report-consistency.yml"
       - ".github/workflows/resend-corrected-post-execution-report.yml"
   workflow_dispatch:
@@ -47,13 +54,20 @@ jobs:
             runtime/render_etf_report_from_state.py \
             runtime/render_etf_report_nl_from_state.py \
             runtime/fix_executed_report_contract.py \
-            send_report_runtime_html.py
+            runtime/scrub_nl_client_language.py \
+            runtime/nonheld_watchlist_replay_cleanup.py \
+            runtime/link_runtime_report_tickers.py \
+            runtime/link_runtime_report_tickers_legacy.py \
+            send_report_runtime_html.py \
+            send_report_runtime_html_legacy.py
 
       - name: Run focused regression tests
         run: |
           python -m pytest -q \
             tests/test_etf_post_execution_report_consistency.py \
-            tests/test_etf_decision_cockpit_html.py
+            tests/test_etf_decision_cockpit_html.py \
+            tests/test_nl_replay_phrase_cleanup.py \
+            tests/test_nonheld_watchlist_replay_cleanup.py
 
       - name: Record official state and ledger hashes
         run: |
@@ -73,7 +87,7 @@ jobs:
           sha256sum -c /tmp/state-before.sha256
           sha256sum -c /tmp/ledger-before.sha256
 
-      - name: Assert exact Markdown and delivery cockpit surfaces
+      - name: Assert exact Markdown, delivery cockpit and governance surfaces
         run: |
           python - <<'PY'
           import json
@@ -94,6 +108,8 @@ jobs:
           changes = {row['ticker']: row for row in state.get('executed_model_changes', [])}
           urnm_delta = f"{float(changes['URNM']['shares_delta']):.2f}"
           xbi_delta = f"{float(changes['XBI']['shares_delta']):.2f}"
+          legacy_entrypoint = Path('send_report_runtime_html_legacy.py').read_text(encoding='utf-8')
+          guarded_entrypoint = Path('send_report_runtime_html.py').read_text(encoding='utf-8')
           checks = {
               'en_execution': 'Guarded model rotation executed and persisted' in en,
               'nl_execution': 'Bewaakte modelrotatie uitgevoerd en verwerkt' in nl,
@@ -107,18 +123,24 @@ jobs:
               'nl_xbi_quantity': xbi_delta in nl,
               'en_no_contradiction': 'no portfolio action' not in en.lower(),
               'nl_no_contradiction': 'geen portefeuilleactie' not in nl.lower(),
+              'nl_no_passive_holds_leak': 'passive holds' not in nl.lower(),
+              'en_ppa_explicitly_non_held': 'non-held watchlist' in en.lower(),
+              'nl_ppa_explicitly_non_held': 'niet-aangehouden volglijst' in nl.lower(),
               'en_html_execution': 'Guarded model rotation executed and persisted' in en_html,
               'nl_html_execution': 'Bewaakte modelrotatie uitgevoerd en verwerkt' in nl_html,
               'en_html_no_contradiction': 'no portfolio action' not in en_html.lower(),
               'nl_html_no_contradiction': 'geen portefeuilleactie' not in nl_html.lower(),
-              'delivery_entrypoint_delegates': 'return decision_cockpit_html_from_markdown(md_text)' in Path('send_report_runtime_html.py').read_text(encoding='utf-8'),
+              'preserved_renderer_delegates': 'return decision_cockpit_html_from_markdown(md_text)' in legacy_entrypoint,
+              'transport_entrypoint_is_gated': 'ensure_release_assurance_from_environment' in guarded_entrypoint,
+              'transport_entrypoint_calls_preserved_sender': '_legacy.report_module.main()' in guarded_entrypoint,
           }
           failed = [name for name, passed in checks.items() if not passed]
           if failed:
               raise SystemExit('Post-execution delivery proof failed: ' + ', '.join(failed))
           print(
               'ETF_POST_EXECUTION_DELIVERY_CONSISTENCY_OK | '
-              f"source=URNM:{urnm_delta} | destination=XBI:{xbi_delta} | markdown=EN,NL | html=EN,NL"
+              f"source=URNM:{urnm_delta} | destination=XBI:{xbi_delta} | "
+              'markdown=EN,NL | html=EN,NL | governance=pre-send-gated'
           )
           PY
 
