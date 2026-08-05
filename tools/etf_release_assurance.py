@@ -32,6 +32,7 @@ REQUIRED_CHECKS = {
 }
 SHA_RE = re.compile(r"[0-9a-f]{40}")
 NUMBER_RE = re.compile(r"[-+]?\d[\d.,]*%?")
+SCORE_HEADING_RE = re.compile(r"\bscore\s+[-+]?\d", re.IGNORECASE)
 
 
 def sha256_file(path: Path) -> str:
@@ -108,9 +109,23 @@ def normalize_number(token: str) -> str | None:
 
 
 def table_numeric_multiset(path: Path) -> Counter[str]:
+    """Return comparable numeric values from bilingual report decision surfaces.
+
+    Most comparable values are in Markdown tables. The English position-review
+    renderer intentionally presents recommendation scores in subsection headings,
+    while the Dutch renderer presents the same scores in a compact table. Score
+    headings are therefore included as an equivalent structured surface. Other
+    prose remains excluded so language-specific narrative numbers cannot mask a
+    genuine table divergence.
+    """
     values: list[str] = []
     for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
-        if "|" not in line or set(line.replace("|", "").replace("-", "").replace(":", "").strip()) == set():
+        is_table_line = "|" in line
+        if is_table_line:
+            stripped = line.replace("|", "").replace("-", "").replace(":", "").strip()
+            if not stripped:
+                continue
+        elif not SCORE_HEADING_RE.search(line):
             continue
         for match in NUMBER_RE.findall(line):
             normalized = normalize_number(match)
@@ -179,109 +194,125 @@ def build_release_assurance(
         },
     )
 
-    en = report_assets(english_report)
-    nl = report_assets(dutch_report)
-    paths = {
+    assets: dict[str, Path] = {
         "pricing_audit": pricing_audit,
         "runtime_state": runtime_state,
         "run_manifest": run_manifest,
         "portfolio_state": portfolio_state,
         "trade_ledger": trade_ledger,
-        "english_report": en["report"],
-        "english_html": en["delivery_html"],
-        "english_pdf": en["pdf"],
-        "english_png": en["equity_curve_png"],
-        "dutch_report": nl["report"],
-        "dutch_html": nl["delivery_html"],
-        "dutch_pdf": nl["pdf"],
-        "dutch_png": nl["equity_curve_png"],
     }
-    missing = [str(path) for path in paths.values() if not path.is_file()]
+    assets.update({f"english_{key}": value for key, value in report_assets(english_report).items()})
+    assets.update({f"dutch_{key}": value for key, value in report_assets(dutch_report).items()})
+    missing = sorted(key for key, path in assets.items() if not path.is_file())
     add_check(checks, blockers, "required_files_present", not missing, {"missing": missing})
 
     parsed: dict[str, Any] = {}
-    json_errors: dict[str, str] = {}
+    parse_errors: dict[str, str] = {}
     for key in ("pricing_audit", "runtime_state", "run_manifest", "portfolio_state"):
-        path = paths[key]
-        if path.is_file():
-            try:
-                parsed[key] = load_json(path)
-            except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-                json_errors[key] = str(exc)
-    add_check(checks, blockers, "control_json_parseable", not json_errors, json_errors)
+        path = assets[key]
+        if not path.is_file():
+            continue
+        try:
+            parsed[key] = load_json(path)
+        except Exception as exc:  # noqa: BLE001 - evidence should preserve parser failure
+            parse_errors[key] = f"{type(exc).__name__}: {exc}"
+    add_check(checks, blockers, "control_json_parseable", not parse_errors, parse_errors)
 
     format_errors: list[str] = []
-    for key, path in paths.items():
-        if path.is_file():
-            error = valid_format(key, path)
-            if error:
-                format_errors.append(error)
+    for key, path in assets.items():
+        if not path.is_file():
+            continue
+        error = valid_format(key, path)
+        if error:
+            format_errors.append(error)
     add_check(checks, blockers, "artifact_formats_valid", not format_errors, format_errors)
 
-    manifest = parsed.get("run_manifest", {})
-    expected_manifest_values = [
-        run_id,
-        requested_close_date,
-        report_token,
-        str(pricing_audit),
-        str(runtime_state),
-        str(english_report),
-        str(dutch_report),
+    manifest = parsed.get("run_manifest") if isinstance(parsed.get("run_manifest"), dict) else {}
+    manifest_expectations = {
+        "run_id": run_id,
+        "requested_close_date": requested_close_date,
+        "report_token": report_token,
+    }
+    manifest_missing = [
+        f"{key}={manifest.get(key)!r} expected {value!r}"
+        for key, value in manifest_expectations.items()
+        if manifest.get(key) != value
     ]
-    manifest_missing = [value for value in expected_manifest_values if not contains_identity(manifest, value)] if isinstance(manifest, dict) else expected_manifest_values
+    manifest_paths = {
+        "pricing_audit_path": pricing_audit,
+        "runtime_state_path": runtime_state,
+        "english_report_path": english_report,
+        "dutch_report_path": dutch_report,
+    }
+    for key, expected_path in manifest_paths.items():
+        if str(manifest.get(key) or "") != str(expected_path):
+            manifest_missing.append(f"{key}={manifest.get(key)!r} expected {str(expected_path)!r}")
     add_check(
         checks,
         blockers,
         "run_manifest_identity_consistent",
         not manifest_missing,
-        {"missing_values": manifest_missing, "path": str(run_manifest)},
+        {"path": str(run_manifest), "missing_values": manifest_missing},
     )
 
-    pricing = parsed.get("pricing_audit", {})
-    pricing_ok = isinstance(pricing, dict) and contains_identity(pricing, requested_close_date) and (contains_identity(pricing, run_id) or run_id in pricing_audit.name)
+    pricing_payload = parsed.get("pricing_audit")
+    pricing_close_bound = contains_identity(pricing_payload, requested_close_date)
+    pricing_run_bound = contains_identity(pricing_payload, run_id)
     add_check(
         checks,
         blockers,
         "pricing_identity_consistent",
-        pricing_ok,
-        {"path": str(pricing_audit), "close_bound": contains_identity(pricing, requested_close_date) if isinstance(pricing, dict) else False, "run_bound": (contains_identity(pricing, run_id) if isinstance(pricing, dict) else False) or run_id in pricing_audit.name},
+        pricing_close_bound and pricing_run_bound,
+        {"path": str(pricing_audit), "close_bound": pricing_close_bound, "run_bound": pricing_run_bound},
     )
 
-    runtime = parsed.get("runtime_state", {})
-    runtime_ok = isinstance(runtime, dict) and contains_identity(runtime, requested_close_date) and (contains_identity(runtime, str(pricing_audit)) or contains_identity(runtime, pricing_audit.name))
+    runtime_payload = parsed.get("runtime_state")
+    runtime_close_bound = contains_identity(runtime_payload, requested_close_date)
+    runtime_pricing_bound = contains_identity(runtime_payload, str(pricing_audit))
     add_check(
         checks,
         blockers,
         "runtime_identity_consistent",
-        runtime_ok,
-        {"path": str(runtime_state), "close_bound": contains_identity(runtime, requested_close_date) if isinstance(runtime, dict) else False, "pricing_bound": (contains_identity(runtime, str(pricing_audit)) or contains_identity(runtime, pricing_audit.name)) if isinstance(runtime, dict) else False},
+        runtime_close_bound and runtime_pricing_bound,
+        {"path": str(runtime_state), "close_bound": runtime_close_bound, "pricing_bound": runtime_pricing_bound},
     )
 
-    parity_evidence: dict[str, Any] = {}
-    parity_ok = False
-    if english_report.is_file() and dutch_report.is_file():
-        en_numbers = table_numeric_multiset(english_report)
-        nl_numbers = table_numeric_multiset(dutch_report)
-        parity_ok = bool(en_numbers) and en_numbers == nl_numbers
-        parity_evidence = {
+    en_numbers = table_numeric_multiset(english_report) if english_report.is_file() else Counter()
+    nl_numbers = table_numeric_multiset(dutch_report) if dutch_report.is_file() else Counter()
+    english_only = sorted((en_numbers - nl_numbers).elements())
+    dutch_only = sorted((nl_numbers - en_numbers).elements())
+    add_check(
+        checks,
+        blockers,
+        "bilingual_table_numeric_parity",
+        not english_only and not dutch_only,
+        {
             "english_count": sum(en_numbers.values()),
             "dutch_count": sum(nl_numbers.values()),
-            "english_only": list((en_numbers - nl_numbers).elements())[:20],
-            "dutch_only": list((nl_numbers - en_numbers).elements())[:20],
-        }
-    add_check(checks, blockers, "bilingual_table_numeric_parity", parity_ok, parity_evidence)
+            "english_only": english_only[:25],
+            "dutch_only": dutch_only[:25],
+        },
+    )
 
-    hashes: dict[str, dict[str, str]] = {}
-    if not missing:
-        hashes = {key: {"path": str(path), "sha256": sha256_file(path)} for key, path in paths.items()}
-    hashes_ok = len(hashes) == len(paths) and all(re.fullmatch(r"[0-9a-f]{64}", item["sha256"]) for item in hashes.values())
-    add_check(checks, blockers, "artifact_hashes_complete", hashes_ok, hashes)
+    artifact_hashes: dict[str, dict[str, str]] = {}
+    for key, path in assets.items():
+        if path.is_file():
+            artifact_hashes[key] = {"path": str(path), "sha256": sha256_file(path)}
+    hashes_complete = len(artifact_hashes) == len(assets)
+    add_check(
+        checks,
+        blockers,
+        "artifact_hashes_complete",
+        hashes_complete,
+        artifact_hashes,
+    )
 
+    roles_separated = IMPLEMENTATION_ROLE != ASSURANCE_ROLE
     add_check(
         checks,
         blockers,
         "roles_separated",
-        IMPLEMENTATION_ROLE != ASSURANCE_ROLE,
+        roles_separated,
         {
             "implementation_role": IMPLEMENTATION_ROLE,
             "assurance_role": ASSURANCE_ROLE,
@@ -300,14 +331,14 @@ def build_release_assurance(
         "implementation_role": IMPLEMENTATION_ROLE,
         "assurance_role": ASSURANCE_ROLE,
         "identity": {
-            "source_sha": source_sha.lower(),
+            "source_sha": source_sha,
             "github_run_id": github_run_id,
             "run_id": run_id,
             "requested_close_date": requested_close_date,
             "report_token": report_token,
         },
         "checks": checks,
-        "artifact_hashes": hashes,
+        "artifact_hashes": artifact_hashes,
         "blockers": blockers,
     }
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -336,15 +367,15 @@ def validate_release_assurance(
 
     checks = {item.get("id"): item for item in payload.get("checks", []) if isinstance(item, dict)}
     missing_checks = sorted(REQUIRED_CHECKS - set(checks))
+    failed_checks = sorted(key for key, item in checks.items() if item.get("passed") is not True)
     if missing_checks:
         errors.append(f"required checks missing: {missing_checks}")
-    failed_checks = sorted(check_id for check_id, item in checks.items() if item.get("passed") is not True)
     if failed_checks:
         errors.append(f"failed checks present: {failed_checks}")
 
-    identity = payload.get("identity", {})
+    identity = payload.get("identity") if isinstance(payload.get("identity"), dict) else {}
     expected = {
-        "source_sha": expected_source_sha.lower() if expected_source_sha else None,
+        "source_sha": expected_source_sha,
         "run_id": expected_run_id,
         "requested_close_date": expected_close_date,
         "report_token": expected_report_token,
@@ -353,9 +384,13 @@ def validate_release_assurance(
         if value is not None and identity.get(key) != value:
             errors.append(f"identity mismatch for {key}: expected {value!r}, got {identity.get(key)!r}")
 
-    hashes = payload.get("artifact_hashes", {})
-    if not hashes or any(not re.fullmatch(r"[0-9a-f]{64}", str(item.get("sha256", ""))) for item in hashes.values() if isinstance(item, dict)):
-        errors.append("artifact hashes incomplete or malformed")
+    artifact_hashes = payload.get("artifact_hashes")
+    if not isinstance(artifact_hashes, dict) or not artifact_hashes:
+        errors.append("artifact_hashes missing or empty")
+    else:
+        for key, item in artifact_hashes.items():
+            if not isinstance(item, dict) or not re.fullmatch(r"[0-9a-f]{64}", str(item.get("sha256") or "")):
+                errors.append(f"invalid artifact hash for {key}")
 
     if errors:
         raise RuntimeError("ETF release assurance rejected: " + "; ".join(errors))
@@ -363,74 +398,75 @@ def validate_release_assurance(
 
 
 def ensure_release_assurance_from_environment() -> Path:
-    required_env = [
-        "GITHUB_SHA",
-        "ETF_PRICING_RUN_ID",
-        "REQUESTED_CLOSE_DATE",
-        "REPORT_TOKEN",
-        "ETF_PRICING_AUDIT_PATH",
-        "ETF_RUNTIME_STATE_PATH",
-        "MRKT_RPRTS_EXPLICIT_REPORT_PATH",
-        "MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL",
-    ]
-    missing_env = [name for name in required_env if not os.environ.get(name, "").strip()]
-    if missing_env:
-        raise RuntimeError(f"ETF release assurance missing required environment: {missing_env}")
+    source_sha = os.environ.get("GITHUB_SHA", "").strip()
+    github_run_id = os.environ.get("GITHUB_RUN_ID", "").strip()
+    run_id = os.environ.get("ETF_PRICING_RUN_ID", "").strip()
+    requested_close_date = os.environ.get("REQUESTED_CLOSE_DATE", "").strip()
+    report_token = os.environ.get("REPORT_TOKEN", "").strip()
+    required_env = {
+        "GITHUB_SHA": source_sha,
+        "GITHUB_RUN_ID": github_run_id,
+        "ETF_PRICING_RUN_ID": run_id,
+        "REQUESTED_CLOSE_DATE": requested_close_date,
+        "REPORT_TOKEN": report_token,
+        "ETF_PRICING_AUDIT_PATH": os.environ.get("ETF_PRICING_AUDIT_PATH", "").strip(),
+        "ETF_RUNTIME_STATE_PATH": os.environ.get("ETF_RUNTIME_STATE_PATH", "").strip(),
+        "MRKT_RPRTS_EXPLICIT_REPORT_PATH": os.environ.get("MRKT_RPRTS_EXPLICIT_REPORT_PATH", "").strip(),
+        "MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL": os.environ.get("MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL", "").strip(),
+    }
+    missing = sorted(key for key, value in required_env.items() if not value)
+    if missing:
+        raise RuntimeError(f"ETF release assurance environment incomplete: {missing}")
 
-    run_id = os.environ["ETF_PRICING_RUN_ID"].strip()
-    close_date = os.environ["REQUESTED_CLOSE_DATE"].strip()
-    token = os.environ["REPORT_TOKEN"].strip()
-    output = Path("output/run_manifests") / f"weekly_etf_release_assurance_{close_date}_{run_id}.json"
-    run_manifest = Path("output/run_manifests") / f"weekly_etf_run_manifest_{close_date}_{run_id}.json"
+    output = Path("output") / "run_manifests" / f"weekly_etf_release_assurance_{requested_close_date}_{run_id}.json"
     record = build_release_assurance(
-        source_sha=os.environ["GITHUB_SHA"].strip(),
-        github_run_id=os.environ.get("GITHUB_RUN_ID", "").strip(),
+        source_sha=source_sha,
+        github_run_id=github_run_id,
         run_id=run_id,
-        requested_close_date=close_date,
-        report_token=token,
-        pricing_audit=Path(os.environ["ETF_PRICING_AUDIT_PATH"]),
-        runtime_state=Path(os.environ["ETF_RUNTIME_STATE_PATH"]),
-        run_manifest=run_manifest,
+        requested_close_date=requested_close_date,
+        report_token=report_token,
+        pricing_audit=Path(required_env["ETF_PRICING_AUDIT_PATH"]),
+        runtime_state=Path(required_env["ETF_RUNTIME_STATE_PATH"]),
+        run_manifest=Path("output") / "run_manifests" / f"weekly_etf_run_manifest_{requested_close_date}_{run_id}.json",
         portfolio_state=Path("output/etf_portfolio_state.json"),
         trade_ledger=Path("output/etf_trade_ledger.csv"),
-        english_report=Path(os.environ["MRKT_RPRTS_EXPLICIT_REPORT_PATH"]),
-        dutch_report=Path(os.environ["MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL"]),
+        english_report=Path(required_env["MRKT_RPRTS_EXPLICIT_REPORT_PATH"]),
+        dutch_report=Path(required_env["MRKT_RPRTS_EXPLICIT_REPORT_PATH_NL"]),
         output=output,
     )
     if record["decision"] != "PASS":
         raise RuntimeError(f"ETF release assurance failed: {record['blockers']}")
     validate_release_assurance(
         output,
-        expected_source_sha=os.environ["GITHUB_SHA"].strip(),
+        expected_source_sha=source_sha,
         expected_run_id=run_id,
-        expected_close_date=close_date,
-        expected_report_token=token,
+        expected_close_date=requested_close_date,
+        expected_report_token=report_token,
     )
-    print(f"ETF_RELEASE_ASSURANCE_PASS | output={output} | artifacts={len(record['artifact_hashes'])}")
     return output
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    sub = parser.add_subparsers(dest="command", required=True)
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    subparsers = parser.add_subparsers(dest="command", required=True)
 
-    build = sub.add_parser("build")
+    build = subparsers.add_parser("build")
     build.add_argument("--source-sha", required=True)
-    build.add_argument("--github-run-id", default="")
+    build.add_argument("--github-run-id", required=True)
     build.add_argument("--run-id", required=True)
     build.add_argument("--requested-close-date", required=True)
     build.add_argument("--report-token", required=True)
-    build.add_argument("--pricing-audit", required=True, type=Path)
-    build.add_argument("--runtime-state", required=True, type=Path)
-    build.add_argument("--run-manifest", required=True, type=Path)
-    build.add_argument("--portfolio-state", required=True, type=Path)
-    build.add_argument("--trade-ledger", required=True, type=Path)
-    build.add_argument("--english-report", required=True, type=Path)
-    build.add_argument("--dutch-report", required=True, type=Path)
-    build.add_argument("--output", required=True, type=Path)
+    build.add_argument("--pricing-audit", type=Path, required=True)
+    build.add_argument("--runtime-state", type=Path, required=True)
+    build.add_argument("--run-manifest", type=Path, required=True)
+    build.add_argument("--portfolio-state", type=Path, required=True)
+    build.add_argument("--trade-ledger", type=Path, required=True)
+    build.add_argument("--english-report", type=Path, required=True)
+    build.add_argument("--dutch-report", type=Path, required=True)
+    build.add_argument("--output", type=Path, required=True)
 
-    validate = sub.add_parser("validate")
-    validate.add_argument("--assurance", required=True, type=Path)
+    validate = subparsers.add_parser("validate")
+    validate.add_argument("--assurance", type=Path, required=True)
     validate.add_argument("--expected-source-sha")
     validate.add_argument("--expected-run-id")
     validate.add_argument("--expected-close-date")
@@ -453,19 +489,22 @@ def main() -> int:
             dutch_report=args.dutch_report,
             output=args.output,
         )
-        print(f"ETF_RELEASE_ASSURANCE_{record['decision']} | output={args.output} | blockers={len(record['blockers'])}")
-        return 0 if record["decision"] == "PASS" else 1
-
-    validate_release_assurance(
-        args.assurance,
-        expected_source_sha=args.expected_source_sha,
-        expected_run_id=args.expected_run_id,
-        expected_close_date=args.expected_close_date,
-        expected_report_token=args.expected_report_token,
-    )
-    print(f"ETF_RELEASE_ASSURANCE_VALID | assurance={args.assurance}")
-    return 0
+        print(
+            "ETF_RELEASE_ASSURANCE_BUILT | "
+            f"decision={record['decision']} | output={args.output} | blockers={record['blockers']}"
+        )
+        if record["decision"] != "PASS":
+            raise SystemExit(1)
+    else:
+        validate_release_assurance(
+            args.assurance,
+            expected_source_sha=args.expected_source_sha,
+            expected_run_id=args.expected_run_id,
+            expected_close_date=args.expected_close_date,
+            expected_report_token=args.expected_report_token,
+        )
+        print(f"ETF_RELEASE_ASSURANCE_VALID | assurance={args.assurance}")
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
