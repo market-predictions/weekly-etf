@@ -1,0 +1,36 @@
+name: Validate ETF delivery closeout
+
+on:
+  pull_request:
+    paths:
+      - "tools/etf_delivery_closeout.py"
+      - "tests/test_etf_delivery_closeout.py"
+      - "control/ETF_RELEASE_ASSURANCE_CONTRACT_V1.md"
+      - "control/PROJECT_GOVERNANCE_BOOTSTRAP.md"
+      - "control/work_packages/WP_ETF_LEVEL4_DELIVERY_CONFIRMATION_20260805.md"
+      - ".github/workflows/validate-etf-delivery-closeout.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependency
+        run: python -m pip install pytest
+
+      - name: Compile closeout implementation
+        run: python -m py_compile tools/etf_delivery_closeout.py
+
+      - name: Run positive and planted-failure contract tests
+        run: pytest -q tests/test_etf_delivery_closeout.py
