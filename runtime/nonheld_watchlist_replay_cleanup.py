@@ -19,6 +19,40 @@ REPLACEMENTS = {
     ],
 }
 
+SECTION_HEADINGS = {
+    "en": "## 4. Structural Opportunity Radar",
+    "nl": "## 4. Structurele kansenradar",
+}
+
+EXPLICIT_NOTES = {
+    "en": (
+        "- **Non-held watchlist status:** PPA and ITA are research candidates only; "
+        "neither is a current portfolio position."
+    ),
+    "nl": (
+        "- **Niet-aangehouden volglijststatus:** PPA en ITA zijn uitsluitend "
+        "onderzoekskandidaten; geen van beide is een huidige portefeuillepositie."
+    ),
+}
+
+
+def _ensure_section_qualifier(text: str, language: str) -> str:
+    heading = SECTION_HEADINGS[language]
+    start = text.find(heading)
+    if start == -1:
+        return text
+    body_start = start + len(heading)
+    next_heading = re.search(r"\n## (?:\d+|\d+[A-Z]?)[\.]?\s", text[body_start:])
+    end = len(text) if next_heading is None else body_start + next_heading.start()
+    section = text[start:end]
+    folded = section.lower()
+    if "ppa" not in folded:
+        return text
+    if "non-held" in folded or "niet-aangehouden" in folded:
+        return text
+    insertion = "\n\n" + EXPLICIT_NOTES[language]
+    return text[:body_start] + insertion + text[body_start:]
+
 
 def normalize_nonheld_watchlist_text(text: str, language: str) -> str:
     language = language.lower().strip()
@@ -26,7 +60,7 @@ def normalize_nonheld_watchlist_text(text: str, language: str) -> str:
         raise ValueError(f"Unsupported language: {language}")
     for pattern, replacement in REPLACEMENTS[language]:
         text = pattern.sub(replacement, text)
-    return text
+    return _ensure_section_qualifier(text, language)
 
 
 def normalize_nonheld_watchlist_file(path: Path, language: str) -> bool:
