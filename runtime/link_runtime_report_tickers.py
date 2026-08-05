@@ -2,9 +2,9 @@ from __future__ import annotations
 
 """Guarded ticker-link entrypoint with narrow historical replay cleanup.
 
-Imported callers receive the preserved implementation. Direct execution performs
-only the exact non-held watchlist normalization required for historical replay,
-then invokes the unchanged linker and portfolio-integrity validator.
+Imported callers receive the preserved implementation. Direct execution applies
+the exact non-held watchlist normalization both before and inside the portfolio-
+integrity transformation boundary, then invokes the unchanged linker/validator.
 """
 
 import os
@@ -17,7 +17,23 @@ import runtime.link_runtime_report_tickers_legacy as _legacy
 if __name__ != "__main__":
     sys.modules[__name__] = _legacy
 else:
-    from runtime.nonheld_watchlist_replay_cleanup import normalize_nonheld_watchlist_file
+    import runtime.report_portfolio_integrity_contract as _integrity
+    from runtime.nonheld_watchlist_replay_cleanup import (
+        normalize_nonheld_watchlist_file,
+        normalize_nonheld_watchlist_text,
+    )
+
+    original_normalize_radar_rows = _integrity._normalize_radar_rows
+
+    def normalize_radar_rows_with_nonheld_boundary(
+        text: str,
+        state: dict,
+        language: str,
+    ) -> str:
+        transformed = original_normalize_radar_rows(text, state, language)
+        return normalize_nonheld_watchlist_text(transformed, language)
+
+    _integrity._normalize_radar_rows = normalize_radar_rows_with_nonheld_boundary
 
     candidates: list[tuple[Path, str]] = []
     explicit_en = os.environ.get("MRKT_RPRTS_EXPLICIT_REPORT_PATH", "").strip()
