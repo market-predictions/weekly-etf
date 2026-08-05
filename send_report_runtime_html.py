@@ -2,19 +2,19 @@ from __future__ import annotations
 
 """Guarded Weekly ETF delivery entrypoint.
 
-The established renderer remains in ``send_report_runtime_html_legacy``. This
-wrapper preserves its import surface and inserts the independent release-
-assurance gate only when the file is executed as the transport entrypoint.
+Imported callers receive the preserved renderer module itself, so monkeypatching,
+module globals and legacy regression behavior remain unchanged. The independent
+release-assurance gate is added only when this path is executed as transport.
 """
+
+import sys
 
 import send_report_runtime_html_legacy as _legacy
 
-for _name, _value in vars(_legacy).items():
-    if _name not in {"__name__", "__file__", "__package__", "__loader__", "__spec__"}:
-        globals()[_name] = _value
 
-
-if __name__ == "__main__":
+if __name__ != "__main__":
+    sys.modules[__name__] = _legacy
+else:
     from tools.etf_release_assurance import ensure_release_assurance_from_environment
 
     assurance_path = ensure_release_assurance_from_environment()
