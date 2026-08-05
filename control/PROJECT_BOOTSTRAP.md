@@ -16,12 +16,28 @@ That means:
 - avoid uploading changing repo files unless there is a specific reason
 
 ## First read sequence for meaningful ETF work
-At the start of any serious ETF architecture, debugging, prompt, or delivery session:
+At the start of any serious ETF architecture, debugging, prompt, production, portfolio, or delivery session:
 
 1. read `control/SYSTEM_INDEX.md` from GitHub
 2. read `control/CURRENT_STATE.md` from GitHub
 3. read `control/NEXT_ACTIONS.md` from GitHub
-4. only then read the minimum relevant execution file(s)
+4. read `control/PROJECT_GOVERNANCE_BOOTSTRAP.md` for consequential work
+5. only then read the minimum relevant execution file(s)
+
+## Separation of duties
+
+The project uses one user-facing coordinator and two internally separated roles:
+
+```text
+implementation_operations
+governance_release_assurance
+```
+
+The user gives one instruction and receives one consolidated status. The user does not separately coordinate the two roles.
+
+Implementation prepares the candidate. Governance independently reconstructs and certifies or rejects it. Implementation may not certify its own completion. Governance may not silently modify the candidate it reviews. A repaired candidate receives a new assurance pass.
+
+The shared standard and current project maturity are linked from `control/PROJECT_GOVERNANCE_BOOTSTRAP.md`.
 
 ## Which execution files to read by task
 ### Prompt architecture / report logic
@@ -44,17 +60,20 @@ So:
 - treat `etf.txt` as a **legacy reference document on GitHub** until it has been split into cleaner layers
 
 ## Required distinctions
-Always keep these four layers separate in reasoning and recommendations:
+Always keep these five layers separate in reasoning and recommendations:
 1. decision framework
 2. input/state contract
 3. output contract
 4. operational runbook
+5. governance and release assurance
 
 ## Quality rules
 - Prefer minimal, precise, non-destructive changes.
 - Treat GitHub as the current truth when project context and repo content differ.
 - Do not treat old report text as current pricing truth.
 - Do not claim delivery succeeded without a real receipt or manifest from the delivery layer.
+- Treat generated output as a release candidate until the required assurance pass exists.
+- Report action execution separately from independently confirmed outcome.
 - When proposing repo changes, identify the exact file(s) to edit.
 
 ## Minimal upload strategy for the ChatGPT Project
@@ -71,6 +90,7 @@ At the end of a meaningful ETF session, check whether GitHub should be updated i
 - `control/CURRENT_STATE.md`
 - `control/NEXT_ACTIONS.md`
 - `control/DECISION_LOG.md`
+- the project governance adoption or assurance files
 
 ## One-line reminder
 **Upload this file to the ChatGPT Project; read the rest live from GitHub.**
