@@ -1,22 +1,22 @@
 {
-  "breadth_trend": "improving",
-  "confidence_trend": "flat",
+  "breadth_trend": "mixed",
+  "confidence_trend": "rising",
   "cross_asset_confirmation": "mixed",
-  "current_confidence": 0.64,
-  "current_regime": "Policy transition / mixed regime",
+  "current_confidence": 0.72,
+  "current_regime": "Risk-on narrow leadership",
   "decision_rule": "Do not rotate aggressively unless a regime shift persists across at least two distinct report dates or cross-asset confirmation becomes broad.",
   "failed_rotation_count": 0,
-  "last_major_shift": "2026-07-29",
-  "previous_confidence": 0.66,
-  "prior_regime": "Risk-on growth",
+  "last_major_shift": "2026-08-05",
+  "previous_confidence": 0.64,
+  "prior_regime": "Policy transition / mixed regime",
   "regime_changed_this_run": true,
-  "report_date": "2026-07-29",
+  "report_date": "2026-08-05",
   "report_transfer": {
     "max_lines": 2,
     "show_in_report": true,
-    "summary": "Policy transition / mixed regime has persisted across 1 weekly observation(s); transition state is a possible transition, breadth is improving, and cross-asset confirmation is mixed."
+    "summary": "Risk-on narrow leadership has persisted across 1 weekly observation(s); transition state is a possible transition, breadth is mixed, and cross-asset confirmation is mixed."
   },
   "transition_state": "transition_candidate",
-  "updated_at_utc": "2026-07-29T21:24:04.404862Z",
+  "updated_at_utc": "2026-08-05T21:09:30.115408Z",
   "weeks_in_regime": 1
 }
