@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Fail closed when FX production assets leak into the Weekly ETF repository."""
+"""Fail closed when FX production assets leak into the Weekly ETF repository.
+
+Provider names are not product identity by themselves. The gate targets the actual
+FX runner, DailyTradeBias product and current FX output contracts.
+"""
 from __future__ import annotations
 
 import argparse
@@ -9,12 +13,13 @@ from typing import Any
 
 PROHIBITED_ROOT_PATHS = ("prediction.py", "daily_outputs", "mt5_output", "gpt.txt")
 PROHIBITED_WORKFLOW_TOKENS = (
-    "TWELVEDATA_API_KEY",
     "python prediction.py",
     "daily_outputs/latest",
     "FX_BACKTEST",
     "DailyTradeBias",
     "market-predictions/daily-fx",
+    "today_prediction_ranking",
+    "Today_Predictions.zip",
 )
 
 
@@ -38,6 +43,8 @@ def validate(root: Path) -> dict[str, Any]:
         "valid": not blockers,
         "verdict": "PASS" if not blockers else "FAIL",
         "blockers": blockers,
+        "prohibited_root_paths": list(PROHIBITED_ROOT_PATHS),
+        "prohibited_workflow_tokens": list(PROHIBITED_WORKFLOW_TOKENS),
     }
 
 
