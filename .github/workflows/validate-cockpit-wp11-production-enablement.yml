@@ -1,6 +1,9 @@
 name: Validate cockpit WP11 production enablement
 
 on:
+  push:
+    branches:
+      - feature/cockpit-wp11-production-enablement-closeout
   pull_request:
     branches: [main]
     paths:
