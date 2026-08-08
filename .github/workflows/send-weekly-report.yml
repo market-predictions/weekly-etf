@@ -14,6 +14,8 @@ permissions:
 jobs:
   send-report:
     runs-on: ubuntu-latest
+    env:
+      MRKT_RPRTS_COCKPIT_FRONT_PAGE: enabled
 
     steps:
       - name: Check out repository
