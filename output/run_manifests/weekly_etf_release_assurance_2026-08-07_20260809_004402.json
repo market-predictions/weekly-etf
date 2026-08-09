@@ -1,0 +1,212 @@
+{
+  "artifact_hashes": {
+    "dutch_delivery_html": {
+      "path": "output/weekly_analysis_pro_nl_260807_03_delivery.html",
+      "sha256": "bc662d3f09c34f5499036ab84fcf76078b26ac30c75cb75c9e7f00eb782cd219"
+    },
+    "dutch_equity_curve_png": {
+      "path": "output/weekly_analysis_pro_nl_260807_03_equity_curve.png",
+      "sha256": "4a154dc16b0ddb3b10a695dc7c73a86b440bd1a99815dddf8b9dd19eebc1121f"
+    },
+    "dutch_pdf": {
+      "path": "output/weekly_analysis_pro_nl_260807_03.pdf",
+      "sha256": "97ac8bc86e01289ad6c3ada808aad0dbdbf10378dea5334eb95086aeeb534c51"
+    },
+    "dutch_report": {
+      "path": "output/weekly_analysis_pro_nl_260807_03.md",
+      "sha256": "7060209bb3f5c05d2f14e7721c969183d298b3f782f1f0fa8307ea4e5bf3e527"
+    },
+    "english_delivery_html": {
+      "path": "output/weekly_analysis_pro_260807_03_delivery.html",
+      "sha256": "c002133ed6c256761ce5769d9bd74b0b67efd5cd5e609ccffdaf81a85cdcf84b"
+    },
+    "english_equity_curve_png": {
+      "path": "output/weekly_analysis_pro_260807_03_equity_curve.png",
+      "sha256": "7acafd21d8cf510e9559ca9b9f6fc4d735060ed0dd5275cfe1537246f474636a"
+    },
+    "english_pdf": {
+      "path": "output/weekly_analysis_pro_260807_03.pdf",
+      "sha256": "0ab4c4a8d0b3dfdf392efb006badd2eb1d69113786d7b11ed3e2cc57dacae01b"
+    },
+    "english_report": {
+      "path": "output/weekly_analysis_pro_260807_03.md",
+      "sha256": "1de12c33cb2adddc7dd54bf8faef88f3894c64cd8abec5c063f6645810a3b9ed"
+    },
+    "portfolio_state": {
+      "path": "output/etf_portfolio_state.json",
+      "sha256": "bc26391ac77b1f928671c1ca8a732a847944e53842df97ee558bd136b32d6dcf"
+    },
+    "pricing_audit": {
+      "path": "output/pricing/price_audit_2026-08-07_20260809_004402.json",
+      "sha256": "f438be3d9bd8acc9d528dad4c5727638f46f7e9c000837b2f942ff4952446029"
+    },
+    "run_manifest": {
+      "path": "output/run_manifests/weekly_etf_run_manifest_2026-08-07_20260809_004402.json",
+      "sha256": "d5825c9f74b6f6f06f470f315a1409942c1c6ebd556e61080140cdf400449807"
+    },
+    "runtime_state": {
+      "path": "output/runtime/etf_report_state_20260807_20260809_004402.json",
+      "sha256": "8ca9c7e617c3143063bf9d1832ea1f1cb673ec34e87057311ce9d46a4a8a56a6"
+    },
+    "trade_ledger": {
+      "path": "output/etf_trade_ledger.csv",
+      "sha256": "5a76e9820123936d2a196430adc59f2823fa8601938843760f0d42054f68df94"
+    }
+  },
+  "assurance_role": "governance_release_assurance",
+  "blockers": [
+    "bilingual_table_numeric_parity"
+  ],
+  "checks": [
+    {
+      "evidence": {
+        "github_run_id": "31286768273",
+        "report_token": "260807",
+        "requested_close_date": "2026-08-07",
+        "run_id": "20260809_004402",
+        "source_sha": "cec1b330b3c26773d0dcd8c54ed299e7a25fd01a"
+      },
+      "id": "source_identity_bound",
+      "passed": true
+    },
+    {
+      "evidence": {
+        "missing": []
+      },
+      "id": "required_files_present",
+      "passed": true
+    },
+    {
+      "evidence": {},
+      "id": "control_json_parseable",
+      "passed": true
+    },
+    {
+      "evidence": [],
+      "id": "artifact_formats_valid",
+      "passed": true
+    },
+    {
+      "evidence": {
+        "missing_values": [],
+        "path": "output/run_manifests/weekly_etf_run_manifest_2026-08-07_20260809_004402.json"
+      },
+      "id": "run_manifest_identity_consistent",
+      "passed": true
+    },
+    {
+      "evidence": {
+        "close_bound": true,
+        "path": "output/pricing/price_audit_2026-08-07_20260809_004402.json",
+        "run_bound": true
+      },
+      "id": "pricing_identity_consistent",
+      "passed": true
+    },
+    {
+      "evidence": {
+        "close_bound": true,
+        "path": "output/runtime/etf_report_state_20260807_20260809_004402.json",
+        "pricing_bound": true
+      },
+      "id": "runtime_identity_consistent",
+      "passed": true
+    },
+    {
+      "evidence": {
+        "dutch_count": 264,
+        "dutch_only": [],
+        "english_count": 268,
+        "english_only": [
+          "70",
+          "75",
+          "77",
+          "90"
+        ]
+      },
+      "id": "bilingual_table_numeric_parity",
+      "passed": false
+    },
+    {
+      "evidence": {
+        "dutch_delivery_html": {
+          "path": "output/weekly_analysis_pro_nl_260807_03_delivery.html",
+          "sha256": "bc662d3f09c34f5499036ab84fcf76078b26ac30c75cb75c9e7f00eb782cd219"
+        },
+        "dutch_equity_curve_png": {
+          "path": "output/weekly_analysis_pro_nl_260807_03_equity_curve.png",
+          "sha256": "4a154dc16b0ddb3b10a695dc7c73a86b440bd1a99815dddf8b9dd19eebc1121f"
+        },
+        "dutch_pdf": {
+          "path": "output/weekly_analysis_pro_nl_260807_03.pdf",
+          "sha256": "97ac8bc86e01289ad6c3ada808aad0dbdbf10378dea5334eb95086aeeb534c51"
+        },
+        "dutch_report": {
+          "path": "output/weekly_analysis_pro_nl_260807_03.md",
+          "sha256": "7060209bb3f5c05d2f14e7721c969183d298b3f782f1f0fa8307ea4e5bf3e527"
+        },
+        "english_delivery_html": {
+          "path": "output/weekly_analysis_pro_260807_03_delivery.html",
+          "sha256": "c002133ed6c256761ce5769d9bd74b0b67efd5cd5e609ccffdaf81a85cdcf84b"
+        },
+        "english_equity_curve_png": {
+          "path": "output/weekly_analysis_pro_260807_03_equity_curve.png",
+          "sha256": "7acafd21d8cf510e9559ca9b9f6fc4d735060ed0dd5275cfe1537246f474636a"
+        },
+        "english_pdf": {
+          "path": "output/weekly_analysis_pro_260807_03.pdf",
+          "sha256": "0ab4c4a8d0b3dfdf392efb006badd2eb1d69113786d7b11ed3e2cc57dacae01b"
+        },
+        "english_report": {
+          "path": "output/weekly_analysis_pro_260807_03.md",
+          "sha256": "1de12c33cb2adddc7dd54bf8faef88f3894c64cd8abec5c063f6645810a3b9ed"
+        },
+        "portfolio_state": {
+          "path": "output/etf_portfolio_state.json",
+          "sha256": "bc26391ac77b1f928671c1ca8a732a847944e53842df97ee558bd136b32d6dcf"
+        },
+        "pricing_audit": {
+          "path": "output/pricing/price_audit_2026-08-07_20260809_004402.json",
+          "sha256": "f438be3d9bd8acc9d528dad4c5727638f46f7e9c000837b2f942ff4952446029"
+        },
+        "run_manifest": {
+          "path": "output/run_manifests/weekly_etf_run_manifest_2026-08-07_20260809_004402.json",
+          "sha256": "d5825c9f74b6f6f06f470f315a1409942c1c6ebd556e61080140cdf400449807"
+        },
+        "runtime_state": {
+          "path": "output/runtime/etf_report_state_20260807_20260809_004402.json",
+          "sha256": "8ca9c7e617c3143063bf9d1832ea1f1cb673ec34e87057311ce9d46a4a8a56a6"
+        },
+        "trade_ledger": {
+          "path": "output/etf_trade_ledger.csv",
+          "sha256": "5a76e9820123936d2a196430adc59f2823fa8601938843760f0d42054f68df94"
+        }
+      },
+      "id": "artifact_hashes_complete",
+      "passed": true
+    },
+    {
+      "evidence": {
+        "assurance_may_mutate_release_candidate": false,
+        "assurance_role": "governance_release_assurance",
+        "implementation_may_self_certify": false,
+        "implementation_role": "implementation_operations"
+      },
+      "id": "roles_separated",
+      "passed": true
+    }
+  ],
+  "contract_id": "ETF_RELEASE_ASSURANCE_CONTRACT_V1",
+  "decision": "FAIL",
+  "generated_at_utc": "2026-08-09T00:45:59+00:00",
+  "identity": {
+    "github_run_id": "31286768273",
+    "report_token": "260807",
+    "requested_close_date": "2026-08-07",
+    "run_id": "20260809_004402",
+    "source_sha": "cec1b330b3c26773d0dcd8c54ed299e7a25fd01a"
+  },
+  "implementation_role": "implementation_operations",
+  "product": "weekly_etf",
+  "schema_version": "1.0.0"
+}
