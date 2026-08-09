@@ -15,6 +15,10 @@ import send_report_runtime_html_legacy as _legacy
 if __name__ != "__main__":
     sys.modules[__name__] = _legacy
 else:
+    from tools.etf_release_assurance_score_surface import install_score_heading_parity_fix
+
+    install_score_heading_parity_fix()
+
     from tools.etf_release_assurance import ensure_release_assurance_from_environment
 
     assurance_path = ensure_release_assurance_from_environment()
