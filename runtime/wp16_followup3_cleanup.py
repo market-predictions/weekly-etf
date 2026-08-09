@@ -42,6 +42,10 @@ DUTCH_MEMORY_PATTERNS = [
         re.compile(r"Risk-on growth has persisted for (\d+) run\(s\); transition state is stable, breadth is mixed, and cross-asset confirmation is mixed\.", re.IGNORECASE),
         r"Risk-on groei houdt al \1 runs aan; de overgangsfase is stabiel, de marktbreedte is gemengd en cross-asset bevestiging blijft gemengd.",
     ),
+    (
+        re.compile(r"Risk-on growth has persisted across (\d+) weekly observation\(s\); transition state is a possible transition, breadth is mixed, and cross-asset confirmation is mixed\.", re.IGNORECASE),
+        r"Risk-on groei houdt al \1 wekelijkse observaties aan; er is een mogelijke overgang, de marktbreedte is gemengd en cross-asset bevestiging blijft gemengd.",
+    ),
 ]
 
 ROTATION_LIMIT_RE = re.compile(
