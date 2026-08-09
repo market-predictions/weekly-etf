@@ -1,1 +1,1 @@
-output/run_manifests/weekly_etf_run_manifest_2026-08-05_20260805_212105.json
+output/run_manifests/weekly_etf_run_manifest_2026-08-07_20260809_002920.json
