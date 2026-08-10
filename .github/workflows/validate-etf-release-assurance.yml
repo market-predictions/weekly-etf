@@ -13,6 +13,20 @@ on:
       - "send_report_runtime_html.py"
       - "send_report_runtime_html_legacy.py"
       - ".github/workflows/validate-etf-release-assurance.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "control/ETF_RELEASE_ASSURANCE_CONTRACT_V1.md"
+      - "control/PROJECT_GOVERNANCE_BOOTSTRAP.md"
+      - "tools/etf_release_assurance.py"
+      - "tools/etf_release_assurance_score_surface.py"
+      - "tests/test_etf_release_assurance.py"
+      - "tests/test_etf_release_assurance_score_surface.py"
+      - "tests/test_etf_release_assurance_score_heading_priority.py"
+      - "send_report_runtime_html.py"
+      - "send_report_runtime_html_legacy.py"
+      - ".github/workflows/validate-etf-release-assurance.yml"
   workflow_dispatch:
 
 permissions:
