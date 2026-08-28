@@ -1,0 +1,116 @@
+{
+  "protocol_id": "WEEKLY_REVIEW_ASSEMBLY_CONTRACT_V1",
+  "version": "1.0",
+  "product": "US_WEEKLY_ETF",
+  "purpose": "Freeze the deterministic mapping from authoritative Weekly ETF state and evidence into the required Weekly Review structure without granting delivery or execution authority.",
+  "authoritative_inputs": [
+    {
+      "id": "governance",
+      "paths": [
+        "control/SYSTEM_INDEX.md",
+        "control/CURRENT_STATE.md",
+        "control/NEXT_ACTIONS.md"
+      ],
+      "rule": "Use only current integrated repository governance; narrative does not override machine state."
+    },
+    {
+      "id": "portfolio_state",
+      "paths": [
+        "output/etf_portfolio_state.json",
+        "output/etf_trade_ledger.csv",
+        "output/etf_valuation_history.csv"
+      ],
+      "rule": "Machine-readable state is authoritative for holdings, cash, executed model changes and valuation history."
+    },
+    {
+      "id": "pricing",
+      "paths": [
+        "output/pricing/"
+      ],
+      "rule": "Use the current canonical pricing lineage and its provenance/freshness status; never substitute stale report prices for current pricing authority."
+    },
+    {
+      "id": "research_and_regime",
+      "paths": [
+        "macro_regime/",
+        "macro_sources/",
+        "lab_inputs/"
+      ],
+      "rule": "Only evidence explicitly admissible under current project governance may influence the review; shadow/lab material is non-authoritative unless promoted."
+    },
+    {
+      "id": "methodology",
+      "paths": [
+        "etf.txt",
+        "MACRO_METHODOLOGY.md",
+        "control/CAPITAL_REUNDERWRITING_RULES.md",
+        "control/BILINGUAL_OUTPUT_RULES.md"
+      ],
+      "rule": "This contract composes existing methodology; it does not silently change thresholds, scoring, product identity or portfolio philosophy."
+    }
+  ],
+  "resolution_order": [
+    "governance",
+    "portfolio_state",
+    "pricing",
+    "research_and_regime",
+    "methodology"
+  ],
+  "fail_closed_conditions": [
+    "missing required authoritative input",
+    "conflicting current machine state",
+    "pricing evidence without admissible freshness/provenance",
+    "methodology identity mismatch",
+    "attempt to treat shadow, lab or historical report values as current authority"
+  ],
+  "output_contract": {
+    "client_layer": [
+      "Executive Summary",
+      "Portfolio Action Snapshot",
+      "Regime Dashboard",
+      "Structural Opportunity Radar",
+      "Key Risks",
+      "Bottom Line",
+      "Equity Curve and Portfolio Development"
+    ],
+    "analyst_layer": [
+      "Asset Allocation Map",
+      "Second-Order Effects Map",
+      "Current Position Review",
+      "Best New Opportunities",
+      "Portfolio Rotation Plan",
+      "Final Action Table",
+      "Position Changes Executed This Run",
+      "Current Portfolio Holdings and Cash",
+      "Continuity Input for Next Run",
+      "Disclaimer"
+    ],
+    "ordering_rule": "Emit every section exactly once in the listed order. Client layer precedes analyst layer.",
+    "content_rule": "For identical authoritative inputs, evidence set and methodology revision, material classifications, scores, actions, holdings/cash state and continuity output must be reproducible; wording may vary only where it does not change meaning.",
+    "identity_rule": "The assembled review must retain exact references to the authoritative state/pricing/evidence identities consumed for the run so later QA can bind the output to its inputs."
+  },
+  "side_effects": {
+    "report_send": false,
+    "smtp": false,
+    "broker_execution": false,
+    "portfolio_mutation": false,
+    "trade_ledger_mutation": false,
+    "release": false,
+    "deployment": false,
+    "note": "Assembly may describe recommendations or already-authoritative executed model state, but this contract itself cannot perform or authorize any of these side effects."
+  },
+  "product_boundaries": [
+    "US Weekly ETF identity remains authoritative for this repository",
+    "EU UCITS/investability semantics are not imported",
+    "FX runtime/output semantics are not imported",
+    "no second pricing, portfolio, ledger or state authority is created"
+  ],
+  "deterministic_acceptance": [
+    "all required input classes resolve to explicit repository paths",
+    "resolution order is fixed",
+    "required output sections and order are fixed",
+    "fail-closed conditions are explicit",
+    "methodology/product identity is preserved",
+    "delivery and financial side effects remain unauthorized"
+  ]
+}
