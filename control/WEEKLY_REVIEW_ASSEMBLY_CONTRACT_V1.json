@@ -2,7 +2,11 @@
   "protocol_id": "WEEKLY_REVIEW_ASSEMBLY_CONTRACT_V1",
   "version": "1.0",
   "product": "US_WEEKLY_ETF",
-  "purpose": "Freeze the deterministic mapping from authoritative Weekly ETF state and evidence into the required Weekly Review structure without granting delivery or execution authority.",
+  "purpose": "Freeze the deterministic mapping from authoritative Weekly ETF runtime state and governed evidence into the required Weekly Review structure without granting delivery or execution authority.",
+  "composes": {
+    "runtime_state_authority": "control/ETF_RUNTIME_STATE_CONTRACT.md",
+    "rule": "ETF_RUNTIME_STATE_CONTRACT defines the canonical runtime input/state authority order and normalized report-state bridge. This assembly contract consumes that authority and may not replace, reorder or duplicate it."
+  },
   "authoritative_inputs": [
     {
       "id": "governance",
@@ -14,29 +18,46 @@
       "rule": "Use only current integrated repository governance; narrative does not override machine state."
     },
     {
+      "id": "runtime_state_contract",
+      "paths": [
+        "control/ETF_RUNTIME_STATE_CONTRACT.md"
+      ],
+      "rule": "This is the canonical input/state authority contract for report assembly. Its authority order is binding."
+    },
+    {
       "id": "portfolio_state",
       "paths": [
-        "output/etf_portfolio_state.json",
-        "output/etf_trade_ledger.csv",
-        "output/etf_valuation_history.csv"
+        "output/etf_portfolio_state.json"
       ],
-      "rule": "Machine-readable state is authoritative for holdings, cash, executed model changes and valuation history."
+      "rule": "Primary holdings, cash, prior NAV, position metadata and implemented state authority as defined by ETF_RUNTIME_STATE_CONTRACT."
     },
     {
-      "id": "pricing",
+      "id": "pricing_audit",
       "paths": [
-        "output/pricing/"
+        "output/pricing/price_audit_YYYY-MM-DD.json"
       ],
-      "rule": "Use the current canonical pricing lineage and its provenance/freshness status; never substitute stale report prices for current pricing authority."
+      "rule": "Latest canonical pricing audit and FX basis under ETF_RUNTIME_STATE_CONTRACT; provenance and freshness must remain admissible."
     },
     {
-      "id": "research_and_regime",
+      "id": "lane_assessment",
       "paths": [
-        "macro_regime/",
-        "macro_sources/",
-        "lab_inputs/"
+        "output/lane_reviews/etf_lane_assessment_YYMMDD.json"
       ],
-      "rule": "Only evidence explicitly admissible under current project governance may influence the review; shadow/lab material is non-authoritative unless promoted."
+      "rule": "Canonical research-breadth and lane-ranking input under ETF_RUNTIME_STATE_CONTRACT."
+    },
+    {
+      "id": "recommendation_scorecard",
+      "paths": [
+        "output/etf_recommendation_scorecard.csv"
+      ],
+      "rule": "Canonical capital re-underwriting and recommendation-memory input under ETF_RUNTIME_STATE_CONTRACT."
+    },
+    {
+      "id": "normalized_runtime_state",
+      "paths": [
+        "output/runtime/etf_report_state_YYYYMMDD.json"
+      ],
+      "rule": "Deterministic normalized bridge produced from the canonical runtime authority order. Review assembly should consume this bridge where available rather than reconstructing a parallel state model."
     },
     {
       "id": "methodology",
@@ -49,17 +70,47 @@
       "rule": "This contract composes existing methodology; it does not silently change thresholds, scoring, product identity or portfolio philosophy."
     }
   ],
+  "advisory_inputs": [
+    {
+      "id": "governed_research_context",
+      "paths": [
+        "macro_regime/",
+        "macro_sources/"
+      ],
+      "rule": "May inform review analysis only when admissible under current project governance and consistent with canonical runtime state."
+    },
+    {
+      "id": "shadow_and_lab",
+      "paths": [
+        "lab_inputs/",
+        "lab_outputs/",
+        "output/macro/latest_thesis_candidates.json"
+      ],
+      "rule": "Explicitly non-authoritative. Never production truth, report-state authority or portfolio-action authority unless promoted through an explicit reviewed architecture decision."
+    }
+  ],
   "resolution_order": [
     "governance",
+    "runtime_state_contract",
     "portfolio_state",
-    "pricing",
-    "research_and_regime",
+    "pricing_audit",
+    "lane_assessment",
+    "recommendation_scorecard",
+    "normalized_runtime_state",
     "methodology"
+  ],
+  "runtime_authority_order": [
+    "output/etf_portfolio_state.json",
+    "output/pricing/price_audit_YYYY-MM-DD.json",
+    "output/lane_reviews/etf_lane_assessment_YYMMDD.json",
+    "output/etf_recommendation_scorecard.csv",
+    "prior markdown report as historical display context only"
   ],
   "fail_closed_conditions": [
     "missing required authoritative input",
     "conflicting current machine state",
     "pricing evidence without admissible freshness/provenance",
+    "runtime state inconsistent with ETF_RUNTIME_STATE_CONTRACT authority order",
     "methodology identity mismatch",
     "attempt to treat shadow, lab or historical report values as current authority"
   ],
@@ -87,7 +138,7 @@
     ],
     "ordering_rule": "Emit every section exactly once in the listed order. Client layer precedes analyst layer.",
     "content_rule": "For identical authoritative inputs, evidence set and methodology revision, material classifications, scores, actions, holdings/cash state and continuity output must be reproducible; wording may vary only where it does not change meaning.",
-    "identity_rule": "The assembled review must retain exact references to the authoritative state/pricing/evidence identities consumed for the run so later QA can bind the output to its inputs."
+    "identity_rule": "The assembled review must retain exact references to the authoritative runtime state, pricing/evidence identities and methodology revision consumed for the run so later QA can bind the output to its inputs."
   },
   "side_effects": {
     "report_send": false,
@@ -101,12 +152,16 @@
   },
   "product_boundaries": [
     "US Weekly ETF identity remains authoritative for this repository",
+    "ETF_RUNTIME_STATE_CONTRACT remains the sole runtime input/state authority contract",
     "EU UCITS/investability semantics are not imported",
     "FX runtime/output semantics are not imported",
     "no second pricing, portfolio, ledger or state authority is created"
   ],
   "deterministic_acceptance": [
-    "all required input classes resolve to explicit repository paths",
+    "all required authoritative input classes resolve to explicit repository paths",
+    "ETF_RUNTIME_STATE_CONTRACT authority order is explicitly composed and unchanged",
+    "normalized output/runtime report state is the canonical assembly bridge where available",
+    "shadow and lab inputs are explicitly non-authoritative unless promoted",
     "resolution order is fixed",
     "required output sections and order are fixed",
     "fail-closed conditions are explicit",
