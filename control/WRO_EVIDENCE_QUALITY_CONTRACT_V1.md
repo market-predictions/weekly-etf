@@ -1,6 +1,6 @@
 # Weekly Review OS — Evidence & Quality Contract V1
 
-Status: candidate contract for `WEEKLY_REVIEW_OS@2026-08-16-r2:WRO-GAP-30`.
+Status: candidate contract for `WEEKLY_REVIEW_OS@2026-09-02-r3:WRO-GAP-30`.
 
 ## Purpose
 
