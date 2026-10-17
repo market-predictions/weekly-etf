@@ -35,6 +35,16 @@ def operator_status(*, assurance: Path, source_sha: str, run_id: str,
         if record.get("contract_id") != "ETF_RELEASE_ASSURANCE_CONTRACT_V1":
             raise ValueError("release assurance contract mismatch")
         result["quality_checks"] = record["checks"]
+        source_checks = [
+            check for check in record["checks"]
+            if check.get("id") == "source_identity_bound"
+        ]
+        if (
+            len(source_checks) != 1
+            or not isinstance(source_checks[0].get("evidence"), dict)
+            or source_checks[0]["evidence"].get("source_sha") != source_sha
+        ):
+            blockers.append("Assurance source SHA contradicts source identity evidence")
         hashes = record["artifact_hashes"]
         result["artifact_hashes"] = hashes
         required = {"pricing_audit", "runtime_state", "run_manifest", "portfolio_state", "trade_ledger"}
