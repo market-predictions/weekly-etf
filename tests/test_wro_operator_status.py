@@ -42,6 +42,15 @@ class OperatorStatusTests(unittest.TestCase):
             self.assertEqual(before, {p: p.read_bytes() for p in root.iterdir()})
             wrong = operator_status(**{**args, 'run_id': 'other'})
             self.assertIn('identity mismatch', wrong['blockers'][0])
+            altered = json.loads(assurance.read_text())
+            altered['identity']['source_sha'] = 'b' * 40
+            assurance.write_text(json.dumps(altered))
+            disputed = operator_status(**{**args, 'source_sha': 'b' * 40})
+            self.assertIn(
+                'Assurance source SHA contradicts source identity evidence',
+                disputed['blockers'],
+            )
+            assurance.write_text(json.dumps(record))
             fx['en'].write_text('changed')
             self.assertIn('Artifact missing or changed: english_report', operator_status(**args)['blockers'])
             fx['en'].unlink()
