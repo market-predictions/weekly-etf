@@ -96,9 +96,14 @@ def format_text(result: dict) -> str:
         f"Assurance: {result['assurance']}",
         f"Delivery authorization: {result['authorization']['status']}",
         f"Delivery evidence: {result['delivery_status']}",
-        "",
-        "Blockers:",
     ]
+    hashes = result["artifact_hashes"]
+    if isinstance(hashes, dict) and hashes:
+        lines.extend(("", "Recorded artifact hashes (SHA-256):"))
+        for name, artifact in sorted(hashes.items()):
+            if isinstance(artifact, dict) and isinstance(artifact.get("sha256"), str):
+                lines.append(f"- {name}: {artifact['sha256']}")
+    lines.extend(("", "Blockers:"))
     lines.extend(f"- {blocker}" for blocker in result["blockers"])
     return "\n".join(lines)
 

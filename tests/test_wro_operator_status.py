@@ -42,14 +42,18 @@ class OperatorStatusTests(unittest.TestCase):
             self.assertIn('Delivery evidence: UNPROVEN', text.stdout)
             for blocker in record['blockers']:
                 self.assertIn(blocker, text.stdout)
+            for name, artifact in record['artifact_hashes'].items():
+                self.assertIn(f"{name}: {artifact['sha256']}", text.stdout)
             self.assertEqual(text.stderr, '')
             self.assertEqual(before, {p: p.read_bytes() for p in Path(tmp).iterdir()})
-            assurance.write_text('{', encoding='utf-8')
-            malformed = subprocess.run(command + ['--format', 'text'],
-                                       capture_output=True, text=True)
-            self.assertEqual(malformed.returncode, 1)
-            self.assertIn('Assurance unavailable or invalid', malformed.stdout)
-            self.assertEqual(malformed.stderr, '')
+            for invalid in ('{', '{"artifact_hashes":[]}',
+                            '{"artifact_hashes":{"english_report":null}}'):
+                assurance.write_text(invalid, encoding='utf-8')
+                malformed = subprocess.run(command + ['--format', 'text'],
+                                           capture_output=True, text=True)
+                self.assertEqual(malformed.returncode, 1)
+                self.assertIn('Assurance unavailable or invalid', malformed.stdout)
+                self.assertEqual(malformed.stderr, '')
 
     def test_missing_and_malformed_fail_closed(self):
         with tempfile.TemporaryDirectory() as tmp:

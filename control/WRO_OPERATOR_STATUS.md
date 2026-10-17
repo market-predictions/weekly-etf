@@ -22,7 +22,8 @@ against the actual files and manifest paths must match the selected package.
 Relative source paths retain the existing repository-root interpretation.
 
 Add `--format text` for a compact operator summary of the exact package,
-delivery authorization, delivery evidence and every blocker. The default
+including the recorded SHA-256 hash of each artifact, delivery authorization,
+delivery evidence and every blocker. The default
 `--format json` output is unchanged. Both formats use the same read-only
 projection and exit code; the text view does not add readiness or delivery
 authority.
