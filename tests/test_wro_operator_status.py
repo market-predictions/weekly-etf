@@ -6,11 +6,49 @@ import unittest
 from pathlib import Path
 
 from tests import test_etf_release_assurance as assurance_tests
-from tools.etf_release_assurance import build_release_assurance
+from tools.etf_release_assurance import build_release_assurance, evaluate_release_assurance, validate_release_assurance
 from tools.wro_operator_status import operator_status
 
 
 class OperatorStatusTests(unittest.TestCase):
+    def test_current_package_failures_are_diagnosed_without_writes(self):
+        for problem, gate in (("bilingual", "canonical_bilingual_state"),
+                              ("stale", "lineage_and_freshness"),
+                              ("execution", "recommendations_not_executions")):
+            with self.subTest(problem=problem), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                fx = assurance_tests.ETFReleaseAssuranceTests()._fixture(root)
+                if problem == "bilingual":
+                    fx['nl'].write_text(fx['nl'].read_text().replace('253', '254'))
+                elif problem == "stale":
+                    fx['en'].write_text(fx['en'].read_text() + '\nThe bank raised rates this week.\n')
+                else:
+                    runtime = json.loads(fx['runtime'].read_text())
+                    runtime['positions'] = [{'ticker': 'CIBR', 'action': 'buy', 'shares': 253}]
+                    fx['runtime'].write_text(json.dumps(runtime))
+                args = dict(source_sha=fx['source_sha'], github_run_id='123', run_id=fx['run_id'],
+                            requested_close_date=fx['close_date'], report_token=fx['token'],
+                            pricing_audit=fx['pricing'], runtime_state=fx['runtime'], run_manifest=fx['manifest'],
+                            portfolio_state=fx['portfolio'], trade_ledger=fx['ledger'],
+                            english_report=fx['en'], dutch_report=fx['nl'])
+                assurance = root / 'assurance.json'
+                record = build_release_assurance(output=assurance, **args)
+                before = {p: p.read_bytes() for p in root.iterdir()}
+                evaluated = evaluate_release_assurance(**args)
+                self.assertEqual(record['checks'], evaluated['checks'])
+                status = operator_status(assurance=assurance, source_sha=fx['source_sha'],
+                                         run_id=fx['run_id'], close_date=fx['close_date'], report_token=fx['token'])
+                self.assertEqual(status['wro_gates'][gate], 'FAIL')
+                self.assertEqual(status['wro_gates']['no_unresolved_blockers'], 'FAIL')
+                self.assertEqual(status['wro_gates']['exact_candidate_independent_assurance'], 'UNPROVEN')
+                self.assertEqual(status['status'], 'BLOCKED')
+                self.assertEqual(before, {p: p.read_bytes() for p in root.iterdir()})
+                if problem == 'bilingual':
+                    self.assertEqual(record['decision'], 'FAIL')
+                    validate_release_assurance(assurance, require_pass=False)
+                    with self.assertRaises(RuntimeError):
+                        validate_release_assurance(assurance)
+
     def test_cli_text_preserves_package_blockers_exit_code_and_no_writes(self):
         with tempfile.TemporaryDirectory() as tmp:
             assurance = Path(tmp) / 'assurance.json'

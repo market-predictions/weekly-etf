@@ -155,7 +155,7 @@ def valid_format(key: str, path: Path) -> str | None:
     return None
 
 
-def build_release_assurance(
+def evaluate_release_assurance(
     *,
     source_sha: str,
     github_run_id: str,
@@ -169,8 +169,8 @@ def build_release_assurance(
     trade_ledger: Path,
     english_report: Path,
     dutch_report: Path,
-    output: Path,
 ) -> dict[str, Any]:
+    """Reconstruct existing scoped checks without writing an assurance record."""
     checks: list[dict[str, Any]] = []
     blockers: list[str] = []
 
@@ -341,6 +341,12 @@ def build_release_assurance(
         "artifact_hashes": artifact_hashes,
         "blockers": blockers,
     }
+    return record
+
+
+def build_release_assurance(*, output: Path, **package: Any) -> dict[str, Any]:
+    """Persist the same legacy contract; read-only consumers use evaluate."""
+    record = evaluate_release_assurance(**package)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return record
@@ -353,16 +359,19 @@ def validate_release_assurance(
     expected_run_id: str | None = None,
     expected_close_date: str | None = None,
     expected_report_token: str | None = None,
+    require_pass: bool = True,
 ) -> dict[str, Any]:
     payload = load_json(path)
     errors: list[str] = []
-    if payload.get("decision") != "PASS":
+    if payload.get("decision") not in {"PASS", "FAIL"}:
+        errors.append("decision must be PASS or FAIL")
+    if require_pass and payload.get("decision") != "PASS":
         errors.append(f"decision must be PASS, got {payload.get('decision')!r}")
     if payload.get("implementation_role") != IMPLEMENTATION_ROLE:
         errors.append("implementation role mismatch")
     if payload.get("assurance_role") != ASSURANCE_ROLE:
         errors.append("assurance role mismatch")
-    if payload.get("blockers"):
+    if require_pass and payload.get("blockers"):
         errors.append(f"blockers present: {payload.get('blockers')}")
 
     checks = {item.get("id"): item for item in payload.get("checks", []) if isinstance(item, dict)}
@@ -370,8 +379,10 @@ def validate_release_assurance(
     failed_checks = sorted(key for key, item in checks.items() if item.get("passed") is not True)
     if missing_checks:
         errors.append(f"required checks missing: {missing_checks}")
-    if failed_checks:
+    if require_pass and failed_checks:
         errors.append(f"failed checks present: {failed_checks}")
+    if not require_pass and (payload.get("decision") == "PASS") != (not failed_checks and not payload.get("blockers")):
+        errors.append("decision contradicts checks or blockers")
 
     identity = payload.get("identity") if isinstance(payload.get("identity"), dict) else {}
     expected = {
