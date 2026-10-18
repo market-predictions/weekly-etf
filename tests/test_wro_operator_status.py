@@ -1,4 +1,6 @@
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,6 +11,50 @@ from tools.wro_operator_status import operator_status
 
 
 class OperatorStatusTests(unittest.TestCase):
+    def test_cli_text_preserves_package_blockers_exit_code_and_no_writes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            assurance = Path(tmp) / 'assurance.json'
+            fx = assurance_tests.ETFReleaseAssuranceTests()._fixture(Path(tmp))
+            build_release_assurance(
+                source_sha=fx['source_sha'], github_run_id='123', run_id=fx['run_id'],
+                requested_close_date=fx['close_date'], report_token=fx['token'],
+                pricing_audit=fx['pricing'], runtime_state=fx['runtime'], run_manifest=fx['manifest'],
+                portfolio_state=fx['portfolio'], trade_ledger=fx['ledger'],
+                english_report=fx['en'], dutch_report=fx['nl'], output=assurance)
+            command = [
+                sys.executable, '-m', 'tools.wro_operator_status',
+                '--assurance', str(assurance), '--source-sha', 'a' * 40,
+                '--run-id', fx['run_id'], '--close-date', '2026-07-17',
+                '--report-token', '260717',
+            ]
+            before = {p: p.read_bytes() for p in Path(tmp).iterdir()}
+            default = subprocess.run(command, capture_output=True, text=True)
+            explicit = subprocess.run(command + ['--format', 'json'],
+                                      capture_output=True, text=True)
+            text = subprocess.run(command + ['--format', 'text'],
+                                  capture_output=True, text=True)
+            self.assertEqual((default.returncode, explicit.returncode, text.returncode), (1, 1, 1))
+            self.assertEqual(default.stdout, explicit.stdout)
+            record = json.loads(default.stdout)
+            for value in ('a' * 40, fx['run_id'], '2026-07-17', '260717', str(assurance)):
+                self.assertIn(value, text.stdout)
+            self.assertIn('Delivery authorization: BLOCKED', text.stdout)
+            self.assertIn('Delivery evidence: UNPROVEN', text.stdout)
+            for blocker in record['blockers']:
+                self.assertIn(blocker, text.stdout)
+            for name, artifact in record['artifact_hashes'].items():
+                self.assertIn(f"{name}: {artifact['sha256']}", text.stdout)
+            self.assertEqual(text.stderr, '')
+            self.assertEqual(before, {p: p.read_bytes() for p in Path(tmp).iterdir()})
+            for invalid in ('{', '{"artifact_hashes":[]}',
+                            '{"artifact_hashes":{"english_report":null}}'):
+                assurance.write_text(invalid, encoding='utf-8')
+                malformed = subprocess.run(command + ['--format', 'text'],
+                                           capture_output=True, text=True)
+                self.assertEqual(malformed.returncode, 1)
+                self.assertIn('Assurance unavailable or invalid', malformed.stdout)
+                self.assertEqual(malformed.stderr, '')
+
     def test_missing_and_malformed_fail_closed(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'assurance.json'

@@ -84,6 +84,30 @@ def operator_status(*, assurance: Path, source_sha: str, run_id: str,
     return result
 
 
+def format_text(result: dict) -> str:
+    """Summarize the existing projection without making new readiness claims."""
+    identity = result["identity"]
+    lines = [
+        f"Weekly ETF: {result['status']}",
+        f"Source commit: {identity['source_sha']}",
+        f"Run: {identity['run_id']}",
+        f"Close date: {identity['requested_close_date']}",
+        f"Report token: {identity['report_token']}",
+        f"Assurance: {result['assurance']}",
+        f"Delivery authorization: {result['authorization']['status']}",
+        f"Delivery evidence: {result['delivery_status']}",
+    ]
+    hashes = result["artifact_hashes"]
+    if isinstance(hashes, dict) and hashes:
+        lines.extend(("", "Recorded artifact hashes (SHA-256):"))
+        for name, artifact in sorted(hashes.items()):
+            if isinstance(artifact, dict) and isinstance(artifact.get("sha256"), str):
+                lines.append(f"- {name}: {artifact['sha256']}")
+    lines.extend(("", "Blockers:"))
+    lines.extend(f"- {blocker}" for blocker in result["blockers"])
+    return "\n".join(lines)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--assurance", type=Path, required=True)
@@ -91,8 +115,13 @@ def main() -> None:
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--close-date", required=True)
     parser.add_argument("--report-token", required=True)
-    result = operator_status(**vars(parser.parse_args()))
-    print(json.dumps(result, indent=2, sort_keys=True))
+    parser.add_argument("--format", choices=("json", "text"), default="json",
+                        help="Output format (default: json)")
+    args = vars(parser.parse_args())
+    output_format = args.pop("format")
+    result = operator_status(**args)
+    print(format_text(result) if output_format == "text"
+          else json.dumps(result, indent=2, sort_keys=True))
     raise SystemExit(1 if result["status"] == "BLOCKED" else 0)
 
 
