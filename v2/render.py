@@ -68,8 +68,8 @@ T = {
                    "nl": "{n} fondsen gerangschikt op rendement over 3, 6 en 12 maanden (score 0–100). De trend is op wanneer de koers boven het 200-daags gemiddelde staat."},
     "state": {"en": "Market state", "nl": "Markttoestand"},
     "risk_on": {"en": "Risk-on", "nl": "Risicobereid"}, "risk_off": {"en": "Risk-off (defensive)", "nl": "Defensief"},
-    "breadth": {"en": "{b}% of ranked funds in an uptrend (defensive below {t}% with world equity in a downtrend)",
-                "nl": "{b}% van de gerangschikte fondsen in een opwaartse trend (defensief onder {t}% bij een dalende trend in wereldaandelen)"},
+    "breadth": {"en": "{b}% of ranked funds in an uptrend (defensive below {t}% with US equities in a downtrend)",
+                "nl": "{b}% van de gerangschikte fondsen in een opwaartse trend (defensief onder {t}% bij een dalende trend in Amerikaanse aandelen)"},
     "top10": {"en": "Top 10", "nl": "Top 10"}, "bottom5": {"en": "Bottom 5", "nl": "Onderste 5"},
     "held": {"en": "held", "nl": "in bezit"}, "new": {"en": "new", "nl": "nieuw"},
     "markets": {"en": "Markets and macro", "nl": "Markten en macro"},
@@ -123,7 +123,7 @@ def tone(v) -> str:
 
 # ── Chart ───────────────────────────────────────────────────────────────────
 def chart_svg(points: list[dict], lang: str) -> str:
-    W, H, L, R, TP, B = 640, 230, 44, 92, 14, 30
+    W, H, L, R, TP, B = 640, 230, 44, 128, 14, 30
     has_m = all("mirror_index" in p for p in points)
     ys = [p["portfolio_index"] for p in points] + [p["benchmark_index"] for p in points] + ([p["mirror_index"] for p in points] if has_m else [])
     lo, hi = min(ys), max(ys)
@@ -294,6 +294,7 @@ def page_mirror(f, c, lang):
 <h2>{t("mirror_traded", lang)}</h2>
 {traded}
 {planned}
+{page_method(f, lang, part="how")}
 </section>'''
 
 
@@ -344,7 +345,7 @@ def page_scan(f, c, lang, method=""):
 {method}'''
 
 
-def page_method(f, lang):
+def page_method(f, lang, part="data"):
     r = f["rules"]
     if lang == "nl":
         how = [
@@ -383,8 +384,9 @@ def page_method(f, lang):
                 "the European mirror shows how the portfolio can be followed with UCITS funds. Investing involves risk; you can lose some or all of your money. "
                 "Past performance is no guarantee of future results. Read the funds' key information documents (KID) before investing.")
     items = "".join(f"<li>{e(x)}</li>" for x in how)
-    return f'''<h2>{t("method", lang)}</h2><ol class="how">{items}</ol>
-<h2>{t("data", lang)}</h2><p class="small">{e(data)}</p>
+    if part == "how":
+        return f'<h2>{t("method", lang)}</h2><ol class="how">{items}</ol>'
+    return f'''<h2>{t("data", lang)}</h2><p class="small">{e(data)}</p>
 <h2>{t("disclaimer", lang)}</h2><p class="small">{e(disc)}</p>
 </section>'''
 
@@ -473,7 +475,7 @@ def render(f: dict, c: dict, out_dir: Path) -> dict:
     result = {}
     for lang in ("nl", "en"):
         h = render_html(f, c[lang], lang)
-        stem = f"weekly_etf_review_{'nl_' if lang == 'nl' else ''}{f['report_date'].replace('-', '')}"
+        stem = f"weekly_etf_review_us_{'nl_' if lang == 'nl' else ''}{f['report_date'].replace('-', '')}"
         (out_dir / f"{stem}.html").write_text(h, encoding="utf-8")
         doc = HTML(string=h, base_url=str(ROOT)).render()
         doc.write_pdf(out_dir / f"{stem}.pdf")

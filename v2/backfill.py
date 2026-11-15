@@ -143,8 +143,9 @@ def main() -> None:
                           "amount_eur": "", "reason": "Holdings carried over from the 7 Aug 2026 report"} for i, sh in START_POSITIONS.items()]
           + [{"date": START.isoformat(), "type": "opening_cash", "id": "CASH", "isin": "", "shares": "", "price_eur": "",
               "amount_eur": START_CASH, "reason": "Cash carried over from the 7 Aug 2026 report"}])
-    v1 = [{"date": r["date"], "nav_eur": r["nav_eur"]} for r in csv.DictReader((REPO / "output" / "etf_valuation_history.csv").open())]
-    write("history_v1.csv", v1)
+    v1_src = REPO / "output" / "etf_valuation_history.csv"  # v1 file; on the archive branch after the cleanup
+    if v1_src.exists():
+        write("history_v1.csv", [{"date": r["date"], "nav_eur": r["nav_eur"]} for r in csv.DictReader(v1_src.open())])
     last = history[-1]
     (STATE / "portfolio.json").write_text(json.dumps({
         "as_of": last["date"], "cash_eur": START_CASH, "nav_eur": last["nav_eur"], "track_record_start": START.isoformat(),

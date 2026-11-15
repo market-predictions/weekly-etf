@@ -269,7 +269,7 @@ def decide(d: str, holdings: dict[str, int], cash: float, prices: Prices, univer
             changes.append((4 + (r["rank"] / 1000 if r else 0), "entry", iid, info))
     # A switch between the normal and the inflation-regime core bond fund is one
     # decision (sell one, buy the other) and is executed together as one change.
-    bond_pair = {policy["core"]["bonds"], (inf or {}).get("alt_bonds")} - {None}
+    bond_pair = ({policy["core"]["bonds"], inf.get("alt_bonds")} - {None}) if inf else set()  # no inflation rule → no bond switch
     switch = [c for c in changes if c[2] in bond_pair]
     if switch:
         changes = [c for c in changes if c[2] not in bond_pair]
@@ -288,7 +288,8 @@ def decide(d: str, holdings: dict[str, int], cash: float, prices: Prices, univer
     for _, kind, iid, info in deferred:
         dec.deferred.append({"id": iid, "kind": kind, **info, "deferred_reason": f"max {limit} instrument changes per week"})
         if kind == "exit":
-            targets[iid] = holdings[iid] * px[iid] / nav  # hold as-is this week
+            # hold this week, but never above the satellite maximum (a resize, not a change)
+            targets[iid] = min(holdings[iid] * px[iid] / nav, policy["satellites"]["max_weight_each"])
         else:
             targets[iid] = 0.0
             # Weight waiting for a deferred entry is parked in the benchmark (core equity)

@@ -1,0 +1,62 @@
+name: Weekly ETF Review US (v2)
+
+# Every Thursday 05:00 UTC on Wednesday's closing prices. GitHub may start
+# scheduled jobs late; the run date is derived from the latest completed
+# Wednesday, so a late start produces the same report.
+on:
+  schedule:
+    - cron: "0 5 * * 4"
+  workflow_dispatch:
+    inputs:
+      rehearsal:
+        description: "Rehearsal: replay the latest saved week on a scratch copy (state untouched; trial email to owner only)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-us
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      MRKT_RPRTS_SMTP_HOST: ${{ secrets.MRKT_RPRTS_SMTP_HOST }}
+      MRKT_RPRTS_SMTP_PORT: ${{ secrets.MRKT_RPRTS_SMTP_PORT }}
+      MRKT_RPRTS_SMTP_USER: ${{ secrets.MRKT_RPRTS_SMTP_USER }}
+      MRKT_RPRTS_SMTP_PASS: ${{ secrets.MRKT_RPRTS_SMTP_PASS }}
+      MRKT_RPRTS_MAIL_FROM: ${{ secrets.MRKT_RPRTS_MAIL_FROM }}
+      MRKT_RPRTS_MAIL_TO: ${{ secrets.MRKT_RPRTS_MAIL_TO }}
+      MRKT_RPRTS_MAIL_TO_NL: ${{ secrets.MRKT_RPRTS_MAIL_TO_NL }}
+      V2_TRIAL_TO: ${{ secrets.V2_TRIAL_TO }}
+      V2_REHEARSAL: ${{ github.event_name == 'workflow_dispatch' && inputs.rehearsal && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq libpango-1.0-0 libpangoft2-1.0-0 >/dev/null
+          pip install -q requests==2.32.3 PyYAML==6.0.2 weasyprint==70.0
+      - name: Weekly run
+        run: python -m v2.run_weekly
+      - name: Save state and report
+        if: success() && env.V2_REHEARSAL != '1'
+        run: |
+          set -euo pipefail
+          git config user.name "weekly-etf-review-bot"
+          git config user.email "weekly-etf-review-bot@users.noreply.github.com"
+          git add -f v2/state v2/evidence
+          if git diff --cached --quiet; then echo "nothing to save"; exit 0; fi
+          git commit -m "Weekly ETF Review: state and report $(date -u +%Y-%m-%d)"
+          git push origin HEAD:${{ github.ref_name }}
+      - name: Alert owner on failure
+        if: failure()
+        run: python -m v2.mailer alert "The weekly run failed. Nothing was sent to readers and the saved state is unchanged. Log - ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

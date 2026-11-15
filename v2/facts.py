@@ -139,6 +139,10 @@ def build(d: str, with_macro: bool = True, applied: dict | None = None) -> dict:
         mres = MR.week(d, mstate, line_of, pol, prices, mprices, hold_after, cash_after) if mstate["as_of"] < d else \
             {"state": mstate, "executed": [], "prices": MR.value({p["line"]: p["shares"] for p in mstate["positions"]}, mstate["cash_eur"], mprices, d)[1],
              "targets": MR.implied_weights(hold_after, cash_after, prices, d, line_of), "benchmark_week_return": None}
+        if not mres["state"].get("pending"):
+            _hold = {p["line"]: p["shares"] for p in mstate["positions"]}
+            if MR.needs_trade(_hold, mstate["cash_eur"], mres["targets"], mprices, d, pol["mirror"]["rebalance_band_pts"]):
+                mres["state"] = dict(mstate, pending={"decided": d, "targets": mres["targets"]})
 
     nav = round(cash_after + sum(sh * prices.close(i, d) for i, sh in hold_after.items()), 2)
     start = hist[0]
@@ -213,7 +217,7 @@ def build(d: str, with_macro: bool = True, applied: dict | None = None) -> dict:
         px = mres["prices"][ln]
         us_ids = by_line.get(ln, [])
         kinds = sorted({uni_by[i]["mirror"]["kind"] for i in us_ids}) or ["sold"]
-        mpos.append({"line": ln, "ticker": ln.split(".")[0], "name": next((uni_by[i]["mirror"]["name"] for i in us_ids), ln),
+        mpos.append({"line": ln, "ticker": ln.split(".")[0], "name": next((u["mirror"]["name"] for u in uni_by.values() if u["mirror"]["line"] == ln), ln),
                      "us_ids": us_ids, "kind": kinds[0], "shares": sh, "price_eur": round(px, 2), "value_eur": round(sh * px, 2),
                      "weight_pct": pct(sh * px / mnav, 1), "us_weight_pct": pct(mres["targets"].get(ln, 0.0), 1)})
     pend = ms.get("pending")

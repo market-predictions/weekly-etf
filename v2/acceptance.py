@@ -31,7 +31,7 @@ def history_reconciles() -> None:
     hist = list(csv.DictReader((ROOT / "state" / "history.csv").open()))
     vals = defaultdict(float)
     for v in csv.DictReader((ROOT / "state" / "valuations.csv").open()):
-        vals[v["date"]] += round(float(v["shares"]) * float(v["close"]), 2)
+        vals[v["date"]] += float(v["shares"]) * float(v["close"])
     bad = [h["date"] for h in hist if abs(float(h["cash_eur"]) + vals[h["date"]] - float(h["nav_eur"])) > 0.02]
     check(not bad, f"every saved week reconciles to the cent ({len(hist)} weeks){' — off: ' + ', '.join(bad) if bad else ''}")
 
@@ -99,12 +99,20 @@ def rules_hold() -> None:
     with contextlib.redirect_stdout(io.StringIO()), tempfile.TemporaryDirectory() as tmp:
         sim.ROOT = Path(tmp)
         s = sim.run("acceptance", hold, 2534.36, "2026-08-07", sim.wednesdays(date(2026, 8, 12), last), prices, uni, pol)
+        weekly = json.loads(next(Path(tmp).rglob("simulation_acceptance.json")).read_text())["checks"]
         sim.ROOT = ROOT
     rc = s["rule_checks"]
     check(rc["max_changes_in_a_week"] <= pol["turnover"]["max_instrument_changes_per_week"] + 1,
           f"at most {pol['turnover']['max_instrument_changes_per_week']} fund changes a week (+1 for a bond-core switch): max {rc['max_changes_in_a_week']}")
     check(rc["max_satellite_weight_pct"] <= pol["satellites"]["max_weight_each"] * 100 + 0.5, f"satellite weight ≤ {pol['satellites']['max_weight_each']:.0%}: max {rc['max_satellite_weight_pct']}%")
-    check(rc["max_satellites_held"] <= pol["satellites"]["count"]["risk_on"] + 1, f"satellites held ≤ {pol['satellites']['count']['risk_on']} (+1 in transition): max {rc['max_satellites_held']}")
+    # The start portfolio (9 satellites, no core) needs weeks to convert at 2 changes a week: the count may
+    # not grow while it is above the limit, and must be within limit + 1 once the transition is over.
+    lim = pol["satellites"]["count"]["risk_on"]
+    n = [c["n_sats"] for c in weekly]
+    grew = any(b > a and b > lim for a, b in zip(n, n[1:]))
+    first_ok = next((k for k, v in enumerate(n) if v <= lim + 1), None)
+    later_bad = first_ok is None or any(v > lim + 1 for v in n[first_ok:])
+    check(not grew and not later_bad, f"satellites held: never growing above {lim}, and ≤ {lim} (+1) once converted (weekly counts {n})")
 
 
 def fresh_state() -> None:

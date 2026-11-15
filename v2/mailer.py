@@ -1,4 +1,4 @@
-"""Email delivery for Weekly ETF EU v2.
+"""Email delivery for Weekly ETF Review · US (v2).
 
 Addresses come only from GitHub secrets and are never printed (the repo and its
 logs are public). Modes (v2/delivery.yml):
@@ -69,7 +69,7 @@ def _attach(msg: EmailMessage, pdf: Path) -> None:
 def deliver(facts: dict, commentary: dict, pdfs: dict[str, Path], dry_run: bool = False, label: str = "TRIAL") -> dict:
     m = mode()
     date_ = facts["report_date"]
-    subj = {"en": f"Weekly ETF Review – {date_}", "nl": f"Wekelijkse ETF Review – {date_}"}
+    subj = {"en": f"Weekly ETF Review · US – {date_}", "nl": f"Wekelijkse ETF Review · VS – {date_}"}
     plan = []
     if m == "trial":
         msg = EmailMessage()
@@ -105,7 +105,7 @@ def alert(text: str) -> None:
         print("ALERT_NOT_SENT (no owner address or SMTP config)")
         return
     msg = EmailMessage()
-    msg["Subject"] = "[ALERT] Weekly ETF Review run failed – nothing was sent to readers"
+    msg["Subject"] = "[ALERT] Weekly ETF Review · US run failed – nothing was sent to readers"
     msg.set_content(text)
     _send(msg, to)
     print("ALERT_SENT")
