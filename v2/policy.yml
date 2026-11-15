@@ -47,6 +47,7 @@ cash:
   target: 0.03
   band: [0.02, 0.05]
   max_net_deployment_per_week_pct_nav: 7    # ~28% excess cash invested over ~4 weeks
+  park_pending_entries_in: SPY   # weight waiting for a deferred entry sits in core equity, not cash (owner 2026-11-15)
 
 turnover:
   max_instrument_changes_per_week: 2   # an entry or a full exit counts as one change

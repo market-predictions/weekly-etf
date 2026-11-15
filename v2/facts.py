@@ -175,7 +175,9 @@ def build(d: str, with_macro: bool = True, applied: dict | None = None) -> dict:
         "rank": t["reason"].get("rank"), "score": round(t["reason"]["score"]) if t["reason"].get("score") is not None else None,
         "replaced_by": t["reason"].get("replaced_by"), "params": t["reason"].get("params", {}),
     } for t in dec.trades]
-    deferred = [{"id": x["id"], "name": names.get(x["id"], x["id"]), "kind": x["kind"], "why": x.get("why"), "detail": x.get("detail"), "params": x.get("params", {})} for x in dec.deferred]
+    bought = {t["id"] for t in dec.trades if t["side"] == "buy"}  # a parked entry (e.g. SPY) is already being bought
+    deferred = [{"id": x["id"], "name": names.get(x["id"], x["id"]), "kind": x["kind"], "why": x.get("why"), "detail": x.get("detail"), "params": x.get("params", {})}
+                for x in dec.deferred if not (x["kind"] == "entry" and x["id"] in bought)]
 
     def scan_row(r):
         return {"rank": r["rank"], "id": r["id"], "name": names.get(r["id"], r["id"]), "score": round(r["score"]),
