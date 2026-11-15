@@ -1,0 +1,64 @@
+{
+ "commentary_source": {
+  "en": "fallback",
+  "nl": "fallback"
+ },
+ "commentary_problems": {
+  "en": [
+   "no OPENAI_API_KEY"
+  ],
+  "nl": [
+   "no OPENAI_API_KEY"
+  ]
+ },
+ "render": {
+  "nl": {
+   "pdf": "/home/runner/work/weekly-etf/weekly-etf/v2/evidence/report_20261111/weekly_etf_review_nl_20261111.pdf",
+   "pages": 6,
+   "problems": [
+    "page count 6 outside 3–5",
+    "forbidden text: \\bNone\\b"
+   ]
+  },
+  "en": {
+   "pdf": "/home/runner/work/weekly-etf/weekly-etf/v2/evidence/report_20261111/weekly_etf_review_20261111.pdf",
+   "pages": 6,
+   "problems": [
+    "page count 6 outside 3–5",
+    "forbidden text: \\bNone\\b"
+   ]
+  }
+ },
+ "macro": {
+  "ecb_deposit_rate": {
+   "available": true,
+   "date": "2026-11-11",
+   "stale": false,
+   "error": null
+  },
+  "fed_funds_effective": {
+   "available": true,
+   "date": "2026-11-10",
+   "stale": false,
+   "error": null
+  },
+  "us_10y_yield": {
+   "available": true,
+   "date": "2026-11-10",
+   "stale": false,
+   "error": null
+  },
+  "eurusd": {
+   "available": true,
+   "date": "2026-11-11",
+   "stale": false,
+   "error": null
+  },
+  "us_inflation": {
+   "available": false,
+   "date": null,
+   "stale": null,
+   "error": "ValueError: could not convert string to float: '-'"
+  }
+ }
+}

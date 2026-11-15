@@ -1,0 +1,138 @@
+{
+ "source": {
+  "en": "fallback",
+  "nl": "fallback"
+ },
+ "problems": {
+  "en": [
+   "no OPENAI_API_KEY"
+  ],
+  "nl": [
+   "no OPENAI_API_KEY"
+  ]
+ },
+ "en": {
+  "headline": "SMH is the main reason the portfolio trails its benchmark",
+  "what_happened": "The model portfolio fell 0.21% this week, against -0.47% for the benchmark (70% SPY / 30% AGG). Since 7 August 2026 it returned -1.16% against 1.39%, a shortfall of 2.54 percentage points.",
+  "why": "The largest effect came from SMH: -2.87 percentage points (weight 27.0%, own return -10.23%). The strongest contribution came from GSG: +0.99 percentage points.",
+  "what_we_do": "The rules lead to 6 trades this week; 6 new positions follow in the coming weeks because of the limit of 2 fund changes per week. The European mirror has returned -0.24% since 7 August 2026, against -1.16% for the US portfolio.",
+  "trades": [
+   {
+    "id": "CIBR",
+    "text": "Weight 20.0% against a target of 8.0%; resized because the gap exceeds 2 percentage points."
+   },
+   {
+    "id": "GSG",
+    "text": "Weight 10.4% against a target of 8.0%; resized because the gap exceeds 2 percentage points."
+   },
+   {
+    "id": "URNM",
+    "text": "Price 37.96 has been below its 200-day average (49.87) for two weeks running: the trend has turned, so the position is closed."
+   },
+   {
+    "id": "AGG",
+    "text": "The inflation rule is no longer active: the bond core moves back from None to AGG."
+   },
+   {
+    "id": "XBI",
+    "text": "Weight 5.1% against a target of 8.0%; resized because the gap exceeds 2 percentage points."
+   },
+   {
+    "id": "XLV",
+    "text": "Weight 5.7% against a target of 8.0%; resized because the gap exceeds 2 percentage points."
+   },
+   {
+    "id": "IEFA",
+    "text": "Dropped to rank 20 of 49; a holding stays only while it ranks in the top 15. Planned for a later week: at most 2 fund changes per week."
+   },
+   {
+    "id": "PAVE",
+    "text": "Dropped to rank 29 of 49; a holding stays only while it ranks in the top 15. Planned for a later week: at most 2 fund changes per week."
+   },
+   {
+    "id": "SMH",
+    "text": "Dropped to rank 30 of 49; a holding stays only while it ranks in the top 15. Planned for a later week: at most 2 fund changes per week."
+   },
+   {
+    "id": "XLU",
+    "text": "Dropped to rank 21 of 49; a holding stays only while it ranks in the top 15. Planned for a later week: at most 2 fund changes per week."
+   },
+   {
+    "id": "SPY",
+    "text": "Core or defensive position, target weight 39.9%. Planned for a later week: at most 2 fund changes per week."
+   },
+   {
+    "id": "XLE",
+    "text": "New: rank 2 of 49 in the scan, score 89, in an uptrend. Planned for a later week: at most 2 fund changes per week."
+   }
+  ],
+  "markets": "Strongest asset class this week: Emerging markets (1.03%); weakest: Gold (-1.63%).",
+  "watch": [
+   "Planned: sell IEFA (iShares Core MSCI EAFE ETF).",
+   "Planned: sell PAVE (Global X U.S. Infrastructure Development ETF).",
+   "Planned: sell SMH (VanEck Semiconductor ETF)."
+  ]
+ },
+ "nl": {
+  "headline": "SMH is de belangrijkste reden voor de achterstand op de benchmark",
+  "what_happened": "De modelportefeuille daalde deze week 0,21%, tegen -0,47% voor de benchmark (70% SPY / 30% AGG). Sinds 7 augustus 2026 is het rendement -1,16% tegen 1,39%: een achterstand van 2,54 procentpunt.",
+  "why": "Het grootste effect kwam van SMH: -2,87 procentpunt (gewicht 27,0%, eigen rendement -10,23%). De sterkste bijdrage kwam van GSG: +0,99 procentpunt.",
+  "what_we_do": "De regels leiden deze week tot 6 transacties; 6 nieuwe posities volgen in de komende weken vanwege het maximum van 2 fondswissels per week. De Europese spiegel staat sinds 7 augustus 2026 op -0,24%, tegen -1,16% voor de Amerikaanse portefeuille.",
+  "trades": [
+   {
+    "id": "CIBR",
+    "text": "Gewicht 20,0% tegen doel 8,0%; bijgesteld omdat het verschil groter is dan 2 procentpunt."
+   },
+   {
+    "id": "GSG",
+    "text": "Gewicht 10,4% tegen doel 8,0%; bijgesteld omdat het verschil groter is dan 2 procentpunt."
+   },
+   {
+    "id": "URNM",
+    "text": "Koers 37,96 staat twee weken op rij onder het 200-daags gemiddelde (49,87): de trend is gekeerd, de positie wordt gesloten."
+   },
+   {
+    "id": "AGG",
+    "text": "De inflatieregel is niet langer actief: de obligatiekern gaat terug van None naar AGG."
+   },
+   {
+    "id": "XBI",
+    "text": "Gewicht 5,1% tegen doel 8,0%; bijgesteld omdat het verschil groter is dan 2 procentpunt."
+   },
+   {
+    "id": "XLV",
+    "text": "Gewicht 5,7% tegen doel 8,0%; bijgesteld omdat het verschil groter is dan 2 procentpunt."
+   },
+   {
+    "id": "IEFA",
+    "text": "Gezakt naar plaats 20 van 49; een positie blijft alleen zolang ze in de top 15 staat. Gepland voor een volgende week: maximaal 2 fondswissels per week."
+   },
+   {
+    "id": "PAVE",
+    "text": "Gezakt naar plaats 29 van 49; een positie blijft alleen zolang ze in de top 15 staat. Gepland voor een volgende week: maximaal 2 fondswissels per week."
+   },
+   {
+    "id": "SMH",
+    "text": "Gezakt naar plaats 30 van 49; een positie blijft alleen zolang ze in de top 15 staat. Gepland voor een volgende week: maximaal 2 fondswissels per week."
+   },
+   {
+    "id": "XLU",
+    "text": "Gezakt naar plaats 21 van 49; een positie blijft alleen zolang ze in de top 15 staat. Gepland voor een volgende week: maximaal 2 fondswissels per week."
+   },
+   {
+    "id": "SPY",
+    "text": "Kern- of defensieve positie, doelgewicht 39,9%. Gepland voor een volgende week: maximaal 2 fondswissels per week."
+   },
+   {
+    "id": "XLE",
+    "text": "Nieuw: plaats 2 van 49 in de scan, score 89, opwaartse trend. Gepland voor een volgende week: maximaal 2 fondswissels per week."
+   }
+  ],
+  "markets": "Sterkste categorie deze week: Opkomende markten (1,03%); zwakste: Goud (-1,63%).",
+  "watch": [
+   "Gepland: verkoop IEFA (iShares Core MSCI EAFE ETF).",
+   "Gepland: verkoop PAVE (Global X U.S. Infrastructure Development ETF).",
+   "Gepland: verkoop SMH (VanEck Semiconductor ETF)."
+  ]
+ }
+}
