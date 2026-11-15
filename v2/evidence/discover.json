@@ -1,0 +1,1594 @@
+[
+ {
+  "id": "SPY",
+  "us": {
+   "symbol": "SPY",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street SPDR S&P 500 ETF Trust",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 754.37
+  },
+  "mirror": {
+   "kind": "twin",
+   "id": "SXR8"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "SXR8.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 736.84
+  }
+ },
+ {
+  "id": "AGG",
+  "us": {
+   "symbol": "AGG",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares Core U.S. Aggregate Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 95.09
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "iShares Core US Aggregate Bond UCITS"
+  },
+  "candidates": []
+ },
+ {
+  "id": "BIL",
+  "us": {
+   "symbol": "BIL",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street SPDR Bloomberg 1-3 Month T-Bill ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 91.53
+  },
+  "mirror": {
+   "kind": "proxy",
+   "id": "XEON"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "XEON.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "Xtrackers II EUR Overnight Rate Swap UCITS ETF 1C",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 150.793
+  }
+ },
+ {
+  "id": "QQQ",
+  "us": {
+   "symbol": "QQQ",
+   "ok": true,
+   "currency": "USD",
+   "name": "Invesco QQQ Trust",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 679.89
+  },
+  "mirror": {
+   "kind": "twin",
+   "id": "SXRV"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "SXRV.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares NASDAQ 100 UCITS ETF USD (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 1446.6
+  }
+ },
+ {
+  "id": "IWM",
+  "us": {
+   "symbol": "IWM",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares Russell 2000 ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 277.54
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "Russell 2000 UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "XRS2.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Xtrackers Russell 2000 UCITS ETF 1C",
+    "first": "2021-09-02",
+    "n": 1326,
+    "last": 374.55,
+    "search_name": "Xtrackers Russell 2000 UCITS ETF 1C"
+   },
+   {
+    "symbol": "RS2K.PA",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Amundi Index Solutions - Amundi Russell 2000 ETF-C EUR",
+    "first": "2021-09-02",
+    "n": 1333,
+    "last": 379.45,
+    "search_name": "Amundi Index Solutions - Amundi Russell 2000 ETF-C EUR"
+   },
+   {
+    "symbol": "SR2000.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Invesco Russell 2000 UCITS ETF",
+    "first": "2021-09-02",
+    "n": 1321,
+    "last": 129.48,
+    "search_name": "Invesco Russell 2000 UCITS ETF"
+   }
+  ]
+ },
+ {
+  "id": "MTUM",
+  "us": {
+   "symbol": "MTUM",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares MSCI USA Momentum Factor ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 67.98
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "iShares Edge MSCI USA Momentum Factor UCITS",
+   "fallback": "IS3R"
+  },
+  "candidates": [
+   {
+    "symbol": "QDVA.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares Edge MSCI USA Momentum Factor UCITS ETF USD (Acc)",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 16.912,
+    "search_name": "iShares Edge MSCI USA Momentum Factor UCITS ETF USD (Acc)"
+   }
+  ],
+  "pool_fallback": {
+   "symbol": "IS3R.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Edge MSCI World Momentum Factor UCITS ETF USD (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 94.29
+  }
+ },
+ {
+  "id": "QUAL",
+  "us": {
+   "symbol": "QUAL",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares MSCI USA Quality Factor ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 56.02
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "iShares Edge MSCI USA Quality Factor UCITS",
+   "fallback": "IS3Q"
+  },
+  "candidates": [
+   {
+    "symbol": "QDVB.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares Edge MSCI USA Quality Factor UCITS ETF USD (Acc)",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 17.09,
+    "search_name": "iShares Edge MSCI USA Quality Factor UCITS ETF USD (Acc)"
+   }
+  ],
+  "pool_fallback": {
+   "symbol": "IS3Q.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Edge MSCI World Quality Factor UCITS ETF USD (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 81.32
+  }
+ },
+ {
+  "id": "VLUE",
+  "us": {
+   "symbol": "VLUE",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares MSCI USA Value Factor ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 189.18
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "iShares Edge MSCI USA Value Factor UCITS",
+   "fallback": "IS3S"
+  },
+  "candidates": [
+   {
+    "symbol": "QDVI.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares Edge MSCI USA Value Factor UCITS ETF USD (Acc)",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 16.336,
+    "search_name": "iShares Edge MSCI USA Value Factor UCITS ETF USD (Acc)"
+   }
+  ],
+  "pool_fallback": {
+   "symbol": "IS3S.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Edge MSCI World Value Factor UCITS ETF USD (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 69.86
+  }
+ },
+ {
+  "id": "USMV",
+  "us": {
+   "symbol": "USMV",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares MSCI USA Min Vol Factor ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 104.1
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "iShares Edge MSCI USA Minimum Volatility UCITS",
+   "fallback": "IQQ0"
+  },
+  "candidates": [],
+  "pool_fallback": {
+   "symbol": "IQQ0.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Edge MSCI World Minimum Volatility UCITS ETF USD (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 73.3
+  }
+ },
+ {
+  "id": "XLK",
+  "us": {
+   "symbol": "XLK",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street Technology Select Sector SPDR ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 170.28
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "S&P 500 Information Technology Sector UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "QDVE.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares S&P 500 Information Technology Sector UCITS ETF USD (Acc)",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 42.695,
+    "search_name": "iShares S&P 500 Information Technology Sector UCITS ETF USD (Acc)"
+   }
+  ]
+ },
+ {
+  "id": "XLF",
+  "us": {
+   "symbol": "XLF",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street Financial Select Sector SPDR ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 58.68
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "S&P 500 Financials Sector UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "QDVH.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares S&P 500 Financials Sector UCITS ETF USD (Acc)",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 15.746,
+    "search_name": "iShares S&P 500 Financials Sector UCITS ETF USD (Acc)"
+   }
+  ]
+ },
+ {
+  "id": "XLE",
+  "us": {
+   "symbol": "XLE",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street Energy Select Sector SPDR ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 64.96
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "S&P 500 Energy Sector UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "QDVF.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares S&P 500 Energy Sector UCITS ETF USD (Acc)",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 12.428,
+    "search_name": "iShares S&P 500 Energy Sector UCITS ETF USD (Acc)"
+   }
+  ]
+ },
+ {
+  "id": "XLV",
+  "us": {
+   "symbol": "XLV",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street Health Care Select Sector SPDR ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 188.85
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "S&P 500 Health Care Sector UCITS",
+   "fallback": "CBUF"
+  },
+  "candidates": [
+   {
+    "symbol": "QDVG.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares S&P 500 Health Care Sector UCITS ETF USD (Acc)",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 13.794,
+    "search_name": "iShares S&P 500 Health Care Sector UCITS ETF USD (Acc)"
+   },
+   {
+    "symbol": "IUHE.AS",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares S&P 500 Health Care Sector UCITS ETF EUR Hedged (Dist)",
+    "first": "2021-09-02",
+    "n": 1333,
+    "last": 8.498,
+    "search_name": "iShares S&P 500 Health Care Sector UCITS ETF EUR Hedged (Dist)"
+   }
+  ],
+  "pool_fallback": {
+   "symbol": "CBUF.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares MSCI World Health Care Sector Advanced UCITS ETF USD Inc",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 8.216
+  }
+ },
+ {
+  "id": "XLI",
+  "us": {
+   "symbol": "XLI",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street Industrial Select Sector SPDR ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 168.78
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "S&P 500 Industrials Sector UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "2B7C.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares S&P 500 Industrials Sector UCITS ETF USD (Acc)",
+    "first": "2021-09-02",
+    "n": 1326,
+    "last": 12.94,
+    "search_name": "iShares S&P 500 Industrials Sector UCITS ETF USD (Acc)"
+   }
+  ]
+ },
+ {
+  "id": "XLY",
+  "us": {
+   "symbol": "XLY",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street Consumer Discretionary Select Sector SPDR ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 119.98
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "S&P 500 Consumer Discretionary Sector UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "QDVK.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares S&P 500 Consumer Discretionary Sector UCITS ETF USD (Acc)",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 15.634,
+    "search_name": "iShares S&P 500 Consumer Discretionary Sector UCITS ETF USD (Acc)"
+   }
+  ]
+ },
+ {
+  "id": "XLP",
+  "us": {
+   "symbol": "XLP",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street Consumer Staples Select Sector SPDR ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 92.35
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "S&P 500 Consumer Staples Sector UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "2B7D.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares S&P 500 Consumer Staples Sector UCITS ETF USD (Acc)",
+    "first": "2021-09-02",
+    "n": 1326,
+    "last": 10.21,
+    "search_name": "iShares S&P 500 Consumer Staples Sector UCITS ETF USD (Acc)"
+   }
+  ]
+ },
+ {
+  "id": "XLU",
+  "us": {
+   "symbol": "XLU",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street Utilities Select Sector SPDR ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 44.04
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "S&P 500 Utilities Sector UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "2B7A.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares S&P 500 Utilities Sector UCITS ETF USD (Acc)",
+    "first": "2021-09-02",
+    "n": 1326,
+    "last": 9.975,
+    "search_name": "iShares S&P 500 Utilities Sector UCITS ETF USD (Acc)"
+   }
+  ]
+ },
+ {
+  "id": "XLB",
+  "us": {
+   "symbol": "XLB",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street Materials Select Sector SPDR ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 52.23
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "S&P 500 Materials Sector UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "2B7B.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares S&P 500 Materials Sector UCITS ETF USD (Acc)",
+    "first": "2021-09-02",
+    "n": 1326,
+    "last": 10.606,
+    "search_name": "iShares S&P 500 Materials Sector UCITS ETF USD (Acc)"
+   }
+  ]
+ },
+ {
+  "id": "XLC",
+  "us": {
+   "symbol": "XLC",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street Communication Services Select Sector SPDR ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 108.69
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "S&P 500 Communication Sector UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "IU5C.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares S&P 500 Communication Sector UCITS ETF USD Acc",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 12.06,
+    "search_name": "iShares S&P 500 Communication Sector UCITS ETF USD Acc"
+   }
+  ]
+ },
+ {
+  "id": "XLRE",
+  "us": {
+   "symbol": "XLRE",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street Real Estate Select Sector SPDR ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 44.37
+  },
+  "mirror": {
+   "kind": "proxy",
+   "id": "IQQ6",
+   "query": "US Property Yield UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "IQQ7.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares US Property Yield UCITS ETF USD (Dist)",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 29.36,
+    "search_name": "iShares US Property Yield UCITS ETF USD (Dist)"
+   },
+   {
+    "symbol": "IUSP.AS",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares US Property Yield UCITS ETF USD (Dist)",
+    "first": "2021-09-02",
+    "n": 1331,
+    "last": 29.35,
+    "search_name": "iShares US Property Yield UCITS ETF USD (Dist)"
+   }
+  ],
+  "pool_id": {
+   "symbol": "IQQ6.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Developed Markets Property Yield UCITS ETF USD (Dist)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 22.7
+  }
+ },
+ {
+  "id": "SMH",
+  "us": {
+   "symbol": "SMH",
+   "ok": true,
+   "currency": "USD",
+   "name": "VanEck Semiconductor ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 486.75
+  },
+  "mirror": {
+   "kind": "twin",
+   "id": "VVSM"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "VVSM.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "VanEck Semiconductor UCITS ETF",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 81.81
+  }
+ },
+ {
+  "id": "AIQ",
+  "us": {
+   "symbol": "AIQ",
+   "ok": true,
+   "currency": "USD",
+   "name": "Global X Artificial Intelligence & Technology ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 58.72
+  },
+  "mirror": {
+   "kind": "proxy",
+   "id": "XAIX",
+   "query": "Global X AI & Big Data UCITS"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "XAIX.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "Xtrackers Artificial Intelligence & Big Data UCITS ETF 1C",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 199.96
+  }
+ },
+ {
+  "id": "CIBR",
+  "us": {
+   "symbol": "CIBR",
+   "ok": true,
+   "currency": "USD",
+   "name": "First Trust NASDAQ Cybersecurity ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 95.04
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "First Trust Nasdaq Cybersecurity UCITS",
+   "fallback": "L0CK"
+  },
+  "candidates": [
+   {
+    "symbol": "CBRS.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "First Trust Nasdaq Cybersecurity UCITS ETF Class A USD Accumulation",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 53.25,
+    "search_name": "First Trust Nasdaq Cybersecurity UCITS ETF Class A USD Accumulation"
+   },
+   {
+    "symbol": "CIBR.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "First Trust Nasdaq Cybersecurity UCITS ETF Class A USD Accumulation",
+    "first": "2021-09-02",
+    "n": 1321,
+    "last": 53.23,
+    "search_name": "First Trust Nasdaq Cybersecurity UCITS ETF Class A USD Accumulation"
+   },
+   {
+    "symbol": "CBEU.AS",
+    "ok": true,
+    "currency": "EUR",
+    "name": "First Trust Nasdaq Cybersecurity UCITS ETF Class C EUR Accumulation",
+    "first": "2023-07-18",
+    "n": 850,
+    "last": 36.47,
+    "search_name": "First Trust Nasdaq Cybersecurity UCITS ETF Class C EUR Accumulation"
+   }
+  ],
+  "pool_fallback": {
+   "symbol": "L0CK.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Digital Security UCITS ETF USD Acc",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 11.296
+  }
+ },
+ {
+  "id": "ITA",
+  "us": {
+   "symbol": "ITA",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares U.S. Aerospace & Defense ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 71.51
+  },
+  "mirror": {
+   "kind": "proxy",
+   "id": "DFEN"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "DFEN.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "VanEck Defense ETF A USD Acc",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 49.63
+  }
+ },
+ {
+  "id": "BOTZ",
+  "us": {
+   "symbol": "BOTZ",
+   "ok": true,
+   "currency": "USD",
+   "name": "Global X Robotics & Artificial Intelligence ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 31.23
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "Global X Robotics & Artificial Intelligence UCITS",
+   "fallback": "2B76"
+  },
+  "candidates": [
+   {
+    "symbol": "XB0T.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Global X Robotics & Artificial Intelligence UCITS ETF USD Acc",
+    "first": "2021-11-18",
+    "n": 1270,
+    "last": 18.82,
+    "search_name": "Global X Robotics & Artificial Intelligence UCITS ETF USD Acc"
+   },
+   {
+    "symbol": "BOTZ.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Global X Robotics & Artificial Intelligence UCITS ETF USD Acc",
+    "first": "2021-11-16",
+    "n": 1268,
+    "last": 18.76,
+    "search_name": "Global X Robotics & Artificial Intelligence UCITS ETF USD Acc"
+   }
+  ],
+  "pool_fallback": {
+   "symbol": "2B76.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Automation & Robotics UCITS ETF USD (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 17.83
+  }
+ },
+ {
+  "id": "URNM",
+  "us": {
+   "symbol": "URNM",
+   "ok": true,
+   "currency": "USD",
+   "name": "Sprott Uranium Miners ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 39.63
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "Sprott Uranium Miners UCITS",
+   "fallback": "NUKL"
+  },
+  "candidates": [
+   {
+    "symbol": "U3O8.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Sprott Uranium Miners UCITS ETF Accumulating",
+    "first": "2022-05-05",
+    "n": 1154,
+    "last": 9.082,
+    "search_name": "Sprott Uranium Miners UCITS ETF Accumulating"
+   }
+  ],
+  "pool_fallback": {
+   "symbol": "NUKL.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "VanEck Uranium and Nuclear Technologies UCITS ETF A USD Acc",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 35.895
+  }
+ },
+ {
+  "id": "ICLN",
+  "us": {
+   "symbol": "ICLN",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares Global Clean Energy ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 15.81
+  },
+  "mirror": {
+   "kind": "twin",
+   "id": "IQQH"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "IQQH.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Global Clean Energy Transition UCITS ETF USD (Dist)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 8.197
+  }
+ },
+ {
+  "id": "GRID",
+  "us": {
+   "symbol": "GRID",
+   "ok": true,
+   "currency": "USD",
+   "name": "First Trust NASDAQ Clean Edge Smart Grid Infrastructure Index Fund",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 160.29
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "First Trust Nasdaq Clean Edge Smart Grid UCITS"
+  },
+  "candidates": []
+ },
+ {
+  "id": "PAVE",
+  "us": {
+   "symbol": "PAVE",
+   "ok": true,
+   "currency": "USD",
+   "name": "Global X U.S. Infrastructure Development ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 53.13
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "Global X US Infrastructure Development UCITS",
+   "fallback": "IQQI"
+  },
+  "candidates": [],
+  "pool_fallback": {
+   "symbol": "IQQI.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Global Infrastructure UCITS ETF USD (Dist)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 35.87
+  }
+ },
+ {
+  "id": "PHO",
+  "us": {
+   "symbol": "PHO",
+   "ok": true,
+   "currency": "USD",
+   "name": "Invesco Water Resources ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 76.59
+  },
+  "mirror": {
+   "kind": "proxy",
+   "id": "IQQQ"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "IQQQ.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Global Water UCITS ETF USD (Dist)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 69.56
+  }
+ },
+ {
+  "id": "XBI",
+  "us": {
+   "symbol": "XBI",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street SPDR S&P Biotech ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 150.55
+  },
+  "mirror": {
+   "kind": "proxy",
+   "id": "2B70"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "2B70.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Nasdaq US Biotechnology UCITS ETF USD (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 9.485
+  }
+ },
+ {
+  "id": "KRE",
+  "us": {
+   "symbol": "KRE",
+   "ok": true,
+   "currency": "USD",
+   "name": "State Street SPDR S&P Regional Banking ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 72.74
+  },
+  "mirror": {
+   "kind": "cash",
+   "id": "XEON"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "XEON.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "Xtrackers II EUR Overnight Rate Swap UCITS ETF 1C",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 150.793
+  }
+ },
+ {
+  "id": "REMX",
+  "us": {
+   "symbol": "REMX",
+   "ok": true,
+   "currency": "USD",
+   "name": "VanEck Rare Earth and Strategic Metals ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 50.02
+  },
+  "mirror": {
+   "kind": "twin",
+   "id": "VVMX"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "VVMX.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "VanEck Rare Earth and Strategic Metals UCITS ETF A USD Acc",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 8.944
+  }
+ },
+ {
+  "id": "COPX",
+  "us": {
+   "symbol": "COPX",
+   "ok": true,
+   "currency": "USD",
+   "name": "Global X Copper Miners ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 69.23
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "Global X Copper Miners UCITS",
+   "fallback": "VVMX"
+  },
+  "candidates": [
+   {
+    "symbol": "4COP.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Global X Copper Miners UCITS ETF USD Acc",
+    "first": "2021-11-24",
+    "n": 1266,
+    "last": 49.41,
+    "search_name": "Global X Copper Miners UCITS ETF USD Acc"
+   },
+   {
+    "symbol": "COPX.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Global X Copper Miners UCITS ETF USD Acc",
+    "first": "2022-02-24",
+    "n": 1198,
+    "last": 49.59,
+    "search_name": "Global X Copper Miners UCITS ETF USD Acc"
+   }
+  ],
+  "pool_fallback": {
+   "symbol": "VVMX.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "VanEck Rare Earth and Strategic Metals UCITS ETF A USD Acc",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 8.944
+  }
+ },
+ {
+  "id": "GDX",
+  "us": {
+   "symbol": "GDX",
+   "ok": true,
+   "currency": "USD",
+   "name": "VanEck Gold Miners ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 81.64
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "VanEck Gold Miners UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "G2X.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "VanEck Gold Miners UCITS ETF",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 84.3,
+    "search_name": "VanEck Gold Miners UCITS ETF"
+   },
+   {
+    "symbol": "GDX.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "VanEck Gold Miners UCITS ETF",
+    "first": "2021-09-02",
+    "n": 1321,
+    "last": 84.35,
+    "search_name": "VanEck Gold Miners UCITS ETF"
+   },
+   {
+    "symbol": "GDX.PA",
+    "ok": true,
+    "currency": "EUR",
+    "name": "VanEck Gold Miners UCITS ETF",
+    "first": "2025-02-05",
+    "n": 452,
+    "last": 84.197,
+    "search_name": "VanEck Gold Miners UCITS ETF"
+   }
+  ]
+ },
+ {
+  "id": "IEFA",
+  "us": {
+   "symbol": "IEFA",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares Core MSCI EAFE ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 96.89
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "MSCI World ex USA UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "EXUS.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Xtrackers MSCI World ex USA UCITS ETF 1C USD",
+    "first": "2024-03-11",
+    "n": 680,
+    "last": 41.03,
+    "search_name": "Xtrackers MSCI World ex USA UCITS ETF 1C USD"
+   },
+   {
+    "symbol": "IXUA.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares MSCI World ex-USA UCITS ETF USD (Acc)",
+    "first": "2025-02-03",
+    "n": 453,
+    "last": 6.407,
+    "search_name": "iShares MSCI World ex-USA UCITS ETF USD (Acc)"
+   },
+   {
+    "symbol": "XUSE.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares MSCI World ex-USA UCITS ETF USD (Acc)",
+    "first": "2025-04-07",
+    "n": 406,
+    "last": 6.404,
+    "search_name": "iShares MSCI World ex-USA UCITS ETF USD (Acc)"
+   }
+  ]
+ },
+ {
+  "id": "VGK",
+  "us": {
+   "symbol": "VGK",
+   "ok": true,
+   "currency": "USD",
+   "name": "Vanguard FTSE Europe ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 89.04
+  },
+  "mirror": {
+   "kind": "proxy",
+   "id": "EUNK"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "EUNK.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Core MSCI Europe UCITS ETF EUR (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 108.16
+  }
+ },
+ {
+  "id": "EWJ",
+  "us": {
+   "symbol": "EWJ",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares MSCI Japan ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 91.76
+  },
+  "mirror": {
+   "kind": "twin",
+   "id": "IJPA"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "IJPA.AS",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Core MSCI Japan IMI UCITS ETF USD (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 71.51
+  }
+ },
+ {
+  "id": "EEM",
+  "us": {
+   "symbol": "EEM",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares MSCI Emerging Markets ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 60.92
+  },
+  "mirror": {
+   "kind": "twin",
+   "id": "EMIM"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "EMIM.AS",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Core MSCI EM IMI UCITS ETF USD (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 45.02
+  }
+ },
+ {
+  "id": "INDA",
+  "us": {
+   "symbol": "INDA",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares MSCI India ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 51.45
+  },
+  "mirror": {
+   "kind": "twin",
+   "id": "QDV5"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "QDV5.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares MSCI India UCITS ETF USD Acc",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 8.319
+  }
+ },
+ {
+  "id": "MCHI",
+  "us": {
+   "symbol": "MCHI",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares MSCI China ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 49.57
+  },
+  "mirror": {
+   "kind": "twin",
+   "id": "ICGA"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "ICGA.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares MSCI China UCITS ETF USD Acc",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 4.607
+  }
+ },
+ {
+  "id": "EWZ",
+  "us": {
+   "symbol": "EWZ",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares MSCI Brazil ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 32.22
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "MSCI Brazil UCITS"
+  },
+  "candidates": [
+   {
+    "symbol": "RIO.PA",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Amundi MSCI Brazil UCITS ETF Acc",
+    "first": "2021-09-02",
+    "n": 1333,
+    "last": 23.86,
+    "search_name": "Amundi MSCI Brazil UCITS ETF Acc"
+   },
+   {
+    "symbol": "IBZL.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares MSCI Brazil UCITS ETF USD (Dist)",
+    "first": "2021-09-02",
+    "n": 1321,
+    "last": 23.495,
+    "search_name": "iShares MSCI Brazil UCITS ETF USD (Dist)"
+   },
+   {
+    "symbol": "4BRZ.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares MSCI Brazil UCITS ETF (DE)",
+    "first": "2026-01-20",
+    "n": 210,
+    "last": 41.48,
+    "search_name": "iShares MSCI Brazil UCITS ETF (DE)"
+   }
+  ]
+ },
+ {
+  "id": "TLT",
+  "us": {
+   "symbol": "TLT",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares 20+ Year Treasury Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 79.38
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "iShares USD Treasury Bond 20+yr UCITS"
+  },
+  "candidates": []
+ },
+ {
+  "id": "IEF",
+  "us": {
+   "symbol": "IEF",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares 7-10 Year Treasury Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 90.04
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "iShares USD Treasury Bond 7-10yr UCITS"
+  },
+  "candidates": []
+ },
+ {
+  "id": "TIP",
+  "us": {
+   "symbol": "TIP",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares TIPS Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 104.61
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "iShares USD TIPS UCITS",
+   "fallback": "IBCI"
+  },
+  "candidates": [],
+  "pool_fallback": {
+   "symbol": "IBCI.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares € Inflation Linked Govt Bond UCITS ETF EUR (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 229.82
+  }
+ },
+ {
+  "id": "LQD",
+  "us": {
+   "symbol": "LQD",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares iBoxx $ Investment Grade Corporate Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 102.81
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "iShares USD Corporate Bond UCITS"
+  },
+  "candidates": []
+ },
+ {
+  "id": "HYG",
+  "us": {
+   "symbol": "HYG",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares iBoxx $ High Yield Corporate Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 76.94
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "iShares USD High Yield Corporate Bond UCITS",
+   "fallback": "EUNW"
+  },
+  "candidates": [],
+  "pool_fallback": {
+   "symbol": "EUNW.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares € High Yield Corp Bond UCITS ETF EUR (Dist)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 89.098
+  }
+ },
+ {
+  "id": "EMB",
+  "us": {
+   "symbol": "EMB",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares J.P. Morgan USD Emerging Markets Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 91.13
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "iShares J.P. Morgan USD EM Bond UCITS"
+  },
+  "candidates": []
+ },
+ {
+  "id": "GLD",
+  "us": {
+   "symbol": "GLD",
+   "ok": true,
+   "currency": "USD",
+   "name": "SPDR Gold Shares",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 355.45
+  },
+  "mirror": {
+   "kind": "twin",
+   "id": "4GLD"
+  },
+  "candidates": [],
+  "pool_id": {
+   "symbol": "4GLD.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "Xetra-Gold",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 113.26
+  }
+ },
+ {
+  "id": "SLV",
+  "us": {
+   "symbol": "SLV",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares Silver Trust",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 44.13
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "physical silver ETC"
+  },
+  "candidates": [
+   {
+    "symbol": "XAD6.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Xtrackers Physical Silver ETC (EUR)",
+    "first": "2021-09-02",
+    "n": 1321,
+    "last": 415.99,
+    "search_name": "Xtrackers Physical Silver ETC (EUR)"
+   },
+   {
+    "symbol": "XAD6.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Xtrackers Physical Silver ETC (EUR)",
+    "first": "2021-09-02",
+    "n": 1326,
+    "last": 415.94,
+    "search_name": "Xtrackers Physical Silver ETC (EUR)"
+   },
+   {
+    "symbol": "8PSB.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Invesco Physical Silver ETC",
+    "first": "2021-09-02",
+    "n": 1326,
+    "last": 42.424,
+    "search_name": "Invesco Physical Silver ETC"
+   }
+  ]
+ },
+ {
+  "id": "GSG",
+  "us": {
+   "symbol": "GSG",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares S&P GSCI Commodity-Indexed Trust",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 34.12
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "S&P GSCI commodity UCITS"
+  },
+  "candidates": []
+ },
+ {
+  "id": "USO",
+  "us": {
+   "symbol": "USO",
+   "ok": true,
+   "currency": "USD",
+   "name": "United States Oil Fund, LP",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 145.58
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": "WTI crude oil ETC"
+  },
+  "candidates": [
+   {
+    "symbol": "WTID.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "WisdomTree Bloomberg WTI Crude Oil ETC",
+    "first": "2026-11-13",
+    "n": 1,
+    "last": 40.28,
+    "search_name": "WisdomTree Bloomberg WTI Crude Oil ETC"
+   }
+  ]
+ }
+]
