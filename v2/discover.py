@@ -47,14 +47,23 @@ def search(q: str) -> list[dict]:
 def main() -> None:
     uni = yaml.safe_load((ROOT / "universe.yml").read_text())["instruments"]
     pool = {i["id"]: i for i in yaml.safe_load((ROOT / "mirror_pool.yml").read_text())["instruments"]}
+    import os
+    only_f = ROOT / "only.txt"
+    only = set(filter(None, (only_f.read_text().strip() if only_f.exists() else os.environ.get("V2_ONLY", "")).split(",")))
     out = []
     for inst in uni:
-        us = chart(inst["id"])
         m = inst.get("mirror") or {}
+        if only and inst["id"] not in only:
+            continue
+        us = chart(inst["id"])
         row = {"id": inst["id"], "us": us, "mirror": m, "candidates": []}
-        if m.get("query"):
-            seen = set()
-            for q in search(m["query"])[:8]:
+        queries = m.get("query") or []
+        queries = [queries] if isinstance(queries, str) else queries
+        if only and inst["id"] not in only:
+            continue
+        seen = set()
+        for qq in queries:
+            for q in search(qq)[:8]:
                 sym = q["symbol"]
                 if sym in seen:
                     continue
