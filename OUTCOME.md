@@ -14,11 +14,11 @@
 **Status:** laatste run van de wekelijkse workflow (na herbouw).
 
 ## Open vragen aan de eigenaar
-- Startportefeuille: doorgaan vanaf de laatste bekende stand in deze repo, of opnieuw beginnen?
-- Benchmark: S&P 500 (bijv. SPY), of een mix met obligaties zoals bij de EU-versie?
 - Taal: NL en EN?
 
 ## Besluiten
 - 2026-11-15 — Overgestapt op het outcome-first model (control-plane). Oudere plan-, status- en controledocumenten in deze repo zijn niet meer leidend.
 - 2026-11-15 — Actief project, niet dormant.
 - 2026-11-15 — Herbouw volgens het model van `weekly-etf-eu`: vaste pijplijn (data → beslissen → feiten → tekst → rapport → mail), AI rekent nooit, één acceptatietoets. Rekent in USD met Amerikaanse ETF's.
+- 2026-11-15 — Doorgaan vanaf de stand van 07-08-2026 (start 28-03-2026, €100k, basis EUR); de weken tot nu worden nagerekend.
+- 2026-11-15 — Benchmark 70% S&P 500 / 30% obligaties, in EUR.
