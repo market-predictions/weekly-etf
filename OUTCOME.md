@@ -1,18 +1,24 @@
-# OUTCOME — weekly-etf (VS-versie)
+# OUTCOME — weekly-etf (wekelijks rapport, VS-aandelen)
 
-> **CONCEPT (2026-11-15)** — opgesteld door Claude uit de README, de oude missie en de recente runs. De eigenaar bevestigt of past aan; tot dan geldt dit als werkhypothese, niet als besluit.
+> **Doel bevestigd door de eigenaar op 2026-11-15.** De invulling van "klaar als" volgt bij de herbouw (ronde B).
 
-**Doel:** Wekelijkse ETF-review (VS-instrumenten) per e-mail bij de lezers.
+**Doel:** Elke week een correct rapport over een modelportefeuille van ETF's op de Amerikaanse aandelenmarkt bij de lezers, volgens het model van `weekly-etf-eu`.
 
 **Klaar als:**
-- Wordt pas ingevuld als het project actief blijft.
+- Het rapport is op de vaste dag vóór het vaste tijdstip verzonden.
+- De portefeuille-historie sluit op de cent; elk getal komt uit de feiten.
+- Eén `acceptance.yml` toetst dit (te bouwen).
 
-**Alleen met akkoord van de eigenaar:** verzenden; lezers; beslisregels.
+**Alleen met akkoord van de eigenaar:** ontvangers en live verzenden; beslisregels, universum en benchmark; startportefeuille.
 
-**Status:** geen geplande runs actief; laatste activiteit 23-10-2026.
+**Status:** laatste run van de wekelijkse workflow (na herbouw).
 
 ## Open vragen aan de eigenaar
-- `weekly-etf-eu` staat nu los en draait zelfstandig. Moet deze VS-versie herbouwd worden op dezelfde manier, of gaat ze op dormant? Voorstel: dormant tot er vraag naar is.
+- Startportefeuille: doorgaan vanaf de laatste bekende stand in deze repo, of opnieuw beginnen?
+- Benchmark: S&P 500 (bijv. SPY), of een mix met obligaties zoals bij de EU-versie?
+- Taal: NL en EN?
 
 ## Besluiten
 - 2026-11-15 — Overgestapt op het outcome-first model (control-plane). Oudere plan-, status- en controledocumenten in deze repo zijn niet meer leidend.
+- 2026-11-15 — Actief project, niet dormant.
+- 2026-11-15 — Herbouw volgens het model van `weekly-etf-eu`: vaste pijplijn (data → beslissen → feiten → tekst → rapport → mail), AI rekent nooit, één acceptatietoets. Rekent in USD met Amerikaanse ETF's.
