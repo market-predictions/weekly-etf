@@ -57,7 +57,11 @@ def _get(url: str, **params) -> requests.Response:
 
 
 def yahoo(ticker: str, exchange: str, start: date, end: date) -> SourceResult:
-    sym = symbol_for("yahoo", ticker, exchange)
+    return yahoo_symbol(symbol_for("yahoo", ticker, exchange), start, end)
+
+
+def yahoo_symbol(sym: str, start: date, end: date) -> SourceResult:
+    """Daily closes for a raw Yahoo symbol (e.g. SPY, SXR8.DE, EURUSD=X)."""
     res = SourceResult("yahoo", sym)
     p1 = int(datetime(start.year, start.month, start.day, tzinfo=timezone.utc).timestamp())
     p2 = int(datetime(end.year, end.month, end.day, 23, 59, tzinfo=timezone.utc).timestamp())

@@ -1,20 +1,21 @@
-# Weekly ETF EU v2 — investment policy (agreed 2026-11-14)
+# Weekly ETF (US-listed) v2 — investment policy
+# Same rules as weekly-etf-eu (agreed there 2026-11-14), applied to US-listed ETFs valued in EUR.
 #
 # All numbers here are rules the code applies mechanically. The AI never changes
 # them; it only explains the trades they produce.
 
-schema_version: weekly_etf_eu_policy_v2
+schema_version: weekly_etf_us_policy_v2
 benchmark:                       # what the report compares against (decided 2026-11-14)
-  label: "70% VWCE / 30% EUNA"
-  weights: {VWCE: 0.70, EUNA: 0.30}   # rebalanced weekly at the Wednesday close
-trend_reference: VWCE               # world-equity trend used by the defensive switch
+  label: "70% SPY / 30% AGG"
+  weights: {SPY: 0.70, AGG: 0.30}     # rebalanced weekly at the Wednesday close (decided 2026-11-15)
+trend_reference: SPY                # US-equity trend used by the defensive switch
 
 core:
   # Core = broad base; its weight floats inside the band, aimed at target.
   weight_band: [0.40, 0.60]
   # Split of the core between equity and bonds (risk-on / risk-off).
-  equity: VWCE
-  bonds: EUNA
+  equity: SPY
+  bonds: AGG
   equity_share: {risk_on: 0.70, risk_off: 0.50}
 
 satellites:
@@ -33,17 +34,14 @@ scoring:
   trend_sma_days: 200                     # trend up = close above its 200-day average
   volatility_days: 63
 
-inflation_regime:                # decided 2026-11-15 after train/test research (v2/research.py)
-  # When euro-area inflation (latest published HICP y/y) is >= threshold and not lower
-  # than 3 months earlier, the bond core is held in short-dated euro government bonds.
-  threshold: 3.0
-  alt_bonds: IBGS
+# inflation_regime: not used here. The rule was validated on euro-area data for weekly-etf-eu;
+# it has not been tested on US data, so it stays off until it is.
 
 defensive_switch:
   # Risk-off when broad equity is in a downtrend AND most risky assets are too.
   benchmark_below_trend: true
   max_breadth_pct: 40            # share of rankable satellites in an uptrend
-  instrument: XEON               # unfilled satellite budget is parked here
+  instrument: BIL                # unfilled satellite budget is parked here
 
 cash:
   target: 0.03
@@ -58,3 +56,10 @@ execution:
   price: wednesday_close         # model trades at the valuation close
   whole_shares: true
   cost_bps: 10                   # assumed spread + commission per trade, both directions
+
+mirror:                          # the European mirror portfolio (decided 2026-11-15)
+  benchmark: {label: "70% SXR8 / 30% EUNA", weights: {"SXR8.DE": 0.70, "EUNA.DE": 0.30}}
+  start: "2026-08-07"            # same start value as the US portfolio on that date
+  execution: next_european_close # US decides at its Wednesday close; the mirror follows at the next European close
+  rebalance_band_pts: 2          # resize a mirror line only if off its US-implied weight by > 2 points
+  cost_bps: 10
