@@ -1,0 +1,488 @@
+[
+ {
+  "id": "AGG",
+  "us": {
+   "symbol": "AGG",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares Core U.S. Aggregate Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 95.09
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": [
+    "IE00B3F81409",
+    "iShares Core US Aggregate Bond",
+    "US Aggregate Bond UCITS"
+   ]
+  },
+  "candidates": []
+ },
+ {
+  "id": "USMV",
+  "us": {
+   "symbol": "USMV",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares MSCI USA Min Vol Factor ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 104.1
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": [
+    "MSCI USA Minimum Volatility UCITS",
+    "IE00BD1F4N50",
+    "USA Min Vol UCITS"
+   ],
+   "fallback": "IQQ0"
+  },
+  "candidates": [],
+  "pool_fallback": {
+   "symbol": "IQQ0.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Edge MSCI World Minimum Volatility UCITS ETF USD (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 73.3
+  }
+ },
+ {
+  "id": "GRID",
+  "us": {
+   "symbol": "GRID",
+   "ok": true,
+   "currency": "USD",
+   "name": "First Trust NASDAQ Clean Edge Smart Grid Infrastructure Index Fund",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 160.29
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": [
+    "Smart Grid Infrastructure UCITS",
+    "Clean Edge Smart Grid"
+   ]
+  },
+  "candidates": [
+   {
+    "symbol": "GRID.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "First Trust Nasdaq Clean Edge Smart Grid Infrastructure UCITS ETF A USD Acc",
+    "first": "2022-04-22",
+    "n": 1163,
+    "last": 50.25,
+    "search_name": "First Trust Nasdaq Clean Edge Smart Grid Infrastructure UCITS ETF A USD Acc"
+   },
+   {
+    "symbol": "GRID.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "First Trust Nasdaq Clean Edge Smart Grid Infrastructure UCITS ETF A USD Acc",
+    "first": "2022-05-02",
+    "n": 1153,
+    "last": 50.21,
+    "search_name": "First Trust Nasdaq Clean Edge Smart Grid Infrastructure UCITS ETF A USD Acc"
+   }
+  ]
+ },
+ {
+  "id": "PAVE",
+  "us": {
+   "symbol": "PAVE",
+   "ok": true,
+   "currency": "USD",
+   "name": "Global X U.S. Infrastructure Development ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 53.13
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": [
+    "US Infrastructure Development UCITS",
+    "Global X Infrastructure UCITS"
+   ],
+   "fallback": "IQQI"
+  },
+  "candidates": [],
+  "pool_fallback": {
+   "symbol": "IQQI.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares Global Infrastructure UCITS ETF USD (Dist)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 35.87
+  }
+ },
+ {
+  "id": "TLT",
+  "us": {
+   "symbol": "TLT",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares 20+ Year Treasury Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 79.38
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": [
+    "IE00BFM6TC58",
+    "USD Treasury Bond 20+yr",
+    "Treasury 20+ UCITS"
+   ]
+  },
+  "candidates": []
+ },
+ {
+  "id": "IEF",
+  "us": {
+   "symbol": "IEF",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares 7-10 Year Treasury Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 90.04
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": [
+    "IE00B3VWN518",
+    "USD Treasury Bond 7-10yr",
+    "US Treasury 7-10 UCITS"
+   ]
+  },
+  "candidates": [
+   {
+    "symbol": "ELFE.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Deka US Treasury 7-10 UCITS ETF",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 775.96,
+    "search_name": "Deka US Treasury 7-10 UCITS ETF"
+   }
+  ]
+ },
+ {
+  "id": "TIP",
+  "us": {
+   "symbol": "TIP",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares TIPS Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 104.61
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": [
+    "IE00B1FZSC47",
+    "USD TIPS UCITS",
+    "US TIPS UCITS"
+   ],
+   "fallback": "IBCI"
+  },
+  "candidates": [
+   {
+    "symbol": "IUST.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares $ TIPS UCITS ETF USD (Acc)",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 228.15,
+    "search_name": "iShares $ TIPS UCITS ETF USD (Acc)"
+   }
+  ],
+  "pool_fallback": {
+   "symbol": "IBCI.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares € Inflation Linked Govt Bond UCITS ETF EUR (Acc)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 229.82
+  }
+ },
+ {
+  "id": "LQD",
+  "us": {
+   "symbol": "LQD",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares iBoxx $ Investment Grade Corporate Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 102.81
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": [
+    "IE0032895942",
+    "USD Corporate Bond UCITS",
+    "iBoxx USD Liquid Investment Grade"
+   ]
+  },
+  "candidates": [
+   {
+    "symbol": "PRAP.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Amundi Core USD Corporate Bond UCITS ETF Acc",
+    "first": "2021-09-02",
+    "n": 1326,
+    "last": 19.038,
+    "search_name": "Amundi Core USD Corporate Bond UCITS ETF Acc"
+   },
+   {
+    "symbol": "XDGE.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Xtrackers USD Corporate Bond UCITS ETF 2D - EUR Hedged",
+    "first": "2021-09-02",
+    "n": 1321,
+    "last": 9.69,
+    "search_name": "Xtrackers USD Corporate Bond UCITS ETF 2D - EUR Hedged"
+   }
+  ]
+ },
+ {
+  "id": "HYG",
+  "us": {
+   "symbol": "HYG",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares iBoxx $ High Yield Corporate Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 76.94
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": [
+    "IE00B4PY7Y77",
+    "USD High Yield Corp Bond UCITS",
+    "iBoxx USD Liquid High Yield"
+   ],
+   "fallback": "EUNW"
+  },
+  "candidates": [
+   {
+    "symbol": "IS0R.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares $ High Yield Corp Bond UCITS ETF USD (Dist)",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 83.12,
+    "search_name": "iShares $ High Yield Corp Bond UCITS ETF USD (Dist)"
+   },
+   {
+    "symbol": "VUYA.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Vanguard Funds PLC - Vanguard USD High Yield Corporate Bond UCITS ETF USD Acc",
+    "first": "2026-10-09",
+    "n": 26,
+    "last": 91.204,
+    "search_name": "Vanguard Funds PLC - Vanguard USD High Yield Corporate Bond UCITS ETF USD Acc"
+   },
+   {
+    "symbol": "VUYD.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Vanguard Funds PLC - Vanguard USD High Yield Corporate Bond UCITS ETF USD Dist",
+    "first": "2026-10-09",
+    "n": 26,
+    "last": 91.204,
+    "search_name": "Vanguard Funds PLC - Vanguard USD High Yield Corporate Bond UCITS ETF USD Dist"
+   },
+   {
+    "symbol": "XUHY.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Xtrackers USD High Yield Corporate Bond UCITS ETF 1D",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 11.32,
+    "search_name": "Xtrackers USD High Yield Corporate Bond UCITS ETF 1D"
+   }
+  ],
+  "pool_fallback": {
+   "symbol": "EUNW.DE",
+   "ok": true,
+   "currency": "EUR",
+   "name": "iShares € High Yield Corp Bond UCITS ETF EUR (Dist)",
+   "first": "2026-10-16",
+   "n": 21,
+   "last": 89.098
+  }
+ },
+ {
+  "id": "EMB",
+  "us": {
+   "symbol": "EMB",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares J.P. Morgan USD Emerging Markets Bond ETF",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 91.13
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": [
+    "IE00B2NPKV68",
+    "J.P. Morgan USD EM Bond UCITS",
+    "USD Emerging Markets Bond UCITS"
+   ]
+  },
+  "candidates": [
+   {
+    "symbol": "XEMB.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Xtrackers II J.P. Morgan USD Emerging Markets Bond UCITS ETF 1C - EUR Hedged",
+    "first": "2021-09-02",
+    "n": 1321,
+    "last": 316.68,
+    "search_name": "Xtrackers II J.P. Morgan USD Emerging Markets Bond UCITS ETF 1C - EUR Hedged"
+   },
+   {
+    "symbol": "XEMB.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Xtrackers II J.P. Morgan USD Emerging Markets Bond UCITS ETF 1C - EUR Hedged",
+    "first": "2021-09-02",
+    "n": 1327,
+    "last": 317.65,
+    "search_name": "Xtrackers II J.P. Morgan USD Emerging Markets Bond UCITS ETF 1C - EUR Hedged"
+   },
+   {
+    "symbol": "XUEM.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Xtrackers II J.P. Morgan USD Emerging Markets Bond UCITS ETF 2D",
+    "first": "2021-09-02",
+    "n": 1326,
+    "last": 10.4735,
+    "search_name": "Xtrackers II J.P. Morgan USD Emerging Markets Bond UCITS ETF 2D"
+   }
+  ]
+ },
+ {
+  "id": "GSG",
+  "us": {
+   "symbol": "GSG",
+   "ok": true,
+   "currency": "USD",
+   "name": "iShares S&P GSCI Commodity-Indexed Trust",
+   "first": "2021-09-02",
+   "n": 1306,
+   "last": 34.12
+  },
+  "mirror": {
+   "kind": "twin",
+   "query": [
+    "commodity UCITS ETF",
+    "Bloomberg Commodity UCITS",
+    "iShares Diversified Commodity Swap"
+   ]
+  },
+  "candidates": [
+   {
+    "symbol": "WTIC.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "WisdomTree Enhanced Commodity UCITS ETF - USD Acc",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 20.08,
+    "search_name": "WisdomTree Enhanced Commodity UCITS ETF - USD Acc"
+   },
+   {
+    "symbol": "CMOD.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Invesco Bloomberg Commodity UCITS ETF",
+    "first": "2021-09-02",
+    "n": 1322,
+    "last": 30.295,
+    "search_name": "Invesco Bloomberg Commodity UCITS ETF"
+   },
+   {
+    "symbol": "CMOE.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Invesco Bloomberg Commodity UCITS ETF EUR Hedged",
+    "first": "2022-02-18",
+    "n": 1206,
+    "last": 66.37,
+    "search_name": "Invesco Bloomberg Commodity UCITS ETF EUR Hedged"
+   },
+   {
+    "symbol": "CMOE.MI",
+    "ok": true,
+    "currency": "EUR",
+    "name": "Invesco Bloomberg Commodity UCITS ETF EUR Hedged",
+    "first": "2021-09-02",
+    "n": 1323,
+    "last": 66.43,
+    "search_name": "Invesco Bloomberg Commodity UCITS ETF EUR Hedged"
+   },
+   {
+    "symbol": "SXRS.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares Diversified Commodity Swap UCITS ETF",
+    "first": "2021-09-02",
+    "n": 1325,
+    "last": 9.073,
+    "search_name": "iShares Diversified Commodity Swap UCITS ETF"
+   },
+   {
+    "symbol": "CMSE.PA",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares Diversified Commodity Swap UCITS ETF (DE)",
+    "first": "2024-11-26",
+    "n": 500,
+    "last": 35.71,
+    "search_name": "iShares Diversified Commodity Swap UCITS ETF (DE)"
+   },
+   {
+    "symbol": "EXXY.DE",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares Diversified Commodity Swap UCITS ETF (DE)",
+    "first": "2021-09-02",
+    "n": 1327,
+    "last": 35.705,
+    "search_name": "iShares Diversified Commodity Swap UCITS ETF (DE)"
+   },
+   {
+    "symbol": "ICOM.PA",
+    "ok": true,
+    "currency": "EUR",
+    "name": "iShares Diversified Commodity Swap UCITS ETF",
+    "first": "2026-10-16",
+    "n": 21,
+    "last": 9.01,
+    "search_name": "iShares Diversified Commodity Swap UCITS ETF"
+   }
+  ]
+ }
+]

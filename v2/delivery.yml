@@ -1,0 +1,6 @@
+# Delivery mode for the weekly run.
+#   off   – build and save, send nothing
+#   trial – send only to the owner (secret V2_TRIAL_TO, else MRKT_RPRTS_MAIL_FROM)
+#   live  – send to readers (MRKT_RPRTS_MAIL_TO / MRKT_RPRTS_MAIL_TO_NL)
+# Switching to live is a deliberate commit by the owner.
+mode: trial

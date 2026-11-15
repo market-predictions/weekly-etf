@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+# Reports are committed by the weekly workflow with `git add -f`.
+*.pdf
+*.html

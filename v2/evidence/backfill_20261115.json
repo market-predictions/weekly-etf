@@ -1,0 +1,950 @@
+{
+ "problems": [],
+ "prices": [
+  {
+   "date": "2026-08-07",
+   "id": "CIBR",
+   "yahoo_usd": 97.85,
+   "av_usd": 97.85,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-12",
+   "id": "CIBR",
+   "yahoo_usd": 100.39,
+   "av_usd": 100.39,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-19",
+   "id": "CIBR",
+   "yahoo_usd": 95.54,
+   "av_usd": 95.54,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-26",
+   "id": "CIBR",
+   "yahoo_usd": 93.66,
+   "av_usd": 93.66,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-02",
+   "id": "CIBR",
+   "yahoo_usd": 93.54,
+   "av_usd": 93.54,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-09",
+   "id": "CIBR",
+   "yahoo_usd": 94.48,
+   "av_usd": 94.48,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-16",
+   "id": "CIBR",
+   "yahoo_usd": 100.3,
+   "av_usd": 100.3,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-23",
+   "id": "CIBR",
+   "yahoo_usd": 104.01,
+   "av_usd": 104.01,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-30",
+   "id": "CIBR",
+   "yahoo_usd": 103.09,
+   "av_usd": 103.09,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-07",
+   "id": "CIBR",
+   "yahoo_usd": 106.57,
+   "av_usd": 106.57,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-14",
+   "id": "CIBR",
+   "yahoo_usd": 103.74,
+   "av_usd": 103.74,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-21",
+   "id": "CIBR",
+   "yahoo_usd": 103.13,
+   "av_usd": 103.13,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-28",
+   "id": "CIBR",
+   "yahoo_usd": 107.92,
+   "av_usd": 107.92,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-04",
+   "id": "CIBR",
+   "yahoo_usd": 97.36,
+   "av_usd": 97.36,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-11",
+   "id": "CIBR",
+   "yahoo_usd": 96.25,
+   "av_usd": 96.25,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-07",
+   "id": "GSG",
+   "yahoo_usd": 31.09,
+   "av_usd": 31.09,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-12",
+   "id": "GSG",
+   "yahoo_usd": 32.62,
+   "av_usd": 32.62,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-19",
+   "id": "GSG",
+   "yahoo_usd": 33.29,
+   "av_usd": 33.29,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-26",
+   "id": "GSG",
+   "yahoo_usd": 33.01,
+   "av_usd": 33.01,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-02",
+   "id": "GSG",
+   "yahoo_usd": 34.89,
+   "av_usd": 34.89,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-09",
+   "id": "GSG",
+   "yahoo_usd": 35.89,
+   "av_usd": 35.89,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-16",
+   "id": "GSG",
+   "yahoo_usd": 36.62,
+   "av_usd": 36.62,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-23",
+   "id": "GSG",
+   "yahoo_usd": 36.15,
+   "av_usd": 36.15,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-30",
+   "id": "GSG",
+   "yahoo_usd": 35.57,
+   "av_usd": 35.57,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-07",
+   "id": "GSG",
+   "yahoo_usd": 35.64,
+   "av_usd": 35.64,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-14",
+   "id": "GSG",
+   "yahoo_usd": 36.6,
+   "av_usd": 36.6,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-21",
+   "id": "GSG",
+   "yahoo_usd": 36.8,
+   "av_usd": 36.8,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-28",
+   "id": "GSG",
+   "yahoo_usd": 37.15,
+   "av_usd": 37.15,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-04",
+   "id": "GSG",
+   "yahoo_usd": 34.2,
+   "av_usd": 34.2,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-11",
+   "id": "GSG",
+   "yahoo_usd": 33.82,
+   "av_usd": 33.82,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-07",
+   "id": "IEFA",
+   "yahoo_usd": 101.08,
+   "av_usd": 101.08,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-12",
+   "id": "IEFA",
+   "yahoo_usd": 101.01,
+   "av_usd": 101.01,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-19",
+   "id": "IEFA",
+   "yahoo_usd": 100.46,
+   "av_usd": 100.46,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-26",
+   "id": "IEFA",
+   "yahoo_usd": 100.96,
+   "av_usd": 100.96,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-02",
+   "id": "IEFA",
+   "yahoo_usd": 99.88,
+   "av_usd": 99.875,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-09",
+   "id": "IEFA",
+   "yahoo_usd": 99.42,
+   "av_usd": 99.42,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-16",
+   "id": "IEFA",
+   "yahoo_usd": 97.97,
+   "av_usd": 97.97,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-23",
+   "id": "IEFA",
+   "yahoo_usd": 97.82,
+   "av_usd": 97.82,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-30",
+   "id": "IEFA",
+   "yahoo_usd": 96.88,
+   "av_usd": 96.88,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-07",
+   "id": "IEFA",
+   "yahoo_usd": 96.2,
+   "av_usd": 96.2,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-14",
+   "id": "IEFA",
+   "yahoo_usd": 95.87,
+   "av_usd": 95.87,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-21",
+   "id": "IEFA",
+   "yahoo_usd": 97.02,
+   "av_usd": 97.02,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-28",
+   "id": "IEFA",
+   "yahoo_usd": 96.66,
+   "av_usd": 96.66,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-04",
+   "id": "IEFA",
+   "yahoo_usd": 98.48,
+   "av_usd": 98.48,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-11",
+   "id": "IEFA",
+   "yahoo_usd": 97.43,
+   "av_usd": 97.43,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-07",
+   "id": "PAVE",
+   "yahoo_usd": 58.69,
+   "av_usd": 58.69,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-12",
+   "id": "PAVE",
+   "yahoo_usd": 58.49,
+   "av_usd": 58.49,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-19",
+   "id": "PAVE",
+   "yahoo_usd": 56.78,
+   "av_usd": 56.78,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-26",
+   "id": "PAVE",
+   "yahoo_usd": 56.21,
+   "av_usd": 56.21,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-02",
+   "id": "PAVE",
+   "yahoo_usd": 54.28,
+   "av_usd": 54.28,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-09",
+   "id": "PAVE",
+   "yahoo_usd": 54.19,
+   "av_usd": 54.19,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-16",
+   "id": "PAVE",
+   "yahoo_usd": 52.75,
+   "av_usd": 52.75,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-23",
+   "id": "PAVE",
+   "yahoo_usd": 53.39,
+   "av_usd": 53.39,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-30",
+   "id": "PAVE",
+   "yahoo_usd": 52.5,
+   "av_usd": 52.5,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-07",
+   "id": "PAVE",
+   "yahoo_usd": 53.29,
+   "av_usd": 53.29,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-14",
+   "id": "PAVE",
+   "yahoo_usd": 52.82,
+   "av_usd": 52.82,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-21",
+   "id": "PAVE",
+   "yahoo_usd": 53.14,
+   "av_usd": 53.14,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-28",
+   "id": "PAVE",
+   "yahoo_usd": 53.34,
+   "av_usd": 53.34,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-04",
+   "id": "PAVE",
+   "yahoo_usd": 53.91,
+   "av_usd": 53.91,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-11",
+   "id": "PAVE",
+   "yahoo_usd": 53.95,
+   "av_usd": 53.95,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-07",
+   "id": "SMH",
+   "yahoo_usd": 582.7,
+   "av_usd": 582.7,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-12",
+   "id": "SMH",
+   "yahoo_usd": 584.83,
+   "av_usd": 584.83,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-19",
+   "id": "SMH",
+   "yahoo_usd": 560.92,
+   "av_usd": 560.92,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-26",
+   "id": "SMH",
+   "yahoo_usd": 555.77,
+   "av_usd": 555.77,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-02",
+   "id": "SMH",
+   "yahoo_usd": 550.48,
+   "av_usd": 550.48,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-09",
+   "id": "SMH",
+   "yahoo_usd": 574.29,
+   "av_usd": 574.29,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-16",
+   "id": "SMH",
+   "yahoo_usd": 545.56,
+   "av_usd": 545.56,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-23",
+   "id": "SMH",
+   "yahoo_usd": 601.41,
+   "av_usd": 601.41,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-30",
+   "id": "SMH",
+   "yahoo_usd": 609.0,
+   "av_usd": 609.0,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-07",
+   "id": "SMH",
+   "yahoo_usd": 625.03,
+   "av_usd": 625.03,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-14",
+   "id": "SMH",
+   "yahoo_usd": 564.74,
+   "av_usd": 564.74,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-21",
+   "id": "SMH",
+   "yahoo_usd": 556.7,
+   "av_usd": 556.7,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-28",
+   "id": "SMH",
+   "yahoo_usd": 567.67,
+   "av_usd": 567.67,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-04",
+   "id": "SMH",
+   "yahoo_usd": 504.27,
+   "av_usd": 504.27,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-11",
+   "id": "SMH",
+   "yahoo_usd": 506.96,
+   "av_usd": 506.96,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-07",
+   "id": "URNM",
+   "yahoo_usd": 54.53,
+   "av_usd": 54.53,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-12",
+   "id": "URNM",
+   "yahoo_usd": 55.39,
+   "av_usd": 55.39,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-19",
+   "id": "URNM",
+   "yahoo_usd": 55.55,
+   "av_usd": 55.55,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-26",
+   "id": "URNM",
+   "yahoo_usd": 61.03,
+   "av_usd": 61.03,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-02",
+   "id": "URNM",
+   "yahoo_usd": 54.95,
+   "av_usd": 54.95,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-09",
+   "id": "URNM",
+   "yahoo_usd": 56.98,
+   "av_usd": 56.98,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-16",
+   "id": "URNM",
+   "yahoo_usd": 50.22,
+   "av_usd": 50.22,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-23",
+   "id": "URNM",
+   "yahoo_usd": 50.62,
+   "av_usd": 50.62,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-30",
+   "id": "URNM",
+   "yahoo_usd": 47.46,
+   "av_usd": 47.46,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-07",
+   "id": "URNM",
+   "yahoo_usd": 47.87,
+   "av_usd": 47.87,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-14",
+   "id": "URNM",
+   "yahoo_usd": 42.42,
+   "av_usd": 42.42,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-21",
+   "id": "URNM",
+   "yahoo_usd": 43.73,
+   "av_usd": 43.73,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-28",
+   "id": "URNM",
+   "yahoo_usd": 45.79,
+   "av_usd": 45.79,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-04",
+   "id": "URNM",
+   "yahoo_usd": 41.22,
+   "av_usd": 41.22,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-11",
+   "id": "URNM",
+   "yahoo_usd": 42.4,
+   "av_usd": 42.4,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-07",
+   "id": "XBI",
+   "yahoo_usd": 157.37,
+   "av_usd": 157.37,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-12",
+   "id": "XBI",
+   "yahoo_usd": 159.39,
+   "av_usd": 159.39,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-19",
+   "id": "XBI",
+   "yahoo_usd": 169.55,
+   "av_usd": 169.55,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-26",
+   "id": "XBI",
+   "yahoo_usd": 168.39,
+   "av_usd": 168.39,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-02",
+   "id": "XBI",
+   "yahoo_usd": 165.37,
+   "av_usd": 165.37,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-09",
+   "id": "XBI",
+   "yahoo_usd": 159.38,
+   "av_usd": 159.38,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-16",
+   "id": "XBI",
+   "yahoo_usd": 154.18,
+   "av_usd": 154.18,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-23",
+   "id": "XBI",
+   "yahoo_usd": 155.2,
+   "av_usd": 155.2,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-30",
+   "id": "XBI",
+   "yahoo_usd": 157.68,
+   "av_usd": 157.68,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-07",
+   "id": "XBI",
+   "yahoo_usd": 150.23,
+   "av_usd": 150.23,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-14",
+   "id": "XBI",
+   "yahoo_usd": 146.77,
+   "av_usd": 146.77,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-21",
+   "id": "XBI",
+   "yahoo_usd": 152.78,
+   "av_usd": 152.78,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-28",
+   "id": "XBI",
+   "yahoo_usd": 157.51,
+   "av_usd": 157.51,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-04",
+   "id": "XBI",
+   "yahoo_usd": 159.1,
+   "av_usd": 159.1,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-11",
+   "id": "XBI",
+   "yahoo_usd": 156.31,
+   "av_usd": 156.31,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-07",
+   "id": "XLU",
+   "yahoo_usd": 43.61,
+   "av_usd": 43.61,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-12",
+   "id": "XLU",
+   "yahoo_usd": 43.84,
+   "av_usd": 43.84,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-19",
+   "id": "XLU",
+   "yahoo_usd": 44.02,
+   "av_usd": 44.02,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-26",
+   "id": "XLU",
+   "yahoo_usd": 43.51,
+   "av_usd": 43.51,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-02",
+   "id": "XLU",
+   "yahoo_usd": 42.67,
+   "av_usd": 42.67,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-09",
+   "id": "XLU",
+   "yahoo_usd": 42.94,
+   "av_usd": 42.94,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-16",
+   "id": "XLU",
+   "yahoo_usd": 41.32,
+   "av_usd": 41.32,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-23",
+   "id": "XLU",
+   "yahoo_usd": 39.75,
+   "av_usd": 39.75,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-30",
+   "id": "XLU",
+   "yahoo_usd": 39.44,
+   "av_usd": 39.44,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-07",
+   "id": "XLU",
+   "yahoo_usd": 41.15,
+   "av_usd": 41.15,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-14",
+   "id": "XLU",
+   "yahoo_usd": 41.72,
+   "av_usd": 41.72,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-21",
+   "id": "XLU",
+   "yahoo_usd": 42.0,
+   "av_usd": 42.0,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-28",
+   "id": "XLU",
+   "yahoo_usd": 42.49,
+   "av_usd": 42.49,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-04",
+   "id": "XLU",
+   "yahoo_usd": 43.61,
+   "av_usd": 43.61,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-11",
+   "id": "XLU",
+   "yahoo_usd": 43.82,
+   "av_usd": 43.82,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-07",
+   "id": "XLV",
+   "yahoo_usd": 165.68,
+   "av_usd": 165.68,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-12",
+   "id": "XLV",
+   "yahoo_usd": 168.44,
+   "av_usd": 168.44,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-19",
+   "id": "XLV",
+   "yahoo_usd": 175.68,
+   "av_usd": 175.68,
+   "status": "verified"
+  },
+  {
+   "date": "2026-08-26",
+   "id": "XLV",
+   "yahoo_usd": 173.54,
+   "av_usd": 173.54,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-02",
+   "id": "XLV",
+   "yahoo_usd": 172.95,
+   "av_usd": 172.95,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-09",
+   "id": "XLV",
+   "yahoo_usd": 166.58,
+   "av_usd": 166.58,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-16",
+   "id": "XLV",
+   "yahoo_usd": 167.77,
+   "av_usd": 167.77,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-23",
+   "id": "XLV",
+   "yahoo_usd": 168.8,
+   "av_usd": 168.8,
+   "status": "verified"
+  },
+  {
+   "date": "2026-09-30",
+   "id": "XLV",
+   "yahoo_usd": 168.42,
+   "av_usd": 168.42,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-07",
+   "id": "XLV",
+   "yahoo_usd": 168.81,
+   "av_usd": 168.81,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-14",
+   "id": "XLV",
+   "yahoo_usd": 173.96,
+   "av_usd": 173.96,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-21",
+   "id": "XLV",
+   "yahoo_usd": 178.94,
+   "av_usd": 178.94,
+   "status": "verified"
+  },
+  {
+   "date": "2026-10-28",
+   "id": "XLV",
+   "yahoo_usd": 179.72,
+   "av_usd": 179.72,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-04",
+   "id": "XLV",
+   "yahoo_usd": 189.66,
+   "av_usd": 189.66,
+   "status": "verified"
+  },
+  {
+   "date": "2026-11-11",
+   "id": "XLV",
+   "yahoo_usd": 188.95,
+   "av_usd": 188.95,
+   "status": "verified"
+  }
+ ]
+}

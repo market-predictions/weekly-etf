@@ -1,0 +1,27 @@
+name: Acceptance
+
+# Does the product meet OUTCOME.md? Runs on every PR and push to main.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq libpango-1.0-0 libpangoft2-1.0-0 >/dev/null
+          pip install -q requests==2.32.3 PyYAML==6.0.2 weasyprint==70.0
+      - name: Acceptance
+        run: python -m v2.acceptance

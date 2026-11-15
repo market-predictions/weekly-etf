@@ -1,0 +1,11 @@
+date,type,id,isin,shares,price_eur,amount_eur,reason
+2026-08-07,opening_balance,CIBR,,253,,,Holdings carried over from the 7 Aug 2026 report
+2026-08-07,opening_balance,GSG,,374,,,Holdings carried over from the 7 Aug 2026 report
+2026-08-07,opening_balance,IEFA,,312,,,Holdings carried over from the 7 Aug 2026 report
+2026-08-07,opening_balance,PAVE,,107,,,Holdings carried over from the 7 Aug 2026 report
+2026-08-07,opening_balance,SMH,,59,,,Holdings carried over from the 7 Aug 2026 report
+2026-08-07,opening_balance,URNM,,48,,,Holdings carried over from the 7 Aug 2026 report
+2026-08-07,opening_balance,XBI,,40,,,Holdings carried over from the 7 Aug 2026 report
+2026-08-07,opening_balance,XLU,,14,,,Holdings carried over from the 7 Aug 2026 report
+2026-08-07,opening_balance,XLV,,37,,,Holdings carried over from the 7 Aug 2026 report
+2026-08-07,opening_cash,CASH,,,,2534.36,Cash carried over from the 7 Aug 2026 report

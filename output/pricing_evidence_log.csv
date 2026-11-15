@@ -1,1 +1,0 @@
-run_date,target_price_date,ticker,issuer,onboarding_state,source_rule_class,source_1_name,source_1_url_or_label,source_1_asof,source_1_price,source_2_name,source_2_url_or_label,source_2_asof,source_2_price,chosen_price,chosen_fx_basis,chosen_status,acceptance_reason,manual_review_flag,notes

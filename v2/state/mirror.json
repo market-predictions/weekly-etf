@@ -1,0 +1,45 @@
+{
+ "as_of": "2026-11-11",
+ "cash_eur": 2560.55,
+ "nav_eur": 110062.71,
+ "start": "2026-08-07",
+ "positions": [
+  {
+   "line": "2B70.DE",
+   "shares": 632
+  },
+  {
+   "line": "2B7A.DE",
+   "shares": 57
+  },
+  {
+   "line": "CBRS.DE",
+   "shares": 398
+  },
+  {
+   "line": "EXUS.DE",
+   "shares": 671
+  },
+  {
+   "line": "PAVE.MI",
+   "shares": 115
+  },
+  {
+   "line": "QDVG.DE",
+   "shares": 454
+  },
+  {
+   "line": "SXRS.DE",
+   "shares": 1168
+  },
+  {
+   "line": "U3O8.DE",
+   "shares": 190
+  },
+  {
+   "line": "VVSM.DE",
+   "shares": 320
+  }
+ ],
+ "pending": null
+}

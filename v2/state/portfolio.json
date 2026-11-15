@@ -1,0 +1,66 @@
+{
+ "as_of": "2026-11-11",
+ "cash_eur": 2534.36,
+ "nav_eur": 109056.21,
+ "track_record_start": "2026-08-07",
+ "inception": {
+  "date": "2026-03-28",
+  "capital_eur": 100000.0
+ },
+ "positions": [
+  {
+   "id": "CIBR",
+   "isin": null,
+   "exchange": "US",
+   "shares": 253
+  },
+  {
+   "id": "GSG",
+   "isin": null,
+   "exchange": "US",
+   "shares": 374
+  },
+  {
+   "id": "IEFA",
+   "isin": null,
+   "exchange": "US",
+   "shares": 312
+  },
+  {
+   "id": "PAVE",
+   "isin": null,
+   "exchange": "US",
+   "shares": 107
+  },
+  {
+   "id": "SMH",
+   "isin": null,
+   "exchange": "US",
+   "shares": 59
+  },
+  {
+   "id": "URNM",
+   "isin": null,
+   "exchange": "US",
+   "shares": 48
+  },
+  {
+   "id": "XBI",
+   "isin": null,
+   "exchange": "US",
+   "shares": 40
+  },
+  {
+   "id": "XLU",
+   "isin": null,
+   "exchange": "US",
+   "shares": 14
+  },
+  {
+   "id": "XLV",
+   "isin": null,
+   "exchange": "US",
+   "shares": 37
+  }
+ ]
+}
