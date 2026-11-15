@@ -1,0 +1,73 @@
+# Weekly ETF (US-listed) v2 — universe + European mirror (DRAFT for owner review)
+#
+# Every instrument is a US-listed ETF, scored on its own USD prices converted to EUR.
+# mirror = what the European mirror portfolio holds when the US portfolio holds this fund:
+#   twin   = UCITS fund tracking the same or practically the same index
+#   proxy  = related UCITS fund ("benadering"), shown as such in the report
+#   cash   = no reasonable UCITS equivalent: the mirror holds the money-market fund (XEON)
+# mirror.query = Yahoo search text used to find/verify a candidate; mirror.id empty = still to find.
+# status: verified after the probe confirms USD closes and a matching fund name.
+schema_version: weekly_etf_us_universe_v2_draft
+base_currency: EUR
+benchmark: {SPY: 0.70, AGG: 0.30}
+
+instruments:
+  # --- core
+  - {id: SPY, name: SPDR S&P 500 ETF Trust, asset_class: equity, region: us, sleeve: core, mirror: {kind: twin, id: SXR8}}
+  - {id: AGG, name: iShares Core U.S. Aggregate Bond ETF, asset_class: bond, sleeve: core, mirror: {kind: twin, query: "iShares Core US Aggregate Bond UCITS"}}
+  - {id: BIL, name: SPDR Bloomberg 1-3 Month T-Bill ETF, asset_class: cash, sleeve: defensive, mirror: {kind: proxy, id: XEON}}
+  # --- US size / style
+  - {id: QQQ, name: Invesco QQQ Trust, asset_class: equity, segment: us_growth, sleeve: satellite, mirror: {kind: twin, id: SXRV}}
+  - {id: IWM, name: iShares Russell 2000 ETF, asset_class: equity, segment: us_small, sleeve: satellite, mirror: {kind: twin, query: "Russell 2000 UCITS"}}
+  - {id: MTUM, name: iShares MSCI USA Momentum Factor ETF, asset_class: equity, factor: momentum, sleeve: satellite, mirror: {kind: twin, query: "iShares Edge MSCI USA Momentum Factor UCITS", fallback: IS3R}}
+  - {id: QUAL, name: iShares MSCI USA Quality Factor ETF, asset_class: equity, factor: quality, sleeve: satellite, mirror: {kind: twin, query: "iShares Edge MSCI USA Quality Factor UCITS", fallback: IS3Q}}
+  - {id: VLUE, name: iShares MSCI USA Value Factor ETF, asset_class: equity, factor: value, sleeve: satellite, mirror: {kind: twin, query: "iShares Edge MSCI USA Value Factor UCITS", fallback: IS3S}}
+  - {id: USMV, name: iShares MSCI USA Min Vol Factor ETF, asset_class: equity, factor: min_vol, sleeve: satellite, mirror: {kind: twin, query: "iShares Edge MSCI USA Minimum Volatility UCITS", fallback: IQQ0}}
+  # --- US sectors (S&P 500 sector UCITS series)
+  - {id: XLK, name: Technology Select Sector SPDR Fund, asset_class: equity, theme: us_tech, sleeve: satellite, mirror: {kind: twin, query: "S&P 500 Information Technology Sector UCITS"}}
+  - {id: XLF, name: Financial Select Sector SPDR Fund, asset_class: equity, theme: us_financials, sleeve: satellite, mirror: {kind: twin, query: "S&P 500 Financials Sector UCITS"}}
+  - {id: XLE, name: Energy Select Sector SPDR Fund, asset_class: equity, theme: us_energy, sleeve: satellite, mirror: {kind: twin, query: "S&P 500 Energy Sector UCITS"}}
+  - {id: XLV, name: Health Care Select Sector SPDR Fund, asset_class: equity, theme: healthcare, sleeve: satellite, mirror: {kind: twin, query: "S&P 500 Health Care Sector UCITS", fallback: CBUF}}
+  - {id: XLI, name: Industrial Select Sector SPDR Fund, asset_class: equity, theme: us_industrials, sleeve: satellite, mirror: {kind: twin, query: "S&P 500 Industrials Sector UCITS"}}
+  - {id: XLY, name: Consumer Discretionary Select Sector SPDR Fund, asset_class: equity, theme: us_cons_disc, sleeve: satellite, mirror: {kind: twin, query: "S&P 500 Consumer Discretionary Sector UCITS"}}
+  - {id: XLP, name: Consumer Staples Select Sector SPDR Fund, asset_class: equity, theme: us_cons_staples, sleeve: satellite, mirror: {kind: twin, query: "S&P 500 Consumer Staples Sector UCITS"}}
+  - {id: XLU, name: Utilities Select Sector SPDR Fund, asset_class: equity, theme: us_utilities, sleeve: satellite, mirror: {kind: twin, query: "S&P 500 Utilities Sector UCITS"}}
+  - {id: XLB, name: Materials Select Sector SPDR Fund, asset_class: equity, theme: us_materials, sleeve: satellite, mirror: {kind: twin, query: "S&P 500 Materials Sector UCITS"}}
+  - {id: XLC, name: Communication Services Select Sector SPDR Fund, asset_class: equity, theme: us_communication, sleeve: satellite, mirror: {kind: twin, query: "S&P 500 Communication Sector UCITS"}}
+  - {id: XLRE, name: Real Estate Select Sector SPDR Fund, asset_class: equity, theme: real_estate, sleeve: satellite, mirror: {kind: proxy, id: IQQ6, query: "US Property Yield UCITS"}}
+  # --- themes
+  - {id: SMH, name: VanEck Semiconductor ETF, asset_class: equity, theme: semiconductors, sleeve: satellite, mirror: {kind: twin, id: VVSM}}
+  - {id: AIQ, name: Global X Artificial Intelligence & Technology ETF, asset_class: equity, theme: ai_software, sleeve: satellite, mirror: {kind: proxy, id: XAIX, query: "Global X AI & Big Data UCITS"}}
+  - {id: CIBR, name: First Trust NASDAQ Cybersecurity ETF, asset_class: equity, theme: cybersecurity, sleeve: satellite, mirror: {kind: twin, query: "First Trust Nasdaq Cybersecurity UCITS", fallback: L0CK}}
+  - {id: ITA, name: iShares U.S. Aerospace & Defense ETF, asset_class: equity, theme: defense, sleeve: satellite, mirror: {kind: proxy, id: DFEN}}
+  - {id: BOTZ, name: Global X Robotics & Artificial Intelligence ETF, asset_class: equity, theme: robotics, sleeve: satellite, mirror: {kind: twin, query: "Global X Robotics & Artificial Intelligence UCITS", fallback: 2B76}}
+  - {id: URNM, name: Sprott Uranium Miners ETF, asset_class: equity, theme: uranium, sleeve: satellite, mirror: {kind: twin, query: "Sprott Uranium Miners UCITS", fallback: NUKL}}
+  - {id: ICLN, name: iShares Global Clean Energy ETF, asset_class: equity, theme: clean_energy, sleeve: satellite, mirror: {kind: twin, id: IQQH}}
+  - {id: GRID, name: First Trust NASDAQ Clean Edge Smart Grid Infrastructure Index Fund, asset_class: equity, theme: grid, sleeve: satellite, mirror: {kind: twin, query: "First Trust Nasdaq Clean Edge Smart Grid UCITS"}}
+  - {id: PAVE, name: Global X U.S. Infrastructure Development ETF, asset_class: equity, theme: infrastructure, sleeve: satellite, mirror: {kind: twin, query: "Global X US Infrastructure Development UCITS", fallback: IQQI}}
+  - {id: PHO, name: Invesco Water Resources ETF, asset_class: equity, theme: water, sleeve: satellite, mirror: {kind: proxy, id: IQQQ}}
+  - {id: XBI, name: SPDR S&P Biotech ETF, asset_class: equity, theme: biotech, sleeve: satellite, mirror: {kind: proxy, id: 2B70}}
+  - {id: KRE, name: SPDR S&P Regional Banking ETF, asset_class: equity, theme: us_regional_banks, sleeve: satellite, mirror: {kind: cash, id: XEON}}
+  - {id: REMX, name: VanEck Rare Earth and Strategic Metals ETF, asset_class: equity, theme: critical_minerals, sleeve: satellite, mirror: {kind: twin, id: VVMX}}
+  - {id: COPX, name: Global X Copper Miners ETF, asset_class: equity, theme: copper, sleeve: satellite, mirror: {kind: twin, query: "Global X Copper Miners UCITS", fallback: VVMX}}
+  - {id: GDX, name: VanEck Gold Miners ETF, asset_class: equity, theme: gold_miners, sleeve: satellite, mirror: {kind: twin, query: "VanEck Gold Miners UCITS"}}
+  # --- regions
+  - {id: IEFA, name: iShares Core MSCI EAFE ETF, asset_class: equity, region: developed_ex_us, sleeve: satellite, mirror: {kind: twin, query: "MSCI World ex USA UCITS"}}
+  - {id: VGK, name: Vanguard FTSE Europe ETF, asset_class: equity, region: europe, sleeve: satellite, mirror: {kind: proxy, id: EUNK}}
+  - {id: EWJ, name: iShares MSCI Japan ETF, asset_class: equity, region: japan, sleeve: satellite, mirror: {kind: twin, id: IJPA}}
+  - {id: EEM, name: iShares MSCI Emerging Markets ETF, asset_class: equity, region: emerging, sleeve: satellite, mirror: {kind: twin, id: EMIM}}
+  - {id: INDA, name: iShares MSCI India ETF, asset_class: equity, region: india, sleeve: satellite, mirror: {kind: twin, id: QDV5}}
+  - {id: MCHI, name: iShares MSCI China ETF, asset_class: equity, region: china, sleeve: satellite, mirror: {kind: twin, id: ICGA}}
+  - {id: EWZ, name: iShares MSCI Brazil ETF, asset_class: equity, region: brazil, sleeve: satellite, mirror: {kind: twin, query: "MSCI Brazil UCITS"}}
+  # --- bonds
+  - {id: TLT, name: iShares 20+ Year Treasury Bond ETF, asset_class: bond, segment: ust_long, sleeve: satellite, mirror: {kind: twin, query: "iShares USD Treasury Bond 20+yr UCITS"}}
+  - {id: IEF, name: iShares 7-10 Year Treasury Bond ETF, asset_class: bond, segment: ust_mid, sleeve: satellite, mirror: {kind: twin, query: "iShares USD Treasury Bond 7-10yr UCITS"}}
+  - {id: TIP, name: iShares TIPS Bond ETF, asset_class: bond, segment: tips, sleeve: satellite, mirror: {kind: twin, query: "iShares USD TIPS UCITS", fallback: IBCI}}
+  - {id: LQD, name: iShares iBoxx $ Investment Grade Corporate Bond ETF, asset_class: bond, segment: us_ig, sleeve: satellite, mirror: {kind: twin, query: "iShares USD Corporate Bond UCITS"}}
+  - {id: HYG, name: iShares iBoxx $ High Yield Corporate Bond ETF, asset_class: bond, segment: us_hy, sleeve: satellite, mirror: {kind: twin, query: "iShares USD High Yield Corporate Bond UCITS", fallback: EUNW}}
+  - {id: EMB, name: iShares J.P. Morgan USD Emerging Markets Bond ETF, asset_class: bond, segment: em_debt, sleeve: satellite, mirror: {kind: twin, query: "iShares J.P. Morgan USD EM Bond UCITS"}}
+  # --- commodities
+  - {id: GLD, name: SPDR Gold Shares, asset_class: commodity, segment: gold, sleeve: satellite, mirror: {kind: twin, id: 4GLD}}
+  - {id: SLV, name: iShares Silver Trust, asset_class: commodity, segment: silver, sleeve: satellite, mirror: {kind: twin, query: "physical silver ETC"}}
+  - {id: GSG, name: iShares S&P GSCI Commodity-Indexed Trust, asset_class: commodity, segment: broad_commodities, sleeve: satellite, mirror: {kind: twin, query: "S&P GSCI commodity UCITS"}}
+  - {id: USO, name: United States Oil Fund, asset_class: commodity, segment: oil, sleeve: satellite, mirror: {kind: twin, query: "WTI crude oil ETC"}}

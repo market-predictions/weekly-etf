@@ -1,0 +1,154 @@
+# Verified UCITS lines (from weekly-etf-eu probe 2026-11-14), usable as mirror instruments.
+instruments:
+- id: VWCE
+  name: Vanguard FTSE All-World UCITS ETF Acc
+  isin: IE00BK5BQT80
+  exchange: Xetra
+- id: IWDA
+  name: iShares Core MSCI World UCITS ETF Acc
+  isin: IE00B4L5Y983
+  exchange: Euronext Amsterdam
+- id: SXR8
+  name: iShares Core S&P 500 UCITS ETF Acc
+  isin: IE00B5BMR087
+  exchange: Xetra
+- id: EUNA
+  name: iShares Core Global Aggregate Bond UCITS ETF EUR Hedged Acc
+  isin: IE00BDBRDM35
+  exchange: Xetra
+- id: EUNH
+  name: iShares Core Euro Government Bond UCITS ETF
+  isin: IE00B4WXJJ64
+  exchange: Xetra
+- id: EUN5
+  name: iShares Core EUR Corp Bond UCITS ETF
+  isin: IE00B3F81R35
+  exchange: Xetra
+- id: XEON
+  name: Xtrackers II EUR Overnight Rate Swap UCITS ETF
+  isin: LU0290358497
+  exchange: Xetra
+- id: IBGS
+  name: iShares Euro Government Bond 1-3yr UCITS ETF
+  isin: IE00B14X4Q57
+  exchange: Euronext Amsterdam
+- id: EUNK
+  name: iShares Core MSCI Europe UCITS ETF Acc
+  isin: IE00B4K48X80
+  exchange: Xetra
+- id: IJPA
+  name: iShares Core MSCI Japan IMI UCITS ETF Acc
+  isin: IE00B4L5YX21
+  exchange: Euronext Amsterdam
+- id: EMIM
+  name: iShares Core MSCI EM IMI UCITS ETF Acc
+  isin: IE00BKM4GZ66
+  exchange: Euronext Amsterdam
+- id: ICGA
+  name: iShares MSCI China UCITS ETF Acc
+  isin: IE00BJ5JPG56
+  exchange: Xetra
+- id: QDV5
+  name: iShares MSCI India UCITS ETF Acc
+  isin: IE00BZCQB185
+  exchange: Xetra
+- id: IUSN
+  name: iShares MSCI World Small Cap UCITS ETF Acc
+  isin: IE00BF4RFH31
+  exchange: Xetra
+- id: SXRV
+  name: iShares Nasdaq 100 UCITS ETF Acc
+  isin: IE00B53SZB19
+  exchange: Xetra
+- id: IS3R
+  name: iShares Edge MSCI World Momentum Factor UCITS ETF
+  isin: IE00BP3QZ825
+  exchange: Xetra
+- id: IS3S
+  name: iShares Edge MSCI World Value Factor UCITS ETF
+  isin: IE00BP3QZB59
+  exchange: Xetra
+- id: IS3Q
+  name: iShares Edge MSCI World Quality Factor UCITS ETF
+  isin: IE00BP3QZ601
+  exchange: Xetra
+- id: IQQ0
+  name: iShares Edge MSCI World Minimum Volatility UCITS ETF
+  isin: IE00B8FHGS14
+  exchange: Xetra
+- id: VVSM
+  name: VanEck Semiconductor UCITS ETF
+  isin: IE00BMC38736
+  exchange: Xetra
+- id: XAIX
+  name: Xtrackers Artificial Intelligence & Big Data UCITS ETF
+  isin: IE00BGV5VN51
+  exchange: Xetra
+- id: L0CK
+  name: iShares Digital Security UCITS ETF Acc
+  isin: IE00BG0J4C88
+  exchange: Xetra
+- id: DFEN
+  name: VanEck Defense UCITS ETF
+  isin: IE000YYE6WK5
+  exchange: Xetra
+- id: 2B76
+  name: iShares Automation & Robotics UCITS ETF
+  isin: IE00BYZK4552
+  exchange: Xetra
+- id: NUKL
+  name: VanEck Uranium and Nuclear Technologies UCITS ETF
+  isin: IE000M7V94E1
+  exchange: Xetra
+- id: IQQH
+  name: iShares Global Clean Energy UCITS ETF
+  isin: IE00B1XNHC34
+  exchange: Xetra
+- id: IQQI
+  name: iShares Global Infrastructure UCITS ETF
+  isin: IE00B1FZS467
+  exchange: Xetra
+- id: IQQQ
+  name: iShares Global Water UCITS ETF Dist
+  isin: IE00B1TXK627
+  exchange: Xetra
+- id: XMLC
+  name: L&G Clean Water UCITS ETF Acc
+  isin: IE00BK5BC891
+  exchange: Xetra
+- id: ISAE
+  name: iShares Agribusiness UCITS ETF Acc
+  isin: IE00B6R52143
+  exchange: Euronext Amsterdam
+- id: CBUF
+  name: iShares MSCI World Health Care Sector Advanced UCITS ETF Dist
+  isin: IE00BJ5JNZ06
+  exchange: Xetra
+- id: 2B70
+  name: iShares Nasdaq US Biotechnology UCITS ETF
+  isin: IE00BYXG2H39
+  exchange: Xetra
+- id: EXV1
+  name: iShares STOXX Europe 600 Banks UCITS ETF (DE)
+  isin: DE000A0F5UJ7
+  exchange: Xetra
+- id: VVMX
+  name: VanEck Rare Earth and Strategic Metals UCITS ETF
+  isin: IE0002PG6CA6
+  exchange: Xetra
+- id: IBCI
+  name: iShares EUR Inflation Linked Govt Bond UCITS ETF
+  isin: IE00B0M62X26
+  exchange: Xetra
+- id: EUNW
+  name: iShares EUR High Yield Corp Bond UCITS ETF
+  isin: IE00B66F4759
+  exchange: Xetra
+- id: 4GLD
+  name: Xetra-Gold ETC
+  isin: DE000A0S9GB0
+  exchange: Xetra
+- id: IQQ6
+  name: iShares Developed Markets Property Yield UCITS ETF
+  isin: IE00B1FZS350
+  exchange: Xetra

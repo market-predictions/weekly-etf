@@ -1,0 +1,60 @@
+# Weekly ETF EU v2 — investment policy (agreed 2026-11-14)
+#
+# All numbers here are rules the code applies mechanically. The AI never changes
+# them; it only explains the trades they produce.
+
+schema_version: weekly_etf_eu_policy_v2
+benchmark:                       # what the report compares against (decided 2026-11-14)
+  label: "70% VWCE / 30% EUNA"
+  weights: {VWCE: 0.70, EUNA: 0.30}   # rebalanced weekly at the Wednesday close
+trend_reference: VWCE               # world-equity trend used by the defensive switch
+
+core:
+  # Core = broad base; its weight floats inside the band, aimed at target.
+  weight_band: [0.40, 0.60]
+  # Split of the core between equity and bonds (risk-on / risk-off).
+  equity: VWCE
+  bonds: EUNA
+  equity_share: {risk_on: 0.70, risk_off: 0.50}
+
+satellites:
+  count: {risk_on: 5, risk_off: 3}
+  weight_each: 0.08
+  max_weight_each: 0.10
+  min_history_days: 252          # need 12 months of prices to be ranked
+  one_per: [theme, segment, region, factor]   # no two satellites sharing the same tag value
+  hold_buffer_rank_multiple: 3   # a held satellite stays while rank <= count * 3 (top 15) and trend is up (was 2; 2026-11-14)
+  replacement_margin_pts: 25     # a newcomer must beat the weakest holding by 25 score points (was 10 → 15 → 25; 2026-11-14)
+  trend_exit_confirm_weeks: 2    # sell on trend only after 2 consecutive weekly closes below the 200-day average
+
+scoring:
+  # Composite = mean of percentile ranks (0–100) of these total returns in EUR.
+  momentum_windows_days: [63, 126, 252]   # ~3, 6 and 12 months
+  trend_sma_days: 200                     # trend up = close above its 200-day average
+  volatility_days: 63
+
+inflation_regime:                # decided 2026-11-15 after train/test research (v2/research.py)
+  # When euro-area inflation (latest published HICP y/y) is >= threshold and not lower
+  # than 3 months earlier, the bond core is held in short-dated euro government bonds.
+  threshold: 3.0
+  alt_bonds: IBGS
+
+defensive_switch:
+  # Risk-off when broad equity is in a downtrend AND most risky assets are too.
+  benchmark_below_trend: true
+  max_breadth_pct: 40            # share of rankable satellites in an uptrend
+  instrument: XEON               # unfilled satellite budget is parked here
+
+cash:
+  target: 0.03
+  band: [0.02, 0.05]
+  max_net_deployment_per_week_pct_nav: 7    # ~28% excess cash invested over ~4 weeks
+
+turnover:
+  max_instrument_changes_per_week: 2   # an entry or a full exit counts as one change
+  rebalance_band_pts: 2                # resize a holding only if off target by > 2 percentage points
+
+execution:
+  price: wednesday_close         # model trades at the valuation close
+  whole_shares: true
+  cost_bps: 10                   # assumed spread + commission per trade, both directions
