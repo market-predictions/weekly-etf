@@ -26,3 +26,4 @@
 - 2026-11-15 — Herbouwd op v2 (archief: branch `archive/v1-pre-outcome-model-2026-11-15`). Rapport NL + EN, 5 pagina's. Startwaarde 7 aug herberekend: € 110.331 tegen € 110.006 in v1 (+0,30%, andere koers- en wisselkoersbron); het rendement sinds 28 maart koppelt beide.
 - 2026-11-15 — Geen inflatieregel in deze portefeuille: die is alleen op eurozonedata getoetst.
 - 2026-11-15 — Een satelliet die verkocht moet worden maar op de wissellimiet wacht, wordt intussen teruggebracht tot het maximum van 10% (een herweging, geen wissel).
+- 2026-11-15 — Geld dat wacht op een uitgestelde aankoop staat tijdelijk in SPY in plaats van in kas (simulatie: kas tijdens de omzetting ~3% in plaats van 44–63%).
