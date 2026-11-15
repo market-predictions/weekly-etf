@@ -21,7 +21,7 @@ BANNED = {
     "nl": ["u moet", "je moet", "wij raden", "we raden", "gegarandeerd", "zal stijgen", "zal dalen", "nu kopen", "nu verkopen"],
 }
 
-SYSTEM = """You write the commentary for a premium weekly model-portfolio report on European UCITS ETFs.
+SYSTEM = """You write the commentary for a premium weekly model-portfolio report on US-listed ETFs (valued in euro), with a European UCITS mirror portfolio that follows the same decisions.
 
 Hard rules:
 1. Use ONLY the facts in the JSON you receive. Do not add any number, date, price, rate, event or name that is not in it.
@@ -208,13 +208,13 @@ def fallback(facts: dict, lang: str) -> dict:
     if _w and p["difference_vs_benchmark_pts"] < 0 and _w["pts"] < 0 and _w["id"] != "CASH":
         headline = (f"{_w['id']} is de belangrijkste reden voor de achterstand op de benchmark" if nl
                     else f"{_w['id']} is the main reason the portfolio trails its benchmark")
-    happened = (f"De modelportefeuille {up_dn(p['week_return_pct'])} deze week {_fmt(abs(p['week_return_pct']), lang)}%, tegen {_fmt(p['benchmark_week_return_pct'], lang)}% voor de benchmark (70% VWCE / 30% EUNA). "
+    happened = (f"De modelportefeuille {up_dn(p['week_return_pct'])} deze week {_fmt(abs(p['week_return_pct']), lang)}%, tegen {_fmt(p['benchmark_week_return_pct'], lang)}% voor de benchmark (70% SPY / 30% AGG). "
                 f"Sinds {_long(facts['track_record_start'], lang)} is het rendement {_fmt(p['since_start_return_pct'], lang)}% tegen {_fmt(p['benchmark_since_start_return_pct'], lang)}%: een achterstand van {_fmt(abs(p['difference_vs_benchmark_pts']), lang)} procentpunt."
                 if nl and p['difference_vs_benchmark_pts'] < 0 else
-                f"De modelportefeuille {up_dn(p['week_return_pct'])} deze week {_fmt(abs(p['week_return_pct']), lang)}%, tegen {_fmt(p['benchmark_week_return_pct'], lang)}% voor de benchmark (70% VWCE / 30% EUNA). "
+                f"De modelportefeuille {up_dn(p['week_return_pct'])} deze week {_fmt(abs(p['week_return_pct']), lang)}%, tegen {_fmt(p['benchmark_week_return_pct'], lang)}% voor de benchmark (70% SPY / 30% AGG). "
                 f"Sinds {_long(facts['track_record_start'], lang)} is het rendement {_fmt(p['since_start_return_pct'], lang)}% tegen {_fmt(p['benchmark_since_start_return_pct'], lang)}%."
                 if nl else
-                f"The model portfolio {up_dn(p['week_return_pct'])} {_fmt(abs(p['week_return_pct']), lang)}% this week, against {_fmt(p['benchmark_week_return_pct'], lang)}% for the benchmark (70% VWCE / 30% EUNA). "
+                f"The model portfolio {up_dn(p['week_return_pct'])} {_fmt(abs(p['week_return_pct']), lang)}% this week, against {_fmt(p['benchmark_week_return_pct'], lang)}% for the benchmark (70% SPY / 30% AGG). "
                 f"Since {_long(facts['track_record_start'], lang)} it returned {_fmt(p['since_start_return_pct'], lang)}% against {_fmt(p['benchmark_since_start_return_pct'], lang)}%"
                 + (f", a shortfall of {_fmt(abs(p['difference_vs_benchmark_pts']), lang)} percentage points." if p['difference_vs_benchmark_pts'] < 0 else "."))
     att = (facts.get("attribution") or {}).get("since_start") or {"items": []}
@@ -231,6 +231,12 @@ def fallback(facts: dict, lang: str) -> dict:
     n_tr, n_def = len(facts["trades"]), len(facts["deferred"])
     what_we_do = (f"De regels leiden deze week tot {n_tr} transacties; {n_def} nieuwe posities volgen in de komende weken vanwege het maximum van {facts['rules']['max_changes_per_week']} fondswissels per week." if nl
                   else f"The rules lead to {n_tr} trades this week; {n_def} new positions follow in the coming weeks because of the limit of {facts['rules']['max_changes_per_week']} fund changes per week.")
+    m = facts.get("mirror")
+    if m:
+        what_we_do += (f" De Europese spiegel staat sinds {_long(m['start'], lang)} op {_fmt(m['since_start_return_pct'], lang)}%, tegen {_fmt(m['us_since_start_return_pct'], lang)}% voor de Amerikaanse portefeuille"
+                       + (f"; {len(m['executed'])} transacties werden deze week uitgevoerd." if m["executed"] else ".") if nl else
+                       f" The European mirror has returned {_fmt(m['since_start_return_pct'], lang)}% since {_long(m['start'], lang)}, against {_fmt(m['us_since_start_return_pct'], lang)}% for the US portfolio"
+                       + (f"; {len(m['executed'])} trades were executed this week." if m["executed"] else "."))
     trades = [{"id": t["id"], "text": reason_text(t, lang)} for t in facts["trades"]]
     trades += [{"id": x["id"], "text": reason_text(x, lang) + (f" Gepland voor een volgende week: maximaal {facts['rules']['max_changes_per_week']} fondswissels per week." if nl
                                         else f" Planned for a later week: at most {facts['rules']['max_changes_per_week']} fund changes per week.")} for x in facts["deferred"]]

@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parent
 
 
 def main() -> None:
-    d = os.environ.get("V2_REPORT_DATE") or date.today().isoformat()
+    d = os.environ.get("V2_REPORT_DATE") or json.loads((ROOT / "state" / "portfolio.json").read_text())["as_of"]
     out = ROOT / "evidence" / f"report_{d.replace('-', '')}"
     out.mkdir(parents=True, exist_ok=True)
     facts = build(d)

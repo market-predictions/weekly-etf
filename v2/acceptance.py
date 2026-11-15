@@ -36,6 +36,41 @@ def history_reconciles() -> None:
     check(not bad, f"every saved week reconciles to the cent ({len(hist)} weeks){' — off: ' + ', '.join(bad) if bad else ''}")
 
 
+def mirror_reconciles() -> None:
+    """Prevents: a mirror portfolio whose holdings, cash or value cannot be traced to its trades and prices."""
+    from v2.engine import Prices
+    m = json.loads((ROOT / "state" / "mirror.json").read_text())
+    mh = list(csv.DictReader((ROOT / "state" / "mirror_history.csv").open()))
+    cost = yaml.safe_load((ROOT / "policy.yml").read_text())["mirror"]["cost_bps"] / 10000
+    hold, cash = defaultdict(int), float(mh[0]["nav_eur"])
+    for t in csv.DictReader((ROOT / "state" / "mirror_trades.csv").open()):
+        if not t["date"]:
+            continue
+        amt = float(t["shares"]) * float(t["price_eur"])
+        if t["type"] == "buy":
+            hold[t["line"]] += int(t["shares"]); cash -= amt * (1 + cost)
+        else:
+            hold[t["line"]] -= int(t["shares"]); cash += amt * (1 - cost)
+    saved = {p["line"]: p["shares"] for p in m["positions"]}
+    check({k: v for k, v in hold.items() if v} == saved and abs(cash - m["cash_eur"]) <= 0.05,
+          f"mirror holdings and cash follow from its trade ledger (cash {cash:.2f} vs saved {m['cash_eur']:.2f})")
+    px = Prices(list(csv.DictReader((ROOT / "state" / "mirror_prices.csv").open())))
+    nav = m["cash_eur"] + sum(sh * px.close(ln, m["as_of"], max_stale_days=4) for ln, sh in saved.items())
+    check(abs(nav - m["nav_eur"]) <= 0.05 and abs(float(mh[-1]["nav_eur"]) - m["nav_eur"]) <= 0.05,
+          f"mirror value = holdings at closing prices + cash ({nav:.2f} vs saved {m['nav_eur']:.2f})")
+
+
+def mirror_maps() -> None:
+    """Prevents: a mirror holding a fund the US portfolio does not hold (outside the approved twin/approximation list)."""
+    uni = yaml.safe_load((ROOT / "universe.yml").read_text())["instruments"]
+    line_of = {i["id"]: i["mirror"]["line"] for i in uni}
+    port = json.loads((ROOT / "state" / "portfolio.json").read_text())
+    m = json.loads((ROOT / "state" / "mirror.json").read_text())
+    us_lines = {line_of[p["id"]] for p in port["positions"]}
+    stray = [p["line"] for p in m["positions"] if p["line"] not in us_lines]
+    check(not stray or bool(m.get("pending")), f"every mirror line belongs to a US holding (or a planned trade is pending){' — stray: ' + ', '.join(stray) if stray else ''}")
+
+
 def report_renders() -> None:
     """Prevents: a broken, too long or internally-worded report; invented numbers in the text."""
     from v2 import narrate as N
@@ -48,7 +83,7 @@ def report_renders() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         res = R.render(facts, commentary, Path(tmp))
     for lang, r in res.items():
-        check(r["pages"] <= 4 and not r["problems"], f"report {lang.upper()} ≤ 4 pages, no layout problems ({r['pages']} pages{'; ' + '; '.join(r['problems']) if r['problems'] else ''})")
+        check(r["pages"] <= 5 and not r["problems"], f"report {lang.upper()} ≤ 5 pages, no layout problems ({r['pages']} pages{'; ' + '; '.join(r['problems']) if r['problems'] else ''})")
 
 
 def rules_hold() -> None:
@@ -59,11 +94,11 @@ def rules_hold() -> None:
     uni = [i for i in yaml.safe_load((ROOT / "universe.yml").read_text())["instruments"] if i.get("status") == "verified"]
     prices = Prices(list(csv.DictReader((ROOT / "state" / "prices.csv").open())))
     port = json.loads((ROOT / "state" / "portfolio.json").read_text())
-    hold = {"L0CK": 934, "DFEN": 207, "VWCE": 151, "EUNA": 1526, "SXR8": 10, "IQQQ": 149}
+    hold = {"CIBR": 253, "GSG": 374, "IEFA": 312, "PAVE": 107, "SMH": 59, "URNM": 48, "XBI": 40, "XLU": 14, "XLV": 37}
     last = date.fromisoformat(port["as_of"])
     with contextlib.redirect_stdout(io.StringIO()), tempfile.TemporaryDirectory() as tmp:
         sim.ROOT = Path(tmp)
-        s = sim.run("acceptance", hold, 28101.01, "2026-08-14", sim.wednesdays(date(2026, 8, 19), last), prices, uni, pol)
+        s = sim.run("acceptance", hold, 2534.36, "2026-08-07", sim.wednesdays(date(2026, 8, 12), last), prices, uni, pol)
         sim.ROOT = ROOT
     rc = s["rule_checks"]
     check(rc["max_changes_in_a_week"] <= pol["turnover"]["max_instrument_changes_per_week"] + 1,
@@ -88,7 +123,7 @@ def size_budget() -> None:
 
 
 def main() -> None:
-    for step in (history_reconciles, fresh_state, rules_hold, report_renders, size_budget):
+    for step in (history_reconciles, mirror_reconciles, mirror_maps, fresh_state, rules_hold, report_renders, size_budget):
         try:
             step()
         except Exception as exc:  # a crashing check is a failing check

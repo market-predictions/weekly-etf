@@ -21,6 +21,7 @@ from pathlib import Path
 import yaml
 
 from v2 import market, mailer
+from v2 import mirror as MR
 from v2 import narrate as N
 from v2 import render as R
 from v2 import sources as S
@@ -57,7 +58,7 @@ def append_csv(name: str, rows: list[dict]) -> None:
 
 
 def cross_check(held: dict[str, int], uni: dict[str, dict], prices: Prices, d: str) -> tuple[dict[str, str], list[str]]:
-    """Primary (Yahoo) close vs Alpha Vantage for every held position."""
+    """Primary (Yahoo) USD close vs Alpha Vantage for every held position (prices = USD closes)."""
     status, blockers = {}, []
     for iid in sorted(held):
         p = prices.close(iid, d, max_stale_days=2)
@@ -65,7 +66,7 @@ def cross_check(held: dict[str, int], uni: dict[str, dict], prices: Prices, d: s
             blockers.append(f"{iid}: no current primary close for {d}")
             status[iid] = "missing_primary"
             continue
-        av = S.alpha_vantage(iid, uni[iid]["exchange"])
+        av = S.alpha_vantage(iid, "US")
         S.pause(13)
         v = av.closes.get(d)
         if v is None:
@@ -100,6 +101,19 @@ def _rehearsal_state() -> str:
     port = json.loads((scratch / "portfolio.json").read_text())
     port["as_of"] = hist[-2]["date"]
     (scratch / "portfolio.json").write_text(json.dumps(port, indent=1))
+    mt = list(csv.DictReader((scratch / "mirror_trades.csv").open()))
+    if any(t["date"] > hist[-2]["date"] for t in mt):
+        raise SystemExit("REHEARSAL_BLOCKED: the mirror traded in the latest week; rehearsal only replays a no-trade week")
+    mh = list(csv.DictReader((scratch / "mirror_history.csv").open()))
+    with (scratch / "mirror_history.csv").open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(mh[0].keys()))
+        w.writeheader()
+        w.writerows(r for r in mh if r["date"] != last)
+    m = json.loads((scratch / "mirror.json").read_text())
+    m["as_of"] = hist[-2]["date"]
+    if m.get("pending") and m["pending"]["decided"] == last:
+        m["pending"] = None
+    (scratch / "mirror.json").write_text(json.dumps(m, indent=1))
     STATE = scratch
     import v2.facts as F
     F.ROOT = scratch.parent  # facts reads state/ under ROOT
@@ -125,8 +139,11 @@ def main() -> None:
     # 1. Prices
     market.main()
     if rehearsal:  # market.main writes to the real state dir; copy fresh prices into scratch
-        (STATE / "prices.csv").write_text((ROOT / "state" / "prices.csv").read_text())
+        for name in ("prices.csv", "prices_usd.csv", "mirror_prices.csv", "fx.csv"):
+            (STATE / name).write_text((ROOT / "state" / name).read_text())
     prices = Prices(read_csv("prices.csv"))
+    prices_usd = Prices(read_csv("prices_usd.csv"))
+    mprices = Prices(read_csv("mirror_prices.csv"))
     uni_all = yaml.safe_load((ROOT / "universe.yml").read_text())["instruments"]
     uni_by = {i["id"]: i for i in uni_all}
     uni = [i for i in uni_all if i.get("status") == "verified"]
@@ -138,15 +155,12 @@ def main() -> None:
         raise SystemExit(f"RUN_BLOCKED: no benchmark close for {d} (market closed or data missing)")
 
     # 2. Cross-check held positions
-    status, blockers = cross_check(hold, uni_by, prices, d)
+    status, blockers = cross_check(hold, uni_by, prices_usd, d)
     print("CROSS_CHECK " + json.dumps(status))
     if blockers:
         raise SystemExit("RUN_BLOCKED: " + "; ".join(blockers))
 
-    # 3. Decide and apply (inflation rule gets the latest published HICP)
-    from v2 import macro as M
-    pol["_runtime"] = M.runtime(M.fetch(date.fromisoformat(d)))
-    print("INFLATION_INPUT " + json.dumps(pol["_runtime"]))
+    # 3. Decide and apply (no inflation rule for the US portfolio; see policy.yml)
     sc = scan(prices, uni, pol, d)
     dec = decide(d, hold, cash, prices, uni, pol, sc)
     hold_after, cash_after = apply(hold, cash, dec)
@@ -181,16 +195,40 @@ def main() -> None:
     }, indent=1) + "\n")
     print(f"STATE_SAVED nav={nav} cash={cash_after:.2f} trades={len(dec.trades)} deferred={len(dec.deferred)}")
 
+    # 4b. European mirror: follow last week's decision, value, plan the next European close
+    mstate = json.loads((STATE / "mirror.json").read_text())
+    line_of = {i: u["mirror"]["line"] for i, u in uni_by.items()}
+    mres = MR.week(d, mstate, line_of, pol, prices, mprices, hold_after, cash_after)
+    mprev = read_csv("mirror_history.csv")
+    mfirst, mlast = mprev[0], mprev[-1]
+    mnav = mres["state"]["nav_eur"]
+    mb_idx = round(float(mlast["benchmark_index"]) * (1 + (mres["benchmark_week_return"] or 0.0)), 6)
+    append_csv("mirror_trades.csv", [{"date": t["date"], "type": t["side"], "line": t["line"], "shares": t["shares"],
+                                      "price_eur": round(t["price"], 4), "amount_eur": t["amount"],
+                                      "reason": f"follows US decision of {t['decided']}"} for t in mres["executed"]])
+    us_base = next(float(h["nav_eur"]) for h in hist if h["date"] == mfirst["date"])
+    append_csv("mirror_history.csv", [{
+        "date": d, "nav_eur": mnav, "cash_eur": mres["state"]["cash_eur"], "invested_eur": round(mnav - mres["state"]["cash_eur"], 2),
+        "cum_return_pct": round((mnav / float(mfirst["nav_eur"]) - 1) * 100, 4), "week_return_pct": round((mnav / float(mlast["nav_eur"]) - 1) * 100, 4),
+        "benchmark_index": mb_idx, "benchmark_cum_return_pct": round((mb_idx / float(mfirst["benchmark_index"]) - 1) * 100, 4),
+        "us_cum_return_pct": round((nav / us_base - 1) * 100, 4),
+    }])
+    (STATE / "mirror.json").write_text(json.dumps(mres["state"], indent=1) + "\n")
+    print(f"MIRROR_SAVED nav={mnav} executed={len(mres['executed'])} pending={'yes' if mres['state']['pending'] else 'no'}")
+
     # 5. Report
     out = (STATE.parent / "rehearsal" if rehearsal else ROOT / "evidence") / f"report_{d.replace('-', '')}"
     out.mkdir(parents=True, exist_ok=True)
-    facts = build(d, applied={"hold_before": hold, "cash_before": cash, "decision": dec, "hold_after": hold_after, "cash_after": cash_after})
+    facts = build(d, applied={"hold_before": hold, "cash_before": cash, "decision": dec, "hold_after": hold_after, "cash_after": cash_after,
+                              "mirror": mres})
     facts["price_checks"] = status
     (out / "facts.json").write_text(json.dumps(facts, indent=1, ensure_ascii=False))
     commentary = N.narrate(facts)
     (out / "commentary.json").write_text(json.dumps(commentary, indent=1, ensure_ascii=False))
     rendered = R.render(facts, commentary, out)
     problems = [p for r in rendered.values() for p in r["problems"]]
+    if facts["mirror"]["value_eur"] != mnav:
+        problems.append(f"facts mirror value {facts['mirror']['value_eur']} != saved mirror nav {mnav}")
     if facts["portfolio"]["value_eur"] != nav:
         problems.append(f"facts value {facts['portfolio']['value_eur']} != saved nav {nav}")
     checks = {"report_date": d, "commentary_source": commentary["source"], "commentary_problems": commentary["problems"],

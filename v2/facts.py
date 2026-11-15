@@ -14,19 +14,21 @@ from pathlib import Path
 import yaml
 
 from v2 import macro as M
+from v2 import mirror as MR
 from v2.engine import Prices, apply, benchmark_index, benchmark_return, decide, scan
 
 ROOT = Path(__file__).resolve().parent
-MARKET_PANEL = [  # asset-class barometer shown in the report
-    ("VWCE", "World equity", "Wereldwijde aandelen"),
-    ("SXR8", "US equity (S&P 500)", "Amerikaanse aandelen (S&P 500)"),
-    ("EUNK", "European equity", "Europese aandelen"),
-    ("IJPA", "Japanese equity", "Japanse aandelen"),
-    ("EMIM", "Emerging-market equity", "Aandelen opkomende markten"),
-    ("EUNH", "Euro government bonds", "Euro-staatsobligaties"),
-    ("EUN5", "Euro corporate bonds", "Euro-bedrijfsobligaties"),
-    ("4GLD", "Gold", "Goud"),
+MARKET_PANEL = [  # asset-class barometer shown in the report (returns in EUR)
+    ("SPY", "US equity (S&P 500)", "Amerikaanse aandelen (S&P 500)"),
+    ("QQQ", "US tech (Nasdaq 100)", "Amerikaanse tech (Nasdaq 100)"),
+    ("IWM", "US small caps", "Amerikaanse small caps"),
+    ("IEFA", "Developed markets ex-US", "Ontwikkelde markten buiten de VS"),
+    ("EEM", "Emerging markets", "Opkomende markten"),
+    ("AGG", "US bonds", "Amerikaanse obligaties"),
+    ("TLT", "Long US Treasuries", "Lange Amerikaanse staatsobligaties"),
+    ("GLD", "Gold", "Goud"),
 ]
+KIND = {"twin": "twin", "proxy": "proxy", "cash": "cash"}
 
 
 def pct(x: float | None, nd: int = 2) -> float | None:
@@ -126,6 +128,17 @@ def build(d: str, with_macro: bool = True, applied: dict | None = None) -> dict:
     else:
         hold, cash = applied["hold_before"], applied["cash_before"]
         dec, hold_after, cash_after = applied["decision"], applied["hold_after"], applied["cash_after"]
+    mprices = Prices(list(csv.DictReader((ROOT / "state" / "mirror_prices.csv").open())))
+    mhist = list(csv.DictReader((ROOT / "state" / "mirror_history.csv").open()))
+    uni_by = {i["id"]: i for i in uni_all}
+    line_of = {i: u["mirror"]["line"] for i, u in uni_by.items()}
+    if applied is not None and applied.get("mirror"):
+        mres = applied["mirror"]
+    else:  # preview: same step, nothing saved
+        mstate = json.loads((ROOT / "state" / "mirror.json").read_text())
+        mres = MR.week(d, mstate, line_of, pol, prices, mprices, hold_after, cash_after) if mstate["as_of"] < d else \
+            {"state": mstate, "executed": [], "prices": MR.value({p["line"]: p["shares"] for p in mstate["positions"]}, mstate["cash_eur"], mprices, d)[1],
+             "targets": MR.implied_weights(hold_after, cash_after, prices, d, line_of), "benchmark_week_return": None}
 
     nav = round(cash_after + sum(sh * prices.close(i, d) for i, sh in hold_after.items()), 2)
     start = hist[0]
@@ -179,8 +192,60 @@ def build(d: str, with_macro: bool = True, applied: dict | None = None) -> dict:
     if not chart or chart[-1]["date"] != d:
         chart.append({"date": d, "portfolio_index": round(nav / float(start["nav_eur"]) * 100, 2), "benchmark_index": round(b_now / b_start * 100, 2)})
 
+    # European mirror
+    ms = mres["state"]
+    mnav = ms["nav_eur"]
+    m_start = mhist[0]
+    m_prev = [h for h in mhist if h["date"] < d]
+    m_prev_nav = float(m_prev[-1]["nav_eur"]) if m_prev else float(m_start["nav_eur"])
+    mpol = {"benchmark": pol["mirror"]["benchmark"]}
+    mbd = sorted({h["date"] for h in mhist if h["date"] <= d} | {d})
+    mbi = benchmark_index(mprices, mpol, mbd)
+    us_at_mstart = next(float(h["nav_eur"]) for h in hist if h["date"] == m_start["date"])
+    us_since_m = nav_before / us_at_mstart - 1
+    m_since = mnav / float(m_start["nav_eur"]) - 1
+    by_line: dict[str, list[str]] = {}
+    for i in hold_after:
+        by_line.setdefault(line_of[i], []).append(i)
+    mpos = []
+    for p in sorted(ms["positions"], key=lambda x: -x["shares"] * mres["prices"][x["line"]]):
+        ln, sh = p["line"], p["shares"]
+        px = mres["prices"][ln]
+        us_ids = by_line.get(ln, [])
+        kinds = sorted({uni_by[i]["mirror"]["kind"] for i in us_ids}) or ["sold"]
+        mpos.append({"line": ln, "ticker": ln.split(".")[0], "name": next((uni_by[i]["mirror"]["name"] for i in us_ids), ln),
+                     "us_ids": us_ids, "kind": kinds[0], "shares": sh, "price_eur": round(px, 2), "value_eur": round(sh * px, 2),
+                     "weight_pct": pct(sh * px / mnav, 1), "us_weight_pct": pct(mres["targets"].get(ln, 0.0), 1)})
+    pend = ms.get("pending")
+    m_names = {u["mirror"]["line"]: u["mirror"]["name"] for u in uni_by.values()}
+    mirror = {
+        "start": m_start["date"], "value_eur": mnav, "cash_eur": round(ms["cash_eur"], 2), "cash_pct": pct(ms["cash_eur"] / mnav, 1),
+        "week_return_pct": pct(mnav / m_prev_nav - 1), "since_start_return_pct": pct(m_since),
+        "us_since_start_return_pct": pct(us_since_m), "gap_vs_us_pts": round((m_since - us_since_m) * 100, 2),
+        "benchmark_label": pol["mirror"]["benchmark"]["label"],
+        "benchmark_week_return_pct": pct(mbi[d] / mbi[m_prev[-1]["date"]] - 1) if m_prev else None,
+        "benchmark_since_start_return_pct": pct(mbi[d] / mbi[m_start["date"]] - 1),
+        "positions": mpos,
+        "executed": [{"date": t["date"], "side": t["side"], "line": t["line"], "ticker": t["line"].split(".")[0], "name": m_names.get(t["line"], t["line"]),
+                      "shares": t["shares"], "price_eur": round(t["price"], 2), "amount_eur": round(t["amount"]), "decided": t.get("decided")} for t in mres["executed"]],
+        "planned": [{"line": k, "ticker": k.split(".")[0], "name": m_names.get(k, k), "target_pct": pct(v, 1)}
+                    for k, v in sorted((pend or {}).get("targets", {}).items(), key=lambda kv: -kv[1])] if pend else [],
+        "n_proxy": sum(1 for x in mpos if x["kind"] == "proxy"), "n_cash_line": sum(1 for x in mpos if x["kind"] == "cash"),
+    }
+    m_by_date = {h["date"]: float(h["nav_eur"]) for h in mhist}
+    m_by_date[d] = mnav
+    for row in chart:
+        if row["date"] in m_by_date:
+            row["mirror_index"] = round(m_by_date[row["date"]] / float(m_start["nav_eur"]) * 100, 2)
+    inc = port.get("inception") or {}
+    v1 = list(csv.DictReader((ROOT / "state" / "history_v1.csv").open())) if (ROOT / "state" / "history_v1.csv").exists() else []
+    v1_at_start = next((float(r["nav_eur"]) for r in v1 if r["date"] == start["date"]), None)
+    since_inception = (v1_at_start / inc["capital_eur"]) * (nav_before / float(start["nav_eur"])) - 1 if inc and v1_at_start else None
+
     facts = {
         "report_date": d,
+        "inception": {"date": inc.get("date"), "return_pct": pct(since_inception)} if since_inception is not None else None,
+        "mirror": mirror,
         "data_through": d,
         "track_record_start": start["date"],
         "benchmark": {"label": pol["benchmark"]["label"], "weights": pol["benchmark"]["weights"]},

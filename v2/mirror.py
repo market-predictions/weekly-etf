@@ -97,3 +97,31 @@ def needs_trade(hold: dict[str, int], cash: float, targets: dict[str, float], pr
     if held != want:
         return True
     return any(abs(cur[k] - targets[k]) * 100 > band_pts for k in want)
+
+
+def week(d: str, state: dict, line_of: dict[str, str], pol: dict, us_prices: Prices, mprices: Prices,
+         us_hold_after: dict[str, int], us_cash_after: float) -> dict:
+    """One weekly mirror step for report date d. Pure: returns the new state plus what happened.
+
+    1. Execute the pending target (decided last week) at the first European close after that decision.
+    2. Value the mirror at d.
+    3. Set the new pending target from the US portfolio after this week's trades (if a trade is needed).
+    """
+    from v2.engine import benchmark_return
+    band, cost = pol["mirror"]["rebalance_band_pts"], pol["mirror"]["cost_bps"]
+    hold = {p["line"]: p["shares"] for p in state["positions"]}
+    cash = float(state["cash_eur"])
+    executed, pending = [], state.get("pending")
+    if pending and pending["decided"] < d:
+        hold, cash, executed, prob = execute(hold, cash, pending["targets"], mprices, pending["decided"], band, cost)
+        if prob:
+            raise SystemExit("MIRROR_BLOCKED: " + "; ".join(prob))
+        executed = [dict(t, decided=pending["decided"]) for t in executed]
+        pending = None
+    nav, px = value(hold, cash, mprices, d)
+    targets = implied_weights(us_hold_after, us_cash_after, us_prices, d, line_of)
+    new_pending = {"decided": d, "targets": targets} if needs_trade(hold, cash, targets, mprices, d, band) else None
+    b_ret = benchmark_return(mprices, {"benchmark": pol["mirror"]["benchmark"]}, state["as_of"], d)
+    return {"state": {"as_of": d, "cash_eur": cash, "nav_eur": nav, "start": state["start"],
+                      "positions": [{"line": ln, "shares": sh} for ln, sh in sorted(hold.items())], "pending": new_pending},
+            "executed": executed, "prices": px, "targets": targets, "benchmark_week_return": b_ret}

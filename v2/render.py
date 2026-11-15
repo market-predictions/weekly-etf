@@ -13,15 +13,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 FONTS = ROOT / "assets" / "fonts"
-BLUE, ORANGE = "#2a78d6", "#eb6834"  # validated categorical slots 1–2 (dataviz validator, light)
+BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"  # categorical slots 1–3, validated adjacent (dataviz validator, light); aqua <3:1 → always labelled + legend
 
 MONTHS = {
     "en": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     "nl": ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"],
 }
 T = {
-    "title": {"en": "Weekly ETF Review", "nl": "Wekelijkse ETF Review"},
-    "subtitle": {"en": "European UCITS model portfolio", "nl": "Europese UCITS-modelportefeuille"},
+    "title": {"en": "Weekly ETF Review · US", "nl": "Wekelijkse ETF Review · VS"},
+    "subtitle": {"en": "Model portfolio of US-listed ETFs, with a European UCITS mirror", "nl": "Modelportefeuille van Amerikaanse ETF's, met een Europese UCITS-spiegel"},
     "footer": {"en": "Model portfolio · rules-based · not personal advice", "nl": "Modelportefeuille · regelgebaseerd · geen persoonlijk advies"},
     "value": {"en": "Portfolio value", "nl": "Waarde portefeuille"},
     "week": {"en": "This week", "nl": "Deze week"},
@@ -33,7 +33,20 @@ T = {
     "h_why": {"en": "Why", "nl": "Waarom"},
     "h_do": {"en": "What we are doing", "nl": "Wat we doen"},
     "att_title": {"en": "What explains the gap with the benchmark", "nl": "Wat verklaart het verschil met de benchmark"},
-    "bench_label": {"en": "Benchmark (70% VWCE / 30% EUNA)", "nl": "Benchmark (70% VWCE / 30% EUNA)"},
+    "bench_label": {"en": "Benchmark (70% SPY / 30% AGG)", "nl": "Benchmark (70% SPY / 30% AGG)"},
+    "mirror": {"en": "European mirror", "nl": "Europese spiegel"},
+    "mirror_title": {"en": "The European mirror", "nl": "De Europese spiegel"},
+    "mirror_intro": {"en": "European investors cannot buy US-listed ETFs. The mirror follows every decision above in UCITS funds that can be bought in Europe, one European trading day later. Where no UCITS twin exists it holds a related fund (approximation) or the money-market fund.",
+                     "nl": "Europese beleggers kunnen Amerikaanse ETF's niet kopen. De spiegel volgt elk besluit hierboven in UCITS-fondsen die in Europa te koop zijn, één Europese handelsdag later. Waar geen UCITS-tweeling bestaat, houdt hij een verwant fonds (benadering) of het geldmarktfonds."},
+    "follows": {"en": "Follows", "nl": "Volgt"}, "kind": {"en": "Match", "nl": "Soort"},
+    "twin": {"en": "Twin", "nl": "Tweeling"}, "proxy": {"en": "Approximation", "nl": "Benadering"}, "sold": {"en": "To sell", "nl": "Te verkopen"},
+    "us_weight": {"en": "US weight", "nl": "Gewicht VS"},
+    "mirror_traded": {"en": "Mirror trades this week", "nl": "Transacties van de spiegel deze week"},
+    "mirror_planned": {"en": "Planned for the next European close", "nl": "Gepland voor de volgende Europese slotkoers"},
+    "mirror_no_trades": {"en": "No mirror trades this week: every line is within 2 points of its US weight.", "nl": "Geen transacties in de spiegel deze week: elke positie zit binnen 2 punten van het gewicht in de VS."},
+    "mirror_vs": {"en": "Since {d}: mirror {m}%, US portfolio {u}%, gap {g} points. Mirror benchmark ({b}): {mb}%.",
+                  "nl": "Sinds {d}: spiegel {m}%, Amerikaanse portefeuille {u}%, verschil {g} punten. Benchmark van de spiegel ({b}): {mb}%."},
+    "inception": {"en": "since {d}", "nl": "sinds {d}"},
     "att_sub": {"en": "Contribution since {d}, percentage points", "nl": "Bijdrage sinds {d}, procentpunt"},
     "att_total": {"en": "Total gap", "nl": "Totaal verschil"},
     "cash_item": {"en": "Cash", "nl": "Kas"},
@@ -111,7 +124,8 @@ def tone(v) -> str:
 # ── Chart ───────────────────────────────────────────────────────────────────
 def chart_svg(points: list[dict], lang: str) -> str:
     W, H, L, R, TP, B = 640, 230, 44, 92, 14, 30
-    ys = [p["portfolio_index"] for p in points] + [p["benchmark_index"] for p in points]
+    has_m = all("mirror_index" in p for p in points)
+    ys = [p["portfolio_index"] for p in points] + [p["benchmark_index"] for p in points] + ([p["mirror_index"] for p in points] if has_m else [])
     lo, hi = min(ys), max(ys)
     pad = max(0.5, (hi - lo) * 0.15)
     lo, hi = lo - pad, hi + pad
@@ -134,19 +148,24 @@ def chart_svg(points: list[dict], lang: str) -> str:
             xl.append(f'<text x="{X(i):.1f}" y="{H - 10}" font-family="Inter" font-size="9" fill="#6b6a66" text-anchor="middle">{MONTHS[lang][d.month - 1][:3]}</text>')
     def path(key):
         return "M" + " L".join(f"{X(i):.1f},{Y(p[key]):.1f}" for i, p in enumerate(points))
-    lp, lb = points[-1]["portfolio_index"], points[-1]["benchmark_index"]
-    yp, yb = Y(lp), Y(lb)
-    if abs(yp - yb) < 14:  # keep end labels apart
-        mid = (yp + yb) / 2
-        yp, yb = (mid - 7, mid + 7) if lp >= lb else (mid + 7, mid - 7)
+    ends = [("portfolio_index", BLUE, t("portfolio", lang)), ("benchmark_index", ORANGE, "Benchmark")] + ([("mirror_index", AQUA, t("mirror", lang))] if has_m else [])
+    labs = sorted(([Y(points[-1][k]), k, col, name] for k, col, name in ends), key=lambda x: x[0])
+    for i in range(1, len(labs)):  # keep end labels at least 13 px apart
+        labs[i][0] = max(labs[i][0], labs[i - 1][0] + 13)
+    over = labs[-1][0] - (H - B)
+    if over > 0:
+        for lab in labs:
+            lab[0] -= over
+    endmarks = "".join(f'<circle cx="{X(n - 1):.1f}" cy="{Y(points[-1][k]):.1f}" r="3" fill="{col}" stroke="#fff" stroke-width="2"/>'
+                       f'<text x="{X(n - 1) + 8:.1f}" y="{yl + 3:.1f}" font-family="Inter" font-weight="600" font-size="9.5" fill="#1d1d1b">{name} {num(points[-1][k], lang)}</text>'
+                       for yl, k, col, name in labs)
+    mpath = f'<path d="{path("mirror_index")}" fill="none" stroke="{AQUA}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' if has_m else ""
     return f'''<svg viewBox="0 0 {W} {H}" width="100%" xmlns="http://www.w3.org/2000/svg" role="img">
 {''.join(grid)}{''.join(xl)}
 <path d="{path("benchmark_index")}" fill="none" stroke="{ORANGE}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+{mpath}
 <path d="{path("portfolio_index")}" fill="none" stroke="{BLUE}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="{X(n - 1):.1f}" cy="{Y(lb):.1f}" r="3" fill="{ORANGE}" stroke="#fff" stroke-width="2"/>
-<circle cx="{X(n - 1):.1f}" cy="{Y(lp):.1f}" r="3" fill="{BLUE}" stroke="#fff" stroke-width="2"/>
-<text x="{X(n - 1) + 8:.1f}" y="{yp + 3:.1f}" font-family="Inter" font-weight="600" font-size="9.5" fill="#1d1d1b">{t("portfolio", lang)} {num(lp, lang)}</text>
-<text x="{X(n - 1) + 8:.1f}" y="{yb + 3:.1f}" font-family="Inter" font-weight="600" font-size="9.5" fill="#1d1d1b">Benchmark {num(lb, lang)}</text>
+{endmarks}
 </svg>'''
 
 
@@ -199,11 +218,14 @@ def decisions_table(f, c, lang):
 def page_summary(f, c, lang):
     p = f["portfolio"]
     tiles = "".join([
-        kpi(t("value", lang), eur(p["value_eur"], lang), f'{p["n_positions"]} ' + ("funds" if lang == "en" else "fondsen")),
+        kpi(t("value", lang), eur(p["value_eur"], lang),
+            (f'{t("inception", lang, d=long_date(f["inception"]["date"], lang))}: {num(f["inception"]["return_pct"], lang, sign=True)}%' if f.get("inception")
+             else f'{p["n_positions"]} ' + ("funds" if lang == "en" else "fondsen"))),
         kpi(t("week", lang), num(p["week_return_pct"], lang, sign=True) + "%", f'{t("vs", lang)} {num(p["benchmark_week_return_pct"], lang, sign=True)}%', tone(p["week_return_pct"])),
         kpi(f'{t("since", lang)} {long_date(f["track_record_start"], lang)}', num(p["since_start_return_pct"], lang, sign=True) + "%",
             f'{t("vs", lang)} {num(p["benchmark_since_start_return_pct"], lang, sign=True)}%', tone(p["since_start_return_pct"])),
-        kpi(t("cash", lang), num(p["cash_pct"], lang, 1) + "%", eur(p["cash_eur"], lang)),
+        kpi(t("mirror", lang), num(f["mirror"]["since_start_return_pct"], lang, sign=True) + "%",
+            f'{"gap with US" if lang == "en" else "verschil met VS"} {num(f["mirror"]["gap_vs_us_pts"], lang, sign=True)} {"pts" if lang == "en" else "pt"}', tone(f["mirror"]["since_start_return_pct"])),
     ])
     att = (f.get("attribution") or {}).get("since_start")
     side = ""
@@ -215,7 +237,7 @@ def page_summary(f, c, lang):
 <h1>{e(c["headline"])}</h1>
 <div class="kpis">{tiles}</div>
 <div class="chart-head"><span>{t("chart_title", lang)} {long_date(f["track_record_start"], lang)}</span>
-<span class="legend"><i style="background:{BLUE}"></i>{t("portfolio", lang)} <i style="background:{ORANGE}"></i>{t("bench_label", lang)}</span></div>
+<span class="legend"><i style="background:{BLUE}"></i>{t("portfolio", lang)} <i style="background:{ORANGE}"></i>{t("bench_label", lang)} <i style="background:{AQUA}"></i>{t("mirror", lang)}</span></div>
 {chart_svg(f["chart"], lang)}
 <div class="story"><div class="narr">
 <h3>{t("h_happened", lang)}</h3><p>{e(c["what_happened"])}</p>
@@ -241,6 +263,37 @@ def page_performance(f, c, lang):
 <h2>{t("positions", lang)}</h2>
 <table><thead><tr><th>{t("fund", lang)}</th><th>{t("role", lang)}</th><th class="num">{"Value" if lang == "en" else "Waarde"}</th><th class="num">{t("weight", lang)}</th>
 <th class="num">{t("w1", lang)}</th><th class="num">{t("m3", lang)}</th><th>{t("trend", lang)}</th><th class="num">{t("rank", lang)}</th></tr></thead><tbody>{"".join(rows)}</tbody></table>
+</section>'''
+
+
+def page_mirror(f, c, lang):
+    m = f["mirror"]
+    rows = []
+    for p in m["positions"]:
+        kind = t(p["kind"], lang) if p["kind"] != "cash" else ("Money market" if lang == "en" else "Geldmarkt")
+        rows.append(f'<tr><td><b>{e(p["ticker"])}</b><div class="sub">{e(short_name(p["name"]))}</div></td><td>{e(", ".join(p["us_ids"]) or "–")}</td>'
+                    f'<td><span class="tag {"planned" if p["kind"] == "proxy" else "buy" if p["kind"] == "twin" else "sell"}">{kind}</span></td>'
+                    f'<td class="num">{eur(p["value_eur"], lang)}</td><td class="num">{num(p["weight_pct"], lang, 1)}%</td><td class="num">{num(p["us_weight_pct"], lang, 1)}%</td></tr>')
+    rows.append(f'<tr class="muted"><td><b>{t("cash", lang)}</b></td><td></td><td></td><td class="num">{eur(m["cash_eur"], lang)}</td><td class="num">{num(m["cash_pct"], lang, 1)}%</td><td></td></tr>')
+    trades = "".join(f'<tr><td><span class="tag {x["side"]}">{t(x["side"], lang)}</span></td><td><b>{e(x["ticker"])}</b><div class="sub">{e(short_name(x["name"]))}</div></td>'
+                     f'<td>{long_date(x["date"], lang)}</td><td class="num">{eur(x["amount_eur"], lang)}</td></tr>' for x in m["executed"])
+    traded = (f'<table class="dec"><thead><tr><th>{t("action", lang)}</th><th>{t("fund", lang)}</th><th>{"Date" if lang == "en" else "Datum"}</th><th class="num">{t("amount", lang)}</th></tr></thead><tbody>{trades}</tbody></table>'
+              if trades else f'<p class="note">{t("mirror_no_trades", lang)}</p>')
+    planned = ""
+    if m["planned"]:
+        planned = (f'<h3>{t("mirror_planned", lang)}</h3><p class="small">' +
+                   e(", ".join(f'{x["ticker"]} {num(x["target_pct"], lang, 1)}%' for x in m["planned"])) + "</p>")
+    vs = t("mirror_vs", lang, d=long_date(m["start"], lang), m=num(m["since_start_return_pct"], lang, sign=True), u=num(m["us_since_start_return_pct"], lang, sign=True),
+           g=num(m["gap_vs_us_pts"], lang, sign=True), b=m["benchmark_label"], mb=num(m["benchmark_since_start_return_pct"], lang, sign=True))
+    return f'''<section class="page">
+<h2 class="top">{t("mirror_title", lang)}</h2>
+<p>{e(t("mirror_intro", lang))}</p>
+<p><b>{e(vs)}</b></p>
+<table><thead><tr><th>{t("fund", lang)} (UCITS)</th><th>{t("follows", lang)}</th><th>{t("kind", lang)}</th><th class="num">{"Value" if lang == "en" else "Waarde"}</th>
+<th class="num">{t("weight", lang)}</th><th class="num">{t("us_weight", lang)}</th></tr></thead><tbody>{"".join(rows)}</tbody></table>
+<h2>{t("mirror_traded", lang)}</h2>
+{traded}
+{planned}
 </section>'''
 
 
@@ -295,36 +348,39 @@ def page_method(f, lang):
     r = f["rules"]
     if lang == "nl":
         how = [
-            f"Kern: VWCE (aandelen) en EUNA (obligaties). Daaromheen {r['satellites']['risk_on']} satellieten van circa {num(r['satellite_weight_pct'], 'nl', 0)}% en een kleine kaspositie (doel {num(r['cash_target_pct'], 'nl', 0)}%).",
-            "Elke week worden alle fondsen gerangschikt op rendement over 3, 6 en 12 maanden; de sterkste met een opwaartse trend vullen de satellietplaatsen, één per thema of regio.",
+            f"Kern: SPY (Amerikaanse aandelen) en AGG (Amerikaanse obligaties). Daaromheen {r['satellites']['risk_on']} satellieten van circa {num(r['satellite_weight_pct'], 'nl', 0)}% en een kleine kaspositie (doel {num(r['cash_target_pct'], 'nl', 0)}%).",
+            "Elke week worden alle fondsen gerangschikt op rendement in euro over 3, 6 en 12 maanden; de sterkste met een opwaartse trend vullen de satellietplaatsen, één per thema, sector of regio.",
             f"Een satelliet blijft zolang hij in de top 15 staat en de trend op is; een nieuw fonds vervangt hem alleen bij minstens {r['replacement_margin_pts']} punten meer. Verkoop op trend volgt na twee weken onder het 200-daags gemiddelde.",
-            f"Defensief bij een dalende trend in wereldaandelen en zwakke breedte: {r['satellites']['risk_off']} satellieten, de rest in een geldmarktfonds (XEON). Bij inflatie boven 3% en stijgend houdt de kern kortlopende staatsobligaties (IBGS) aan.",
+            f"Defensief bij een dalende trend in Amerikaanse aandelen en zwakke breedte: {r['satellites']['risk_off']} satellieten, de rest in kortlopend Amerikaans staatspapier (BIL).",
             f"Maximaal {r['max_changes_per_week']} fondswissels per week. Doel: meedoen met de markt en grote verliezen beperken; de regels beloven geen beter rendement dan de benchmark.",
+            "De Europese spiegel volgt elk besluit in UCITS-fondsen op de eerstvolgende Europese slotkoers; een positie wordt alleen aangepast bij meer dan 2 punten afwijking.",
         ]
-        data = ("Benchmark: 70% wereldwijde aandelen (VWCE) en 30% wereldwijde obligaties (EUNA), wekelijks geherbalanceerd. "
-                "Koersen: slotkoersen op Xetra en Euronext Amsterdam in euro (Yahoo Finance), posities gecontroleerd tegen een tweede bron (Alpha Vantage). "
-                "Rendementen zijn koersrendementen; bij uitkerende fondsen (Dist) zijn dividenden niet meegerekend. Transacties worden gemodelleerd tegen de slotkoers van woensdag "
-                f"met hele stukken en {num(r['cost_bps'] / 100, 'nl')}% geschatte kosten per transactie. " +
-                "Macrodata: ECB Data Portal, Federal Reserve Bank of New York en Eurostat. Het commentaar is opgesteld met behulp van AI op basis van uitsluitend de cijfers in dit rapport; "
-                "elk getal in de tekst wordt automatisch gecontroleerd tegen die cijfers.")
-        disc = ("Dit rapport beschrijft een fictieve modelportefeuille die volgens vaste regels wordt beheerd. Er wordt niet daadwerkelijk belegd. Het rapport is algemene informatie "
-                "en geen persoonlijk beleggingsadvies: het houdt geen rekening met uw financiële situatie, doelen of risicobereidheid. Beleggen brengt risico's met zich mee; u kunt "
-                "(een deel van) uw inleg verliezen. In het verleden behaalde resultaten bieden geen garantie voor de toekomst. Lees voor u belegt de essentiële-informatiedocumenten (KID) van de fondsen.")
+        data = ("Benchmark: 70% Amerikaanse aandelen (SPY) en 30% Amerikaanse obligaties (AGG), in euro, wekelijks geherbalanceerd; voor de spiegel 70% SXR8 en 30% EUNA. "
+                "Koersen: slotkoersen van de Amerikaanse fondsen in dollar (Yahoo Finance), posities gecontroleerd tegen Alpha Vantage, omgerekend naar euro met de EUR/USD-slotkoers van dezelfde dag; "
+                "de spiegel tegen slotkoersen in euro op Europese beurzen. Rendementen zijn koersrendementen zonder dividend. Transacties worden gemodelleerd met hele stukken en "
+                f"{num(r['cost_bps'] / 100, 'nl')}% geschatte kosten. Het rendement sinds de start (28 maart 2026) koppelt de waarde van het vorige rapportsysteem tot 7 augustus aan de herberekende waarde daarna. "
+                "Het commentaar is opgesteld met behulp van AI op basis van uitsluitend de cijfers in dit rapport; elk getal in de tekst wordt automatisch gecontroleerd.")
+        disc = ("Dit rapport beschrijft fictieve modelportefeuilles die volgens vaste regels worden beheerd. Er wordt niet daadwerkelijk belegd. Het is algemene informatie en geen persoonlijk "
+                "beleggingsadvies: het houdt geen rekening met uw financiële situatie, doelen of risicobereidheid. Amerikaanse ETF's zijn voor Europese particuliere beleggers doorgaans niet verkrijgbaar; "
+                "de Europese spiegel laat zien hoe de portefeuille met UCITS-fondsen te volgen is. Beleggen brengt risico's met zich mee; u kunt (een deel van) uw inleg verliezen. "
+                "In het verleden behaalde resultaten bieden geen garantie voor de toekomst. Lees voor u belegt de essentiële-informatiedocumenten (KID) van de fondsen.")
     else:
         how = [
-            f"Core: VWCE (equities) and EUNA (bonds). Around it {r['satellites']['risk_on']} satellites of about {num(r['satellite_weight_pct'], 'en', 0)}% and a small cash position (target {num(r['cash_target_pct'], 'en', 0)}%).",
-            "Every week all funds are ranked on 3-, 6- and 12-month returns; the strongest in an uptrend fill the satellite slots, one per theme or region.",
+            f"Core: SPY (US equities) and AGG (US bonds). Around it {r['satellites']['risk_on']} satellites of about {num(r['satellite_weight_pct'], 'en', 0)}% and a small cash position (target {num(r['cash_target_pct'], 'en', 0)}%).",
+            "Every week all funds are ranked on 3-, 6- and 12-month returns in euro; the strongest in an uptrend fill the satellite slots, one per theme, sector or region.",
             f"A satellite stays while it ranks in the top 15 and its trend is up; a newcomer replaces it only if it scores at least {r['replacement_margin_pts']} points higher. A trend sale follows two weeks below the 200-day average.",
-            f"Defensive when world equity is in a downtrend and breadth is weak: {r['satellites']['risk_off']} satellites, the rest in a money-market fund (XEON). With inflation above 3% and rising, the core holds short-dated government bonds (IBGS).",
+            f"Defensive when US equities are in a downtrend and breadth is weak: {r['satellites']['risk_off']} satellites, the rest in short-dated US Treasury bills (BIL).",
             f"At most {r['max_changes_per_week']} fund changes per week. Aim: keep up with the market and limit large losses; the rules do not promise to beat the benchmark.",
+            "The European mirror follows every decision in UCITS funds at the next European close; a line is only resized when it is more than 2 points off.",
         ]
-        data = ("Benchmark: 70% world equity (VWCE) and 30% global bonds (EUNA), rebalanced weekly. "
-                "Prices: closing prices on Xetra and Euronext Amsterdam in euro (Yahoo Finance), with holdings checked against a second source (Alpha Vantage). "
-                "Returns are price returns; for distributing funds (Dist) dividends are not included. Trades are modelled at the Wednesday close in whole shares "
-                f"with an estimated {num(r['cost_bps'] / 100, 'en')}% cost per trade. Macro data: ECB Data Portal, Federal Reserve Bank of New York and Eurostat. "
-                "The commentary is drafted with the help of AI from the figures in this report only; every number in the text is checked automatically against those figures.")
-        disc = ("This report describes a hypothetical model portfolio managed by fixed rules. No money is actually invested. It is general information, not personal investment advice: "
-                "it does not take your financial situation, objectives or risk tolerance into account. Investing involves risk; you can lose some or all of your money. "
+        data = ("Benchmark: 70% US equities (SPY) and 30% US bonds (AGG), in euro, rebalanced weekly; for the mirror 70% SXR8 and 30% EUNA. "
+                "Prices: closing prices of the US funds in dollars (Yahoo Finance), holdings checked against Alpha Vantage, converted to euro at the same day's EUR/USD close; "
+                "the mirror at euro closing prices on European exchanges. Returns are price returns without dividends. Trades are modelled in whole shares with an estimated "
+                f"{num(r['cost_bps'] / 100, 'en')}% cost. The return since inception (28 March 2026) links the previous report system's value up to 7 August to the recalculated value after it. "
+                "The commentary is drafted with the help of AI from the figures in this report only; every number in the text is checked automatically.")
+        disc = ("This report describes hypothetical model portfolios managed by fixed rules. No money is actually invested. It is general information, not personal investment advice: "
+                "it does not take your financial situation, objectives or risk tolerance into account. US-listed ETFs are generally not available to European retail investors; "
+                "the European mirror shows how the portfolio can be followed with UCITS funds. Investing involves risk; you can lose some or all of your money. "
                 "Past performance is no guarantee of future results. Read the funds' key information documents (KID) before investing.")
     items = "".join(f"<li>{e(x)}</li>" for x in how)
     return f'''<h2>{t("method", lang)}</h2><ol class="how">{items}</ol>
@@ -392,7 +448,7 @@ ol.how li {{ margin-bottom: 2.5pt; font-size: 8.5pt; }}
 
 def render_html(f: dict, c: dict, lang: str) -> str:
     css = CSS.replace("var(--footer)", f'"{T["footer"][lang]}"')
-    body = page_summary(f, c, lang) + page_performance(f, c, lang) + page_scan(f, c, lang, method=page_method(f, lang))
+    body = page_summary(f, c, lang) + page_performance(f, c, lang) + page_mirror(f, c, lang) + page_scan(f, c, lang, method=page_method(f, lang))
     return f'<!DOCTYPE html><html lang="{lang}"><head><meta charset="utf-8"><title>{t("title", lang)} {f["report_date"]}</title><style>{css}</style></head><body>{body}</body></html>'
 
 

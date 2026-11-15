@@ -16,15 +16,15 @@ from pathlib import Path
 import requests
 
 ROOT = Path(__file__).resolve().parent
-UA = {"User-Agent": "Mozilla/5.0 (weekly-etf-eu v2)"}
+UA = {"User-Agent": "Mozilla/5.0 (weekly-etf v2)"}
 
 # id: (source, series key, label EN, label NL, unit, max_age_days)
 SERIES = {
     "ecb_deposit_rate": ("ecb", "FM/D.U2.EUR.4F.KR.DFR.LEV", "ECB deposit rate", "ECB-depositorente", "%", 10),
     "fed_funds_effective": ("nyfed", "effr", "US federal funds rate (effective)", "Amerikaanse federal funds-rente (effectief)", "%", 10),
-    "euro_10y_yield": ("ecb", "YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y", "Euro area 10y government yield (AAA)", "Rente 10-jaars staatsobligaties eurozone (AAA)", "%", 10),
+    "us_10y_yield": ("treasury", "10 Yr", "US 10-year Treasury yield", "Rente 10-jaars Amerikaanse staatsobligaties", "%", 10),
     "eurusd": ("ecb", "EXR/D.USD.EUR.SP00.A", "EUR/USD", "EUR/USD", "", 10),
-    "euro_inflation": ("eurostat", "prc_hicp_minr:geo=EA,coicop18=TOTAL,unit=RCH_A", "Euro area inflation (HICP, y/y)", "Inflatie eurozone (HICP, j/j)", "%", 75),
+    "us_inflation": ("bls", "CUUR0000SA0", "US inflation (CPI, y/y)", "Inflatie VS (CPI, j/j)", "%", 75),
 }
 
 
@@ -78,7 +78,36 @@ def _eurostat(key: str, start: date) -> list[tuple[str, float]]:
     return sorted(out)
 
 
-FETCHERS = {"ecb": _ecb, "fred": _fred, "nyfed": _nyfed, "eurostat": _eurostat}
+def _treasury(key: str, start: date) -> list[tuple[str, float]]:
+    out = []
+    for y in range(start.year, date.today().year + 1):
+        r = requests.get(f"https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/{y}/all",
+                         params={"type": "daily_treasury_yield_curve", "field_tdr_date_value": y, "page": "", "_format": "csv"}, headers=UA, timeout=30)
+        r.raise_for_status()
+        for row in csv.DictReader(io.StringIO(r.text)):
+            if row.get(key) not in (None, ""):
+                m, d_, yy = row["Date"].split("/")
+                out.append((f"{yy}-{m}-{d_}", float(row[key])))
+    return sorted(x for x in out if x[0] >= start.isoformat())
+
+
+def _bls(key: str, start: date) -> list[tuple[str, float]]:
+    """CPI index from the BLS public API (no key); returns year-on-year % per month."""
+    r = requests.post("https://api.bls.gov/publicAPI/v2/timeseries/data/",
+                      json={"seriesid": [key], "startyear": str(start.year - 1), "endyear": str(date.today().year)}, headers=UA, timeout=30)
+    r.raise_for_status()
+    rows = r.json()["Results"]["series"][0]["data"]
+    lvl = {f"{x['year']}-{x['period'][1:]}": float(x["value"]) for x in rows if x["period"].startswith("M") and x["period"] != "M13"}
+    out = []
+    for k, v in lvl.items():
+        y, m = k.split("-")
+        prev = lvl.get(f"{int(y) - 1}-{m}")
+        if prev:
+            out.append((f"{k}-01", round((v / prev - 1) * 100, 1)))
+    return sorted(x for x in out if x[0] >= start.isoformat())
+
+
+FETCHERS = {"ecb": _ecb, "fred": _fred, "nyfed": _nyfed, "eurostat": _eurostat, "treasury": _treasury, "bls": _bls}
 
 
 def fetch(asof: date) -> dict:
