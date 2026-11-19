@@ -5,7 +5,7 @@ name: Weekly ETF Review US (v2)
 # Wednesday, so a late start produces the same report.
 on:
   schedule:
-    - cron: "0 5 * * 4"
+    - cron: "23 4 * * 4"   # off the top of the hour: GitHub delays or drops busy :00 schedules (missed on 2026-11-19)
   workflow_dispatch:
     inputs:
       rehearsal:

@@ -62,13 +62,19 @@ def cross_check(held: dict[str, int], uni: dict[str, dict], prices: Prices, d: s
     status, blockers = {}, []
     for iid in sorted(held):
         p = prices.close(iid, d, max_stale_days=2)
+        pdate = max((x for x in prices.dates.get(iid, []) if x <= d), default=None)
         if p is None:
             blockers.append(f"{iid}: no current primary close for {d}")
             status[iid] = "missing_primary"
             continue
         av = S.alpha_vantage(iid, "US")
         S.pause(13)
-        v = av.closes.get(d)
+        newer = [x for x in av.closes if pdate < x <= d]
+        if newer:  # the verifier has a later close than the primary: the primary is stale (e.g. Yahoo left the bar empty)
+            status[iid] = "stale_primary"
+            blockers.append(f"{iid}: primary close is from {pdate}, verifier has {max(newer)}")
+            continue
+        v = av.closes.get(pdate)  # compare like with like: same date
         if v is None:
             status[iid] = "unverified"
         elif abs(p - v) / p * 100 > TOLERANCE_PCT:
