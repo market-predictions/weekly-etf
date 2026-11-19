@@ -9,3 +9,11 @@ date,type,id,isin,shares,price_eur,amount_eur,reason
 2026-08-07,opening_balance,XLU,,14,,,Holdings carried over from the 7 Aug 2026 report
 2026-08-07,opening_balance,XLV,,37,,,Holdings carried over from the 7 Aug 2026 report
 2026-08-07,opening_cash,CASH,,,,2534.36,Cash carried over from the 7 Aug 2026 report
+2026-11-18,sell,CIBR,,156,87.3839,13631.89,resize: weight 21.0% vs target 8.0% (band 2%)
+2026-11-18,sell,GSG,,89,29.5919,2633.68,resize: weight 10.5% vs target 8.0% (band 2%)
+2026-11-18,sell,IEFA,,312,84.9368,26500.28,rank_dropped: rank 25 of 49 (keep while ≤ 15)
+2026-11-18,sell,SMH,,34,418.0344,14213.17,resize: weight 23.4% vs target 10.0% (band 2%)
+2026-11-18,sell,URNM,,48,33.7673,1620.83,trend_down: close 33.77 below 200-day average 49.11 for 2 consecutive weeks
+2026-11-18,buy,SPY,,80,664.2484,53139.87,resize: weight 0.0% vs target 65.0% (band 2%)
+2026-11-18,buy,XBI,,18,131.94,2374.92,resize: weight 5.0% vs target 8.0% (band 2%)
+2026-11-18,buy,XLV,,11,164.8067,1812.87,resize: weight 5.8% vs target 8.0% (band 2%)
