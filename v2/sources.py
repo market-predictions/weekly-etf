@@ -89,6 +89,15 @@ def yahoo_symbol(sym: str, start: date, end: date) -> SourceResult:
                     continue
                 d = datetime.fromtimestamp(t + tz_offset, tz=timezone.utc).date().isoformat()
                 res.closes[d] = float(v)
+            # Yahoo often leaves the latest daily bar's close empty (seen 2026-11-19 on Xetra lines) while
+            # meta.regularMarketPrice already holds that day's final close. Use it only once the regular
+            # session of that day has ended, so an intraday price never becomes a close.
+            rmt, rmp = meta.get("regularMarketTime"), meta.get("regularMarketPrice")
+            session_end = ((meta.get("currentTradingPeriod") or {}).get("regular") or {}).get("end")
+            if ts and closes and closes[-1] is None and rmt and rmp and session_end and rmt >= session_end:
+                d_last = datetime.fromtimestamp(ts[-1] + tz_offset, tz=timezone.utc).date().isoformat()
+                if datetime.fromtimestamp(rmt + tz_offset, tz=timezone.utc).date().isoformat() == d_last:
+                    res.closes[d_last] = float(rmp)
             return res
         except Exception as exc:  # network / parse
             last_exc = type(exc).__name__
