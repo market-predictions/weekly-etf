@@ -1,0 +1,11 @@
+{
+ "mode": "trial",
+ "dry_run": false,
+ "messages": [
+  {
+   "name": "trial",
+   "recipients": 1,
+   "sent": true
+  }
+ ]
+}

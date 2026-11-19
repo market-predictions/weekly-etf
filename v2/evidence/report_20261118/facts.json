@@ -1,0 +1,1145 @@
+{
+ "report_date": "2026-11-18",
+ "inception": null,
+ "mirror": {
+  "start": "2026-08-07",
+  "value_eur": 105148.69,
+  "cash_eur": 2560.55,
+  "cash_pct": 2.4,
+  "week_return_pct": -4.46,
+  "since_start_return_pct": -4.7,
+  "us_since_start_return_pct": -4.39,
+  "gap_vs_us_pts": -0.31,
+  "benchmark_label": "70% SXR8 / 30% EUNA",
+  "benchmark_week_return_pct": -2.06,
+  "benchmark_since_start_return_pct": -0.58,
+  "positions": [
+   {
+    "line": "EXUS.DE",
+    "ticker": "EXUS",
+    "name": "Xtrackers MSCI World ex USA UCITS",
+    "us_ids": [],
+    "kind": "sold",
+    "shares": 671,
+    "price_eur": 39.71,
+    "value_eur": 26645.41,
+    "weight_pct": 25.3,
+    "us_weight_pct": 0.0
+   },
+   {
+    "line": "VVSM.DE",
+    "ticker": "VVSM",
+    "name": "VanEck Semiconductor UCITS",
+    "us_ids": [
+     "SMH"
+    ],
+    "kind": "twin",
+    "shares": 320,
+    "price_eur": 78.05,
+    "value_eur": 24976.0,
+    "weight_pct": 23.8,
+    "us_weight_pct": 9.9
+   },
+   {
+    "line": "CBRS.DE",
+    "ticker": "CBRS",
+    "name": "First Trust Nasdaq Cybersecurity UCITS",
+    "us_ids": [
+     "CIBR"
+    ],
+    "kind": "twin",
+    "shares": 398,
+    "price_eur": 53.82,
+    "value_eur": 21420.36,
+    "weight_pct": 20.4,
+    "us_weight_pct": 8.0
+   },
+   {
+    "line": "SXRS.DE",
+    "ticker": "SXRS",
+    "name": "iShares Diversified Commodity Swap UCITS (Bloomberg Commodity)",
+    "us_ids": [
+     "GSG"
+    ],
+    "kind": "proxy",
+    "shares": 1168,
+    "price_eur": 8.78,
+    "value_eur": 10255.04,
+    "weight_pct": 9.8,
+    "us_weight_pct": 8.0
+   },
+   {
+    "line": "QDVG.DE",
+    "ticker": "QDVG",
+    "name": "iShares S&P 500 Health Care Sector UCITS",
+    "us_ids": [
+     "XLV"
+    ],
+    "kind": "twin",
+    "shares": 454,
+    "price_eur": 13.45,
+    "value_eur": 6104.48,
+    "weight_pct": 5.8,
+    "us_weight_pct": 7.5
+   },
+   {
+    "line": "2B70.DE",
+    "ticker": "2B70",
+    "name": "iShares Nasdaq US Biotechnology UCITS",
+    "us_ids": [
+     "XBI"
+    ],
+    "kind": "proxy",
+    "shares": 632,
+    "price_eur": 9.29,
+    "value_eur": 5874.44,
+    "weight_pct": 5.6,
+    "us_weight_pct": 7.3
+   },
+   {
+    "line": "PAVE.MI",
+    "ticker": "PAVE",
+    "name": "Global X U.S. Infrastructure Development UCITS",
+    "us_ids": [
+     "PAVE"
+    ],
+    "kind": "twin",
+    "shares": 115,
+    "price_eur": 44.37,
+    "value_eur": 5102.55,
+    "weight_pct": 4.9,
+    "us_weight_pct": 4.8
+   },
+   {
+    "line": "U3O8.DE",
+    "ticker": "U3O8",
+    "name": "Sprott Uranium Miners UCITS",
+    "us_ids": [],
+    "kind": "sold",
+    "shares": 190,
+    "price_eur": 8.66,
+    "value_eur": 1645.78,
+    "weight_pct": 1.6,
+    "us_weight_pct": 0.0
+   },
+   {
+    "line": "2B7A.DE",
+    "ticker": "2B7A",
+    "name": "iShares S&P 500 Utilities Sector UCITS",
+    "us_ids": [
+     "XLU"
+    ],
+    "kind": "twin",
+    "shares": 57,
+    "price_eur": 9.9,
+    "value_eur": 564.07,
+    "weight_pct": 0.5,
+    "us_weight_pct": 0.5
+   }
+  ],
+  "executed": [],
+  "planned": [
+   {
+    "line": "SXR8.DE",
+    "ticker": "SXR8",
+    "name": "iShares Core S&P 500 UCITS",
+    "target_pct": 50.4
+   },
+   {
+    "line": "VVSM.DE",
+    "ticker": "VVSM",
+    "name": "VanEck Semiconductor UCITS",
+    "target_pct": 9.9
+   },
+   {
+    "line": "CBRS.DE",
+    "ticker": "CBRS",
+    "name": "First Trust Nasdaq Cybersecurity UCITS",
+    "target_pct": 8.0
+   },
+   {
+    "line": "SXRS.DE",
+    "ticker": "SXRS",
+    "name": "iShares Diversified Commodity Swap UCITS (Bloomberg Commodity)",
+    "target_pct": 8.0
+   },
+   {
+    "line": "QDVG.DE",
+    "ticker": "QDVG",
+    "name": "iShares S&P 500 Health Care Sector UCITS",
+    "target_pct": 7.5
+   },
+   {
+    "line": "2B70.DE",
+    "ticker": "2B70",
+    "name": "iShares Nasdaq US Biotechnology UCITS",
+    "target_pct": 7.3
+   },
+   {
+    "line": "PAVE.MI",
+    "ticker": "PAVE",
+    "name": "Global X U.S. Infrastructure Development UCITS",
+    "target_pct": 4.8
+   },
+   {
+    "line": "2B7A.DE",
+    "ticker": "2B7A",
+    "name": "iShares S&P 500 Utilities Sector UCITS",
+    "target_pct": 0.5
+   }
+  ],
+  "n_proxy": 2,
+  "n_cash_line": 0
+ },
+ "data_through": "2026-11-18",
+ "track_record_start": "2026-08-07",
+ "benchmark": {
+  "label": "70% SPY / 30% AGG",
+  "weights": {
+   "SPY": 0.7,
+   "AGG": 0.3
+  }
+ },
+ "portfolio": {
+  "value_eur": 105376.47,
+  "value_before_trades_eur": 105492.37,
+  "cash_eur": 3690.64,
+  "cash_pct": 3.5,
+  "week_return_pct": -3.27,
+  "since_start_return_pct": -4.39,
+  "benchmark_week_return_pct": -1.27,
+  "benchmark_since_start_return_pct": 0.1,
+  "difference_vs_benchmark_pts": -4.49,
+  "n_positions": 8,
+  "start_value_eur": 110331.09
+ },
+ "regime": {
+  "state": "risk_on",
+  "breadth_pct": 59.2,
+  "world_equity_trend": "up",
+  "breadth_threshold_pct": 40,
+  "n_ranked": 49
+ },
+ "attribution": {
+  "since_start": {
+   "from": "2026-08-07",
+   "to": "2026-11-18",
+   "gap_pts": -4.59,
+   "benchmark_return_pct": 0.1,
+   "items": [
+    {
+     "id": "SMH",
+     "name": "VanEck Semiconductor ETF",
+     "pts": -4.49,
+     "own_return_pct": -17.32,
+     "start_weight_pct": 27.0
+    },
+    {
+     "id": "IEFA",
+     "name": "iShares Core MSCI EAFE ETF",
+     "pts": -0.83,
+     "own_return_pct": -3.16,
+     "start_weight_pct": 24.8
+    },
+    {
+     "id": "URNM",
+     "name": "Sprott Uranium Miners ETF",
+     "pts": -0.57,
+     "own_return_pct": -28.63,
+     "start_weight_pct": 2.1
+    },
+    {
+     "id": "PAVE",
+     "name": "Global X U.S. Infrastructure Development ETF",
+     "pts": -0.35,
+     "own_return_pct": -7.01,
+     "start_weight_pct": 4.9
+    },
+    {
+     "id": "XBI",
+     "name": "SPDR S&P Biotech ETF",
+     "pts": -0.18,
+     "own_return_pct": -3.38,
+     "start_weight_pct": 5.0
+    },
+    {
+     "id": "CASH",
+     "name": "Cash",
+     "pts": -0.0,
+     "own_return_pct": 0.0,
+     "start_weight_pct": 2.3
+    },
+    {
+     "id": "XLU",
+     "name": "Utilities Select Sector SPDR Fund",
+     "pts": 0.02,
+     "own_return_pct": 4.69,
+     "start_weight_pct": 0.5
+    },
+    {
+     "id": "CIBR",
+     "name": "First Trust NASDAQ Cybersecurity ETF",
+     "pts": 0.66,
+     "own_return_pct": 2.92,
+     "start_weight_pct": 19.5
+    },
+    {
+     "id": "XLV",
+     "name": "Health Care Select Sector SPDR Fund",
+     "pts": 0.68,
+     "own_return_pct": 14.64,
+     "start_weight_pct": 4.8
+    },
+    {
+     "id": "GSG",
+     "name": "iShares S&P GSCI Commodity-Indexed Trust",
+     "pts": 0.88,
+     "own_return_pct": 9.69,
+     "start_weight_pct": 9.1
+    }
+   ],
+   "residual_pts": -0.41
+  },
+  "week": {
+   "from": "2026-11-11",
+   "to": "2026-11-18",
+   "gap_pts": -2.11,
+   "benchmark_return_pct": -1.27,
+   "items": [
+    {
+     "id": "SMH",
+     "name": "VanEck Semiconductor ETF",
+     "pts": -1.63,
+     "own_return_pct": -7.9,
+     "start_weight_pct": 24.6
+    },
+    {
+     "id": "IEFA",
+     "name": "iShares Core MSCI EAFE ETF",
+     "pts": -0.34,
+     "own_return_pct": -2.63,
+     "start_weight_pct": 25.0
+    },
+    {
+     "id": "XBI",
+     "name": "SPDR S&P Biotech ETF",
+     "pts": -0.23,
+     "own_return_pct": -5.72,
+     "start_weight_pct": 5.1
+    },
+    {
+     "id": "URNM",
+     "name": "Sprott Uranium Miners ETF",
+     "pts": -0.16,
+     "own_return_pct": -11.05,
+     "start_weight_pct": 1.7
+    },
+    {
+     "id": "GSG",
+     "name": "iShares S&P GSCI Commodity-Indexed Trust",
+     "pts": -0.1,
+     "own_return_pct": -2.27,
+     "start_weight_pct": 10.4
+    },
+    {
+     "id": "XLV",
+     "name": "Health Care Select Sector SPDR Fund",
+     "pts": -0.08,
+     "own_return_pct": -2.58,
+     "start_weight_pct": 5.7
+    },
+    {
+     "id": "PAVE",
+     "name": "Global X U.S. Infrastructure Development ETF",
+     "pts": -0.03,
+     "own_return_pct": -1.96,
+     "start_weight_pct": 4.7
+    },
+    {
+     "id": "XLU",
+     "name": "Utilities Select Sector SPDR Fund",
+     "pts": 0.01,
+     "own_return_pct": 0.98,
+     "start_weight_pct": 0.5
+    },
+    {
+     "id": "CASH",
+     "name": "Cash",
+     "pts": 0.03,
+     "own_return_pct": 0.0,
+     "start_weight_pct": 2.3
+    },
+    {
+     "id": "CIBR",
+     "name": "First Trust NASDAQ Cybersecurity ETF",
+     "pts": 0.53,
+     "own_return_pct": 1.4,
+     "start_weight_pct": 20.0
+    }
+   ],
+   "residual_pts": -0.11
+  }
+ },
+ "trades": [
+  {
+   "side": "sell",
+   "id": "CIBR",
+   "name": "First Trust NASDAQ Cybersecurity ETF",
+   "shares": 156,
+   "price_eur": 87.38,
+   "amount_eur": 13632,
+   "kind": "resize",
+   "why": "resize",
+   "detail": "weight 21.0% vs target 8.0% (band 2%)",
+   "rank": null,
+   "score": null,
+   "replaced_by": null,
+   "params": {
+    "weight_pct": 21.0,
+    "target_pct": 8.0,
+    "band_pts": 2
+   }
+  },
+  {
+   "side": "sell",
+   "id": "GSG",
+   "name": "iShares S&P GSCI Commodity-Indexed Trust",
+   "shares": 89,
+   "price_eur": 29.59,
+   "amount_eur": 2634,
+   "kind": "resize",
+   "why": "resize",
+   "detail": "weight 10.5% vs target 8.0% (band 2%)",
+   "rank": null,
+   "score": null,
+   "replaced_by": null,
+   "params": {
+    "weight_pct": 10.5,
+    "target_pct": 8.0,
+    "band_pts": 2
+   }
+  },
+  {
+   "side": "sell",
+   "id": "IEFA",
+   "name": "iShares Core MSCI EAFE ETF",
+   "shares": 312,
+   "price_eur": 84.94,
+   "amount_eur": 26500,
+   "kind": "exit",
+   "why": "rank_dropped",
+   "detail": "rank 25 of 49 (keep while ≤ 15)",
+   "rank": 25,
+   "score": 51,
+   "replaced_by": null,
+   "params": {
+    "rank": 25,
+    "n": 49,
+    "keep_limit": 15
+   }
+  },
+  {
+   "side": "sell",
+   "id": "SMH",
+   "name": "VanEck Semiconductor ETF",
+   "shares": 34,
+   "price_eur": 418.03,
+   "amount_eur": 14213,
+   "kind": "resize",
+   "why": "resize",
+   "detail": "weight 23.4% vs target 10.0% (band 2%)",
+   "rank": null,
+   "score": null,
+   "replaced_by": null,
+   "params": {
+    "weight_pct": 23.4,
+    "target_pct": 10.0,
+    "band_pts": 2
+   }
+  },
+  {
+   "side": "sell",
+   "id": "URNM",
+   "name": "Sprott Uranium Miners ETF",
+   "shares": 48,
+   "price_eur": 33.77,
+   "amount_eur": 1621,
+   "kind": "exit",
+   "why": "trend_down",
+   "detail": "close 33.77 below 200-day average 49.11 for 2 consecutive weeks",
+   "rank": 48,
+   "score": 4,
+   "replaced_by": null,
+   "params": {
+    "close": 33.77,
+    "sma200": 49.11
+   }
+  },
+  {
+   "side": "buy",
+   "id": "SPY",
+   "name": "SPDR S&P 500 ETF Trust",
+   "shares": 80,
+   "price_eur": 664.25,
+   "amount_eur": 53140,
+   "kind": "resize",
+   "why": "resize",
+   "detail": "weight 0.0% vs target 65.0% (band 2%)",
+   "rank": null,
+   "score": null,
+   "replaced_by": null,
+   "params": {
+    "weight_pct": 0.0,
+    "target_pct": 65.0,
+    "band_pts": 2
+   }
+  },
+  {
+   "side": "buy",
+   "id": "XBI",
+   "name": "SPDR S&P Biotech ETF",
+   "shares": 18,
+   "price_eur": 131.94,
+   "amount_eur": 2375,
+   "kind": "resize",
+   "why": "resize",
+   "detail": "weight 5.0% vs target 8.0% (band 2%)",
+   "rank": null,
+   "score": null,
+   "replaced_by": null,
+   "params": {
+    "weight_pct": 5.0,
+    "target_pct": 8.0,
+    "band_pts": 2
+   }
+  },
+  {
+   "side": "buy",
+   "id": "XLV",
+   "name": "Health Care Select Sector SPDR Fund",
+   "shares": 11,
+   "price_eur": 164.81,
+   "amount_eur": 1813,
+   "kind": "resize",
+   "why": "resize",
+   "detail": "weight 5.8% vs target 8.0% (band 2%)",
+   "rank": null,
+   "score": null,
+   "replaced_by": null,
+   "params": {
+    "weight_pct": 5.8,
+    "target_pct": 8.0,
+    "band_pts": 2
+   }
+  }
+ ],
+ "deferred": [
+  {
+   "id": "PAVE",
+   "name": "Global X U.S. Infrastructure Development ETF",
+   "kind": "exit",
+   "why": "rank_dropped",
+   "detail": "rank 24 of 49 (keep while ≤ 15)",
+   "params": {
+    "rank": 24,
+    "n": 49,
+    "keep_limit": 15
+   }
+  },
+  {
+   "id": "SMH",
+   "name": "VanEck Semiconductor ETF",
+   "kind": "exit",
+   "why": "rank_dropped",
+   "detail": "rank 35 of 49 (keep while ≤ 15)",
+   "params": {
+    "rank": 35,
+    "n": 49,
+    "keep_limit": 15
+   }
+  },
+  {
+   "id": "XLU",
+   "name": "Utilities Select Sector SPDR Fund",
+   "kind": "exit",
+   "why": "rank_dropped",
+   "detail": "rank 18 of 49 (keep while ≤ 15)",
+   "params": {
+    "rank": 18,
+    "n": 49,
+    "keep_limit": 15
+   }
+  },
+  {
+   "id": "AGG",
+   "name": "iShares Core U.S. Aggregate Bond ETF",
+   "kind": "entry",
+   "why": "core_or_defensive",
+   "detail": "core/defensive allocation",
+   "params": {
+    "target_pct": 17.1
+   }
+  },
+  {
+   "id": "XLP",
+   "name": "Consumer Staples Select Sector SPDR Fund",
+   "kind": "entry",
+   "why": "selected",
+   "detail": "rank 3 of 49, score 90, uptrend",
+   "params": {
+    "rank": 3,
+    "n": 49,
+    "score": 90
+   }
+  }
+ ],
+ "decision_notes": [
+  "buys scaled to 78% of target by the cash/deployment limit"
+ ],
+ "positions": [
+  {
+   "id": "SPY",
+   "name": "SPDR S&P 500 ETF Trust",
+   "role": "core",
+   "shares": 80,
+   "price_eur": 664.25,
+   "value_eur": 53139.87,
+   "weight_pct": 50.4,
+   "week_return_pct": -2.36,
+   "return_3m_pct": 1.8,
+   "trend": "up",
+   "rank": null,
+   "score": null
+  },
+  {
+   "id": "SMH",
+   "name": "VanEck Semiconductor ETF",
+   "role": "satellite",
+   "shares": 25,
+   "price_eur": 418.03,
+   "value_eur": 10450.86,
+   "weight_pct": 9.9,
+   "week_return_pct": -7.9,
+   "return_3m_pct": -13.16,
+   "trend": "down",
+   "rank": 35,
+   "score": 38
+  },
+  {
+   "id": "CIBR",
+   "name": "First Trust NASDAQ Cybersecurity ETF",
+   "role": "satellite",
+   "shares": 97,
+   "price_eur": 87.38,
+   "value_eur": 8476.24,
+   "weight_pct": 8.0,
+   "week_return_pct": 1.4,
+   "return_3m_pct": 9.29,
+   "trend": "up",
+   "rank": 2,
+   "score": 93
+  },
+  {
+   "id": "GSG",
+   "name": "iShares S&P GSCI Commodity-Indexed Trust",
+   "role": "satellite",
+   "shares": 285,
+   "price_eur": 29.59,
+   "value_eur": 8433.69,
+   "weight_pct": 8.0,
+   "week_return_pct": -2.27,
+   "return_3m_pct": 2.78,
+   "trend": "up",
+   "rank": 12,
+   "score": 73
+  },
+  {
+   "id": "XLV",
+   "name": "Health Care Select Sector SPDR Fund",
+   "role": "satellite",
+   "shares": 48,
+   "price_eur": 164.81,
+   "value_eur": 7910.72,
+   "weight_pct": 7.5,
+   "week_return_pct": -2.58,
+   "return_3m_pct": 11.74,
+   "trend": "up",
+   "rank": 1,
+   "score": 93
+  },
+  {
+   "id": "XBI",
+   "name": "SPDR S&P Biotech ETF",
+   "role": "satellite",
+   "shares": 58,
+   "price_eur": 131.94,
+   "value_eur": 7652.52,
+   "weight_pct": 7.3,
+   "week_return_pct": -5.72,
+   "return_3m_pct": -5.61,
+   "trend": "up",
+   "rank": 13,
+   "score": 72
+  },
+  {
+   "id": "PAVE",
+   "name": "Global X U.S. Infrastructure Development ETF",
+   "role": "satellite",
+   "shares": 107,
+   "price_eur": 47.36,
+   "value_eur": 5067.3,
+   "weight_pct": 4.8,
+   "week_return_pct": -1.96,
+   "return_3m_pct": -1.23,
+   "trend": "down",
+   "rank": 24,
+   "score": 53
+  },
+  {
+   "id": "XLU",
+   "name": "Utilities Select Sector SPDR Fund",
+   "role": "satellite",
+   "shares": 14,
+   "price_eur": 39.62,
+   "value_eur": 554.63,
+   "weight_pct": 0.5,
+   "week_return_pct": 0.98,
+   "return_3m_pct": 5.79,
+   "trend": "up",
+   "rank": 18,
+   "score": 62
+  }
+ ],
+ "scan_top10": [
+  {
+   "rank": 1,
+   "id": "XLV",
+   "name": "Health Care Select Sector SPDR Fund",
+   "score": 93,
+   "return_3m_pct": 11.7,
+   "return_6m_pct": 30.2,
+   "return_12m_pct": 26.2,
+   "trend": "up",
+   "held": true,
+   "new_in_top10": false
+  },
+  {
+   "rank": 2,
+   "id": "CIBR",
+   "name": "First Trust NASDAQ Cybersecurity ETF",
+   "score": 93,
+   "return_3m_pct": 9.3,
+   "return_6m_pct": 24.4,
+   "return_12m_pct": 37.6,
+   "trend": "up",
+   "held": true,
+   "new_in_top10": true
+  },
+  {
+   "rank": 3,
+   "id": "XLP",
+   "name": "Consumer Staples Select Sector SPDR Fund",
+   "score": 90,
+   "return_3m_pct": 13.6,
+   "return_6m_pct": 12.8,
+   "return_12m_pct": 25.5,
+   "trend": "up",
+   "held": false,
+   "new_in_top10": false
+  },
+  {
+   "rank": 4,
+   "id": "PHO",
+   "name": "Invesco Water Resources ETF",
+   "score": 85,
+   "return_3m_pct": 13.1,
+   "return_6m_pct": 24.3,
+   "return_12m_pct": 14.4,
+   "trend": "up",
+   "held": false,
+   "new_in_top10": false
+  },
+  {
+   "rank": 5,
+   "id": "XLF",
+   "name": "Financial Select Sector SPDR Fund",
+   "score": 80,
+   "return_3m_pct": 5.3,
+   "return_6m_pct": 15.5,
+   "return_12m_pct": 15.9,
+   "trend": "up",
+   "held": false,
+   "new_in_top10": false
+  },
+  {
+   "rank": 6,
+   "id": "QUAL",
+   "name": "iShares MSCI USA Quality Factor ETF",
+   "score": 78,
+   "return_3m_pct": 4.1,
+   "return_6m_pct": 8.5,
+   "return_12m_pct": 19.6,
+   "trend": "up",
+   "held": false,
+   "new_in_top10": true
+  },
+  {
+   "rank": 7,
+   "id": "XLE",
+   "name": "Energy Select Sector SPDR Fund",
+   "score": 78,
+   "return_3m_pct": 2.2,
+   "return_6m_pct": 8.4,
+   "return_12m_pct": 43.4,
+   "trend": "up",
+   "held": false,
+   "new_in_top10": false
+  },
+  {
+   "rank": 8,
+   "id": "USMV",
+   "name": "iShares MSCI USA Min Vol Factor ETF",
+   "score": 76,
+   "return_3m_pct": 6.9,
+   "return_6m_pct": 11.7,
+   "return_12m_pct": 14.2,
+   "trend": "up",
+   "held": false,
+   "new_in_top10": false
+  },
+  {
+   "rank": 9,
+   "id": "USO",
+   "name": "United States Oil Fund",
+   "score": 76,
+   "return_3m_pct": 7.6,
+   "return_6m_pct": -0.2,
+   "return_12m_pct": 101.7,
+   "trend": "up",
+   "held": false,
+   "new_in_top10": false
+  },
+  {
+   "rank": 10,
+   "id": "XLB",
+   "name": "Materials Select Sector SPDR Fund",
+   "score": 73,
+   "return_3m_pct": 2.3,
+   "return_6m_pct": 7.3,
+   "return_12m_pct": 24.8,
+   "trend": "up",
+   "held": false,
+   "new_in_top10": false
+  }
+ ],
+ "scan_bottom5": [
+  {
+   "rank": 45,
+   "id": "BOTZ",
+   "name": "Global X Robotics & Artificial Intelligence ETF",
+   "score": 10,
+   "return_3m_pct": -11.8,
+   "return_6m_pct": -20.0,
+   "return_12m_pct": -8.5,
+   "trend": "down",
+   "held": false
+  },
+  {
+   "rank": 46,
+   "id": "ICLN",
+   "name": "iShares Global Clean Energy ETF",
+   "score": 10,
+   "return_3m_pct": -11.2,
+   "return_6m_pct": -27.7,
+   "return_12m_pct": -7.4,
+   "trend": "down",
+   "held": false
+  },
+  {
+   "rank": 47,
+   "id": "SLV",
+   "name": "iShares Silver Trust",
+   "score": 5,
+   "return_3m_pct": -29.8,
+   "return_6m_pct": -37.4,
+   "return_12m_pct": -5.4,
+   "trend": "down",
+   "held": false
+  },
+  {
+   "rank": 48,
+   "id": "URNM",
+   "name": "Sprott Uranium Miners ETF",
+   "score": 4,
+   "return_3m_pct": -27.0,
+   "return_6m_pct": -31.6,
+   "return_12m_pct": -25.8,
+   "trend": "down",
+   "held": false
+  },
+  {
+   "rank": 49,
+   "id": "REMX",
+   "name": "VanEck Rare Earth and Strategic Metals ETF",
+   "score": 0,
+   "return_3m_pct": -36.4,
+   "return_6m_pct": -49.7,
+   "return_12m_pct": -33.6,
+   "trend": "down",
+   "held": false
+  }
+ ],
+ "market": [
+  {
+   "id": "SPY",
+   "label_en": "US equity (S&P 500)",
+   "label_nl": "Amerikaanse aandelen (S&P 500)",
+   "week_pct": -2.36,
+   "return_3m_pct": 0.8,
+   "return_12m_pct": 16.6
+  },
+  {
+   "id": "QQQ",
+   "label_en": "US tech (Nasdaq 100)",
+   "label_nl": "Amerikaanse tech (Nasdaq 100)",
+   "week_pct": -2.94,
+   "return_3m_pct": -2.2,
+   "return_12m_pct": 16.6
+  },
+  {
+   "id": "IWM",
+   "label_en": "US small caps",
+   "label_nl": "Amerikaanse small caps",
+   "week_pct": -3.05,
+   "return_3m_pct": -4.9,
+   "return_12m_pct": 22.0
+  },
+  {
+   "id": "IEFA",
+   "label_en": "Developed markets ex-US",
+   "label_nl": "Ontwikkelde markten buiten de VS",
+   "week_pct": -2.63,
+   "return_3m_pct": -1.3,
+   "return_12m_pct": 13.8
+  },
+  {
+   "id": "EEM",
+   "label_en": "Emerging markets",
+   "label_nl": "Opkomende markten",
+   "week_pct": -5.21,
+   "return_3m_pct": -7.0,
+   "return_12m_pct": 12.9
+  },
+  {
+   "id": "AGG",
+   "label_en": "US bonds",
+   "label_nl": "Amerikaanse obligaties",
+   "week_pct": 1.27,
+   "return_3m_pct": 3.7,
+   "return_12m_pct": 0.6
+  },
+  {
+   "id": "TLT",
+   "label_en": "Long US Treasuries",
+   "label_nl": "Lange Amerikaanse staatsobligaties",
+   "week_pct": 0.72,
+   "return_3m_pct": 2.6,
+   "return_12m_pct": -5.0
+  },
+  {
+   "id": "GLD",
+   "label_en": "Gold",
+   "label_nl": "Goud",
+   "week_pct": -5.07,
+   "return_3m_pct": -12.4,
+   "return_12m_pct": -3.9
+  }
+ ],
+ "macro": {
+  "ecb_deposit_rate": {
+   "label_en": "ECB deposit rate",
+   "label_nl": "ECB-depositorente",
+   "unit": "%",
+   "source": "ecb",
+   "series": "FM/D.U2.EUR.4F.KR.DFR.LEV",
+   "date": "2026-11-18",
+   "value": 2.5,
+   "value_1m_ago": 2.5,
+   "value_1y_ago": 2.0,
+   "value_3m_ago": 2.25,
+   "stale": false,
+   "available": true
+  },
+  "fed_funds_effective": {
+   "label_en": "US federal funds rate (effective)",
+   "label_nl": "Amerikaanse federal funds-rente (effectief)",
+   "unit": "%",
+   "source": "nyfed",
+   "series": "effr",
+   "date": "2026-11-17",
+   "value": 3.88,
+   "value_1m_ago": 3.88,
+   "value_1y_ago": 3.88,
+   "value_3m_ago": 3.63,
+   "stale": false,
+   "available": true
+  },
+  "us_10y_yield": {
+   "label_en": "US 10-year Treasury yield",
+   "label_nl": "Rente 10-jaars Amerikaanse staatsobligaties",
+   "unit": "%",
+   "source": "treasury",
+   "series": "10 Yr",
+   "date": "2026-11-18",
+   "value": 5.07,
+   "value_1m_ago": 5.15,
+   "value_1y_ago": 4.12,
+   "value_3m_ago": 4.74,
+   "stale": false,
+   "available": true
+  },
+  "eurusd": {
+   "label_en": "EUR/USD",
+   "label_nl": "EUR/USD",
+   "unit": "",
+   "source": "ecb",
+   "series": "EXR/D.USD.EUR.SP00.A",
+   "date": "2026-11-18",
+   "value": 1.0968,
+   "value_1m_ago": 1.1225,
+   "value_1y_ago": 1.159,
+   "value_3m_ago": 1.1699,
+   "stale": false,
+   "available": true
+  },
+  "us_inflation": {
+   "label_en": "US inflation (CPI, y/y)",
+   "label_nl": "Inflatie VS (CPI, j/j)",
+   "unit": "%",
+   "source": "bls",
+   "series": "CUUR0000SA0",
+   "available": false,
+   "error": "ValueError: could not convert string to float: '-'"
+  }
+ },
+ "chart": [
+  {
+   "date": "2026-08-07",
+   "portfolio_index": 100.0,
+   "benchmark_index": 100.0,
+   "mirror_index": 100.0
+  },
+  {
+   "date": "2026-08-12",
+   "portfolio_index": 101.15,
+   "benchmark_index": 99.83,
+   "mirror_index": 100.89
+  },
+  {
+   "date": "2026-08-19",
+   "portfolio_index": 98.34,
+   "benchmark_index": 98.41,
+   "mirror_index": 97.98
+  },
+  {
+   "date": "2026-08-26",
+   "portfolio_index": 97.98,
+   "benchmark_index": 98.32,
+   "mirror_index": 97.6
+  },
+  {
+   "date": "2026-09-02",
+   "portfolio_index": 98.06,
+   "benchmark_index": 98.52,
+   "mirror_index": 97.41
+  },
+  {
+   "date": "2026-09-09",
+   "portfolio_index": 98.83,
+   "benchmark_index": 97.81,
+   "mirror_index": 98.63
+  },
+  {
+   "date": "2026-09-16",
+   "portfolio_index": 99.36,
+   "benchmark_index": 98.18,
+   "mirror_index": 99.0
+  },
+  {
+   "date": "2026-09-23",
+   "portfolio_index": 103.42,
+   "benchmark_index": 100.08,
+   "mirror_index": 103.19
+  },
+  {
+   "date": "2026-09-30",
+   "portfolio_index": 103.54,
+   "benchmark_index": 99.81,
+   "mirror_index": 103.49
+  },
+  {
+   "date": "2026-10-07",
+   "portfolio_index": 105.88,
+   "benchmark_index": 102.21,
+   "mirror_index": 105.72
+  },
+  {
+   "date": "2026-10-14",
+   "portfolio_index": 102.48,
+   "benchmark_index": 101.73,
+   "mirror_index": 103.02
+  },
+  {
+   "date": "2026-10-21",
+   "portfolio_index": 102.4,
+   "benchmark_index": 101.85,
+   "mirror_index": 101.44
+  },
+  {
+   "date": "2026-10-28",
+   "portfolio_index": 105.15,
+   "benchmark_index": 102.93,
+   "mirror_index": 104.07
+  },
+  {
+   "date": "2026-11-04",
+   "portfolio_index": 99.05,
+   "benchmark_index": 101.86,
+   "mirror_index": 97.77
+  },
+  {
+   "date": "2026-11-11",
+   "portfolio_index": 98.84,
+   "benchmark_index": 101.39,
+   "mirror_index": 99.76
+  },
+  {
+   "date": "2026-11-18",
+   "portfolio_index": 95.51,
+   "benchmark_index": 100.1,
+   "mirror_index": 95.3
+  }
+ ],
+ "rules": {
+  "satellites": {
+   "risk_on": 5,
+   "risk_off": 3
+  },
+  "satellite_weight_pct": 8.0,
+  "max_changes_per_week": 2,
+  "replacement_margin_pts": 25,
+  "cash_target_pct": 3.0,
+  "cost_bps": 10
+ },
+ "price_checks": {
+  "CIBR": "verified",
+  "GSG": "verified",
+  "IEFA": "verified",
+  "PAVE": "verified",
+  "SMH": "verified",
+  "URNM": "verified",
+  "XBI": "verified",
+  "XLU": "verified",
+  "XLV": "verified"
+ }
+}
